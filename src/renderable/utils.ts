@@ -117,6 +117,51 @@ export function formatBusinessValue(value: string | undefined): string {
 // Description Extraction
 // ═══════════════════════════════════════════════════════════════════════════
 
+/**
+ * Strip leading markdown headers from text to avoid duplicate headings.
+ *
+ * When directive descriptions start with a markdown header (e.g., "## Topic"),
+ * rendering under a "## Description" heading creates duplicate/nested headers.
+ * This function removes leading headers and empty lines to get the actual content.
+ *
+ * @param text - Text that may start with markdown headers
+ * @returns Text with leading headers and empty lines stripped
+ *
+ * @example
+ * ```typescript
+ * stripLeadingHeaders("## Topic\n\nActual content here")
+ * // Returns: "Actual content here"
+ *
+ * stripLeadingHeaders("Content without header")
+ * // Returns: "Content without header"
+ * ```
+ */
+export function stripLeadingHeaders(text: string): string {
+  if (!text) return text;
+
+  const lines = text.split("\n");
+  let startIndex = 0;
+
+  // Skip leading empty lines and markdown header lines (# to ######)
+  while (startIndex < lines.length) {
+    const line = lines[startIndex]?.trim() ?? "";
+    if (!line) {
+      // Skip empty lines
+      startIndex++;
+      continue;
+    }
+    // Check if line is a markdown header (starts with 1-6 # followed by space)
+    if (/^#{1,6}\s/.test(line)) {
+      startIndex++;
+      continue;
+    }
+    // Found non-empty, non-header line - stop here
+    break;
+  }
+
+  return lines.slice(startIndex).join("\n").trim();
+}
+
 /** Maximum length for summary text */
 const SUMMARY_MAX_LENGTH = 120;
 /** Truncation suffix */
@@ -201,7 +246,7 @@ export function extractSummary(description: string, patternName?: string): strin
   const firstCleaned = stripMarkdown(nonEmptyLines[0] ?? "");
 
   // Skip tautological first line (just the pattern name)
-  if (patternName && firstCleaned.toLowerCase().trim() === patternName.toLowerCase().trim()) {
+  if (firstCleaned.toLowerCase().trim() === patternName?.toLowerCase().trim()) {
     startIndex = 1;
   }
 
@@ -238,7 +283,7 @@ export function extractSummary(description: string, patternName?: string): strin
     const withinLimit = summary.slice(0, SUMMARY_MAX_LENGTH);
 
     // Try to find the last complete sentence within the limit
-    const lastSentenceMatch = withinLimit.match(/.*[.!?](?=\s|$)/);
+    const lastSentenceMatch = /.*[.!?](?=\s|$)/.exec(withinLimit);
     if (lastSentenceMatch && lastSentenceMatch[0].length > 20) {
       // Found a sentence boundary with reasonable length
       summary = lastSentenceMatch[0];

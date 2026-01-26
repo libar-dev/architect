@@ -29,6 +29,23 @@ export const GherkinDataTableSchema = z
   .strict();
 
 /**
+ * Schema for a DocString attached to a step
+ *
+ * DocStrings can have an optional mediaType that specifies the content language
+ * (e.g., "typescript", "json", "jsdoc") for proper syntax highlighting.
+ */
+export const GherkinDocStringSchema = z
+  .object({
+    /** The DocString content */
+    content: z.string(),
+    /** Optional media type / language hint (e.g., "typescript", "json", "jsdoc") */
+    mediaType: z.string().optional(),
+  })
+  .strict();
+
+export type GherkinDocString = z.infer<typeof GherkinDocStringSchema>;
+
+/**
  * Schema for a step within a Background or Scenario
  *
  * Uses flexible string for keyword to handle any Cucumber parser output.
@@ -41,8 +58,8 @@ export const GherkinStepSchema = z
     text: z.string(),
     /** Optional DataTable attached to this step */
     dataTable: GherkinDataTableSchema.optional(),
-    /** Optional DocString attached to this step */
-    docString: z.string().optional(),
+    /** Optional DocString attached to this step (with content and optional mediaType) */
+    docString: GherkinDocStringSchema.optional(),
   })
   .strict();
 
@@ -209,7 +226,7 @@ export const ParsedStepSchema = z.object({
   keyword: z.enum(["Given", "When", "Then", "And", "But"]),
   text: z.string().min(1),
   dataTable: z.array(z.record(z.string(), z.string())).optional(),
-  docString: z.string().optional(),
+  docString: GherkinDocStringSchema.optional(),
 });
 
 /**

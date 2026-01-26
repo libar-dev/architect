@@ -163,18 +163,32 @@ export function renderDataTable(dt: ScenarioDataTable): SectionBlock {
 /**
  * Render a DocString as a code block
  *
- * @param docString - The DocString content
- * @param language - Optional language hint (default: "markdown")
+ * Accepts either a plain string (legacy format) or an object with content and optional mediaType.
+ * When mediaType is provided in the object, it takes precedence over the language parameter.
+ *
+ * @param docString - The DocString content (string or object with content/mediaType)
+ * @param language - Optional language hint fallback (default: "markdown")
  * @returns A code SectionBlock
  *
  * @example
  * ```typescript
+ * // With plain string (legacy)
  * const codeBlock = renderDocString(step.docString, "json");
- * sections.push(codeBlock);
+ *
+ * // With object containing mediaType
+ * const codeBlock = renderDocString({ content: "code", mediaType: "typescript" });
  * ```
  */
-export function renderDocString(docString: string, language = "markdown"): SectionBlock {
-  return code(docString, language);
+export function renderDocString(
+  docString: string | { content: string; mediaType?: string | undefined },
+  language = "markdown"
+): SectionBlock {
+  if (typeof docString === "string") {
+    // Legacy string format
+    return code(docString, language);
+  }
+  // Object format with optional mediaType
+  return code(docString.content, docString.mediaType ?? language);
 }
 
 /**
@@ -566,11 +580,47 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
 
   // Clean up remaining content and restore backticks
   remaining = restore(remaining.trim());
+
+  // Strip markdown tables from remaining content (tables are extracted separately
+  // by extractTables() in business-rules.ts to avoid duplicate rendering)
+  remaining = stripMarkdownTables(remaining);
+
   if (remaining.length > 0) {
     result.remainingContent = remaining;
   }
 
   return result;
+}
+
+/**
+ * Strip markdown tables from text content.
+ *
+ * Tables are identified by lines starting and ending with | character.
+ * This removes header rows, separator rows, and data rows to prevent
+ * duplicate rendering when tables are extracted separately.
+ *
+ * @param text - Text that may contain markdown tables
+ * @returns Text with tables removed and excess newlines cleaned up
+ *
+ * @example
+ * ```typescript
+ * const text = "Intro\n| Col | Col |\n| --- | --- |\n| A | B |\nOutro";
+ * stripMarkdownTables(text); // "Intro\n\nOutro"
+ * ```
+ */
+export function stripMarkdownTables(text: string): string {
+  if (!text) return text;
+
+  return text
+    .split("\n")
+    .filter((line) => {
+      const trimmed = line.trim();
+      // Skip lines that are markdown table rows (start and end with |)
+      return !(trimmed.startsWith("|") && trimmed.endsWith("|"));
+    })
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n") // Clean up excess newlines
+    .trim();
 }
 
 /**
