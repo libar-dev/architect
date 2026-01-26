@@ -176,7 +176,10 @@ export function extractFirstSentence(description: string, maxLength = 120): stri
 }
 
 /**
- * Extract summary for pattern (first sentence, truncated)
+ * Extract summary for pattern (first complete sentence, truncated if needed)
+ *
+ * Combines multiple lines to find a complete sentence, respecting max length.
+ * If no sentence ending is found within the limit, truncates at word boundary with "..."
  */
 export function extractSummary(description: string, patternName?: string): string {
   if (!description) return "";
@@ -193,34 +196,62 @@ export function extractSummary(description: string, patternName?: string): strin
 
   if (nonEmptyLines.length === 0) return "";
 
-  let selectedLine = nonEmptyLines[0] ?? "";
-  const cleanedLine = stripMarkdown(selectedLine);
+  // Find starting index, skipping tautological first lines and section headers
+  let startIndex = 0;
+  const firstCleaned = stripMarkdown(nonEmptyLines[0] ?? "");
 
-  // Skip tautological first line
-  if (patternName && cleanedLine.toLowerCase().trim() === patternName.toLowerCase().trim()) {
-    selectedLine = nonEmptyLines[1] ?? "";
+  // Skip tautological first line (just the pattern name)
+  if (patternName && firstCleaned.toLowerCase().trim() === patternName.toLowerCase().trim()) {
+    startIndex = 1;
   }
-
-  let summary = stripMarkdown(selectedLine);
 
   // Skip section header labels like "Problem:", "Solution:", "Context:"
-  // These are structural markers, not content, and should not become the summary
-  const currentIndex = nonEmptyLines.indexOf(selectedLine);
-  if (/^[A-Za-z]+:$/.test(summary) && currentIndex < nonEmptyLines.length - 1) {
-    selectedLine = nonEmptyLines[currentIndex + 1] ?? "";
-    summary = stripMarkdown(selectedLine);
+  const startText = stripMarkdown(nonEmptyLines[startIndex] ?? "");
+  if (/^[A-Za-z]+:$/.test(startText) && startIndex < nonEmptyLines.length - 1) {
+    startIndex++;
   }
 
-  // Extract first sentence
+  // Combine lines until we find a sentence ending or exceed max length
+  let summary = "";
   const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
-  const sentenceMatch = sentenceEndPattern.exec(summary);
-  if (sentenceMatch) {
-    summary = summary.slice(0, sentenceMatch.index + 1);
+
+  for (let i = startIndex; i < nonEmptyLines.length && summary.length < SUMMARY_MAX_LENGTH; i++) {
+    const lineText = stripMarkdown(nonEmptyLines[i] ?? "");
+    if (!lineText) continue;
+
+    // Add space between combined lines
+    if (summary.length > 0) {
+      summary += " ";
+    }
+    summary += lineText;
+
+    // Check if we've found a complete sentence
+    const sentenceMatch = sentenceEndPattern.exec(summary);
+    if (sentenceMatch) {
+      summary = summary.slice(0, sentenceMatch.index + 1);
+      break;
+    }
   }
 
-  // Truncate if too long
+  // Truncate if too long, preferring sentence boundaries
   if (summary.length > SUMMARY_MAX_LENGTH) {
-    summary = summary.slice(0, SUMMARY_MAX_LENGTH - 3) + TRUNCATION_SUFFIX;
+    const withinLimit = summary.slice(0, SUMMARY_MAX_LENGTH);
+
+    // Try to find the last complete sentence within the limit
+    const lastSentenceMatch = withinLimit.match(/.*[.!?](?=\s|$)/);
+    if (lastSentenceMatch && lastSentenceMatch[0].length > 20) {
+      // Found a sentence boundary with reasonable length
+      summary = lastSentenceMatch[0];
+    } else {
+      // No sentence boundary found - truncate at word boundary
+      const truncateAt = SUMMARY_MAX_LENGTH - TRUNCATION_SUFFIX.length;
+      const lastSpace = withinLimit.lastIndexOf(" ", truncateAt);
+      summary =
+        withinLimit.slice(0, lastSpace > 0 ? lastSpace : truncateAt) + TRUNCATION_SUFFIX;
+    }
+  } else if (summary.length > 0 && !/[.!?]$/.test(summary)) {
+    // Text is under limit but doesn't end with sentence punctuation - add ellipsis
+    summary = summary + TRUNCATION_SUFFIX;
   }
 
   return summary.trim();
