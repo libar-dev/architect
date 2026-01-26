@@ -57,6 +57,30 @@ import {
 } from "./types/base.js";
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Path Normalization Helpers
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Known repository prefixes that should be stripped from implementation paths.
+ */
+const REPO_PREFIXES = ["libar-platform/", "monorepo/"];
+
+/**
+ * Normalize implementation file path by stripping repository prefixes.
+ *
+ * @param filePath - The implementation file path (may include repo prefix)
+ * @returns Path with repo prefix stripped if present
+ */
+function normalizeImplPath(filePath: string): string {
+  for (const prefix of REPO_PREFIXES) {
+    if (filePath.startsWith(prefix)) {
+      return filePath.slice(prefix.length);
+    }
+  }
+  return filePath;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Requirements Codec Options (co-located with codec)
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -556,8 +580,10 @@ function buildSingleRequirementDocument(
       list(
         rel.implementedBy.map((impl) => {
           const fileName = impl.file.split("/").pop() ?? impl.file;
+          // Normalize path to strip repo prefixes (e.g., "libar-platform/packages/..." -> "packages/...")
+          const normalizedPath = normalizeImplPath(impl.file);
           // Link is relative from output/requirements/ directory, go up two levels to project root
-          const link = `[\`${fileName}\`](../../${impl.file})`;
+          const link = `[\`${fileName}\`](../../${normalizedPath})`;
           return impl.description ? `${link} - ${impl.description}` : link;
         })
       )

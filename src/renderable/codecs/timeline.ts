@@ -1002,7 +1002,7 @@ function buildCurrentWorkDocument(
  */
 function buildCurrentWorkSummary(
   dataset: MasterDataset,
-  activePatterns: ExtractedPattern[]
+  _activePatterns: ExtractedPattern[]
 ): SectionBlock[] {
   // Count phases with active work
   const activePhasesCount = dataset.byPhase.filter((p) => p.counts.active > 0).length;

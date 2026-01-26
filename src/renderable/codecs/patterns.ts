@@ -51,9 +51,49 @@ import {
   completionPercentage,
   renderProgressBar,
   sortByStatusAndName,
+  stripLeadingHeaders,
 } from "../utils.js";
 import { toKebabCase } from "../../utils/index.js";
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Path Normalization Helpers
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Known repository prefixes that should be stripped from implementation paths.
+ * These prefixes appear when the baseDir used for extraction is a parent
+ * directory of the actual repo root.
+ */
+const REPO_PREFIXES = ["libar-platform/", "monorepo/"];
+
+/**
+ * Normalize implementation file path by stripping repository prefixes.
+ *
+ * When extraction uses a parent directory as baseDir, paths may include
+ * the repo directory name (e.g., "libar-platform/packages/..."). This
+ * function strips those prefixes to generate correct relative links.
+ *
+ * @param filePath - The implementation file path (may include repo prefix)
+ * @returns Path with repo prefix stripped if present
+ *
+ * @example
+ * ```typescript
+ * normalizeImplPath("libar-platform/packages/core/src/handler.ts")
+ * // Returns: "packages/core/src/handler.ts"
+ *
+ * normalizeImplPath("packages/core/src/handler.ts")
+ * // Returns: "packages/core/src/handler.ts" (unchanged)
+ * ```
+ */
+function normalizeImplPath(filePath: string): string {
+  for (const prefix of REPO_PREFIXES) {
+    if (filePath.startsWith(prefix)) {
+      return filePath.slice(prefix.length);
+    }
+  }
+  return filePath;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Patterns Codec Options (co-located with codec)
@@ -473,8 +513,13 @@ function buildSinglePatternDocument(
   sections.push(heading(2, "Overview"), table(["Property", "Value"], metaRows));
 
   // Description
+  // Description - strip leading headers to avoid duplicate headings when
+  // directive descriptions start with markdown headers like "## Topic"
   if (pattern.directive.description) {
-    sections.push(heading(2, "Description"), paragraph(pattern.directive.description));
+    const cleanDescription = stripLeadingHeaders(pattern.directive.description);
+    if (cleanDescription) {
+      sections.push(heading(2, "Description"), paragraph(cleanDescription));
+    }
   }
 
   // Use cases
@@ -507,9 +552,11 @@ function buildSinglePatternDocument(
         rel.implementedBy.map((impl) => {
           // Extract file name from path for display (e.g., "outbox.ts" from "packages/.../outbox.ts")
           const fileName = impl.file.split("/").pop() ?? impl.file;
+          // Normalize path to strip repo prefixes (e.g., "libar-platform/packages/..." -> "packages/...")
+          const normalizedPath = normalizeImplPath(impl.file);
           // ListItem accepts plain strings - build inline markdown link
           // Link is relative from output/patterns/ directory, go up two levels to project root
-          const link = `[\`${fileName}\`](../../${impl.file})`;
+          const link = `[\`${fileName}\`](../../${normalizedPath})`;
           return impl.description ? `${link} - ${impl.description}` : link;
         })
       )

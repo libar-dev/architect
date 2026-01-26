@@ -925,11 +925,13 @@ function buildRemainingPhaseNavigation(
     });
 
   // Add backlog row for patterns without a phase assignment
+  // Use pattern.id (always defined) instead of patternName (can be undefined)
+  // to avoid incorrect filtering when undefined values are added to the Set
   const patternsWithPhase = new Set(
-    dataset.byPhase.flatMap((p) => p.patterns.map((pat) => pat.patternName))
+    dataset.byPhase.flatMap((p) => p.patterns.map((pat) => pat.id))
   );
   const incomplete = [...dataset.byStatus.active, ...dataset.byStatus.planned];
-  const backlogPatterns = incomplete.filter((p) => !patternsWithPhase.has(p.patternName));
+  const backlogPatterns = incomplete.filter((p) => !patternsWithPhase.has(p.id));
 
   if (backlogPatterns.length > 0) {
     const backlogActive = backlogPatterns.filter(
