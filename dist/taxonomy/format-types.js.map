@@ -1,0 +1,1 @@
+{"version":3,"file":"format-types.js","sourceRoot":"","sources":["../../src/taxonomy/format-types.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AACH,MAAM,CAAC,MAAM,YAAY,GAAG;IAC1B,OAAO,EAAE,sBAAsB;IAC/B,MAAM,EAAE,mCAAmC;IAC3C,cAAc,EAAE,sCAAsC;IACtD,KAAK,EAAE,yBAAyB;IAChC,QAAQ,EAAE,gBAAgB;IAC1B,MAAM,EAAE,qCAAqC;CACrC,CAAC"}

@@ -1,0 +1,84 @@
+#!/usr/bin/env node
+/**
+ * @libar-docs
+ * @libar-docs-cli
+ * @libar-docs-pattern CLIErrorHandler
+ * @libar-docs-status completed
+ * @libar-docs-uses DocError
+ * @libar-docs-used-by LintPatternsCLI, ValidatePatternsCLI, DocumentationGeneratorCLI
+ *
+ * ## CLIErrorHandler - Unified CLI Error Handling Utilities
+ *
+ * Provides type-safe error handling for all CLI commands using the
+ * DocError discriminated union pattern. Ensures structured error
+ * context is preserved and formatted consistently.
+ *
+ * ### When to Use
+ *
+ * - In catch blocks of CLI main functions
+ * - When formatting DocError for console output
+ * - When checking if an unknown error is a DocError
+ */
+import type { DocError } from "../types/errors.js";
+/**
+ * Type guard to check if an unknown value is a DocError
+ *
+ * Uses the discriminated union `type` property to identify DocError instances.
+ * All DocError variants have a `type` string property that uniquely identifies them.
+ *
+ * @param error - Unknown error value to check
+ * @returns True if the error is a DocError with recognized type
+ *
+ * @example
+ * ```typescript
+ * try {
+ *   await scanPatterns(config);
+ * } catch (error) {
+ *   if (isDocError(error)) {
+ *     // TypeScript knows error is DocError here
+ *     console.log(error.type, error.message);
+ *   }
+ * }
+ * ```
+ */
+export declare function isDocError(error: unknown): error is DocError;
+/**
+ * Format a DocError for console output with structured context
+ *
+ * Extracts file paths, line numbers, and validation errors from the
+ * DocError structure and formats them for human-readable output.
+ *
+ * @param error - DocError to format
+ * @returns Formatted error string with context
+ *
+ * @example
+ * ```typescript
+ * const error = createFileParseError('/path/to/file.ts', 'Syntax error', { line: 42 });
+ * console.error(formatDocError(error));
+ * // Output: "FILE_PARSE_ERROR: Failed to parse /path/to/file.ts at line 42: Syntax error"
+ * ```
+ */
+export declare function formatDocError(error: DocError): string;
+/**
+ * Unified CLI error handler that formats and exits
+ *
+ * Handles both DocError instances and generic Error/unknown values.
+ * Outputs structured error information and exits with specified code.
+ *
+ * @param error - Error to handle (DocError, Error, or unknown)
+ * @param exitCode - Process exit code (default: 1)
+ * @returns Never - always calls process.exit
+ *
+ * @example
+ * ```typescript
+ * async function main(): Promise<void> {
+ *   try {
+ *     await doWork();
+ *   } catch (error) {
+ *     handleCliError(error, 1);
+ *   }
+ * }
+ * ```
+ */
+export declare function handleCliError(error: unknown, exitCode?: number): never;
+//# sourceMappingURL=error-handler.d.ts.map
