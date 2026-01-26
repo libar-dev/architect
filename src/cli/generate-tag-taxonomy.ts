@@ -21,7 +21,6 @@
 
 import * as fs from "fs/promises";
 import * as path from "path";
-import { fileURLToPath } from "url";
 import { loadConfig, formatConfigError } from "../config/config-loader.js";
 import { generateTagTaxonomy } from "../config/tag-taxonomy-generator.js";
 import { printVersionAndExit } from "./version.js";
@@ -189,15 +188,5 @@ async function main(): Promise<void> {
   }
 }
 
-// Entry point - only run when executed directly, not when imported
-// Using process.argv[1] check for ESM compatibility
-const __filename = fileURLToPath(import.meta.url);
-const arg1 = process.argv[1];
-const isDirectRun =
-  arg1 === __filename ||
-  arg1?.endsWith("/generate-tag-taxonomy") === true ||
-  arg1?.endsWith("\\generate-tag-taxonomy") === true;
-
-if (isDirectRun) {
-  void main();
-}
+// Entry point
+void main();

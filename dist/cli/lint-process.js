@@ -18,7 +18,6 @@
  * - CI/CD to validate all changes against main branch
  * - Development to check specific files
  */
-import { fileURLToPath } from "url";
 import { printVersionAndExit } from "./version.js";
 import { handleCliError } from "./error-handler.js";
 import { deriveProcessState, detectStagedChanges, detectBranchChanges, detectFileChanges, validateChanges, hasChanges, hasErrors, hasWarnings, summarizeResult, } from "../lint/process-guard/index.js";
@@ -290,13 +289,6 @@ async function main() {
         handleCliError(error, 1);
     }
 }
-// Entry point - only run when executed directly
-const __filename = fileURLToPath(import.meta.url);
-const arg1 = process.argv[1];
-const isDirectRun = arg1 === __filename ||
-    arg1?.endsWith("/lint-process") === true ||
-    arg1?.endsWith("\\lint-process") === true;
-if (isDirectRun) {
-    void main();
-}
+// Entry point
+void main();
 //# sourceMappingURL=lint-process.js.map

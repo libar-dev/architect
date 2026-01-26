@@ -20,7 +20,6 @@
  * - Development to check specific files
  */
 
-import { fileURLToPath } from "url";
 import { printVersionAndExit } from "./version.js";
 import { handleCliError } from "./error-handler.js";
 import {
@@ -344,14 +343,5 @@ async function main(): Promise<void> {
   }
 }
 
-// Entry point - only run when executed directly
-const __filename = fileURLToPath(import.meta.url);
-const arg1 = process.argv[1];
-const isDirectRun =
-  arg1 === __filename ||
-  arg1?.endsWith("/lint-process") === true ||
-  arg1?.endsWith("\\lint-process") === true;
-
-if (isDirectRun) {
-  void main();
-}
+// Entry point
+void main();

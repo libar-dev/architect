@@ -25,7 +25,6 @@
  * - Strict mode (`--strict`) for production readiness checks
  */
 
-import { fileURLToPath } from "url";
 import { printVersionAndExit } from "./version.js";
 import { handleCliError } from "./error-handler.js";
 import { scanPatterns } from "../scanner/index.js";
@@ -776,14 +775,5 @@ async function main(): Promise<void> {
   }
 }
 
-// Entry point - only run when executed directly
-const __filename = fileURLToPath(import.meta.url);
-const arg1 = process.argv[1];
-const isDirectRun =
-  arg1 === __filename ||
-  arg1?.endsWith("/validate-patterns") === true ||
-  arg1?.endsWith("\\validate-patterns") === true;
-
-if (isDirectRun) {
-  void main();
-}
+// Entry point
+void main();

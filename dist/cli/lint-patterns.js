@@ -17,7 +17,6 @@
  * - Use locally to check annotations before committing
  * - Use with `--strict` flag to treat warnings as errors
  */
-import { fileURLToPath } from "url";
 import { printVersionAndExit } from "./version.js";
 import { handleCliError } from "./error-handler.js";
 import { scanPatterns } from "../scanner/index.js";
@@ -260,14 +259,6 @@ async function main() {
         handleCliError(error, 1);
     }
 }
-// Entry point - only run when executed directly, not when imported
-// Using process.argv[1] check for ESM compatibility
-const __filename = fileURLToPath(import.meta.url);
-const arg1 = process.argv[1];
-const isDirectRun = arg1 === __filename ||
-    arg1?.endsWith("/lint-patterns") === true ||
-    arg1?.endsWith("\\lint-patterns") === true;
-if (isDirectRun) {
-    void main();
-}
+// Entry point
+void main();
 //# sourceMappingURL=lint-patterns.js.map
