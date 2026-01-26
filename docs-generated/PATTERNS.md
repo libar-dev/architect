@@ -389,13 +389,13 @@ graph TD
     CodecUtils --> Zod
     ArtefactSetSchema --> Zod
     ArtefactSetSchema --> WorkflowConfigSchema
-    UtilsModule --> StringUtilities
-    UtilsModule --> CollectionUtilities
     DoDValidator --> DoDValidationTypes
     DoDValidator --> GherkinTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
     AntiPatternDetector --> GherkinTypes
+    UtilsModule --> StringUtilities
+    UtilsModule --> CollectionUtilities
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -408,13 +408,6 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     GherkinExtractor --> GherkinTypes
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> DocExtractor
@@ -423,6 +416,28 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> TagRegistryLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    Documentation_Generator_CLI --> Tag_Registry_Loader
+    Documentation_Generator_CLI --> Artefact_Set_Loader
+    CLIErrorHandler --> DocError
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     TagRegistryLoader --> TagRegistrySchema
@@ -440,30 +455,15 @@ graph TD
     ArtefactSetLoader --> ArtefactSetSchema
     ArtefactSetLoader --> Result
     ArtefactSetLoader --> CodecUtils
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> TagRegistryLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    Documentation_Generator_CLI --> Tag_Registry_Loader
-    Documentation_Generator_CLI --> Artefact_Set_Loader
-    CLIErrorHandler --> DocError
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     PipelineModule --> TransformDataset
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
 ```
 
 ---

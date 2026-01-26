@@ -35,10 +35,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - **Public API**: Main entry point for the @libar-dev/delivery-process package.
-- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
-- **Validation Module**: Barrel export for validation module providing:
-- **DoD Validator**: Validates that completed phases meet Definition of Done criteria:
-- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and
 - **Workflow Config Schema**: Zod schemas for validating workflow configuration files that define
 - **Tag Registry Configuration**: Defines the structure and validation for external tag taxonomy configuration.
 - **Output Schemas**: Zod schemas for JSON output formats used by CLI tools.
@@ -49,6 +45,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Doc Directive Schema**: Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
 - **Codec Utils**: Provides factory functions for creating type-safe JSON parsing and serialization
 - **Artefact Set Schema**: Defines the schema for artefact sets - predefined groupings of generators
+- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
+- **Validation Module**: Barrel export for validation module providing:
+- **DoD Validator**: Validates that completed phases meet Definition of Done criteria:
+- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and
 - **String Utilities**: Provides shared utilities for string manipulation used across the delivery-process package,
 - **Utils Module**: Common helper functions used across the delivery-process package.
 - **Pattern Id Generator**: Generates unique, deterministic pattern IDs based on file path and line number.
@@ -68,10 +68,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
 - **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline:
 - **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the
-- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component)
-- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects
-- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
-- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with
 - **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
 - **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
 - **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
@@ -87,6 +83,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Configuration Defaults**: Centralized default constants for the delivery-process package.
 - **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 - **Artefact Set Loader**: Loads and validates artefact set configurations from the catalogue directory.
+- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component)
+- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects
+- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
+- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with
 - **Timeline Codec**: Transforms MasterDataset into RenderableDocuments for timeline outputs:
 - **Shared Codec Schema**: Provides a simplified RenderableDocument output schema for use with
 - **Session Codec**: Transforms MasterDataset into RenderableDocuments for session/planning outputs:

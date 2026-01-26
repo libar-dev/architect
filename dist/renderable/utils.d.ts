@@ -57,7 +57,10 @@ export declare function extractFirstParagraph(description: string, maxLength?: n
  */
 export declare function extractFirstSentence(description: string, maxLength?: number): string;
 /**
- * Extract summary for pattern (first sentence, truncated)
+ * Extract summary for pattern (first complete sentence, truncated if needed)
+ *
+ * Combines multiple lines to find a complete sentence, respecting max length.
+ * If no sentence ending is found within the limit, truncates at word boundary with "..."
  */
 export declare function extractSummary(description: string, patternName?: string): string;
 /**

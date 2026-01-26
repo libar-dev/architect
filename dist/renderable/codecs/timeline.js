@@ -674,10 +674,11 @@ function buildCurrentWorkSummary(dataset, activePatterns) {
         heading(2, "Summary"),
         paragraph(`**Overall Progress:** ${progressBar} (${progress}%)`),
         table(["Metric", "Value"], [
-            ["Active Patterns", String(activePatterns.length)],
-            ["Active Phases", String(activePhasesCount)],
+            ["Total Patterns", String(counts.total)],
             ["Completed", String(counts.completed)],
-            ["Remaining (Planned)", String(counts.planned)],
+            ["Active", String(counts.active)],
+            ["Planned", String(counts.planned)],
+            ["Active Phases", String(activePhasesCount)],
         ]),
         separator(),
     ];
@@ -703,7 +704,12 @@ function buildActivePhases(dataset, options) {
         const progress = completionPercentage(counts);
         const progressBar = renderProgressBar(counts.completed, counts.total, 15);
         sections.push(heading(3, `🚧 ${displayName}`));
-        sections.push(paragraph(`${progressBar} ${progress}% complete (${activeInPhase.length} active, ${counts.completed} done)`));
+        // Build status breakdown with all non-zero categories
+        const statusParts = [`${counts.completed} done`, `${activeInPhase.length} active`];
+        if (counts.planned > 0)
+            statusParts.push(`${counts.planned} planned`);
+        const statusText = statusParts.join(", ");
+        sections.push(paragraph(`${progressBar} ${progress}% complete (${statusText})`));
         // Pattern table for active patterns in this phase
         const rows = sortByPhaseAndName([...activeInPhase]).map((p) => {
             const name = getDisplayName(p);
