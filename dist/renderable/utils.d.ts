@@ -45,6 +45,26 @@ export declare function formatCategoryName(category: string): string;
  */
 export declare function formatBusinessValue(value: string | undefined): string;
 /**
+ * Strip leading markdown headers from text to avoid duplicate headings.
+ *
+ * When directive descriptions start with a markdown header (e.g., "## Topic"),
+ * rendering under a "## Description" heading creates duplicate/nested headers.
+ * This function removes leading headers and empty lines to get the actual content.
+ *
+ * @param text - Text that may start with markdown headers
+ * @returns Text with leading headers and empty lines stripped
+ *
+ * @example
+ * ```typescript
+ * stripLeadingHeaders("## Topic\n\nActual content here")
+ * // Returns: "Actual content here"
+ *
+ * stripLeadingHeaders("Content without header")
+ * // Returns: "Content without header"
+ * ```
+ */
+export declare function stripLeadingHeaders(text: string): string;
+/**
  * Strip markdown formatting from text
  */
 export declare function stripMarkdown(text: string): string;

@@ -137,7 +137,12 @@ function extractSteps(steps) {
             keyword: step.keyword.trim(),
             text: step.text,
             ...(step.dataTable && { dataTable: extractDataTable(step.dataTable) }),
-            ...(step.docString && { docString: step.docString.content }),
+            ...(step.docString && {
+                docString: {
+                    content: step.docString.content,
+                    ...(step.docString.mediaType && { mediaType: step.docString.mediaType }),
+                },
+            }),
         };
         return gherkinStep;
     });

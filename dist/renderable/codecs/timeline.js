@@ -663,7 +663,7 @@ function buildCurrentWorkDocument(dataset, options) {
 /**
  * Build current work summary section
  */
-function buildCurrentWorkSummary(dataset, activePatterns) {
+function buildCurrentWorkSummary(dataset, _activePatterns) {
     // Count phases with active work
     const activePhasesCount = dataset.byPhase.filter((p) => p.counts.active > 0).length;
     // Calculate overall progress (from total dataset)

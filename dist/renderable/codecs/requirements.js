@@ -25,6 +25,27 @@ import { normalizeStatus } from "../../taxonomy/index.js";
 import { getStatusEmoji, getDisplayName, computeStatusCounts, completionPercentage, renderProgressBar, groupBy, sortByStatusAndName, formatBusinessValue, } from "../utils.js";
 import { toKebabCase } from "../../utils/index.js";
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from "./types/base.js";
+// ═══════════════════════════════════════════════════════════════════════════
+// Path Normalization Helpers
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Known repository prefixes that should be stripped from implementation paths.
+ */
+const REPO_PREFIXES = ["libar-platform/", "monorepo/"];
+/**
+ * Normalize implementation file path by stripping repository prefixes.
+ *
+ * @param filePath - The implementation file path (may include repo prefix)
+ * @returns Path with repo prefix stripped if present
+ */
+function normalizeImplPath(filePath) {
+    for (const prefix of REPO_PREFIXES) {
+        if (filePath.startsWith(prefix)) {
+            return filePath.slice(prefix.length);
+        }
+    }
+    return filePath;
+}
 /**
  * Default options for RequirementsDocumentCodec
  */
@@ -369,8 +390,10 @@ function buildSingleRequirementDocument(pattern, options, dataset) {
         sections.push(heading(2, "Implementations"));
         sections.push(paragraph("Files that implement this pattern:"), list(rel.implementedBy.map((impl) => {
             const fileName = impl.file.split("/").pop() ?? impl.file;
+            // Normalize path to strip repo prefixes (e.g., "libar-platform/packages/..." -> "packages/...")
+            const normalizedPath = normalizeImplPath(impl.file);
             // Link is relative from output/requirements/ directory, go up two levels to project root
-            const link = `[\`${fileName}\`](../../${impl.file})`;
+            const link = `[\`${fileName}\`](../../${normalizedPath})`;
             return impl.description ? `${link} - ${impl.description}` : link;
         })));
     }

@@ -168,7 +168,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                     rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                 }, z.core.$strict>>;
-                docString: z.ZodOptional<z.ZodString>;
+                docString: z.ZodOptional<z.ZodObject<{
+                    content: z.ZodString;
+                    mediaType: z.ZodOptional<z.ZodString>;
+                }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
@@ -382,7 +385,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -559,7 +565,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -736,7 +745,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -917,7 +929,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -1101,7 +1116,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                     rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                 }, z.core.$strict>>;
-                docString: z.ZodOptional<z.ZodString>;
+                docString: z.ZodOptional<z.ZodObject<{
+                    content: z.ZodString;
+                    mediaType: z.ZodOptional<z.ZodString>;
+                }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
@@ -1278,7 +1296,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                     rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                 }, z.core.$strict>>;
-                docString: z.ZodOptional<z.ZodString>;
+                docString: z.ZodOptional<z.ZodObject<{
+                    content: z.ZodString;
+                    mediaType: z.ZodOptional<z.ZodString>;
+                }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
@@ -1456,7 +1477,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -1633,7 +1657,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -1810,7 +1837,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -1987,7 +2017,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -2190,7 +2223,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -2367,7 +2403,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -2544,7 +2583,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
@@ -2721,7 +2763,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
                         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
                     }, z.core.$strict>>;
-                    docString: z.ZodOptional<z.ZodString>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";

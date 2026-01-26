@@ -627,9 +627,11 @@ function buildRemainingPhaseNavigation(dataset, options) {
         return [nameCell, String(remaining), String(counts.active), `${progress}%`];
     });
     // Add backlog row for patterns without a phase assignment
-    const patternsWithPhase = new Set(dataset.byPhase.flatMap((p) => p.patterns.map((pat) => pat.patternName)));
+    // Use pattern.id (always defined) instead of patternName (can be undefined)
+    // to avoid incorrect filtering when undefined values are added to the Set
+    const patternsWithPhase = new Set(dataset.byPhase.flatMap((p) => p.patterns.map((pat) => pat.id)));
     const incomplete = [...dataset.byStatus.active, ...dataset.byStatus.planned];
-    const backlogPatterns = incomplete.filter((p) => !patternsWithPhase.has(p.patternName));
+    const backlogPatterns = incomplete.filter((p) => !patternsWithPhase.has(p.id));
     if (backlogPatterns.length > 0) {
         const backlogActive = backlogPatterns.filter((p) => normalizeStatus(p.status) === "active").length;
         const statusEmoji = backlogActive > 0 ? "🚧" : "📋";

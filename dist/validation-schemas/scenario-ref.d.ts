@@ -8,6 +8,17 @@ export declare const ScenarioDataTableSchema: z.ZodObject<{
 }, z.core.$strict>;
 export type ScenarioDataTable = z.infer<typeof ScenarioDataTableSchema>;
 /**
+ * Schema for a DocString attached to a step
+ *
+ * DocStrings can have an optional mediaType that specifies the content language
+ * (e.g., "typescript", "json", "jsdoc") for proper syntax highlighting.
+ */
+export declare const ScenarioDocStringSchema: z.ZodObject<{
+    content: z.ZodString;
+    mediaType: z.ZodOptional<z.ZodString>;
+}, z.core.$strict>;
+export type ScenarioDocString = z.infer<typeof ScenarioDocStringSchema>;
+/**
  * Schema for scenario steps with optional DataTable/DocString
  *
  * Mirrors GherkinStep type but with Zod validation.
@@ -19,7 +30,10 @@ export declare const ScenarioStepSchema: z.ZodObject<{
         headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
     }, z.core.$strict>>;
-    docString: z.ZodOptional<z.ZodString>;
+    docString: z.ZodOptional<z.ZodObject<{
+        content: z.ZodString;
+        mediaType: z.ZodOptional<z.ZodString>;
+    }, z.core.$strict>>;
 }, z.core.$strict>;
 export type ScenarioStep = z.infer<typeof ScenarioStepSchema>;
 /**
@@ -42,15 +56,18 @@ export declare const ScenarioRefSchema: z.ZodObject<{
             headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
         }, z.core.$strict>>;
-        docString: z.ZodOptional<z.ZodString>;
+        docString: z.ZodOptional<z.ZodObject<{
+            content: z.ZodString;
+            mediaType: z.ZodOptional<z.ZodString>;
+        }, z.core.$strict>>;
     }, z.core.$strict>>>>;
     layer: z.ZodOptional<z.ZodEnum<{
+        unknown: "unknown";
         timeline: "timeline";
         domain: "domain";
         integration: "integration";
         e2e: "e2e";
         component: "component";
-        unknown: "unknown";
     }>>;
     line: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strict>;

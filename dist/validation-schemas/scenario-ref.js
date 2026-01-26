@@ -12,6 +12,20 @@ export const ScenarioDataTableSchema = z
 })
     .strict();
 /**
+ * Schema for a DocString attached to a step
+ *
+ * DocStrings can have an optional mediaType that specifies the content language
+ * (e.g., "typescript", "json", "jsdoc") for proper syntax highlighting.
+ */
+export const ScenarioDocStringSchema = z
+    .object({
+    /** The DocString content */
+    content: z.string(),
+    /** Optional media type / language hint (e.g., "typescript", "json", "jsdoc") */
+    mediaType: z.string().optional(),
+})
+    .strict();
+/**
  * Schema for scenario steps with optional DataTable/DocString
  *
  * Mirrors GherkinStep type but with Zod validation.
@@ -24,8 +38,8 @@ export const ScenarioStepSchema = z
     text: z.string(),
     /** Optional DataTable attached to this step */
     dataTable: ScenarioDataTableSchema.optional(),
-    /** Optional DocString attached to this step */
-    docString: z.string().optional(),
+    /** Optional DocString attached to this step (with content and optional mediaType) */
+    docString: ScenarioDocStringSchema.optional(),
 })
     .strict();
 /**
