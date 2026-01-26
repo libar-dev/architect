@@ -1,0 +1,86 @@
+@libar-docs-pattern:PhaseStateMachineValidation
+@libar-docs-status:completed
+@libar-docs-phase:100
+@libar-docs-effort:4h
+@libar-docs-product-area:DeliveryProcess
+@libar-docs-business-value:ensure-state-machine-rules-are-enforced-programmatically
+@libar-docs-priority:high
+Feature: Phase State Machine Validation
+
+  **Problem:**
+  Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.
+  Invalid transitions can occur silently, leading to inconsistent process state.
+
+  **Solution:**
+  Implement state machine validation that:
+  - Validates all status transitions
+  - Enforces required metadata for terminal states
+  - Provides clear error messages for invalid transitions
+  - Integrates with generators and linters
+
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable | Status | Tests | Location |
+      | FSM states and protection levels | ✅ | 123 | @libar-dev/delivery-process/src/validation/fsm/states.ts |
+      | FSM transition matrix and validator | ✅ | 123 | @libar-dev/delivery-process/src/validation/fsm/transitions.ts |
+      | Pure validation functions | ✅ | 123 | @libar-dev/delivery-process/src/validation/fsm/validator.ts |
+      | Status validation lint rule | ✅ | 2190 | @libar-dev/delivery-process/src/lint/rules.ts |
+      | ProcessStateAPI for programmatic queries | ✅ | 95 | @libar-dev/delivery-process/src/api/process-state.ts |
+
+  Rule: Valid status values are enforced
+
+    @acceptance-criteria
+    Scenario: Only valid status values are accepted
+      Given a feature file with status tag
+      When the status value is "roadmap", "active", "completed", or "deferred"
+      Then validation passes
+
+    @acceptance-criteria
+    Scenario: Invalid status values are rejected
+      Given a feature file with status tag
+      When the status value is "done" or "in-progress"
+      Then validation fails with "Invalid status: must be roadmap, active, completed, or deferred"
+
+  Rule: Status transitions follow state machine rules
+
+    @acceptance-criteria
+    Scenario Outline: Valid transitions are allowed
+      Given a phase with current status "<from>"
+      When transitioning to status "<to>"
+      Then the transition is valid
+
+      Examples:
+        | from     | to        |
+        | roadmap  | active    |
+        | roadmap  | deferred  |
+        | roadmap  | roadmap   |
+        | active   | completed |
+        | active   | roadmap   |
+        | deferred | roadmap   |
+
+    @acceptance-criteria
+    Scenario Outline: Invalid transitions are rejected
+      Given a phase with current status "<from>"
+      When transitioning to status "<to>"
+      Then the transition is rejected
+      And error message indicates valid transitions from "<from>"
+
+      Examples:
+        | from      | to       |
+        | completed | active   |
+        | completed | roadmap  |
+        | roadmap   | completed|
+
+  Rule: Terminal states require completion metadata
+
+    @acceptance-criteria
+    Scenario: Completed status requires completion date
+      Given a phase transitioning to "completed" status
+      When the @libar-docs-completed tag is missing
+      Then validation warns "Completed phases should have @libar-docs-completed date"
+
+    @acceptance-criteria
+    Scenario: Completed phases should have effort-actual
+      Given a phase transitioning to "completed" status
+      When the @libar-docs-effort-actual tag is missing
+      Then validation warns "Completed phases should have @libar-docs-effort-actual for variance tracking"

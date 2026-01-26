@@ -1,0 +1,97 @@
+Feature: PRD Implementation Section
+
+  Tests the Implementations section rendering in pattern documents.
+  Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
+  with working links to the source files.
+
+  Background: Pattern generator test context
+    Given a pattern generator test context
+
+  # ===========================================================================
+  # Rule 1: Implementation files appear in pattern docs
+  # ===========================================================================
+
+  Rule: Implementation files appear in pattern docs via @libar-docs-implements
+
+    Scenario: Implementations section renders with file links
+      Given a pattern "EventStoreDurability" defined with:
+        | Field | Value |
+        | status | roadmap |
+        | category | event-sourcing |
+      And a TypeScript file "durability/outbox.ts" that implements "EventStoreDurability" with:
+        | Field | Value |
+        | name | OutboxPattern |
+        | description | Action results captured via onComplete mutation |
+      When generating the pattern document for "EventStoreDurability"
+      Then the document contains heading "Implementations"
+      And the document contains file link to "durability/outbox.ts"
+      And the document contains implementation description "Action results captured"
+
+    Scenario: Implementation includes description when available
+      Given a pattern "TestPattern" defined with:
+        | Field | Value |
+        | status | active |
+        | category | core |
+      And a TypeScript file "impl/test-impl.ts" that implements "TestPattern" with:
+        | Field | Value |
+        | name | TestImpl |
+        | description | This implementation provides core functionality |
+      When generating the pattern document for "TestPattern"
+      Then the document contains implementation description "This implementation provides core functionality"
+
+  # ===========================================================================
+  # Rule 2: Multiple implementations are listed alphabetically
+  # ===========================================================================
+
+  Rule: Multiple implementations are listed alphabetically
+
+    Scenario: Multiple implementations sorted by file path
+      Given a pattern "MultiImplPattern" defined with:
+        | Field | Value |
+        | status | active |
+        | category | core |
+      And TypeScript files that implement "MultiImplPattern":
+        | File | Name |
+        | durability/outbox.ts | OutboxPattern |
+        | durability/publication.ts | PublicationPattern |
+        | durability/idempotentAppend.ts | IdempotentAppend |
+      When generating the pattern document for "MultiImplPattern"
+      Then implementations appear in file path order:
+        | File |
+        | durability/idempotentAppend.ts |
+        | durability/outbox.ts |
+        | durability/publication.ts |
+
+  # ===========================================================================
+  # Rule 3: Patterns without implementations omit the section
+  # ===========================================================================
+
+  Rule: Patterns without implementations omit the section
+
+    Scenario: No implementations section when none exist
+      Given a pattern "NoImplPattern" defined with:
+        | Field | Value |
+        | status | roadmap |
+        | category | core |
+      And no TypeScript files implement "NoImplPattern"
+      When generating the pattern document for "NoImplPattern"
+      Then the document does not contain heading "Implementations"
+
+  # ===========================================================================
+  # Rule 4: Implementation references use correct link format
+  # ===========================================================================
+
+  Rule: Implementation references use relative file links
+
+    Scenario: Links are relative from patterns directory
+      Given a pattern "LinkTestPattern" defined with:
+        | Field | Value |
+        | status | active |
+        | category | infra |
+      And a TypeScript file "packages/@libar-dev/platform-core/src/durability/outbox.ts" that implements "LinkTestPattern" with:
+        | Field | Value |
+        | name | Outbox |
+        | description | Outbox implementation |
+      When generating the pattern document for "LinkTestPattern"
+      Then the implementation link path starts with "../"
+      And the implementation link path contains "outbox.ts"

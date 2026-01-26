@@ -1,0 +1,146 @@
+/**
+ * @libar-docs
+ * @libar-docs-validation
+ * @libar-docs-pattern FSMTransitions
+ * @libar-docs-status active
+ * @libar-docs-depends-on:PDR005MvpWorkflow
+ *
+ * ## FSM Transitions - Valid State Transition Matrix
+ *
+ * Defines valid transitions between FSM states per PDR-005:
+ *
+ * ```
+ * roadmap ──→ active ──→ completed
+ *    │          │
+ *    │          ↓
+ *    │       roadmap (blocked/regressed)
+ *    │
+ *    ↓
+ * deferred ──→ roadmap
+ * ```
+ *
+ * ### When to Use
+ *
+ * - Use `isValidTransition()` to validate proposed status changes
+ * - Use `getValidTransitionsFrom()` to show available options
+ */
+
+import type { ProcessStatusValue } from "../../taxonomy/index.js";
+import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
+
+/**
+ * Default tag prefix for error messages when no registry is provided.
+ */
+const DEFAULT_TAG_PREFIX = "@libar-docs-";
+
+/**
+ * Options for transition functions that generate messages
+ */
+export interface TransitionMessageOptions {
+  /** Tag registry for prefix-aware error messages (optional) */
+  readonly registry?: TagRegistry;
+}
+
+/**
+ * Valid FSM transitions matrix
+ *
+ * Maps each state to the list of states it can transition to.
+ *
+ * | From      | Valid Targets              | Notes                        |
+ * |-----------|----------------------------|------------------------------|
+ * | roadmap   | active, deferred, roadmap  | Can start, park, or stay     |
+ * | active    | completed, roadmap         | Can finish or regress        |
+ * | completed | (none)                     | Terminal state               |
+ * | deferred  | roadmap                    | Must go through roadmap      |
+ */
+export const VALID_TRANSITIONS: Readonly<
+  Record<ProcessStatusValue, readonly ProcessStatusValue[]>
+> = {
+  roadmap: ["active", "deferred", "roadmap"], // Can start work, park, or stay in planning
+  active: ["completed", "roadmap"], // Can finish or regress if blocked
+  completed: [], // Terminal state - no transitions allowed
+  deferred: ["roadmap"], // Must reactivate through roadmap first
+} as const;
+
+/**
+ * Check if a transition between two states is valid
+ *
+ * @param from - Current status
+ * @param to - Target status
+ * @returns true if the transition is allowed
+ *
+ * @example
+ * ```typescript
+ * isValidTransition("roadmap", "active"); // → true
+ * isValidTransition("roadmap", "completed"); // → false (must go through active)
+ * isValidTransition("completed", "active"); // → false (terminal state)
+ * ```
+ */
+export function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean {
+  const validTargets = VALID_TRANSITIONS[from];
+  return validTargets.includes(to);
+}
+
+/**
+ * Get all valid transitions from a given state
+ *
+ * @param status - Current status
+ * @returns Array of valid target states (empty for terminal states)
+ *
+ * @example
+ * ```typescript
+ * getValidTransitionsFrom("roadmap"); // → ["active", "deferred", "roadmap"]
+ * getValidTransitionsFrom("completed"); // → []
+ * ```
+ */
+export function getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[] {
+  return VALID_TRANSITIONS[status];
+}
+
+/**
+ * Get a human-readable description of why a transition is invalid
+ *
+ * @param from - Current status
+ * @param to - Attempted target status
+ * @param options - Optional message options with registry for prefix
+ * @returns Error message describing the violation
+ *
+ * @example
+ * ```typescript
+ * getTransitionErrorMessage("roadmap", "completed");
+ * // → "Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first."
+ *
+ * getTransitionErrorMessage("completed", "active");
+ * // → "Cannot transition from 'completed' (terminal state). Use unlock-reason tag to modify."
+ * ```
+ */
+export function getTransitionErrorMessage(
+  from: ProcessStatusValue,
+  to: ProcessStatusValue,
+  options?: TransitionMessageOptions
+): string {
+  const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
+
+  // Handle terminal state
+  if (from === "completed") {
+    return `Cannot transition from 'completed' (terminal state). Use ${tagPrefix}unlock-reason to modify.`;
+  }
+
+  // Handle skipping active (roadmap → completed)
+  if (from === "roadmap" && to === "completed") {
+    return `Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first.`;
+  }
+
+  // Handle deferred shortcuts
+  if (from === "deferred" && (to === "active" || to === "completed")) {
+    return `Cannot transition from 'deferred' to '${to}'. Must reactivate to 'roadmap' first.`;
+  }
+
+  // Generic message
+  const validTargets = VALID_TRANSITIONS[from];
+  if (validTargets.length === 0) {
+    return `Cannot transition from '${from}' (terminal state).`;
+  }
+
+  return `Invalid transition from '${from}' to '${to}'. Valid targets: ${validTargets.join(", ")}.`;
+}

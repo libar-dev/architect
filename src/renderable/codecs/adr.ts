@@ -1,0 +1,724 @@
+/**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern AdrDocumentCodec
+ * @libar-docs-status completed
+ *
+ * ## ADR Document Codec
+ *
+ * Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+ * Extracts ADRs from patterns with `@libar-docs-adr` tags.
+ *
+ * ### Factory Pattern
+ *
+ * Use `createAdrCodec(options)` for custom options:
+ * ```typescript
+ * const codec = createAdrCodec({
+ *   groupBy: 'phase',
+ *   includeContext: true,
+ *   includeDecision: true,
+ *   includeConsequences: false,
+ * });
+ * const doc = codec.decode(dataset);
+ * ```
+ *
+ * ### ADR Content
+ *
+ * ADR content is parsed from feature file descriptions:
+ * - **Context**: Problem background and constraints
+ * - **Decision**: The chosen solution
+ * - **Consequences**: Positive and negative outcomes
+ */
+
+import { z } from "zod";
+import {
+  MasterDatasetSchema,
+  type MasterDataset,
+} from "../../validation-schemas/master-dataset.js";
+import type { ExtractedPattern, BusinessRule } from "../../validation-schemas/index.js";
+import {
+  type RenderableDocument,
+  type SectionBlock,
+  heading,
+  paragraph,
+  separator,
+  table,
+  collapsible,
+  linkOut,
+  document,
+} from "../schema.js";
+import { getDisplayName, groupBy } from "../utils.js";
+import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ADR Codec Options (co-located with codec)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Options for AdrDocumentCodec
+ */
+export interface AdrCodecOptions extends BaseCodecOptions {
+  /** Group ADRs by (default: "category") */
+  groupBy?: "category" | "phase" | "date";
+
+  /** Include context section (default: true) */
+  includeContext?: boolean;
+
+  /** Include decision section (default: true) */
+  includeDecision?: boolean;
+
+  /** Include consequences section (default: true) */
+  includeConsequences?: boolean;
+}
+
+/**
+ * Default options for AdrDocumentCodec
+ */
+export const DEFAULT_ADR_OPTIONS: Required<AdrCodecOptions> = {
+  ...DEFAULT_BASE_OPTIONS,
+  groupBy: "category",
+  includeContext: true,
+  includeDecision: true,
+  includeConsequences: true,
+};
+import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ADR Document Codec
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Create an AdrDocumentCodec with custom options.
+ *
+ * @param options - Codec configuration options
+ * @returns Configured Zod codec
+ *
+ * @example
+ * ```typescript
+ * // Group by phase instead of category
+ * const codec = createAdrCodec({ groupBy: 'phase' });
+ *
+ * // Hide consequences section
+ * const codec = createAdrCodec({ includeConsequences: false });
+ *
+ * // Inline all categories (no progressive disclosure)
+ * const codec = createAdrCodec({ generateDetailFiles: false });
+ * ```
+ */
+export function createAdrCodec(
+  options?: AdrCodecOptions
+): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+  const opts = mergeOptions(DEFAULT_ADR_OPTIONS, options);
+
+  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
+    decode: (dataset: MasterDataset): RenderableDocument => {
+      return buildAdrDocument(dataset, opts);
+    },
+    /** @throws Always - this codec is decode-only. See zod-codecs.md */
+    encode: (): never => {
+      throw new Error("AdrDocumentCodec is decode-only. See zod-codecs.md");
+    },
+  });
+}
+
+/**
+ * Default ADR Document Codec
+ *
+ * Transforms MasterDataset → RenderableDocument for architecture decisions.
+ * Groups ADRs by category with progressive disclosure.
+ */
+export const AdrDocumentCodec = createAdrCodec();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Document Builder
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Build ADR document
+ */
+function buildAdrDocument(
+  dataset: MasterDataset,
+  options: Required<AdrCodecOptions>
+): RenderableDocument {
+  const sections: SectionBlock[] = [];
+
+  // Filter to patterns with ADR metadata
+  const adrPatterns = dataset.patterns.filter((p) => p.adr !== undefined);
+
+  if (adrPatterns.length === 0) {
+    sections.push(
+      heading(2, "No Architecture Decisions"),
+      paragraph("No patterns have @libar-docs-adr tags.")
+    );
+
+    return document("Architecture Decision Records", sections, {
+      purpose: "Architectural decisions extracted from feature files",
+    });
+  }
+
+  // 1. Summary
+  sections.push(...buildAdrSummary(adrPatterns));
+
+  // 2. ADRs by grouping
+  if (options.groupBy === "phase") {
+    sections.push(...buildAdrsByPhase(adrPatterns, options));
+  } else if (options.groupBy === "date") {
+    sections.push(...buildAdrsByDate(adrPatterns, options));
+  } else {
+    // Default: category
+    sections.push(...buildAdrsByCategory(adrPatterns, options));
+  }
+
+  // 3. ADR index table
+  sections.push(...buildAdrIndexTable(adrPatterns, options));
+
+  // Build category detail files (if enabled and threshold met)
+  const additionalFiles = options.generateDetailFiles
+    ? buildAdrDetailFiles(adrPatterns, options)
+    : {};
+
+  const docOpts: {
+    purpose: string;
+    detailLevel: string;
+    additionalFiles?: Record<string, RenderableDocument>;
+  } = {
+    purpose: "Architectural decisions extracted from feature files",
+    detailLevel: options.generateDetailFiles
+      ? "Summary with links to category details"
+      : "Compact summary",
+  };
+
+  if (Object.keys(additionalFiles).length > 0) {
+    docOpts.additionalFiles = additionalFiles;
+  }
+
+  return document("Architecture Decision Records", sections, docOpts);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Section Builders
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Build ADR summary section
+ */
+function buildAdrSummary(patterns: ExtractedPattern[]): SectionBlock[] {
+  // Count by status
+  const byStatus = groupBy(
+    patterns.filter((p) => p.adrStatus),
+    (p) => p.adrStatus ?? "proposed"
+  );
+
+  const accepted = byStatus.get("accepted")?.length ?? 0;
+  const proposed = byStatus.get("proposed")?.length ?? 0;
+  const deprecated = byStatus.get("deprecated")?.length ?? 0;
+  const superseded = byStatus.get("superseded")?.length ?? 0;
+
+  // Count by category
+  const byCategory = groupBy(
+    patterns.filter((p) => p.adrCategory),
+    (p) => p.adrCategory ?? "uncategorized"
+  );
+
+  return [
+    heading(2, "Summary"),
+    table(
+      ["Metric", "Value"],
+      [
+        ["Total ADRs", String(patterns.length)],
+        ["Accepted", String(accepted)],
+        ["Proposed", String(proposed)],
+        ["Deprecated", String(deprecated)],
+        ["Superseded", String(superseded)],
+        ["Categories", String(byCategory.size)],
+      ]
+    ),
+    separator(),
+  ];
+}
+
+/**
+ * Build ADRs grouped by category
+ * Each ADR links to its individual detail file when generateDetailFiles is enabled
+ */
+function buildAdrsByCategory(
+  patterns: ExtractedPattern[],
+  options: Required<AdrCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  const byCategory = groupBy(patterns, (p) => p.adrCategory ?? "uncategorized");
+
+  if (byCategory.size === 0) {
+    return [];
+  }
+
+  sections.push(heading(2, "By Category"));
+
+  const sortedCategories = [...byCategory.keys()].sort();
+
+  for (const category of sortedCategories) {
+    const categoryPatterns = byCategory.get(category) ?? [];
+
+    if (!options.generateDetailFiles) {
+      // Inline the category (no progressive disclosure)
+      sections.push(...buildCategorySection(category, categoryPatterns, options));
+    } else {
+      // Show category with list of ADRs linking to individual files
+      sections.push(heading(3, category), paragraph(`${categoryPatterns.length} decisions`));
+
+      // Sort by ADR number and create links
+      const sorted = [...categoryPatterns].sort((a, b) => {
+        const aNum = parseAdrNumber(a.adr);
+        const bNum = parseAdrNumber(b.adr);
+        return aNum - bNum;
+      });
+
+      const adrRows = sorted.map((p) => {
+        const adrNum = p.adr ?? "???";
+        const name = getDisplayName(p);
+        const status = p.adrStatus ?? "proposed";
+        const statusEmoji = getAdrStatusEmoji(status);
+        const slug = adrToSlug(p);
+        return [`[${statusEmoji} ADR-${adrNum}](decisions/${slug}.md)`, name, status];
+      });
+
+      sections.push(table(["ADR", "Title", "Status"], adrRows), separator());
+    }
+  }
+
+  return sections;
+}
+
+/**
+ * Build a category section with ADRs
+ */
+function buildCategorySection(
+  category: string,
+  patterns: ExtractedPattern[],
+  options: Required<AdrCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  sections.push(heading(3, category));
+  sections.push(paragraph(`${patterns.length} decisions`));
+
+  // Sort by ADR number
+  const sorted = [...patterns].sort((a, b) => {
+    const aNum = parseAdrNumber(a.adr);
+    const bNum = parseAdrNumber(b.adr);
+    return aNum - bNum;
+  });
+
+  for (const pattern of sorted) {
+    sections.push(...buildAdrEntry(pattern, options));
+  }
+
+  sections.push(separator());
+
+  return sections;
+}
+
+/**
+ * Build a single ADR entry
+ */
+function buildAdrEntry(
+  pattern: ExtractedPattern,
+  options: Required<AdrCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+  const name = getDisplayName(pattern);
+  const adrNum = pattern.adr ?? "???";
+  const status = pattern.adrStatus ?? "proposed";
+
+  // Status emoji
+  const statusEmoji = getAdrStatusEmoji(status);
+
+  sections.push(heading(4, `${statusEmoji} ADR-${adrNum}: ${name}`));
+
+  // Metadata
+  const metaRows: string[][] = [["Status", status]];
+
+  if (pattern.adrCategory) {
+    metaRows.push(["Category", pattern.adrCategory]);
+  }
+
+  if (pattern.phase !== undefined) {
+    metaRows.push(["Phase", String(pattern.phase)]);
+  }
+
+  if (pattern.adrSupersedes) {
+    metaRows.push(["Supersedes", `ADR-${pattern.adrSupersedes}`]);
+  }
+
+  if (pattern.adrSupersededBy) {
+    metaRows.push(["Superseded By", `ADR-${pattern.adrSupersededBy}`]);
+  }
+
+  sections.push(table(["Property", "Value"], metaRows));
+
+  // ADR Content sections from Gherkin Rule: keywords
+  // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
+  const partitioned = partitionAdrRules(pattern.rules, name);
+  sections.push(...renderPartitionedAdrSections(partitioned, options, 5));
+
+  return sections;
+}
+
+/**
+ * Build ADRs grouped by phase
+ */
+function buildAdrsByPhase(
+  patterns: ExtractedPattern[],
+  options: Required<AdrCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  const byPhase = groupBy(patterns, (p) => p.phase ?? 0);
+
+  if (byPhase.size === 0) {
+    return [];
+  }
+
+  sections.push(heading(2, "By Phase"));
+
+  const sortedPhases = [...byPhase.keys()].sort((a, b) => a - b);
+
+  for (const phaseNum of sortedPhases) {
+    const phasePatterns = byPhase.get(phaseNum) ?? [];
+
+    const phaseContent: SectionBlock[] = [];
+    for (const pattern of phasePatterns) {
+      phaseContent.push(...buildAdrEntry(pattern, options));
+    }
+
+    sections.push(
+      collapsible(`Phase ${phaseNum} (${phasePatterns.length} decisions)`, phaseContent)
+    );
+  }
+
+  sections.push(separator());
+
+  return sections;
+}
+
+/**
+ * Build ADRs grouped by date (quarter)
+ */
+function buildAdrsByDate(
+  patterns: ExtractedPattern[],
+  options: Required<AdrCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  const byQuarter = groupBy(
+    patterns.filter((p) => p.quarter),
+    (p) => p.quarter ?? "undated"
+  );
+
+  if (byQuarter.size === 0) {
+    return [];
+  }
+
+  sections.push(heading(2, "By Date"));
+
+  const sortedQuarters = [...byQuarter.keys()].sort().reverse(); // Most recent first
+
+  for (const quarter of sortedQuarters) {
+    const quarterPatterns = byQuarter.get(quarter) ?? [];
+
+    const quarterContent: SectionBlock[] = [];
+    for (const pattern of quarterPatterns) {
+      quarterContent.push(...buildAdrEntry(pattern, options));
+    }
+
+    sections.push(collapsible(`${quarter} (${quarterPatterns.length} decisions)`, quarterContent));
+  }
+
+  sections.push(separator());
+
+  return sections;
+}
+
+/**
+ * Build ADR index table
+ * Links to individual files when generateDetailFiles is enabled
+ */
+function buildAdrIndexTable(
+  patterns: ExtractedPattern[],
+  options: Required<AdrCodecOptions>
+): SectionBlock[] {
+  // Sort by ADR number
+  const sorted = [...patterns].sort((a, b) => {
+    const aNum = parseAdrNumber(a.adr);
+    const bNum = parseAdrNumber(b.adr);
+    return aNum - bNum;
+  });
+
+  const rows = sorted.map((p) => {
+    const adrNum = p.adr ?? "???";
+    const name = getDisplayName(p);
+    const status = p.adrStatus ?? "proposed";
+    const category = p.adrCategory ?? "-";
+    const statusEmoji = getAdrStatusEmoji(status);
+    if (options.generateDetailFiles) {
+      const slug = adrToSlug(p);
+      return [`[${statusEmoji} ADR-${adrNum}](decisions/${slug}.md)`, name, status, category];
+    }
+    return [`${statusEmoji} ADR-${adrNum}`, name, status, category];
+  });
+
+  return [
+    heading(2, "ADR Index"),
+    table(["ADR", "Title", "Status", "Category"], rows),
+    separator(),
+  ];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Individual ADR Detail Files (Progressive Disclosure)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Generate URL-safe slug from ADR number and name
+ *
+ * Handles edge cases:
+ * - Empty pattern names fallback to "unnamed"
+ * - ADR numbers are zero-padded to 3 digits
+ * - Non-alphanumeric characters are replaced with hyphens
+ *
+ * @param pattern - The extracted pattern with ADR metadata
+ * @returns URL-safe slug like "adr-001-my-decision"
+ */
+function adrToSlug(pattern: ExtractedPattern): string {
+  const adrNum = pattern.adr ?? "000";
+  const displayName = getDisplayName(pattern);
+  const sluggedName = displayName
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  // Fallback to "unnamed" if the slug would be empty
+  const name = sluggedName.length > 0 ? sluggedName : "unnamed";
+  return `adr-${adrNum.padStart(3, "0")}-${name}`;
+}
+
+/**
+ * Parse ADR number for sorting, handling non-numeric values
+ *
+ * Returns 0 for non-numeric ADR numbers to avoid NaN in sort comparisons.
+ * Emits a warning when falling back to 0 for non-numeric values.
+ * Examples: "001" → 1, "v1" → 0 (with warning), undefined → 0
+ */
+function parseAdrNumber(adr: string | undefined): number {
+  if (!adr) return 0;
+  const parsed = parseInt(adr, 10);
+  if (Number.isNaN(parsed)) {
+    console.warn(`[adr-codec] Invalid ADR number "${adr}", defaulting to 0 for sorting`);
+    return 0;
+  }
+  return parsed;
+}
+
+/**
+ * Build individual ADR files (progressive disclosure)
+ * Creates one file per ADR instead of grouping by category
+ */
+function buildAdrDetailFiles(
+  patterns: ExtractedPattern[],
+  options: Required<AdrCodecOptions>
+): Record<string, RenderableDocument> {
+  const files: Record<string, RenderableDocument> = {};
+
+  for (const pattern of patterns) {
+    const slug = adrToSlug(pattern);
+    files[`decisions/${slug}.md`] = buildSingleAdrDocument(pattern, options);
+  }
+
+  return files;
+}
+
+/**
+ * Build a single ADR detail document
+ */
+function buildSingleAdrDocument(
+  pattern: ExtractedPattern,
+  options: Required<AdrCodecOptions>
+): RenderableDocument {
+  const sections: SectionBlock[] = [];
+  const name = getDisplayName(pattern);
+  const adrNum = pattern.adr ?? "???";
+  const status = pattern.adrStatus ?? "proposed";
+  const statusEmoji = getAdrStatusEmoji(status);
+
+  // Metadata
+  const metaRows: string[][] = [["Status", status]];
+
+  if (pattern.adrCategory) {
+    metaRows.push(["Category", pattern.adrCategory]);
+  }
+
+  if (pattern.phase !== undefined) {
+    metaRows.push(["Phase", String(pattern.phase)]);
+  }
+
+  if (pattern.adrSupersedes) {
+    metaRows.push(["Supersedes", `ADR-${pattern.adrSupersedes}`]);
+  }
+
+  if (pattern.adrSupersededBy) {
+    metaRows.push(["Superseded By", `ADR-${pattern.adrSupersededBy}`]);
+  }
+
+  sections.push(heading(2, "Overview"), table(["Property", "Value"], metaRows));
+
+  // ADR Content sections from Gherkin Rule: keywords
+  // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
+  const partitioned = partitionAdrRules(pattern.rules, name);
+  sections.push(...renderPartitionedAdrSections(partitioned, options, 2));
+
+  // Back link
+  sections.push(separator(), linkOut("← Back to All Decisions", "../DECISIONS.md"));
+
+  return document(`${statusEmoji} ADR-${adrNum}: ${name}`, sections, {
+    purpose: `Architecture decision record for ${name}`,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Utilities
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Partitioned ADR rules by semantic category
+ *
+ * ADR content is derived from Gherkin Rule: keywords with semantic prefixes:
+ * - "Context - ..." rules describe the problem background
+ * - "Decision - ..." rules describe the chosen solution
+ * - "Consequences - ..." rules describe outcomes
+ * - Other rules are not rendered in standard ADR sections
+ */
+interface PartitionedAdrRules {
+  context: BusinessRule[];
+  decision: BusinessRule[];
+  consequences: BusinessRule[];
+  other: BusinessRule[];
+}
+
+/**
+ * Partition ADR rules by semantic prefix
+ *
+ * Rules are classified by their name prefix (case-insensitive):
+ * - "Context..." → context section
+ * - "Decision..." → decision section
+ * - "Consequence..." → consequences section
+ * - Others → other (logged as warning, not rendered in standard ADR format)
+ *
+ * @param rules - Business rules from the extracted pattern
+ * @param patternName - Pattern name for warning context (optional)
+ * @returns Partitioned rules by category
+ */
+function partitionAdrRules(
+  rules: readonly BusinessRule[] | undefined,
+  patternName?: string
+): PartitionedAdrRules {
+  if (!rules || rules.length === 0) {
+    return { context: [], decision: [], consequences: [], other: [] };
+  }
+
+  const context: BusinessRule[] = [];
+  const decision: BusinessRule[] = [];
+  const consequences: BusinessRule[] = [];
+  const other: BusinessRule[] = [];
+
+  for (const rule of rules) {
+    const nameLower = rule.name.toLowerCase();
+    if (nameLower.startsWith("context")) {
+      context.push(rule);
+    } else if (nameLower.startsWith("decision")) {
+      decision.push(rule);
+    } else if (nameLower.startsWith("consequence")) {
+      consequences.push(rule);
+    } else {
+      other.push(rule);
+    }
+  }
+
+  // Warn about rules that don't match expected ADR prefixes
+  if (other.length > 0) {
+    const otherNames = other.map((r) => `"${r.name}"`).join(", ");
+    const patternContext = patternName ? ` in pattern "${patternName}"` : "";
+    console.warn(
+      `[adr-codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`
+    );
+  }
+
+  return { context, decision, consequences, other };
+}
+
+/**
+ * Render partitioned ADR sections (Context, Decision, Consequences)
+ *
+ * Shared helper to ensure consistent rendering between buildAdrEntry and buildSingleAdrDocument.
+ *
+ * @param partitioned - Partitioned ADR rules
+ * @param options - ADR codec options
+ * @param headingLevel - Heading level for section headers (2 for detail docs, 5 for inline entries)
+ * @returns Array of SectionBlocks
+ */
+function renderPartitionedAdrSections(
+  partitioned: PartitionedAdrRules,
+  options: Required<AdrCodecOptions>,
+  headingLevel: 2 | 5
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  // Render Context section
+  if (options.includeContext && partitioned.context.length > 0) {
+    sections.push(heading(headingLevel, "Context"));
+    for (const rule of partitioned.context) {
+      if (rule.description) {
+        sections.push(paragraph(rule.description));
+      }
+    }
+  }
+
+  // Render Decision section
+  if (options.includeDecision && partitioned.decision.length > 0) {
+    sections.push(heading(headingLevel, "Decision"));
+    for (const rule of partitioned.decision) {
+      if (rule.description) {
+        sections.push(paragraph(rule.description));
+      }
+    }
+  }
+
+  // Render Consequences section
+  if (options.includeConsequences && partitioned.consequences.length > 0) {
+    sections.push(heading(headingLevel, "Consequences"));
+    for (const rule of partitioned.consequences) {
+      if (rule.description) {
+        sections.push(paragraph(rule.description));
+      }
+    }
+  }
+
+  return sections;
+}
+
+/**
+ * Get emoji for ADR status
+ */
+function getAdrStatusEmoji(status: string): string {
+  switch (status) {
+    case "accepted":
+      return "✅";
+    case "proposed":
+      return "📋";
+    case "deprecated":
+      return "⚠️";
+    case "superseded":
+      return "🔄";
+    default:
+      return "📋";
+  }
+}

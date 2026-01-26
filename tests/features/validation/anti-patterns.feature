@@ -1,0 +1,213 @@
+@behavior @anti-patterns
+@libar-docs-pattern:AntiPatternDetector
+@libar-docs-product-area:Validation
+Feature: Anti-Pattern Detection
+  Detects violations of the dual-source documentation architecture and
+  process hygiene issues that lead to documentation drift.
+
+  **Problem:**
+  - Dependencies in features (should be code-only) cause drift
+  - Process metadata in code (should be features-only) violates separation
+  - Generator hints in features create tight coupling
+  - Large feature files are hard to maintain
+
+  **Solution:**
+  - detectTagDuplication() finds code-only tags in features
+  - detectProcessInCode() finds feature-only tags in code
+  - detectMagicComments() finds generator hints in features
+  - detectScenarioBloat() warns about too many scenarios
+  - detectMegaFeature() warns about large feature files
+
+  # ==========================================================================
+  # Tag Duplication Detection
+  # ==========================================================================
+
+  Rule: Code-only tags should not appear in feature files
+
+    @happy-path
+    Scenario: Feature without code-only tags passes
+      Given a feature file with tags:
+        | tag                          |
+        | libar-process-pattern:MyTest |
+        | libar-process-phase:01       |
+      When detecting tag duplication
+      Then no violations are found
+
+    @edge-case
+    Scenario Outline: Code-only dependency tags in features are flagged
+      Given a feature file with code-only tag "<code_tag>"
+      When detecting tag duplication
+      Then a "tag-duplication" violation is found
+      And the violation severity is "error"
+      And the fix suggests moving to code
+
+      Examples:
+        | code_tag                           |
+        | libar-process-depends-on:PatternA  |
+        | libar-process-enables:PatternB     |
+
+    @edge-case
+    Scenario: Scenario-level code-only tags are also flagged
+      Given a feature file with feature tags:
+        | tag                          |
+        | libar-process-pattern:MyTest |
+      And scenario tags:
+        | tag                           |
+        | libar-process-depends-on:Foo  |
+      When detecting tag duplication
+      Then a "tag-duplication" violation is found
+
+  # ==========================================================================
+  # Process-in-Code Detection
+  # ==========================================================================
+
+  Rule: Process metadata should not appear in TypeScript code
+
+    @happy-path
+    Scenario: Code without process tags passes
+      Given a TypeScript file with directive tags:
+        | tag                        |
+        | @libar-docs                |
+        | @libar-docs-pattern        |
+        | @libar-docs-status         |
+        | @libar-docs-depends-on     |
+      When detecting process-in-code anti-patterns
+      Then no violations are found
+
+    @edge-case
+    Scenario Outline: Feature-only process tags in code are flagged
+      Given a TypeScript file with process tag "<process_tag>"
+      When detecting process-in-code anti-patterns
+      Then a "process-in-code" violation is found
+      And the violation severity is "error"
+      And the fix suggests moving to feature file
+
+      Examples:
+        | process_tag               |
+        | @libar-docs-quarter       |
+        | @libar-docs-team          |
+        | @libar-docs-effort        |
+        | @libar-docs-workflow      |
+        | @libar-docs-completed     |
+        | @libar-docs-effort-actual |
+
+  # ==========================================================================
+  # Magic Comments Detection
+  # ==========================================================================
+
+  Rule: Generator hints should not appear in feature files
+
+    @happy-path
+    Scenario: Feature without magic comments passes
+      Given a feature file content:
+        """
+        Feature: Normal Feature
+          A normal feature without generator hints.
+
+        Scenario: Normal scenario
+          Given some precondition
+          Then some result
+        """
+      When detecting magic comments with threshold 5
+      Then no violations are found
+
+    @edge-case
+    Scenario: Features with excessive magic comments are flagged
+      Given a feature file with 6 magic comments
+      When detecting magic comments with threshold 5
+      Then a "magic-comments" violation is found
+      And the violation severity is "warning"
+      And the violation message mentions "6 magic comments"
+
+    @edge-case
+    Scenario: Magic comments within threshold pass
+      Given a feature file content:
+        """
+        # GENERATOR: header
+        Feature: Acceptable Feature
+          Some generator hint is OK.
+        """
+      When detecting magic comments with threshold 5
+      Then no violations are found
+
+  # ==========================================================================
+  # Scenario Bloat Detection
+  # ==========================================================================
+
+  Rule: Feature files should not have excessive scenarios
+
+    @happy-path
+    Scenario: Feature with few scenarios passes
+      Given a feature with 5 scenarios
+      When detecting scenario bloat with threshold 20
+      Then no violations are found
+
+    @edge-case
+    Scenario: Feature exceeding scenario threshold is flagged
+      Given a feature with 25 scenarios
+      When detecting scenario bloat with threshold 20
+      Then a "scenario-bloat" violation is found
+      And the violation severity is "warning"
+      And the fix suggests splitting the feature
+
+  # ==========================================================================
+  # Mega-Feature Detection
+  # ==========================================================================
+
+  Rule: Feature files should not exceed size thresholds
+
+    @happy-path
+    Scenario: Normal-sized feature passes
+      Given a feature file with 100 lines
+      When detecting mega-feature with threshold 500
+      Then no violations are found
+
+    @edge-case
+    Scenario: Oversized feature is flagged
+      Given a feature file with 600 lines
+      When detecting mega-feature with threshold 500
+      Then a "mega-feature" violation is found
+      And the violation severity is "warning"
+      And the violation message mentions "lines"
+
+  # ==========================================================================
+  # Combined Detection
+  # ==========================================================================
+
+  Rule: All anti-patterns can be detected in one pass
+
+    @integration
+    Scenario: Combined detection finds multiple issues
+      Given a TypeScript file with directive tags:
+        | tag                 |
+        | @libar-docs         |
+        | @libar-docs-quarter |
+      And a feature file with tags:
+        | tag                            |
+        | libar-process-depends-on:Other |
+      When detecting all anti-patterns
+      Then 2 violations are found
+      And violations include "process-in-code"
+      And violations include "tag-duplication"
+
+  # ==========================================================================
+  # Report Formatting
+  # ==========================================================================
+
+  Rule: Violations can be formatted for console output
+
+    Scenario: Empty violations produce clean report
+      Given no violations
+      When formatting the anti-pattern report
+      Then the report contains "No anti-patterns detected"
+
+    Scenario: Violations are grouped by severity
+      Given violations:
+        | id               | severity |
+        | tag-duplication  | error    |
+        | magic-comments   | warning  |
+        | process-in-code  | error    |
+      When formatting the anti-pattern report
+      Then the report contains "Errors (architectural violations)"
+      And the report contains "Warnings (hygiene issues)"
+      And the report shows "2 errors, 1 warning"

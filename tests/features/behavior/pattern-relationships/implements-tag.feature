@@ -1,0 +1,118 @@
+@libar-docs
+@libar-docs-implements:PatternRelationshipModel
+Feature: Implements Tag Extraction and Processing
+
+  Tests for the @libar-docs-implements tag which links implementation files
+  to their corresponding roadmap pattern specifications.
+
+  # ===========================================================================
+  # RULE 1: Tag Extraction from Registry (Data-Driven)
+  # ===========================================================================
+
+  Rule: Implements tag is defined in taxonomy registry
+
+    The tag registry defines `implements` with CSV format, enabling the
+    data-driven AST parser to automatically extract it.
+
+    @unit
+    Scenario: Implements tag exists in registry
+      Given the tag registry is loaded
+      When querying for tag "implements"
+      Then the tag should exist
+      And the tag format should be "csv"
+      And the tag purpose should mention "realization"
+
+  # ===========================================================================
+  # RULE 2: Single Pattern Implementation
+  # ===========================================================================
+
+  Rule: Files can implement a single pattern
+
+    @unit
+    Scenario: Parse implements with single pattern
+      Given a TypeScript file with content:
+        """typescript
+        /**
+         * @libar-docs
+         * @libar-docs-implements EventStoreDurability
+         * @libar-docs-status roadmap
+         */
+        export function outbox() {}
+        """
+      When the AST parser extracts metadata
+      Then the directive should have implements ["EventStoreDurability"]
+
+    @unit
+    Scenario: Implements preserved through extraction pipeline
+      Given a scanned file with implements "EventStoreDurability"
+      When the extractor builds ExtractedPattern
+      Then the pattern should have implementsPatterns ["EventStoreDurability"]
+
+  # ===========================================================================
+  # RULE 3: Multiple Pattern Implementation (CSV)
+  # ===========================================================================
+
+  Rule: Files can implement multiple patterns using CSV format
+
+    @unit
+    Scenario: Parse implements with multiple patterns
+      Given a TypeScript file with content:
+        """typescript
+        /**
+         * @libar-docs
+         * @libar-docs-implements EventStoreDurability, IdempotentAppend
+         */
+        export function durabilityPrimitive() {}
+        """
+      When the AST parser extracts metadata
+      Then the directive should have implements ["EventStoreDurability", "IdempotentAppend"]
+
+    @unit
+    Scenario: CSV values are trimmed
+      Given a TypeScript file with implements " Pattern1 , Pattern2 "
+      When the AST parser extracts metadata
+      Then the directive should have implements ["Pattern1", "Pattern2"]
+
+  # ===========================================================================
+  # RULE 4: Relationship Index Building
+  # ===========================================================================
+
+  Rule: Transform builds implementedBy reverse lookup
+
+    @unit
+    Scenario: Single implementation creates reverse lookup
+      Given patterns:
+        | name | implementsPatterns |
+        | outbox.ts | EventStoreDurability |
+      And a pattern "EventStoreDurability" exists
+      When the relationship index is built
+      Then "EventStoreDurability" should have implementedBy ["outbox.ts"]
+
+    @unit
+    Scenario: Multiple implementations aggregate
+      Given patterns:
+        | name | implementsPatterns |
+        | outbox.ts | EventStoreDurability |
+        | publication.ts | EventStoreDurability |
+        | idempotentAppend.ts | EventStoreDurability |
+      And a pattern "EventStoreDurability" exists
+      When the relationship index is built
+      Then "EventStoreDurability" should have implementedBy containing all three files
+
+  # ===========================================================================
+  # RULE 5: Schema Validation
+  # ===========================================================================
+
+  Rule: Schemas validate implements field correctly
+
+    @unit
+    Scenario: DocDirective schema accepts implements
+      Given a DocDirective with implementsPatterns ["Pattern1"]
+      When validating against DocDirectiveSchema
+      Then validation should pass
+
+    @unit
+    Scenario: RelationshipEntry schema accepts implementedBy
+      Given a RelationshipEntry with implementedBy ["file1.ts", "file2.ts"]
+      When validating against RelationshipEntrySchema
+      Then validation should pass

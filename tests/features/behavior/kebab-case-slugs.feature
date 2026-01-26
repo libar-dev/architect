@@ -1,0 +1,88 @@
+@libar-docs
+@libar-docs-pattern KebabCaseSlugs
+@libar-docs-status roadmap
+@libar-docs-phase 44
+
+Feature: Slug Generation for Progressive Disclosure
+  As a documentation generator
+  I need to generate readable, URL-safe slugs from pattern names
+  So that generated file names are discoverable and human-friendly
+
+  The slug generation must handle:
+  - CamelCase patterns like "DeciderPattern" → "decider-pattern"
+  - Consecutive uppercase like "APIEndpoint" → "api-endpoint"
+  - Numbers in names like "OAuth2Flow" → "o-auth-2-flow"
+  - Special characters removal
+  - Proper phase prefixing for requirements
+
+  Rule: CamelCase names convert to kebab-case
+
+    Scenario Outline: Convert pattern names to readable slugs
+      Given pattern name "<input>"
+      When converting to kebab-case slug
+      Then the slug is "<expected>"
+
+      Examples:
+        | input                          | expected                            |
+        | DeciderPattern                 | decider-pattern                     |
+        | BddTestingInfrastructure       | bdd-testing-infrastructure          |
+        | ReactiveProjectionSharedEvolve | reactive-projection-shared-evolve   |
+        | DCB                            | dcb                                 |
+        | ProcessGuardLinter             | process-guard-linter                |
+        | APIEndpoint                    | api-endpoint                        |
+        | OAuth2Flow                     | o-auth-2-flow                       |
+        | HTTPServer                     | http-server                         |
+        | JSONParser                     | json-parser                         |
+        | already-kebab                  | already-kebab                       |
+
+  Rule: Edge cases are handled correctly
+
+    Scenario Outline: Handle edge cases in slug generation
+      Given pattern name "<input>"
+      When converting to kebab-case slug
+      Then the slug is "<expected>"
+
+      Examples:
+        | input            | expected  |
+        | Pattern (v2)     | pattern-v-2 |
+        | Test__Name       | test-name  |
+        | -trimmed-        | trimmed    |
+        | ALLCAPS          | allcaps    |
+        | XMLHTTPRequest   | xmlhttp-request |
+
+  Rule: Requirements include phase prefix
+
+    Scenario Outline: Requirement slugs include phase number
+      Given pattern "<pattern>" with phase "<phase>"
+      When generating requirement slug
+      Then the slug is "<expected>"
+
+      Examples:
+        | pattern                  | phase | expected                              |
+        | DeciderPattern           | 14    | phase-14-decider-pattern              |
+        | BddTestingInfrastructure | 19    | phase-19-bdd-testing-infrastructure   |
+        | ProcessGuardLinter       | 7     | phase-07-process-guard-linter         |
+        | DCB                      | 15    | phase-15-dcb                          |
+
+    Scenario: Requirement without phase uses phase 00
+      Given pattern "SomeUnassigned" without a phase
+      When generating requirement slug
+      Then the slug is "phase-00-some-unassigned"
+
+  Rule: Phase slugs use kebab-case for names
+
+    Scenario Outline: Phase slugs combine number and kebab-case name
+      Given phase number "<number>" with name "<name>"
+      When generating phase slug
+      Then the slug is "<expected>"
+
+      Examples:
+        | number | name                     | expected                               |
+        | 14     | DeciderPattern           | phase-14-decider-pattern               |
+        | 19     | BddTestingInfrastructure | phase-19-bdd-testing-infrastructure    |
+        | 7      | ActiveWorkDemo           | phase-07-active-work-demo              |
+
+    Scenario: Phase without name uses "unnamed"
+      Given phase number "5" without a name
+      When generating phase slug
+      Then the slug is "phase-05-unnamed"

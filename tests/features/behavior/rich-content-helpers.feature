@@ -1,0 +1,119 @@
+@libar-docs
+@libar-docs-pattern RichContentHelpers
+@libar-docs-status roadmap
+@libar-docs-phase 44
+
+Feature: Rich Content Rendering Helpers
+  As a document codec author
+  I need helpers to render Gherkin rich content
+  So that DataTables, DocStrings, and scenarios render consistently across codecs
+
+  The helpers handle edge cases like:
+  - Unclosed DocStrings (fallback to plain paragraph)
+  - Windows CRLF line endings (normalized to LF)
+  - Empty inputs (graceful handling)
+  - Missing table cells (empty string fallback)
+
+  Rule: DocString parsing handles edge cases
+
+    Scenario: Empty description returns empty array
+      Given a description ""
+      When parsing for DocStrings
+      Then the result is an empty array
+
+    Scenario: Description with no DocStrings returns single paragraph
+      Given a description "This is plain text without any code blocks."
+      When parsing for DocStrings
+      Then the result contains 1 block
+      And block 1 is a paragraph with text "This is plain text without any code blocks."
+
+    Scenario: Single DocString parses correctly
+      Given a description with embedded DocString containing typescript code
+      When parsing for DocStrings
+      Then the result contains 3 blocks with types:
+        | index | type      | language   |
+        | 1     | paragraph |            |
+        | 2     | code      | typescript |
+        | 3     | paragraph |            |
+
+    Scenario: DocString without language hint uses text
+      Given a description with embedded DocString without language hint
+      When parsing for DocStrings
+      Then block 2 is a code block with language "text"
+
+    Scenario: Unclosed DocString returns plain paragraph fallback
+      Given a description with unclosed DocString
+      When parsing for DocStrings
+      Then the result contains 1 block
+      And block 1 is a paragraph
+
+    Scenario: Windows CRLF line endings are normalized
+      Given a description with CRLF line endings
+      When parsing for DocStrings
+      Then line endings are normalized to LF
+
+  Rule: DataTable rendering produces valid markdown
+
+    Scenario: Single row DataTable renders correctly
+      Given a DataTable with headers "Name" and "Value"
+      And a row with values "foo" and "bar"
+      When rendering the DataTable
+      Then the output is a table block with 1 row
+
+    Scenario: Multi-row DataTable renders correctly
+      Given a DataTable with headers "A" and "B" and "C"
+      And rows:
+        | A | B | C |
+        | 1 | 2 | 3 |
+        | 4 | 5 | 6 |
+      When rendering the DataTable
+      Then the output is a table block with 2 rows
+
+    Scenario: Missing cell values become empty strings
+      Given a DataTable with headers "Col1" and "Col2"
+      And a row with only "Col1" value "only-first"
+      When rendering the DataTable
+      Then the row has empty string for "Col2"
+
+  Rule: Scenario content rendering respects options
+
+    Scenario: Render scenario with steps
+      Given a scenario "Test Scenario" with steps:
+        | keyword | text          |
+        | Given   | initial state |
+        | When    | action taken  |
+        | Then    | expected result |
+      When rendering scenario content with default options
+      Then the output contains a list block with 3 items
+
+    Scenario: Skip steps when includeSteps is false
+      Given a scenario "Test Scenario" with steps:
+        | keyword | text          |
+        | Given   | some step     |
+      When rendering scenario content with includeSteps false
+      Then the output does not contain a list block
+
+    Scenario: Render scenario with DataTable in step
+      Given a scenario "Table Test" with a step containing a DataTable
+      When rendering scenario content with default options
+      Then the output contains a table block
+
+  Rule: Business rule rendering handles descriptions
+
+    Scenario: Rule with simple description
+      Given a business rule "Must validate input" with description "Ensures all input is validated."
+      When rendering the business rule
+      Then the output contains a bold paragraph with the rule name
+      And the output contains the description as a paragraph
+
+    Scenario: Rule with no description
+      Given a business rule "Simple Rule" with no description
+      When rendering the business rule
+      Then the output contains a bold paragraph with the rule name
+      And no description paragraph is rendered
+
+    Scenario: Rule with embedded DocString in description
+      Given a business rule "Code Example" with description containing a DocString
+      When rendering the business rule
+      Then the description is parsed for DocStrings
+      And code blocks are rendered from embedded DocStrings

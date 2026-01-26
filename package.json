@@ -1,0 +1,132 @@
+{
+  "name": "@libar-dev/delivery-process",
+  "version": "0.3.0",
+  "description": "Documentation generator from TypeScript source code and Gherkin feature files",
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config/index.d.ts",
+      "import": "./dist/config/index.js"
+    },
+    "./api": {
+      "types": "./dist/api/index.d.ts",
+      "import": "./dist/api/index.js"
+    },
+    "./lint": {
+      "types": "./dist/lint/index.d.ts",
+      "import": "./dist/lint/index.js"
+    },
+    "./renderable": {
+      "types": "./dist/renderable/index.d.ts",
+      "import": "./dist/renderable/index.js"
+    },
+    "./generators": {
+      "types": "./dist/generators/index.d.ts",
+      "import": "./dist/generators/index.js"
+    },
+    "./scanner": {
+      "types": "./dist/scanner/index.d.ts",
+      "import": "./dist/scanner/index.js"
+    },
+    "./extractor": {
+      "types": "./dist/extractor/index.d.ts",
+      "import": "./dist/extractor/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
+    "./validation-schemas": {
+      "types": "./dist/validation-schemas/index.d.ts",
+      "import": "./dist/validation-schemas/index.js"
+    },
+    "./taxonomy": {
+      "types": "./dist/taxonomy/index.d.ts",
+      "import": "./dist/taxonomy/index.js"
+    }
+  },
+  "bin": {
+    "generate-docs": "./dist/cli/generate-docs.js",
+    "lint-patterns": "./dist/cli/lint-patterns.js",
+    "lint-process": "./dist/cli/lint-process.js",
+    "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
+    "validate-patterns": "./dist/cli/validate-patterns.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "lint:process": "tsx src/cli/lint-process.ts --staged",
+    "lint:process:all": "tsx src/cli/lint-process.ts --all",
+    "lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts'",
+    "validate:patterns": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature'",
+    "validate:dod": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature' --dod",
+    "validate:anti-patterns": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature' --anti-patterns",
+    "validate:all": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature' --dod --anti-patterns",
+    "docs:patterns": "tsx src/cli/generate-docs.ts -g patterns -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:roadmap": "tsx src/cli/generate-docs.ts -g roadmap -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
+    "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog",
+    "migrate-tags": "tsx scripts/migrate-tags.ts",
+    "preversion": "pnpm test && pnpm typecheck && pnpm lint"
+  },
+  "keywords": [
+    "libar",
+    "documentation",
+    "code-first",
+    "typescript",
+    "docs",
+    "jsdoc",
+    "extraction"
+  ],
+  "author": "Libar AI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libar-dev/delivery-process.git"
+  },
+  "bugs": {
+    "url": "https://github.com/libar-dev/delivery-process/issues"
+  },
+  "homepage": "https://github.com/libar-dev/delivery-process#readme",
+  "dependencies": {
+    "@cucumber/gherkin": "^29.0.0",
+    "@cucumber/messages": "^25.0.1",
+    "@typescript-eslint/typescript-estree": "^8.18.0",
+    "glob": "^10.3.10",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@amiceli/vitest-cucumber": "^5.2.1",
+    "@types/node": "20.10.0",
+    "eslint": "^9.17.0",
+    "pixelmatch": "^7.1.0",
+    "quickpickle": "^1.10.1",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.2",
+    "vitest": "^2.1.8"
+  },
+  "files": [
+    "dist",
+    "catalogue",
+    "docs-generated",
+    "README.md",
+    "LICENSE"
+  ],
+  "private": false
+}

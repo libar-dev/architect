@@ -1,0 +1,386 @@
+/**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern RenderableUtils
+ * @libar-docs-status completed
+ *
+ * ## Renderable Utilities
+ *
+ * Utility functions for document codecs. These are pure functions that
+ * transform pattern data into display-ready strings.
+ *
+ * Ported from the original helpers.ts with the essential functions
+ * needed by document codecs.
+ */
+
+import type { ExtractedPattern, StatusCounts } from "../validation-schemas/index.js";
+import type { LoadedWorkflow } from "../validation-schemas/workflow-config.js";
+import { camelCaseToTitleCase, groupBy } from "../utils/index.js";
+import {
+  normalizeStatus as taxonomyNormalizeStatus,
+  type NormalizedStatus as TaxonomyNormalizedStatus,
+} from "../taxonomy/index.js";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Status Utilities
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Default status emoji mapping (fallback when no workflow)
+ * Per PDR-005: roadmap, active, completed, deferred
+ * Intentionally maps both legacy and new values for display backward compat.
+ */
+const STATUS_EMOJI: Record<string, string> = {
+  implemented: "\u2705", // ✅ (legacy)
+  completed: "\u2705", // ✅
+  partial: "\ud83d\udea7", // 🚧 (legacy)
+  active: "\ud83d\udea7", // 🚧
+  roadmap: "\ud83d\udccb", // 📋
+  planned: "\ud83d\udccb", // 📋 (normalized)
+  deferred: "\u23f8\ufe0f", // ⏸️
+};
+
+/**
+ * Get status emoji
+ *
+ * @param status - Status string
+ * @param workflow - Optional workflow for custom emojis
+ * @returns Emoji string
+ */
+export function getStatusEmoji(status: string | undefined, workflow?: LoadedWorkflow): string {
+  if (!status) return "";
+
+  if (workflow) {
+    const statusDef = workflow.statusMap.get(status.toLowerCase());
+    return statusDef?.emoji ?? "";
+  }
+
+  return STATUS_EMOJI[status.toLowerCase()] ?? "";
+}
+
+/**
+ * Get status display text (capitalized)
+ */
+export function getStatusText(status: string | undefined): string {
+  if (!status) return "Planned";
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Display Name & Text Processing
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Get human-readable display name for a pattern
+ *
+ * Priority: title > patternName (CamelCase converted) > name
+ */
+export function getDisplayName(pattern: ExtractedPattern): string {
+  if (pattern.title) return pattern.title;
+  if (pattern.patternName) return camelCaseToTitleCase(pattern.patternName);
+  return pattern.name;
+}
+
+/**
+ * Common acronyms that should be rendered in uppercase
+ */
+const ACRONYMS = new Set(["ddd", "cqrs", "api", "cms", "es", "occ", "dcb", "bc"]);
+
+/**
+ * Format category name (capitalize words, handle acronyms)
+ *
+ * Handles common acronyms like DDD, CQRS, API by rendering them in uppercase.
+ * Hyphenated names like "event-sourcing" become "Event Sourcing".
+ */
+export function formatCategoryName(category: string): string {
+  return category
+    .split("-")
+    .map((word) => {
+      const lower = word.toLowerCase();
+      if (ACRONYMS.has(lower)) {
+        return word.toUpperCase();
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
+
+/**
+ * Format business value (replace hyphens with spaces)
+ */
+export function formatBusinessValue(value: string | undefined): string {
+  if (!value) return "";
+  return value.replace(/-/g, " ");
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Description Extraction
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Maximum length for summary text */
+const SUMMARY_MAX_LENGTH = 120;
+/** Truncation suffix */
+const TRUNCATION_SUFFIX = "...";
+
+/**
+ * Strip markdown formatting from text
+ */
+export function stripMarkdown(text: string): string {
+  return text
+    .replace(/^#+\s*/, "") // Remove heading markers
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // Bold
+    .replace(/\*([^*]+)\*/g, "$1") // Italic
+    .replace(/`([^`]+)`/g, "`$1`") // Keep inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // Links
+}
+
+/**
+ * Extract first paragraph from description
+ */
+export function extractFirstParagraph(description: string, maxLength = 500): string {
+  if (!description) return "";
+
+  const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, "");
+  const paragraphs = withoutHeaders.split(/\n\s*\n/);
+  const firstParagraph = paragraphs[0]?.trim() ?? "";
+
+  if (firstParagraph.length > maxLength) {
+    return firstParagraph.slice(0, maxLength - 3) + TRUNCATION_SUFFIX;
+  }
+  return firstParagraph;
+}
+
+/**
+ * Extract first sentence from description
+ */
+export function extractFirstSentence(description: string, maxLength = 120): string {
+  if (!description) return "";
+
+  const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, "");
+  const lines = withoutHeaders.split("\n").filter((l) => l.trim());
+  const firstLine = lines[0]?.trim() ?? "";
+
+  // Find sentence-ending punctuation followed by space + capital or end of string
+  const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
+  const match = sentenceEndPattern.exec(firstLine);
+
+  if (match) {
+    return firstLine.slice(0, match.index + 1);
+  }
+
+  if (/[.!?]$/.test(firstLine)) {
+    return firstLine;
+  }
+
+  return firstLine.slice(0, maxLength);
+}
+
+/**
+ * Extract summary for pattern (first sentence, truncated)
+ */
+export function extractSummary(description: string, patternName?: string): string {
+  if (!description) return "";
+
+  const lines = description.split("\n");
+  const nonEmptyLines: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#")) {
+      nonEmptyLines.push(trimmed);
+    }
+  }
+
+  if (nonEmptyLines.length === 0) return "";
+
+  let selectedLine = nonEmptyLines[0] ?? "";
+  const cleanedLine = stripMarkdown(selectedLine);
+
+  // Skip tautological first line
+  if (patternName && cleanedLine.toLowerCase().trim() === patternName.toLowerCase().trim()) {
+    selectedLine = nonEmptyLines[1] ?? "";
+  }
+
+  let summary = stripMarkdown(selectedLine);
+
+  // Skip section header labels like "Problem:", "Solution:", "Context:"
+  // These are structural markers, not content, and should not become the summary
+  const currentIndex = nonEmptyLines.indexOf(selectedLine);
+  if (/^[A-Za-z]+:$/.test(summary) && currentIndex < nonEmptyLines.length - 1) {
+    selectedLine = nonEmptyLines[currentIndex + 1] ?? "";
+    summary = stripMarkdown(selectedLine);
+  }
+
+  // Extract first sentence
+  const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
+  const sentenceMatch = sentenceEndPattern.exec(summary);
+  if (sentenceMatch) {
+    summary = summary.slice(0, sentenceMatch.index + 1);
+  }
+
+  // Truncate if too long
+  if (summary.length > SUMMARY_MAX_LENGTH) {
+    summary = summary.slice(0, SUMMARY_MAX_LENGTH - 3) + TRUNCATION_SUFFIX;
+  }
+
+  return summary.trim();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Progress & Counts
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Note: StatusCounts type is now imported from validation-schemas (canonical source)
+// and re-exported above for backward compatibility
+
+/**
+ * Compute status counts from patterns
+ */
+export function computeStatusCounts(patterns: readonly ExtractedPattern[]): StatusCounts {
+  const counts: StatusCounts = { completed: 0, active: 0, planned: 0, total: patterns.length };
+
+  for (const p of patterns) {
+    const status = taxonomyNormalizeStatus(p.status);
+    counts[status]++;
+  }
+
+  return counts;
+}
+
+/**
+ * Calculate completion percentage
+ */
+export function completionPercentage(counts: StatusCounts): number {
+  if (counts.total === 0) return 0;
+  return Math.round((counts.completed / counts.total) * 100);
+}
+
+/**
+ * Check if all items are completed
+ */
+export function isFullyCompleted(counts: StatusCounts): boolean {
+  return counts.total > 0 && counts.completed === counts.total;
+}
+
+/**
+ * Render ASCII progress bar
+ *
+ * @param completed - Number completed
+ * @param total - Total number
+ * @param width - Bar width in characters
+ * @returns Progress bar string like "[████░░░░] 4/8"
+ */
+export function renderProgressBar(completed: number, total: number, width = 10): string {
+  if (total === 0) return `[${"░".repeat(width)}] 0/0`;
+
+  const percent = completed / total;
+  const filled = Math.round(percent * width);
+  const empty = width - filled;
+
+  return `[${"█".repeat(filled)}${"░".repeat(empty)}] ${completed}/${total}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Pattern Grouping
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Re-export groupBy for backward compatibility (canonical source: ../utils/collection-utils.ts)
+/** @deprecated Import directly from `../utils/index.js` instead */
+export { groupBy };
+
+/**
+ * Group patterns by category
+ */
+export function groupByCategory(
+  patterns: readonly ExtractedPattern[]
+): Map<string, ExtractedPattern[]> {
+  return groupBy(patterns, (p) => p.category);
+}
+
+/**
+ * Group patterns by phase number
+ */
+export function groupByPhase(
+  patterns: readonly ExtractedPattern[]
+): Map<number, ExtractedPattern[]> {
+  const withPhase = patterns.filter(
+    (p): p is ExtractedPattern & { phase: number } => p.phase !== undefined
+  );
+  return groupBy(withPhase, (p) => p.phase);
+}
+
+/**
+ * Group patterns by quarter
+ */
+export function groupByQuarter(
+  patterns: readonly ExtractedPattern[]
+): Map<string, ExtractedPattern[]> {
+  const withQuarter = patterns.filter(
+    (p): p is ExtractedPattern & { quarter: string } => p.quarter !== undefined
+  );
+  return groupBy(withQuarter, (p) => p.quarter);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Sorting
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Sort patterns by phase number then name
+ *
+ * @param patterns - Array of patterns to sort
+ * @param inPlace - If true, sorts the array in place (mutates input).
+ *                  If false (default), creates a copy before sorting.
+ *                  Use inPlace=true when you've already created a copy.
+ * @returns Sorted array (same reference if inPlace=true, new array otherwise)
+ *
+ * @example
+ * ```typescript
+ * // Safe default - doesn't modify input
+ * const sorted = sortByPhaseAndName(patterns);
+ *
+ * // Performance optimization - when array is already a copy
+ * const copy = [...patterns];
+ * sortByPhaseAndName(copy, true); // Mutates copy
+ * ```
+ */
+export function sortByPhaseAndName(
+  patterns: ExtractedPattern[],
+  inPlace = false
+): ExtractedPattern[] {
+  const arr = inPlace ? patterns : [...patterns];
+  return arr.sort((a, b) => {
+    const phaseA = a.phase ?? Infinity;
+    const phaseB = b.phase ?? Infinity;
+    if (phaseA !== phaseB) return phaseA - phaseB;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+/**
+ * Sort patterns by status (completed first) then name
+ *
+ * @param patterns - Array of patterns to sort
+ * @param inPlace - If true, sorts the array in place (mutates input).
+ *                  If false (default), creates a copy before sorting.
+ *                  Use inPlace=true when you've already created a copy.
+ * @returns Sorted array (same reference if inPlace=true, new array otherwise)
+ */
+export function sortByStatusAndName(
+  patterns: ExtractedPattern[],
+  inPlace = false
+): ExtractedPattern[] {
+  const statusOrder: Record<TaxonomyNormalizedStatus, number> = {
+    completed: 0,
+    active: 1,
+    planned: 2,
+  };
+
+  const arr = inPlace ? patterns : [...patterns];
+  return arr.sort((a, b) => {
+    const statusA = statusOrder[taxonomyNormalizeStatus(a.status)];
+    const statusB = statusOrder[taxonomyNormalizeStatus(b.status)];
+    if (statusA !== statusB) return statusA - statusB;
+    return a.name.localeCompare(b.name);
+  });
+}

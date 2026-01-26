@@ -1,0 +1,96 @@
+@behavior @error-handling
+Feature: Error Handling Unification
+  All CLI commands and extractors should use the DocError discriminated
+  union pattern for consistent, structured error handling.
+
+  **Problem:**
+  - Raw errors lack context (no file path, line number, or pattern name)
+  - Inconsistent error formats across CLI, scanner, and extractor
+  - console.warn bypasses error collection, losing validation warnings
+  - Unknown errors produce unhelpful messages
+
+  **Solution:**
+  - DocError discriminated union with structured context (type, file, line, reason)
+  - isDocError type guard for safe error classification
+  - formatDocError for human-readable output with all context fields
+  - Error collection pattern that captures warnings without console output
+
+  Background: Error handling context
+    Given an error handling context
+
+  # ==========================================================================
+  # CLI Error Handler Utilities
+  # ==========================================================================
+
+  @happy-path @cli
+  Scenario: isDocError detects valid DocError instances
+    Given a DocError of type "FILE_PARSE_ERROR" with file "/test.ts"
+    When I check if it is a DocError
+    Then isDocError should return true
+
+  @happy-path @cli
+  Scenario: isDocError rejects non-DocError objects
+    Given a plain Error with message "Something went wrong"
+    When I check if it is a DocError
+    Then isDocError should return false
+
+  @happy-path @cli
+  Scenario: isDocError rejects null and undefined
+    Given a null value
+    When I check if it is a DocError
+    Then isDocError should return false
+
+  @happy-path @cli
+  Scenario: formatDocError includes structured context
+    Given a DocError of type "FILE_PARSE_ERROR" with:
+      | field   | value           |
+      | file    | /path/to/src.ts |
+      | line    | 42              |
+      | reason  | Syntax error    |
+    When I format the DocError
+    Then the formatted output should contain the error type "[FILE_PARSE_ERROR]"
+    And the formatted output should contain the file path "File: /path/to/src.ts"
+    And the formatted output should contain the line number "Line: 42"
+
+  @happy-path @cli
+  Scenario: formatDocError includes validation errors for pattern errors
+    Given a DocError of type "GHERKIN_PATTERN_VALIDATION_ERROR" with:
+      | field            | value           |
+      | file             | test.feature    |
+      | patternName      | TestPattern     |
+      | reason           | Schema failed   |
+      | validationErrors | id: Required, category: Invalid enum |
+    When I format the DocError
+    Then the formatted output should contain the pattern name "Pattern: TestPattern"
+    And the formatted output should contain "Validation errors:"
+    And the formatted output should contain the first validation error "id: Required"
+
+  # ==========================================================================
+  # Gherkin Extractor Error Collection
+  # ==========================================================================
+
+  @acceptance-criteria @extractor
+  Scenario: Errors include structured context
+    Given a Gherkin feature file with invalid pattern data
+    When the feature is extracted with invalid schema data
+    Then the extraction result should contain errors
+    And each error should include file path
+    And each error should include pattern name
+    And each error should include validation errors
+
+  @acceptance-criteria @extractor
+  Scenario: No console.warn bypasses error collection
+    Given a Gherkin feature file that would trigger validation warning
+    When I extract patterns from the feature file
+    Then the extraction result errors array should contain the warning
+    And console.warn should not have been called
+
+  # ==========================================================================
+  # CLI Error Handler Integration
+  # ==========================================================================
+
+  @edge-case @cli
+  Scenario: handleCliError formats unknown errors
+    Given an unknown error value "string error"
+    When handleCliError formats the error
+    Then the output should contain "Error: string error"

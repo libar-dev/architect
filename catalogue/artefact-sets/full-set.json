@@ -1,0 +1,23 @@
+{
+  "name": "full-set",
+  "version": "1.0.0",
+  "description": "All available generators for comprehensive project documentation",
+  "generators": [
+    "patterns",
+    "roadmap",
+    "remaining",
+    "current",
+    "milestones",
+    "requirements",
+    "adrs",
+    "business-rules",
+    "architecture",
+    "traceability",
+    "overview-rdm",
+    "changelog"
+  ],
+  "metadata": {
+    "author": "Libar AI",
+    "tags": ["comprehensive", "all-generators"]
+  }
+}

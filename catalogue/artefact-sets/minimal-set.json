@@ -1,0 +1,14 @@
+{
+  "name": "minimal-set",
+  "version": "1.0.0",
+  "description": "Essential generators for basic project documentation - patterns, roadmap, and remaining work",
+  "generators": [
+    "patterns",
+    "roadmap",
+    "remaining"
+  ],
+  "metadata": {
+    "author": "Libar AI",
+    "tags": ["essential", "quick-start"]
+  }
+}

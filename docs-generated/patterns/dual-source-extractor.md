@@ -1,0 +1,38 @@
+# ✅ Dual Source Extractor
+
+**Purpose:** Detailed documentation for the Dual Source Extractor pattern
+
+---
+
+## Overview
+
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Category | Extractor |
+
+## Description
+
+## DualSourceExtractor - Compose Pattern Data from Code + Features
+
+Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
+and Gherkin feature files (@libar-process-*), validates consistency,
+and composes unified pattern data for documentation generation.
+
+### When to Use
+
+- When implementing USDP Pattern 2 (Standard) or higher
+- When you have both code stubs AND timeline features
+- When generating artifacts that need both timeless and temporal data
+- When validating cross-source consistency (pattern name, phase alignment)
+
+### Key Concepts
+
+- **Code Source**: @libar-docs-* tags define timeless pattern graph
+- **Feature Source**: @libar-process-* tags add temporal process metadata
+- **Cross-Validation**: Pattern name + phase must match across sources
+- **Deliverables**: Parsed from Gherkin Background tables in features
+
+---
+
+[← Back to Pattern Registry](../PATTERNS.md)

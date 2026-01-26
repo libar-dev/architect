@@ -1,0 +1,749 @@
+/**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern BusinessRulesCodec
+ * @libar-docs-status roadmap
+ *
+ * ## Business Rules Document Codec
+ *
+ * Transforms MasterDataset into a RenderableDocument for business rules output.
+ * Generates BUSINESS-RULES.md organized by product area, phase, and feature.
+ *
+ * ### Purpose
+ *
+ * Enable stakeholders to understand domain constraints without reading
+ * implementation details or full feature files.
+ *
+ * ### Information Architecture
+ *
+ * ```
+ * Product Area (Platform, DeliveryProcess)
+ *   └── Phase (21, 15, etc.) or Release (v0.1.0 for DeliveryProcess)
+ *        └── Feature (pattern name with description)
+ *             └── Rules (inline with Invariant + Rationale)
+ * ```
+ *
+ * ### Progressive Disclosure
+ *
+ * - **summary**: Statistics only (compact reference)
+ * - **standard**: Above + all features with rules inline
+ * - **detailed**: Full content including code examples and verification links
+ *
+ * ### Factory Pattern
+ *
+ * Use `createBusinessRulesCodec(options)` to create a configured codec:
+ * ```typescript
+ * const codec = createBusinessRulesCodec({ detailLevel: "summary" });
+ * const doc = codec.decode(dataset);
+ * ```
+ */
+
+import { z } from "zod";
+import {
+  MasterDatasetSchema,
+  type MasterDataset,
+} from "../../validation-schemas/master-dataset.js";
+import type { ExtractedPattern } from "../../validation-schemas/index.js";
+import type { BusinessRule } from "../../validation-schemas/extracted-pattern.js";
+import {
+  type RenderableDocument,
+  type SectionBlock,
+  heading,
+  paragraph,
+  separator,
+  table,
+  document,
+} from "../schema.js";
+import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Business Rules Codec Options (co-located with codec)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Options for BusinessRulesCodec
+ *
+ * Supports progressive disclosure via detailLevel:
+ * - "summary": Statistics table + All Rules table only (no domain sections)
+ * - "standard": Above + domain sections with truncated descriptions
+ * - "detailed": Full content including code examples and verification links
+ */
+export interface BusinessRulesCodecOptions extends BaseCodecOptions {
+  /** Group rules by (default: "domain-then-phase") */
+  groupBy?: "domain" | "phase" | "domain-then-phase";
+
+  /** Include code examples from DocStrings (default: false, only in detailed mode) */
+  includeCodeExamples?: boolean;
+
+  /** Include markdown tables from rule descriptions (default: true) */
+  includeTables?: boolean;
+
+  /** Include rationale section (default: true) */
+  includeRationale?: boolean;
+
+  /** Filter by domain categories (default: all) */
+  filterDomains?: string[];
+
+  /** Filter by phases (default: all) */
+  filterPhases?: number[];
+
+  /** Show only rules with explicit invariants (default: false) */
+  onlyWithInvariants?: boolean;
+
+  /** Include source feature file link for each rule (default: true) */
+  includeSource?: boolean;
+
+  /** Include "Verified by" scenario links (default: false, only in detailed mode) */
+  includeVerifiedBy?: boolean;
+
+  /** Maximum description length in characters for standard mode (default: 150, 0 = no limit) */
+  maxDescriptionLength?: number;
+}
+
+/**
+ * Default options for BusinessRulesCodec
+ */
+export const DEFAULT_BUSINESS_RULES_OPTIONS: Required<BusinessRulesCodecOptions> = {
+  ...DEFAULT_BASE_OPTIONS,
+  groupBy: "domain-then-phase",
+  includeCodeExamples: false, // Only in detailed mode
+  includeTables: true,
+  includeRationale: true,
+  filterDomains: [],
+  filterPhases: [],
+  onlyWithInvariants: false,
+  includeSource: true,
+  includeVerifiedBy: false, // Only in detailed mode
+  maxDescriptionLength: 150,
+};
+import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import {
+  parseBusinessRuleAnnotations,
+  type BusinessRuleAnnotations,
+  extractFirstSentence,
+} from "./helpers.js";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Types
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * A business rule with its context (pattern, parsed annotations)
+ */
+interface RuleWithContext {
+  rule: BusinessRule;
+  pattern: ExtractedPattern;
+  annotations: BusinessRuleAnnotations;
+}
+
+/**
+ * A feature (pattern) with its rules
+ */
+interface FeatureWithRules {
+  pattern: ExtractedPattern;
+  featureName: string;
+  featureDescription: string;
+  rules: RuleWithContext[];
+}
+
+/**
+ * Grouped by product area → phase/release → features
+ */
+interface ProductAreaGroup {
+  productArea: string;
+  displayName: string;
+  phases: Map<string, FeatureWithRules[]>; // phase key → features
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Business Rules Document Codec
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Create a BusinessRulesCodec with custom options.
+ *
+ * @param options - Codec configuration options
+ * @returns Configured Zod codec
+ *
+ * @example
+ * ```typescript
+ * // Compact summary mode
+ * const codec = createBusinessRulesCodec({ detailLevel: "summary" });
+ *
+ * // Filter to specific domains
+ * const codec = createBusinessRulesCodec({ filterDomains: ["ddd", "event-sourcing"] });
+ * ```
+ */
+export function createBusinessRulesCodec(
+  options?: BusinessRulesCodecOptions
+): z.ZodCodec<typeof MasterDatasetSchema, typeof RenderableDocumentOutputSchema> {
+  const opts = mergeOptions(DEFAULT_BUSINESS_RULES_OPTIONS, options);
+
+  return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
+    decode: (dataset: MasterDataset): RenderableDocument => {
+      return buildBusinessRulesDocument(dataset, opts);
+    },
+    /** @throws Always - this codec is decode-only. See zod-codecs.md */
+    encode: (): never => {
+      throw new Error("BusinessRulesCodec is decode-only. See zod-codecs.md");
+    },
+  });
+}
+
+/**
+ * Default Business Rules Document Codec
+ *
+ * Transforms MasterDataset → RenderableDocument for business rules.
+ * Uses default options with standard detail level.
+ *
+ * @example
+ * ```typescript
+ * const doc = BusinessRulesCodec.decode(masterDataset);
+ * const markdown = renderToMarkdown(doc);
+ * ```
+ */
+export const BusinessRulesCodec = createBusinessRulesCodec();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Document Builder
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Build the business rules document from dataset
+ */
+function buildBusinessRulesDocument(
+  dataset: MasterDataset,
+  options: Required<BusinessRulesCodecOptions>
+): RenderableDocument {
+  const sections: SectionBlock[] = [];
+
+  // 1. Collect all rules organized by product area → phase → feature
+  const productAreaGroups = collectRulesByProductArea(dataset, options);
+
+  // Calculate stats
+  const stats = calculateStats(productAreaGroups);
+
+  if (stats.totalRules === 0) {
+    sections.push(
+      heading(2, "No Business Rules Found"),
+      paragraph(
+        "No business rules were found in the feature files. " +
+          "Business rules are defined using the `Rule:` keyword in Gherkin feature files."
+      )
+    );
+    return document("Business Rules", sections, {
+      purpose: "Domain constraints and invariants",
+    });
+  }
+
+  // 2. Build summary (single line with stats)
+  sections.push(...buildSummarySection(stats));
+
+  // 3. Build content sections (standard and detailed modes only)
+  if (options.detailLevel !== "summary") {
+    sections.push(...buildProductAreaSections(productAreaGroups, options));
+  }
+
+  return document("Business Rules", sections, {
+    purpose: "Domain constraints and invariants extracted from feature files",
+    detailLevel: options.detailLevel,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Rule Collection
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Collect rules organized by Product Area → Phase → Feature
+ */
+function collectRulesByProductArea(
+  dataset: MasterDataset,
+  options: Required<BusinessRulesCodecOptions>
+): Map<string, ProductAreaGroup> {
+  const groups = new Map<string, ProductAreaGroup>();
+
+  for (const pattern of dataset.patterns) {
+    // Skip patterns without rules
+    if (!pattern.rules || pattern.rules.length === 0) {
+      continue;
+    }
+
+    // Apply domain filter
+    if (options.filterDomains.length > 0 && !options.filterDomains.includes(pattern.category)) {
+      continue;
+    }
+
+    // Apply phase filter
+    if (
+      options.filterPhases.length > 0 &&
+      pattern.phase !== undefined &&
+      !options.filterPhases.includes(pattern.phase)
+    ) {
+      continue;
+    }
+
+    // Determine product area (default to "Platform" if not specified)
+    const productArea = pattern.productArea ?? "Platform";
+    const productAreaDisplay = formatProductAreaName(productArea);
+
+    // Determine phase key (use release for DeliveryProcess items without phase)
+    const phaseKey = getPhaseKey(pattern);
+
+    // Get or create product area group
+    let group = groups.get(productArea);
+    if (!group) {
+      group = {
+        productArea,
+        displayName: productAreaDisplay,
+        phases: new Map(),
+      };
+      groups.set(productArea, group);
+    }
+
+    // Get or create phase group
+    let phaseFeatures = group.phases.get(phaseKey);
+    if (!phaseFeatures) {
+      phaseFeatures = [];
+      group.phases.set(phaseKey, phaseFeatures);
+    }
+
+    // Build feature with rules
+    const featureWithRules: FeatureWithRules = {
+      pattern,
+      featureName: pattern.name,
+      featureDescription: extractFeatureDescription(pattern),
+      rules: [],
+    };
+
+    // Process rules
+    for (const rule of pattern.rules) {
+      const annotations = parseBusinessRuleAnnotations(rule.description);
+
+      // Apply onlyWithInvariants filter
+      if (options.onlyWithInvariants && !annotations.invariant) {
+        continue;
+      }
+
+      featureWithRules.rules.push({
+        rule,
+        pattern,
+        annotations,
+      });
+    }
+
+    // Only add feature if it has rules after filtering
+    if (featureWithRules.rules.length > 0) {
+      phaseFeatures.push(featureWithRules);
+    }
+  }
+
+  return groups;
+}
+
+/**
+ * Get the phase key for grouping (e.g., "Phase 21" or "v0.1.0")
+ */
+function getPhaseKey(pattern: ExtractedPattern): string {
+  // If pattern has a phase, use it
+  if (pattern.phase !== undefined) {
+    return `Phase ${pattern.phase}`;
+  }
+
+  // For DeliveryProcess items without phase, use release
+  const release = pattern.release;
+  if (release) {
+    return release;
+  }
+
+  // Fallback
+  return "Uncategorized";
+}
+
+/**
+ * Extract a compact description from the feature
+ *
+ * Looks for content after header markers like **Problem:** or **Business Value:**
+ * and extracts the full first sentence/paragraph.
+ */
+function extractFeatureDescription(pattern: ExtractedPattern): string {
+  const desc = pattern.directive.description;
+
+  // Headers that indicate content follows
+  const contentHeaders = [
+    /\*\*Problem:\*\*\s*/,
+    /\*\*Business Value:\*\*\s*/,
+    /\*\*Solution:\*\*\s*/,
+    /\*\*Context:\*\*\s*/,
+  ];
+
+  // Try to find content after a header
+  for (const headerPattern of contentHeaders) {
+    const match = headerPattern.exec(desc);
+    if (match) {
+      // Get text after the header
+      const afterHeader = desc.slice(match.index + match[0].length);
+      // Get content up to the next header or table
+      const nextHeaderPattern = /\n\s*(\*\*[A-Z]|^\|)/m;
+      const nextHeaderMatch = nextHeaderPattern.exec(afterHeader);
+      const content = nextHeaderMatch ? afterHeader.slice(0, nextHeaderMatch.index) : afterHeader;
+
+      // Clean up and extract first sentence
+      const cleaned = content.trim().split("\n")[0]?.trim() ?? "";
+      if (cleaned.length > 0) {
+        return extractFirstSentence(cleaned);
+      }
+    }
+  }
+
+  // Fallback: Try to get the first meaningful line
+  const lines = desc.split("\n").filter((line: string) => {
+    const trimmed = line.trim();
+    return (
+      trimmed.length > 0 &&
+      !trimmed.startsWith("**") && // Skip any header
+      !trimmed.startsWith("|") && // Skip table rows
+      !trimmed.startsWith("-") && // Skip list items
+      trimmed.length > 20 // Require substantial content
+    );
+  });
+
+  const firstLine = lines[0];
+  if (firstLine) {
+    return extractFirstSentence(firstLine);
+  }
+
+  return "";
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Statistics
+// ═══════════════════════════════════════════════════════════════════════════
+
+interface Stats {
+  totalRules: number;
+  totalFeatures: number;
+  withInvariants: number;
+  productAreas: number;
+}
+
+function calculateStats(groups: Map<string, ProductAreaGroup>): Stats {
+  let totalRules = 0;
+  let totalFeatures = 0;
+  let withInvariants = 0;
+
+  for (const group of groups.values()) {
+    for (const features of group.phases.values()) {
+      totalFeatures += features.length;
+      for (const feature of features) {
+        totalRules += feature.rules.length;
+        for (const ruleCtx of feature.rules) {
+          if (ruleCtx.annotations.invariant) {
+            withInvariants++;
+          }
+        }
+      }
+    }
+  }
+
+  return {
+    totalRules,
+    totalFeatures,
+    withInvariants,
+    productAreas: groups.size,
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Summary Section
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Build compact summary section
+ */
+function buildSummarySection(stats: Stats): SectionBlock[] {
+  const summary = `Domain constraints and invariants extracted from feature specifications. ${stats.totalRules} rules from ${stats.totalFeatures} features across ${stats.productAreas} product areas.`;
+
+  return [paragraph(`**${summary}**`), separator()];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Product Area Sections
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Build sections organized by Product Area → Phase → Feature → Rules
+ */
+function buildProductAreaSections(
+  groups: Map<string, ProductAreaGroup>,
+  options: Required<BusinessRulesCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  // Sort product areas alphabetically
+  const sortedGroups = [...groups.values()].sort((a, b) =>
+    a.displayName.localeCompare(b.displayName)
+  );
+
+  for (const group of sortedGroups) {
+    // Sort phases: numeric phases first (ascending), then releases
+    const sortedPhases = [...group.phases.entries()].sort(([a], [b]) => {
+      const aNum = extractPhaseNumber(a);
+      const bNum = extractPhaseNumber(b);
+
+      if (aNum !== null && bNum !== null) {
+        return aNum - bNum;
+      }
+      if (aNum !== null) return -1;
+      if (bNum !== null) return 1;
+      return a.localeCompare(b);
+    });
+
+    for (const [phaseKey, features] of sortedPhases) {
+      // Product Area / Phase heading
+      sections.push(heading(2, `${group.displayName} / ${phaseKey}`));
+
+      // Sort features by name
+      const sortedFeatures = [...features].sort((a, b) =>
+        a.featureName.localeCompare(b.featureName)
+      );
+
+      for (const feature of sortedFeatures) {
+        sections.push(...renderFeatureWithRules(feature, options));
+      }
+
+      sections.push(separator());
+    }
+  }
+
+  return sections;
+}
+
+/**
+ * Extract phase number from phase key (e.g., "Phase 21" → 21)
+ */
+function extractPhaseNumber(phaseKey: string): number | null {
+  const pattern = /^Phase\s+(\d+)$/;
+  const match = pattern.exec(phaseKey);
+  if (match?.[1]) {
+    return parseInt(match[1], 10);
+  }
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Feature Rendering
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Render a feature with its rules inline
+ */
+function renderFeatureWithRules(
+  feature: FeatureWithRules,
+  options: Required<BusinessRulesCodecOptions>
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+  const isDetailed = options.detailLevel === "detailed";
+
+  // Feature heading (H3)
+  sections.push(heading(3, feature.featureName));
+
+  // Feature description (plain text, rule title bold provides structure)
+  if (feature.featureDescription) {
+    sections.push(paragraph(`*${feature.featureDescription}*`));
+  }
+
+  // Render each rule inline
+  for (const ruleCtx of feature.rules) {
+    sections.push(...renderRuleInline(ruleCtx, options, isDetailed));
+  }
+
+  // Source link
+  if (options.includeSource) {
+    const sourceFile = feature.pattern.source.file;
+    sections.push(paragraph(`*[${extractSourceName(sourceFile)}](${sourceFile})*`));
+  }
+
+  return sections;
+}
+
+/**
+ * Render a single rule inline with its annotations
+ */
+function renderRuleInline(
+  ruleCtx: RuleWithContext,
+  options: Required<BusinessRulesCodecOptions>,
+  isDetailed: boolean
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+  const { rule, annotations } = ruleCtx;
+
+  // Rule name as H4 heading (for proper document structure and test assertions)
+  sections.push(heading(4, rule.name));
+
+  // Invariant (or first line of description if no invariant)
+  if (annotations.invariant) {
+    sections.push(paragraph(`- **Invariant:** ${annotations.invariant}`));
+  } else if (annotations.remainingContent) {
+    // Show first line as summary
+    const firstLine = extractFirstSentence(annotations.remainingContent);
+    if (firstLine) {
+      sections.push(paragraph(firstLine));
+    }
+  }
+
+  // Rationale (if enabled and present)
+  if (options.includeRationale && annotations.rationale) {
+    sections.push(paragraph(`- **Rationale:** ${annotations.rationale}`));
+  }
+
+  // Tables from remaining content (always include if present)
+  if (options.includeTables && annotations.remainingContent) {
+    const tableBlocks = extractTables(annotations.remainingContent);
+    for (const tableBlock of tableBlocks) {
+      sections.push(tableBlock);
+    }
+  }
+
+  // Code examples (detailed mode only, or if explicitly enabled)
+  if ((isDetailed || options.includeCodeExamples) && annotations.codeExamples) {
+    for (const codeBlock of annotations.codeExamples) {
+      sections.push(codeBlock);
+    }
+  }
+
+  // Verified by (detailed mode only, or if explicitly enabled)
+  if (
+    (isDetailed || options.includeVerifiedBy) &&
+    annotations.verifiedBy &&
+    annotations.verifiedBy.length > 0
+  ) {
+    sections.push(paragraph(`**Verified by:** ${annotations.verifiedBy.join(", ")}`));
+  }
+
+  // API implementation references
+  if (annotations.apiRefs && annotations.apiRefs.length > 0) {
+    const refList = annotations.apiRefs.map((ref) => `\`${ref}\``).join(", ");
+    sections.push(paragraph(`**Implementation:** ${refList}`));
+  }
+
+  // Add spacing between rules
+  sections.push(paragraph(""));
+
+  return sections;
+}
+
+/**
+ * Extract markdown tables from content
+ */
+function extractTables(content: string): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+  const lines = content.split("\n");
+
+  let inTable = false;
+  let tableLines: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+      inTable = true;
+      tableLines.push(trimmed);
+    } else if (inTable) {
+      // End of table
+      if (tableLines.length >= 2) {
+        const tableBlock = parseMarkdownTable(tableLines);
+        if (tableBlock) {
+          sections.push(tableBlock);
+        }
+      }
+      inTable = false;
+      tableLines = [];
+    }
+  }
+
+  // Handle table at end of content
+  if (inTable && tableLines.length >= 2) {
+    const tableBlock = parseMarkdownTable(tableLines);
+    if (tableBlock) {
+      sections.push(tableBlock);
+    }
+  }
+
+  return sections;
+}
+
+/**
+ * Parse markdown table lines into a table SectionBlock
+ */
+function parseMarkdownTable(lines: string[]): SectionBlock | null {
+  if (lines.length < 2) return null;
+
+  // Skip separator row (contains only dashes and pipes)
+  const dataLines = lines.filter((line) => !/^\|[\s-:|]+\|$/.test(line));
+  if (dataLines.length < 1) return null;
+
+  // First row is headers
+  const headerRow = dataLines[0];
+  if (!headerRow) return null;
+
+  const headers = headerRow
+    .split("|")
+    .map((cell) => cell.trim())
+    .filter((cell) => cell.length > 0);
+
+  if (headers.length === 0) return null;
+
+  // Remaining rows are data
+  const rows: string[][] = [];
+  for (let i = 1; i < dataLines.length; i++) {
+    const row = dataLines[i];
+    if (!row) continue;
+
+    const cells = row
+      .split("|")
+      .map((cell) => cell.trim())
+      .filter((cell) => cell.length > 0);
+    if (cells.length > 0) {
+      rows.push(cells);
+    }
+  }
+
+  return table(headers, rows);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Utilities
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Format product area name for display
+ */
+function formatProductAreaName(productArea: string): string {
+  // Handle common product areas
+  switch (productArea.toLowerCase()) {
+    case "platform":
+      return "Platform";
+    case "deliveryprocess":
+      return "Delivery Process";
+    case "exampleapp":
+      return "Example App";
+    case "taxonomy":
+      return "Taxonomy";
+    default:
+      // Title case for unknown product areas
+      return productArea.charAt(0).toUpperCase() + productArea.slice(1);
+  }
+}
+
+/**
+ * Extract a clean source name from file path
+ */
+function extractSourceName(filePath: string): string {
+  const pattern = /([^/]+)\.feature$/;
+  const match = pattern.exec(filePath);
+  if (match?.[1]) {
+    return match[1] + ".feature";
+  }
+  return filePath;
+}

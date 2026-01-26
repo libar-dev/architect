@@ -1,0 +1,164 @@
+@validation @config @security
+Feature: Configuration Schema Validation
+  Configuration schemas validate scanner and generator inputs with security
+  constraints to prevent path traversal attacks and ensure safe file operations.
+
+  **Security focus:**
+  - Parent directory traversal (..) is blocked in glob patterns
+  - Output directories must be within project bounds
+  - Registry files must be .json format
+  - Symlink bypass attempts are prevented
+
+  Background:
+    Given a config schema test context
+
+  # ============================================================================
+  # ScannerConfigSchema - Scanner configuration validation
+  # ============================================================================
+
+  @schema:ScannerConfigSchema @happy-path
+  Scenario: ScannerConfigSchema validates correct configuration
+    When I validate a scanner config with:
+      | patterns        | baseDir        |
+      | src/**/*.ts     | /project       |
+    Then the scanner config should be valid
+    And the validated patterns should include "src/**/*.ts"
+
+  @schema:ScannerConfigSchema
+  Scenario: ScannerConfigSchema accepts multiple patterns
+    When I validate a scanner config with patterns:
+      | pattern          |
+      | src/**/*.ts      |
+      | lib/**/*.ts      |
+      | tests/**/*.ts    |
+    Then the scanner config should be valid
+    And the validated patterns should have 3 items
+
+  @schema:ScannerConfigSchema
+  Scenario: ScannerConfigSchema rejects empty patterns array
+    When I validate a scanner config with empty patterns
+    Then the scanner config should be invalid
+    And the validation error should mention "At least one glob pattern"
+
+  @schema:ScannerConfigSchema @security
+  Scenario: ScannerConfigSchema rejects parent traversal in patterns
+    When I validate a scanner config with pattern "../secret/*.ts"
+    Then the scanner config should be invalid
+    And the validation error should mention "parent directory traversal"
+
+  @schema:ScannerConfigSchema @security
+  Scenario: ScannerConfigSchema rejects hidden parent traversal
+    When I validate a scanner config with pattern "src/../../etc/passwd"
+    Then the scanner config should be invalid
+    And the validation error should mention "parent directory traversal"
+
+  @schema:ScannerConfigSchema
+  Scenario: ScannerConfigSchema normalizes baseDir to absolute path
+    When I validate a scanner config with baseDir "relative/path"
+    Then the scanner config should be valid
+    And the validated baseDir should be an absolute path
+
+  @schema:ScannerConfigSchema
+  Scenario: ScannerConfigSchema accepts optional exclude patterns
+    When I validate a scanner config with exclude patterns:
+      | pattern          |
+      | **/node_modules  |
+      | **/.git          |
+    Then the scanner config should be valid
+    And the validated exclude should have 2 items
+
+  # ============================================================================
+  # createGeneratorConfigSchema - Generator configuration with security
+  # ============================================================================
+
+  @schema:GeneratorConfigSchema @happy-path
+  Scenario: GeneratorConfigSchema validates correct configuration
+    Given the current working directory as base
+    When I validate a generator config with:
+      | outputDir    | registryPath    |
+      | docs         | registry.json   |
+    Then the generator config should be valid
+
+  @schema:GeneratorConfigSchema
+  Scenario: GeneratorConfigSchema requires .json registry file
+    Given the current working directory as base
+    When I validate a generator config with registryPath "registry.yaml"
+    Then the generator config should be invalid
+    And the validation error should mention ".json"
+
+  @schema:GeneratorConfigSchema @security
+  Scenario: GeneratorConfigSchema rejects outputDir with parent traversal
+    Given the current working directory as base
+    When I validate a generator config with outputDir "../outside"
+    Then the generator config should be invalid
+    And the validation error should mention "parent traversal"
+
+  @schema:GeneratorConfigSchema
+  Scenario: GeneratorConfigSchema accepts relative output directory
+    Given the current working directory as base
+    When I validate a generator config with outputDir "docs/generated"
+    Then the generator config should be valid
+
+  @schema:GeneratorConfigSchema
+  Scenario: GeneratorConfigSchema defaults overwrite to false
+    Given the current working directory as base
+    When I validate a generator config without overwrite
+    Then the generator config should be valid
+    And the validated overwrite should be false
+
+  @schema:GeneratorConfigSchema
+  Scenario: GeneratorConfigSchema defaults readmeOnly to false
+    Given the current working directory as base
+    When I validate a generator config without readmeOnly
+    Then the generator config should be valid
+    And the validated readmeOnly should be false
+
+  # ============================================================================
+  # isScannerConfig - Type guard for ScannerConfig
+  # ============================================================================
+
+  @function:isScannerConfig @happy-path
+  Scenario: isScannerConfig returns true for valid config
+    Given a valid scanner config object
+    When I check if it is a scanner config
+    Then isScannerConfig should return true
+
+  @function:isScannerConfig
+  Scenario: isScannerConfig returns false for invalid config
+    Given an object with missing patterns
+    When I check if it is a scanner config
+    Then isScannerConfig should return false
+
+  @function:isScannerConfig
+  Scenario: isScannerConfig returns false for null
+    Given a null value
+    When I check if it is a scanner config
+    Then isScannerConfig should return false
+
+  @function:isScannerConfig
+  Scenario: isScannerConfig returns false for non-object
+    Given a string value "not a config"
+    When I check if it is a scanner config
+    Then isScannerConfig should return false
+
+  # ============================================================================
+  # isGeneratorConfig - Type guard for GeneratorConfig
+  # ============================================================================
+
+  @function:isGeneratorConfig @happy-path
+  Scenario: isGeneratorConfig returns true for valid config
+    Given a valid generator config object
+    When I check if it is a generator config
+    Then isGeneratorConfig should return true
+
+  @function:isGeneratorConfig
+  Scenario: isGeneratorConfig returns false for invalid config
+    Given an object with missing outputDir
+    When I check if it is a generator config
+    Then isGeneratorConfig should return false
+
+  @function:isGeneratorConfig
+  Scenario: isGeneratorConfig returns false for non-json registry
+    Given a generator config with registryPath "data.xml"
+    When I check if it is a generator config
+    Then isGeneratorConfig should return false

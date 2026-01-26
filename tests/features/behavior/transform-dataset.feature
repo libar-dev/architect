@@ -1,0 +1,254 @@
+@behavior @transform-dataset
+@libar-docs-pattern:TransformDataset
+@libar-docs-product-area:Pipeline
+Feature: Transform Dataset Pipeline
+  The transformToMasterDataset function transforms raw extracted patterns
+  into a MasterDataset with all pre-computed views in a single pass.
+  This is the core of the unified transformation pipeline.
+
+  **Problem:**
+  - Generators need multiple views of the same pattern data
+  - Computing views lazily leads to O(n*v) complexity
+  - Views must be consistent with each other
+
+  **Solution:**
+  - Single-pass transformation computes all views in O(n)
+  - All views are immutable and pre-computed
+  - MasterDataset is the source of truth for all generators
+
+  Background:
+    Given a transform dataset test context
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Empty Dataset Edge Case
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @edge-case
+  Scenario: Transform empty dataset
+    Given an empty raw dataset
+    When transforming to MasterDataset
+    Then the dataset has 0 patterns
+    And all status counts are 0
+    And the phase count is 0
+    And the category count is 0
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Status Grouping
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @status-grouping
+  Scenario: Group patterns by status
+    Given a raw dataset with status distribution:
+      | status    | count |
+      | completed | 5     |
+      | active    | 3     |
+      | planned   | 2     |
+    When transforming to MasterDataset
+    Then byStatus.completed has 5 patterns
+    And byStatus.active has 3 patterns
+    And byStatus.planned has 2 patterns
+    And counts.total is 10
+
+  Scenario: Normalize status variants to canonical values
+    Given patterns with various status values:
+      | status    | expected     |
+      | completed | completed    |
+      | active    | active       |
+      | roadmap   | planned      |
+      | deferred  | planned      |
+    When transforming to MasterDataset
+    Then each pattern is grouped in the expected status bucket
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Phase Grouping
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @phase-grouping
+  Scenario: Group patterns by phase
+    Given patterns in multiple phases:
+      | phase | count |
+      | 1     | 2     |
+      | 2     | 3     |
+      | 3     | 1     |
+    When transforming to MasterDataset
+    Then byPhase has 3 phase groups with counts:
+      | phase | count |
+      | 1     | 2     |
+      | 2     | 3     |
+      | 3     | 1     |
+
+  Scenario: Sort phases by phase number
+    Given patterns in phases 3, 1, 2 (out of order)
+    When transforming to MasterDataset
+    Then byPhase is sorted as [1, 2, 3]
+
+  Scenario: Compute per-phase status counts
+    Given phase 1 with 2 completed and 1 active patterns
+    When transforming to MasterDataset
+    Then phase 1 counts are:
+      | field     | value |
+      | completed | 2     |
+      | active    | 1     |
+      | planned   | 0     |
+      | total     | 3     |
+
+  Scenario: Patterns without phase are not in byPhase
+    Given 3 patterns without phase metadata
+    And 2 patterns in phase 1
+    When transforming to MasterDataset
+    Then byPhase has 1 phase group
+    And phaseCount is 1
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Quarter Grouping
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @quarter-grouping
+  Scenario: Group patterns by quarter
+    Given patterns in multiple quarters:
+      | quarter | count |
+      | Q1-2024 | 2     |
+      | Q2-2024 | 3     |
+      | Q4-2024 | 1     |
+    When transforming to MasterDataset
+    Then byQuarter has 3 quarters with counts:
+      | quarter | count |
+      | Q1-2024 | 2     |
+      | Q2-2024 | 3     |
+      | Q4-2024 | 1     |
+
+  Scenario: Patterns without quarter are not in byQuarter
+    Given 3 patterns without quarter
+    And 2 patterns in quarter "Q1-2024"
+    When transforming to MasterDataset
+    Then byQuarter has 1 quarter
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Category Grouping
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @category-grouping
+  Scenario: Group patterns by category
+    Given patterns in categories:
+      | category | count |
+      | core     | 3     |
+      | ddd      | 2     |
+      | saga     | 1     |
+    When transforming to MasterDataset
+    Then byCategory has 3 categories with counts:
+      | category | count |
+      | core     | 3     |
+      | ddd      | 2     |
+      | saga     | 1     |
+    And categoryCount is 3
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Source Grouping
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @source-grouping
+  Scenario: Group patterns by source file type
+    Given patterns from different sources:
+      | source                          | expectedView |
+      | src/patterns/core.ts            | typescript   |
+      | src/patterns/ddd.ts             | typescript   |
+      | tests/features/saga.feature     | gherkin      |
+    When transforming to MasterDataset
+    Then bySource.typescript has 2 patterns
+    And bySource.gherkin has 1 pattern
+
+  Scenario: Patterns with phase are also in roadmap view
+    Given 3 patterns with phase metadata
+    And 2 patterns without phase
+    When transforming to MasterDataset
+    Then bySource.roadmap has 3 patterns
+
+  # Note: PRD view test requires extending pattern factories to support productArea/userRole/businessValue
+  # The transform-dataset.ts correctly checks these fields at lines 167-169
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Relationship Index
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path @relationships
+  Scenario: Build relationship index from patterns
+    Given a pattern "Core" that uses "Base"
+    And a pattern "Base" that is used by "Core"
+    When transforming to MasterDataset
+    Then the relationship index for "Core" uses contains "Base"
+    And the relationship index for "Base" usedBy contains "Core"
+
+  Scenario: Build relationship index with all relationship types
+    Given a pattern "Feature" with relationships:
+      | type      | targets        |
+      | uses      | Utility        |
+      | usedBy    | Application    |
+      | dependsOn | Infrastructure |
+      | enables   | Extension      |
+    When transforming to MasterDataset
+    Then the relationship index for "Feature" contains:
+      | field     | value          |
+      | uses      | Utility        |
+      | usedBy    | Application    |
+      | dependsOn | Infrastructure |
+      | enables   | Extension      |
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Completion Percentage Function
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @function:completionPercentage
+  Scenario Outline: Calculate completion percentage
+    Given status counts with completed "<completed>" of total "<total>"
+    When calculating completion percentage
+    Then the result is "<percentage>" percent
+
+    Examples:
+      | completed | total | percentage |
+      | 0         | 0     | 0          |
+      | 0         | 10    | 0          |
+      | 5         | 10    | 50         |
+      | 10        | 10    | 100        |
+      | 3         | 7     | 43         |
+      | 1         | 3     | 33         |
+      | 2         | 3     | 67         |
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Is Fully Completed Function
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @function:isFullyCompleted
+  Scenario Outline: Check if fully completed
+    Given status counts "<completed>" completed "<active>" active "<planned>" planned of "<total>" total
+    When checking if fully completed
+    Then the result is "<expected>"
+
+    Examples:
+      | completed | active | planned | total | expected |
+      | 0         | 0      | 0       | 0     | false    |
+      | 10        | 0      | 0       | 10    | true     |
+      | 9         | 1      | 0       | 10    | false    |
+      | 9         | 0      | 1       | 10    | false    |
+      | 5         | 3      | 2       | 10    | false    |
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Workflow Integration
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  Scenario: Include workflow in result when provided
+    Given a workflow with phases:
+      | order | name                 |
+      | 1     | Foundation           |
+      | 2     | Core Patterns        |
+      | 3     | Advanced Integration |
+    And patterns in phases 1 and 2
+    When transforming with the workflow
+    Then the result includes the workflow with phase names:
+      | phase | name          |
+      | 1     | Foundation    |
+      | 2     | Core Patterns |
+
+  Scenario: Result omits workflow when not provided
+    Given patterns without a workflow
+    When transforming to MasterDataset
+    Then the result does not include workflow
