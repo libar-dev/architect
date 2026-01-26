@@ -513,14 +513,4 @@ async function main(): Promise<void> {
   );
 }
 
-main().catch((error: unknown) => {
-  if (error instanceof Error) {
-    console.error("Error:", error.message);
-    if (process.env["DEBUG"]) {
-      console.error("Stack trace:", error.stack);
-    }
-  } else {
-    console.error("Error:", String(error));
-  }
-  process.exit(1);
-});
+void main();

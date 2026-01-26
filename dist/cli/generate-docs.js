@@ -431,16 +431,5 @@ async function main() {
     console.log("\n✅ Documentation generation complete!");
     console.log(`   ${successCount} files written${skippedCount > 0 ? `, ${skippedCount} skipped` : ""}`);
 }
-main().catch((error) => {
-    if (error instanceof Error) {
-        console.error("Error:", error.message);
-        if (process.env["DEBUG"]) {
-            console.error("Stack trace:", error.stack);
-        }
-    }
-    else {
-        console.error("Error:", String(error));
-    }
-    process.exit(1);
-});
+void main();
 //# sourceMappingURL=generate-docs.js.map
