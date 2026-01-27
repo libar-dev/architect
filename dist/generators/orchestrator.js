@@ -421,11 +421,14 @@ export async function generateDocumentation(options) {
 /**
  * Merge patterns from TypeScript and Gherkin sources with conflict detection
  *
+ * Exported for testing purposes - allows direct unit testing of merge logic
+ * without running the full pipeline.
+ *
  * @param tsPatterns - Patterns extracted from TypeScript files
  * @param gherkinPatterns - Patterns extracted from Gherkin feature files
  * @returns Result containing merged patterns or error if conflicts detected
  */
-function mergePatterns(tsPatterns, gherkinPatterns) {
+export function mergePatterns(tsPatterns, gherkinPatterns) {
     // Check for conflicts (same pattern name in both sources)
     const conflicts = [];
     const tsPatternNames = new Set(tsPatterns.map((p) => p.patternName ?? p.name));
