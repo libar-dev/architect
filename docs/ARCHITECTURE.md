@@ -94,11 +94,12 @@ const dp = createDeliveryProcess({ preset: 'generic' });
 createDeliveryProcess(options)
          │
          ▼
-┌────────────────────────────────────┐
-│ 1. Select preset (or use default)  │
-│    - generic: @docs-               │
-│    - ddd-es-cqrs: @libar-docs-     │
-└────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│ 1. Select preset (or use default)       │
+│    - generic: @docs-                    │
+│    - libar-generic: @libar-docs-        │
+│    - ddd-es-cqrs: @libar-docs- (default)│
+└─────────────────────────────────────────┘
          │
          ▼
 ┌────────────────────────────────────┐
@@ -126,12 +127,12 @@ createDeliveryProcess(options)
 
 ### Key Files
 
-| File                           | Purpose                                        |
-| ------------------------------ | ---------------------------------------------- |
-| `src/config/factory.ts`        | `createDeliveryProcess()` factory              |
-| `src/config/presets.ts`        | GENERIC_PRESET, DDD_ES_CQRS_PRESET             |
-| `src/config/types.ts`          | DeliveryProcessConfig, DeliveryProcessInstance |
-| `src/config/regex-builders.ts` | RegexBuilders factory                          |
+| File                           | Purpose                                                  |
+| ------------------------------ | -------------------------------------------------------- |
+| `src/config/factory.ts`        | `createDeliveryProcess()` factory                        |
+| `src/config/presets.ts`        | GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET |
+| `src/config/types.ts`          | DeliveryProcessConfig, DeliveryProcessInstance           |
+| `src/config/regex-builders.ts` | RegexBuilders factory                                    |
 
 > **See:** [CONFIGURATION.md](./CONFIGURATION.md) for usage examples and API reference.
 

@@ -4,10 +4,10 @@ Complete reference for documentation tags and CLI commands.
 
 > **Configurable Prefixes:** This document uses `@libar-docs-*` examples (DDD_ES_CQRS_PRESET default).
 > For other prefixes (e.g., `@docs-*` with GENERIC_PRESET), substitute the configured prefix.
-> See [docs/CONFIGURATION.md](./docs/CONFIGURATION.md) for configuration options.
+> See [docs/CONFIGURATION.md](./docs/CONFIGURATION.md) for preset options and custom prefixes.
 
-> **Source of Truth:** All tags are defined in TypeScript at `src/taxonomy/registry-builder.ts`.
-> Presets can customize the tag prefix. Generate a complete reference with: `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f`
+> **Source of Truth:** All tags are defined in TypeScript at `src/taxonomy/`.
+> Generate a complete reference with: `npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f`
 
 ## Table of Contents
 
@@ -17,29 +17,29 @@ Complete reference for documentation tags and CLI commands.
 - [Aggregation Tags](#aggregation-tags)
 - [CLI Reference](#cli-reference)
 - [Gherkin Integration](#gherkin-integration)
-- [CI Integration](#ci-integration)
 
 ---
 
 ## File-Level Opt-In
 
-Files must have an opt-in marker to be scanned. The marker depends on your configuration:
+Files must have an opt-in marker to be scanned. The marker depends on your configuration.
 
-| Preset                | Opt-In Marker             |
-| --------------------- | ------------------------- |
-| DDD_ES_CQRS (default) | `@libar-docs`             |
-| GENERIC               | `@docs`                   |
-| Custom                | Configured `fileOptInTag` |
+| Preset        | Opt-In Marker       | Tag Prefix       |
+| ------------- | ------------------- | ---------------- |
+| `generic`     | `@docs`             | `@docs-`         |
+| `ddd-es-cqrs` | `@libar-docs`       | `@libar-docs-`   |
+| Custom        | Your `fileOptInTag` | Your `tagPrefix` |
 
-**Example (default preset):**
+**Basic usage:**
 
 ```typescript
 /** @libar-docs */
-
 // This file will be scanned for documentation patterns
 ```
 
 Without the opt-in marker, the file is skipped entirely.
+
+> **See:** [CONFIGURATION.md](./docs/CONFIGURATION.md) for preset details, custom tag prefixes, and hierarchical configuration.
 
 ---
 
@@ -49,7 +49,6 @@ Assign patterns to categories. Multiple categories allowed per pattern.
 
 > **Complete list:** See `src/taxonomy/categories.ts` for all 21 DDD_ES_CQRS categories.
 > The GENERIC_PRESET includes only 3 categories (core, api, infra).
-> Custom configurations can define their own categories.
 
 | Tag                           | Domain               | Priority |
 | ----------------------------- | -------------------- | -------- |
@@ -79,13 +78,13 @@ Assign patterns to categories. Multiple categories allowed per pattern.
 
 **Aliases:** Some categories have aliases (e.g., `es` for `event-sourcing`, `process-manager` for `saga`).
 
+> **See:** [TAXONOMY.md](./docs/TAXONOMY.md) for TypeScript API and extending categories.
+
 ---
 
 ## Metadata Tags
 
 Enrich patterns with structured data.
-
-> **Complete list:** See `src/taxonomy/registry-builder.ts` for all metadata tags.
 
 ### Core Metadata
 
@@ -197,19 +196,10 @@ generate-docs [options]
 | `--changed-files <file>`     |       | PR Changes: explicit file list                 | -                   |
 | `--release-filter <version>` |       | PR Changes: filter by release                  | -                   |
 
-**Examples:**
+**Basic usage:**
 
 ```bash
-# Generate pattern registry
 generate-docs -g patterns -i "src/**/*.ts" -o docs -f
-
-# Multiple generators
-generate-docs -g patterns,adrs,roadmap -i "src/**/*.ts" -o docs -f
-
-# With Gherkin integration
-generate-docs -g patterns -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
-
-# List available generators
 generate-docs --list-generators
 ```
 
@@ -231,17 +221,9 @@ lint-patterns [options]
 | `--quiet`                | `-q`  | Only show errors                    | false    |
 | `--min-severity <level>` |       | `error`, `warning`, `info`          | -        |
 
-**Lint Rules:**
-
-| Severity | Rule                       | Description                        |
-| -------- | -------------------------- | ---------------------------------- |
-| error    | `missing-pattern-name`     | Must have `@libar-docs-pattern`    |
-| error    | `tautological-description` | Description can't just repeat name |
-| warning  | `missing-status`           | Should have `@libar-docs-status`   |
-| warning  | `missing-when-to-use`      | Should have "When to Use" section  |
-| info     | `missing-relationships`    | Consider `uses`/`usedBy`           |
-
 **Exit Codes:** `0` = no errors, `1` = errors (or warnings with `--strict`)
+
+> **See:** [VALIDATION.md](./docs/VALIDATION.md) for lint rules and CI/CD integration.
 
 ### lint-process
 
@@ -262,6 +244,10 @@ lint-process [options]
 | `--ignore-session` |       | Ignore session scope rules            | false        |
 | `--show-state`     |       | Show derived process state (debug)    | false        |
 | `--format`         |       | Output: `pretty` or `json`            | `pretty`     |
+
+**Exit Codes:** `0` = no errors, `1` = errors (or warnings with `--strict`)
+
+> **See:** [PROCESS-GUARD.md](./docs/PROCESS-GUARD.md) for FSM rules, protection levels, and troubleshooting.
 
 ### validate-patterns
 
@@ -285,6 +271,10 @@ validate-patterns [options]
 | `--scenario-threshold`      |       | Max scenarios per feature                        | 20       |
 | `--mega-feature-threshold`  |       | Max lines per feature                            | 500      |
 | `--magic-comment-threshold` |       | Max magic comments                               | 5        |
+
+**Exit Codes:** `0` = no errors, `1` = errors (or warnings with `--strict`)
+
+> **See:** [VALIDATION.md](./docs/VALIDATION.md) for validation rules, anti-pattern detection, and DoD checks.
 
 ### generate-tag-taxonomy
 
@@ -330,6 +320,7 @@ Feature: Order Management
 In `.feature` files, use `@libar-docs-*` tags (same as TypeScript):
 
 ```gherkin
+@libar-docs
 @libar-docs-pattern:DeciderPattern
 @libar-docs-status:active
 @libar-docs-phase:14
@@ -337,50 +328,16 @@ In `.feature` files, use `@libar-docs-*` tags (same as TypeScript):
 Feature: Decider Pattern Implementation
 ```
 
+> **See:** [GHERKIN-PATTERNS.md](./docs/GHERKIN-PATTERNS.md) for Gherkin writing guidelines and best practices.
+
 ---
 
-## CI Integration
+## Related Documentation
 
-### GitHub Actions
-
-```yaml
-name: Pattern Documentation
-
-on:
-  push:
-    paths:
-      - 'packages/**/*.ts'
-      - 'specs/**/*.feature'
-
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-      - run: pnpm install
-      - name: Lint annotations
-        run: npx lint-patterns -i "src/**/*.ts" --strict
-      - name: Validate patterns
-        run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod
-      - name: Generate docs
-        run: npx generate-docs -g patterns -i "src/**/*.ts" -o docs -f
-```
-
-### package.json Scripts
-
-```json
-{
-  "scripts": {
-    "docs:patterns": "generate-docs -g patterns -i 'src/**/*.ts' -o docs -f",
-    "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
-    "lint:patterns:strict": "lint-patterns -i 'src/**/*.ts' --strict",
-    "lint:process": "lint-process --staged",
-    "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
-  }
-}
-```
+| Document                                          | Purpose                                  |
+| ------------------------------------------------- | ---------------------------------------- |
+| [CONFIGURATION.md](./docs/CONFIGURATION.md)       | Presets, custom prefixes, config files   |
+| [VALIDATION.md](./docs/VALIDATION.md)             | Lint rules, anti-patterns, DoD, CI/CD    |
+| [PROCESS-GUARD.md](./docs/PROCESS-GUARD.md)       | FSM rules, protection levels, pre-commit |
+| [TAXONOMY.md](./docs/TAXONOMY.md)                 | TypeScript taxonomy API                  |
+| [GHERKIN-PATTERNS.md](./docs/GHERKIN-PATTERNS.md) | Writing good Gherkin specs               |

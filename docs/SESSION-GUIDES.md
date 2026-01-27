@@ -1,518 +1,337 @@
 # Session Workflow Guides
 
-> **Reference document for AI sessions and developers working with the delivery process.**
-
-This guide defines workflows for different session types: planning, design, implementation, and combined sessions. Each session type has specific inputs, outputs, and constraints.
+> Quick reference for each session type. For concepts (FSM, two-tier architecture), see [METHODOLOGY.md](./METHODOLOGY.md).
 
 ---
 
-## Table of Contents
-
-- [Session Type Decision Tree](#session-type-decision-tree)
-- [Planning Session](#planning-session)
-- [Design Session](#design-session)
-- [Implementation Session](#implementation-session)
-- [Planning + Design Session](#planning--design-session)
-- [Handoff Documentation](#handoff-documentation)
-
----
-
-## Session Type Decision Tree
-
-Use this decision tree to determine which session type fits your current task:
+## Session Decision Tree
 
 ```
 Starting from pattern brief?
-├── Yes ──► Need Tier 2 stubs now?
-│           ├── Yes ──► Planning + Design Session
-│           └── No ──►  Planning Session
-└── No ──► Ready to code?
-           ├── Yes ──► Complex architecture decisions?
-           │           ├── Yes ──► Design Session first
-           │           └── No ──►  Implementation Session
-           └── No ──►  Need implementation plan? ──► Planning Session
+├── Yes → Need code stubs now? → Yes → Planning + Design
+│                              → No  → Planning
+└── No  → Ready to code? → Yes → Complex decisions? → Yes → Design first
+                                                    → No  → Implementation
+                        → No  → Planning
 ```
 
-### Session Overview
-
-| Session Type          | Input               | Output                      | FSM Impact                 |
-| --------------------- | ------------------- | --------------------------- | -------------------------- |
-| **Planning**          | Pattern brief       | Roadmap spec (Tier 1)       | Creates `roadmap` spec     |
-| **Design**            | Complex requirement | Design document             | None                       |
-| **Implementation**    | Roadmap spec        | Code + tests                | `roadmap→active→completed` |
-| **Planning + Design** | Pattern brief       | Roadmap spec + Tier 2 stubs | Creates `roadmap` spec     |
-| **Handoff**           | Session state       | Handoff documentation       | None                       |
+| Session           | Input               | Output                    | FSM Change                 |
+| ----------------- | ------------------- | ------------------------- | -------------------------- |
+| Planning          | Pattern brief       | Roadmap spec (`.feature`) | Creates `roadmap`          |
+| Design            | Complex requirement | Design doc + code stubs   | None                       |
+| Implementation    | Roadmap spec        | Code + tests              | `roadmap→active→completed` |
+| Planning + Design | Pattern brief       | Spec + stubs              | Creates `roadmap`          |
 
 ---
 
 ## Planning Session
 
-**Core concept:** Planning sessions create specs. Implementation sessions create code.
+**Goal:** Create a roadmap spec. Do not write implementation code.
 
-### What You MUST Do
+### Checklist
 
-1. **DO** produce a complete roadmap spec in `{specs-directory}/{product-area}/`
-2. **DO** convert all pattern brief tables to Gherkin DataTables
-3. **DO** convert code examples to DocStrings
-4. **DO** create at least one acceptance scenario per Rule
-5. **DO** use `@<prefix>-status:roadmap` (not `active`)
+- [ ] **Extract metadata** from pattern brief:
+  - Phase number → `@<prefix>-phase`
+  - Dependencies → `@<prefix>-depends-on`
+  - Status → `@<prefix>-status:roadmap` (always `roadmap`)
 
-### What You MUST NOT Do
+- [ ] **Create spec file** at `{specs-directory}/{product-area}/{pattern}.feature`
 
-1. **DO NOT** create implementation files (`.ts`, `.js`, etc.)
-2. **DO NOT** modify existing code
-3. **DO NOT** ask "Ready to implement?"
-4. **DO NOT** transition the spec to `active` status
+- [ ] **Structure the feature:**
 
-### Pattern Brief → Spec Conversion Checklist
+  ```gherkin
+  @<prefix>
+  @<prefix>-pattern:MyPattern
+  @<prefix>-status:roadmap
+  @<prefix>-phase:15
+  Feature: My Pattern
 
-#### 1. Extract Metadata
+    **Problem:** One sentence.
 
-- [ ] Phase number from header
-- [ ] Priority → estimate effort (`@<prefix>-effort`)
-- [ ] Status → `@<prefix>-status:roadmap`
-- [ ] Dependencies from "Depends On" section (`@<prefix>-depends-on`)
+    **Solution:**
+    - Key mechanism 1
+    - Key mechanism 2
+  ```
 
-#### 2. Structure Feature Description
+- [ ] **Add deliverables table:**
 
-```gherkin
-Feature: My Pattern
+  ```gherkin
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable | Status  | Location | Tests | Test Type |
+      | Core types  | planned | src/types.ts | Yes | unit |
+  ```
 
-  **Problem:** Current pain point in 1-2 sentences.
+- [ ] **Convert tables to Rules** — Each business constraint becomes a `Rule:` block
 
-  **Solution:**
-  - Key mechanism 1
-  - Key mechanism 2
+- [ ] **Add scenarios per Rule** — Minimum: 1 `@happy-path` + 1 `@validation`
 
-  **Business Value:**
-  | Benefit | How |
-  | ...     | ... |
-```
+- [ ] **Set executable specs location:**
+  ```gherkin
+  @<prefix>-executable-specs:{package}/tests/features/behavior/{pattern}
+  ```
 
-#### 3. Build Deliverables Table
+### Do NOT
 
-- [ ] Extract from "Key Files" section
-- [ ] Add implementation locations (best guess for packages)
-- [ ] Mark all as `planned` status
-- [ ] Identify which need tests (`Yes`/`No`)
-- [ ] Identify test type (`unit`/`integration`)
+- Create `.ts` implementation files
+- Transition to `active`
+- Ask "Ready to implement?"
 
-#### 4. Convert Tables to Rules (Mandatory)
+### Example: delivery-process dogfood
 
-- [ ] Each major business constraint → one `Rule:` block
-- [ ] Table content becomes DataTable under Rule description
-- [ ] At least 2 scenarios per Rule (happy-path + validation)
-
-#### 5. Add Acceptance Scenarios
-
-- [ ] One `@happy-path` scenario per Rule (minimum)
-- [ ] One `@validation` scenario for constraints
-- [ ] All scenarios tagged `@acceptance-criteria`
-
-#### 6. Set Traceability
-
-- [ ] Add `@<prefix>-executable-specs` tag with target package location
-- [ ] Ensure pattern name matches convention
-
-### Handoff Criteria
-
-A planning session is complete when:
-
-- [ ] Spec file created at `{specs-directory}/{product-area}/{pattern-name}.feature`
-- [ ] All required `@<prefix>-*` tags present
-- [ ] Deliverables table lists all expected outputs with locations
-- [ ] Acceptance scenarios cover all major concepts from pattern brief
-- [ ] Executable spec location specified in `@<prefix>-executable-specs`
-- [ ] Status is `roadmap` (not `active` or `completed`)
+See [`tests/features/validation/fsm-validator.feature`](../tests/features/validation/fsm-validator.feature) for a complete roadmap spec with Rules, ScenarioOutlines, and proper tagging.
 
 ---
 
 ## Design Session
 
-**Core concept:** Design sessions create architectural decisions. Implementation sessions create code.
+**Goal:** Make architectural decisions. Create code stubs with interfaces. Do not implement.
 
-### When to Use Design Session
+### When Required
 
-| Use Design Session When...      | Skip When...                       |
-| ------------------------------- | ---------------------------------- |
-| Multiple valid approaches exist | Roadmap spec is straightforward    |
-| Architectural changes needed    | Single obvious implementation path |
-| New patterns or capabilities    | Bug fix or documentation update    |
-| Cross-context coordination      | Feature with clear requirements    |
-| Performance-critical decisions  | —                                  |
+| Use Design Session         | Skip Design Session |
+| -------------------------- | ------------------- |
+| Multiple valid approaches  | Single obvious path |
+| New patterns/capabilities  | Bug fix             |
+| Cross-context coordination | Clear requirements  |
 
-### What You MUST Do
+### Checklist
 
-1. **DO** focus on the "WHY" — capture reasoning, trade-offs, alternatives
-2. **DO** present at least 2-3 different approaches with pros/cons
-3. **DO** reference the roadmap spec this design addresses
-4. **DO** create structured output that enables future implementation
-5. **DO** create code stubs with interfaces and annotated JSDoc
+- [ ] **Create design doc** at `{plans-directory}/designs/draft/DESIGN-{name}.md`
 
-### What You MUST NOT Do
+- [ ] **Document options** — At least 2-3 approaches with pros/cons
 
-1. **DO NOT** create an implementation plan with file-by-file changes
-2. **DO NOT** ask "Ready to code?" or "Should I implement this?"
-3. **DO NOT** transition the roadmap spec to `active` status
-4. **DO NOT** create full implementations (stubs only)
+- [ ] **Get approval** — User must approve recommended approach
 
-### Design Document Sections
+- [ ] **Create code stubs** with interfaces:
 
-| Section                    | Purpose                                       |
-| -------------------------- | --------------------------------------------- |
-| **Problem Statement**      | What problem does this design solve?          |
-| **Related Roadmap Spec**   | Link to the `.feature` spec being implemented |
-| **Current State Analysis** | Honest assessment of what exists              |
-| **Strategic Context**      | How this fits with architecture/roadmap       |
-| **Options Considered**     | Each option with pros/cons                    |
-| **Recommended Approach**   | Which option and WHY                          |
-| **Impact Assessment**      | High-level affected areas                     |
-| **Open Questions**         | What still needs resolution                   |
+  ```typescript
+  /**
+   * @<prefix>
+   * @<prefix>-status roadmap
+   * @<prefix>-uses Workpool, EventStore
+   *
+   * ## My Pattern - Description
+   */
+  export interface MyResult {
+    id: string;
+  }
 
-### Code Stubs in Design Sessions
+  export function myFunction(args: MyArgs): Promise<MyResult> {
+    throw new Error('MyPattern not yet implemented - roadmap pattern');
+  }
+  ```
 
-Design sessions create code stubs, not just documentation:
+- [ ] **Move to approved** after user approval: `designs/draft/` → `designs/approved/`
 
-```typescript
-/**
- * @<prefix>
- * @<prefix>-infra
- * @<prefix>-uses Workpool, ActionRetrier
- *
- * ## Circuit Breaker - Fault Tolerance for External Dependencies
- *
- * Prevents cascade failures when external services are unavailable.
- */
-export interface CircuitBreakerConfig {
-  failureThreshold: number;
-  timeout: number;
-  successThreshold: number;
-}
+### Do NOT
 
-export function withCircuitBreaker<T>(
-  name: string,
-  operation: () => Promise<T>,
-  config?: Partial<CircuitBreakerConfig>
-): Promise<T> {
-  throw new Error('CircuitBreaker not yet implemented - roadmap pattern');
-}
-```
-
-### Handoff to Implementation
-
-A design session is complete when:
-
-- [ ] Design document created at `{plans-directory}/designs/draft/DESIGN-*.md`
-- [ ] Related Roadmap Spec section links to the `.feature` file
-- [ ] User approves the recommended approach
-- [ ] Code stubs created with interfaces and JSDoc annotations
-- [ ] Design moved to `designs/approved/` after approval
+- Create implementation plans
+- Transition spec to `active`
+- Write full implementations (stubs only)
 
 ---
 
 ## Implementation Session
 
-**Core concept:** Implementation sessions create code. The roadmap spec is the source of truth.
+**Goal:** Write code. The roadmap spec is the source of truth.
 
-### Pre-Requisites
+### Pre-flight
 
-Before starting an implementation session, verify:
+- [ ] Roadmap spec exists with `@<prefix>-status:roadmap`
+- [ ] Design doc approved (if needed)
+- [ ] Implementation plan exists (for multi-session work)
 
-1. **Roadmap spec exists** with `@<prefix>-status:roadmap`
-2. **Implementation plan exists** (optional for single-session work)
-3. **Design document approved** (if complex architecture decisions needed)
+### Execution Checklist
 
-### Step 1: Transition to Active
+1. **Transition to active FIRST** (before any code):
 
-**CRITICAL:** Before writing any code, transition the spec:
+   ```gherkin
+   # Change in roadmap spec:
+   @<prefix>-status:active
+   ```
 
-```gherkin
-# Before:
-@<prefix>-status:roadmap
+   > Protection: `active` = scope-locked (no new deliverables)
 
-# After:
-@<prefix>-status:active
-```
+2. **Create executable spec stubs** (if `@<prefix>-executable-specs` present):
 
-**FSM Protection:** `active` = Scope-locked (no new deliverables allowed)
+   ```gherkin
+   @<prefix>-implements:MyPattern
+   Feature: My Pattern Behavior
+   ```
 
-### Step 2: Create Executable Spec Stubs
+3. **For each deliverable:**
+   - [ ] Read acceptance criteria from spec
+   - [ ] Implement code (replace `throw new Error`)
+   - [ ] Preserve `@<prefix>-*` annotations in JSDoc
+   - [ ] Write tests
+   - [ ] Update deliverable status:
+     ```gherkin
+     | Core types | completed | src/types.ts | Yes | unit |
+     ```
 
-If the roadmap spec has `@<prefix>-executable-specs`, create package-level stubs:
+4. **Transition to completed** (only when ALL done):
 
-```bash
-# Target from roadmap spec tag
-@<prefix>-executable-specs:{package}/tests/features/behavior/{pattern}
-```
+   ```gherkin
+   @<prefix>-status:completed
+   ```
 
-Use templates and ensure `@<prefix>-implements:{PatternName}` links back.
+   > Protection: `completed` = hard-locked (requires `@<prefix>-unlock-reason` to modify)
 
-### Step 3: Execution Loop
+5. **Regenerate docs:**
+   ```bash
+   npx generate-docs -g patterns,roadmap -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
+   ```
 
-For each deliverable in the roadmap spec:
+### Do NOT
 
-1. **Check for existing code stubs** in the deliverable location
-2. **Read** the acceptance criteria and `Rule:` invariants from the spec
-3. **Implement** the code (replace `throw new Error` with real logic)
-4. **Preserve** `@<prefix>-*` annotations in JSDoc
-5. **Write tests** in the executable spec location
-6. **Update** the deliverable status in the roadmap spec
-
-```gherkin
-# Before:
-| ProjectionCategory type | planned | {package}/src/... |
-
-# After:
-| ProjectionCategory type | completed | {package}/src/... |
-```
-
-### Step 4: Transition to Completed
-
-After all deliverables are done:
-
-```gherkin
-# Before:
-@<prefix>-status:active
-
-# After:
-@<prefix>-status:completed
-```
-
-**FSM Protection:** `completed` = Hard-locked (requires `@<prefix>-unlock-reason` to modify)
-
-### Step 5: Regenerate Documentation
-
-```bash
-# Regenerate all living docs
-npx generate-docs -g patterns,roadmap -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
-```
-
-### Session Constraints
-
-| MUST DO                                                  | MUST NOT DO                                    |
-| -------------------------------------------------------- | ---------------------------------------------- |
-| Transition roadmap spec to `active` BEFORE coding        | Add new deliverables to an `active` spec       |
-| Create executable spec stubs with `@<prefix>-implements` | Transition to `completed` with incomplete work |
-| Update deliverable statuses as work progresses           | Skip the FSM transitions                       |
-| Transition to `completed` only when ALL done             | Modify generated docs directly                 |
+- Add new deliverables to an `active` spec
+- Mark `completed` with incomplete work
+- Skip FSM transitions
+- Edit generated docs directly
 
 ---
 
 ## Planning + Design Session
 
-**Core concept:** Planning sessions create specs. Design sessions create stubs. This guide combines both.
+**Goal:** Create spec AND code stubs in one session. For immediate implementation handoff.
 
-Use this workflow when you need to complete ALL spec artifacts before handing off to implementation.
+### When to Use
 
-### When to Use This Workflow
+| Use Planning + Design               | Use Planning Only            |
+| ----------------------------------- | ---------------------------- |
+| Need stubs for implementation       | Only enhancing spec          |
+| Preparing for immediate handoff     | Still exploring requirements |
+| Want complete two-tier architecture | Don't need Tier 2 yet        |
 
-| Use This Guide When...                         | Use Planning Session Instead When...  |
-| ---------------------------------------------- | ------------------------------------- |
-| Need executable spec stubs for implementation  | Only enhancing roadmap spec           |
-| Want complete two-tier spec architecture       | Don't need Tier 2 stubs yet           |
-| Preparing for immediate implementation handoff | Still exploring/defining requirements |
+### Checklist
 
-### Step 1: Assess Current State
+1. **Complete Planning checklist** (above)
 
-1. Read the existing roadmap spec (if any)
-2. Identify gaps compared to reference specs
-3. Read the pattern brief for source content
+2. **Add `@<prefix>-executable-specs` tag** pointing to Tier 2 location
 
-### Step 2: Enhance Tier 1 Roadmap Spec
+3. **Create code stubs** (see Design Session checklist)
 
-Follow the Planning Session checklist, plus:
+4. **Create Tier 2 directory:**
 
-- [ ] Add `@<prefix>-executable-specs` tag pointing to Tier 2 location
-- [ ] Deliverables table has `Tests` and `Test Type` columns
-- [ ] Benefits table from pattern brief
-- [ ] Code examples as DocStrings (`"""typescript ... """`)
+   ```
+   {package}/tests/features/behavior/{pattern-name}/
+   ```
 
-### Step 3: Create Code Stubs (Critical)
+5. **Create Tier 2 feature stubs:**
 
-Code stubs define APIs before implementation:
+   ```gherkin
+   @<prefix>-implements:MyPattern
+   @acceptance-criteria
+   Feature: My Pattern - Rule Name
 
-```typescript
-/**
- * @<prefix>
- * @<prefix>-status roadmap
- * @<prefix>-uses EventStoreFoundation, Workpool
- *
- * ## My Pattern - Description
- */
-export interface MyResult {
-  id: string;
-  // ...
-}
+     @happy-path
+     Scenario: Happy path from roadmap spec
+       # Implementation placeholder
+       Given {precondition}
+       When {action}
+       Then {outcome}
+   ```
 
-export function myFunction(args: MyArgs): Promise<MyResult> {
-  throw new Error('MyPattern not yet implemented - roadmap pattern');
-}
-```
+6. **Create step definitions stub** at `tests/planning-stubs/{pattern}.steps.ts`:
 
-### Step 4: Create Tier 2 Directory Structure
+   ```typescript
+   /**
+    * @<prefix>-implements:MyPattern
+    *
+    * NOTE: In tests/planning-stubs/ (excluded from test runner).
+    * Move to tests/steps/ during implementation.
+    */
 
-```bash
-{packages-directory}/{package}/tests/features/behavior/{pattern-name}/
-```
+   interface TestState {
+     result: unknown;
+     error: Error | null;
+   }
 
-### Step 5: Create Tier 2 Feature Stubs
+   let state: TestState;
+   // Steps with: throw new Error("Not implemented: description");
+   ```
 
-For each Rule in the roadmap spec, create a corresponding `.feature` file:
+### Handoff Complete When
 
-```gherkin
-@<prefix>-implements:{PatternName}
-@acceptance-criteria
-Feature: {Rule Title}
+**Tier 1:**
 
-  As a {role}
-  I want {capability}
-  So that {benefit}
+- [ ] All `@<prefix>-*` tags present
+- [ ] `@<prefix>-executable-specs` points to Tier 2
+- [ ] Deliverables table complete
+- [ ] Status is `roadmap`
 
-  Background: {Setup context}
-    Given {common setup step - placeholder}
-
-  @happy-path
-  Scenario: {Happy path from roadmap spec}
-    # Implementation placeholder - stub scenario
-    Given {precondition}
-    When {action}
-    Then {outcome}
-
-  @validation
-  Scenario: {Validation case from roadmap spec}
-    # Implementation placeholder - stub scenario
-    Given {invalid precondition}
-    When {action}
-    Then {error outcome}
-```
-
-### Step 6: Create Step Definitions Stub
-
-**Location:** `{packages-directory}/{package}/tests/planning-stubs/{path}/{pattern}.steps.ts`
-
-> **IMPORTANT:** Planning stubs go to `tests/planning-stubs/` (excluded from test runner).
-> During implementation, move to `tests/steps/` and replace `throw` with real logic.
-
-```typescript
-/**
- * {Pattern Name} - Step Definitions Stub
- *
- * @<prefix>
- * @<prefix>-implements:{PatternName}
- *
- * NOTE: This file is in tests/planning-stubs/ and excluded from test runner.
- * Move to tests/steps/ during implementation.
- */
-
-// ============================================================================
-// Test State
-// ============================================================================
-
-interface TestState {
-  result: unknown;
-  error: Error | null;
-}
-
-let state: TestState;
-
-function resetState(): void {
-  state = { result: null, error: null };
-}
-
-// ============================================================================
-// Feature Tests
-// ============================================================================
-
-// TODO: Import and configure test framework
-// Implement steps with: throw new Error("Not implemented: description");
-```
-
-### Handoff Criteria
-
-**Tier 1 Complete:**
-
-- [ ] All required `@<prefix>-*` tags present
-- [ ] `@<prefix>-executable-specs` points to Tier 2 location
-- [ ] Deliverables table has Tests and Test Type columns
-- [ ] At least 2 acceptance scenarios per Rule
-- [ ] Code examples in DocStrings
-- [ ] Status remains `roadmap`
-
-**Tier 2 Complete:**
+**Tier 2:**
 
 - [ ] Directory created with `.feature` files
-- [ ] Each file has `@<prefix>-implements` linking to Tier 1
-- [ ] Stub scenarios with placeholder comments
-- [ ] Step definitions stub compiles without errors
+- [ ] Each file has `@<prefix>-implements`
+- [ ] Step definitions stub compiles
 
-**Validation Complete:**
+**Validation:**
 
-- [ ] Lint passes
-- [ ] TypeScript compiles
-- [ ] Documentation regenerates without errors
+- [ ] `pnpm lint` passes
+- [ ] `pnpm typecheck` passes
 
 ---
 
 ## Handoff Documentation
 
-For work spanning multiple sessions, use structured handoff documentation.
+For multi-session work, capture state at session boundaries.
 
-### Handoff Format
+### Handoff Template
 
 ```markdown
-### Current Session State
+## Session State
 
 - **Last completed:** Phase 1 - Core types
-- **In progress:** Phase 2 - Category metadata
+- **In progress:** Phase 2 - Validation
 - **Blockers:** None
-- **Files modified this session:**
-  - `src/path/types.ts` - Added core type definitions
-  - `src/path/registry.ts` - Added category field
 
-### Next Session TODO
+### Files Modified
 
-1. **FIRST:** Complete category metadata in defineProjection()
-2. Add query routing validation
-3. Write integration tests
+- `src/types.ts` - Added core types
+- `src/validate.ts` - Started validation (incomplete)
+
+## Next Session
+
+1. **FIRST:** Complete validation in `src/validate.ts`
+2. Add integration tests
+3. Update deliverable statuses
 ```
 
-### Multi-Session Implementation
+### Discovery Tags
 
-For multi-session work:
+Capture learnings inline during sessions:
 
-1. **Create implementation plan** with clear phases
-2. **Update plan after each session** with current state
-3. **Resume from plan** — the plan contains all context needed
-
-### Deliverable Status Workflow
-
+```gherkin
+# In feature file comments or code:
+# @<prefix>-discovered-gap: Missing-edge-case-for-empty-input
+# @<prefix>-discovered-improvement: Cache-parsed-results
+# @<prefix>-discovered-learning: Gherkin-requires-strict-indentation
 ```
-roadmap → active → completed
-    │        │
-    │        ↓
-    │    blocked → roadmap (rescheduled)
-    ↓
-deferred → roadmap (resumed)
-```
+
+See [`tests/features/behavior/session-handoffs.feature`](../tests/features/behavior/session-handoffs.feature) for the full handoff specification.
 
 ---
 
-## Quick Reference: FSM States
+## Quick Reference: FSM Protection
 
-| State       | Protection   | What's Allowed                               |
-| ----------- | ------------ | -------------------------------------------- |
-| `roadmap`   | None         | Full editing                                 |
-| `active`    | Scope-locked | Implementation only, no new deliverables     |
-| `completed` | Hard-locked  | Requires `@<prefix>-unlock-reason` to modify |
-| `deferred`  | None         | Full editing                                 |
+| State       | Protection   | Can Add Deliverables | Needs Unlock |
+| ----------- | ------------ | -------------------- | ------------ |
+| `roadmap`   | None         | Yes                  | No           |
+| `active`    | Scope-locked | No                   | No           |
+| `completed` | Hard-locked  | No                   | Yes          |
+| `deferred`  | None         | Yes                  | No           |
+
+Valid transitions: See [METHODOLOGY.md#fsm-enforced-workflow](./METHODOLOGY.md#fsm-enforced-workflow)
 
 ---
 
 ## Related Documentation
 
-| Document                                     | Purpose                                 |
-| -------------------------------------------- | --------------------------------------- |
-| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM, two-tier architecture |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Rich Gherkin patterns for BDD specs     |
-| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                   |
-| [../INSTRUCTIONS.md](../INSTRUCTIONS.md)     | Complete tag reference, CLI commands    |
+| Document                                     | Content                                        |
+| -------------------------------------------- | ---------------------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM states, two-tier architecture |
+| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | DataTables, DocStrings, Rule blocks            |
+| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                          |
+| [../INSTRUCTIONS.md](../INSTRUCTIONS.md)     | CLI commands, full tag reference               |
