@@ -226,6 +226,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         if (!state!.configResult!.ok) throw new Error('Expected success');
         expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@libar-docs-');
       });
+
+      And('loaded registry should have exactly 3 categories', () => {
+        if (!state!.configResult!.ok) throw new Error('Expected success');
+        // Default fallback uses libar-generic preset which has 3 categories (core, api, infra)
+        expect(state!.configResult!.value.instance.registry.categories).toHaveLength(3);
+      });
     });
 
     RuleScenario('Load valid config file', ({ Given, When, Then, And }) => {

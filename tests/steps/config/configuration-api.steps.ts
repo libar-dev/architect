@@ -69,7 +69,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule('Factory creates configured instances with correct defaults', ({ RuleScenario }) => {
-    RuleScenario('Create with no arguments uses DDD-ES-CQRS preset', ({ When, Then, And }) => {
+    RuleScenario('Create with no arguments uses libar-generic preset', ({ When, Then, And }) => {
       When('I call createDeliveryProcess without arguments', () => {
         const dp = createDeliveryProcess();
         state!.registry = dp.registry;
@@ -83,8 +83,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.registry!.fileOptInTag).toBe('@libar-docs');
       });
 
-      And('the registry should have 21 categories', () => {
-        expect(state!.registry!.categories).toHaveLength(21);
+      And('the registry should have exactly 3 categories', () => {
+        // Default libar-generic preset has 3 categories (core, api, infra)
+        expect(state!.registry!.categories).toHaveLength(3);
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).toContain('core');
+        expect(categoryTags).toContain('api');
+        expect(categoryTags).toContain('infra');
       });
     });
 
@@ -102,10 +107,34 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.registry!.fileOptInTag).toBe('@docs');
       });
 
-      And('the registry should have merged categories from base', () => {
-        // Generic preset overrides prefix/opt-in but categories are merged with base
-        expect(state!.registry!.categories.length).toBeGreaterThanOrEqual(3);
+      And('the registry should have exactly 3 categories', () => {
+        // Generic preset categories REPLACE base taxonomy (not merged)
+        expect(state!.registry!.categories).toHaveLength(3);
         // The preset's 3 categories (core, api, infra) should be included
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).toContain('core');
+        expect(categoryTags).toContain('api');
+        expect(categoryTags).toContain('infra');
+      });
+    });
+
+    RuleScenario('Create with libar-generic preset', ({ When, Then, And }) => {
+      When('I call createDeliveryProcess with preset "libar-generic"', () => {
+        const dp = createDeliveryProcess({ preset: 'libar-generic' });
+        state!.registry = dp.registry;
+      });
+
+      Then('the registry tagPrefix should be "@libar-docs-"', () => {
+        expect(state!.registry!.tagPrefix).toBe('@libar-docs-');
+      });
+
+      And('the registry fileOptInTag should be "@libar-docs"', () => {
+        expect(state!.registry!.fileOptInTag).toBe('@libar-docs');
+      });
+
+      And('the registry should have exactly 3 categories', () => {
+        // Libar-generic preset categories REPLACE base taxonomy (not merged)
+        expect(state!.registry!.categories).toHaveLength(3);
         const categoryTags = state!.registry!.categories.map((c) => c.tag);
         expect(categoryTags).toContain('core');
         expect(categoryTags).toContain('api');
@@ -172,6 +201,66 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('the registry fileOptInTag should be "@proj"', () => {
         expect(state!.registry!.fileOptInTag).toBe('@proj');
+      });
+    });
+  });
+
+  // ===========================================================================
+  // Preset Categories Replace Base Categories
+  // ===========================================================================
+
+  Rule('Preset categories replace base categories entirely', ({ RuleScenario }) => {
+    RuleScenario('Generic preset excludes DDD categories', ({ When, Then, And }) => {
+      When('I call createDeliveryProcess with preset "generic"', () => {
+        const dp = createDeliveryProcess({ preset: 'generic' });
+        state!.registry = dp.registry;
+      });
+
+      Then('the registry should NOT include category "ddd"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('ddd');
+      });
+
+      And('the registry should NOT include category "event-sourcing"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('event-sourcing');
+      });
+
+      And('the registry should NOT include category "cqrs"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('cqrs');
+      });
+
+      And('the registry should NOT include category "saga"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('saga');
+      });
+    });
+
+    RuleScenario('Libar-generic preset excludes DDD categories', ({ When, Then, And }) => {
+      When('I call createDeliveryProcess with preset "libar-generic"', () => {
+        const dp = createDeliveryProcess({ preset: 'libar-generic' });
+        state!.registry = dp.registry;
+      });
+
+      Then('the registry should NOT include category "ddd"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('ddd');
+      });
+
+      And('the registry should NOT include category "event-sourcing"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('event-sourcing');
+      });
+
+      And('the registry should NOT include category "cqrs"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('cqrs');
+      });
+
+      And('the registry should NOT include category "saga"', () => {
+        const categoryTags = state!.registry!.categories.map((c) => c.tag);
+        expect(categoryTags).not.toContain('saga');
       });
     });
   });

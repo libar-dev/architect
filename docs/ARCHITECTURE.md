@@ -96,7 +96,7 @@ createDeliveryProcess(options)
          ▼
 ┌──────────────────────────────────────────┐
 │ 1. Select preset (or use default)        │
-│    - libar-generic: @libar-docs-(default)│
+│    - libar-generic: @libar-docs- (default)│
 │    - generic: @docs-                     │
 │    - ddd-es-cqrs: @libar-docs-           │
 └──────────────────────────────────────────┘

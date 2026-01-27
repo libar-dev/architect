@@ -635,7 +635,7 @@ async function main(): Promise<void> {
 
     const { instance: dpInstance, isDefault, path: configPath } = configResult.value;
     const registry = dpInstance.registry;
-    const configSource = !isDefault && configPath ? configPath : '(default DDD-ES-CQRS taxonomy)';
+    const configSource = !isDefault && configPath ? configPath : '(default libar-generic preset)';
 
     if (config.format === 'pretty') {
       console.log('Validating patterns...');

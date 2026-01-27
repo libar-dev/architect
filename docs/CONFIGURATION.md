@@ -12,34 +12,60 @@ Configure tag prefixes, presets, and custom taxonomies for `@libar-dev/delivery-
 | Preset                        | Tag Prefix     | Categories | Use Case                             |
 | ----------------------------- | -------------- | ---------- | ------------------------------------ |
 | **`libar-generic`** (default) | `@libar-docs-` | 3          | Simple projects (this package)       |
-| `ddd-es-cqrs`                 | `@libar-docs-` | 21         | DDD/Event Sourcing architectures     |
 | `generic`                     | `@docs-`       | 3          | Simple projects with `@docs-` prefix |
+| `ddd-es-cqrs`                 | `@libar-docs-` | 21         | DDD/Event Sourcing architectures     |
 
 ```typescript
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-// Default: libar-generic preset (used by this package)
-const dp = createDeliveryProcess();
+// Default: libar-generic preset (simple 3-category taxonomy)
+const dpDefault = createDeliveryProcess();
 // Tag prefix: @libar-docs-*
 // Categories: core, api, infra
 
-// DDD preset (for DDD/ES/CQRS architectures)
-const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+// DDD-ES-CQRS preset (full 21-category taxonomy)
+const dpDDD = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
 // Tag prefix: @libar-docs-*
 // Categories: 21 domain-specific categories
 
-// Generic preset (for projects preferring @docs- prefix)
-const dp = createDeliveryProcess({ preset: 'generic' });
+// Generic preset (simple taxonomy with @docs- prefix)
+const dpGeneric = createDeliveryProcess({ preset: 'generic' });
 // Tag prefix: @docs-*
 // Categories: core, api, infra
 
 // Custom prefix with any taxonomy
-const dp = createDeliveryProcess({
+const dpCustom = createDeliveryProcess({
   preset: 'libar-generic',
   tagPrefix: '@acme-',
   fileOptInTag: '@acme',
 });
 ```
+
+### Preset Category Behavior
+
+When using a preset, the preset's categories **replace** the base taxonomy categories entirely (not merged):
+
+| Preset          | Categories        | Count |
+| --------------- | ----------------- | ----- |
+| `generic`       | core, api, infra  | 3     |
+| `libar-generic` | core, api, infra  | 3     |
+| `ddd-es-cqrs`   | Full DDD taxonomy | 21    |
+
+**Design decision:** If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.), use the `ddd-es-cqrs` preset. The `generic` and `libar-generic` presets provide a simpler 3-category taxonomy.
+
+**Note:** The `mergeTagRegistries()` function is exported for consumers who need custom merge behavior, but `createDeliveryProcess()` uses replacement semantics.
+
+### Default Preset Selection
+
+All entry points use the same default:
+
+| Entry Point                       | Default Preset                 | Context                  |
+| --------------------------------- | ------------------------------ | ------------------------ |
+| `createDeliveryProcess()`         | `libar-generic` (3 categories) | Programmatic API         |
+| `loadConfig()` fallback (no file) | `libar-generic` (3 categories) | CLI tools                |
+| This package's config file        | `libar-generic` (3 categories) | Standalone package usage |
+
+**Rationale:** Simple defaults for most users. Use `preset: 'ddd-es-cqrs'` explicitly if you need the full 21-category DDD taxonomy.
 
 ---
 
