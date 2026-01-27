@@ -613,11 +613,14 @@ export async function generateDocumentation(
 /**
  * Merge patterns from TypeScript and Gherkin sources with conflict detection
  *
+ * Exported for testing purposes - allows direct unit testing of merge logic
+ * without running the full pipeline.
+ *
  * @param tsPatterns - Patterns extracted from TypeScript files
  * @param gherkinPatterns - Patterns extracted from Gherkin feature files
  * @returns Result containing merged patterns or error if conflicts detected
  */
-function mergePatterns(
+export function mergePatterns(
   tsPatterns: readonly ExtractedPattern[],
   gherkinPatterns: readonly ExtractedPattern[]
 ): Result<readonly ExtractedPattern[], string> {

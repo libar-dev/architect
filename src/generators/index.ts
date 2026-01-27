@@ -42,6 +42,7 @@ export {
 // Orchestrator - programmatic API for documentation generation
 export {
   generateDocumentation,
+  mergePatterns,
   type GenerateOptions,
   type GenerateResult,
   type GeneratedFile,
