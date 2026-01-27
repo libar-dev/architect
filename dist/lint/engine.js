@@ -18,7 +18,7 @@
  * - Use when building CI pipelines for documentation standards
  * - Use for formatting lint results (pretty or JSON output)
  */
-import { severityOrder, } from './rules.js';
+import { severityOrder } from './rules.js';
 import { createJsonOutputCodec, LintOutputSchema, } from '../validation-schemas/index.js';
 /**
  * Codec for serializing lint output to JSON

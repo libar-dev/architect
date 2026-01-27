@@ -77,9 +77,6 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             active: "active";
             completed: "completed";
             deferred: "deferred";
-            implemented: "implemented";
-            partial: "partial";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -139,9 +136,6 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         active: "active";
         completed: "completed";
         deferred: "deferred";
-        implemented: "implemented";
-        partial: "partial";
-        "in-progress": "in-progress";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
     useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -169,8 +163,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
             unknown: "unknown";
-            domain: "domain";
             timeline: "timeline";
+            domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";

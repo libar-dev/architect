@@ -13,8 +13,6 @@
 
 ## Description
 
-## DualSourceSchemas - Dual-Source Extraction Type Validation
-
 Zod schemas for dual-source extraction types.
 
 Following the project's schema-first pattern, all dual-source types

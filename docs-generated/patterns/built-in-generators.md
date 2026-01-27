@@ -13,8 +13,6 @@
 
 ## Description
 
-## BuiltInGenerators - Default Generator Bootstrap
-
 Registers all codec-based generators on import using the RDM
 (RenderableDocument Model) architecture.
 

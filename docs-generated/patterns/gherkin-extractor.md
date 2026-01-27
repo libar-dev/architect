@@ -13,8 +13,6 @@
 
 ## Description
 
-## GherkinExtractor - Convert Feature Files to Pattern Documentation
-
 Transforms scanned Gherkin feature files into ExtractedPattern objects
 for inclusion in generated documentation. Maps feature tags, descriptions,
 and scenarios to pattern metadata.

@@ -13,8 +13,6 @@
 
 ## Description
 
-## Shared Codec Output Schema
-
 Provides a simplified RenderableDocument output schema for use with
 Zod 4 codecs. The simplification (using z.any() for recursive fields)
 avoids complex recursive type issues at the codec boundary while

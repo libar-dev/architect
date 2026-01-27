@@ -47,7 +47,6 @@ export {
 // Anti-Pattern Detector
 export {
   type AntiPatternDetectionOptions,
-  detectTagDuplication,
   detectProcessInCode,
   detectMagicComments,
   detectScenarioBloat,

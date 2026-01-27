@@ -223,59 +223,5 @@ export function formatWorkflowLoadError(error: WorkflowLoadError): string {
   return lines.join('\n');
 }
 
-/**
- * Get status emoji from loaded workflow
- *
- * Provides a convenient way to look up emoji for a status from a LoadedWorkflow.
- * Returns empty string if status not found.
- *
- * @param workflow - LoadedWorkflow instance
- * @param status - Status name to look up
- * @returns Emoji string or empty string if not found
- *
- * @example
- * ```typescript
- * const workflow = await loadDefaultWorkflow();
- * const emoji = getWorkflowStatusEmoji(workflow, "completed"); // "✅"
- * ```
- */
-export function getWorkflowStatusEmoji(
-  workflow: LoadedWorkflow,
-  status: string | undefined
-): string {
-  if (!status) return '';
-  const statusDef = workflow.statusMap.get(status.toLowerCase());
-  return statusDef?.emoji ?? '';
-}
-
-/**
- * Get status label from loaded workflow
- *
- * Returns the human-readable label for a status, or the capitalized
- * status name if no label is defined.
- *
- * @param workflow - LoadedWorkflow instance
- * @param status - Status name to look up
- * @returns Label string
- *
- * @example
- * ```typescript
- * const workflow = await loadDefaultWorkflow();
- * const label = getWorkflowStatusLabel(workflow, "roadmap"); // "Planned"
- * ```
- */
-export function getWorkflowStatusLabel(
-  workflow: LoadedWorkflow,
-  status: string | undefined
-): string {
-  if (!status) return 'Unknown';
-  const statusDef = workflow.statusMap.get(status.toLowerCase());
-  if (statusDef?.label) {
-    return statusDef.label;
-  }
-  // Capitalize status name as fallback
-  return status.charAt(0).toUpperCase() + status.slice(1);
-}
-
 // Re-export types for convenience
 export type { LoadedWorkflow, WorkflowConfig };

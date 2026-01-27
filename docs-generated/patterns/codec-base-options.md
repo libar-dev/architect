@@ -13,8 +13,6 @@
 
 ## Description
 
-## Base Codec Options
-
 Shared types, interfaces, and utilities for all document codecs.
 Individual codec files define their own specific option types that extend BaseCodecOptions.
 

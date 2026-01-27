@@ -104,7 +104,6 @@ export {
   getStatusEmoji,
   getDisplayName,
   formatCategoryName,
-  extractFirstParagraph,
   extractSummary,
   computeStatusCounts,
   completionPercentage,

@@ -24,9 +24,6 @@ import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { STATUS_NORMALIZATION_MAP, PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
 import { DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 
-// Re-export types from schema for backwards compatibility
-export type { LintSeverity, LintViolation };
-
 /**
  * Context for lint rules that need access to the full pattern registry.
  * Used for "strict mode" validation where relationships are checked

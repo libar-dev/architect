@@ -24,7 +24,6 @@
  */
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as crypto from 'crypto';
 import { glob } from 'glob';
 import { Result as R } from '../../types/index.js';
 import { scanGherkinFiles } from '../../scanner/gherkin-scanner.js';
@@ -62,19 +61,11 @@ const DEFAULT_SPEC_PATTERNS = [
  */
 export async function deriveProcessState(config) {
     const specPatterns = config.specPatterns ?? DEFAULT_SPEC_PATTERNS;
-    // taxonomyPath is now optional - TypeScript is the source of truth for taxonomy
-    const taxonomyPath = config.taxonomyPath ?? null;
     const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, 'sessions');
     // Derive file states
     const filesResult = await deriveFileStates(config.baseDir, specPatterns);
     if (!filesResult.ok) {
         return filesResult;
-    }
-    // Compute taxonomy hash (only if JSON path provided for backwards compatibility)
-    let taxonomyHash = '';
-    if (taxonomyPath) {
-        const hashResult = await computeTaxonomyHash(taxonomyPath);
-        taxonomyHash = hashResult.ok ? hashResult.value : '';
     }
     // Find active session
     const sessionResult = await findActiveSession(sessionsDir, config.baseDir);
@@ -82,7 +73,6 @@ export async function deriveProcessState(config) {
     // Build ProcessState (handle exactOptionalPropertyTypes)
     const processState = {
         files: filesResult.value,
-        taxonomyHash,
         derivedAt: new Date().toISOString(),
     };
     // Only add activeSession if it exists
@@ -191,19 +181,6 @@ function extractUnlockReason(tags) {
         }
     }
     return { hasUnlockReason: false, unlockReason: undefined };
-}
-/**
- * Compute SHA256 hash of tag-registry.json.
- */
-async function computeTaxonomyHash(taxonomyPath) {
-    try {
-        const content = await fs.readFile(taxonomyPath, 'utf-8');
-        const hash = crypto.createHash('sha256').update(content).digest('hex');
-        return R.ok(hash.slice(0, 16)); // First 16 chars is enough
-    }
-    catch (error) {
-        return R.err(error instanceof Error ? error : new Error(String(error)));
-    }
 }
 /**
  * Find active session from sessions directory.

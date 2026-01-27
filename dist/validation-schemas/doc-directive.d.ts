@@ -73,9 +73,6 @@ export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
     active: "active";
     completed: "completed";
     deferred: "deferred";
-    implemented: "implemented";
-    partial: "partial";
-    "in-progress": "in-progress";
 }>;
 /**
  * Pattern status schema for directive validation
@@ -88,9 +85,6 @@ export declare const PatternStatusSchema: z.ZodEnum<{
     active: "active";
     completed: "completed";
     deferred: "deferred";
-    implemented: "implemented";
-    partial: "partial";
-    "in-progress": "in-progress";
 }>;
 export type PatternStatus = AcceptedStatusValue;
 /**
@@ -140,9 +134,6 @@ export declare const DocDirectiveSchema: z.ZodObject<{
         active: "active";
         completed: "completed";
         deferred: "deferred";
-        implemented: "implemented";
-        partial: "partial";
-        "in-progress": "in-progress";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
     useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;

@@ -53,7 +53,6 @@ export {
 export {
   loadConfig,
   findConfigFile,
-  findConfigFileSync,
   formatConfigError,
   type ConfigDiscoveryResult,
   type ConfigLoadError,
@@ -65,8 +64,6 @@ export {
   loadWorkflowFromPath,
   loadDefaultWorkflow,
   formatWorkflowLoadError,
-  getWorkflowStatusEmoji,
-  getWorkflowStatusLabel,
   type WorkflowLoadError,
   type LoadedWorkflow,
   type WorkflowConfig,

@@ -13,8 +13,6 @@
 
 ## Description
 
-## GeneratorTypes - Pluggable Document Generation Interface
-
 Minimal interface for pluggable generators that produce documentation from patterns.
 Both JSON-configured built-in generators and TypeScript custom generators implement this.
 

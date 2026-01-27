@@ -7,21 +7,21 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 75/108 (69% complete)
+**Overall:** [██████████████░░░░░░] 71/104 (68% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 75 |
+| ✅ Completed | 71 |
 | 🚧 Active | 13 |
 | 📋 Planned | 20 |
-| **Total** | 108 |
+| **Total** | 104 |
 
 ---
 
 ## Categories
 
 - [Cli](#cli) (6)
-- [Config](#config) (3)
+- [Config](#config) (1)
 - [Core](#core) (45)
 - [DDD](#ddd) (17)
 - [Extractor](#extractor) (3)
@@ -35,7 +35,7 @@
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
 - [Scanner](#scanner) (2)
-- [Validation](#validation) (14)
+- [Validation](#validation) (12)
 
 ---
 
@@ -44,113 +44,109 @@
 | Pattern | Category | Status | Description |
 | --- | --- | --- | --- |
 | ✅ Adr Document Codec | Core | completed | Transforms MasterDataset into RenderableDocument for Architecture Decision Records. |
-| ✅ Anti Pattern Detector | Validation | completed | Detects violations of the dual-source documentation architecture and |
-| ✅ Architecture Codec | Core | completed | Transforms MasterDataset into a RenderableDocument containing |
-| ✅ Artefact Set Loader | Config | completed | Loads and validates artefact set configurations from the catalogue directory. |
-| ✅ Artefact Set Schema | Validation | completed | Defines the schema for artefact sets - predefined groupings of generators |
-| ✅ Built In Generators | Generator | completed | Registers all codec-based generators on import using the RDM |
-| ✅ CLI Error Handler | Cli | completed | Provides type-safe error handling for all CLI commands using the |
+| ✅ Anti Pattern Detector | Validation | completed | Detects violations of the dual-source documentation architecture and process hygiene issues that lead to... |
+| ✅ Architecture Codec | Core | completed | Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source... |
+| ✅ Built In Generators | Generator | completed | Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture. |
+| ✅ CLI Error Handler | Cli | completed | Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern. |
 | ✅ CLI Version Helper | Cli | completed | Reads package version from package.json for CLI --version flag. |
-| ✅ Codec Based Generator | Core | completed | Adapts the new RenderableDocument Model (RDM) codec system to the |
+| ✅ Codec Based Generator | Core | completed | Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface. |
 | ✅ Codec Base Options | Core | completed | Shared types, interfaces, and utilities for all document codecs. |
 | ✅ Codec Generator Registration | Core | completed | Registers codec-based generators for the RenderableDocument Model (RDM) system. |
-| ✅ Codec Utils | Core | completed | Provides factory functions for creating type-safe JSON parsing and serialization |
-| ✅ Collection Utilities | Core | completed | Provides shared utilities for working with arrays and collections, |
+| ✅ Codec Utils | Core | completed | Provides factory functions for creating type-safe JSON parsing and serialization pipelines using Zod schemas. |
+| ✅ Collection Utilities | Core | completed | Provides shared utilities for working with arrays and collections, such as grouping items by a key function. |
 | ✅ Config Loader | Core | completed | Discovers and loads `delivery-process.config.ts` files for hierarchical configuration. |
 | ✅ Configuration Defaults | Core | completed | Centralized default constants for the delivery-process package. |
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
 | ✅ Doc Directive Schema | Validation | completed | Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments. |
-| ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with |
-| ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: |
-| ✅ Documentation Generator CLI | Core | completed | Replaces multiple specialized CLIs with one unified interface that supports |
+| ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and... |
+| ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts... |
+| ✅ Documentation Generator CLI | Core | completed | Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run. |
 | ✅ Document Generator | Core | completed | Simplified document generation using codecs. |
 | ✅ DoD Validation Types | Validation | completed | Types and schemas for Definition of Done (DoD) validation and anti-pattern detection. |
-| ✅ DoD Validator | Validation | completed | Validates that completed phases meet Definition of Done criteria: |
-| ✅ Dual Source Extractor | Extractor | completed | Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) |
+| ✅ DoD Validator | Validation | completed | Validates that completed phases meet Definition of Done criteria: 1. |
+| ✅ Dual Source Extractor | Extractor | completed | Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),... |
 | ✅ Dual Source Schemas | Validation | completed | Zod schemas for dual-source extraction types. |
-| ✅ Extracted Pattern Schema | Validation | completed | Zod schema for validating complete extracted patterns with code, |
-| ✅ Generator Config Schema | Validation | completed | Zod schemas for declarative JSON-based generator configuration. |
+| ✅ Extracted Pattern Schema | Validation | completed | Zod schema for validating complete extracted patterns with code, metadata, relationships, and source information. |
 | ✅ Generator Registry | Generator | completed | Manages registration and lookup of document generators (both built-in and custom). |
 | ✅ Generator Types | Generator | completed | Minimal interface for pluggable generators that produce documentation from patterns. |
-| ✅ Gherkin AST Parser | Scanner | completed | Parses Gherkin feature files using @cucumber/gherkin and extracts structured data |
-| ✅ Gherkin Extractor | Extractor | completed | Transforms scanned Gherkin feature files into ExtractedPattern objects |
+| ✅ Gherkin AST Parser | Scanner | completed | Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,... |
+| ✅ Gherkin Extractor | Extractor | completed | Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation. |
 | ✅ Gherkin Rules Support | DDD | completed | Feature files were limited to flat scenario lists. |
 | ✅ Gherkin Scanner | Scanner | completed | Scans .feature files for pattern metadata encoded in Gherkin tags. |
-| ✅ Layer Inference | Extractor | completed | Infers feature file layer (timeline, domain, integration, e2e, component) |
+| ✅ Layer Inference | Extractor | completed | Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns. |
 | ✅ Lint Engine | Lint | completed | Orchestrates lint rule execution against parsed directives. |
 | ✅ Lint Module | Lint | completed | Provides lint rules and engine for pattern annotation quality checking. |
 | ✅ Lint Patterns CLI | Cli | completed | Validates pattern annotations for quality and completeness. |
-| ✅ Lint Rules | Lint | completed | Defines lint rules that check @libar-docs-* directives for completeness |
-| ✅ Master Dataset | Core | completed | Defines the schema for a pre-computed dataset that holds all extracted patterns |
-| ✅ Mvp Workflow Implementation | DDD | completed | PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) |
+| ✅ Lint Rules | Lint | completed | Defines lint rules that check @libar-docs-* directives for completeness and quality. |
+| ✅ Master Dataset | Core | completed | Defines the schema for a pre-computed dataset that holds all extracted patterns along with derived views (by status,... |
+| ✅ Mvp Workflow Implementation | DDD | completed | PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package... |
 | ✅ Output Schemas | Core | completed | Zod schemas for JSON output formats used by CLI tools. |
-| ✅ Pattern Scanner | Core | completed | Discovers TypeScript files matching glob patterns and filters to only |
+| ✅ Pattern Scanner | Core | completed | Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in. |
 | ✅ Pattern Id Generator | Core | completed | Generates unique, deterministic pattern IDs based on file path and line number. |
 | ✅ Pattern Relationship Model | DDD | completed | Problem: The delivery process lacks a comprehensive relationship model between artifacts. |
 | ✅ Patterns Codec | Core | completed | Transforms MasterDataset into a RenderableDocument for pattern registry output. |
 | ✅ Phase State Machine Validation | DDD | completed | Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md. |
 | ✅ Pipeline Module | Infra | completed | Barrel export for the unified transformation pipeline components. |
-| ✅ Planning Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for planning outputs: |
+| ✅ Planning Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for planning outputs: - PLANNING-CHECKLIST.md (pre-planning... |
 | ✅ Pr Changes Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PR-scoped output. |
-| ✅ Process Guard Linter | DDD | completed | During planning and implementation sessions, accidental modifications occur: |
+| ✅ Process Guard Linter | DDD | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
 | ✅ Public API | Core | completed | Main entry point for the @libar-dev/delivery-process package. |
 | ✅ Regex Builders | Core | completed | Type-safe regex factory functions for tag detection and normalization. |
 | ✅ Renderable Document | Core | completed | Universal intermediate format for all generated documentation. |
 | ✅ Renderable Utils | Core | completed | Utility functions for document codecs. |
-| ✅ Reporting Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for reporting outputs: |
+| ✅ Reporting Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for reporting outputs: - CHANGELOG-GENERATED.md (Keep a Changelog... |
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
 | ✅ Rich Content Helpers | Core | completed | Shared helper functions for rendering Gherkin rich content in document codecs. |
-| ✅ Session Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for session/planning outputs: |
-| ✅ Shared Codec Schema | Core | completed | Provides a simplified RenderableDocument output schema for use with |
-| ✅ String Utilities | Core | completed | Provides shared utilities for string manipulation used across the delivery-process package, |
+| ✅ Session Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session... |
+| ✅ Shared Codec Schema | Core | completed | Provides a simplified RenderableDocument output schema for use with Zod 4 codecs. |
+| ✅ String Utilities | Core | completed | Provides shared utilities for string manipulation used across the delivery-process package, including slugification... |
 | ✅ Tag Registry Configuration | Core | completed | Defines the structure and validation for external tag taxonomy configuration. |
-| ✅ Tag Registry Loader | Config | completed | Loads and validates tag registry configuration from external JSON files. |
 | ✅ Tag Taxonomy CLI | Cli | completed | Generates TAG_TAXONOMY.md from tag-registry.json. |
-| ✅ Timeline Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for timeline outputs: |
-| ✅ Transform Dataset | Core | completed | Transforms raw extracted patterns into a MasterDataset with all pre-computed |
-| ✅ TypeScript AST Parser | Core | completed | Parses TypeScript source files using @typescript-eslint/typescript-estree |
-| ✅ TypeScript Taxonomy Implementation | DDD | completed | As a delivery-process developer |
+| ✅ Timeline Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)... |
+| ✅ Transform Dataset | Core | completed | Transforms raw extracted patterns into a MasterDataset with all pre-computed views. |
+| ✅ TypeScript AST Parser | Core | completed | Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with... |
+| ✅ TypeScript Taxonomy Implementation | DDD | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |
 | ✅ Universal Renderer | Core | completed | Converts RenderableDocument to Markdown. |
 | ✅ Utils Module | Core | completed | Common helper functions used across the delivery-process package. |
 | ✅ Validate Patterns CLI | Cli | completed | Cross-validates TypeScript patterns vs Gherkin feature files. |
-| ✅ Validation Module | Validation | completed | Barrel export for validation module providing: |
-| ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define |
+| ✅ Validation Module | Validation | completed | Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -... |
+| ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact... |
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
-| 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript |
-| 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator |
-| 🚧 Detect Changes | Lint | active | :DeriveProcessState |
-| 🚧 FSM Module | Validation | active | :PDR005MvpWorkflow |
-| 🚧 FSM States | Validation | active | :PDR005MvpWorkflow |
-| 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow |
-| 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow |
-| 🚧 Lint Process CLI | Cli | active | :ProcessGuardModule |
-| 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges |
-| 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider |
-| 🚧 Process Guard Types | Lint | active | :FSMValidator |
-| 🚧 Process State API | Core | active | :FSMValidator |
-| 🚧 Process State Types | Core | active | :MasterDataset |
+| 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
+| 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
+| 🚧 Detect Changes | Lint | active | :DeriveProcessState Detects changes from git diff including: - Modified, added, deleted files - Status transitions... |
+| 🚧 FSM Module | Validation | active | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
+| 🚧 FSM States | Validation | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
+| 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
+| 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
+| 🚧 Lint Process CLI | Cli | active | :ProcessGuardModule Validates git changes against delivery process rules. |
+| 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
+| 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
+| 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
+| 🚧 Process State API | Core | active | :FSMValidator TypeScript interface for querying delivery process state. |
+| 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
-| 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams |
+| 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 | 📋 Business Rules Codec | Core | planned | Transforms MasterDataset into a RenderableDocument for business rules output. |
-| 📋 Business Rules Generator | DDD | planned | Business Value: Enable stakeholders to understand domain constraints without reading |
-| 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin |
+| 📋 Business Rules Generator | DDD | planned | Business Value: Enable stakeholders to understand domain constraints without reading implementation details or full... |
+| 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
 |  Document Codecs | Core | planned | Barrel export for all document codecs. |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
-| 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to |
-| 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich |
-| 📋 Process State API CLI | DDD | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but |
-| 📋 Process State API Relationship Queries | DDD | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, |
+| 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
+| 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
+| 📋 Process State API CLI | DDD | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 📋 Process State API Relationship Queries | DDD | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
-| 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release |
+| 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 |  Renderable Document Model (RDM) | Core | planned | Unified document generation using codecs and a universal renderer. |
-| 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working |
-| 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused |
+| 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
+| 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
-| 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate |
+| 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
 
 ---
 
@@ -169,10 +165,8 @@
 
 ### Config
 
-3/3 complete (100%)
+1/1 complete (100%)
 
-- [✅ Artefact Set Loader](patterns/artefact-set-loader.md)
-- [✅ Tag Registry Loader](patterns/tag-registry-loader.md)
 - [✅ Workflow Loader](patterns/workflow-loader.md)
 
 ---
@@ -355,16 +349,14 @@
 
 ### Validation
 
-10/14 complete (71%)
+8/12 complete (67%)
 
 - [✅ Anti Pattern Detector](patterns/anti-pattern-detector.md)
-- [✅ Artefact Set Schema](patterns/artefact-set-schema.md)
 - [✅ Doc Directive Schema](patterns/doc-directive-schema.md)
 - [✅ DoD Validation Types](patterns/do-d-validation-types.md)
 - [✅ DoD Validator](patterns/do-d-validator.md)
 - [✅ Dual Source Schemas](patterns/dual-source-schemas.md)
 - [✅ Extracted Pattern Schema](patterns/extracted-pattern-schema.md)
-- [✅ Generator Config Schema](patterns/generator-config-schema.md)
 - [✅ Validation Module](patterns/validation-module.md)
 - [✅ Workflow Config Schema](patterns/workflow-config-schema.md)
 - [🚧 FSM Module](patterns/fsm-module.md)
@@ -387,8 +379,6 @@ graph TD
     MasterDataset --> TagRegistry
     ExtractedPatternSchema --> DocDirectiveSchema
     CodecUtils --> Zod
-    ArtefactSetSchema --> Zod
-    ArtefactSetSchema --> WorkflowConfigSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> GherkinTypes
     DoDValidator --> DualSourceExtractor
@@ -408,6 +398,13 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     GherkinExtractor --> GherkinTypes
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> DocExtractor
@@ -416,13 +413,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -435,13 +425,9 @@ graph TD
     TagTaxonomyCLI --> TagTaxonomyGenerator
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
-    Documentation_Generator_CLI --> Tag_Registry_Loader
-    Documentation_Generator_CLI --> Artefact_Set_Loader
     CLIErrorHandler --> DocError
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
-    TagRegistryLoader --> TagRegistrySchema
-    TagRegistryLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
     ConfigurationPresets --> ConfigurationTypes
     ConfigurationPresets --> Categories
@@ -452,9 +438,6 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ArtefactSetLoader --> ArtefactSetSchema
-    ArtefactSetLoader --> Result
-    ArtefactSetLoader --> CodecUtils
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset

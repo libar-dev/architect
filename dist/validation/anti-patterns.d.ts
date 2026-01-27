@@ -39,18 +39,6 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
     readonly thresholds?: Partial<AntiPatternThresholds>;
 }
 /**
- * Detect tag duplication anti-pattern
- *
- * Finds code-only tags that should not appear in feature files.
- * Currently returns empty array as all deprecated tags have been migrated.
- * Kept for API stability and future extensibility.
- *
- * @param features - Array of scanned feature files
- * @param registry - Optional tag registry for prefix-aware messages (defaults to @libar-docs-)
- * @returns Array of anti-pattern violations (currently always empty)
- */
-export declare function detectTagDuplication(features: readonly ScannedGherkinFile[], registry?: TagRegistry): AntiPatternViolation[];
-/**
  * Detect process metadata in code anti-pattern
  *
  * Finds process tracking annotations (e.g., @docs-quarter, @docs-team, etc.)

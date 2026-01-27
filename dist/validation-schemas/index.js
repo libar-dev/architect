@@ -7,7 +7,7 @@ export { SourceInfoSchema, ExtractedPatternSchema, BusinessRuleSchema, isExtract
 // ScenarioRef schemas and types
 export { ScenarioRefSchema } from './scenario-ref.js';
 // Config schemas and types
-export { ScannerConfigSchema, GeneratorConfigSchema, createGeneratorConfigSchema, isScannerConfig, isGeneratorConfig, } from './config.js';
+export { ScannerConfigSchema, createGeneratorConfigSchema, isScannerConfig, isGeneratorConfig, } from './config.js';
 // Feature schemas and types (Gherkin)
 // Runtime types (from Cucumber parser)
 export { GherkinDataTableSchema, GherkinStepSchema, GherkinBackgroundSchema, GherkinScenarioSchema, GherkinFeatureSchema, ScannedGherkinFileSchema, GherkinFileErrorSchema, GherkinScanResultsSchema, 

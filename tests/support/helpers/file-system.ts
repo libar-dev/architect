@@ -241,7 +241,7 @@ export interface RegularType {
 }
 
 /**
- * Create a Gherkin feature file with @libar-process tags.
+ * Create a Gherkin feature file with @libar-docs-* tags.
  *
  * @example
  * ```typescript

@@ -13,8 +13,6 @@
 
 ## Description
 
-## ExtractedPatternSchema - Complete Pattern Validation
-
 Zod schema for validating complete extracted patterns with code,
 metadata, relationships, and source information.
 

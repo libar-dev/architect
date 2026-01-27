@@ -13,8 +13,6 @@
 
 ## Description
 
-## Config Loader - TypeScript Configuration File Discovery
-
 Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 Supports package-level and repo-level configuration inheritance.
 

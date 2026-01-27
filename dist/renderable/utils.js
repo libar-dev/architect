@@ -20,12 +20,9 @@ import { normalizeStatus as taxonomyNormalizeStatus, } from '../taxonomy/index.j
 /**
  * Default status emoji mapping (fallback when no workflow)
  * Per PDR-005: roadmap, active, completed, deferred
- * Intentionally maps both legacy and new values for display backward compat.
  */
 const STATUS_EMOJI = {
-    implemented: '\u2705', // ✅ (legacy)
     completed: '\u2705', // ✅
-    partial: '\ud83d\udea7', // 🚧 (legacy)
     active: '\ud83d\udea7', // 🚧
     roadmap: '\ud83d\udccb', // 📋
     planned: '\ud83d\udccb', // 📋 (normalized)
@@ -159,20 +156,6 @@ export function stripMarkdown(text) {
         .replace(/\*([^*]+)\*/g, '$1') // Italic
         .replace(/`([^`]+)`/g, '`$1`') // Keep inline code
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1'); // Links
-}
-/**
- * Extract first paragraph from description
- */
-export function extractFirstParagraph(description, maxLength = 500) {
-    if (!description)
-        return '';
-    const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, '');
-    const paragraphs = withoutHeaders.split(/\n\s*\n/);
-    const firstParagraph = paragraphs[0]?.trim() ?? '';
-    if (firstParagraph.length > maxLength) {
-        return firstParagraph.slice(0, maxLength - 3) + TRUNCATION_SUFFIX;
-    }
-    return firstParagraph;
 }
 /**
  * Extract first sentence from description

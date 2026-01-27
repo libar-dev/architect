@@ -13,10 +13,8 @@
 
 ## Description
 
-## DualSourceExtractor - Compose Pattern Data from Code + Features
-
 Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
-and Gherkin feature files (@libar-process-*), validates consistency,
+and Gherkin feature files (@libar-docs-*), validates consistency,
 and composes unified pattern data for documentation generation.
 
 ### When to Use
@@ -29,7 +27,7 @@ and composes unified pattern data for documentation generation.
 ### Key Concepts
 
 - **Code Source**: @libar-docs-* tags define timeless pattern graph
-- **Feature Source**: @libar-process-* tags add temporal process metadata
+- **Feature Source**: @libar-docs-* tags add temporal process metadata
 - **Cross-Validation**: Pattern name + phase must match across sources
 - **Deliverables**: Parsed from Gherkin Background tables in features
 

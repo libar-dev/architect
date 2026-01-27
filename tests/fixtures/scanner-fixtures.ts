@@ -417,7 +417,7 @@ export interface GherkinContentOptions {
 }
 
 /**
- * Build Gherkin feature file content with @libar-process-* tags.
+ * Build Gherkin feature file content with @libar-docs-* tags.
  *
  * @example
  * ```typescript

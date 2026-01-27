@@ -19,7 +19,8 @@
  * - Use for formatting lint results (pretty or JSON output)
  */
 import type { DocDirective } from '../validation-schemas/doc-directive.js';
-import { type LintContext, type LintRule, type LintViolation } from './rules.js';
+import type { LintViolation } from '../validation-schemas/lint.js';
+import { type LintContext, type LintRule } from './rules.js';
 import type { Result } from '../types/result.js';
 /**
  * Lint results for a single file

@@ -22,6 +22,6 @@ export { renderToMarkdown, renderDocumentWithFiles, type OutputFile } from './re
 export { PatternsDocumentCodec, RoadmapDocumentCodec, CompletedMilestonesCodec, RequirementsDocumentCodec, SessionContextCodec, RemainingWorkCodec, } from './codecs/index.js';
 export { generateDocument, generateDocuments, generateAllDocuments, getAvailableDocumentTypes, isValidDocumentType, getDocumentTypeInfo, DOCUMENT_TYPES, type DocumentType, } from './generate.js';
 export { normalizeStatus } from '../taxonomy/index.js';
-export { getStatusEmoji, getDisplayName, formatCategoryName, extractFirstParagraph, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, sortByPhaseAndName, sortByStatusAndName, formatBusinessValue, } from './utils.js';
+export { getStatusEmoji, getDisplayName, formatCategoryName, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, sortByPhaseAndName, sortByStatusAndName, formatBusinessValue, } from './utils.js';
 export { groupBy } from '../utils/index.js';
 //# sourceMappingURL=index.d.ts.map

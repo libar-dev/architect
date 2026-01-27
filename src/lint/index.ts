@@ -17,7 +17,8 @@
  */
 
 // Rule types and definitions
-export type { LintSeverity, LintViolation, LintRule, LintContext } from './rules.js';
+export type { LintSeverity, LintViolation } from '../validation-schemas/lint.js';
+export type { LintRule, LintContext } from './rules.js';
 export {
   defaultRules,
   filterRulesBySeverity,

@@ -45,7 +45,7 @@
 - Then unused exports "ReservationResult" and "reserve" are NOT reported as errors
 - And if reported, severity is "warn" not "error"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern ReservationPattern
@@ -67,7 +67,7 @@ export function reserve(): void {
 - Then unused exports "CMSState" ARE reported as errors
 - And severity is "error"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern CMSDualWrite
@@ -186,7 +186,7 @@ export interface CMSState {
 - When processing a roadmap file with empty interfaces
 - Then both rules are relaxed for the file
 
-```markdown
+```javascript
 statusAwareProcessor({
   relaxedRules: [
     "@typescript-eslint/no-unused-vars",

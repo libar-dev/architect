@@ -13,8 +13,6 @@
 
 ## Description
 
-## TransformDataset - Single-Pass Pattern Transformation
-
 Transforms raw extracted patterns into a MasterDataset with all pre-computed
 views. This is the core of the unified transformation pipeline, computing
 status groups, phase groups, quarter groups, category groups, and source

@@ -13,8 +13,6 @@
 
 ## Description
 
-## Documentation Generation Orchestrator - Full Pipeline Coordination
-
 Orchestrates the complete documentation generation pipeline:
 Scanner → Extractor → Generators → File Writer
 

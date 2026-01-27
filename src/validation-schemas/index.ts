@@ -32,7 +32,6 @@ export { ScenarioRefSchema, type ScenarioRef } from './scenario-ref.js';
 // Config schemas and types
 export {
   ScannerConfigSchema,
-  GeneratorConfigSchema,
   createGeneratorConfigSchema,
   isScannerConfig,
   isGeneratorConfig,

@@ -20,13 +20,8 @@
  */
 
 import type { DocDirective } from '../validation-schemas/doc-directive.js';
-import {
-  severityOrder,
-  type LintContext,
-  type LintRule,
-  type LintViolation,
-  type LintSeverity,
-} from './rules.js';
+import type { LintViolation, LintSeverity } from '../validation-schemas/lint.js';
+import { severityOrder, type LintContext, type LintRule } from './rules.js';
 import {
   createJsonOutputCodec,
   LintOutputSchema,

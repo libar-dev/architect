@@ -105,14 +105,4 @@ export declare function loadConfig(baseDir: string): Promise<ConfigLoadResult>;
  * @returns Formatted error message
  */
 export declare function formatConfigError(error: ConfigLoadError): string;
-/**
- * Synchronous check for config file (for non-async contexts)
- *
- * Note: This only checks if the file exists, not if it's valid.
- * Use loadConfig() for full validation.
- *
- * @param startDir - Directory to start searching from
- * @returns Path to config file or null
- */
-export declare function findConfigFileSync(startDir: string): string | null;
 //# sourceMappingURL=config-loader.d.ts.map

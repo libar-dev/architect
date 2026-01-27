@@ -105,9 +105,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -167,9 +164,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             active: "active";
             completed: "completed";
             deferred: "deferred";
-            implemented: "implemented";
-            partial: "partial";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -197,8 +191,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -281,8 +275,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                value: "value";
                 enum: "enum";
+                value: "value";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -322,9 +316,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -384,9 +375,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -414,8 +402,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -502,9 +490,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -564,9 +549,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -594,8 +576,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -682,9 +664,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -744,9 +723,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -774,8 +750,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -866,9 +842,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -928,9 +901,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -958,8 +928,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1053,9 +1023,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1115,9 +1082,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             active: "active";
             completed: "completed";
             deferred: "deferred";
-            implemented: "implemented";
-            partial: "partial";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1145,8 +1109,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1233,9 +1197,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1295,9 +1256,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             active: "active";
             completed: "completed";
             deferred: "deferred";
-            implemented: "implemented";
-            partial: "partial";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1325,8 +1283,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1414,9 +1372,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1476,9 +1431,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1506,8 +1458,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1594,9 +1546,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1656,9 +1605,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1686,8 +1632,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1774,9 +1720,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1836,9 +1779,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1866,8 +1806,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1954,9 +1894,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2016,9 +1953,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2046,8 +1980,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2160,9 +2094,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2222,9 +2153,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2252,8 +2180,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2340,9 +2268,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2402,9 +2327,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2432,8 +2354,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2520,9 +2442,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2582,9 +2501,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2612,8 +2528,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2700,9 +2616,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     active: "active";
                     completed: "completed";
                     deferred: "deferred";
-                    implemented: "implemented";
-                    partial: "partial";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2762,9 +2675,6 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 active: "active";
                 completed: "completed";
                 deferred: "deferred";
-                implemented: "implemented";
-                partial: "partial";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2792,8 +2702,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";

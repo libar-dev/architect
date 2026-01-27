@@ -13,8 +13,6 @@
 
 ## Description
 
-## PR Changes Document Codec
-
 Transforms MasterDataset into RenderableDocument for PR-scoped output.
 Filters patterns by changed files and/or release version tags.
 

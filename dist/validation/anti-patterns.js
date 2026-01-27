@@ -30,12 +30,6 @@ import { readFileSync } from 'fs';
 import { DEFAULT_THRESHOLDS } from './types.js';
 import { DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 /**
- * Tags that should NOT appear in feature files (belong in code only).
- * Currently empty - all deprecated libar-process-* tags have been migrated.
- * Array kept for API stability and future extensibility.
- */
-const CODE_ONLY_TAGS = [];
-/**
  * Tag suffixes that should only appear in feature files, not TypeScript code.
  * These are process metadata tags that track delivery workflow state.
  */
@@ -66,39 +60,6 @@ const MAGIC_COMMENT_PATTERNS = [
     /^#\s*AUTO-GEN:/i,
     /^#\s*DO NOT EDIT/i,
 ];
-/**
- * Detect tag duplication anti-pattern
- *
- * Finds code-only tags that should not appear in feature files.
- * Currently returns empty array as all deprecated tags have been migrated.
- * Kept for API stability and future extensibility.
- *
- * @param features - Array of scanned feature files
- * @param registry - Optional tag registry for prefix-aware messages (defaults to @libar-docs-)
- * @returns Array of anti-pattern violations (currently always empty)
- */
-export function detectTagDuplication(features, registry) {
-    const violations = [];
-    const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
-    for (const feature of features) {
-        const allTags = [...feature.feature.tags, ...feature.scenarios.flatMap((s) => s.tags)];
-        for (const tag of allTags) {
-            const normalizedTag = tag.toLowerCase();
-            for (const codeOnlyTag of CODE_ONLY_TAGS) {
-                if (normalizedTag.startsWith(codeOnlyTag.toLowerCase())) {
-                    violations.push({
-                        id: 'tag-duplication',
-                        message: `Tag "${tag}" found in feature file. Dependency tags belong in code (${tagPrefix}depends-on), not features.`,
-                        file: feature.filePath,
-                        severity: 'error',
-                        fix: `Move dependency to TypeScript code using ${tagPrefix}depends-on annotation instead.`,
-                    });
-                }
-            }
-        }
-    }
-    return violations;
-}
 /**
  * Detect process metadata in code anti-pattern
  *
@@ -273,7 +234,6 @@ export function detectAntiPatterns(scannedFiles, features, options = {}) {
     };
     return [
         // Error-level (architectural violations)
-        ...detectTagDuplication(features, registry),
         ...detectProcessInCode(scannedFiles, registry),
         // Warning-level (hygiene issues)
         ...detectMagicComments(features, mergedThresholds.magicCommentThreshold),

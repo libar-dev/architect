@@ -17,12 +17,10 @@ export declare const PROCESS_STATUS_VALUES: readonly ["roadmap", "active", "comp
 /**
  * Extended status values accepted for extraction and validation
  *
- * Includes FSM states plus legacy values for backward compatibility.
- * Legacy values are normalized to FSM states via normalizeStatus().
- *
- * @see normalized-status.ts for normalization mapping
+ * FSM states that can be used in annotations.
+ * Use only these canonical values: roadmap, active, completed, deferred.
  */
-export declare const ACCEPTED_STATUS_VALUES: readonly ["roadmap", "active", "completed", "deferred", "implemented", "partial", "in-progress"];
+export declare const ACCEPTED_STATUS_VALUES: readonly ["roadmap", "active", "completed", "deferred"];
 export type AcceptedStatusValue = (typeof ACCEPTED_STATUS_VALUES)[number];
 export type ProcessStatusValue = (typeof PROCESS_STATUS_VALUES)[number];
 /**

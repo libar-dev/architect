@@ -13,8 +13,6 @@
 
 ## Description
 
-## ValidatePatternsCLI - Cross-Source Pattern Validator
-
 Cross-validates TypeScript patterns vs Gherkin feature files.
 Ensures consistency between code annotations and feature specifications.
 

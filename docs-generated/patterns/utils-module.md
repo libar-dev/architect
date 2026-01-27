@@ -13,8 +13,6 @@
 
 ## Description
 
-## UtilsModule - Shared Utilities Barrel Export
-
 Common helper functions used across the delivery-process package.
 Provides text transformation and collection manipulation utilities.
 

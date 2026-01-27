@@ -23,17 +23,10 @@ export const PROCESS_STATUS_VALUES = [
 /**
  * Extended status values accepted for extraction and validation
  *
- * Includes FSM states plus legacy values for backward compatibility.
- * Legacy values are normalized to FSM states via normalizeStatus().
- *
- * @see normalized-status.ts for normalization mapping
+ * FSM states that can be used in annotations.
+ * Use only these canonical values: roadmap, active, completed, deferred.
  */
-export const ACCEPTED_STATUS_VALUES = [
-  ...PROCESS_STATUS_VALUES,
-  'implemented', // Legacy → normalized to "completed"
-  'partial', // Legacy → normalized to "active"
-  'in-progress', // Legacy → normalized to "active"
-] as const;
+export const ACCEPTED_STATUS_VALUES = [...PROCESS_STATUS_VALUES] as const;
 
 export type AcceptedStatusValue = (typeof ACCEPTED_STATUS_VALUES)[number];
 

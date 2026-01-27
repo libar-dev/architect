@@ -13,7 +13,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import {
-  detectTagDuplication,
   detectProcessInCode,
   detectMagicComments,
   detectScenarioBloat,
@@ -178,31 +177,6 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
     cleanupTempFiles();
     state = null;
-  });
-
-  // ===========================================================================
-  // Tag Duplication Detection
-  // ===========================================================================
-
-  Rule('Code-only tags should not appear in feature files', ({ RuleScenario }) => {
-    RuleScenario(
-      'Feature with any tags passes when no code-only tags defined',
-      ({ Given, When, Then }) => {
-        Given('a feature file with tags:', (_ctx, table: Array<{ tag: string }>) => {
-          state = initState();
-          const tags = table.map((row) => row.tag);
-          state.featureFiles = [createMockFeature(tags)];
-        });
-
-        When('detecting tag duplication', () => {
-          state!.violations = detectTagDuplication(state!.featureFiles);
-        });
-
-        Then('no violations are found', () => {
-          expect(state!.violations).toHaveLength(0);
-        });
-      }
-    );
   });
 
   // ===========================================================================

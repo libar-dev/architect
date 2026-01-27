@@ -33,8 +33,6 @@ export interface DeriveStateConfig {
     readonly baseDir: string;
     /** Glob patterns for spec files */
     readonly specPatterns?: readonly string[];
-    /** Optional path to tag-registry.json for hash computation (deprecated - TypeScript is source of truth) */
-    readonly taxonomyPath?: string | null;
     /** Path to sessions directory */
     readonly sessionsDir?: string;
 }

@@ -13,8 +13,6 @@
 
 ## Description
 
-## MasterDataset - Unified Pattern Views Schema
-
 Defines the schema for a pre-computed dataset that holds all extracted patterns
 along with derived views (by status, phase, quarter, category, source). This enables
 single-pass transformation instead of redundant filtering in each section renderer.

@@ -50,7 +50,7 @@
 - When the traceability generator parses the Rule
 - Then it should extract 3 scenario references:
 
-```markdown
+```gherkin
 Rule: Reservations prevent race conditions
   **Verified by:** Concurrent reservations, Expired reservation cleanup, User cancels
 ```

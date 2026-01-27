@@ -18,6 +18,6 @@
 export type { AntiPatternId, AntiPatternThresholds, AntiPatternViolation, DoDValidationResult, DoDValidationSummary, WithTagRegistry, } from './types.js';
 export { AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, } from './types.js';
 export { isDeliverableComplete, hasAcceptanceCriteria, extractAcceptanceCriteriaScenarios, validateDoDForPhase, validateDoD, formatDoDSummary, } from './dod-validator.js';
-export { type AntiPatternDetectionOptions, detectTagDuplication, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, detectAntiPatterns, formatAntiPatternReport, toValidationIssues, } from './anti-patterns.js';
+export { type AntiPatternDetectionOptions, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, detectAntiPatterns, formatAntiPatternReport, toValidationIssues, } from './anti-patterns.js';
 export * from './fsm/index.js';
 //# sourceMappingURL=index.d.ts.map

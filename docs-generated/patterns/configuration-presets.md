@@ -13,8 +13,6 @@
 
 ## Description
 
-## Configuration Presets
-
 Predefined configuration presets for common use cases.
 Uses `as const satisfies` for full type inference while ensuring
 configuration shape compliance.

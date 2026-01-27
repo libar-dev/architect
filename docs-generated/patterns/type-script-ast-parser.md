@@ -13,8 +13,6 @@
 
 ## Description
 
-## TypeScript AST Parser - JSDoc Directive Extraction
-
 Parses TypeScript source files using @typescript-eslint/typescript-estree
 to extract @libar-docs-* directives with their associated code blocks.
 First stage of the three-stage pipeline: Scanner → Extractor → Generator.

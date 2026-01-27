@@ -13,8 +13,6 @@
 
 ## Description
 
-## GeneratorRegistry - Central Registry for Document Generators
-
 Manages registration and lookup of document generators (both built-in and custom).
 Uses explicit registration pattern for transparency and debuggability.
 

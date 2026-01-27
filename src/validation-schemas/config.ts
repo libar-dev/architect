@@ -182,17 +182,6 @@ export function createGeneratorConfigSchema(baseDir: string): z.ZodType<Generato
 }
 
 /**
- * Generator configuration (backward compatibility)
- *
- * **Deprecated**: Use createGeneratorConfigSchema(baseDir) instead for better security.
- *
- * This version uses process.cwd() which can be manipulated.
- */
-export const GeneratorConfigSchema: z.ZodType<GeneratorConfig> = createGeneratorConfigSchema(
-  process.cwd()
-);
-
-/**
  * Runtime type guard for ScannerConfig
  *
  * @param value - Value to check
@@ -223,6 +212,6 @@ export function isScannerConfig(value: unknown): value is ScannerConfig {
  * ```
  */
 export function isGeneratorConfig(value: unknown): value is GeneratorConfig {
-  const result = GeneratorConfigSchema.safeParse(value);
-  return result.success;
+  const schema = createGeneratorConfigSchema(process.cwd());
+  return schema.safeParse(value).success;
 }

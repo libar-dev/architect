@@ -13,8 +13,6 @@
 
 ## Description
 
-## RenderableDocument Schema
-
 Universal intermediate format for all generated documentation.
 Document codecs transform MasterDataset into this format,
 then the universal renderer converts it to markdown.

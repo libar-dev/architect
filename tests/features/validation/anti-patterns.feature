@@ -12,26 +12,10 @@ Feature: Anti-Pattern Detection
   - Large feature files are hard to maintain
 
   **Solution:**
-  - detectTagDuplication() finds code-only tags in features
   - detectProcessInCode() finds feature-only tags in code
   - detectMagicComments() finds generator hints in features
   - detectScenarioBloat() warns about too many scenarios
   - detectMegaFeature() warns about large feature files
-
-  # ==========================================================================
-  # Tag Duplication Detection
-  # ==========================================================================
-
-  Rule: Code-only tags should not appear in feature files
-
-    @happy-path
-    Scenario: Feature with any tags passes when no code-only tags defined
-      Given a feature file with tags:
-        | tag                        |
-        | libar-docs-pattern:MyTest  |
-        | libar-docs-phase:01        |
-      When detecting tag duplication
-      Then no violations are found
 
   # ==========================================================================
   # Process-in-Code Detection

@@ -63,7 +63,7 @@
 - When the AST parser extracts metadata
 - Then the directive should have archRole "projection"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern MyProjection
@@ -78,7 +78,7 @@
 - When the AST parser extracts metadata
 - Then the directive should have archContext "orders"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern OrderHandler
@@ -93,7 +93,7 @@
 - When the AST parser extracts metadata
 - Then the directive should have archLayer "infrastructure"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern MyInfra
@@ -110,7 +110,7 @@
 - And the directive should have archContext "orders"
 - And the directive should have archLayer "application"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern OrderCommandHandlers
@@ -129,7 +129,7 @@
 - And the directive should have archContext undefined
 - And the directive should have archLayer undefined
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern NoArchTags

@@ -13,8 +13,6 @@
 
 ## Description
 
-## Pattern Scanner - File Discovery and Directive Detection
-
 Discovers TypeScript files matching glob patterns and filters to only
 those with `@libar-docs` opt-in. Entry point for the scanning phase.
 

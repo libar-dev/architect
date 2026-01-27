@@ -13,8 +13,6 @@
 
 ## Description
 
-## PublicAPI - Package Entry Point
-
 Main entry point for the @libar-dev/delivery-process package.
 Exports the three-stage pipeline (Scanner → Extractor → Generator) for
 extracting documentation directly from TypeScript source code.

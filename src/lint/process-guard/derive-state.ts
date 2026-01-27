@@ -25,7 +25,6 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as crypto from 'crypto';
 import { glob } from 'glob';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
@@ -50,8 +49,6 @@ export interface DeriveStateConfig {
   readonly baseDir: string;
   /** Glob patterns for spec files */
   readonly specPatterns?: readonly string[];
-  /** Optional path to tag-registry.json for hash computation (deprecated - TypeScript is source of truth) */
-  readonly taxonomyPath?: string | null;
   /** Path to sessions directory */
   readonly sessionsDir?: string;
 }
@@ -90,21 +87,12 @@ const DEFAULT_SPEC_PATTERNS = [
  */
 export async function deriveProcessState(config: DeriveStateConfig): Promise<Result<ProcessState>> {
   const specPatterns = config.specPatterns ?? DEFAULT_SPEC_PATTERNS;
-  // taxonomyPath is now optional - TypeScript is the source of truth for taxonomy
-  const taxonomyPath = config.taxonomyPath ?? null;
   const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, 'sessions');
 
   // Derive file states
   const filesResult = await deriveFileStates(config.baseDir, specPatterns);
   if (!filesResult.ok) {
     return filesResult;
-  }
-
-  // Compute taxonomy hash (only if JSON path provided for backwards compatibility)
-  let taxonomyHash = '';
-  if (taxonomyPath) {
-    const hashResult = await computeTaxonomyHash(taxonomyPath);
-    taxonomyHash = hashResult.ok ? hashResult.value : '';
   }
 
   // Find active session
@@ -114,7 +102,6 @@ export async function deriveProcessState(config: DeriveStateConfig): Promise<Res
   // Build ProcessState (handle exactOptionalPropertyTypes)
   const processState: ProcessState = {
     files: filesResult.value,
-    taxonomyHash,
     derivedAt: new Date().toISOString(),
   };
 
@@ -249,19 +236,6 @@ function extractUnlockReason(tags: readonly string[]): {
     }
   }
   return { hasUnlockReason: false, unlockReason: undefined };
-}
-
-/**
- * Compute SHA256 hash of tag-registry.json.
- */
-async function computeTaxonomyHash(taxonomyPath: string): Promise<Result<string>> {
-  try {
-    const content = await fs.readFile(taxonomyPath, 'utf-8');
-    const hash = crypto.createHash('sha256').update(content).digest('hex');
-    return R.ok(hash.slice(0, 16)); // First 16 chars is enough
-  } catch (error) {
-    return R.err(error instanceof Error ? error : new Error(String(error)));
-  }
 }
 
 /**

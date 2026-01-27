@@ -9,9 +9,6 @@ export {
   type AggregationTags,
 } from './doc-extractor.js';
 
-// Re-export generatePatternId from canonical location for backward compatibility
-export { generatePatternId } from '../utils/index.js';
-
 // Dual-Source Extraction (USDP)
 export {
   extractProcessMetadata,

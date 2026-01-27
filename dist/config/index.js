@@ -36,6 +36,6 @@ export { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG, DEFAULT_REGEX_BUILDERS } f
 // Presets
 export { GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, } from './presets.js';
 // Config file discovery and loading
-export { loadConfig, findConfigFile, findConfigFileSync, formatConfigError, } from './config-loader.js';
-export { loadWorkflowConfig, loadWorkflowFromPath, loadDefaultWorkflow, formatWorkflowLoadError, getWorkflowStatusEmoji, getWorkflowStatusLabel, } from './workflow-loader.js';
+export { loadConfig, findConfigFile, formatConfigError, } from './config-loader.js';
+export { loadWorkflowConfig, loadWorkflowFromPath, loadDefaultWorkflow, formatWorkflowLoadError, } from './workflow-loader.js';
 //# sourceMappingURL=index.js.map

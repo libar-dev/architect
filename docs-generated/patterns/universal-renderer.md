@@ -13,8 +13,6 @@
 
 ## Description
 
-## Universal Renderer
-
 Converts RenderableDocument to Markdown. This is the "dumb printer" -
 it knows nothing about patterns, phases, or domain concepts.
 All logic lives in the codecs; this just renders blocks.

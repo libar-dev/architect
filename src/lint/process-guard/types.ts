@@ -37,8 +37,6 @@ export interface ProcessState {
   readonly files: Map<string, FileState>;
   /** Active session if one exists */
   readonly activeSession?: SessionState;
-  /** Hash of tag-registry.json for change detection */
-  readonly taxonomyHash: string;
   /** Timestamp when state was derived */
   readonly derivedAt: string;
 }

@@ -19,7 +19,7 @@ export { AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, COMPLETION_PATTERNS, I
 // DoD Validator
 export { isDeliverableComplete, hasAcceptanceCriteria, extractAcceptanceCriteriaScenarios, validateDoDForPhase, validateDoD, formatDoDSummary, } from './dod-validator.js';
 // Anti-Pattern Detector
-export { detectTagDuplication, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, detectAntiPatterns, formatAntiPatternReport, toValidationIssues, } from './anti-patterns.js';
+export { detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, detectAntiPatterns, formatAntiPatternReport, toValidationIssues, } from './anti-patterns.js';
 // FSM Module - Phase State Machine (PDR-005)
 export * from './fsm/index.js';
 //# sourceMappingURL=index.js.map

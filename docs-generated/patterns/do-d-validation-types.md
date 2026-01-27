@@ -13,8 +13,6 @@
 
 ## Description
 
-## DoDValidationTypes - Type Definitions for DoD Validation
-
 Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
 Follows the project's schema-first pattern with Zod for runtime validation.
 

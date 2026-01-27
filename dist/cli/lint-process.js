@@ -218,7 +218,6 @@ async function main() {
             console.log('\nDerived Process State:');
             console.log(`  Files: ${state.files.size}`);
             console.log(`  Active Session: ${state.activeSession?.id ?? 'none'}`);
-            console.log(`  Taxonomy Hash: ${state.taxonomyHash || 'not found'}`);
             console.log('');
             // Show file states
             for (const [path, fileState] of state.files) {

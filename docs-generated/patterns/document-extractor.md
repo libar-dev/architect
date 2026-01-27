@@ -13,8 +13,6 @@
 
 ## Description
 
-## Document Extractor - Pattern Extraction and Metadata Generation
-
 Converts scanned file data into complete ExtractedPattern objects with
 unique IDs, inferred names, categories, and timestamps. Second stage of
 the pipeline: Scanner → **Extractor** → Generator.

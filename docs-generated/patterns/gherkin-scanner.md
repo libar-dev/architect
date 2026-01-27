@@ -13,8 +13,6 @@
 
 ## Description
 
-## GherkinScanner - Multi-Source Pattern Extraction from Feature Files
-
 Scans .feature files for pattern metadata encoded in Gherkin tags.
 Enables roadmap patterns to be defined in acceptance criteria files
 before implementation, supporting specification-first development.

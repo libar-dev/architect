@@ -13,8 +13,6 @@
 
 ## Description
 
-## CodecUtils - Type-Safe JSON Codec Factories
-
 Provides factory functions for creating type-safe JSON parsing and serialization
 pipelines using Zod schemas. Replaces manual JSON.parse/stringify with single-step
 validated operations.

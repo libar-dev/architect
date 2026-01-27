@@ -68,10 +68,6 @@ export declare function stripLeadingHeaders(text: string): string;
  */
 export declare function stripMarkdown(text: string): string;
 /**
- * Extract first paragraph from description
- */
-export declare function extractFirstParagraph(description: string, maxLength?: number): string;
-/**
  * Extract first sentence from description
  */
 export declare function extractFirstSentence(description: string, maxLength?: number): string;

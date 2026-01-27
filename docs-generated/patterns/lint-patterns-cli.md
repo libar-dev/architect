@@ -13,8 +13,6 @@
 
 ## Description
 
-## LintPatternsCLI - Pattern Annotation Quality Checker
-
 Validates pattern annotations for quality and completeness.
 Use in CI to enforce documentation standards.
 

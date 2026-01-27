@@ -29,7 +29,6 @@
  */
 
 import * as fs from 'fs/promises';
-import { existsSync } from 'fs';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 import { createDeliveryProcess } from './factory.js';
@@ -262,44 +261,4 @@ export function formatConfigError(error: ConfigLoadError): string {
   }
 
   return lines.join('\n');
-}
-
-/**
- * Synchronous check for config file (for non-async contexts)
- *
- * Note: This only checks if the file exists, not if it's valid.
- * Use loadConfig() for full validation.
- *
- * @param startDir - Directory to start searching from
- * @returns Path to config file or null
- */
-export function findConfigFileSync(startDir: string): string | null {
-  let currentDir = path.resolve(startDir);
-  const root = path.parse(currentDir).root;
-
-  while (currentDir !== root) {
-    const tsConfigPath = path.join(currentDir, CONFIG_FILE_NAME);
-    if (existsSync(tsConfigPath)) {
-      return tsConfigPath;
-    }
-
-    const jsConfigPath = path.join(currentDir, CONFIG_FILE_NAME_JS);
-    if (existsSync(jsConfigPath)) {
-      return jsConfigPath;
-    }
-
-    // Check for .git to stop at repo root
-    const gitPath = path.join(currentDir, '.git');
-    if (existsSync(gitPath)) {
-      break;
-    }
-
-    const parentDir = path.dirname(currentDir);
-    if (parentDir === currentDir) {
-      break;
-    }
-    currentDir = parentDir;
-  }
-
-  return null;
 }
