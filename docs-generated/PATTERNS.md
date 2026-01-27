@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 71/108 (66% complete)
+**Overall:** [█████████████░░░░░░░] 71/109 (65% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 71 |
 | 🚧 Active | 13 |
-| 📋 Planned | 24 |
-| **Total** | 108 |
+| 📋 Planned | 25 |
+| **Total** | 109 |
 
 ---
 
@@ -23,7 +23,7 @@
 - [Cli](#cli) (6)
 - [Config](#config) (1)
 - [Core](#core) (45)
-- [DDD](#ddd) (21)
+- [DDD](#ddd) (22)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
 - [Infra](#infra) (1)
@@ -131,6 +131,7 @@
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 | 📋 Business Rules Codec | Core | planned | Transforms MasterDataset into a RenderableDocument for business rules output. |
 | 📋 Business Rules Generator | DDD | planned | Business Value: Enable stakeholders to understand domain constraints without reading implementation details or full... |
+| 📋 Claude Module Generation | DDD | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
 | 📋 Cli Behavior Testing | DDD | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
 | 📋 Codec Behavior Testing | DDD | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
@@ -229,7 +230,7 @@
 
 ### DDD
 
-6/21 complete (29%)
+6/22 complete (27%)
 
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -239,6 +240,7 @@
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
+- [📋 Claude Module Generation](patterns/claude-module-generation.md)
 - [📋 Cli Behavior Testing](patterns/cli-behavior-testing.md)
 - [📋 Codec Behavior Testing](patterns/codec-behavior-testing.md)
 - [📋 Cross Source Validation](patterns/cross-source-validation.md)
@@ -421,18 +423,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -446,6 +436,18 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
@@ -455,6 +457,7 @@ graph TD
     PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
+    ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```
 
 ---

@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 71/108 (66%)
+**Patterns:** [█████████████░░░░░░░] 71/109 (65%)
 
-**Phases:** 0/8 complete
+**Phases:** 0/9 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 108 |
+| Total Patterns | 109 |
 | Completed | 71 |
 | Active | 13 |
-| Planned | 24 |
+| Planned | 25 |
 
 ---
 
@@ -26,6 +26,7 @@
 | --- | --- | --- |
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
+| 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/8 | 50% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -54,6 +55,16 @@
 | Pattern | Status | Description |
 | --- | --- | --- |
 | 📋 Architecture Diagram Generation | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
+
+---
+
+### 📋 ClaudeModuleGeneration
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Claude Module Generation | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
 
 ---
 
