@@ -2,6 +2,7 @@
 @libar-docs-pattern:TypeScriptTaxonomyImplementation
 @libar-docs-status:completed
 @libar-docs-phase:99
+@libar-docs-release:v1.0.0
 @libar-docs-effort:4h
 @libar-docs-business-value:compile-time-taxonomy-protection
 @libar-docs-product-area:Taxonomy

@@ -1,3 +1,4 @@
+@libar-docs-implements:BusinessRulesGenerator
 Feature: Business Rules Document Codec
 
   Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.

@@ -1,3 +1,4 @@
+@libar-docs-implements:ProcessStateAPICLI
 @behavior @process-state-api
 @libar-docs-pattern:ProcessStateAPI
 @libar-docs-product-area:API

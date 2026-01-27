@@ -1,3 +1,4 @@
+@libar-docs-implements:DoDValidation
 @behavior @dod-validation
 @libar-docs-pattern:DoDValidator
 @libar-docs-product-area:Validation

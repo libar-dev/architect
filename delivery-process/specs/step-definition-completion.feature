@@ -6,7 +6,7 @@
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:make-existing-behavior-specs-executable
 @libar-docs-priority:critical
-@libar-docs-executable-specs:delivery-process/tests/steps/behavior
+@libar-docs-executable-specs:tests/steps/behavior
 Feature: Step Definition Completion
 
   **Problem:**

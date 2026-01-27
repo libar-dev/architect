@@ -27,6 +27,31 @@ Feature: PDR-001 - Self-Documentation Process
     **Key Commands:**
     - `pnpm docs:all` - Generate all documentation
     - `pnpm validate:all` - Validate patterns, DoD, and anti-patterns
+    - `pnpm docs:tag-taxonomy` - Generate TAG_TAXONOMY.md
+
+  Rule: Decision - Relationship tags in use (libar-generic preset)
+
+    The following relationship tags from PatternRelationshipModel are effective in this repo:
+
+    **Currently Used:**
+    | Tag | Purpose | Example |
+    |-----|---------|---------|
+    | `implements` | Behavior test → Tier 1 spec traceability | `@libar-docs-implements:ProcessGuardLinter` |
+    | `uses` | Technical dependency (code→code) | `@libar-docs-uses:ConfigLoader,TagRegistry` |
+    | `used-by` | Reverse dependency annotation | `@libar-docs-used-by:CLI` |
+    | `executable-specs` | Tier 1 → behavior test location | `@libar-docs-executable-specs:tests/features/validation` |
+    | `release` | Version association | `@libar-docs-release:v1.0.0` |
+
+    **Available but not yet used:**
+    | Tag | Future Use Case |
+    |-----|-----------------|
+    | `extends` | Pattern inheritance (e.g., specialized codecs) |
+    | `depends-on` | Roadmap sequencing between tier 1 specs |
+    | `enables` | Inverse of depends-on |
+    | `roadmap-spec` | Back-link from behavior to tier 1 spec |
+    | `parent`/`level` | Epic→phase→task breakdown |
+
+    **Note:** Full relationship taxonomy documented in `delivery-process/specs/pattern-relationship-model.feature`
 
   Rule: Consequences - Benefits and trade-offs
 

@@ -6,7 +6,7 @@
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:ensure-generator-orchestration-works-correctly
 @libar-docs-priority:high
-@libar-docs-executable-specs:delivery-process/tests/features/generators
+@libar-docs-executable-specs:tests/features/generators
 Feature: Generator Infrastructure Testing
 
   **Problem:**

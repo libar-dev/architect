@@ -9,23 +9,33 @@ Configure tag prefixes, presets, and custom taxonomies for `@libar-dev/delivery-
 
 ## Quick Reference
 
-| Preset        | Tag Prefix     | Categories | Use Case                     |
-| ------------- | -------------- | ---------- | ---------------------------- |
-| **`generic`** | `@docs-`       | 3          | Most projects (recommended)  |
-| `ddd-es-cqrs` | `@libar-docs-` | 21         | DDD/Event Sourcing codebases |
+| Preset                        | Tag Prefix     | Categories | Use Case                             |
+| ----------------------------- | -------------- | ---------- | ------------------------------------ |
+| **`libar-generic`** (default) | `@libar-docs-` | 3          | Simple projects (this package)       |
+| `ddd-es-cqrs`                 | `@libar-docs-` | 21         | DDD/Event Sourcing architectures     |
+| `generic`                     | `@docs-`       | 3          | Simple projects with `@docs-` prefix |
 
 ```typescript
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-// Generic preset (recommended for most projects)
-const dp = createDeliveryProcess({ preset: 'generic' });
+// Default: libar-generic preset (used by this package)
+const dp = createDeliveryProcess();
+// Tag prefix: @libar-docs-*
+// Categories: core, api, infra
 
 // DDD preset (for DDD/ES/CQRS architectures)
 const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+// Tag prefix: @libar-docs-*
+// Categories: 21 domain-specific categories
 
-// Custom prefix with generic taxonomy
+// Generic preset (for projects preferring @docs- prefix)
+const dp = createDeliveryProcess({ preset: 'generic' });
+// Tag prefix: @docs-*
+// Categories: core, api, infra
+
+// Custom prefix with any taxonomy
 const dp = createDeliveryProcess({
-  preset: 'generic',
+  preset: 'libar-generic',
   tagPrefix: '@acme-',
   fileOptInTag: '@acme',
 });
@@ -35,7 +45,30 @@ const dp = createDeliveryProcess({
 
 ## Presets
 
+### Libar-Generic Preset (Default)
+
+The default preset used by this package. Same 3 categories as `generic` but with `@libar-docs-` prefix.
+
+| Property        | Value                |
+| --------------- | -------------------- |
+| **Tag Prefix**  | `@libar-docs-`       |
+| **File Opt-In** | `@libar-docs`        |
+| **Categories**  | 3 (core, api, infra) |
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-pattern PatternScanner
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-uses FileDiscovery, ASTParser
+ */
+export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
+```
+
 ### Generic Preset
+
+Same 3 categories as `libar-generic` but with `@docs-` prefix. Use when you prefer shorter tag names.
 
 | Property        | Value                |
 | --------------- | -------------------- |
@@ -54,7 +87,7 @@ const dp = createDeliveryProcess({
 export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
 ```
 
-### DDD-ES-CQRS Preset (Default)
+### DDD-ES-CQRS Preset
 
 Full taxonomy for domain-driven architectures with 21 categories.
 
@@ -96,7 +129,11 @@ CLI tools discover `delivery-process.config.ts` files automatically.
 // delivery-process.config.ts
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-export default createDeliveryProcess({ preset: 'generic' });
+// Uses libar-generic preset (default)
+export default createDeliveryProcess();
+
+// Or explicitly specify a preset
+export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
 ```
 
 ### Monorepo Example
@@ -121,7 +158,7 @@ Keep a preset's taxonomy but change the prefix:
 
 ```typescript
 const dp = createDeliveryProcess({
-  preset: 'generic',
+  preset: 'libar-generic',
   tagPrefix: '@team-',
   fileOptInTag: '@team',
 });
@@ -167,16 +204,16 @@ const dp = createDeliveryProcess({
 The `DeliveryProcessInstance` includes utilities for tag detection:
 
 ```typescript
-const dp = createDeliveryProcess({ preset: 'generic' });
+const dp = createDeliveryProcess(); // Uses libar-generic (default)
 
 // Check if file should be scanned
-dp.regexBuilders.hasFileOptIn(fileContent); // true if contains /** @docs */
+dp.regexBuilders.hasFileOptIn(fileContent); // true if contains /** @libar-docs */
 
 // Check for any documentation directives
-dp.regexBuilders.hasDocDirectives(fileContent); // true if contains @docs-*
+dp.regexBuilders.hasDocDirectives(fileContent); // true if contains @libar-docs-*
 
 // Normalize tag for lookup
-dp.regexBuilders.normalizeTag('@docs-pattern'); // "pattern"
+dp.regexBuilders.normalizeTag('@libar-docs-pattern'); // "pattern"
 ```
 
 ---

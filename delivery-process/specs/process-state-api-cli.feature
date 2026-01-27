@@ -6,7 +6,7 @@
 @libar-docs-effort:2d
 @libar-docs-priority:high
 @libar-docs-business-value:direct-api-queries-for-planning
-@libar-docs-executable-specs:delivery-process/tests/features/behavior/process-state-api-cli
+@libar-docs-executable-specs:tests/features/api
 Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
 
   **Problem:**
@@ -37,10 +37,10 @@ Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | process:query CLI command | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/query-state.ts | Yes | unit |
-      | CLI argument parser | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/query-state.ts | Yes | unit |
-      | JSON output formatter | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/formatters/json.ts | Yes | unit |
-      | Text output formatter | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/formatters/text.ts | Yes | unit |
+      | process:query CLI command | planned | src/cli/query-state.ts | Yes | unit |
+      | CLI argument parser | planned | src/cli/query-state.ts | Yes | unit |
+      | JSON output formatter | planned | src/cli/formatters/json.ts | Yes | unit |
+      | Text output formatter | planned | src/cli/formatters/text.ts | Yes | unit |
       | Root package.json script | planned | package.json | No | N/A |
       | CLAUDE.md documentation update | planned | CLAUDE.md | No | N/A |
 

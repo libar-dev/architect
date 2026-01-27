@@ -6,7 +6,7 @@
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:ensure-all-document-codecs-produce-correct-output
 @libar-docs-priority:medium
-@libar-docs-executable-specs:delivery-process/tests/features/renderable
+@libar-docs-executable-specs:tests/features/behavior/codecs
 Feature: Codec Behavior Testing
 
   **Problem:**

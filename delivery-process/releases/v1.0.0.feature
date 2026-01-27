@@ -7,7 +7,7 @@ Feature: v1.0.0 - Package Extraction Release
   First independent release of @libar-dev/delivery-process as a
   standalone package.
 
-  **Summary:**
+  **Summary - TODO - relesaes should have minimal content and primarily serve to "instantiate" release/phase annotations:**
 
   This release marks the extraction of delivery-process from the
   convex-event-sourcing monorepo into an independent package ready

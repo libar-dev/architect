@@ -1,7 +1,5 @@
 @libar-docs
-@libar-docs-pattern:ArchitectureDiagramGeneration
-@libar-docs-status:active
-@libar-docs-phase:23
+@libar-docs-implements:ArchitectureDiagramGeneration
 @libar-docs-product-area:DeliveryProcess
 @architecture
 Feature: Component Diagram Generation

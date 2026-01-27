@@ -1,6 +1,7 @@
 @libar-docs-pattern:ProcessGuardLinter
 @libar-docs-status:completed
 @libar-docs-phase:99
+@libar-docs-release:v1.0.0
 @libar-docs-effort:1d
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:prevent-accidental-scope-creep-and-locked-file-modifications

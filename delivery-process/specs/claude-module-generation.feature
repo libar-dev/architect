@@ -7,7 +7,7 @@
 @libar-docs-depends-on:ArchitectureDiagramGeneration
 @libar-docs-business-value:automated-claude-md-modules-from-source
 @libar-docs-priority:high
-@libar-docs-executable-specs:delivery-process/tests/features/behavior/claude-modules
+@libar-docs-executable-specs:tests/features/behavior/claude-modules
 Feature: CLAUDE.md Module Generation from Source Annotations
 
   **Problem:** CLAUDE.md modules are hand-written markdown files that drift from source
