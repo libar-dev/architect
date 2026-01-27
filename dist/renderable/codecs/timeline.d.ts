@@ -104,9 +104,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -163,9 +163,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -243,9 +243,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -315,9 +315,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -374,9 +374,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -454,9 +454,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -489,9 +489,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -548,9 +548,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -628,9 +628,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -663,9 +663,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -722,9 +722,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -802,9 +802,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -841,9 +841,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -900,9 +900,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -980,9 +980,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -1022,9 +1022,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1081,9 +1081,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1161,9 +1161,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -1196,9 +1196,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1255,9 +1255,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1335,9 +1335,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -1371,9 +1371,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1430,9 +1430,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1510,9 +1510,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -1545,9 +1545,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1604,9 +1604,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1684,9 +1684,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -1719,9 +1719,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1778,9 +1778,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1858,9 +1858,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -1893,9 +1893,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1952,9 +1952,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2032,9 +2032,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -2093,9 +2093,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2152,9 +2152,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2232,9 +2232,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -2267,9 +2267,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2326,9 +2326,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2406,9 +2406,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -2441,9 +2441,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2500,9 +2500,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2580,9 +2580,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -2615,9 +2615,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2674,9 +2674,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2754,9 +2754,9 @@ export declare const RoadmapDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -2817,9 +2817,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2876,9 +2876,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2956,9 +2956,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -3028,9 +3028,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3087,9 +3087,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3167,9 +3167,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -3202,9 +3202,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3261,9 +3261,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3341,9 +3341,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -3376,9 +3376,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3435,9 +3435,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3515,9 +3515,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -3554,9 +3554,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3613,9 +3613,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3693,9 +3693,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -3735,9 +3735,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3794,9 +3794,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3874,9 +3874,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -3909,9 +3909,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3968,9 +3968,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4048,9 +4048,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -4084,9 +4084,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4143,9 +4143,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4223,9 +4223,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -4258,9 +4258,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4317,9 +4317,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4397,9 +4397,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -4432,9 +4432,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4491,9 +4491,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4571,9 +4571,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -4606,9 +4606,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4665,9 +4665,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4745,9 +4745,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -4806,9 +4806,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4865,9 +4865,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -4945,9 +4945,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -4980,9 +4980,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5039,9 +5039,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5119,9 +5119,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -5154,9 +5154,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5213,9 +5213,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5293,9 +5293,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -5328,9 +5328,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5387,9 +5387,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5467,9 +5467,9 @@ export declare const CompletedMilestonesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -5533,9 +5533,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5592,9 +5592,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5672,9 +5672,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -5744,9 +5744,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5803,9 +5803,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5883,9 +5883,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -5918,9 +5918,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -5977,9 +5977,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6057,9 +6057,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -6092,9 +6092,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6151,9 +6151,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6231,9 +6231,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -6270,9 +6270,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6329,9 +6329,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6409,9 +6409,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -6451,9 +6451,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6510,9 +6510,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6590,9 +6590,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -6625,9 +6625,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6684,9 +6684,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6764,9 +6764,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
             superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
@@ -6800,9 +6800,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6859,9 +6859,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -6939,9 +6939,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -6974,9 +6974,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7033,9 +7033,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7113,9 +7113,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -7148,9 +7148,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7207,9 +7207,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7287,9 +7287,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -7322,9 +7322,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7381,9 +7381,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7461,9 +7461,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -7522,9 +7522,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7581,9 +7581,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7661,9 +7661,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -7696,9 +7696,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7755,9 +7755,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7835,9 +7835,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -7870,9 +7870,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -7929,9 +7929,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -8009,9 +8009,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
@@ -8044,9 +8044,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -8103,9 +8103,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -8183,9 +8183,9 @@ export declare const CurrentWorkCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
                 superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;

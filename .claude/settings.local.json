@@ -15,7 +15,11 @@
       "Bash(./dist/cli/generate-docs.js:*)",
       "Bash(node dist/cli/generate-tag-taxonomy.js:*)",
       "Bash(node dist/cli/lint-patterns.js:*)",
-      "Bash(node dist/cli/validate-patterns.js:*)"
+      "Bash(node dist/cli/validate-patterns.js:*)",
+      "Bash(pnpm validate:all:*)",
+      "Bash(git show:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(pnpm docs:all:*)"
     ]
   }
 }
