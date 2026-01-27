@@ -88,7 +88,7 @@ CLI tools discover `delivery-process.config.ts` files automatically.
 
 1. Current directory
 2. Walk up to repo root (`.git` folder)
-3. Fall back to ddd-es-cqrs preset
+3. Fall back to libar-generic preset (3 categories, `@libar-docs-` prefix)
 
 ### Config File Format
 

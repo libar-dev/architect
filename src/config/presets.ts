@@ -20,8 +20,9 @@
  *
  * ### When to Use
  *
- * - Use GENERIC_PRESET for simple documentation needs
- * - Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy (default)
+ * - Use GENERIC_PRESET for simple documentation needs with @docs- prefix
+ * - Use LIBAR_GENERIC_PRESET for simple documentation needs with @libar-docs- prefix (default)
+ * - Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
  * - Use as base for custom configurations
  */
 
@@ -77,6 +78,8 @@ export const GENERIC_PRESET = {
  * Generic preset with @libar-docs- prefix.
  *
  * Same minimal categories as GENERIC_PRESET but with @libar-docs- prefix.
+ * This is the default preset when no configuration is specified.
+ *
  * Suitable for:
  * - Projects already using @libar-docs- tags
  * - Package-level configuration (simplified categories, same prefix)
@@ -86,7 +89,9 @@ export const GENERIC_PRESET = {
  * ```typescript
  * import { createDeliveryProcess, LIBAR_GENERIC_PRESET } from '@libar-dev/delivery-process';
  *
- * const dp = createDeliveryProcess({ preset: "libar-generic" });
+ * // These are equivalent:
+ * const dp1 = createDeliveryProcess();
+ * const dp2 = createDeliveryProcess({ preset: "libar-generic" });
  * // Uses @libar-docs-, @libar-docs-pattern, @libar-docs-status, etc.
  * // But only 3 category tags: @libar-docs-core, @libar-docs-api, @libar-docs-infra
  * ```
@@ -128,15 +133,11 @@ export const LIBAR_GENERIC_PRESET = {
  * - CQRS implementations
  * - Full roadmap/phase tracking
  *
- * This is the default preset when no configuration is specified.
- *
  * @example
  * ```typescript
  * import { createDeliveryProcess, DDD_ES_CQRS_PRESET } from '@libar-dev/delivery-process';
  *
- * // These are equivalent:
- * const dp1 = createDeliveryProcess();
- * const dp2 = createDeliveryProcess({ preset: "ddd-es-cqrs" });
+ * const dp = createDeliveryProcess({ preset: "ddd-es-cqrs" });
  * ```
  */
 export const DDD_ES_CQRS_PRESET = {

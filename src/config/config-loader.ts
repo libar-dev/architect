@@ -184,7 +184,7 @@ async function importConfigFile(configPath: string): Promise<DeliveryProcessInst
  * 1. Search for `delivery-process.config.ts` starting from baseDir
  * 2. Walk up parent directories until repo root
  * 3. If found, import and return the configuration
- * 4. If not found, return default DDD_ES_CQRS_PRESET configuration
+ * 4. If not found, return default libar-generic preset configuration
  *
  * @param baseDir - Directory to start searching from (usually cwd or project root)
  * @returns Result with loaded configuration or error
@@ -215,7 +215,7 @@ export async function loadConfig(baseDir: string): Promise<ConfigLoadResult> {
       ok: true,
       value: {
         found: false,
-        instance: createDeliveryProcess(), // Default DDD_ES_CQRS_PRESET
+        instance: createDeliveryProcess({ preset: 'libar-generic' }),
         isDefault: true,
       },
     };
