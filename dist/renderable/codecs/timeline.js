@@ -22,8 +22,8 @@ import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
 import { heading, paragraph, separator, table, list, collapsible, linkOut, document, } from '../schema.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
-import { getStatusEmoji, getDisplayName, extractSummary, completionPercentage, renderProgressBar, sortByPhaseAndName, formatBusinessValue, groupBy, } from '../utils.js';
-import { toKebabCase } from '../../utils/index.js';
+import { getStatusEmoji, getDisplayName, extractSummary, completionPercentage, renderProgressBar, sortByPhaseAndName, formatBusinessValue, } from '../utils.js';
+import { toKebabCase, groupBy } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 /**
  * Default options for RoadmapDocumentCodec

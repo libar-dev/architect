@@ -14,7 +14,6 @@
  */
 import type { ExtractedPattern, StatusCounts } from '../validation-schemas/index.js';
 import type { LoadedWorkflow } from '../validation-schemas/workflow-config.js';
-import { groupBy } from '../utils/index.js';
 /**
  * Get status emoji
  *
@@ -104,8 +103,6 @@ export declare function isFullyCompleted(counts: StatusCounts): boolean;
  * @returns Progress bar string like "[████░░░░] 4/8"
  */
 export declare function renderProgressBar(completed: number, total: number, width?: number): string;
-/** @deprecated Import directly from `../utils/index.js` instead */
-export { groupBy };
 /**
  * Group patterns by category
  */

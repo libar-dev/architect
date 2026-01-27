@@ -47,7 +47,8 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { getDisplayName, groupBy } from '../utils.js';
+import { getDisplayName } from '../utils.js';
+import { groupBy } from '../../utils/index.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════

@@ -33,7 +33,5 @@ export { createRegexBuilders } from './regex-builders.js';
 export { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG, DEFAULT_REGEX_BUILDERS } from './defaults.js';
 export { GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, type PresetName, } from './presets.js';
 export { loadConfig, findConfigFile, findConfigFileSync, formatConfigError, type ConfigDiscoveryResult, type ConfigLoadError, type ConfigLoadResult, } from './config-loader.js';
-export { loadTagRegistry, formatTagRegistryError, type TagRegistryLoadError, type TagRegistryResult, } from './tag-registry-loader.js';
-export { loadArtefactSet, listAvailableArtefactSets, formatArtefactSetError, type ArtefactSetLoadError, } from './artefact-set-loader.js';
 export { loadWorkflowConfig, loadWorkflowFromPath, loadDefaultWorkflow, formatWorkflowLoadError, getWorkflowStatusEmoji, getWorkflowStatusLabel, type WorkflowLoadError, type LoadedWorkflow, type WorkflowConfig, } from './workflow-loader.js';
 //# sourceMappingURL=index.d.ts.map

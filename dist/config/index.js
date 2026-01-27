@@ -37,8 +37,5 @@ export { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG, DEFAULT_REGEX_BUILDERS } f
 export { GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, } from './presets.js';
 // Config file discovery and loading
 export { loadConfig, findConfigFile, findConfigFileSync, formatConfigError, } from './config-loader.js';
-// Re-export existing config loaders for backwards compatibility
-export { loadTagRegistry, formatTagRegistryError, } from './tag-registry-loader.js';
-export { loadArtefactSet, listAvailableArtefactSets, formatArtefactSetError, } from './artefact-set-loader.js';
 export { loadWorkflowConfig, loadWorkflowFromPath, loadDefaultWorkflow, formatWorkflowLoadError, getWorkflowStatusEmoji, getWorkflowStatusLabel, } from './workflow-loader.js';
 //# sourceMappingURL=index.js.map

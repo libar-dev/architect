@@ -111,8 +111,6 @@ export interface ValidateCLIConfig {
   strict: boolean;
   /** Output format */
   format: 'pretty' | 'json';
-  /** Path to tag registry JSON */
-  tagRegistryPath: string | null;
   /** Show help */
   help: boolean;
   /** Enable DoD validation mode */
@@ -142,7 +140,6 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
     baseDir: process.cwd(),
     strict: false,
     format: 'pretty',
-    tagRegistryPath: null,
     help: false,
     dod: false,
     phases: [],
@@ -193,12 +190,6 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid format: ${nextArg}. Use "pretty" or "json"`);
       }
       config.format = nextArg;
-    } else if (arg === '--tag-registry' || arg === '-R') {
-      const nextArg = argv[++i];
-      if (!nextArg) {
-        throw new Error(`Missing value for ${arg} flag`);
-      }
-      config.tagRegistryPath = nextArg;
     } else if (arg === '--dod') {
       config.dod = true;
     } else if (arg === '--phase') {
@@ -268,7 +259,6 @@ Options:
   -F, --features <pattern>    Glob pattern for Gherkin feature files (required, repeatable)
   -e, --exclude <pattern>     Glob pattern to exclude (repeatable)
   -b, --base-dir <dir>        Base directory for paths (default: cwd)
-  -R, --tag-registry <file>   Tag registry JSON file (auto-discovers if not specified)
   --strict                    Treat warnings as errors (exit 2 on warnings)
   -f, --format <type>         Output format: "pretty" (default) or "json"
   -h, --help                  Show this help message

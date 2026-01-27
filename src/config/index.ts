@@ -60,21 +60,6 @@ export {
   type ConfigLoadResult,
 } from './config-loader.js';
 
-// Re-export existing config loaders for backwards compatibility
-export {
-  loadTagRegistry,
-  formatTagRegistryError,
-  type TagRegistryLoadError,
-  type TagRegistryResult,
-} from './tag-registry-loader.js';
-
-export {
-  loadArtefactSet,
-  listAvailableArtefactSets,
-  formatArtefactSetError,
-  type ArtefactSetLoadError,
-} from './artefact-set-loader.js';
-
 export {
   loadWorkflowConfig,
   loadWorkflowFromPath,

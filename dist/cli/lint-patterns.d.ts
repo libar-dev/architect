@@ -36,8 +36,6 @@ export interface LintCLIConfig {
     quiet: boolean;
     /** Minimum severity to report */
     minSeverity: LintSeverity;
-    /** Path to tag registry JSON (auto-discovers if not specified) */
-    tagRegistryPath: string | null;
     /** Show help */
     help: boolean;
     /** Show version */

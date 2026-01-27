@@ -47,9 +47,8 @@ import {
   renderProgressBar,
   sortByPhaseAndName,
   formatBusinessValue,
-  groupBy,
 } from '../utils.js';
-import { toKebabCase } from '../../utils/index.js';
+import { toKebabCase, groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,

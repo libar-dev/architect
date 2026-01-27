@@ -4,7 +4,7 @@
  * @libar-docs-pattern CodecUtils
  * @libar-docs-status completed
  * @libar-docs-uses Zod
- * @libar-docs-used-by TagRegistryLoader, ArtefactSetLoader, WorkflowLoader, Orchestrator
+ * @libar-docs-used-by WorkflowLoader, Orchestrator
  * @libar-docs-usecase "When loading JSON config files with type-safe validation"
  * @libar-docs-usecase "When serializing typed objects to formatted JSON"
  *

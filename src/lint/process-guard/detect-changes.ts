@@ -91,7 +91,6 @@ export function detectStagedChanges(
       deletedFiles: deleted,
       statusTransitions: new Map(statusTransitions),
       deliverableChanges: new Map(deliverableChanges),
-      taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
     });
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));
@@ -136,7 +135,6 @@ export function detectBranchChanges(
       deletedFiles: deleted,
       statusTransitions: new Map(statusTransitions),
       deliverableChanges: new Map(deliverableChanges),
-      taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
     });
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));
@@ -191,7 +189,6 @@ export function detectFileChanges(
       deletedFiles: [],
       statusTransitions: new Map(statusTransitions),
       deliverableChanges: new Map(deliverableChanges),
-      taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
     });
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));

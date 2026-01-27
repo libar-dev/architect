@@ -41,12 +41,6 @@ export interface GenerateOptions {
     baseDir: string;
     /** Output directory for generated files */
     outputDir: string;
-    /**
-     * @deprecated Since v1.0.0 - Use `delivery-process.config.ts` files instead.
-     * Config discovery now uses TypeScript configuration files.
-     * This option is ignored.
-     */
-    tagRegistryPath?: string | null;
     /** Generator names to run (e.g., ['patterns', 'adrs']) */
     generators: string[];
     /** Overwrite existing files (default: false) */

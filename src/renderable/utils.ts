@@ -359,10 +359,6 @@ export function renderProgressBar(completed: number, total: number, width = 10):
 // Pattern Grouping
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Re-export groupBy for backward compatibility (canonical source: ../utils/collection-utils.ts)
-/** @deprecated Import directly from `../utils/index.js` instead */
-export { groupBy };
-
 /**
  * Group patterns by category
  */

@@ -88,12 +88,6 @@ export interface ChangeDetection {
     readonly statusTransitions: ReadonlyMap<string, StatusTransition>;
     /** Deliverable changes detected (file path -> changes) */
     readonly deliverableChanges: ReadonlyMap<string, DeliverableChange>;
-    /**
-     * Whether taxonomy was modified.
-     * @deprecated Always false. Taxonomy moved from JSON to TypeScript (src/taxonomy/).
-     * TypeScript changes require recompilation, making runtime detection unnecessary.
-     */
-    readonly taxonomyModified: boolean;
 }
 /**
  * A status transition detected in a file.

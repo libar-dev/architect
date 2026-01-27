@@ -109,8 +109,8 @@ export {
   computeStatusCounts,
   completionPercentage,
   renderProgressBar,
-  groupBy,
   sortByPhaseAndName,
   sortByStatusAndName,
   formatBusinessValue,
 } from './utils.js';
+export { groupBy } from '../utils/index.js';

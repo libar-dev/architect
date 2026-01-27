@@ -22,8 +22,8 @@ import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js
 import { heading, paragraph, separator, table, list, collapsible, linkOut, document, } from '../schema.js';
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
-import { getStatusEmoji, getDisplayName, computeStatusCounts, completionPercentage, renderProgressBar, groupBy, sortByStatusAndName, formatBusinessValue, } from '../utils.js';
-import { toKebabCase } from '../../utils/index.js';
+import { getStatusEmoji, getDisplayName, computeStatusCounts, completionPercentage, renderProgressBar, sortByStatusAndName, formatBusinessValue, } from '../utils.js';
+import { toKebabCase, groupBy } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers

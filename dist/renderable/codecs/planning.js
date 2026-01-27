@@ -15,8 +15,9 @@ import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
 import { heading, paragraph, separator, table, list, document, } from '../schema.js';
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
-import { getStatusEmoji, getDisplayName, groupBy } from '../utils.js';
+import { getStatusEmoji, getDisplayName } from '../utils.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
+import { groupBy } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 /**
  * Default options for PlanningChecklistCodec

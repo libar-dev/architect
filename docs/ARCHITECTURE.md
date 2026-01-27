@@ -75,18 +75,18 @@ The package supports configurable tag prefixes via the Configuration API.
 ```typescript
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-const dp = createDeliveryProcess({ preset: "generic" });
+const dp = createDeliveryProcess({ preset: 'generic' });
 // Returns: { registry: TagRegistry, regexBuilders: RegexBuilders }
 ```
 
 ### How Configuration Affects the Pipeline
 
-| Stage | Configuration Input | Effect |
-|-------|---------------------|--------|
-| **Scanner** | `regexBuilders.hasFileOptIn()` | Detects files with configured opt-in marker |
-| **Scanner** | `regexBuilders.directivePattern` | Matches tags with configured prefix |
-| **Extractor** | `registry.categories` | Maps tags to category names |
-| **Transformer** | `registry` | Builds MasterDataset with category indexes |
+| Stage           | Configuration Input              | Effect                                      |
+| --------------- | -------------------------------- | ------------------------------------------- |
+| **Scanner**     | `regexBuilders.hasFileOptIn()`   | Detects files with configured opt-in marker |
+| **Scanner**     | `regexBuilders.directivePattern` | Matches tags with configured prefix         |
+| **Extractor**   | `registry.categories`            | Maps tags to category names                 |
+| **Transformer** | `registry`                       | Builds MasterDataset with category indexes  |
 
 ### Configuration Resolution
 
@@ -126,12 +126,12 @@ createDeliveryProcess(options)
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/config/factory.ts` | `createDeliveryProcess()` factory |
-| `src/config/presets.ts` | GENERIC_PRESET, DDD_ES_CQRS_PRESET |
-| `src/config/types.ts` | DeliveryProcessConfig, DeliveryProcessInstance |
-| `src/config/regex-builders.ts` | RegexBuilders factory |
+| File                           | Purpose                                        |
+| ------------------------------ | ---------------------------------------------- |
+| `src/config/factory.ts`        | `createDeliveryProcess()` factory              |
+| `src/config/presets.ts`        | GENERIC_PRESET, DDD_ES_CQRS_PRESET             |
+| `src/config/types.ts`          | DeliveryProcessConfig, DeliveryProcessInstance |
+| `src/config/regex-builders.ts` | RegexBuilders factory                          |
 
 > **See:** [CONFIGURATION.md](./CONFIGURATION.md) for usage examples and API reference.
 
@@ -209,8 +209,8 @@ This is the **key innovation** of the unified pipeline. Instead of each section 
 
 ```typescript
 // OLD: Each section filters independently - O(n) per section
-const completed = patterns.filter((p) => normalizeStatus(p.status) === "completed");
-const active = patterns.filter((p) => normalizeStatus(p.status) === "active");
+const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
+const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
 const phase3 = patterns.filter((p) => p.phase === 3);
 ```
 
@@ -239,7 +239,7 @@ const phase3 = masterDataset.byPhase.find((p) => p.phaseNumber === 3);
 const doc = PatternsDocumentCodec.decode(masterDataset);
 
 // Renderer produces markdown files
-const files = renderDocumentWithFiles(doc, "PATTERNS.md");
+const files = renderDocumentWithFiles(doc, 'PATTERNS.md');
 ```
 
 ---
@@ -395,11 +395,11 @@ Every codec provides two exports:
 
 ```typescript
 // Default codec with standard options
-import { PatternsDocumentCodec } from "./codecs";
+import { PatternsDocumentCodec } from './codecs';
 const doc = PatternsDocumentCodec.decode(dataset);
 
 // Factory for custom options
-import { createPatternsCodec } from "./codecs";
+import { createPatternsCodec } from './codecs';
 const codec = createPatternsCodec({ generateDetailFiles: false });
 const doc = codec.decode(dataset);
 ```
@@ -987,11 +987,11 @@ Data-driven configuration for pattern categorization:
 Use planning codecs to prepare for implementation:
 
 ```typescript
-import { createSessionPlanCodec, createPlanningChecklistCodec } from "@libar-dev/delivery-process";
+import { createSessionPlanCodec, createPlanningChecklistCodec } from '@libar-dev/delivery-process';
 
 // Generate planning documents
 const planCodec = createSessionPlanCodec({
-  statusFilter: ["planned"],
+  statusFilter: ['planned'],
   includeAcceptanceCriteria: true,
 });
 
@@ -1011,7 +1011,7 @@ const checklistCodec = createPlanningChecklistCodec({
 Use session context and PR changes for active development:
 
 ```typescript
-import { createSessionContextCodec, createPrChangesCodec } from "@libar-dev/delivery-process";
+import { createSessionContextCodec, createPrChangesCodec } from '@libar-dev/delivery-process';
 
 // Current session context
 const sessionCodec = createSessionContextCodec({
@@ -1036,11 +1036,11 @@ const prCodec = createPrChangesCodec({
 Use milestone and changelog codecs for release documentation:
 
 ```typescript
-import { createMilestonesCodec, createChangelogCodec } from "@libar-dev/delivery-process";
+import { createMilestonesCodec, createChangelogCodec } from '@libar-dev/delivery-process';
 
 // Quarter-filtered milestones
 const milestonesCodec = createMilestonesCodec({
-  filterQuarters: ["Q1-2026"],
+  filterQuarters: ['Q1-2026'],
 });
 
 // Changelog with release tagging
@@ -1063,7 +1063,7 @@ import {
   createSessionContextCodec,
   createRemainingWorkCodec,
   createCurrentWorkCodec,
-} from "@libar-dev/delivery-process";
+} from '@libar-dev/delivery-process';
 
 // Full session context bundle
 const sessionCodec = createSessionContextCodec({
@@ -1074,7 +1074,7 @@ const sessionCodec = createSessionContextCodec({
 const remainingCodec = createRemainingWorkCodec({
   includeNextActionable: true,
   maxNextActionable: 10,
-  groupPlannedBy: "priority",
+  groupPlannedBy: 'priority',
 });
 
 const currentCodec = createCurrentWorkCodec({
@@ -1096,12 +1096,12 @@ const currentCodec = createCurrentWorkCodec({
 ### Direct Codec Usage
 
 ```typescript
-import { createPatternsCodec, type MasterDataset } from "@libar-dev/delivery-process";
-import { renderToMarkdown } from "@libar-dev/delivery-process/renderable";
+import { createPatternsCodec, type MasterDataset } from '@libar-dev/delivery-process';
+import { renderToMarkdown } from '@libar-dev/delivery-process/renderable';
 
 // Create custom codec
 const codec = createPatternsCodec({
-  filterCategories: ["core"],
+  filterCategories: ['core'],
   generateDetailFiles: false,
 });
 
@@ -1115,10 +1115,10 @@ const markdown = renderToMarkdown(document);
 ### Using generateDocument
 
 ```typescript
-import { generateDocument, type DocumentType } from "@libar-dev/delivery-process/renderable";
+import { generateDocument, type DocumentType } from '@libar-dev/delivery-process/renderable';
 
 // Generate with default options
-const files = generateDocument("patterns", masterDataset);
+const files = generateDocument('patterns', masterDataset);
 
 // files is OutputFile[]
 for (const file of files) {
@@ -1153,10 +1153,10 @@ if (document.additionalFiles) {
 ### Creating a Custom Codec
 
 ```typescript
-import { z } from "zod";
-import { MasterDatasetSchema, type MasterDataset } from "../validation-schemas/master-dataset";
-import { type RenderableDocument, document, heading, paragraph } from "../renderable/schema";
-import { RenderableDocumentOutputSchema } from "../renderable/codecs/shared-schema";
+import { z } from 'zod';
+import { MasterDatasetSchema, type MasterDataset } from '../validation-schemas/master-dataset';
+import { type RenderableDocument, document, heading, paragraph } from '../renderable/schema';
+import { RenderableDocumentOutputSchema } from '../renderable/codecs/shared-schema';
 
 // Define options
 interface MyCodecOptions {
@@ -1170,21 +1170,21 @@ export function createMyCodec(options?: MyCodecOptions) {
   return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
     decode: (dataset: MasterDataset): RenderableDocument => {
       const sections = [
-        heading(2, "Summary"),
+        heading(2, 'Summary'),
         paragraph(`Total patterns: ${dataset.counts.total}`),
       ];
 
       if (opts.includeCustomSection) {
-        sections.push(heading(2, "Custom Section"));
-        sections.push(paragraph("Custom content here"));
+        sections.push(heading(2, 'Custom Section'));
+        sections.push(paragraph('Custom content here'));
       }
 
-      return document("My Custom Document", sections, {
-        purpose: "Custom document purpose",
+      return document('My Custom Document', sections, {
+        purpose: 'Custom document purpose',
       });
     },
     encode: () => {
-      throw new Error("MyCodec is decode-only");
+      throw new Error('MyCodec is decode-only');
     },
   });
 }
@@ -1193,21 +1193,21 @@ export function createMyCodec(options?: MyCodecOptions) {
 ### Registering a Custom Generator
 
 ```typescript
-import { generatorRegistry } from "@libar-dev/delivery-process/generators";
-import { createCodecGenerator } from "@libar-dev/delivery-process/generators/codec-based";
+import { generatorRegistry } from '@libar-dev/delivery-process/generators';
+import { createCodecGenerator } from '@libar-dev/delivery-process/generators/codec-based';
 
 // Register if using existing document type
-generatorRegistry.register(createCodecGenerator("my-patterns", "patterns"));
+generatorRegistry.register(createCodecGenerator('my-patterns', 'patterns'));
 
 // Or create custom generator class for new codec
 class MyCustomGenerator implements DocumentGenerator {
-  readonly name = "my-custom";
-  readonly description = "My custom generator";
+  readonly name = 'my-custom';
+  readonly description = 'My custom generator';
 
   generate(patterns, context) {
     const codec = createMyCodec();
     const doc = codec.decode(context.masterDataset);
-    const files = renderDocumentWithFiles(doc, "MY-CUSTOM.md");
+    const files = renderDocumentWithFiles(doc, 'MY-CUSTOM.md');
     return Promise.resolve({ files });
   }
 }
@@ -1248,9 +1248,6 @@ generate-docs -i "src/**/*.ts" -g patterns -o docs
 # Multiple generators
 generate-docs -i "src/**/*.ts" -g patterns -g roadmap -g session -o docs
 
-# Using artefact sets
-generate-docs -i "src/**/*.ts" --artefact-set full-set -o docs
-
 # List available generators
 generate-docs --list-generators
 ```
@@ -1259,8 +1256,8 @@ generate-docs --list-generators
 
 ```typescript
 // Status filters
-filterStatus: ["completed"]; // Historical only
-filterStatus: ["active", "planned"]; // Future work
+filterStatus: ['completed']; // Historical only
+filterStatus: ['active', 'planned']; // Future work
 filterStatus: []; // All (default)
 
 // Phase filters
@@ -1268,11 +1265,11 @@ filterPhases: [14, 15, 16]; // Specific phases
 filterPhases: []; // All (default)
 
 // Category filters
-filterCategories: ["core", "ddd"]; // Specific categories
+filterCategories: ['core', 'ddd']; // Specific categories
 filterCategories: []; // All (default)
 
 // Quarter filters
-filterQuarters: ["Q1-2026"]; // Specific quarter
+filterQuarters: ['Q1-2026']; // Specific quarter
 filterQuarters: []; // All (default)
 ```
 

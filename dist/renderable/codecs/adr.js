@@ -32,7 +32,8 @@
 import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
 import { heading, paragraph, separator, table, collapsible, linkOut, document, } from '../schema.js';
-import { getDisplayName, groupBy } from '../utils.js';
+import { getDisplayName } from '../utils.js';
+import { groupBy } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 /**
  * Default options for AdrDocumentCodec

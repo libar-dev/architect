@@ -130,16 +130,6 @@ export {
   type LoadedWorkflow,
 } from './workflow-config.js';
 
-// Artefact Set schemas and types
-export {
-  ArtefactSetMetadataSchema,
-  ArtefactSetSchema,
-  isArtefactSet,
-  parseArtefactSet,
-  type ArtefactSet,
-  type ArtefactSetMetadata,
-} from './artefact-set.js';
-
 // Codec utilities for JSON parsing and serialization
 export {
   createJsonInputCodec,

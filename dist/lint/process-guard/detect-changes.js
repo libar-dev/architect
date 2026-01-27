@@ -69,7 +69,6 @@ export function detectStagedChanges(baseDir, options) {
             deletedFiles: deleted,
             statusTransitions: new Map(statusTransitions),
             deliverableChanges: new Map(deliverableChanges),
-            taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
         });
     }
     catch (error) {
@@ -104,7 +103,6 @@ export function detectBranchChanges(baseDir, baseBranch = 'main', options) {
             deletedFiles: deleted,
             statusTransitions: new Map(statusTransitions),
             deliverableChanges: new Map(deliverableChanges),
-            taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
         });
     }
     catch (error) {
@@ -149,7 +147,6 @@ export function detectFileChanges(baseDir, files, options) {
             deletedFiles: [],
             statusTransitions: new Map(statusTransitions),
             deliverableChanges: new Map(deliverableChanges),
-            taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
         });
     }
     catch (error) {

@@ -29,8 +29,9 @@ import {
   document,
 } from '../schema.js';
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
-import { getStatusEmoji, getDisplayName, groupBy } from '../utils.js';
+import { getStatusEmoji, getDisplayName } from '../utils.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
+import { groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,

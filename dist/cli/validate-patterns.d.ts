@@ -78,8 +78,6 @@ export interface ValidateCLIConfig {
     strict: boolean;
     /** Output format */
     format: 'pretty' | 'json';
-    /** Path to tag registry JSON */
-    tagRegistryPath: string | null;
     /** Show help */
     help: boolean;
     /** Enable DoD validation mode */

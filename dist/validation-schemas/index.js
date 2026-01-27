@@ -21,8 +21,6 @@ export { CategoryDefinitionSchema, MetadataTagDefinitionSchema, AggregationTagDe
 export { ProcessStatusSchema, RiskLevelSchema, ProcessMetadataSchema, DeliverableSchema, CrossValidationErrorSchema, ValidationSummarySchema, HierarchyLevelSchema, } from './dual-source.js';
 // Workflow configuration schemas and types
 export { WorkflowStatusSchema, PhaseArtifactsSchema, WorkflowPhaseSchema, WorkflowConfigSchema, createLoadedWorkflow, isWorkflowConfig, } from './workflow-config.js';
-// Artefact Set schemas and types
-export { ArtefactSetMetadataSchema, ArtefactSetSchema, isArtefactSet, parseArtefactSet, } from './artefact-set.js';
 // Codec utilities for JSON parsing and serialization
 export { createJsonInputCodec, createJsonOutputCodec, createFileLoader, formatCodecError, } from './codec-utils.js';
 // Output schemas for JSON serialization

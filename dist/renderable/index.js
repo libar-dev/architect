@@ -41,5 +41,6 @@ export { generateDocument, generateDocuments, generateAllDocuments, getAvailable
 // Utility Exports
 // ═══════════════════════════════════════════════════════════════════════════
 export { normalizeStatus } from '../taxonomy/index.js';
-export { getStatusEmoji, getDisplayName, formatCategoryName, extractFirstParagraph, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, groupBy, sortByPhaseAndName, sortByStatusAndName, formatBusinessValue, } from './utils.js';
+export { getStatusEmoji, getDisplayName, formatCategoryName, extractFirstParagraph, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, sortByPhaseAndName, sortByStatusAndName, formatBusinessValue, } from './utils.js';
+export { groupBy } from '../utils/index.js';
 //# sourceMappingURL=index.js.map

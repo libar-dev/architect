@@ -32,10 +32,10 @@ import {
 import {
   getDisplayName,
   extractSummary,
-  groupBy,
   completionPercentage,
   renderProgressBar,
 } from '../utils.js';
+import { groupBy } from '../../utils/index.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════

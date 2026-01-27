@@ -39,7 +39,6 @@ export function parseArgs(argv = process.argv.slice(2)) {
         format: 'pretty',
         quiet: false,
         minSeverity: 'info',
-        tagRegistryPath: null,
         help: false,
         version: false,
     };
@@ -95,13 +94,6 @@ export function parseArgs(argv = process.argv.slice(2)) {
             }
             config.minSeverity = nextArg;
         }
-        else if (arg === '--tag-registry' || arg === '-R') {
-            const nextArg = argv[++i];
-            if (!nextArg) {
-                throw new Error(`Missing value for ${arg} flag`);
-            }
-            config.tagRegistryPath = nextArg;
-        }
         else if (arg === '--version' || arg === '-v') {
             config.version = true;
         }
@@ -125,7 +117,6 @@ Options:
   -i, --input <pattern>     Glob pattern for TypeScript files (required, repeatable)
   -e, --exclude <pattern>   Glob pattern to exclude (repeatable)
   -b, --base-dir <dir>      Base directory for paths (default: cwd)
-  -R, --tag-registry <file> Tag registry JSON file (auto-discovers if not specified)
   --strict                  Treat warnings as errors (exit 1 on warnings)
   -f, --format <type>       Output format: "pretty" (default) or "json"
   -q, --quiet               Only show errors (suppress warnings/info)
@@ -186,9 +177,6 @@ async function main() {
         // Log configuration source (for transparency)
         if (!isDefault && configPath) {
             console.log(`  Config: ${configPath}`);
-        }
-        else if (config.tagRegistryPath) {
-            console.log(`  Tag Registry: ${config.tagRegistryPath}`);
         }
         else {
             console.log('  Config: (default DDD-ES-CQRS taxonomy)');
