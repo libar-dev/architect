@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 71/104 (68%)
+**Overall Progress:** [█████████████░░░░░░░] 71/108 (66%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 13 |
-| 📋 Planned | 20 |
-| **Total Remaining** | 33 |
+| 📋 Planned | 24 |
+| **Total Remaining** | 37 |
 
 ---
 
@@ -25,6 +25,10 @@
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 50% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
+| 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
+| 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
+| 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
+| 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
 | 🚧 Backlog (No Phase) | 16 | 13 | 0% |
 
 ---
@@ -34,7 +38,7 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 13 |
-| ✅ Ready to Start | 20 |
+| ✅ Ready to Start | 24 |
 | ⚠️ Blocked | 0 |
 
 ### Top Ready to Start
@@ -64,6 +68,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Process State API CLI (Phase 99) - 2d
 - 📋 Process State API Relationship Queries (Phase 99) - 3d
 
-Showing 5 of 20 actionable items.
+Showing 5 of 24 actionable items.
 
 ---

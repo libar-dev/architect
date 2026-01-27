@@ -124,6 +124,11 @@ function findPhaseNavigationTable(doc: RenderableDocument): TableBlock | null {
   return findTableWithHeader(doc, 'Phase');
 }
 
+/**
+ * Find a phase section by phase number.
+ * Note: Phase name mappings (Foundation Types, CMS Integration, etc.)
+ * align with createMasterDatasetWithTimeline() output.
+ */
 function findPhaseSection(
   doc: RenderableDocument,
   phaseNum: number

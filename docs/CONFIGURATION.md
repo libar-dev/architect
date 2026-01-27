@@ -35,7 +35,7 @@ const dp = createDeliveryProcess({
 
 ## Presets
 
-### Generic Preset (Default)
+### Generic Preset
 
 | Property        | Value                |
 | --------------- | -------------------- |
@@ -54,7 +54,7 @@ const dp = createDeliveryProcess({
 export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
 ```
 
-### DDD-ES-CQRS Preset
+### DDD-ES-CQRS Preset (Default)
 
 Full taxonomy for domain-driven architectures with 21 categories.
 

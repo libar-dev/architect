@@ -113,11 +113,11 @@ export const GherkinScenarioSchema = z
  *   Each new tag must be fully specified with format, purpose, and examples.
  *
  *   # RATIONALE: Centralized tag definitions prevent inconsistent usage
- *   # SEE-ALSO: tag-registry.json, PDR-003
+ *   # SEE-ALSO: src/taxonomy/, PDR-003
  *
  *   @acceptance-criteria
  *   Scenario: New tags are defined in tag registry
- *     Given the delivery-process/tag-registry.json file
+ *     Given the src/taxonomy/ TypeScript module
  *     Then it should contain metadataTags for risk, effort-actual...
  * ```
  */

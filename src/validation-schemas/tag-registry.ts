@@ -6,15 +6,14 @@
  *
  * ## Tag Registry Configuration Schema
  *
- * Defines the structure and validation for external tag taxonomy configuration.
- * Enables repos to define their own taxonomy (categories, metadata tags, etc.)
- * without hardcoding values in the delivery-process package.
+ * Defines the structure and validation for tag taxonomy configuration.
+ * The taxonomy is defined in TypeScript at src/taxonomy/ and built via buildRegistry().
  *
  * ### When to Use
  *
- * - Creating a custom tag-registry.json for your project
- * - Validating tag registry configuration at load time
- * - Merging user registry with default registry
+ * - Validating tag registry configuration at runtime
+ * - Merging custom registry overrides with default registry
+ * - Creating delivery process instances with custom categories
  */
 
 import { z } from 'zod';
@@ -172,23 +171,6 @@ export const TagRegistrySchema = z
   .strict();
 
 export type TagRegistry = z.infer<typeof TagRegistrySchema>;
-
-/**
- * Parse and validate tag registry data
- *
- * @param data - Unknown data to parse as tag registry
- * @returns Validated tag registry
- * @throws ZodError if data doesn't match schema
- *
- * @example
- * ```typescript
- * const data = JSON.parse(fs.readFileSync("tag-registry.json", "utf-8"));
- * const registry = parseTagRegistry(data);
- * ```
- */
-export function parseTagRegistry(data: unknown): TagRegistry {
-  return TagRegistrySchema.parse(data);
-}
 
 /**
  * Create default tag registry

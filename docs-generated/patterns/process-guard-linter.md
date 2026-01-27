@@ -17,7 +17,6 @@
 **Problem:**
   During planning and implementation sessions, accidental modifications occur:
   - Specs outside the intended scope get modified in bulk
-  - Taxonomy (tag-registry.json) changes break downstream generation
   - Completed/approved work gets inadvertently changed
   - No enforcement boundary between "planning what to do" and "doing it"
 
@@ -116,35 +115,6 @@
 - Then session scope rules do not apply
 - And only protection level rules are checked
 
-**Cannot remove tag used by completed spec**
-
-- Given spec "phase-state-machine.feature" has status "completed"
-- And it uses category tag @libar-docs-fsm
-- When removing "fsm" category from tag-registry.json
-- Then linting fails with "taxonomy-locked-tag" violation
-- And message lists "fsm" as used by protected spec
-- And suggestion is "Unlock dependent specs first"
-
-**Cannot modify enum values used by protected spec**
-
-- Given spec "mvp-workflow-implementation.feature" has status "active"
-- And it uses @libar-docs-status:roadmap
-- When removing "roadmap" from status enum in tag-registry.json
-- Then linting fails with "taxonomy-enum-in-use" violation
-
-**Adding new tags is always allowed**
-
-- Given any process state
-- When adding new category "my-new-category" to tag-registry.json
-- Then linting passes
-- And no warnings about taxonomy
-
-**Modifying unused tags is allowed**
-
-- Given no spec uses category tag @libar-docs-performance
-- When modifying "performance" category in tag-registry.json
-- Then linting passes
-
 **Valid status transitions**
 
 - Given a spec with current @libar-docs-status:<from>
@@ -212,7 +182,6 @@
 | Active Session | Session ID and status, or "none" |
 | Scoped Specs | List of specs in scope |
 | Protected Specs | Specs with active/completed status |
-| Taxonomy Hash | Current hash of tag-registry.json |
 
 **Strict mode treats warnings as errors**
 
@@ -241,7 +210,7 @@
 
 **Session-related tags are recognized**
 
-- Given tag-registry.json includes session tags
+- Given the taxonomy includes session tags
 - Then the following tags are valid:
 
 | Tag | Format | Purpose |
@@ -252,7 +221,7 @@
 
 **Protection-related tags are recognized**
 
-- Given tag-registry.json includes protection tags
+- Given the taxonomy includes protection tags
 - Then the following tags are valid:
 
 | Tag | Format | Purpose |
@@ -276,13 +245,6 @@ Optional session files (`delivery-process/sessions/*.feature`) explicitly
     When active, modifications outside scope trigger warnings or errors.
 
 _Verified by: Session file defines modification scope, Modifying spec outside active session scope warns, Modifying explicitly excluded spec fails, No active session allows all modifications_
-
-**Taxonomy changes are validated against dependent specs**
-
-The tag-registry.json defines the taxonomy. Changes to tags used by
-    protected specs (status: active or completed) are blocked.
-
-_Verified by: Cannot remove tag used by completed spec, Cannot modify enum values used by protected spec, Adding new tags is always allowed, Modifying unused tags is allowed_
 
 **Status transitions follow PDR-005 FSM**
 
@@ -308,7 +270,7 @@ _Verified by: Output format matches lint-patterns, Can run alongside lint-patter
 
 **New tags support process guard functionality**
 
-The following tags are added to tag-registry.json to support process guard:
+The following tags are defined in the TypeScript taxonomy to support process guard:
 
 _Verified by: Session-related tags are recognized, Protection-related tags are recognized_
 

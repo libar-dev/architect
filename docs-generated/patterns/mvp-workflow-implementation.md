@@ -22,12 +22,8 @@
   **Solution:**
   Implement PDR-005 status values via taxonomy module refactor:
   1. Create taxonomy module as single source of truth (src/taxonomy/status-values.ts)
-  2. Update repo tag-registry.json with new enum values
-  3. Update validation schemas to import from taxonomy module
-  4. Update generators to use normalizeStatus() for display bucket mapping
-
-  **Note:** Package-level tag-registry.json is not needed - the package provides
-  infrastructure (schemas/validators), while consumers provide configuration.
+  2. Update validation schemas to import from taxonomy module
+  3. Update generators to use normalizeStatus() for display bucket mapping
 
 ## Acceptance Criteria
 

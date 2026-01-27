@@ -25,7 +25,6 @@ import { runCommand, type CLIResult } from '../../support/helpers/cli-runner.js'
 interface CLITestState {
   tempContext: TempDirContext | null;
   result: CLIResult | null;
-  hasGitRepo: boolean;
 }
 
 // =============================================================================
@@ -38,7 +37,6 @@ function initState(): CLITestState {
   return {
     tempContext: null,
     result: null,
-    hasGitRepo: false,
   };
 }
 
@@ -229,7 +227,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Fail when files mode has no files', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -249,7 +246,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Accept file via positional argument', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       And(
@@ -271,7 +267,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Accept file via --file flag', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       And(
@@ -299,7 +294,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('No changes detected exits successfully', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -324,7 +318,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('JSON output format', ({ Given, When, Then }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -339,7 +332,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Pretty output format is default', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -364,7 +356,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Show state flag displays derived state', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {
@@ -389,7 +380,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
     RuleScenario('Warn on unknown flag but continue', ({ Given, When, Then, And }) => {
       Given('a git repository', () => {
         initGitRepo(getTempDir());
-        getState().hasGitRepo = true;
       });
 
       When('running {string}', async (_ctx: unknown, cmd: string) => {

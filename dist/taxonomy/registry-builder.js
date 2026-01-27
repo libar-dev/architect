@@ -2,7 +2,6 @@
  * Registry Builder
  *
  * Constructs a complete TagRegistry from TypeScript constants.
- * This replaces JSON-based tag-registry.json files.
  */
 import { CATEGORIES } from './categories.js';
 import { ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, GLOBAL_FORMAT_OPTIONS, PRIORITY_VALUES, WORKFLOW_VALUES, } from './generator-options.js';

@@ -87,7 +87,6 @@ export {
   MetadataTagDefinitionSchema,
   AggregationTagDefinitionSchema,
   TagRegistrySchema,
-  parseTagRegistry,
   createDefaultTagRegistry,
   mergeTagRegistries,
   type CategoryDefinition,

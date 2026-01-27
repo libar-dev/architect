@@ -770,7 +770,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         // Check that deliverables are rendered somewhere in the document with status indicators
         const allText = getAllDocumentText(state!.document!);
         // Items should have status indicators (emoji)
-        const hasStatusIndicator = /[✅🚧📋]/.test(allText);
+        const hasStatusIndicator = /[✅🚧📋]/u.test(allText);
         expect(
           hasStatusIndicator,
           'Document should contain deliverables with status indicators'

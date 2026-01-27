@@ -43,7 +43,7 @@ Process Guard validates delivery workflow changes at commit time. For FSM concep
 
 **Error:**
 
-```
+```text
 [ERROR] specs/phase-state-machine.feature
   Cannot modify completed spec without unlock reason
   Suggestion: Add @libar-docs-unlock-reason:'reason for modification'
@@ -69,7 +69,7 @@ Feature: Phase State Machine
 
 **Error:**
 
-```
+```text
 [ERROR] specs/my-feature.feature
   Invalid status transition: roadmap -> completed
   Suggestion: Valid transitions from roadmap: active, deferred
@@ -102,7 +102,7 @@ Feature: Phase State Machine
 
 **Error:**
 
-```
+```text
 [ERROR] specs/process-guard-linter.feature
   Cannot add deliverables to active spec: "New unplanned feature"
   Suggestion: Remove new deliverable or revert status to roadmap
@@ -128,7 +128,7 @@ Feature: Phase State Machine
 
 **Warning:**
 
-```
+```text
 [WARN] specs/unrelated-feature.feature
   File not in active session scope
   Suggestion: Add to session scope or use --ignore-session
@@ -150,7 +150,7 @@ Feature: Phase State Machine
 
 **Error:**
 
-```
+```text
 [ERROR] specs/legacy-feature.feature
   File is explicitly excluded from session
   Suggestion: Remove from exclusion list or use --ignore-session
@@ -172,7 +172,7 @@ Feature: Phase State Machine
 
 **Warning:**
 
-```
+```text
 [WARN] specs/active-feature.feature
   Deliverable removed: "Unit tests"
   Suggestion: Document if descoped or completed elsewhere
