@@ -1,12 +1,29 @@
-# CLAUDE.md
+# @libar-dev/delivery-process
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **Code-first documentation and delivery process toolkit**
+
+---
 
 ## Project Overview
 
-Code-first documentation and delivery process toolkit. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks. Code is the single source of truth.
+### Project Overview
+
+Code-first documentation and delivery process toolkit. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks.
+
+**Core Principle:** Code is the single source of truth. Generated documentation is a projection of annotated source code.
+
+**Key Capabilities:**
+
+- Pattern extraction from TypeScript JSDoc and Gherkin tags
+- MasterDataset transformation with pre-computed views (O(1) access)
+- Codec-based markdown generation with progressive disclosure
+- FSM-enforced delivery workflow validation via pre-commit hooks
+
+---
 
 ## Common Commands
+
+### Common Commands
 
 ```bash
 # Build and development
@@ -32,6 +49,8 @@ pnpm validate:all       # All validations including anti-patterns
 pnpm docs:patterns      # Generate pattern docs
 pnpm docs:all           # Generate all doc types (patterns, roadmap, remaining, changelog)
 ```
+
+---
 
 ## Architecture
 
@@ -75,6 +94,8 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 | `ddd-es-cqrs` (default) | `@libar-docs-` | 21         | DDD/Event Sourcing architectures |
 | `generic`               | `@docs-`       | 3          | Simple projects                  |
 
+---
+
 ## Testing
 
 Tests use Vitest with BDD/Gherkin integration:
@@ -114,7 +135,7 @@ This package enforces **strict Gherkin-only testing**:
 
 **If you cannot fix it:** Stop and escalate to the human. Skipping is not an option.
 
-### vitest-cucumber: The Two-Pattern Problem (CRITICAL)
+### The Two-Pattern Problem (CRITICAL)
 
 vitest-cucumber uses **TWO COMPLETELY DIFFERENT patterns** depending on scenario type:
 
@@ -152,7 +173,7 @@ ScenarioOutline(
 **Common Mistake (WRONG):**
 
 ```typescript
-// ❌ WRONG - {string} does NOT work in ScenarioOutline
+// WRONG - {string} does NOT work in ScenarioOutline
 ScenarioOutline('...', ({ When }) => {
   When('I set quantity to {string}', (_ctx, qty: string) => {
     /* FAILS! */
@@ -269,6 +290,8 @@ console.log(JSON.stringify(doc.sections, null, 2));
 5. [ ] **Write Steps:** Implement steps with `_` prefixes for unused args
 6. [ ] **Verify:** Run specific test file → Run related group → Run full suite
 
+---
+
 ## Session Workflows
 
 For detailed guides, see [SESSION-GUIDES.md](./docs/SESSION-GUIDES.md).
@@ -367,6 +390,24 @@ roadmap ──→ active ──→ completed (terminal)
 deferred ──→ roadmap
 ```
 
+### FSM Error Messages and Fixes
+
+| Error                       | Cause                                         | Fix                                       |
+| --------------------------- | --------------------------------------------- | ----------------------------------------- |
+| `completed-protection`      | File has `completed` status but no unlock tag | Add `@libar-docs-unlock-reason:'reason'`  |
+| `invalid-status-transition` | Skipped FSM state (e.g., `roadmap→completed`) | Follow path: `roadmap→active→completed`   |
+| `scope-creep`               | Added deliverable to `active` spec            | Remove deliverable OR revert to `roadmap` |
+| `session-scope` (warning)   | Modified file outside session scope           | Add to scope OR use `--ignore-session`    |
+| `session-excluded`          | Modified excluded pattern during session      | Remove from exclusion OR override         |
+
+### Escape Hatches
+
+| Situation                    | Solution              | Example                                  |
+| ---------------------------- | --------------------- | ---------------------------------------- |
+| Fix bug in completed spec    | Add unlock reason tag | `@libar-docs-unlock-reason:'Fix-typo'`   |
+| Modify outside session scope | Use ignore flag       | `lint-process --staged --ignore-session` |
+| CI treats warnings as errors | Use strict flag       | `lint-process --all --strict`            |
+
 ### Handoff Documentation
 
 For multi-session work, capture state at session boundaries:
@@ -390,7 +431,99 @@ For multi-session work, capture state at session boundaries:
 3. Update deliverable statuses
 ```
 
+---
+
+## Validation
+
+### Process Guard
+
+Process Guard validates delivery workflow changes at commit time using a Decider pattern.
+
+#### Protection Levels
+
+| Status      | Protection   | Allowed Actions                | Blocked Actions               |
+| ----------- | ------------ | ------------------------------ | ----------------------------- |
+| `roadmap`   | None         | Full editing, add deliverables | -                             |
+| `deferred`  | None         | Full editing, add deliverables | -                             |
+| `active`    | Scope-locked | Edit existing deliverables     | Adding new deliverables       |
+| `completed` | Hard-locked  | Nothing                        | Any change without unlock tag |
+
+#### CLI Usage
+
+```bash
+# Pre-commit (default mode)
+lint-process --staged
+
+# CI pipeline with strict mode
+lint-process --all --strict
+
+# Debug: show derived process state
+lint-process --staged --show-state
+
+# Override session scope checking
+lint-process --staged --ignore-session
+```
+
+#### CLI Options
+
+| Flag               | Description                             |
+| ------------------ | --------------------------------------- |
+| `--staged`         | Validate staged files only (pre-commit) |
+| `--all`            | Validate all tracked files (CI)         |
+| `--strict`         | Treat warnings as errors (exit 1)       |
+| `--ignore-session` | Skip session scope validation           |
+| `--show-state`     | Debug: show derived process state       |
+| `--format json`    | Machine-readable JSON output            |
+
+#### Exit Codes
+
+| Code | Meaning                                        |
+| ---- | ---------------------------------------------- |
+| `0`  | No errors (warnings allowed unless `--strict`) |
+| `1`  | Errors found or warnings with `--strict`       |
+
+### Anti-Pattern Detection
+
+Enforces dual-source architecture ownership between TypeScript and Gherkin files.
+
+#### Tag Location Constraints
+
+| Tag                      | Correct Location | Wrong Location | Why                                |
+| ------------------------ | ---------------- | -------------- | ---------------------------------- |
+| `@libar-docs-uses`       | TypeScript       | Feature files  | TS owns runtime dependencies       |
+| `@libar-docs-depends-on` | Feature files    | TypeScript     | Gherkin owns planning dependencies |
+| `@libar-docs-quarter`    | Feature files    | TypeScript     | Gherkin owns timeline metadata     |
+| `@libar-docs-team`       | Feature files    | TypeScript     | Gherkin owns ownership metadata    |
+
+#### DoD Validation
+
+For patterns with `completed` status, validates:
+
+- All deliverables marked complete (checkmark, "Done", "Complete")
+- At least one `@acceptance-criteria` scenario exists in the spec
+
+#### Running Validation
+
+```bash
+# Anti-pattern check only
+npx validate-patterns \
+  -i "src/**/*.ts" \
+  -F "specs/**/*.feature" \
+  --anti-patterns
+
+# Full validation with DoD
+npx validate-patterns \
+  -i "src/**/*.ts" \
+  -F "specs/**/*.feature" \
+  --anti-patterns \
+  --dod
+```
+
+---
+
 ## Annotation System
+
+### Annotation System
 
 Files must opt-in with a marker to be scanned:
 
@@ -408,15 +541,64 @@ Files must opt-in with a marker to be scanned:
 export class MyClass { ... }
 ```
 
-Key tags: `pattern`, `status` (roadmap/active/completed/deferred), `uses`, `used-by`, `phase`, `release`, category tags (`core`, `api`, `infra`, etc.)
+#### Key Tags
 
-## CLI Commands
+| Tag          | Format | Description                                             |
+| ------------ | ------ | ------------------------------------------------------- |
+| `pattern`    | value  | Pattern identifier (required for named patterns)        |
+| `status`     | enum   | FSM state: `roadmap`, `active`, `completed`, `deferred` |
+| `phase`      | number | Roadmap phase number                                    |
+| `release`    | value  | Version tag: `v0.1.0` or `vNEXT`                        |
+| `uses`       | csv    | Runtime dependencies (TypeScript only)                  |
+| `used-by`    | csv    | Reverse dependencies                                    |
+| `depends-on` | csv    | Planning dependencies (Gherkin only)                    |
+| `quarter`    | value  | Timeline: `Q1-2025` (Gherkin only)                      |
 
-- `generate-docs` - Generate documentation from annotated sources
-- `lint-patterns` - Validate annotation quality
-- `lint-process` - FSM validation for delivery process
-- `validate-patterns` - Cross-source validation with DoD checks
-- `generate-tag-taxonomy` - Generate tag reference from TypeScript
+**Category tags** are flags (no value): `@libar-docs-core`, `@libar-docs-api`, `@libar-docs-infra`, `@libar-docs-domain`, etc.
+
+#### CLI Commands
+
+| Command                 | Purpose                                                    |
+| ----------------------- | ---------------------------------------------------------- |
+| `generate-docs`         | Generate documentation from annotated sources              |
+| `lint-patterns`         | Validate annotation quality (missing tags, invalid status) |
+| `lint-process`          | FSM validation for delivery process                        |
+| `validate-patterns`     | Cross-source validation with DoD checks                    |
+| `generate-tag-taxonomy` | Generate tag reference from TypeScript                     |
+
+### Tag Format Types
+
+Tags have different value formats for parsing:
+
+| Format         | Example                    | Description                    |
+| -------------- | -------------------------- | ------------------------------ |
+| `flag`         | `@docs-core`               | Boolean presence (no value)    |
+| `value`        | `@docs-pattern MyPattern`  | Simple string value            |
+| `enum`         | `@docs-status completed`   | Constrained to predefined list |
+| `csv`          | `@docs-uses A, B, C`       | Comma-separated values         |
+| `number`       | `@docs-phase 15`           | Numeric value                  |
+| `quoted-value` | `@docs-brief:'Multi word'` | Preserves spaces in value      |
+
+#### Status Normalization
+
+All codecs normalize status to three canonical display values:
+
+| Input Status                        | Normalized To |
+| ----------------------------------- | ------------- |
+| `completed`                         | `completed`   |
+| `active`                            | `active`      |
+| `roadmap`, `deferred`, or undefined | `planned`     |
+
+#### Tag Value Constraints
+
+**Tag values cannot contain spaces.** Use hyphens instead:
+
+| Invalid                        | Valid                          |
+| ------------------------------ | ------------------------------ |
+| `@unlock-reason:Fix for issue` | `@unlock-reason:Fix-for-issue` |
+| `@pattern:My Pattern`          | `@pattern:MyPattern`           |
+
+---
 
 ## ProcessStateAPI
 
@@ -452,7 +634,7 @@ api.getPhaseProgress(19); // Phase completion metrics
 - Real-time accuracy — direct from source, not snapshot
 - Instant queries — no regeneration required
 
-## Using Generated Documentation as Context
+### Using Generated Documentation as Context
 
 When adding features, consult generated documentation for current state:
 
@@ -467,3 +649,68 @@ Generated files are in `docs-generated/`:
 - `ROADMAP.md` - Development roadmap by phase
 - `REMAINING-WORK.md` - Incomplete work summary
 - `CURRENT-WORK.md` - Active work summary
+
+---
+
+## Authoring
+
+### Gherkin Authoring Patterns
+
+#### Roadmap Spec Structure
+
+```gherkin
+@libar-docs-pattern:ProcessGuardLinter
+@libar-docs-status:roadmap
+@libar-docs-phase:99
+Feature: Process Guard Linter
+
+  **Problem:**
+  During planning sessions, accidental modifications can occur.
+
+  **Solution:**
+  Implement a Decider-based linter that validates proposed changes.
+
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable | Status  | Location |
+      | State derivation | Pending | src/lint/derive.ts |
+```
+
+#### Feature Description Patterns
+
+| Structure        | Headers                                    | Best For           |
+| ---------------- | ------------------------------------------ | ------------------ |
+| Problem/Solution | `**Problem:**`, `**Solution:**`            | Pain point to fix  |
+| Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style specs    |
+| Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns |
+
+#### Tag Conventions
+
+| Tag                    | Purpose                     |
+| ---------------------- | --------------------------- |
+| `@happy-path`          | Primary success scenario    |
+| `@edge-case`           | Boundary conditions         |
+| `@error-handling`      | Error recovery scenarios    |
+| `@validation`          | Input validation rules      |
+| `@acceptance-criteria` | Required for DoD validation |
+| `@integration`         | Cross-component behavior    |
+
+#### Rule Block Structure
+
+For business constraints, use `Rule:` blocks with structured annotations:
+
+```gherkin
+Rule: Reservations prevent race conditions
+
+  **Invariant:** Only one reservation can exist for a key.
+  **Rationale:** Check-then-create has TOCTOU vulnerabilities.
+  **Verified by:** @happy-path, @edge-case scenarios below.
+
+  @acceptance-criteria @happy-path
+  Scenario: Concurrent reservations are prevented
+    Given an existing reservation for key "order-123"
+    When another process attempts to reserve "order-123"
+    Then the reservation fails with "already reserved"
+```
+
+---

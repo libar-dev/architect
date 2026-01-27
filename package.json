@@ -96,7 +96,10 @@
     "release:major": "npm version major",
     "prepare": "husky",
     "pr:comments": "node scripts/fetch-pr-comments.mjs",
-    "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread"
+    "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread",
+    "claude-md:build": "modular-claude-md build",
+    "claude-md:validate": "modular-claude-md validate",
+    "claude-md:info": "modular-claude-md info"
   },
   "keywords": [
     "source-first",
