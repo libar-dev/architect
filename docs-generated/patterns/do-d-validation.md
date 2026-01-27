@@ -28,7 +28,7 @@
 
   Implements Convergence Opportunity 2: DoD as Machine-Checkable.
 
-  See: deps/libar-dev-packages/packages/tooling/delivery-process/docs/ideation-convergence/01-delivery-process-opportunities.md
+  See: docs/ideation-convergence/01-delivery-process-opportunities.md
 
 ## Acceptance Criteria
 

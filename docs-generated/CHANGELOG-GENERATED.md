@@ -30,6 +30,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.0.0]
+
+### Added
+
+- **TypeScript Taxonomy Implementation**: As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time...
+- **Process Guard Linter**: During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get...
+- **Phase State Machine Validation**: Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.
+- **Pattern Relationship Model**: Problem: The delivery process lacks a comprehensive relationship model between artifacts.
+- **Mvp Workflow Implementation**: PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package...
+- **Gherkin Rules Support**: Feature files were limited to flat scenario lists.
+
+---
+
 ## [Earlier]
 
 ### Added
@@ -58,6 +71,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Renderable Utils**: Utility functions for document codecs.
 - **Renderable Document**: Universal intermediate format for all generated documentation.
 - **Universal Renderer**: Converts RenderableDocument to Markdown.
+- **Renderable Document Model(RDM)**: Unified document generation using codecs and a universal renderer.
 - **Document Generator**: Simplified document generation using codecs.
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
@@ -66,10 +80,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
 - **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
 - **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
-- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
-- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
-- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
-- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
+- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
+- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
+- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
+- **Tag Taxonomy CLI**: Generates TAG_TAXONOMY.md from the TypeScript taxonomy module.
+- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
+- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
 - **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
 - **Configuration Types**: Type definitions for the delivery process configuration system.
 - **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
@@ -77,12 +93,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
 - **Configuration Defaults**: Centralized default constants for the delivery-process package.
 - **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
-- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
-- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
-- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
-- **Tag Taxonomy CLI**: Generates TAG_TAXONOMY.md from the TypeScript taxonomy module.
-- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
-- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
+- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
+- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
+- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
+- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **Timeline Codec**: Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)...
 - **Shared Codec Schema**: Provides a simplified RenderableDocument output schema for use with Zod 4 codecs.
 - **Session Codec**: Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session...
@@ -91,20 +105,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Pr Changes Codec**: Transforms MasterDataset into RenderableDocument for PR-scoped output.
 - **Planning Codecs**: Transforms MasterDataset into RenderableDocuments for planning outputs: - PLANNING-CHECKLIST.md (pre-planning...
 - **Patterns Codec**: Transforms MasterDataset into a RenderableDocument for pattern registry output.
+- **Document Codecs**: Barrel export for all document codecs.
 - **Rich Content Helpers**: Shared helper functions for rendering Gherkin rich content in document codecs.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
-- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
-- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
+- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
+- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
-- **TypeScript Taxonomy Implementation**: As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time...
-- **Process Guard Linter**: During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get...
-- **Phase State Machine Validation**: Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.
-- **Pattern Relationship Model**: Problem: The delivery process lacks a comprehensive relationship model between artifacts.
-- **Mvp Workflow Implementation**: PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package...
-- **Gherkin Rules Support**: Feature files were limited to flat scenario lists.
 - **PDR 001 Self Documentation**
 - **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
 - **ADR 004 Gherkin Only Testing**: The delivery-process package had dual test approaches creating inconsistency.

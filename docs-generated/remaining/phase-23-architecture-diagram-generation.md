@@ -37,7 +37,7 @@ These patterns can be started immediately:
 
   **Solution:** Generate architecture diagrams automatically from source code annotations
   using dedicated `arch-*` tags for precise control. Three tags classify components:
-  - `@libar-docs-arch-role` - Component type (command-handler, projection, saga, etc.)
+  - `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
   - `@libar-docs-arch-context` - Bounded context for subgraph grouping
   - `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
 
@@ -57,7 +57,7 @@ These patterns can be started immediately:
 - When querying for tag "arch-role"
 - Then the tag should exist
 - And the tag format should be "enum"
-- And the tag should have values including "command-handler", "projection", "saga"
+- And the tag should have values including "service", "repository", "infrastructure"
 
 **Tag registry contains arch-context**
 
@@ -400,6 +400,10 @@ These patterns can be started immediately:
     **Rationale:** Architecture diagram generation requires metadata to classify
     source files into diagram components. Standard tag infrastructure enables
     consistent extraction via the existing AST parser.
+
+    **Note:** The `arch-role` enum values are configurable via presets:
+    - `libar-generic` preset: generic roles (`service`, `repository`, `handler`, `infrastructure`)
+    - `ddd-es-cqrs` preset: DDD-specific roles (`command-handler`, `projection`, `saga`, etc.)
 
     **Verified by:** Tag registry contains arch-role, Tag registry contains arch-context,
     Tag registry contains arch-layer, arch-role has enum values, arch-layer has enum values

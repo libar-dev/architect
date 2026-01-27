@@ -3,6 +3,9 @@
  * @libar-docs-generator @libar-docs-core
  * @libar-docs-pattern TransformDataset
  * @libar-docs-status completed
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer application
  * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry, NormalizeStatus
  * @libar-docs-used-by Orchestrator
  * @libar-docs-usecase "When computing all pattern views in a single pass"

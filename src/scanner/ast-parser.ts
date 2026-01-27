@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-scanner
  * @libar-docs-pattern TypeScript AST Parser
  * @libar-docs-status completed
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context scanner
+ * @libar-docs-arch-layer infrastructure
  * @libar-docs-uses TagRegistry, DocDirectiveSchema, typescript-estree
  * @libar-docs-used-by Pattern Scanner, Doc Extractor
  * @libar-docs-usecase "When parsing JSDoc comments for @libar-docs-* directives"

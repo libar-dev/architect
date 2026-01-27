@@ -206,7 +206,7 @@
     CSV format allows a single implementation file to realize multiple patterns when
     implementing a pattern family (e.g., durability primitives).
 
-    **API:** See `deps/libar-dev-packages/packages/tooling/delivery-process/src/taxonomy/registry-builder.ts`
+    **API:** See `src/taxonomy/registry-builder.ts`
 
     **Verified by:** Implements tag parsed, Multiple patterns supported, No conflict with pattern definition, Multiple implementations of same pattern
 
@@ -222,7 +222,7 @@ _Verified by: Implements tag parsed from TypeScript, Multiple patterns implement
     For example, `ReactiveProjections` extends `ProjectionCategories`. The extends
     relationship enables inheritance-based documentation and validates pattern hierarchy.
 
-    **API:** See `deps/libar-dev-packages/packages/tooling/delivery-process/src/taxonomy/registry-builder.ts`
+    **API:** See `src/taxonomy/registry-builder.ts`
 
     **Verified by:** Extends tag parsed, Extended-by computed, Inheritance chain validated
 
