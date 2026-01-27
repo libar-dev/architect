@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 71/109 (65% complete)
+**Overall:** [█████████████░░░░░░░] 71/110 (65% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 71 |
 | 🚧 Active | 13 |
-| 📋 Planned | 25 |
-| **Total** | 109 |
+| 📋 Planned | 26 |
+| **Total** | 110 |
 
 ---
 
@@ -23,7 +23,7 @@
 - [Cli](#cli) (6)
 - [Config](#config) (1)
 - [Core](#core) (45)
-- [DDD](#ddd) (22)
+- [DDD](#ddd) (23)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
 - [Infra](#infra) (1)
@@ -150,6 +150,7 @@
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
+| 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
 
@@ -230,7 +231,7 @@
 
 ### DDD
 
-6/22 complete (27%)
+6/23 complete (26%)
 
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -253,6 +254,7 @@
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
 - [📋 Step Definition Completion](patterns/step-definition-completion.md)
+- [📋 Streaming Git Diff](patterns/streaming-git-diff.md)
 - [📋 Traceability Generator](patterns/traceability-generator.md)
 
 ---
@@ -415,14 +417,6 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
-    GherkinExtractor --> GherkinTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> DocExtractor
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    Document_Extractor --> Tag_Registry
-    Document_Extractor --> Zod
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -436,6 +430,14 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
+    GherkinExtractor --> GherkinTypes
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> DocExtractor
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    Document_Extractor --> Tag_Registry
+    Document_Extractor --> Zod
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -457,6 +459,7 @@ graph TD
     PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
+    StreamingGitDiff -.-> ProcessGuardLinter
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```
 

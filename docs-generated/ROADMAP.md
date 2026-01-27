@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 71/109 (65%)
+**Patterns:** [█████████████░░░░░░░] 71/110 (65%)
 
 **Phases:** 0/9 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 109 |
+| Total Patterns | 110 |
 | Completed | 71 |
 | Active | 13 |
-| Planned | 25 |
+| Planned | 26 |
 
 ---
 
@@ -27,7 +27,7 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/8 | 50% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
@@ -70,7 +70,7 @@
 
 ### 📋 TypeScriptTaxonomyImplementation
 
-[████████░░░░░░░] 4/8 50% complete
+[███████░░░░░░░░] 4/9 44% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -81,6 +81,7 @@
 | 📋 Process State API CLI | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 📋 Process State API Relationship Queries | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
+| 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
 | ✅ TypeScript Taxonomy Implementation | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |
 
 ---

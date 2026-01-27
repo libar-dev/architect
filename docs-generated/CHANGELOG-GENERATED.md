@@ -99,17 +99,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
-- **PDR 001 Self Documentation**
-- **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
-- **ADR 004 Gherkin Only Testing**: The delivery-process package had dual test approaches creating inconsistency.
-- **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
-- **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
-- **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
 - **TypeScript Taxonomy Implementation**: As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time...
 - **Process Guard Linter**: During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get...
 - **Phase State Machine Validation**: Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.
 - **Pattern Relationship Model**: Problem: The delivery process lacks a comprehensive relationship model between artifacts.
 - **Mvp Workflow Implementation**: PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package...
 - **Gherkin Rules Support**: Feature files were limited to flat scenario lists.
+- **PDR 001 Self Documentation**
+- **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
+- **ADR 004 Gherkin Only Testing**: The delivery-process package had dual test approaches creating inconsistency.
+- **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
+- **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
+- **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
 
 ---
