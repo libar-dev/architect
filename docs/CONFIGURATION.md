@@ -8,6 +8,7 @@ This guide covers the configuration system for `@libar-dev/delivery-process`, in
 
 - [Import Paths](#import-paths)
 - [Quick Start](#quick-start)
+- [Tag Ownership Rules](#tag-ownership-rules)
 - [Available Presets](#available-presets)
 - [Hierarchical Configuration](#hierarchical-configuration)
 - [Custom Configuration](#custom-configuration)
@@ -81,6 +82,25 @@ const dp = createDeliveryProcess({
 | **Generic Preset** | `{ preset: "generic" }`       | `@docs-`       | 3 basic categories |
 | **Libar Generic**  | `{ preset: "libar-generic" }` | `@libar-docs-` | 3 basic categories |
 | **Custom**         | Explicit options              | Your choice    | Your choice        |
+
+---
+
+## Tag Ownership Rules
+
+Before using tags, understand where they belong. The package uses a **dual-source architecture**:
+
+| Tag Type                                  | Belongs In      | NOT In          |
+| ----------------------------------------- | --------------- | --------------- |
+| `status`, `phase`, `quarter`, `effort`    | Feature files   | TypeScript code |
+| `uses`, `used-by`                         | TypeScript code | Feature files   |
+| `pattern` (canonical definition)          | Feature files   | TypeScript code |
+| `arch-role`, `arch-context`, `arch-layer` | TypeScript code | Feature files   |
+
+**Why?** Feature files own "WHAT and WHEN" (planning metadata). Code owns "HOW and WITH WHAT" (implementation relationships).
+
+Anti-pattern detection (`validate-patterns --anti-patterns`) will flag violations of these ownership rules.
+
+See [METHODOLOGY.md](./METHODOLOGY.md#annotation-ownership-strategy) for the full rationale.
 
 ---
 

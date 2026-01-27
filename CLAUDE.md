@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Documentation generator that extracts patterns from TypeScript and Gherkin sources using configurable JSDoc annotations. Generates LLM-optimized markdown documentation treating code as the single source of truth.
+Code-first documentation and delivery process toolkit. Extracts patterns from TypeScript and Gherkin sources using configurable annotations, generates LLM-optimized markdown and Mermaid architecture diagrams, and validates delivery workflow via pre-commit hooks. Code is the single source of truth.
 
 ## Common Commands
 
@@ -113,3 +113,53 @@ Key tags: `pattern`, `status` (roadmap/active/completed/deferred), `uses`, `used
 - `lint-process` - FSM validation for delivery process
 - `validate-patterns` - Cross-source validation with DoD checks
 - `generate-tag-taxonomy` - Generate tag reference from TypeScript
+
+## ProcessStateAPI
+
+For Claude Code sessions, use ProcessStateAPI instead of reading generated documentation:
+
+```typescript
+import {
+  generators,
+  api as apiModule,
+  createDefaultTagRegistry,
+} from '@libar-dev/delivery-process';
+
+// Build dataset from extracted patterns
+const tagRegistry = createDefaultTagRegistry();
+const dataset = generators.transformToMasterDataset({
+  patterns: extractedPatterns, // From scanPatterns + extractPatterns
+  tagRegistry,
+});
+const api = apiModule.createProcessStateAPI(dataset);
+
+// Common queries
+api.getCurrentWork(); // Active patterns
+api.getRoadmapItems(); // Available to start
+api.getPatternsByPhase(19); // All Phase 19 patterns
+api.isValidTransition('roadmap', 'active'); // Can we start?
+api.getPattern('BddTestingInfrastructure'); // Full pattern details
+api.getPhaseProgress(19); // Phase completion metrics
+```
+
+**Benefits over generated docs:**
+
+- Low context cost — typed queries vs. reading markdown
+- Real-time accuracy — direct from source, not snapshot
+- Instant queries — no regeneration required
+
+## Using Generated Documentation as Context
+
+When adding features, consult generated documentation for current state:
+
+```bash
+pnpm docs:patterns    # Creates PATTERNS.md with all patterns
+pnpm docs:all         # Creates roadmap, remaining work, changelog
+```
+
+Generated files are in `docs-generated/`:
+
+- `PATTERNS.md` - Pattern registry with completion status
+- `ROADMAP.md` - Development roadmap by phase
+- `REMAINING-WORK.md` - Incomplete work summary
+- `CURRENT-WORK.md` - Active work summary

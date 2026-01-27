@@ -1,17 +1,103 @@
 # @libar-dev/delivery-process
 
-Documentation generator that extracts patterns from TypeScript and Gherkin sources using configurable annotations.
+**A source-first delivery process where everything is code.**
 
-**Features:**
+Turn TypeScript annotations and Gherkin feature files into **living documentation**, **architecture diagrams**, **dependency graphs**, **traceability matrices**, and **enforced delivery workflows** — without ever writing Markdown by hand.
 
-- Configurable tag prefix (`@docs-`, `@libar-docs-`, or custom)
-- Two presets: **Generic** (simple) and **DDD-ES-CQRS** (full taxonomy)
-- Four-stage pipeline: Scanner → Extractor → Transformer → Codec
-- CLI tools and programmatic API
+[![npm version](https://img.shields.io/npm/v/@libar-dev/delivery-process.svg)](https://www.npmjs.com/package/@libar-dev/delivery-process)
+[![Build Status](https://github.com/libar-dev/delivery-process/workflows/CI/badge.svg)](https://github.com/libar-dev/delivery-process/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/@libar-dev/delivery-process.svg)](https://nodejs.org/)
+
+> **Pre-release v0.1.0-pre.0** – This is an early release. We welcome feedback and contributions!
+
+## Why Source-First?
+
+Traditional docs drift from code. This package makes **code the single source of truth**:
+
+| Aspect             | Traditional Docs             | Source-First (This Package)                          |
+| ------------------ | ---------------------------- | ---------------------------------------------------- |
+| **Source**         | Separate Markdown/Confluence | Annotations in TypeScript + Gherkin feature files    |
+| **Freshness**      | Manual updates → drift       | Always generated → always current                    |
+| **Enforcement**    | Guidelines                   | FSM-enforced workflow (roadmap → active → completed) |
+| **Traceability**   | Manual links                 | Rich relationships (implements, uses, depends-on)    |
+| **AI Integration** | Parse Markdown               | Direct typed ProcessStateAPI queries                 |
+
+## Accelerates AI Development
+
+Annotations give AI agents precise context without reading docs. Use `ProcessStateAPI` for typed queries instead of parsing generated Markdown:
+
+```typescript
+const api = createProcessStateAPI(dataset);
+api.getCurrentWork(); // What's active right now
+api.getRoadmapItems(); // What can be started
+api.getPatternDependencies('MyPattern'); // uses, used-by, depends-on, enables
+api.isValidTransition('roadmap', 'active'); // FSM check
+```
+
+No more hallucinated code from outdated docs — everything is code the AI can understand.
+
+## Rich Relationship Model
+
+The package supports a full taxonomy of relationships:
+
+| Relationship   | Tag(s)                               | Arrow Style | Meaning                       |
+| -------------- | ------------------------------------ | ----------- | ----------------------------- |
+| Realization    | `@libar-docs-implements`             | `..>`       | Code realizes a pattern spec  |
+| Generalization | `@libar-docs-extends`                | `-->>`      | Pattern extends another       |
+| Dependency     | `@libar-docs-uses` / `used-by`       | `-->`       | Technical coupling            |
+| Sequencing     | `@libar-docs-depends-on` / `enables` | `-.->`      | Roadmap ordering              |
+| Hierarchy      | `@libar-docs-parent` / `level`       | —           | Epic → Phase → Task           |
+| Traceability   | `@libar-docs-executable-specs`       | `...>`      | Links tiers (roadmap ↔ specs) |
+
+Auto-generated dependency graph:
+
+```mermaid
+graph TD
+    CommandOrchestrator --> EventStore
+    CommandOrchestrator --> CommandBus
+    CommandOrchestrator --> Workpool
+    SagaOrchestration -.-> CommandBusFoundation
+    EventStoreDurability -.-> DurableFunctionAdapters
+```
+
+## Dual-Source Architecture
+
+**Feature files** own planning metadata (status, phase, effort, depends-on):
+
+```gherkin
+@libar-docs-pattern:ReservationPattern
+@libar-docs-status:roadmap
+@libar-docs-phase:15
+@libar-docs-depends-on:EventStoreFoundation
+@libar-docs-enables:SagaEngine
+Feature: Reservation Pattern
+```
+
+**TypeScript stubs** own implementation relationships:
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-status roadmap
+ * @libar-docs-uses EventStoreFoundation, Workpool
+ * @libar-docs-used-by SagaEngine, CommandOrchestrator
+ */
+export function reserve(...) { ... }
+```
 
 ## Quick Start
 
-### 1. Annotate Your Code
+### 1. Install
+
+```bash
+npm install @libar-dev/delivery-process@pre
+# or pnpm add @libar-dev/delivery-process@pre
+```
+
+**Requirements:** Node.js >= 18.0.0
+
+### 2. Annotate Your Code
 
 ```typescript
 /** @libar-docs */
@@ -19,59 +105,67 @@ Documentation generator that extracts patterns from TypeScript and Gherkin sourc
 /**
  * @libar-docs-pattern CommandOrchestrator
  * @libar-docs-status completed
- * @libar-docs-core
- *
- * ## CommandOrchestrator - 7-Step Command Pipeline
- *
- * Coordinates command execution through the full lifecycle.
+ * @libar-docs-uses EventStore, CommandBus
  */
 export class CommandOrchestrator { ... }
 ```
 
-### 2. Generate Documentation
+### 3. Generate Docs
 
 ```bash
-npx generate-docs -g patterns -i "src/**/*.ts" -o docs -f
+npx generate-docs -g patterns,roadmap -i "src/**/*.ts" -o docs -f
 ```
 
-### 3. Lint Annotations
+### 4. Enforce Workflow (Pre-commit Hook)
 
 ```bash
-npx lint-patterns -i "src/**/*.ts" --strict
+npx lint-process --staged
 ```
 
----
+See [docs/INDEX.md](docs/INDEX.md) for full navigation.
 
-## Configuration
+## Features at a Glance
 
-The package supports configurable tag prefixes via presets or custom configuration:
+- **Living docs** — always generated from source
+- **FSM enforcement** — prevents invalid transitions (Process Guard)
+- **AI-native** — ProcessStateAPI for agents
+- **TypeScript-first** — annotations integrate with language server
+- **Dual-source** — Gherkin for planning, TS for implementation
+- **Rich outputs** — patterns, roadmap, changelog, traceability, ADRs
+- **Quality gates** — Definition of Done validation and anti-pattern detection
+
+## ProcessStateAPI — For AI Agents
+
+Give your AI assistant typed queries instead of making it parse markdown:
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+import {
+  generators,
+  api as apiModule,
+  createDefaultTagRegistry,
+} from '@libar-dev/delivery-process';
 
-// Default: DDD-ES-CQRS preset with @libar-docs- prefix
-const dp = createDeliveryProcess();
-
-// Generic preset with @docs- prefix (simpler taxonomy)
-const dp = createDeliveryProcess({ preset: 'generic' });
-
-// Custom prefix
-const dp = createDeliveryProcess({
-  tagPrefix: '@my-project-',
-  fileOptInTag: '@my-project',
+const tagRegistry = createDefaultTagRegistry();
+const dataset = generators.transformToMasterDataset({
+  patterns: extractedPatterns,
+  tagRegistry,
 });
+const api = apiModule.createProcessStateAPI(dataset);
+
+// Status queries
+api.getCurrentWork(); // Active patterns
+api.getRoadmapItems(); // Available to start
+api.getCompletionPercentage(); // Overall progress
+
+// Relationship queries
+api.getPatternDependencies('Saga'); // What it uses
+api.getPatternRelationships('Saga'); // All relationships
+api.getRelatedPatterns('EventStore'); // Everything connected
+
+// Workflow queries
+api.isValidTransition('roadmap', 'active');
+api.getProtectionInfo('completed'); // { level: 'hard', requiresUnlock: true }
 ```
-
-### Available Presets
-
-| Preset                  | Tag Prefix     | Categories | Use Case                         |
-| ----------------------- | -------------- | ---------- | -------------------------------- |
-| `ddd-es-cqrs` (default) | `@libar-docs-` | 21         | DDD/Event Sourcing architectures |
-| `generic`               | `@docs-`       | 3          | Simple projects                  |
-
-> **See:** [docs/CONFIGURATION.md](./docs/CONFIGURATION.md) for complete configuration guide.
-
----
 
 ## CLI Commands
 
@@ -79,60 +173,36 @@ const dp = createDeliveryProcess({
 | ----------------------- | --------------------------------------------- |
 | `generate-docs`         | Generate documentation from annotated sources |
 | `lint-patterns`         | Validate annotation quality                   |
-| `lint-process`          | FSM validation for delivery process (PDR-005) |
+| `lint-process`          | Validate delivery workflow (pre-commit hooks) |
 | `validate-patterns`     | Cross-source validation with DoD checks       |
 | `generate-tag-taxonomy` | Generate tag reference from TypeScript source |
 
-## Available Generators
+## Configuration
 
-```bash
-npx generate-docs --list-generators
+```typescript
+import { createDeliveryProcess } from '@libar-dev/delivery-process';
+
+// Default: DDD-ES-CQRS preset (21 categories)
+const dp = createDeliveryProcess();
+
+// Generic preset (3 categories, simpler)
+const dp = createDeliveryProcess({ preset: 'generic' });
 ```
 
-## Tag Taxonomy
-
-Tags are defined in TypeScript as the single source of truth:
-
-```
-src/taxonomy/
-├── registry-builder.ts  # buildRegistry() - main entry
-├── categories.ts        # 21 category definitions
-├── status-values.ts     # FSM states
-└── format-types.ts      # Tag value formats
-```
-
-Generate a complete reference:
-
-```bash
-npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
-```
+| Preset                  | Tag Prefix     | Categories | Use Case                         |
+| ----------------------- | -------------- | ---------- | -------------------------------- |
+| `ddd-es-cqrs` (default) | `@libar-docs-` | 21         | DDD/Event Sourcing architectures |
+| `generic`               | `@docs-`       | 3          | Simple projects                  |
 
 ## Documentation
 
-### Getting Started
+- **[docs/INDEX.md](docs/INDEX.md)** — Documentation navigation hub
+- **[docs/METHODOLOGY.md](docs/METHODOLOGY.md)** — Core thesis and FSM
+- **[docs/PROCESS-GUARD.md](docs/PROCESS-GUARD.md)** — Workflow enforcement
+- **[docs/GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md)** — Writing effective specs
+- **[docs/CONFIGURATION.md](docs/CONFIGURATION.md)** — Presets and custom tags
+- **[INSTRUCTIONS.md](INSTRUCTIONS.md)** — Complete tag reference
 
-- **[docs/CONFIGURATION.md](./docs/CONFIGURATION.md)** - Configuration guide, presets, customization
-- **[INSTRUCTIONS.md](./INSTRUCTIONS.md)** - Complete tag reference and CLI details
+## License
 
-### Methodology
-
-- **[docs/METHODOLOGY.md](./docs/METHODOLOGY.md)** - Core thesis, FSM workflow, two-tier architecture
-- **[docs/SESSION-GUIDES.md](./docs/SESSION-GUIDES.md)** - Planning, design, and implementation session workflows
-- **[docs/GHERKIN-PATTERNS.md](./docs/GHERKIN-PATTERNS.md)** - Rich Gherkin patterns for BDD specs
-
-### Architecture
-
-- **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Pipeline architecture and codec system
-
-### Validation & Quality
-
-- **[docs/PROCESS-GUARD.md](./docs/PROCESS-GUARD.md)** - FSM validation, protection levels, change detection
-- **[docs/VALIDATION.md](./docs/VALIDATION.md)** - Lint rules, anti-patterns, Definition of Done
-
-### Contributing & Publishing
-
-- **[docs/PUBLISHING.md](./docs/PUBLISHING.md)** - npm publishing workflow, pre-releases, GitHub Actions
-
-### Reference
-
-- **[docs/TAXONOMY.md](./docs/TAXONOMY.md)** - Tag taxonomy reference (status, categories, formats)
+MIT © Libar AI

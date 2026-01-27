@@ -1,7 +1,7 @@
 {
   "name": "@libar-dev/delivery-process",
-  "version": "0.3.0",
-  "description": "Documentation generator from TypeScript source code and Gherkin feature files",
+  "version": "0.1.0-pre.0",
+  "description": "Source-first delivery process: annotations in TypeScript + Gherkin become living docs, architecture diagrams, dependency graphs, traceability matrices, and enforced workflows. Accelerates AI development with ProcessStateAPI.",
   "type": "module",
   "sideEffects": false,
   "main": "dist/index.js",
@@ -51,6 +51,10 @@
     "./taxonomy": {
       "types": "./dist/taxonomy/index.d.ts",
       "import": "./dist/taxonomy/index.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.js"
     }
   },
   "bin": {
@@ -93,13 +97,23 @@
     "prepare": "husky"
   },
   "keywords": [
-    "libar",
-    "documentation",
-    "code-first",
-    "typescript",
-    "docs",
-    "jsdoc",
-    "extraction"
+    "source-first",
+    "delivery-process",
+    "living-documentation",
+    "fsm-enforcement",
+    "gherkin",
+    "bdd",
+    "ai-assisted-development",
+    "process-state-api",
+    "typescript-annotations",
+    "ddd",
+    "event-sourcing",
+    "cqrs",
+    "traceability",
+    "architecture-diagrams",
+    "mermaid",
+    "documentation-driven-development",
+    "workflow-enforcement"
   ],
   "author": "Libar AI",
   "license": "MIT",
@@ -138,9 +152,10 @@
   },
   "files": [
     "dist",
-    "catalogue",
+    "docs",
     "docs-generated",
     "README.md",
+    "INSTRUCTIONS.md",
     "LICENSE"
   ],
   "private": false,

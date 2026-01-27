@@ -5,10 +5,27 @@ The Process Guard is an FSM (Finite State Machine) validation system that enforc
 ## Overview
 
 Process Guard validates changes before they're committed, ensuring:
+
 - **Completed specs remain stable** (require explicit unlock to modify)
 - **Status transitions follow the FSM** (can't skip `active` to reach `completed`)
 - **Active specs don't expand scope** (no new deliverables during implementation)
 - **Session scoping is respected** (optional workflow constraint)
+
+## Quick Reference: Escape Hatches
+
+When you need to override the normal workflow:
+
+| Situation                      | Escape Hatch                        | When Appropriate                  |
+| ------------------------------ | ----------------------------------- | --------------------------------- |
+| Fix bug in completed spec      | `@<prefix>-unlock-reason:'reason'`  | Critical bug, documentation error |
+| Emergency hotfix outside scope | `--ignore-session`                  | Production incident               |
+| Retroactive completion         | Set status directly + unlock-reason | Discovered work was already done  |
+| Skip workflow for legacy code  | Multiple transitions in one commit  | Migration from unmanaged codebase |
+| CI/CD strict validation        | `--strict`                          | Treat warnings as errors          |
+
+See [Escape Hatches](#escape-hatches) section below for detailed explanations.
+
+---
 
 ## Architecture
 
@@ -20,11 +37,11 @@ derive-state.ts ──┐
 detect-changes.ts─┘
 ```
 
-| Component | Purpose |
-|-----------|---------|
-| `derive-state.ts` | Scans files to build `ProcessState` from annotations |
+| Component           | Purpose                                                |
+| ------------------- | ------------------------------------------------------ |
+| `derive-state.ts`   | Scans files to build `ProcessState` from annotations   |
 | `detect-changes.ts` | Parses git diff to find modified files and transitions |
-| `decider.ts` | Pure validation: `(state, changes, options) → result` |
+| `decider.ts`        | Pure validation: `(state, changes, options) → result`  |
 
 **Key insight:** State is derived from file annotations—there's no separate state file to maintain.
 
@@ -34,14 +51,15 @@ detect-changes.ts─┘
 
 Each status has an associated protection level that determines what modifications are allowed:
 
-| Status | Protection | What's Allowed | Restriction |
-|--------|------------|----------------|-------------|
-| `roadmap` | `none` | Full editing | - |
-| `active` | `scope` | Edit existing deliverables | Cannot add new deliverables |
-| `completed` | `hard` | Read only | Requires `@<prefix>-unlock-reason` |
-| `deferred` | `none` | Full editing | - |
+| Status      | Protection | What's Allowed             | Restriction                        |
+| ----------- | ---------- | -------------------------- | ---------------------------------- |
+| `roadmap`   | `none`     | Full editing               | -                                  |
+| `active`    | `scope`    | Edit existing deliverables | Cannot add new deliverables        |
+| `completed` | `hard`     | Read only                  | Requires `@<prefix>-unlock-reason` |
+| `deferred`  | `none`     | Full editing               | -                                  |
 
 **Protection enforcement:**
+
 - **none** — No restrictions, fully editable
 - **scope** — Scope-locked, prevents adding new deliverables to prevent scope creep
 - **hard** — Hard-locked, requires explicit unlock reason annotation to modify
@@ -54,19 +72,19 @@ Process Guard enforces 6 validation rules:
 
 ### Error Rules (Block Commit)
 
-| Rule | Description | Fix |
-|------|-------------|-----|
-| `completed-protection` | Cannot modify completed specs without unlock | Add `@<prefix>-unlock-reason:'reason'` |
-| `invalid-status-transition` | Status transition must follow FSM | Use valid transition path |
-| `scope-creep` | Cannot add deliverables to active specs | Remove new deliverable or revert to `roadmap` |
-| `session-excluded` | Cannot modify files explicitly excluded from session | Remove from exclusion list |
+| Rule                        | Description                                          | Fix                                           |
+| --------------------------- | ---------------------------------------------------- | --------------------------------------------- |
+| `completed-protection`      | Cannot modify completed specs without unlock         | Add `@<prefix>-unlock-reason:'reason'`        |
+| `invalid-status-transition` | Status transition must follow FSM                    | Use valid transition path                     |
+| `scope-creep`               | Cannot add deliverables to active specs              | Remove new deliverable or revert to `roadmap` |
+| `session-excluded`          | Cannot modify files explicitly excluded from session | Remove from exclusion list                    |
 
 ### Warning Rules (Informational)
 
-| Rule | Description | Fix |
-|------|-------------|-----|
-| `session-scope` | File not in active session scope | Add to session scope or use `--ignore-session` |
-| `deliverable-removed` | Deliverable was removed from spec | Document if descoped or completed |
+| Rule                  | Description                       | Fix                                            |
+| --------------------- | --------------------------------- | ---------------------------------------------- |
+| `session-scope`       | File not in active session scope  | Add to session scope or use `--ignore-session` |
+| `deliverable-removed` | Deliverable was removed from spec | Document if descoped or completed              |
 
 ---
 
@@ -85,14 +103,15 @@ deferred ──→ roadmap
 
 **Transition rules:**
 
-| From | Valid Targets | Notes |
-|------|--------------|-------|
-| `roadmap` | `active`, `deferred`, `roadmap` | Can start, defer, or stay |
-| `active` | `completed`, `roadmap` | Can finish or regress if blocked |
-| `completed` | *(none)* | Terminal state—use unlock to modify |
-| `deferred` | `roadmap` | Must reactivate through roadmap |
+| From        | Valid Targets                   | Notes                               |
+| ----------- | ------------------------------- | ----------------------------------- |
+| `roadmap`   | `active`, `deferred`, `roadmap` | Can start, defer, or stay           |
+| `active`    | `completed`, `roadmap`          | Can finish or regress if blocked    |
+| `completed` | _(none)_                        | Terminal state—use unlock to modify |
+| `deferred`  | `roadmap`                       | Must reactivate through roadmap     |
 
 **Invalid transitions (will fail):**
+
 - `roadmap` → `completed` — Must go through `active` first
 - `deferred` → `active` — Must go through `roadmap` first
 - `deferred` → `completed` — Must go through `roadmap` → `active`
@@ -108,11 +127,11 @@ Sessions optionally constrain which files can be modified during a work session.
 
 ```typescript
 interface SessionState {
-  id: string;              // Session identifier
-  status: SessionStatus;   // "draft" | "active" | "closed"
-  scopedSpecs: string[];   // Files allowed to be modified
+  id: string; // Session identifier
+  status: SessionStatus; // "draft" | "active" | "closed"
+  scopedSpecs: string[]; // Files allowed to be modified
   excludedSpecs: string[]; // Files explicitly forbidden
-  sessionFile: string;     // Path to session definition
+  sessionFile: string; // Path to session definition
 }
 ```
 
@@ -132,31 +151,31 @@ lint-process [options] [files...]
 
 ### Modes
 
-| Flag | Description | Use Case |
-|------|-------------|----------|
-| `--staged` | Validate staged changes (default) | Pre-commit hooks |
-| `--all` | Validate all changes vs main branch | CI/CD pipelines |
-| `--files` | Validate specific files | Development checks |
+| Flag       | Description                         | Use Case           |
+| ---------- | ----------------------------------- | ------------------ |
+| `--staged` | Validate staged changes (default)   | Pre-commit hooks   |
+| `--all`    | Validate all changes vs main branch | CI/CD pipelines    |
+| `--files`  | Validate specific files             | Development checks |
 
 ### Options
 
-| Flag | Description |
-|------|-------------|
-| `-f, --file <path>` | File to validate (repeatable, implies `--files` mode) |
-| `-b, --base-dir <dir>` | Base directory for paths (default: cwd) |
-| `--strict` | Treat warnings as errors (exit 1 on warnings) |
-| `--ignore-session` | Ignore session scope rules |
-| `--show-state` | Show derived process state (debugging) |
-| `--format <type>` | Output format: `pretty` (default) or `json` |
-| `-h, --help` | Show help message |
-| `-v, --version` | Show version number |
+| Flag                   | Description                                           |
+| ---------------------- | ----------------------------------------------------- |
+| `-f, --file <path>`    | File to validate (repeatable, implies `--files` mode) |
+| `-b, --base-dir <dir>` | Base directory for paths (default: cwd)               |
+| `--strict`             | Treat warnings as errors (exit 1 on warnings)         |
+| `--ignore-session`     | Ignore session scope rules                            |
+| `--show-state`         | Show derived process state (debugging)                |
+| `--format <type>`      | Output format: `pretty` (default) or `json`           |
+| `-h, --help`           | Show help message                                     |
+| `-v, --version`        | Show version number                                   |
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | No errors (warnings allowed unless `--strict`) |
-| `1` | Errors found (or warnings with `--strict`) |
+| Code | Meaning                                        |
+| ---- | ---------------------------------------------- |
+| `0`  | No errors (warnings allowed unless `--strict`) |
+| `1`  | Errors found (or warnings with `--strict`)     |
 
 ### Examples
 
@@ -196,17 +215,17 @@ import {
   hasErrors,
   hasWarnings,
   summarizeResult,
-} from "@libar-dev/delivery-process/lint";
+} from '@libar-dev/delivery-process/lint';
 
 // 1. Derive state from file annotations
-const stateResult = await deriveProcessState({ baseDir: "/path/to/repo" });
+const stateResult = await deriveProcessState({ baseDir: '/path/to/repo' });
 if (!stateResult.ok) {
   throw stateResult.error;
 }
 const state = stateResult.value;
 
 // 2. Detect changes from git
-const changesResult = detectStagedChanges("/path/to/repo");
+const changesResult = detectStagedChanges('/path/to/repo');
 // Or: detectBranchChanges(baseDir) for all changes vs main
 // Or: detectFileChanges(baseDir, ["path/to/file.feature"])
 if (!changesResult.ok) {
@@ -237,34 +256,34 @@ if (!output.result.valid) {
 
 **State Derivation:**
 
-| Function | Description |
-|----------|-------------|
-| `deriveProcessState(config)` | Derive `ProcessState` from file annotations |
-| `getFileState(state, path)` | Get state for a specific file |
-| `getFilesByProtection(state, level)` | Get files with specific protection level |
-| `isInSessionScope(state, path)` | Check if file is in session scope |
-| `isSessionExcluded(state, path)` | Check if file is explicitly excluded |
+| Function                             | Description                                 |
+| ------------------------------------ | ------------------------------------------- |
+| `deriveProcessState(config)`         | Derive `ProcessState` from file annotations |
+| `getFileState(state, path)`          | Get state for a specific file               |
+| `getFilesByProtection(state, level)` | Get files with specific protection level    |
+| `isInSessionScope(state, path)`      | Check if file is in session scope           |
+| `isSessionExcluded(state, path)`     | Check if file is explicitly excluded        |
 
 **Change Detection:**
 
-| Function | Description |
-|----------|-------------|
-| `detectStagedChanges(baseDir)` | Detect staged git changes |
-| `detectBranchChanges(baseDir)` | Detect all changes vs main branch |
-| `detectFileChanges(baseDir, files)` | Detect changes in specific files |
-| `hasChanges(changes)` | Check if any changes were detected |
-| `getAllChangedFiles(changes)` | Get all changed file paths |
+| Function                            | Description                        |
+| ----------------------------------- | ---------------------------------- |
+| `detectStagedChanges(baseDir)`      | Detect staged git changes          |
+| `detectBranchChanges(baseDir)`      | Detect all changes vs main branch  |
+| `detectFileChanges(baseDir, files)` | Detect changes in specific files   |
+| `hasChanges(changes)`               | Check if any changes were detected |
+| `getAllChangedFiles(changes)`       | Get all changed file paths         |
 
 **Validation:**
 
-| Function | Description |
-|----------|-------------|
-| `validateChanges(input)` | Run all validation rules |
-| `hasErrors(result)` | Check if result has any errors |
-| `hasWarnings(result)` | Check if result has any warnings |
-| `getAllIssues(result)` | Get all violations and warnings |
-| `getViolationsByRule(result, rule)` | Filter violations by rule |
-| `summarizeResult(result)` | Create summary string |
+| Function                            | Description                      |
+| ----------------------------------- | -------------------------------- |
+| `validateChanges(input)`            | Run all validation rules         |
+| `hasErrors(result)`                 | Check if result has any errors   |
+| `hasWarnings(result)`               | Check if result has any warnings |
+| `getAllIssues(result)`              | Get all violations and warnings  |
+| `getViolationsByRule(result, rule)` | Filter violations by rule        |
+| `summarizeResult(result)`           | Create summary string            |
 
 ---
 

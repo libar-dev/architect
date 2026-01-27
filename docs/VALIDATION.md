@@ -146,10 +146,10 @@ The anti-pattern detector enforces ownership rules:
 
 ```bash
 # Run via validate-patterns command
-npx validate-patterns -i "**/*.feature" -t "src/**/*.ts" --anti-patterns
+npx validate-patterns -i "src/**/*.ts" -F "**/*.feature" --anti-patterns
 
 # With custom thresholds
-npx validate-patterns -i "**/*.feature" -t "src/**/*.ts" --anti-patterns \
+npx validate-patterns -i "src/**/*.ts" -F "**/*.feature" --anti-patterns \
   --scenario-threshold 15 --mega-threshold 300
 ```
 
@@ -300,8 +300,8 @@ The `validate-patterns` CLI combines all validation tools:
 ```bash
 # Full validation suite
 npx validate-patterns \
-  -i "specs/**/*.feature" \
-  -t "src/**/*.ts" \
+  -i "src/**/*.ts" \
+  -F "specs/**/*.feature" \
   --dod \
   --anti-patterns \
   --cross-source \
@@ -310,16 +310,16 @@ npx validate-patterns \
 
 ### CLI Options
 
-| Flag                      | Description                               |
-| ------------------------- | ----------------------------------------- |
-| `-i, --input <glob>`      | Glob pattern for feature files            |
-| `-t, --typescript <glob>` | Glob pattern for TypeScript files         |
-| `--dod`                   | Run Definition of Done validation         |
-| `--anti-patterns`         | Run anti-pattern detection                |
-| `--cross-source`          | Validate feature/TypeScript consistency   |
-| `--phases <list>`         | Specific phases for DoD (comma-separated) |
-| `--strict`                | Treat warnings as errors                  |
-| `--format <type>`         | Output format: pretty or json             |
+| Flag                    | Description                               |
+| ----------------------- | ----------------------------------------- |
+| `-i, --input <glob>`    | Glob pattern for TypeScript files         |
+| `-F, --features <glob>` | Glob pattern for Gherkin feature files    |
+| `--dod`                 | Run Definition of Done validation         |
+| `--anti-patterns`       | Run anti-pattern detection                |
+| `--cross-source`        | Validate feature/TypeScript consistency   |
+| `--phases <list>`       | Specific phases for DoD (comma-separated) |
+| `--strict`              | Treat warnings as errors                  |
+| `--format <type>`       | Output format: pretty or json             |
 
 ### Exit Codes
 
@@ -356,7 +356,7 @@ jobs:
         run: pnpm lint-patterns -i "src/**/*.ts" --strict
 
       - name: Validate Documentation
-        run: pnpm validate-patterns -i "specs/**/*.feature" -t "src/**/*.ts" --dod --anti-patterns
+        run: pnpm validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
 ```
 
 ### package.json Scripts
@@ -366,8 +366,8 @@ jobs:
   "scripts": {
     "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
     "lint:patterns:strict": "lint-patterns -i 'src/**/*.ts' --strict",
-    "validate": "validate-patterns -i 'specs/**/*.feature' -t 'src/**/*.ts' --dod --anti-patterns",
-    "validate:strict": "validate-patterns -i 'specs/**/*.feature' -t 'src/**/*.ts' --dod --anti-patterns --strict"
+    "validate": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns",
+    "validate:strict": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns --strict"
   }
 }
 ```
