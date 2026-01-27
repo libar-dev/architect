@@ -1,7 +1,7 @@
 {
   "name": "@libar-dev/delivery-process",
   "version": "0.1.0-pre.0",
-  "description": "Source-first delivery process: annotations in TypeScript + Gherkin become living docs, architecture diagrams, dependency graphs, traceability matrices, and enforced workflows. Accelerates AI development with ProcessStateAPI.",
+  "description": "Source-first delivery process: TypeScript + Gherkin annotations become living docs, architecture diagrams, dependency graphs, traceability matrices, and enforced workflows.",
   "type": "module",
   "sideEffects": false,
   "main": "dist/index.js",
@@ -100,20 +100,21 @@
     "source-first",
     "delivery-process",
     "living-documentation",
+    "documentation-generator",
+    "architecture-graph",
+    "traceability-matrix",
+    "workflow-enforcement",
     "fsm-enforcement",
+    "process-guard",
+    "roadmap",
     "gherkin",
     "bdd",
     "ai-assisted-development",
     "process-state-api",
     "typescript-annotations",
-    "ddd",
-    "event-sourcing",
-    "cqrs",
     "traceability",
-    "architecture-diagrams",
     "mermaid",
-    "documentation-driven-development",
-    "workflow-enforcement"
+    "cli"
   ],
   "author": "Libar AI",
   "license": "MIT",
@@ -161,7 +162,8 @@
   "private": false,
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "tag": "pre"
   },
   "lint-staged": {
     "*.ts": [
