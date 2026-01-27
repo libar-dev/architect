@@ -68,7 +68,7 @@ Feature: Component Diagram Generation
         | OrderHandler | command-handler | orders      | OrderRepo | -         | -          |
         | OrderRepo    | repository      | orders      | -         | Database  | Repository |
         | Database     | infrastructure  | -           | -         | -         | -          |
-        | Repository   | interface       | -           | -         | -         | -          |
+        | Repository   | repository      | -           | -         | -         | -          |
       When the component diagram is generated
       Then the Mermaid output contains arrows:
         | arrow                       |

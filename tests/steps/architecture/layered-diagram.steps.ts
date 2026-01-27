@@ -167,10 +167,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   // ---------------------------------------------------------------------------
-  // Rule: Layer order is infrastructure to domain (top to bottom)
+  // Rule: Layer order is domain to infrastructure (top to bottom)
   // ---------------------------------------------------------------------------
 
-  Rule('Layer order is infrastructure to domain (top to bottom)', ({ RuleScenario }) => {
+  Rule('Layer order is domain to infrastructure (top to bottom)', ({ RuleScenario }) => {
     RuleScenario('Layers render in correct order', ({ Given, When, Then, And }) => {
       Given('patterns with layers:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         if (!state) state = initState();
@@ -190,24 +190,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         generateDiagram();
       });
 
-      Then('the infrastructure layer appears before application layer', () => {
+      Then('the domain layer appears before application layer', () => {
         const markdown = state?.markdown ?? '';
-        const infraPos = markdown.indexOf('"Infrastructure Layer"');
+        const domainPos = markdown.indexOf('"Domain Layer"');
         const appPos = markdown.indexOf('"Application Layer"');
         // Guard: verify both layers are present before comparing positions
-        expect(infraPos).toBeGreaterThanOrEqual(0);
+        expect(domainPos).toBeGreaterThanOrEqual(0);
         expect(appPos).toBeGreaterThanOrEqual(0);
-        expect(infraPos).toBeLessThan(appPos);
+        expect(domainPos).toBeLessThan(appPos);
       });
 
-      And('the application layer appears before domain layer', () => {
+      And('the application layer appears before infrastructure layer', () => {
         const markdown = state?.markdown ?? '';
         const appPos = markdown.indexOf('"Application Layer"');
-        const domainPos = markdown.indexOf('"Domain Layer"');
+        const infraPos = markdown.indexOf('"Infrastructure Layer"');
         // Guard: verify both layers are present before comparing positions
         expect(appPos).toBeGreaterThanOrEqual(0);
-        expect(domainPos).toBeGreaterThanOrEqual(0);
-        expect(appPos).toBeLessThan(domainPos);
+        expect(infraPos).toBeGreaterThanOrEqual(0);
+        expect(appPos).toBeLessThan(infraPos);
       });
     });
   });

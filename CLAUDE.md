@@ -570,16 +570,22 @@ export class MyClass { ... }
 
 #### Key Tags
 
-| Tag          | Format | Description                                             |
-| ------------ | ------ | ------------------------------------------------------- |
-| `pattern`    | value  | Pattern identifier (required for named patterns)        |
-| `status`     | enum   | FSM state: `roadmap`, `active`, `completed`, `deferred` |
-| `phase`      | number | Roadmap phase number                                    |
-| `release`    | value  | Version tag: `v0.1.0` or `vNEXT`                        |
-| `uses`       | csv    | Runtime dependencies (TypeScript only)                  |
-| `used-by`    | csv    | Reverse dependencies                                    |
-| `depends-on` | csv    | Planning dependencies (Gherkin only)                    |
-| `quarter`    | value  | Timeline: `Q1-2025` (Gherkin only)                      |
+| Tag                | Format | Description                                             |
+| ------------------ | ------ | ------------------------------------------------------- |
+| `pattern`          | value  | Pattern identifier (required for named patterns)        |
+| `status`           | enum   | FSM state: `roadmap`, `active`, `completed`, `deferred` |
+| `phase`            | number | Roadmap phase number                                    |
+| `release`          | value  | Version tag: `v0.1.0` or `vNEXT`                        |
+| `uses`             | csv    | Runtime dependencies (TypeScript only)                  |
+| `used-by`          | csv    | Reverse dependencies                                    |
+| `depends-on`       | csv    | Planning dependencies (Gherkin only)                    |
+| `quarter`          | value  | Timeline: `Q1-2025` (Gherkin only)                      |
+| `implements`       | csv    | Links behavior tests to tier 1 specs                    |
+| `extends`          | value  | Pattern inheritance                                     |
+| `executable-specs` | value  | Location of behavior tests                              |
+| `arch-role`        | value  | Architecture diagram: component role                    |
+| `arch-context`     | value  | Architecture diagram: bounded context                   |
+| `arch-layer`       | value  | Architecture diagram: layer assignment                  |
 
 **Category tags** are flags (no value): `@libar-docs-core`, `@libar-docs-api`, `@libar-docs-infra`, `@libar-docs-domain`, etc.
 
@@ -662,6 +668,38 @@ When pattern exists in both TypeScript AND feature file:
 | Description       | TypeScript markdown description |
 
 **Warning:** If TypeScript file is missing `@libar-docs-status`, the pattern data is **ignored** and not merged with feature file.
+
+## Relationship Taxonomy
+
+| Tag          | UML Analog     | Direction     | Format | Source     | Arrow  |
+| ------------ | -------------- | ------------- | ------ | ---------- | ------ |
+| `implements` | Realization    | CODE→SPEC     | csv    | TypeScript | `..->` |
+| `extends`    | Generalization | CHILD→PARENT  | value  | Any        | `-->>` |
+| `uses`       | Dependency     | OUT           | csv    | TypeScript | `-->`  |
+| `used-by`    | Dependency     | IN            | csv    | TypeScript | `-->`  |
+| `depends-on` | Ordering       | SEQUENCE      | csv    | Gherkin    | `-.->` |
+| `enables`    | Ordering       | SEQUENCE      | csv    | Gherkin    | `-.->` |
+| `see-also`   | Association    | BIDIRECTIONAL | csv    | Any        | `---`  |
+| `api-ref`    | Reference      | DOC→API       | value  | Any        | N/A    |
+
+### Tag Ownership Rules
+
+| Tag                | TypeScript | Gherkin | Why                   |
+| ------------------ | ---------- | ------- | --------------------- |
+| `uses`             | ✅         | ❌      | Runtime dependencies  |
+| `used-by`          | ✅         | ❌      | Reverse of uses       |
+| `depends-on`       | ❌         | ✅      | Planning dependencies |
+| `enables`          | ❌         | ✅      | What this unblocks    |
+| `implements`       | ✅         | ❌      | Behavior test links   |
+| `executable-specs` | ❌         | ✅      | Spec file location    |
+
+### Workflow-Relationship Matrix
+
+| Workflow           | Required Tags     | Recommended Tags         |
+| ------------------ | ----------------- | ------------------------ |
+| **Planning**       | `status`, `phase` | `depends-on`, `enables`  |
+| **Design**         | `status`, `uses`  | `arch-*` tags, `extends` |
+| **Implementation** | `implements`      | `uses`, `used-by`        |
 
 ---
 

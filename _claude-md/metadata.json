@@ -114,6 +114,11 @@
           "path": "api/dual-source.md",
           "tags": ["core-mandatory"],
           "description": "Dual-source architecture, TypeScript vs Feature Files, merging rules"
+        },
+        {
+          "path": "api/relationships.md",
+          "tags": ["core-mandatory", "api", "relationships"],
+          "description": "Relationship taxonomy, tag ownership rules, workflow-relationship matrix"
         }
       ]
     },

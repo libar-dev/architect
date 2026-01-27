@@ -441,8 +441,22 @@ export const ExtractedPatternSchema = z
      * - repository: CMS state loader
      * - decider: Pure business logic
      * - read-model: Query-side table/view
+     * - service: Application service (orchestration, coordination)
      */
-    archRole: z.string().optional(),
+    archRole: z
+      .enum([
+        'bounded-context',
+        'command-handler',
+        'projection',
+        'saga',
+        'process-manager',
+        'infrastructure',
+        'repository',
+        'decider',
+        'read-model',
+        'service',
+      ])
+      .optional(),
 
     /**
      * Bounded context this component belongs to (from @libar-docs-arch-context tag)
@@ -462,7 +476,7 @@ export const ExtractedPatternSchema = z
      * - application: Application services, handlers, projections
      * - infrastructure: External interfaces, persistence, messaging
      */
-    archLayer: z.string().optional(),
+    archLayer: z.enum(['domain', 'application', 'infrastructure']).optional(),
   })
   .strict();
 

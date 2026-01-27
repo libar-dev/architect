@@ -18,16 +18,22 @@ export class MyClass { ... }
 
 #### Key Tags
 
-| Tag          | Format | Description                                             |
-| ------------ | ------ | ------------------------------------------------------- |
-| `pattern`    | value  | Pattern identifier (required for named patterns)        |
-| `status`     | enum   | FSM state: `roadmap`, `active`, `completed`, `deferred` |
-| `phase`      | number | Roadmap phase number                                    |
-| `release`    | value  | Version tag: `v0.1.0` or `vNEXT`                        |
-| `uses`       | csv    | Runtime dependencies (TypeScript only)                  |
-| `used-by`    | csv    | Reverse dependencies                                    |
-| `depends-on` | csv    | Planning dependencies (Gherkin only)                    |
-| `quarter`    | value  | Timeline: `Q1-2025` (Gherkin only)                      |
+| Tag                | Format | Description                                             |
+| ------------------ | ------ | ------------------------------------------------------- |
+| `pattern`          | value  | Pattern identifier (required for named patterns)        |
+| `status`           | enum   | FSM state: `roadmap`, `active`, `completed`, `deferred` |
+| `phase`            | number | Roadmap phase number                                    |
+| `release`          | value  | Version tag: `v0.1.0` or `vNEXT`                        |
+| `uses`             | csv    | Runtime dependencies (TypeScript only)                  |
+| `used-by`          | csv    | Reverse dependencies                                    |
+| `depends-on`       | csv    | Planning dependencies (Gherkin only)                    |
+| `quarter`          | value  | Timeline: `Q1-2025` (Gherkin only)                      |
+| `implements`       | csv    | Links behavior tests to tier 1 specs                    |
+| `extends`          | value  | Pattern inheritance                                     |
+| `executable-specs` | value  | Location of behavior tests                              |
+| `arch-role`        | value  | Architecture diagram: component role                    |
+| `arch-context`     | value  | Architecture diagram: bounded context                   |
+| `arch-layer`       | value  | Architecture diagram: layer assignment                  |
 
 **Category tags** are flags (no value): `@libar-docs-core`, `@libar-docs-api`, `@libar-docs-infra`, `@libar-docs-domain`, etc.
 

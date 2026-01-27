@@ -3,7 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern DetectChanges
  * @libar-docs-status active
- * @libar-docs-depends-on:DeriveProcessState
+ * @libar-docs-uses DeriveProcessState
  *
  * ## DetectChanges - Git Diff Change Detection
  *
@@ -29,7 +29,7 @@
  * - When detecting scope creep (new deliverables)
  */
 
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import * as path from 'path';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
@@ -113,15 +113,18 @@ export function detectBranchChanges(
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
   try {
-    // Get merge base
-    const mergeBase = execGit(`merge-base ${baseBranch} HEAD`, baseDir).trim();
+    // Validate branch name to prevent command injection
+    const safeBranch = sanitizeBranchName(baseBranch);
+
+    // Get merge base using safe execution (array args, no shell interpolation)
+    const mergeBase = execGitSafe('merge-base', [safeBranch, 'HEAD'], baseDir).trim();
 
     // Get list of changed files
-    const nameStatus = execGit(`diff --name-status ${mergeBase}`, baseDir);
+    const nameStatus = execGitSafe('diff', ['--name-status', mergeBase], baseDir);
     const { modified, added, deleted } = parseNameStatus(nameStatus);
 
     // Get full diff
-    const diff = execGit(`diff ${mergeBase}`, baseDir);
+    const diff = execGitSafe('diff', [mergeBase], baseDir);
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
@@ -164,9 +167,9 @@ export function detectFileChanges(
       const fullPath = path.isAbsolute(file) ? file : path.join(baseDir, file);
       const relativePath = path.relative(baseDir, fullPath);
 
-      // Check if file is tracked
+      // Check if file is tracked (use -- to separate path from options)
       try {
-        execGit(`ls-files --error-unmatch ${relativePath}`, baseDir);
+        execGitSafe('ls-files', ['--error-unmatch', '--', relativePath], baseDir);
         modified.push(relativePath);
       } catch {
         // File not tracked, might be new
@@ -174,8 +177,9 @@ export function detectFileChanges(
       }
     }
 
-    // Get diff for modified files
-    const diff = modified.length > 0 ? execGit(`diff HEAD -- ${modified.join(' ')}`, baseDir) : '';
+    // Get diff for modified files (use -- to separate paths from options)
+    const diff =
+      modified.length > 0 ? execGitSafe('diff', ['HEAD', '--', ...modified], baseDir) : '';
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, modified, tagPrefix);
@@ -201,6 +205,9 @@ export function detectFileChanges(
 
 /**
  * Execute a git command and return output.
+ *
+ * @deprecated Use execGitSafe for user-controlled inputs to prevent command injection.
+ * This function is kept for simple hardcoded commands like 'diff --cached'.
  */
 function execGit(command: string, cwd: string): string {
   return execSync(`git ${command}`, {
@@ -208,6 +215,48 @@ function execGit(command: string, cwd: string): string {
     encoding: 'utf-8',
     stdio: ['pipe', 'pipe', 'pipe'],
   });
+}
+
+/**
+ * Execute a git command safely using execFileSync to prevent command injection.
+ *
+ * Uses array-based arguments instead of string interpolation to avoid shell
+ * metacharacter injection vulnerabilities.
+ *
+ * @param subcommand - Git subcommand (e.g., 'merge-base', 'diff', 'ls-files')
+ * @param args - Array of arguments (never interpolated into a shell command)
+ * @param cwd - Working directory
+ * @returns Command output as string
+ */
+function execGitSafe(subcommand: string, args: readonly string[], cwd: string): string {
+  return execFileSync('git', [subcommand, ...args], {
+    cwd,
+    encoding: 'utf-8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+}
+
+/**
+ * Validate and sanitize a git branch name to prevent command injection.
+ *
+ * Allows only alphanumeric characters, dots, hyphens, underscores, and forward slashes.
+ * This matches the valid git branch name character set per git-check-ref-format.
+ *
+ * @param branch - Branch name to validate
+ * @returns The validated branch name (unchanged if valid)
+ * @throws Error if branch name contains invalid characters
+ */
+function sanitizeBranchName(branch: string): string {
+  // Git branch names: alphanumeric, dots, hyphens, underscores, forward slashes
+  // Excludes shell metacharacters: ; | & $ ` ( ) { } [ ] < > ! ~ ^ * ? " ' \
+  if (!/^[a-zA-Z0-9._\-/]+$/.test(branch)) {
+    throw new Error(`Invalid branch name: ${branch}`);
+  }
+  // Prevent path traversal attempts in branch names
+  if (branch.includes('..')) {
+    throw new Error(`Invalid branch name (contains ..): ${branch}`);
+  }
+  return branch;
 }
 
 /**

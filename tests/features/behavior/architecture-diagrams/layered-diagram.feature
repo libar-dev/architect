@@ -34,10 +34,11 @@ Feature: Layered Architecture Diagram Generation
         | application    |
         | infrastructure |
 
-  Rule: Layer order is infrastructure to domain (top to bottom)
+  Rule: Layer order is domain to infrastructure (top to bottom)
 
-    The layer subgraphs are rendered in conventional order:
-    infrastructure at top, then application, then domain at bottom.
+    The layer subgraphs are rendered in Clean Architecture order:
+    domain at top, then application, then infrastructure at bottom.
+    This reflects the dependency rule: outer layers depend on inner layers.
 
     @acceptance-criteria @happy-path
     Scenario: Layers render in correct order
@@ -47,8 +48,8 @@ Feature: Layered Architecture Diagram Generation
         | Handler1    | command-handler | orders      | application    |
         | Repository1 | repository      | orders      | infrastructure |
       When the layered diagram is generated
-      Then the infrastructure layer appears before application layer
-      And the application layer appears before domain layer
+      Then the domain layer appears before application layer
+      And the application layer appears before infrastructure layer
 
   Rule: Context labels included in layered diagram nodes
 
