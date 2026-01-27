@@ -73,9 +73,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         }, z.core.$strict>;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -132,9 +132,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     extractedAt: z.ZodISODateTime;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
-        completed: "completed";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
+        completed: "completed";
         deferred: "deferred";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
@@ -162,12 +162,12 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
-            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
+            unknown: "unknown";
         }>>;
         line: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strict>>>>;
@@ -199,8 +199,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     risk: z.ZodOptional<z.ZodString>;
     priority: z.ZodOptional<z.ZodString>;
     level: z.ZodOptional<z.ZodEnum<{
-        phase: "phase";
         epic: "epic";
+        phase: "phase";
         task: "task";
     }>>;
     parent: z.ZodOptional<z.ZodString>;
