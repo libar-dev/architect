@@ -17,12 +17,8 @@ import {
   type DirectiveWithLocation,
   type LintSummary,
 } from '../../../src/lint/engine.js';
-import {
-  defaultRules,
-  type LintRule,
-  type LintViolation,
-  type LintSeverity,
-} from '../../../src/lint/rules.js';
+import { defaultRules, type LintRule } from '../../../src/lint/rules.js';
+import { type LintSeverity, type LintViolation } from '../../../src/validation-schemas/lint.js';
 import type { DocDirective } from '../../../src/validation-schemas/doc-directive.js';
 import { asDirectiveTag } from '../../../src/types/branded.js';
 import type { DataTableRow } from '../../support/world.js';
