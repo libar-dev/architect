@@ -146,8 +146,10 @@ Feature: Description Quality Foundation
       | 10    | Full Cycle Demo     | Documented-full-cycle-enables-adoption  |              |
     When generating REMAINING-WORK.md
     Then the Next Actionable table includes a Business Value column
-    And the Business Value column shows "Eliminate manual regeneration"
-    And the Business Value column shows "Documented full cycle enables adoption"
+    And the Business Value column shows expected values:
+      | value |
+      | Eliminate manual regeneration |
+      | Documented full cycle enables adoption |
 
   # ==========================================================================
   # Full PRD Descriptions (Phase 40 Acceptance Criteria)

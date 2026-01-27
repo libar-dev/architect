@@ -14,59 +14,24 @@ Feature: DocString MediaType Preservation
   Rule: Parser preserves DocString mediaType during extraction
 
     Scenario: Parse DocString with typescript mediaType
-      Given a feature file with content:
-        """
-        Feature: Code Example
-          Scenario: Has typed docstring
-            Given the following code:
-              \"\"\"typescript
-              const x: number = 1;
-              \"\"\"
-        """
+      Given a feature file containing a typescript docstring
       When the feature file is parsed
       Then parsing succeeds
       And scenario 1 step 1 has docString.content containing "const x: number = 1"
       And scenario 1 step 1 has docString.mediaType "typescript"
 
     Scenario: Parse DocString with json mediaType
-      Given a feature file with content:
-        """
-        Feature: JSON Example
-          Scenario: Has JSON docstring
-            Given the following data:
-              \"\"\"json
-              {"key": "value"}
-              \"\"\"
-        """
+      Given a feature file containing a json docstring
       When the feature file is parsed
       Then scenario 1 step 1 has docString.mediaType "json"
 
     Scenario: Parse DocString with jsdoc mediaType
-      Given a feature file with content:
-        """
-        Feature: JSDoc Example
-          Scenario: Has jsdoc docstring
-            Given the following documentation:
-              \"\"\"jsdoc
-              /**
-               * @param name - The user name
-               * @returns The greeting message
-               */
-              \"\"\"
-        """
+      Given a feature file containing a jsdoc docstring
       When the feature file is parsed
       Then scenario 1 step 1 has docString.mediaType "jsdoc"
 
     Scenario: DocString without mediaType has undefined mediaType
-      Given a feature file with content:
-        """
-        Feature: Plain DocString
-          Scenario: No language hint
-            Given plain text:
-              \"\"\"
-              Just some plain text
-              \"\"\"
-        """
+      Given a feature file containing a plain docstring without mediaType
       When the feature file is parsed
       Then scenario 1 step 1 has docString.content "Just some plain text"
       And scenario 1 step 1 has docString.mediaType undefined
@@ -78,23 +43,18 @@ Feature: DocString MediaType Preservation
   Rule: MediaType is used when rendering code blocks
 
     Scenario: TypeScript mediaType renders as typescript code block
-      Given a parsed step with docString:
-        | content | const x: number = 1; |
-        | mediaType | typescript |
+      Given a docString with content "const x: number = 1;" and mediaType "typescript"
       When the step docString is rendered
       Then the code block language is "typescript"
 
     Scenario: JSDoc mediaType prevents asterisk escaping
-      Given a parsed step with docString:
-        | content | /** @param name */ |
-        | mediaType | jsdoc |
+      Given a docString with content "/** @param name */" and mediaType "jsdoc"
       When the step docString is rendered
       Then the code block language is "jsdoc"
       And asterisks are not escaped in the output
 
     Scenario: Missing mediaType falls back to default language
-      Given a parsed step with docString:
-        | content | some content |
+      Given a docString with content "some content" and no mediaType
       When the step docString is rendered with default language "markdown"
       Then the code block language is "markdown"
 
@@ -111,9 +71,7 @@ Feature: DocString MediaType Preservation
       And the code block language is "javascript"
 
     Scenario: Object docString with mediaType takes precedence
-      Given a docString object:
-        | content | const x = 1 |
-        | mediaType | typescript |
+      Given a docString with content "const x = 1" and mediaType "typescript"
       When renderDocString is called with language "javascript"
       Then the code block language is "typescript"
       And the language parameter is ignored

@@ -121,6 +121,13 @@ export function findLists(doc: RenderableDocument): ListBlock[] {
 }
 
 /**
+ * Find all paragraph blocks in a document
+ */
+export function findParagraphs(doc: RenderableDocument): ParagraphBlock[] {
+  return findBlocksByType(doc, 'paragraph');
+}
+
+/**
  * Find a table with a specific column header
  *
  * @param doc - Document to search

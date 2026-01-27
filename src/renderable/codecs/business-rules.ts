@@ -597,9 +597,10 @@ function renderRuleInline(
     sections.push(paragraph(`- **Rationale:** ${annotations.rationale}`));
   }
 
-  // Tables from remaining content (always include if present)
-  if (options.includeTables && annotations.remainingContent) {
-    const tableBlocks = extractTables(annotations.remainingContent);
+  // Tables from rule description (extract from original description since
+  // remainingContent has tables stripped to avoid duplicate rendering in text)
+  if (options.includeTables && rule.description) {
+    const tableBlocks = extractTables(rule.description);
     for (const tableBlock of tableBlocks) {
       sections.push(tableBlock);
     }

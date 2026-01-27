@@ -90,6 +90,24 @@ export interface TestPatternOptions {
   level?: 'epic' | 'phase' | 'task';
   /** Patterns this code implements (realization relationship, default: none) */
   implementsPatterns?: string[];
+  // Display and traceability fields
+  /** Explicit human-readable title for display (default: none) */
+  title?: string;
+  /** Path to behavior file for traceability (default: none) */
+  behaviorFile?: string;
+  /** Whether the behavior file was verified to exist (default: none) */
+  behaviorFileVerified?: boolean;
+  // Discovery findings (from @discovered-* tags)
+  /** Discovered gaps during implementation (default: none) */
+  discoveredGaps?: string[];
+  /** Discovered improvements during implementation (default: none) */
+  discoveredImprovements?: string[];
+  /** Discovered learnings during implementation (default: none) */
+  discoveredLearnings?: string[];
+  /** Discovered risks during implementation (default: none) */
+  discoveredRisks?: string[];
+  /** Business value statement (default: none) */
+  businessValue?: string;
 }
 
 /**
@@ -164,6 +182,16 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     priority,
     level,
     implementsPatterns,
+    // Display and traceability fields
+    title,
+    behaviorFile,
+    behaviorFileVerified,
+    // Discovery findings
+    discoveredGaps,
+    discoveredImprovements,
+    discoveredLearnings,
+    discoveredRisks,
+    businessValue,
   } = options;
 
   const directive: DocDirective = {
@@ -215,6 +243,18 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(priority ? { priority } : {}),
     ...(level ? { level } : {}),
     ...(implementsPatterns && implementsPatterns.length > 0 ? { implementsPatterns } : {}),
+    // Display and traceability fields
+    ...(title ? { title } : {}),
+    ...(behaviorFile ? { behaviorFile } : {}),
+    ...(behaviorFileVerified !== undefined ? { behaviorFileVerified } : {}),
+    // Discovery findings
+    ...(discoveredGaps && discoveredGaps.length > 0 ? { discoveredGaps } : {}),
+    ...(discoveredImprovements && discoveredImprovements.length > 0
+      ? { discoveredImprovements }
+      : {}),
+    ...(discoveredLearnings && discoveredLearnings.length > 0 ? { discoveredLearnings } : {}),
+    ...(discoveredRisks && discoveredRisks.length > 0 ? { discoveredRisks } : {}),
+    ...(businessValue ? { businessValue } : {}),
   };
 }
 
