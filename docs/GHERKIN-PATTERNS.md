@@ -1,428 +1,343 @@
 # Gherkin Patterns Guide
 
-> **Rich Gherkin usage patterns for BDD specs in the delivery process.**
+Practical patterns for writing Gherkin specs that work with `delivery-process` generators.
 
-This guide describes patterns for writing effective Gherkin feature files that work well with generators and provide clear documentation.
-
----
-
-## Table of Contents
-
-- [Rule Description Structure](#rule-description-structure)
-- [When to Use Each Element](#when-to-use-each-element)
-- [DataTable Patterns](#datatable-patterns)
-- [DocString Patterns](#docstring-patterns)
-- [Scenario Organization](#scenario-organization)
-- [Test Type Identification](#test-type-identification)
+> **Tag Reference:** For the complete tag list, see [INSTRUCTIONS.md](../INSTRUCTIONS.md#category-tags).
 
 ---
 
-## Rule Description Structure
+## Essential Patterns
 
-Every feature spec MUST use `Rule:` blocks to organize business constraints. Rules are extracted by generators to create business rules documentation.
+### 1. Roadmap Spec Structure
 
-### Required Structure
+Roadmap specs define planned work with Problem/Solution descriptions and a Background deliverables table.
 
 ```gherkin
-Rule: Reservations prevent race conditions
+@libar-docs-pattern:ProcessGuardLinter
+@libar-docs-status:roadmap
+@libar-docs-phase:99
+Feature: Process Guard Linter
 
-  **Invariant:** Only one reservation can claim available inventory at a time.
+  **Problem:**
+  During planning and implementation sessions, accidental modifications occur:
+  - Specs outside the intended scope get modified in bulk
+  - Completed/approved work gets inadvertently changed
 
-  **Rationale:** Without atomic claim, concurrent requests create ghost reservations
-  that fail at fulfillment time, causing poor UX and support tickets.
+  **Solution:**
+  Implement a Decider-based linter that:
+  1. Derives process state from existing file annotations
+  2. Validates proposed changes against derived state
+  3. Enforces file protection levels per PDR-005
 
-  | Scenario | Without Pattern | With Pattern |
-  | Concurrent claims | Last-write-wins, overselling | Atomic OCC, deterministic |
-  | Timeout handling | Manual cleanup | Auto-expiry |
-
-  **Verified by:** Concurrent reservations, Expired reservation cleanup
-
-  @acceptance-criteria @happy-path
-  Scenario: Concurrent reservations resolve deterministically
-    ...
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable                   | Status  | Location                           |
+      | State derivation              | Pending | src/lint/process-guard/derive.ts   |
+      | Git diff change detection     | Pending | src/lint/process-guard/detect.ts   |
+      | CLI integration               | Pending | src/cli/lint-process.ts            |
 ```
 
-### Rule Description Elements
+**Key elements:**
 
-| Element | Required | Purpose | Extracted By |
-|---------|----------|---------|--------------|
-| `**Invariant:**` | Recommended | The business constraint being enforced | Business Rules generator |
-| `**Rationale:**` | Recommended | Why this rule exists (business justification) | Business Rules generator |
-| Tables | Optional | Comparison, examples, or reference data | Requirements generator |
-| Code DocStrings | Optional | API examples with `"""typescript` | Requirements generator |
-| `**Verified by:**` | Recommended | Comma-separated scenario names | Traceability generator |
+- `@libar-docs-pattern:Name` - Unique identifier (required)
+- `@libar-docs-status:roadmap` - FSM state
+- `**Problem:**` / `**Solution:**` - Extracted by generators
+- Background deliverables table - Tracks implementation progress
 
-### Minimum Rule Requirements
+### 2. Rule Blocks for Business Constraints
 
-- At least 2 scenarios per Rule (happy-path + validation)
-- Each scenario tagged with `@acceptance-criteria`
-- Happy-path scenarios tagged `@happy-path`
-- Validation scenarios tagged `@validation`
+Use `Rule:` to group related scenarios under a business constraint.
+
+```gherkin
+Rule: Status transitions must follow PDR-005 FSM
+
+  @happy-path
+  Scenario Outline: Valid transitions pass validation
+    Given a file with status "<from>"
+    When the status changes to "<to>"
+    Then validation passes
+
+    Examples:
+      | from     | to        |
+      | roadmap  | active    |
+      | roadmap  | deferred  |
+      | active   | completed |
+      | deferred | roadmap   |
+
+  @edge-case
+  Scenario Outline: Invalid transitions fail validation
+    Given a file with status "<from>"
+    When the status changes to "<to>"
+    Then validation fails with "invalid-status-transition"
+
+    Examples:
+      | from      | to        |
+      | roadmap   | completed |
+      | deferred  | active    |
+      | completed | roadmap   |
+```
+
+Rules provide semantic grouping - generators extract them for business rules documentation.
+
+### 3. Scenario Outline for Variations
+
+When the same pattern applies with different inputs, use `Scenario Outline` with an `Examples` table.
+
+```gherkin
+Scenario Outline: Protection levels by status
+  Given a file with status "<status>"
+  When checking protection level
+  Then protection is "<protection>"
+  And unlock required is "<unlock>"
+
+  Examples:
+    | status    | protection | unlock |
+    | roadmap   | none       | no     |
+    | active    | scope      | no     |
+    | completed | hard       | yes    |
+    | deferred  | none       | no     |
+```
+
+### 4. Executable Test Feature
+
+Test features focus on behavior verification with section dividers for organization.
+
+```gherkin
+@behavior @scanner-core
+@libar-docs-pattern:ScannerCore
+Feature: Scanner Core Integration
+  The scanPatterns function orchestrates file discovery and AST parsing.
+
+  **Problem:**
+  - Need to scan codebases for documentation directives efficiently
+  - Files without @libar-docs opt-in should be skipped
+
+  **Solution:**
+  - Two-phase filtering: quick regex check, then file opt-in validation
+  - Result monad pattern captures errors without failing entire scan
+
+  Background:
+    Given a scanner integration context with temp directory
+
+  # ==========================================================================
+  # Basic Scanning
+  # ==========================================================================
+
+  @happy-path
+  Scenario: Scan files and extract directives
+    Given a file "src/auth.ts" with content:
+      """
+      /** @libar-docs */
+
+      /** @libar-docs-core */
+      export function authenticate() {}
+      """
+    When scanning with pattern "src/**/*.ts"
+    Then the scan should succeed with 1 file
+
+  # ==========================================================================
+  # Error Handling
+  # ==========================================================================
+
+  @error-handling
+  Scenario: Collect errors for files that fail to parse
+    Given a file "src/valid.ts" with valid content
+    And a file "src/invalid.ts" with syntax errors
+    When scanning with pattern "src/**/*.ts"
+    Then the scan should succeed with 1 file
+    And the scan should have 1 error
+```
+
+Section comments (`# ===`) improve readability in large feature files.
 
 ---
 
-## When to Use Each Element
-
-| Element | Use For | Example |
-|---------|---------|---------|
-| **Rule:** | Group related scenarios under a business concept | `Rule: Each projection must declare a category` |
-| **DataTable in Background** | Structured reference data (deliverables, definitions) | Deliverables table |
-| **DataTable in Description** | Guidelines, comparison tables | Category guidelines |
-| **Scenario Outline + Examples** | Same pattern with variations | Category-based validation |
-| **DocString** | Code examples, multi-line content | TypeScript before/after snippets |
-| **Comments (#)** | Section dividers, rationale | `# RULE 1: Category Definitions` |
-
-### Decision Tree: Which Element?
-
-```
-Is it a business constraint?
-├── Yes ──► Rule: block with Invariant/Rationale
-│           └── Has variations? ──► Scenario Outline
-└── No ──► Is it reference data?
-           ├── Yes ──► DataTable (Background or Description)
-           └── No ──► Is it a code example?
-                      ├── Yes ──► DocString ("""typescript)
-                      └── No ──► Prose in Feature description
-```
-
----
-
-## DataTable Patterns
+## DataTable and DocString Usage
 
 ### Background DataTable (Reference Data)
 
-Use for data that applies to all scenarios:
+Use for data that applies to all scenarios - deliverables, definitions, etc.
 
 ```gherkin
-Background: Category Definitions
-  Given the following projection categories:
-    | Category    | Purpose                          | Query Pattern  | Example            |
-    | Logic       | Minimal data for command validation | Internal only | orderExists(id)    |
-    | View        | Denormalized for UI queries      | Client queries | orderSummaries     |
-    | Reporting   | Aggregated analytics             | Scheduled      | dailySalesReport   |
-    | Integration | External system sync             | Event-driven   | shippingSync       |
-```
-
-### Description DataTable (Guidelines)
-
-Use for comparison or guideline tables in the Feature description:
-
-```gherkin
-Feature: Projection Categories
-
-  **Category Guidelines:**
-  | Category    | Client Exposed | Requires Auth | Typical Size |
-  | Logic       | No             | N/A           | Minimal      |
-  | View        | Yes            | Per query     | Medium       |
-  | Reporting   | Dashboard only | Admin         | Large        |
-  | Integration | No             | Service-to-service | Variable |
+Background: Deliverables
+  Given the following deliverables:
+    | Deliverable        | Status  | Location               | Tests |
+    | Category types     | Done    | src/types.ts           | Yes   |
+    | Validation logic   | Pending | src/validate.ts        | Yes   |
 ```
 
 ### Scenario DataTable (Test Data)
 
-Use for scenario-specific test inputs:
+Use for scenario-specific test inputs.
 
 ```gherkin
-Scenario: Validate multiple items
-  Given the following order items:
-    | product_id | quantity | unit_price |
-    | SKU-001    | 2        | 29.99      |
-    | SKU-002    | 1        | 49.99      |
-  When I calculate the total
-  Then the total should be 109.97
+Scenario: Session file defines modification scope
+  Given a session file with in-scope specs:
+    | spec                        | intent |
+    | mvp-workflow-implementation | modify |
+    | short-form-tag-migration    | review |
+  When deriving process state
+  Then "mvp-workflow-implementation" is modifiable
 ```
 
-### DataTable Best Practices
+### DocString for Code Examples
 
-| Do | Don't |
-|----|-------|
-| Use headers that match domain language | Use generic column names |
-| Keep tables readable (4-6 columns max) | Create wide tables that scroll |
-| Include all required columns | Rely on implicit defaults |
-| Use consistent formats | Mix formats (dates, numbers) |
+Use `"""typescript` for code blocks. Essential when content contains pipes or special characters.
+
+```gherkin
+Scenario: Extract directive from TypeScript
+  Given a file with content:
+    """typescript
+    /** @libar-docs */
+
+    /**
+     * @libar-docs-core
+     * Authentication utilities
+     */
+    export function authenticate() {}
+    """
+  When scanning the file
+  Then directive should have tag "@libar-docs-core"
+```
 
 ---
 
-## DocString Patterns
+## Tag Conventions
 
-### Code Example DocString
+| Tag               | Purpose                              |
+| ----------------- | ------------------------------------ |
+| `@happy-path`     | Primary success scenario             |
+| `@edge-case`      | Boundary conditions, unusual inputs  |
+| `@error-handling` | Error recovery, graceful degradation |
+| `@validation`     | Input validation, constraint checks  |
+| `@integration`    | Cross-component behavior             |
+| `@poc`            | Proof of concept, experimental       |
 
-Use for showing API usage or code transformations:
+Combine with feature-level tags for filtering:
 
 ```gherkin
-Rule: Projections must declare explicit category
+@behavior @scanner-core
+@libar-docs-pattern:ScannerCore
+Feature: Scanner Core Integration
+```
 
+---
+
+## Feature File Rich Content
+
+Feature files serve dual purposes: **executable specs** and **documentation source**. Content in the Feature description section appears in generated docs.
+
+### Code-First Principle
+
+**Prefer code stubs over DocStrings for complex examples.** Feature files should reference code, not duplicate it.
+
+| Approach                     | When to Use                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| DocStrings (`"""typescript`) | Brief examples (5-10 lines), current/target state comparison |
+| Code stub reference          | Complex APIs, interfaces, full implementations               |
+
+**Instead of large DocStrings:**
+
+```gherkin
+Rule: Reservations use atomic claim
+  See `@libar-dev/platform-core/src/reservations/reserve.ts` for API.
+```
+
+Code stubs are annotated TypeScript files with `throw new Error("not yet implemented")`.
+
+### Rule Block Structure (Recommended)
+
+For features that define business constraints, use `Rule:` blocks with structured descriptions:
+
+```gherkin
+Rule: Reservations prevent race conditions
+
+  **Invariant:** Only one reservation can exist for a given key at a time.
+
+  **Rationale:** Check-then-create patterns have TOCTOU vulnerabilities.
+
+  **Verified by:** Concurrent reservations, Expired reservation cleanup
+
+  @acceptance-criteria @happy-path
+  Scenario: Concurrent reservations
+    ...
+```
+
+| Element            | Purpose                                 | Extracted By             |
+| ------------------ | --------------------------------------- | ------------------------ |
+| `**Invariant:**`   | Business constraint (what must be true) | Business Rules generator |
+| `**Rationale:**`   | Business justification (why it exists)  | Business Rules generator |
+| `**Verified by:**` | Comma-separated scenario names          | Traceability generator   |
+
+> **Note:** Rule blocks are optional. Use them when the feature defines business invariants that benefit from structured documentation.
+
+### Feature Description Patterns
+
+Choose headers that fit your pattern:
+
+| Structure        | Headers                                    | Best For                  |
+| ---------------- | ------------------------------------------ | ------------------------- |
+| Problem/Solution | `**Problem:**`, `**Solution:**`            | Pain point → fix          |
+| Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style, Gherkin spirit |
+| Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns        |
+
+The **Problem/Solution** pattern is the dominant style in this codebase.
+
+### Valid Rich Content
+
+| Content Type  | Syntax                  | Appears in Docs  |
+| ------------- | ----------------------- | ---------------- |
+| Plain text    | Regular paragraphs      | Yes              |
+| Bold/emphasis | `**bold**`, `*italic*`  | Yes              |
+| Tables        | Markdown pipe tables    | Yes              |
+| Lists         | `- item` or `1. item`   | Yes              |
+| DocStrings    | `"""typescript`...`"""` | Yes (code block) |
+| Comments      | `# comment`             | No (ignored)     |
+
+### Syntax Notes
+
+**Prefer DocStrings over code fences for portability:**
+
+```gherkin
+# Preferred - DocStrings with language hint
+Given the following code:
   """typescript
-  // Current: No category metadata
-  defineProjection({
-    name: 'orderSummaries',
-    subscribes: ['OrderCreated'],
-    handler: async (ctx, event) => { ... }
-  });
-
-  // Target: Category is explicit
-  defineProjection({
-    name: 'orderSummaries',
-    category: 'view',              // <-- NEW: Required category
-    subscribes: ['OrderCreated'],
-    handler: async (ctx, event) => { ... }
-  });
+  const x = 1;
   """
+
+# Avoid - markdown fences in descriptions may not render consistently
 ```
 
-### Configuration DocString
+**Tag values cannot contain spaces.** Use hyphens:
 
-Use for showing configuration examples:
+| Invalid                          | Valid                           |
+| -------------------------------- | ------------------------------- |
+| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
+| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+
+For values with spaces, use the `quoted-value` format where supported:
 
 ```gherkin
-Scenario: Configure circuit breaker
-  Given the following configuration:
-    """json
-    {
-      "failureThreshold": 5,
-      "timeout": 30000,
-      "successThreshold": 2
-    }
-    """
-  When I create a circuit breaker with this config
-  Then the breaker should use the specified values
-```
-
-### Multi-line Content DocString
-
-Use for content with pipes or special characters:
-
-```gherkin
-Scenario: Generate markdown table
-  When I generate the report
-  Then the output contains:
-    """
-    | Pattern | Status    | Phase |
-    |---------|-----------|-------|
-    | MyPattern | completed | 15    |
-    """
-```
-
-### DocString Best Practices
-
-| Do | Don't |
-|----|-------|
-| Use language hints (`"""typescript`) | Leave DocStrings untyped |
-| Label "Current" vs "Target" states | Assume context is obvious |
-| Keep examples focused and minimal | Include full implementation |
-| Use for content with pipes/special chars | Escape pipes in regular text |
-
----
-
-## Scenario Organization
-
-### Tag Conventions
-
-| Tag | Purpose | When to Use |
-|-----|---------|-------------|
-| `@acceptance-criteria` | Marks as acceptance test | All acceptance scenarios |
-| `@happy-path` | Successful flow | Primary success scenarios |
-| `@validation` | Error/edge case | Input validation, constraints |
-| `@integration` | Requires infrastructure | Database, network, etc. |
-| `@unit` | Pure function test | No I/O, pure logic |
-
-### Section Comments
-
-Use comments to organize large feature files:
-
-```gherkin
-Feature: Order Management
-
-  # ============================================================================
-  # RULE 1: Order Creation
-  # ============================================================================
-
-  Rule: Orders must have valid customer
-    ...
-
-  # ============================================================================
-  # RULE 2: Order Submission
-  # ============================================================================
-
-  Rule: Only draft orders can be submitted
-    ...
-```
-
-### Scenario Outline for Variations
-
-Use when the same pattern applies with different inputs:
-
-```gherkin
-@acceptance-criteria
-Scenario Outline: Category determines client exposure
-  Given a projection with category "<category>"
-  When checking client exposure
-  Then client accessible should be <exposed>
-
-  Examples:
-    | category    | exposed |
-    | logic       | false   |
-    | view        | true    |
-    | reporting   | false   |
-    | integration | false   |
-```
-
-### Minimum Scenario Requirements
-
-Per Rule block:
-- [ ] At least 1 `@happy-path` scenario
-- [ ] At least 1 `@validation` scenario
-- [ ] All scenarios tagged `@acceptance-criteria`
-- [ ] Scenarios named to match `**Verified by:**` list
-
----
-
-## Test Type Identification
-
-When filling out deliverables tables, identify the appropriate test type:
-
-### Test Type Definitions
-
-| Test Type | Infrastructure | When to Use |
-|-----------|----------------|-------------|
-| `unit` | Test framework only | Pure functions, type guards, utilities |
-| `integration` | Test framework + database/services | Database operations, mutations/queries |
-| `e2e` | Full application stack | User workflows, UI interactions |
-| No tests | N/A | Types, interfaces (compile-time only) |
-
-### Test Type by Deliverable
-
-| Deliverable Type | Test Type | Reason |
-|------------------|-----------|--------|
-| Type definitions | No tests | Types are compile-time only |
-| Pure validation functions | unit | No I/O, pure logic |
-| Projection handlers | integration | Requires database context |
-| Decider functions | unit | Pure functions by design |
-| Command bus operations | integration | Requires database |
-| API endpoints | integration | Requires request context |
-| User workflows | e2e | Requires full stack |
-
-### Decision Tree: Test Type
-
-```
-Does it have side effects (I/O)?
-├── No ──► unit test
-└── Yes ──► Does it need database?
-           ├── No ──► Does it call external APIs?
-           │         ├── Yes ──► integration (mocked)
-           │         └── No ──► unit (with stubs)
-           └── Yes ──► Does it need full app stack?
-                      ├── Yes ──► e2e
-                      └── No ──► integration
+@libar-docs-usecase "When handling command failures"
 ```
 
 ---
 
-## Generator Content Mapping
+## Quick Reference
 
-Feature file elements are extracted by generators:
-
-| Feature File Element | Extracted To |
-|---------------------|--------------|
-| Feature description (Problem/Solution/Value) | Requirements doc |
-| `Rule:` name | Business Rules heading |
-| `**Invariant:**` in Rule | Business Rules constraint |
-| `**Rationale:**` in Rule | Business Rules justification |
-| `**Verified by:**` in Rule | Traceability matrix |
-| Tables in Rule description | Both Requirements and Business Rules |
-| DocStrings (`"""typescript`) | Code examples in Requirements |
-| Scenarios with `@acceptance-criteria` | Acceptance Criteria section |
-
----
-
-## Complete Example
-
-```gherkin
-@<prefix>
-@<prefix>-pattern:ProjectionCategories
-@<prefix>-status:roadmap
-@<prefix>-phase:15
-@<prefix>-executable-specs:{package}/tests/features/behavior/projection-categories
-Feature: Projection Categories
-
-  **Problem:** Projections lack semantic classification, making it unclear
-  which are safe for client exposure vs internal-only.
-
-  **Solution:** Require explicit category declaration with validation.
-
-  **Business Value:**
-  | Benefit | How |
-  | Security | Clear client exposure rules |
-  | Clarity | Obvious purpose per projection |
-
-  Background: Deliverables
-    Given the following deliverables:
-      | Deliverable | Status  | Location | Tests | Test Type |
-      | Category types | planned | src/projections/types.ts | Yes | unit |
-      | Validation | planned | src/projections/validate.ts | Yes | unit |
-
-  # ============================================================================
-  # RULE 1: Category Declaration
-  # ============================================================================
-
-  Rule: Every projection must declare a category
-
-    **Invariant:** A projection without explicit category cannot be registered.
-
-    **Rationale:** Implicit "view" assumptions leak internal data to clients.
-
-    **Verified by:** Projection without category fails, Projection with category succeeds
-
-    @acceptance-criteria @validation
-    Scenario: Projection without category fails
-      Given a projection definition without category
-      When I attempt to register the projection
-      Then registration should fail with "Category required"
-
-    @acceptance-criteria @happy-path
-    Scenario: Projection with category succeeds
-      Given a projection definition with category "view"
-      When I register the projection
-      Then registration should succeed
-
-  # ============================================================================
-  # RULE 2: Client Exposure
-  # ============================================================================
-
-  Rule: Category determines client exposure
-
-    **Invariant:** Only "view" category projections are exposed to clients.
-
-    **Rationale:** Logic, reporting, and integration projections contain
-    internal data that should not be accessible from client code.
-
-    **Verified by:** View projections are client-accessible, Non-view projections are internal
-
-    @acceptance-criteria @happy-path
-    Scenario: View projections are client-accessible
-      Given a projection with category "view"
-      When checking client exposure
-      Then the projection should be client-accessible
-
-    @acceptance-criteria @validation
-    Scenario Outline: Non-view projections are internal
-      Given a projection with category "<category>"
-      When checking client exposure
-      Then the projection should NOT be client-accessible
-
-      Examples:
-        | category    |
-        | logic       |
-        | reporting   |
-        | integration |
-```
+| Element              | Use For                                | Example Location                            |
+| -------------------- | -------------------------------------- | ------------------------------------------- |
+| Background DataTable | Deliverables, shared reference data    | `specs/process-guard-linter.feature`        |
+| Rule:                | Group scenarios by business constraint | `tests/features/validation/*.feature`       |
+| Scenario Outline     | Same pattern with variations           | `tests/features/behavior/fsm-*.feature`     |
+| DocString `"""`      | Code examples, content with pipes      | `tests/features/behavior/scanner-*.feature` |
+| Section comments `#` | Organize large feature files           | Most test features                          |
 
 ---
 
 ## Related Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [METHODOLOGY.md](./METHODOLOGY.md) | Core thesis, FSM, two-tier architecture |
-| [SESSION-GUIDES.md](./SESSION-GUIDES.md) | Session workflows |
-| [../INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag reference |
+| Document                                    | Purpose                             |
+| ------------------------------------------- | ----------------------------------- |
+| [INSTRUCTIONS.md](../INSTRUCTIONS.md)       | Complete tag reference and CLI      |
+| [docs/CONFIGURATION.md](./CONFIGURATION.md) | Preset and tag prefix configuration |

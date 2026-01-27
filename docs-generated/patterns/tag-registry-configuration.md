@@ -13,15 +13,14 @@
 
 ## Description
 
-Defines the structure and validation for external tag taxonomy configuration.
-Enables repos to define their own taxonomy (categories, metadata tags, etc.)
-without hardcoding values in the delivery-process package.
+Defines the structure and validation for tag taxonomy configuration.
+The taxonomy is defined in TypeScript at src/taxonomy/ and built via buildRegistry().
 
 ### When to Use
 
-- Creating a custom tag-registry.json for your project
-- Validating tag registry configuration at load time
-- Merging user registry with default registry
+- Validating tag registry configuration at runtime
+- Merging custom registry overrides with default registry
+- Creating delivery process instances with custom categories
 
 ---
 

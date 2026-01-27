@@ -6,14 +6,14 @@
 
 ## Summary
 
-**Progress:** [██████████░░░░░░░░░░] 4/8 (50%)
+**Progress:** [█████████░░░░░░░░░░░] 4/9 (44%)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 4 |
 | 🚧 Active | 0 |
-| 📋 Planned | 4 |
-| **Total** | 8 |
+| 📋 Planned | 5 |
+| **Total** | 9 |
 
 ---
 
@@ -937,6 +937,106 @@ _Verified by: Default configuration relaxes no-unused-vars, Custom rules can be 
 
 ---
 
+### 📋 Streaming Git Diff
+
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Effort | 2d |
+| Business Value | enable process guard on large repositories |
+
+**Problem:**
+  The process guard (`lint-process --all`) fails with `ENOBUFS` error on large
+  repositories. The current implementation uses `execSync` which buffers the
+  entire `git diff` output in memory. When comparing against `main` in repos
+  with hundreds of changed files, the diff output can exceed Node.js buffer
+  limits (~1MB default), causing the pipe to overflow.
+
+  This prevents using `--all` mode in CI/CD pipelines for production repositories.
+
+  **Solution:**
+  Replace synchronous buffered git execution with streaming approach:
+
+  1. Use `spawn` instead of `execSync` for git diff commands
+  2. Process diff output line-by-line as it streams
+  3. Extract status transitions and deliverable changes incrementally
+  4. Never hold full diff content in memory
+
+  **Design Principles:**
+  - Constant memory usage regardless of diff size
+  - Same validation results as current implementation
+  - Backward compatible - no CLI changes required
+  - Async/await API for streaming operations
+
+  **Scope:**
+  Only `detect-changes.ts` requires modification. The `deriveProcessState`
+  and validation logic remain unchanged - they receive the same data structures.
+
+#### Dependencies
+
+- Depends on: ProcessGuardLinter
+
+#### Acceptance Criteria
+
+**Large diff does not cause memory overflow**
+
+- Given a repository with 500+ changed files since main
+- And total diff size exceeds 10MB
+- When running "lint-process --all"
+- Then command completes without ENOBUFS error
+- And memory usage stays below 50MB
+
+**Streaming produces same results as buffered**
+
+- Given a repository with known status transitions
+- When comparing streaming vs buffered implementation
+- Then detected status transitions are identical
+- And detected deliverable changes are identical
+
+**Status transitions detected incrementally**
+
+- Given a streaming diff with status changes in multiple files
+- When processing the stream line-by-line
+- Then status transitions are detected as each file section completes
+- And results accumulate into final ChangeDetection structure
+
+**Deliverable changes detected incrementally**
+
+- Given a streaming diff with DataTable modifications
+- When processing the stream line-by-line
+- Then deliverable additions and removals are tracked per file
+- And correlation (modification detection) happens at end of file section
+
+**Git command failure returns Result error**
+
+- Given git command exits with non-zero code
+- When stream processing completes
+- Then Result.err is returned with error message
+- And partial results are discarded
+
+**Malformed diff lines are skipped**
+
+- Given a diff stream with unexpected line format
+- When parsing encounters malformed line
+- Then line is skipped without throwing
+- And processing continues with next line
+
+#### Business Rules
+
+**Git commands stream output instead of buffering**
+
+_Verified by: Large diff does not cause memory overflow, Streaming produces same results as buffered_
+
+**Diff content is parsed as it streams**
+
+_Verified by: Status transitions detected incrementally, Deliverable changes detected incrementally_
+
+**Streaming errors are handled gracefully**
+
+_Verified by: Git command failure returns Result error, Malformed diff lines are skipped_
+
+---
+
 ## ✅ Completed Patterns
 
 ### ✅ Mvp Workflow Implementation
@@ -955,12 +1055,8 @@ _Verified by: Default configuration relaxes no-unused-vars, Custom rules can be 
   **Solution:**
   Implement PDR-005 status values via taxonomy module refactor:
   1. Create taxonomy module as single source of truth (src/taxonomy/status-values.ts)
-  2. Update repo tag-registry.json with new enum values
-  3. Update validation schemas to import from taxonomy module
-  4. Update generators to use normalizeStatus() for display bucket mapping
-
-  **Note:** Package-level tag-registry.json is not needed - the package provides
-  infrastructure (schemas/validators), while consumers provide configuration.
+  2. Update validation schemas to import from taxonomy module
+  3. Update generators to use normalizeStatus() for display bucket mapping
 
 #### Acceptance Criteria
 
@@ -1325,7 +1421,6 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 **Problem:**
   During planning and implementation sessions, accidental modifications occur:
   - Specs outside the intended scope get modified in bulk
-  - Taxonomy (tag-registry.json) changes break downstream generation
   - Completed/approved work gets inadvertently changed
   - No enforcement boundary between "planning what to do" and "doing it"
 
@@ -1424,35 +1519,6 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 - Then session scope rules do not apply
 - And only protection level rules are checked
 
-**Cannot remove tag used by completed spec**
-
-- Given spec "phase-state-machine.feature" has status "completed"
-- And it uses category tag @libar-docs-fsm
-- When removing "fsm" category from tag-registry.json
-- Then linting fails with "taxonomy-locked-tag" violation
-- And message lists "fsm" as used by protected spec
-- And suggestion is "Unlock dependent specs first"
-
-**Cannot modify enum values used by protected spec**
-
-- Given spec "mvp-workflow-implementation.feature" has status "active"
-- And it uses @libar-docs-status:roadmap
-- When removing "roadmap" from status enum in tag-registry.json
-- Then linting fails with "taxonomy-enum-in-use" violation
-
-**Adding new tags is always allowed**
-
-- Given any process state
-- When adding new category "my-new-category" to tag-registry.json
-- Then linting passes
-- And no warnings about taxonomy
-
-**Modifying unused tags is allowed**
-
-- Given no spec uses category tag @libar-docs-performance
-- When modifying "performance" category in tag-registry.json
-- Then linting passes
-
 **Valid status transitions**
 
 - Given a spec with current @libar-docs-status:<from>
@@ -1520,7 +1586,6 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 | Active Session | Session ID and status, or "none" |
 | Scoped Specs | List of specs in scope |
 | Protected Specs | Specs with active/completed status |
-| Taxonomy Hash | Current hash of tag-registry.json |
 
 **Strict mode treats warnings as errors**
 
@@ -1549,7 +1614,7 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 
 **Session-related tags are recognized**
 
-- Given tag-registry.json includes session tags
+- Given the taxonomy includes session tags
 - Then the following tags are valid:
 
 | Tag | Format | Purpose |
@@ -1560,7 +1625,7 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 
 **Protection-related tags are recognized**
 
-- Given tag-registry.json includes protection tags
+- Given the taxonomy includes protection tags
 - Then the following tags are valid:
 
 | Tag | Format | Purpose |
@@ -1584,13 +1649,6 @@ Optional session files (`delivery-process/sessions/*.feature`) explicitly
     When active, modifications outside scope trigger warnings or errors.
 
 _Verified by: Session file defines modification scope, Modifying spec outside active session scope warns, Modifying explicitly excluded spec fails, No active session allows all modifications_
-
-**Taxonomy changes are validated against dependent specs**
-
-The tag-registry.json defines the taxonomy. Changes to tags used by
-    protected specs (status: active or completed) are blocked.
-
-_Verified by: Cannot remove tag used by completed spec, Cannot modify enum values used by protected spec, Adding new tags is always allowed, Modifying unused tags is allowed_
 
 **Status transitions follow PDR-005 FSM**
 
@@ -1616,7 +1674,7 @@ _Verified by: Output format matches lint-patterns, Can run alongside lint-patter
 
 **New tags support process guard functionality**
 
-The following tags are added to tag-registry.json to support process guard:
+The following tags are defined in the TypeScript taxonomy to support process guard:
 
 _Verified by: Session-related tags are recognized, Protection-related tags are recognized_
 
@@ -1658,7 +1716,6 @@ As a delivery-process developer
 
 - Given the package-level taxonomy
 - Then PROCESS_STATUS_VALUES contains ["roadmap", "active", "completed", "deferred"]
-- And ACCEPTED_STATUS_VALUES includes legacy values for backward compatibility
 - And the repo-level taxonomy follows PDR-005 FSM
 
 **Define format types as TypeScript constant**
@@ -1728,7 +1785,7 @@ As a delivery-process developer
 
 - Given a pattern with status field
 - When validated against schema
-- Then the schema references ACCEPTED_STATUS_VALUES
+- Then the schema references PROCESS_STATUS_VALUES
 - And invalid status values are rejected
 
 **IDE autocomplete for status values**
@@ -1744,19 +1801,12 @@ As a delivery-process developer
 - When I rename it to "planned" using IDE refactor
 - Then all TypeScript usages are updated automatically
 
-**Existing loadTagRegistry works unchanged**
+**buildRegistry returns expected structure**
 
-- Given the updated taxonomy module
-- When createDefaultTagRegistry() is called
-- Then it returns the same structure as before
+- Given the taxonomy module
+- When buildRegistry() is called
+- Then it returns the expected TagRegistry structure
 - And all existing generators work without modification
-
-**External JSON overrides still work**
-
-- Given a user-provided tag-registry.json
-- When merged with TypeScript defaults via mergeTagRegistries()
-- Then user values override defaults as before
-- And the merge logic is unchanged
 
 ---
 

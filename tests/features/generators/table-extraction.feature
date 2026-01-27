@@ -14,10 +14,15 @@ Feature: Table Extraction Without Duplication
   Rule: Tables in rule descriptions render exactly once
 
     Scenario: Single table renders once in detailed mode
-      Given a pattern with a rule containing:
-        | Field | Value |
-        | name | Command categories |
-        | description | **Invariant:** Categories must be valid.\n\n\| Category \| Purpose \|\n\| --- \| --- \|\n\| aggregate \| State change \|\n\| process \| Workflow \| |
+      Given a pattern with a rule named "Command categories" and description:
+        """
+        Categories must be valid.
+
+        | Category | Purpose |
+        | --- | --- |
+        | aggregate | State change |
+        | process | Workflow |
+        """
       When decoding with BusinessRulesCodec in detailed mode
       Then the document contains exactly 1 table with header "Category"
       And the document does not contain raw pipe characters in text paragraphs
@@ -35,10 +40,18 @@ Feature: Table Extraction Without Duplication
   Rule: Multiple tables in description each render exactly once
 
     Scenario: Two tables in description render as two separate tables
-      Given a pattern with a rule containing:
-        | Field | Value |
-        | name | Multiple table rule |
-        | description | First table:\n\| A \| B \|\n\| --- \| --- \|\n\| 1 \| 2 \|\n\nSecond table:\n\| X \| Y \|\n\| --- \| --- \|\n\| 3 \| 4 \| |
+      Given a pattern with a rule named "Multiple table rule" and description:
+        """
+        First table:
+        | A | B |
+        | --- | --- |
+        | 1 | 2 |
+
+        Second table:
+        | X | Y |
+        | --- | --- |
+        | 3 | 4 |
+        """
       When decoding with BusinessRulesCodec in detailed mode
       Then the document contains exactly 2 tables
       And the first table has header "A"

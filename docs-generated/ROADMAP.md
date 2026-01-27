@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 71/104 (68%)
+**Patterns:** [█████████████░░░░░░░] 71/110 (65%)
 
-**Phases:** 0/4 complete
+**Phases:** 0/9 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 104 |
+| Total Patterns | 110 |
 | Completed | 71 |
 | Active | 13 |
-| Planned | 20 |
+| Planned | 26 |
 
 ---
 
@@ -26,8 +26,13 @@
 | --- | --- | --- |
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/8 | 50% |
+| 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
+| 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
+| 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
+| 📋 [StepDefinitionCompletion](phases/phase-103-step-definition-completion.md) | 0/1 | 0% |
+| 📋 [GeneratorInfrastructureTesting](phases/phase-104-generator-infrastructure-testing.md) | 0/1 | 0% |
 
 ---
 
@@ -53,9 +58,19 @@
 
 ---
 
+### 📋 ClaudeModuleGeneration
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Claude Module Generation | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
+
+---
+
 ### 📋 TypeScriptTaxonomyImplementation
 
-[████████░░░░░░░] 4/8 50% complete
+[███████░░░░░░░░] 4/9 44% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -66,6 +81,7 @@
 | 📋 Process State API CLI | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 📋 Process State API Relationship Queries | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
+| 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
 | ✅ TypeScript Taxonomy Implementation | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |
 
 ---
@@ -89,5 +105,45 @@
 | 📋 Release Association Rules | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Traceability Enhancements | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
+
+---
+
+### 📋 CliBehaviorTesting
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Cli Behavior Testing | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
+
+---
+
+### 📋 CodecBehaviorTesting
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Codec Behavior Testing | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
+
+---
+
+### 📋 StepDefinitionCompletion
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Step Definition Completion | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
+
+---
+
+### 📋 GeneratorInfrastructureTesting
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Generator Infrastructure Testing | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
 
 ---

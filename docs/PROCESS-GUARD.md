@@ -1,289 +1,254 @@
 # Process Guard
 
-The Process Guard is an FSM (Finite State Machine) validation system that enforces delivery process rules. It validates changes against protection levels, status transitions, and session scope.
+> **Quick reference for `lint-process` validation rules, error fixes, and escape hatches.**
 
-## Overview
-
-Process Guard validates changes before they're committed, ensuring:
-- **Completed specs remain stable** (require explicit unlock to modify)
-- **Status transitions follow the FSM** (can't skip `active` to reach `completed`)
-- **Active specs don't expand scope** (no new deliverables during implementation)
-- **Session scoping is respected** (optional workflow constraint)
-
-## Architecture
-
-Process Guard uses the **Decider pattern** from DDD: pure functions with no I/O or side effects.
-
-```
-derive-state.ts ──┐
-                  ├──► decider.ts ──► ValidationResult
-detect-changes.ts─┘
-```
-
-| Component | Purpose |
-|-----------|---------|
-| `derive-state.ts` | Scans files to build `ProcessState` from annotations |
-| `detect-changes.ts` | Parses git diff to find modified files and transitions |
-| `decider.ts` | Pure validation: `(state, changes, options) → result` |
-
-**Key insight:** State is derived from file annotations—there's no separate state file to maintain.
+Process Guard validates delivery workflow changes at commit time. For FSM concepts and state definitions, see [METHODOLOGY.md](./METHODOLOGY.md#fsm-enforced-workflow).
 
 ---
 
-## Protection Levels
+## Quick Reference
 
-Each status has an associated protection level that determines what modifications are allowed:
+### Protection Levels
 
-| Status | Protection | What's Allowed | Restriction |
-|--------|------------|----------------|-------------|
-| `roadmap` | `none` | Full editing | - |
-| `active` | `scope` | Edit existing deliverables | Cannot add new deliverables |
-| `completed` | `hard` | Read only | Requires `@<prefix>-unlock-reason` |
-| `deferred` | `none` | Full editing | - |
+| Status      | Level | Allowed                    | Blocked                               |
+| ----------- | ----- | -------------------------- | ------------------------------------- |
+| `roadmap`   | none  | Full editing               | -                                     |
+| `deferred`  | none  | Full editing               | -                                     |
+| `active`    | scope | Edit existing deliverables | Adding new deliverables               |
+| `completed` | hard  | Nothing                    | Any change without `@*-unlock-reason` |
 
-**Protection enforcement:**
-- **none** — No restrictions, fully editable
-- **scope** — Scope-locked, prevents adding new deliverables to prevent scope creep
-- **hard** — Hard-locked, requires explicit unlock reason annotation to modify
+### Valid Transitions
 
----
+| From        | To                     | Notes                           |
+| ----------- | ---------------------- | ------------------------------- |
+| `roadmap`   | `active`, `deferred`   | Start work or postpone          |
+| `active`    | `completed`, `roadmap` | Finish or regress if blocked    |
+| `deferred`  | `roadmap`              | Resume planning                 |
+| `completed` | _(none)_               | Terminal — use unlock to modify |
 
-## Validation Rules
+### Escape Hatches
 
-Process Guard enforces 6 validation rules:
-
-### Error Rules (Block Commit)
-
-| Rule | Description | Fix |
-|------|-------------|-----|
-| `completed-protection` | Cannot modify completed specs without unlock | Add `@<prefix>-unlock-reason:'reason'` |
-| `invalid-status-transition` | Status transition must follow FSM | Use valid transition path |
-| `scope-creep` | Cannot add deliverables to active specs | Remove new deliverable or revert to `roadmap` |
-| `session-excluded` | Cannot modify files explicitly excluded from session | Remove from exclusion list |
-
-### Warning Rules (Informational)
-
-| Rule | Description | Fix |
-|------|-------------|-----|
-| `session-scope` | File not in active session scope | Add to session scope or use `--ignore-session` |
-| `deliverable-removed` | Deliverable was removed from spec | Document if descoped or completed |
+| Situation                     | Solution                           | Example                                       |
+| ----------------------------- | ---------------------------------- | --------------------------------------------- |
+| Fix bug in completed spec     | Add `@*-unlock-reason:'reason'`    | `@libar-docs-unlock-reason:'Fix typo'`        |
+| Modify outside session scope  | `--ignore-session` flag            | `lint-process --staged --ignore-session`      |
+| CI treats warnings as errors  | `--strict` flag                    | `lint-process --all --strict`                 |
+| Skip workflow (legacy import) | Multiple transitions in one commit | Set `roadmap` then `completed` in same commit |
 
 ---
 
-## FSM Transition Matrix
+## Error Messages and Fixes
 
-Valid transitions follow this state machine:
+### `completed-protection`
 
+**Error:**
+
+```text
+[ERROR] specs/phase-state-machine.feature
+  Cannot modify completed spec without unlock reason
+  Suggestion: Add @libar-docs-unlock-reason:'reason for modification'
 ```
-roadmap ──→ active ──→ completed
-   │          │
-   │          ↓
-   │       roadmap (if blocked/regressed)
-   ↓
-deferred ──→ roadmap
+
+**Cause:** File has `@libar-docs-status:completed` but no unlock annotation.
+
+**Fix:** Add unlock reason explaining why modification is necessary:
+
+```gherkin
+@libar-docs
+@libar-docs-pattern:PhaseStateMachine
+@libar-docs-status:completed
+@libar-docs-unlock-reason:'Fix incorrect FSM diagram in documentation'
+Feature: Phase State Machine
 ```
 
-**Transition rules:**
-
-| From | Valid Targets | Notes |
-|------|--------------|-------|
-| `roadmap` | `active`, `deferred`, `roadmap` | Can start, defer, or stay |
-| `active` | `completed`, `roadmap` | Can finish or regress if blocked |
-| `completed` | *(none)* | Terminal state—use unlock to modify |
-| `deferred` | `roadmap` | Must reactivate through roadmap |
-
-**Invalid transitions (will fail):**
-- `roadmap` → `completed` — Must go through `active` first
-- `deferred` → `active` — Must go through `roadmap` first
-- `deferred` → `completed` — Must go through `roadmap` → `active`
-- `completed` → anything — Terminal state
+**Alternative:** If this should be new work, create a new spec instead of modifying completed work.
 
 ---
 
-## Session Scoping
+### `invalid-status-transition`
 
-Sessions optionally constrain which files can be modified during a work session. This prevents accidental modifications to unrelated specs.
+**Error:**
 
-### Session State
-
-```typescript
-interface SessionState {
-  id: string;              // Session identifier
-  status: SessionStatus;   // "draft" | "active" | "closed"
-  scopedSpecs: string[];   // Files allowed to be modified
-  excludedSpecs: string[]; // Files explicitly forbidden
-  sessionFile: string;     // Path to session definition
-}
+```text
+[ERROR] specs/my-feature.feature
+  Invalid status transition: roadmap -> completed
+  Suggestion: Valid transitions from roadmap: active, deferred
 ```
 
-### Session Rules
+**Cause:** Attempted to skip `active` phase.
 
-- **Scoped specs:** Files in `scopedSpecs` can be modified without warnings
-- **Excluded specs:** Files in `excludedSpecs` trigger errors (cannot modify)
-- **Out of scope:** Other files trigger warnings (can use `--ignore-session` to bypass)
+**Fix:** Follow the FSM path:
+
+```gherkin
+# Step 1: Move to active
+@libar-docs-status:active
+
+# Step 2: After implementation complete, move to completed
+@libar-docs-status:completed
+```
+
+**Common invalid transitions:**
+
+| Attempted             | Why Invalid                  | Valid Path                             |
+| --------------------- | ---------------------------- | -------------------------------------- |
+| `roadmap->completed`  | Must go through `active`     | `roadmap->active->completed`           |
+| `deferred->active`    | Must return to roadmap first | `deferred->roadmap->active`            |
+| `deferred->completed` | Cannot skip two states       | `deferred->roadmap->active->completed` |
+| `completed->*`        | Terminal state               | Use `@*-unlock-reason` to modify       |
+
+---
+
+### `scope-creep`
+
+**Error:**
+
+```text
+[ERROR] specs/process-guard-linter.feature
+  Cannot add deliverables to active spec: "New unplanned feature"
+  Suggestion: Remove new deliverable or revert status to roadmap
+```
+
+**Cause:** Added a row to the deliverables table while status is `active`.
+
+**Fix options:**
+
+1. **Remove the new deliverable** — Keep scope locked during implementation
+2. **Revert to roadmap** — If scope genuinely needs to expand:
+   ```gherkin
+   @libar-docs-status:roadmap  # Temporarily revert
+   # Add deliverable, then:
+   @libar-docs-status:active   # Resume implementation
+   ```
+
+**Why this rule exists:** Prevents scope creep during implementation. Plan fully before starting; implement what was planned.
+
+---
+
+### `session-scope` (Warning)
+
+**Warning:**
+
+```text
+[WARN] specs/unrelated-feature.feature
+  File not in active session scope
+  Suggestion: Add to session scope or use --ignore-session
+```
+
+**Cause:** Modifying a file not listed in the current session's `scopedSpecs`.
+
+**Fix options:**
+
+1. **Add to session scope** — If this file should be in scope
+2. **Use `--ignore-session`** — For intentional out-of-scope changes:
+   ```bash
+   lint-process --staged --ignore-session
+   ```
+
+---
+
+### `session-excluded`
+
+**Error:**
+
+```text
+[ERROR] specs/legacy-feature.feature
+  File is explicitly excluded from session
+  Suggestion: Remove from exclusion list or use --ignore-session
+```
+
+**Cause:** File is in the session's `excludedSpecs` list.
+
+**Fix options:**
+
+1. **Remove from exclusion list** — If exclusion was a mistake
+2. **Use `--ignore-session`** — For emergency changes:
+   ```bash
+   lint-process --staged --ignore-session
+   ```
+
+---
+
+### `deliverable-removed` (Warning)
+
+**Warning:**
+
+```text
+[WARN] specs/active-feature.feature
+  Deliverable removed: "Unit tests"
+  Suggestion: Document if descoped or completed elsewhere
+```
+
+**Cause:** A deliverable was removed from an active spec.
+
+**Fix:** This is informational. If intentional, no action needed. Consider documenting why in a commit message.
 
 ---
 
 ## CLI Usage
 
 ```bash
-lint-process [options] [files...]
+lint-process [options]
 ```
 
 ### Modes
 
-| Flag | Description | Use Case |
-|------|-------------|----------|
-| `--staged` | Validate staged changes (default) | Pre-commit hooks |
-| `--all` | Validate all changes vs main branch | CI/CD pipelines |
-| `--files` | Validate specific files | Development checks |
+| Flag       | Description                       | Use Case           |
+| ---------- | --------------------------------- | ------------------ |
+| `--staged` | Validate staged changes (default) | Pre-commit hooks   |
+| `--all`    | Validate all changes vs main      | CI/CD pipelines    |
+| `--files`  | Validate specific files           | Development checks |
 
 ### Options
 
-| Flag | Description |
-|------|-------------|
-| `-f, --file <path>` | File to validate (repeatable, implies `--files` mode) |
-| `-b, --base-dir <dir>` | Base directory for paths (default: cwd) |
-| `--strict` | Treat warnings as errors (exit 1 on warnings) |
-| `--ignore-session` | Ignore session scope rules |
-| `--show-state` | Show derived process state (debugging) |
-| `--format <type>` | Output format: `pretty` (default) or `json` |
-| `-h, --help` | Show help message |
-| `-v, --version` | Show version number |
+| Flag                | Description                            |
+| ------------------- | -------------------------------------- |
+| `--strict`          | Treat warnings as errors (exit 1)      |
+| `--ignore-session`  | Skip session scope rules               |
+| `--show-state`      | Debug: show derived process state      |
+| `--format json`     | Machine-readable output                |
+| `-f, --file <path>` | Specific file to validate (repeatable) |
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | No errors (warnings allowed unless `--strict`) |
-| `1` | Errors found (or warnings with `--strict`) |
+| Code | Meaning                                      |
+| ---- | -------------------------------------------- |
+| `0`  | No errors (warnings allowed unless --strict) |
+| `1`  | Errors found                                 |
 
 ### Examples
 
 ```bash
-# Pre-commit hook (default)
+# Pre-commit hook (recommended)
 lint-process --staged
 
-# CI/CD pipeline (strict mode)
+# CI pipeline with strict mode
 lint-process --all --strict
 
-# Validate specific files
+# Validate specific file
 lint-process --file specs/my-feature.feature
 
-# Debugging - show derived state
+# Debug: see what state was derived
 lint-process --staged --show-state
 
-# JSON output for tooling
-lint-process --staged --format json
-
-# Ignore session scope
+# Override session scope for emergency fix
 lint-process --staged --ignore-session
 ```
 
 ---
 
-## Programmatic API
+## Pre-commit Setup
 
-### Basic Usage
-
-```typescript
-import {
-  deriveProcessState,
-  detectStagedChanges,
-  detectBranchChanges,
-  detectFileChanges,
-  validateChanges,
-  hasErrors,
-  hasWarnings,
-  summarizeResult,
-} from "@libar-dev/delivery-process/lint";
-
-// 1. Derive state from file annotations
-const stateResult = await deriveProcessState({ baseDir: "/path/to/repo" });
-if (!stateResult.ok) {
-  throw stateResult.error;
-}
-const state = stateResult.value;
-
-// 2. Detect changes from git
-const changesResult = detectStagedChanges("/path/to/repo");
-// Or: detectBranchChanges(baseDir) for all changes vs main
-// Or: detectFileChanges(baseDir, ["path/to/file.feature"])
-if (!changesResult.ok) {
-  throw changesResult.error;
-}
-const changes = changesResult.value;
-
-// 3. Validate
-const output = validateChanges({
-  state,
-  changes,
-  options: { strict: false, ignoreSession: false },
-});
-
-// 4. Handle results
-if (!output.result.valid) {
-  console.log(summarizeResult(output.result));
-  for (const v of output.result.violations) {
-    console.log(`[${v.rule}] ${v.file}: ${v.message}`);
-    if (v.suggestion) {
-      console.log(`  Fix: ${v.suggestion}`);
-    }
-  }
-}
-```
-
-### API Reference
-
-**State Derivation:**
-
-| Function | Description |
-|----------|-------------|
-| `deriveProcessState(config)` | Derive `ProcessState` from file annotations |
-| `getFileState(state, path)` | Get state for a specific file |
-| `getFilesByProtection(state, level)` | Get files with specific protection level |
-| `isInSessionScope(state, path)` | Check if file is in session scope |
-| `isSessionExcluded(state, path)` | Check if file is explicitly excluded |
-
-**Change Detection:**
-
-| Function | Description |
-|----------|-------------|
-| `detectStagedChanges(baseDir)` | Detect staged git changes |
-| `detectBranchChanges(baseDir)` | Detect all changes vs main branch |
-| `detectFileChanges(baseDir, files)` | Detect changes in specific files |
-| `hasChanges(changes)` | Check if any changes were detected |
-| `getAllChangedFiles(changes)` | Get all changed file paths |
-
-**Validation:**
-
-| Function | Description |
-|----------|-------------|
-| `validateChanges(input)` | Run all validation rules |
-| `hasErrors(result)` | Check if result has any errors |
-| `hasWarnings(result)` | Check if result has any warnings |
-| `getAllIssues(result)` | Get all violations and warnings |
-| `getViolationsByRule(result, rule)` | Filter violations by rule |
-| `summarizeResult(result)` | Create summary string |
-
----
-
-## Pre-commit Integration
-
-Add Process Guard to your git hooks using Husky or similar:
-
-### Husky Setup
+### Husky
 
 ```bash
 # .husky/pre-commit
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run process guard on staged changes
 npx lint-process --staged
 ```
 
-### package.json Scripts
+### package.json
 
 ```json
 {
@@ -296,62 +261,74 @@ npx lint-process --staged
 
 ---
 
-## Escape Hatches
+## Programmatic API
 
-### Unlocking Completed Specs
+```typescript
+import {
+  deriveProcessState,
+  detectStagedChanges,
+  validateChanges,
+  hasErrors,
+  summarizeResult,
+} from '@libar-dev/delivery-process/lint';
 
-To modify a completed spec, add the unlock reason annotation:
+// 1. Derive state from annotations
+const state = (await deriveProcessState({ baseDir: '.' })).value;
 
-```gherkin
-@<prefix>
-@<prefix>-pattern:MyPattern
-@<prefix>-status:completed
-@<prefix>-unlock-reason:'Fixing critical bug in documentation'
-Feature: My Pattern
+// 2. Detect changes
+const changes = detectStagedChanges('.').value;
+
+// 3. Validate
+const { result } = validateChanges({
+  state,
+  changes,
+  options: { strict: false, ignoreSession: false },
+});
+
+// 4. Handle results
+if (hasErrors(result)) {
+  console.log(summarizeResult(result));
+  for (const v of result.violations) {
+    console.log(`[${v.rule}] ${v.file}: ${v.message}`);
+    if (v.suggestion) console.log(`  Fix: ${v.suggestion}`);
+  }
+  process.exit(1);
+}
 ```
 
-The unlock reason should document why the completed spec is being modified.
+### API Functions
 
-### Ignoring Session Scope
-
-Use `--ignore-session` flag when you intentionally need to modify files outside the current session scope:
-
-```bash
-lint-process --staged --ignore-session
-```
-
-### Strict Mode
-
-Use `--strict` in CI/CD to treat warnings as errors:
-
-```bash
-lint-process --all --strict
-```
+| Category | Function                    | Description                       |
+| -------- | --------------------------- | --------------------------------- |
+| State    | `deriveProcessState(cfg)`   | Build state from file annotations |
+| Changes  | `detectStagedChanges(dir)`  | Parse staged git diff             |
+| Changes  | `detectBranchChanges(dir)`  | Parse all changes vs main         |
+| Changes  | `detectFileChanges(dir, f)` | Parse specific files              |
+| Validate | `validateChanges(input)`    | Run all validation rules          |
+| Results  | `hasErrors(result)`         | Check for blocking errors         |
+| Results  | `hasWarnings(result)`       | Check for warnings                |
+| Results  | `summarizeResult(result)`   | Human-readable summary            |
 
 ---
 
-## Troubleshooting
+## Architecture
 
-### "Cannot modify completed spec without unlock reason"
+Process Guard uses the **Decider pattern**: pure functions with no I/O.
 
-**Cause:** Attempting to modify a file with `@<prefix>-status:completed`.
+```
+deriveProcessState() ─┐
+                      ├─► validateChanges() ─► ValidationResult
+detectChanges()  ─────┘
+```
 
-**Fix:** Add `@<prefix>-unlock-reason:'your reason'` to the file, or consider if the change should go into a new spec instead.
+State is derived from file annotations — there is no separate state file to maintain.
 
-### "Invalid status transition"
+---
 
-**Cause:** Attempting a disallowed status change (e.g., `roadmap` → `completed`).
+## Related Documentation
 
-**Fix:** Follow the FSM path. To mark something completed, first set it to `active`, then to `completed`.
-
-### "Cannot add deliverables to active spec"
-
-**Cause:** Adding new rows to the deliverables table while status is `active`.
-
-**Fix:** Either remove the new deliverable, or revert status to `roadmap` to expand scope.
-
-### "File not in session scope"
-
-**Cause:** Modifying a file not listed in the active session's scope.
-
-**Fix:** Either add the file to the session scope, or use `--ignore-session` if this is intentional.
+| Document                              | Content                         |
+| ------------------------------------- | ------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md)    | FSM concepts, state definitions |
+| [README.md](../README.md)             | Package overview, quick start   |
+| [INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag reference          |

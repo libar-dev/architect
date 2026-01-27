@@ -16,7 +16,7 @@ ParsedStepSchema, ParsedScenarioSchema, ParsedBackgroundSchema, ParsedFeatureSch
 // Lint schemas and types
 export { LintSeveritySchema, LintViolationSchema, isLintViolation, } from './lint.js';
 // Tag Registry schemas and types
-export { CategoryDefinitionSchema, MetadataTagDefinitionSchema, AggregationTagDefinitionSchema, TagRegistrySchema, parseTagRegistry, createDefaultTagRegistry, mergeTagRegistries, } from './tag-registry.js';
+export { CategoryDefinitionSchema, MetadataTagDefinitionSchema, AggregationTagDefinitionSchema, TagRegistrySchema, createDefaultTagRegistry, mergeTagRegistries, } from './tag-registry.js';
 // Dual-source extraction schemas and types
 export { ProcessStatusSchema, RiskLevelSchema, ProcessMetadataSchema, DeliverableSchema, CrossValidationErrorSchema, ValidationSummarySchema, HierarchyLevelSchema, } from './dual-source.js';
 // Workflow configuration schemas and types

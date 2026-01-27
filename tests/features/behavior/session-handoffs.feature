@@ -55,20 +55,24 @@ Feature: Session Handoffs and Multi-Developer Coordination
   @documentation @template
   Scenario: Handoff template exists and contains required sections
     Given the session handoff template at catalogue/templates/session-handoff.md
-    Then the template should contain "When to Handoff" section
-    And the template should contain "Handoff Information Checklist"
-    And the template should contain "State Capture Template"
-    And the template should contain "Resume Procedure"
-    And the template should contain "Common Pitfalls"
+    Then the template should contain the following sections:
+      | section |
+      | When to Handoff |
+      | Handoff Information Checklist |
+      | State Capture Template |
+      | Resume Procedure |
+      | Common Pitfalls |
 
   @documentation @checklist
   Scenario: Retrospective checklist exists and contains required sections
     Given the session retrospective checklist at catalogue/checklists/session-retrospective.md
-    Then the checklist should contain "Pre-Retrospective Tasks"
-    And the checklist should contain "Progress Review"
-    And the checklist should contain "Discovery Capture"
-    And the checklist should contain "Handoff Preparation"
-    And the checklist should contain "Session Summary"
+    Then the checklist should contain the following sections:
+      | section |
+      | Pre-Retrospective Tasks |
+      | Progress Review |
+      | Discovery Capture |
+      | Handoff Preparation |
+      | Session Summary |
 
   # ==========================================================================
   # PROCESS_SETUP.md Integration

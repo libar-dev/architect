@@ -8,13 +8,13 @@
  *
  * ## TagTaxonomyCLI - Tag Registry Documentation Generator
  *
- * Generates TAG_TAXONOMY.md from tag-registry.json.
+ * Generates TAG_TAXONOMY.md from the TypeScript taxonomy module.
  * Use to auto-generate comprehensive tag reference documentation.
  *
  * ### When to Use
  *
- * - Use after modifying tag-registry.json to update documentation
- * - Use to generate human-readable tag reference from JSON config
+ * - Use after modifying src/taxonomy/ to update documentation
+ * - Use to generate human-readable tag reference from TypeScript config
  * - Use in documentation regeneration workflows
  */
 export {};

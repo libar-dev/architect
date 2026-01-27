@@ -1,94 +1,41 @@
 # Configuration Guide
 
-This guide covers the configuration system for `@libar-dev/delivery-process`, including presets, custom tag prefixes, and programmatic usage.
+Configure tag prefixes, presets, and custom taxonomies for `@libar-dev/delivery-process`.
+
+> **Prerequisites:** See [README.md](../README.md) for installation and basic usage.
+> **Tag Reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md) for complete tag lists.
 
 ---
 
-## Table of Contents
+## Quick Reference
 
-- [Import Paths](#import-paths)
-- [Quick Start](#quick-start)
-- [Available Presets](#available-presets)
-- [Hierarchical Configuration](#hierarchical-configuration)
-- [Custom Configuration](#custom-configuration)
-- [RegexBuilders API](#regexbuilders-api)
-- [CLI Integration](#cli-integration)
-
----
-
-## Import Paths
-
-The Configuration API is available from two import paths:
-
-| Import Path                          | Recommended            | Description                  |
-| ------------------------------------ | ---------------------- | ---------------------------- |
-| `@libar-dev/delivery-process`        | ✅ **Yes**             | Main entry point (canonical) |
-| `@libar-dev/delivery-process/config` | For specific use cases | Dedicated config module      |
-
-### Canonical Import (Recommended)
-
-```typescript
-import {
-  createDeliveryProcess,
-  GENERIC_PRESET,
-  DDD_ES_CQRS_PRESET,
-  type DeliveryProcessConfig,
-  type DeliveryProcessInstance,
-} from '@libar-dev/delivery-process';
-```
-
-### Dedicated Config Path
-
-Use the `/config` subpath when you need fine-grained tree-shaking or are building tooling that only needs configuration:
-
-```typescript
-import { createDeliveryProcess, PRESETS } from '@libar-dev/delivery-process/config';
-```
-
-> **Note:** Both paths export the same API. The main entry point is recommended for most use cases as it provides consistent imports across the codebase.
-
----
-
-## Quick Start
-
-The package provides a `createDeliveryProcess()` factory function for creating configured instances:
+| Preset        | Tag Prefix     | Categories | Use Case                     |
+| ------------- | -------------- | ---------- | ---------------------------- |
+| **`generic`** | `@docs-`       | 3          | Most projects (recommended)  |
+| `ddd-es-cqrs` | `@libar-docs-` | 21         | DDD/Event Sourcing codebases |
 
 ```typescript
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-// Option 1: Use defaults (DDD-ES-CQRS preset with @libar-docs- prefix)
-const dp = createDeliveryProcess();
-
-// Option 2: Use generic preset (simpler taxonomy with @docs- prefix)
+// Generic preset (recommended for most projects)
 const dp = createDeliveryProcess({ preset: 'generic' });
 
-// Option 3: Use libar-generic preset (simpler taxonomy, same @libar-docs- prefix)
-const dp = createDeliveryProcess({ preset: 'libar-generic' });
+// DDD preset (for DDD/ES/CQRS architectures)
+const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
 
-// Option 4: Custom prefix with DDD taxonomy
+// Custom prefix with generic taxonomy
 const dp = createDeliveryProcess({
-  preset: 'ddd-es-cqrs',
-  tagPrefix: '@my-project-',
-  fileOptInTag: '@my-project',
+  preset: 'generic',
+  tagPrefix: '@acme-',
+  fileOptInTag: '@acme',
 });
 ```
 
-### Four Usage Modes
-
-| Mode               | Options                       | Tag Prefix     | Categories         |
-| ------------------ | ----------------------------- | -------------- | ------------------ |
-| **Default**        | `{}` or none                  | `@libar-docs-` | 21 DDD categories  |
-| **Generic Preset** | `{ preset: "generic" }`       | `@docs-`       | 3 basic categories |
-| **Libar Generic**  | `{ preset: "libar-generic" }` | `@libar-docs-` | 3 basic categories |
-| **Custom**         | Explicit options              | Your choice    | Your choice        |
-
 ---
 
-## Available Presets
+## Presets
 
-### GENERIC_PRESET
-
-Minimal preset for simple documentation needs.
+### Generic Preset
 
 | Property        | Value                |
 | --------------- | -------------------- |
@@ -96,176 +43,147 @@ Minimal preset for simple documentation needs.
 | **File Opt-In** | `@docs`              |
 | **Categories**  | 3 (core, api, infra) |
 
-**Use when:**
-
-- Simple projects without DDD architecture
-- Basic pattern tracking needs
-- You want minimal overhead
-
-**Example usage:**
-
 ```typescript
-import { createDeliveryProcess, GENERIC_PRESET } from '@libar-dev/delivery-process';
-
-const dp = createDeliveryProcess({ preset: 'generic' });
-
-// Your code annotations use @docs- prefix:
-// /** @docs */
-// /** @docs-pattern MyPattern */
-// /** @docs-status completed */
+/**
+ * @docs
+ * @docs-pattern PatternScanner
+ * @docs-status completed
+ * @docs-core
+ * @docs-uses FileDiscovery, ASTParser
+ */
+export function scanPatterns(config: ScanConfig): Promise<ScanResult> { ... }
 ```
 
-**Categories in Generic Preset:**
+### DDD-ES-CQRS Preset (Default)
 
-| Tag           | Domain         | Priority |
-| ------------- | -------------- | -------- |
-| `@docs-core`  | Core           | 1        |
-| `@docs-api`   | API            | 2        |
-| `@docs-infra` | Infrastructure | 3        |
+Full taxonomy for domain-driven architectures with 21 categories.
 
----
-
-### LIBAR_GENERIC_PRESET
-
-Same minimal categories as GENERIC_PRESET but with `@libar-docs-` prefix.
-
-| Property        | Value                |
-| --------------- | -------------------- |
-| **Tag Prefix**  | `@libar-docs-`       |
-| **File Opt-In** | `@libar-docs`        |
-| **Categories**  | 3 (core, api, infra) |
-
-**Use when:**
-
-- Projects already using `@libar-docs-` tags
-- Package-level configuration with simplified categories
-- Gradual adoption without tag migration
-
-**Example usage:**
+| Property        | Value                                                                  |
+| --------------- | ---------------------------------------------------------------------- |
+| **Tag Prefix**  | `@libar-docs-`                                                         |
+| **File Opt-In** | `@libar-docs`                                                          |
+| **Categories**  | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, etc.) |
 
 ```typescript
-import { createDeliveryProcess, LIBAR_GENERIC_PRESET } from '@libar-dev/delivery-process';
-
-const dp = createDeliveryProcess({ preset: 'libar-generic' });
-
-// Your code annotations use @libar-docs- prefix with 3 categories:
-// /** @libar-docs */
-// /** @libar-docs-pattern MyPattern */
-// /** @libar-docs-core */
+/**
+ * @libar-docs
+ * @libar-docs-pattern TransformDataset
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-uses MasterDataset, ExtractedPattern
+ * @libar-docs-used-by Orchestrator
+ */
+export function transformToMasterDataset(input: TransformInput): MasterDataset { ... }
 ```
 
-**Categories in Libar Generic Preset:**
-
-| Tag                 | Domain         | Priority |
-| ------------------- | -------------- | -------- |
-| `@libar-docs-core`  | Core           | 1        |
-| `@libar-docs-api`   | API            | 2        |
-| `@libar-docs-infra` | Infrastructure | 3        |
-
----
-
-### DDD_ES_CQRS_PRESET
-
-Full taxonomy for DDD/Event Sourcing/CQRS architectures. **This is the default preset.**
-
-| Property        | Value                  |
-| --------------- | ---------------------- |
-| **Tag Prefix**  | `@libar-docs-`         |
-| **File Opt-In** | `@libar-docs`          |
-| **Categories**  | 21 (full DDD taxonomy) |
-
-**Use when:**
-
-- Building DDD architectures
-- Event sourcing implementations
-- CQRS patterns
-- Full roadmap/phase tracking
-- Enterprise-scale projects
-
-**Example usage:**
-
-```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
-
-// These are equivalent:
-const dp1 = createDeliveryProcess();
-const dp2 = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
-
-// Your code annotations use @libar-docs- prefix:
-// /** @libar-docs */
-// /** @libar-docs-pattern DeciderPattern */
-// /** @libar-docs-event-sourcing */
-```
-
-**Key Categories in DDD Preset:**
-
-| Tag                           | Domain               | Priority |
-| ----------------------------- | -------------------- | -------- |
-| `@libar-docs-domain`          | Strategic DDD        | 1        |
-| `@libar-docs-ddd`             | Domain-Driven Design | 2        |
-| `@libar-docs-bounded-context` | Bounded Context      | 3        |
-| `@libar-docs-event-sourcing`  | Event Sourcing       | 4        |
-| `@libar-docs-decider`         | Decider              | 5        |
-| `@libar-docs-cqrs`            | CQRS                 | 5        |
-| `@libar-docs-projection`      | Projections          | 6        |
-| `@libar-docs-saga`            | Sagas/Workflows      | 7        |
-| ...                           | ...                  | ...      |
-
-> **See:** [INSTRUCTIONS.md](../INSTRUCTIONS.md) for the complete category list.
+> **Category Reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md#category-tags) for the complete list.
 
 ---
 
 ## Hierarchical Configuration
 
-CLI tools automatically discover configuration via `delivery-process.config.ts` files.
+CLI tools discover `delivery-process.config.ts` files automatically.
 
-### Config File Discovery
+### Discovery Order
 
-When you run a CLI tool (e.g., `lint-patterns`, `validate-patterns`), it searches for configuration:
-
-1. Look for `delivery-process.config.ts` in the current directory
-2. Walk up parent directories until a `.git` folder is found (repo root)
-3. If found, load the configuration
-4. If not found, use the default `DDD_ES_CQRS_PRESET`
+1. Current directory
+2. Walk up to repo root (`.git` folder)
+3. Fall back to libar-generic preset (3 categories, `@libar-docs-` prefix)
 
 ### Config File Format
 
-Create a `delivery-process.config.ts` file in your project root:
-
 ```typescript
+// delivery-process.config.ts
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-export default createDeliveryProcess({ preset: 'libar-generic' });
+export default createDeliveryProcess({ preset: 'generic' });
 ```
 
-### Two-Level Configuration Example
+### Monorepo Example
 
-For monorepos with package-level and repo-level configurations:
+```
+my-monorepo/
+├── delivery-process.config.ts          # Repo: ddd-es-cqrs
+└── packages/
+    └── my-package/
+        └── delivery-process.config.ts  # Package: generic
+```
 
-**Package level** (`packages/my-package/delivery-process.config.ts`):
+CLI tools use the nearest config file to the working directory.
+
+---
+
+## Custom Configuration
+
+### Custom Tag Prefix
+
+Keep a preset's taxonomy but change the prefix:
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+const dp = createDeliveryProcess({
+  preset: 'generic',
+  tagPrefix: '@team-',
+  fileOptInTag: '@team',
+});
 
-// Simplified 3-category taxonomy for the package
-export default createDeliveryProcess({ preset: 'libar-generic' });
+// Your annotations:
+// /** @team */
+// /** @team-pattern DualSourceExtractor */
+// /** @team-core */
 ```
 
-**Repo level** (`delivery-process.config.ts` at repo root):
+### Custom Categories
+
+Define your own taxonomy:
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
-
-// Full 21-category DDD taxonomy for the repo
-export default createDeliveryProcess(); // Uses DDD_ES_CQRS_PRESET (default)
+const dp = createDeliveryProcess({
+  tagPrefix: '@docs-',
+  fileOptInTag: '@docs',
+  categories: [
+    { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
+    {
+      tag: 'extractor',
+      domain: 'Extractor',
+      priority: 2,
+      description: 'Pattern extraction',
+      aliases: [],
+    },
+    {
+      tag: 'generator',
+      domain: 'Generator',
+      priority: 3,
+      description: 'Doc generation',
+      aliases: [],
+    },
+  ],
+});
 ```
 
-When you run CLI tools from the package directory, they use the package config.
-When you run from the repo root, they use the repo-level config.
+---
 
-### Config Loader API
+## RegexBuilders API
 
-For programmatic access to the config loader:
+The `DeliveryProcessInstance` includes utilities for tag detection:
+
+```typescript
+const dp = createDeliveryProcess({ preset: 'generic' });
+
+// Check if file should be scanned
+dp.regexBuilders.hasFileOptIn(fileContent); // true if contains /** @docs */
+
+// Check for any documentation directives
+dp.regexBuilders.hasDocDirectives(fileContent); // true if contains @docs-*
+
+// Normalize tag for lookup
+dp.regexBuilders.normalizeTag('@docs-pattern'); // "pattern"
+```
+
+---
+
+## Programmatic Config Loading
+
+For tools that need to load configuration files:
 
 ```typescript
 import { loadConfig, formatConfigError } from '@libar-dev/delivery-process/config';
@@ -278,195 +196,19 @@ if (!result.ok) {
 }
 
 const { instance, isDefault, path } = result.value;
-// instance.registry - the TagRegistry
-// instance.regexBuilders - regex utilities
-// isDefault - true if no config file was found
-// path - path to the config file (if found)
-```
-
----
-
-## Custom Configuration
-
-### Custom Tag Prefix
-
-Override the tag prefix while keeping the preset's taxonomy:
-
-```typescript
-const dp = createDeliveryProcess({
-  preset: 'ddd-es-cqrs', // Full 21-category taxonomy
-  tagPrefix: '@acme-docs-',
-  fileOptInTag: '@acme-docs',
-});
-
-// Your annotations:
-// /** @acme-docs */
-// /** @acme-docs-pattern MyPattern */
-// /** @acme-docs-event-sourcing */
-```
-
-### Custom File Opt-In Tag
-
-The file opt-in tag is separate from the prefix:
-
-```typescript
-const dp = createDeliveryProcess({
-  tagPrefix: '@docs-',
-  fileOptInTag: '@documented', // Files must have /** @documented */ to be scanned
-});
-```
-
-### Custom Categories (Advanced)
-
-Provide your own category definitions directly to `createDeliveryProcess()`:
-
-```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
-
-const dp = createDeliveryProcess({
-  tagPrefix: '@team-',
-  fileOptInTag: '@team',
-  categories: [
-    {
-      tag: 'frontend',
-      domain: 'Frontend',
-      priority: 1,
-      description: 'UI components',
-      aliases: ['ui'],
-    },
-    {
-      tag: 'backend',
-      domain: 'Backend',
-      priority: 2,
-      description: 'Server code',
-      aliases: ['server'],
-    },
-    { tag: 'shared', domain: 'Shared', priority: 3, description: 'Shared utilities', aliases: [] },
-  ],
-});
-
-// Your annotations now use @team- prefix:
-// /** @team */
-// /** @team-pattern MyPattern */
-// /** @team-frontend */
-```
-
-For advanced use cases requiring direct registry manipulation:
-
-```typescript
-import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
-```
-
----
-
-## RegexBuilders API
-
-The `DeliveryProcessInstance` returned by `createDeliveryProcess()` includes `regexBuilders` for tag detection:
-
-```typescript
-const dp = createDeliveryProcess({ preset: 'generic' });
-
-// Check if a file has the opt-in marker
-const hasOptIn = dp.regexBuilders.hasFileOptIn(fileContent);
-// Returns: true if content contains /** @docs */ (or configured opt-in)
-
-// Check if content has any doc directives
-const hasDirectives = dp.regexBuilders.hasDocDirectives(fileContent);
-// Returns: true if content contains @docs-* tags
-
-// Normalize a tag (remove @ and prefix)
-const normalized = dp.regexBuilders.normalizeTag('@docs-pattern');
-// Returns: "pattern"
-```
-
-### RegexBuilders Interface
-
-```typescript
-interface RegexBuilders {
-  /** Pattern to match file-level opt-in (e.g., /** @docs */) */
-  readonly fileOptInPattern: RegExp;
-
-  /** Pattern to match directives (e.g., @docs-pattern, @docs-status) */
-  readonly directivePattern: RegExp;
-
-  /** Check if content has the file-level opt-in marker */
-  hasFileOptIn(content: string): boolean;
-
-  /** Check if content has any doc directives */
-  hasDocDirectives(content: string): boolean;
-
-  /** Normalize a tag by removing @ and prefix */
-  normalizeTag(tag: string): string;
-}
-```
-
----
-
-## CLI Integration
-
-### Config File Discovery
-
-CLI tools (`lint-patterns`, `validate-patterns`, `generate-tag-taxonomy`) automatically discover `delivery-process.config.ts`:
-
-```bash
-# CLI discovers configuration from delivery-process.config.ts
-npx lint-patterns -i "src/**/*.ts"
-```
-
-Output shows which configuration is being used:
-
-```
-  Config: /path/to/delivery-process.config.ts
-```
-
-Or if no config file is found:
-
-```
-  Config: (default DDD-ES-CQRS taxonomy)
-```
-
-### Example: Package with Custom Config
-
-1. Create `delivery-process.config.ts` in your package:
-
-```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
-
-export default createDeliveryProcess({ preset: 'libar-generic' });
-```
-
-2. Run CLI tools - they automatically use your config:
-
-```bash
-cd my-package
-npx lint-patterns -i "src/**/*.ts"
-# Uses libar-generic preset with 3 categories
-```
-
-### Programmatic API
-
-For advanced use cases, you can also use the programmatic API:
-
-```typescript
-import { createDeliveryProcess, scanPatterns, extractPatterns } from '@libar-dev/delivery-process';
-
-// Create configured instance
-const dp = createDeliveryProcess({ preset: 'libar-generic' });
-
-// Use registry in scanner
-const scanned = await scanPatterns(
-  { patterns: ['src/**/*.ts'], baseDir: process.cwd() },
-  dp.registry
-);
-
-// Extract patterns
-const patterns = extractPatterns(scanned.value.files, process.cwd(), dp.registry);
+// instance.registry - TagRegistry for scanning/extraction
+// instance.regexBuilders - Regex utilities for detection
+// isDefault - true if no config file found
+// path - config file path (if found)
 ```
 
 ---
 
 ## Related Documentation
 
-- **[README.md](../README.md)** - Package quick start
-- **[INSTRUCTIONS.md](../INSTRUCTIONS.md)** - Complete tag reference
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Pipeline and codec architecture
+| Document                              | Purpose                         |
+| ------------------------------------- | ------------------------------- |
+| [README.md](../README.md)             | Installation and quick start    |
+| [INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag and CLI reference  |
+| [ARCHITECTURE.md](./ARCHITECTURE.md)  | Pipeline and codec architecture |
+| [METHODOLOGY.md](./METHODOLOGY.md)    | Dual-source ownership strategy  |

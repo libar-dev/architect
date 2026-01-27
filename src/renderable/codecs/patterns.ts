@@ -86,7 +86,7 @@ const REPO_PREFIXES = ['libar-platform/', 'monorepo/'];
  * // Returns: "packages/core/src/handler.ts" (unchanged)
  * ```
  */
-function normalizeImplPath(filePath: string): string {
+export function normalizeImplPath(filePath: string): string {
   for (const prefix of REPO_PREFIXES) {
     if (filePath.startsWith(prefix)) {
       return filePath.slice(prefix.length);

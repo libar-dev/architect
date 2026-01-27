@@ -26,6 +26,26 @@ import { z } from 'zod';
 import { MasterDatasetSchema } from '../../validation-schemas/master-dataset.js';
 import { type BaseCodecOptions } from './types/base.js';
 /**
+ * Normalize implementation file path by stripping repository prefixes.
+ *
+ * When extraction uses a parent directory as baseDir, paths may include
+ * the repo directory name (e.g., "libar-platform/packages/..."). This
+ * function strips those prefixes to generate correct relative links.
+ *
+ * @param filePath - The implementation file path (may include repo prefix)
+ * @returns Path with repo prefix stripped if present
+ *
+ * @example
+ * ```typescript
+ * normalizeImplPath("libar-platform/packages/core/src/handler.ts")
+ * // Returns: "packages/core/src/handler.ts"
+ *
+ * normalizeImplPath("packages/core/src/handler.ts")
+ * // Returns: "packages/core/src/handler.ts" (unchanged)
+ * ```
+ */
+export declare function normalizeImplPath(filePath: string): string;
+/**
  * Options for PatternsDocumentCodec
  */
 export interface PatternsCodecOptions extends BaseCodecOptions {
@@ -173,12 +193,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -210,8 +230,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -258,8 +278,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                value: "value";
                 enum: "enum";
+                value: "value";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -384,12 +404,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -421,8 +441,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -558,12 +578,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -595,8 +615,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -732,12 +752,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -769,8 +789,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -910,12 +930,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -947,8 +967,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1091,12 +1111,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1128,8 +1148,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1265,12 +1285,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1302,8 +1322,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1440,12 +1460,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1477,8 +1497,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1614,12 +1634,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1651,8 +1671,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1788,12 +1808,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1825,8 +1845,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1962,12 +1982,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1999,8 +2019,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2162,12 +2182,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2199,8 +2219,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2336,12 +2356,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2373,8 +2393,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2510,12 +2530,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2547,8 +2567,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2684,12 +2704,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2721,8 +2741,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;

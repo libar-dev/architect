@@ -157,6 +157,17 @@ export interface GenerationWarning {
  */
 export declare function generateDocumentation(options: GenerateOptions): Promise<Result<GenerateResult, string>>;
 /**
+ * Merge patterns from TypeScript and Gherkin sources with conflict detection
+ *
+ * Exported for testing purposes - allows direct unit testing of merge logic
+ * without running the full pipeline.
+ *
+ * @param tsPatterns - Patterns extracted from TypeScript files
+ * @param gherkinPatterns - Patterns extracted from Gherkin feature files
+ * @returns Result containing merged patterns or error if conflicts detected
+ */
+export declare function mergePatterns(tsPatterns: readonly ExtractedPattern[], gherkinPatterns: readonly ExtractedPattern[]): Result<readonly ExtractedPattern[], string>;
+/**
  * Result from cleaning up orphaned session files.
  */
 export interface CleanupResult {

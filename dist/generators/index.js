@@ -29,7 +29,7 @@ export { GeneratorRegistry, generatorRegistry } from './registry.js';
 // Codec-based generators (RDM architecture)
 export { CodecBasedGenerator, createCodecGenerator, DOCUMENT_TYPES, } from './codec-based.js';
 // Orchestrator - programmatic API for documentation generation
-export { generateDocumentation, } from './orchestrator.js';
+export { generateDocumentation, mergePatterns, } from './orchestrator.js';
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
 export { transformToMasterDataset, } from './pipeline/index.js';
 /**

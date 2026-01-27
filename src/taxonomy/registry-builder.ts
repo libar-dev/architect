@@ -2,7 +2,6 @@
  * Registry Builder
  *
  * Constructs a complete TagRegistry from TypeScript constants.
- * This replaces JSON-based tag-registry.json files.
  */
 import { CATEGORIES } from './categories.js';
 import { type FormatType } from './format-types.js';

@@ -25,8 +25,9 @@ configuration shape compliance.
 
 ### When to Use
 
-- Use GENERIC_PRESET for simple documentation needs
-- Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy (default)
+- Use GENERIC_PRESET for simple documentation needs with @docs- prefix
+- Use LIBAR_GENERIC_PRESET for simple documentation needs with @libar-docs- prefix (default)
+- Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
 - Use as base for custom configurations
 
 ---

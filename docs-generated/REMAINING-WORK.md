@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 71/104 (68%)
+**Overall Progress:** [█████████████░░░░░░░] 71/110 (65%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 13 |
-| 📋 Planned | 20 |
-| **Total Remaining** | 33 |
+| 📋 Planned | 26 |
+| **Total Remaining** | 39 |
 
 ---
 
@@ -23,8 +23,13 @@
 | --- | --- | --- | --- |
 | 📋 [TraceabilityGenerator](remaining/phase-18-traceability-generator.md) | 1 | 0 | 0% |
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 50% |
+| 📋 [ClaudeModuleGeneration](remaining/phase-25-claude-module-generation.md) | 1 | 0 | 0% |
+| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 5 | 0 | 44% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
+| 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
+| 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
+| 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
+| 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
 | 🚧 Backlog (No Phase) | 16 | 13 | 0% |
 
 ---
@@ -34,8 +39,8 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 13 |
-| ✅ Ready to Start | 20 |
-| ⚠️ Blocked | 0 |
+| ✅ Ready to Start | 25 |
+| ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
 
@@ -45,10 +50,10 @@
 - Process State API CLI (Phase 99)
 - Process State API Relationship Queries (Phase 99)
 - Status Aware Eslint Suppression (Phase 99)
+- Streaming Git Diff (Phase 99)
 - Architecture Delta (Phase 100)
 - Business Rules Generator (Phase 100)
 - Cross Source Validation (Phase 100)
-- DoD Validation (Phase 100)
 
 See phase detail files for full list.
 
@@ -64,6 +69,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Process State API CLI (Phase 99) - 2d
 - 📋 Process State API Relationship Queries (Phase 99) - 3d
 
-Showing 5 of 20 actionable items.
+Showing 5 of 25 actionable items.
 
 ---

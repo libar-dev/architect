@@ -1,7 +1,7 @@
 Feature: Description Header Normalization
 
   Pattern descriptions should not create duplicate headers when rendered.
-  When directive descriptions start with markdown headers, those headers
+  If directive descriptions start with markdown headers, those headers
   should be stripped before rendering under the "Description" section.
 
   Background: Patterns codec test context
@@ -35,8 +35,10 @@ Feature: Description Header Normalization
         """
       When the pattern detail document is generated
       Then the Description section contains "Actual content starts here"
-      And the Description section does not contain "## Topic Name"
-      And the Description section does not contain "### Subtopic"
+      And the Description section does not contain any of:
+        | header |
+        | ## Topic Name |
+        | ### Subtopic |
 
     Scenario: Preserve description without leading header
       Given a pattern with directive description:
@@ -73,17 +75,10 @@ Feature: Description Header Normalization
       Then no Description section is rendered
 
     Scenario: Header in middle of description is preserved
-      Given a pattern with directive description:
-        """
-        Introduction paragraph.
-
-        ## Section Header
-
-        More content after header.
-        """
+      Given a pattern with description containing middle header
       When the pattern detail document is generated
       Then the Description section contains "Introduction paragraph"
-      And the Description section contains "## Section Header"
+      And the Description section contains middle header text
 
   # ===========================================================================
   # Rule 3: stripLeadingHeaders helper function

@@ -15,23 +15,23 @@ Feature: Implementation Link Path Normalization
 
     Scenario: Strip libar-platform prefix from implementation paths
       Given a pattern with implementation:
-        | file | libar-platform/packages/core/src/handler.ts |
-        | description | Main handler |
+        | file | description |
+        | libar-platform/packages/core/src/handler.ts | Main handler |
       When the pattern detail document is generated
       Then the implementation link path is "../../packages/core/src/handler.ts"
       And the link text is "`handler.ts`"
 
     Scenario: Strip monorepo prefix from implementation paths
       Given a pattern with implementation:
-        | file | monorepo/packages/api/src/client.ts |
-        | description | API client |
+        | file | description |
+        | monorepo/packages/api/src/client.ts | API client |
       When the pattern detail document is generated
       Then the implementation link path is "../../packages/api/src/client.ts"
 
     Scenario: Preserve paths without repository prefix
       Given a pattern with implementation:
-        | file | packages/core/src/handler.ts |
-        | description | Main handler |
+        | file | description |
+        | packages/core/src/handler.ts | Main handler |
       When the pattern detail document is generated
       Then the implementation link path is "../../packages/core/src/handler.ts"
 
@@ -48,9 +48,12 @@ Feature: Implementation Link Path Normalization
         | packages/core/src/b.ts | File B |
         | libar-platform/packages/api/src/c.ts | File C |
       When the pattern detail document is generated
-      Then implementation 1 link path is "../../packages/core/src/a.ts"
-      And implementation 2 link path is "../../packages/core/src/b.ts"
-      And implementation 3 link path is "../../packages/api/src/c.ts"
+      # Links are sorted alphabetically by original file path before normalization
+      Then the implementation links should be:
+        | index | path |
+        | 1 | ../../packages/api/src/c.ts |
+        | 2 | ../../packages/core/src/a.ts |
+        | 3 | ../../packages/core/src/b.ts |
 
   # ===========================================================================
   # Rule 3: normalizeImplPath helper function

@@ -1,7 +1,7 @@
 {
   "name": "@libar-dev/delivery-process",
-  "version": "0.3.0",
-  "description": "Documentation generator from TypeScript source code and Gherkin feature files",
+  "version": "0.1.0-pre.0",
+  "description": "Turn TypeScript annotations and Gherkin specs into living docs, architecture graphs, and AI-queryable delivery state. FSM-enforced workflows.",
   "type": "module",
   "sideEffects": false,
   "main": "dist/index.js",
@@ -51,6 +51,10 @@
     "./taxonomy": {
       "types": "./dist/taxonomy/index.d.ts",
       "import": "./dist/taxonomy/index.js"
+    },
+    "./validation": {
+      "types": "./dist/validation/index.d.ts",
+      "import": "./dist/validation/index.js"
     }
   },
   "bin": {
@@ -90,16 +94,42 @@
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
     "release:major": "npm version major",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pr:comments": "node scripts/fetch-pr-comments.mjs",
+    "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread"
   },
   "keywords": [
-    "libar",
-    "documentation",
+    "source-first",
+    "delivery-process",
+    "living-documentation",
+    "documentation-generator",
+    "docs-as-code",
     "code-first",
-    "typescript",
-    "docs",
-    "jsdoc",
-    "extraction"
+    "technical-documentation",
+    "architecture-graph",
+    "dependency-graph",
+    "traceability-matrix",
+    "mermaid",
+    "workflow-enforcement",
+    "fsm-enforcement",
+    "process-guard",
+    "pre-commit-hooks",
+    "git-hooks",
+    "roadmap",
+    "sdlc",
+    "software-delivery",
+    "gherkin",
+    "bdd",
+    "typescript-annotations",
+    "traceability",
+    "ai-assisted-development",
+    "ai-context",
+    "llm-context",
+    "process-state-api",
+    "claude-code",
+    "cursor-ai",
+    "ai-coding",
+    "cli"
   ],
   "author": "Libar AI",
   "license": "MIT",
@@ -138,15 +168,17 @@
   },
   "files": [
     "dist",
-    "catalogue",
+    "docs",
     "docs-generated",
     "README.md",
+    "INSTRUCTIONS.md",
     "LICENSE"
   ],
   "private": false,
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "tag": "pre"
   },
   "lint-staged": {
     "*.ts": [
