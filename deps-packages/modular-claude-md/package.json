@@ -1,0 +1,59 @@
+{
+  "name": "@libar-dev/modular-claude-md",
+  "version": "0.1.0",
+  "description": "Modular CLAUDE.md generator - build context-specific AI coding instructions with additive composition",
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "modular-claude-md": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "prepare": "pnpm run build",
+    "prepublishOnly": "pnpm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai-coding",
+    "documentation",
+    "context",
+    "modular",
+    "claude-md"
+  ],
+  "author": "Libar AI",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/libar-dev/modular-claude-md.git"
+  },
+  "bugs": {
+    "url": "https://github.com/libar-dev/modular-claude-md/issues"
+  },
+  "homepage": "https://github.com/libar-dev/modular-claude-md#readme",
+  "devDependencies": {
+    "@amiceli/vitest-cucumber": "^5.2.1",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2",
+    "vitest": "^3.1.4"
+  },
+  "private": false
+}
