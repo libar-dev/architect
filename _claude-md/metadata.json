@@ -109,6 +109,11 @@
           "path": "api/tag-formats.md",
           "tags": ["core-mandatory"],
           "description": "Tag format types, status normalization, value constraints"
+        },
+        {
+          "path": "api/dual-source.md",
+          "tags": ["core-mandatory"],
+          "description": "Dual-source architecture, TypeScript vs Feature Files, merging rules"
         }
       ]
     },
@@ -131,6 +136,27 @@
           "path": "authoring/gherkin-patterns.md",
           "tags": ["core-mandatory"],
           "description": "Gherkin spec structure, tag conventions, Rule blocks"
+        },
+        {
+          "path": "authoring/feature-content.md",
+          "tags": ["core-mandatory"],
+          "description": "Feature file rich content, code-first principle, valid/forbidden content"
+        }
+      ]
+    },
+    {
+      "title": "Claude MD Management",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "meta/management.md",
+          "tags": ["core-mandatory"],
+          "description": "Modular CLAUDE.md architecture, adding content, guidelines"
+        },
+        {
+          "path": "meta/deps-packages.md",
+          "tags": ["core-mandatory"],
+          "description": "External package sources via git subtrees"
         }
       ]
     }

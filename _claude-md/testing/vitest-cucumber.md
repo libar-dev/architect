@@ -84,6 +84,18 @@ describeFeature(feature, ({ Background, Rule }) => {
 });
 ```
 
+### Docstring Pattern for Pipes
+
+Use docstrings when Gherkin content contains pipe characters:
+
+```typescript
+Then('the output contains the table:', (_ctx: unknown, docString: string) => {
+  for (const line of docString.trim().split('\n')) {
+    expect(state!.markdown).toContain(line.trim());
+  }
+});
+```
+
 ### vitest-cucumber Quirks & Constraints
 
 The library behaves differently than standard Cucumber.js.

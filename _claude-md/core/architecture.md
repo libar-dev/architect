@@ -31,9 +31,10 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 | `src/lint/`       | Pattern linting and process guard                         |
 | `src/api/`        | Process State API for programmatic access                 |
 
-### Two Presets
+### Three Presets
 
-| Preset                  | Tag Prefix     | Categories | Use Case                         |
-| ----------------------- | -------------- | ---------- | -------------------------------- |
-| `ddd-es-cqrs` (default) | `@libar-docs-` | 21         | DDD/Event Sourcing architectures |
-| `generic`               | `@docs-`       | 3          | Simple projects                  |
+| Preset                    | Tag Prefix     | Categories | Use Case                           |
+| ------------------------- | -------------- | ---------- | ---------------------------------- |
+| `libar-generic` (default) | `@libar-docs-` | 3          | Simple projects (this package)     |
+| `ddd-es-cqrs`             | `@libar-docs-` | 21         | DDD/Event Sourcing architectures   |
+| `generic`                 | `@docs-`       | 3          | Simple projects with @docs- prefix |

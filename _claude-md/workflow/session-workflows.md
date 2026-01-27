@@ -1,3 +1,5 @@
+**Core Thesis:** Git is the event store. Documentation artifacts are projections. Feature files are the single source of truth.
+
 For detailed guides, see [SESSION-GUIDES.md](./docs/SESSION-GUIDES.md).
 
 ### Session Decision Tree

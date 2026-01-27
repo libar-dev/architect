@@ -87,12 +87,13 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 | `src/lint/`       | Pattern linting and process guard                         |
 | `src/api/`        | Process State API for programmatic access                 |
 
-### Two Presets
+### Three Presets
 
-| Preset                  | Tag Prefix     | Categories | Use Case                         |
-| ----------------------- | -------------- | ---------- | -------------------------------- |
-| `ddd-es-cqrs` (default) | `@libar-docs-` | 21         | DDD/Event Sourcing architectures |
-| `generic`               | `@docs-`       | 3          | Simple projects                  |
+| Preset                    | Tag Prefix     | Categories | Use Case                           |
+| ------------------------- | -------------- | ---------- | ---------------------------------- |
+| `libar-generic` (default) | `@libar-docs-` | 3          | Simple projects (this package)     |
+| `ddd-es-cqrs`             | `@libar-docs-` | 21         | DDD/Event Sourcing architectures   |
+| `generic`                 | `@docs-`       | 3          | Simple projects with @docs- prefix |
 
 ---
 
@@ -221,6 +222,18 @@ describeFeature(feature, ({ Background, Rule }) => {
 });
 ```
 
+### Docstring Pattern for Pipes
+
+Use docstrings when Gherkin content contains pipe characters:
+
+```typescript
+Then('the output contains the table:', (_ctx: unknown, docString: string) => {
+  for (const line of docString.trim().split('\n')) {
+    expect(state!.markdown).toContain(line.trim());
+  }
+});
+```
+
 ### vitest-cucumber Quirks & Constraints
 
 The library behaves differently than standard Cucumber.js.
@@ -293,6 +306,8 @@ console.log(JSON.stringify(doc.sections, null, 2));
 ---
 
 ## Session Workflows
+
+**Core Thesis:** Git is the event store. Documentation artifacts are projections. Feature files are the single source of truth.
 
 For detailed guides, see [SESSION-GUIDES.md](./docs/SESSION-GUIDES.md).
 
@@ -438,6 +453,18 @@ For multi-session work, capture state at session boundaries:
 ### Process Guard
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
+
+#### 7 Validation Rules
+
+| Rule ID                       | Severity | Description                                         |
+| ----------------------------- | -------- | --------------------------------------------------- |
+| `completed-protection`        | error    | Completed specs require `@libar-docs-unlock-reason` |
+| `invalid-status-transition`   | error    | Must follow FSM path                                |
+| `scope-creep`                 | error    | Active specs cannot add new deliverables            |
+| `session-excluded`            | error    | Cannot modify explicitly excluded files             |
+| `missing-relationship-target` | warning  | Relationship target pattern not found               |
+| `session-scope`               | warning  | File outside session scope                          |
+| `deliverable-removed`         | warning  | Deliverable was removed                             |
 
 #### Protection Levels
 
@@ -598,6 +625,44 @@ All codecs normalize status to three canonical display values:
 | `@unlock-reason:Fix for issue` | `@unlock-reason:Fix-for-issue` |
 | `@pattern:My Pattern`          | `@pattern:MyPattern`           |
 
+### Dual-Source Architecture
+
+Patterns can be defined in TypeScript, Feature files, or both. Each source owns specific metadata.
+
+#### When to Use TypeScript vs Feature Files
+
+| Use Case                  | Source       | Why                                       |
+| ------------------------- | ------------ | ----------------------------------------- |
+| Retroactive documentation | TypeScript   | Code existed before delivery process      |
+| Rich relationships        | TypeScript   | `@libar-docs-uses`, `@libar-docs-used-by` |
+| Phase/release tracking    | Feature file | Milestone planning                        |
+| Acceptance criteria       | Feature file | BDD scenarios                             |
+| New patterns              | Both         | Feature for roadmap, TypeScript for graph |
+
+#### Category Flags (libar-generic preset)
+
+| Flag                | Domain         |
+| ------------------- | -------------- |
+| `@libar-docs-core`  | Core patterns  |
+| `@libar-docs-api`   | Public APIs    |
+| `@libar-docs-infra` | Infrastructure |
+
+**Note:** The `@libar-docs` opt-in marker is NOT a category—add explicit category tags for proper categorization.
+
+#### Dual-Source Merging
+
+When pattern exists in both TypeScript AND feature file:
+
+| Aspect            | Resolution                      |
+| ----------------- | ------------------------------- |
+| Pattern name      | Must match exactly              |
+| Categories        | Unioned from both sources       |
+| `uses`, `used-by` | Unioned from both sources       |
+| Phase/release     | Feature file takes precedence   |
+| Description       | TypeScript markdown description |
+
+**Warning:** If TypeScript file is missing `@libar-docs-status`, the pattern data is **ignored** and not merged with feature file.
+
 ---
 
 ## ProcessStateAPI
@@ -711,6 +776,137 @@ Rule: Reservations prevent race conditions
     Given an existing reservation for key "order-123"
     When another process attempts to reserve "order-123"
     Then the reservation fails with "already reserved"
+```
+
+### Feature File Rich Content
+
+Feature files serve dual purposes: **executable specs** and **documentation source**. Content in the Feature description section appears in generated docs.
+
+#### Code-First Principle
+
+**Prefer code stubs over DocStrings for complex examples.** Feature files should reference code, not duplicate it.
+
+| Approach                     | When to Use                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| DocStrings (`"""typescript`) | Brief examples (5-10 lines), current/target state comparison |
+| Code stub reference          | Complex APIs, interfaces, full implementations               |
+
+**Instead of large DocStrings:**
+
+```gherkin
+Rule: Reservations use atomic claim
+  See `src/reservations/reserve.ts` for API.
+```
+
+Code stubs are annotated TypeScript files with `throw new Error("not yet implemented")`.
+
+#### Valid Rich Content
+
+| Content Type  | Syntax                  | Appears in Docs  |
+| ------------- | ----------------------- | ---------------- |
+| Plain text    | Regular paragraphs      | Yes              |
+| Bold/emphasis | `**bold**`, `*italic*`  | Yes              |
+| Tables        | Markdown pipe tables    | Yes              |
+| Lists         | `- item` or `1. item`   | Yes              |
+| DocStrings    | `"""typescript`...`"""` | Yes (code block) |
+| Comments      | `# comment`             | No (ignored)     |
+
+#### Forbidden in Feature Descriptions
+
+| Forbidden           | Why                        | Alternative                   |
+| ------------------- | -------------------------- | ----------------------------- |
+| Code fences ` ``` ` | Not Gherkin syntax         | Use DocStrings with lang hint |
+| `@prefix` in text   | Interpreted as Gherkin tag | Remove `@` or escape          |
+| Nested DocStrings   | Gherkin parser error       | Reference code stub file      |
+
+#### Tag Value Constraints
+
+**Tag values cannot contain spaces.** Use hyphens instead:
+
+| Invalid                          | Valid                           |
+| -------------------------------- | ------------------------------- |
+| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
+| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+
+---
+
+## Claude MD Management
+
+### Modular CLAUDE.md Architecture
+
+The package uses a **modular CLAUDE.md system** via `@libar-dev/modular-claude-md`.
+
+**Philosophy:** Optimized instructions are the 20% of context that delivers 80% of value. Different work contexts need different information.
+
+#### Directory Structure
+
+| Directory                  | Purpose                                   |
+| -------------------------- | ----------------------------------------- |
+| `_claude-md/core/`         | Project overview, commands, architecture  |
+| `_claude-md/testing/`      | Gherkin policy, vitest-cucumber rules     |
+| `_claude-md/workflow/`     | Session workflows, FSM, handoff           |
+| `_claude-md/validation/`   | Process Guard, anti-patterns              |
+| `_claude-md/api/`          | Annotations, tag formats, ProcessStateAPI |
+| `_claude-md/authoring/`    | Gherkin patterns, feature file content    |
+| `_claude-md/meta/`         | Claude MD management, deps-packages       |
+| `_claude-md/metadata.json` | Central configuration                     |
+
+#### Adding New Content
+
+1. **Create module file** in appropriate directory:
+   - Use tables over paragraphs where possible
+   - Focus on actionable rules and patterns
+   - Keep it essential and compact
+
+2. **Update metadata.json** with module path and tags
+
+3. **Validate and build:**
+
+   ```bash
+   pnpm claude-md:validate  # Check configuration
+   pnpm claude-md:build     # Regenerate CLAUDE.md
+   pnpm claude-md:info      # Review structure
+   ```
+
+4. **Commit both** module and generated CLAUDE.md files
+
+#### Content Guidelines
+
+| Guideline      | Rationale                                            |
+| -------------- | ---------------------------------------------------- |
+| Essential only | Only include what Claude needs to know               |
+| Actionable     | Rules, patterns, decisions - not prose               |
+| Compact        | Tables over paragraphs where possible                |
+| Tagged         | Use tags to control which variations include content |
+
+### External Package Sources (deps-packages/)
+
+> **Claude Code Context Only**: This directory contains git subtrees of external packages for **source code exploration during Claude Code sessions**. These are NOT the actual dependencies—those come from npm via `package.json`.
+
+**Purpose:** Enable Claude Code to read implementations, understand APIs, and reference source code without leaving the repo.
+
+**Current Packages:**
+
+| Package           | Namespace                    | Purpose                     |
+| ----------------- | ---------------------------- | --------------------------- |
+| modular-claude-md | @libar-dev/modular-claude-md | CLAUDE.md generation system |
+
+**Rules:**
+
+| Rule         | Enforcement                                   |
+| ------------ | --------------------------------------------- |
+| Read freely  | Use Glob/Grep/Read to explore implementations |
+| Don't modify | `Edit(deps-packages/**)` denied               |
+| Don't push   | `git subtree push` blocked by settings        |
+
+**Updating packages:**
+
+```bash
+# Update to a specific tag
+git subtree pull --prefix=deps-packages/<name> <remote> <tag> --squash
+
+# Example:
+git subtree pull --prefix=deps-packages/modular-claude-md modular-claude-md v1.0.0 --squash
 ```
 
 ---
