@@ -21,6 +21,7 @@ reviews:
     - 'tests/**'
     - 'docs/**'
     - '.github/**'
+    - 'delivery-process/**'
 
   # Path-specific review guidance
   path_instructions:
@@ -44,6 +45,13 @@ reviews:
         Validate Gherkin syntax and best practices.
         Ensure scenarios are clear and follow BDD patterns.
         Check that feature files align with implemented step definitions.
+
+    - path: 'delivery-process/**/*.feature'
+      instructions: |
+        Validate Gherkin syntax and best practices.
+        These are specification files for roadmap patterns and decisions.
+        Ensure scenarios define clear acceptance criteria.
+        Check that @libar-docs tags are properly set (status, phase, etc.).
 
     - path: 'docs/**/*.md'
       instructions: |
