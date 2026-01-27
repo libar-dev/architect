@@ -1,4 +1,5 @@
 @opportunity-8
+@libar-docs
 @capstone
 @libar-docs-pattern:LivingRoadmapCLI
 @libar-docs-status:roadmap

@@ -232,7 +232,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
         feature: {
           name: 'InvalidPattern',
           description: 'Invalid pattern',
-          tags: ['pattern:InvalidPattern', 'status:roadmap', 'phase:0'], // phase:0 fails validation
+          tags: ['libar-docs', 'pattern:InvalidPattern', 'status:roadmap', 'phase:0'], // phase:0 fails validation
           language: 'en',
           line: 1,
         },
@@ -285,7 +285,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
         feature: {
           name: 'WarningPattern',
           description: 'Pattern that triggers validation',
-          tags: ['pattern:WarningPattern', 'status:roadmap', 'phase:-1'], // negative phase fails
+          tags: ['libar-docs', 'pattern:WarningPattern', 'status:roadmap', 'phase:-1'], // negative phase fails
           language: 'en',
           line: 1,
         },

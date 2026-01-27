@@ -1,3 +1,4 @@
+@libar-docs
 @libar-docs-pattern:ProcessGuardLinter
 @libar-docs-status:completed
 @libar-docs-unlock-reason:Complete-deliverables-for-v1.0.0-release

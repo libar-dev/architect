@@ -121,7 +121,9 @@ async function main() {
         }
         const { instance: dpInstance, isDefault, path: configPath } = configResult.value;
         const tagRegistry = dpInstance.registry;
-        const sourcePath = !isDefault && configPath ? configPath : '(default libar-generic preset)';
+        const sourcePath = !isDefault && configPath
+            ? path.relative(config.baseDir, configPath)
+            : '(default libar-generic preset)';
         console.log(`  Loaded: ${sourcePath}`);
         // Check if output file exists
         const outputPath = path.isAbsolute(config.output)

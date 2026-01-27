@@ -1,3 +1,4 @@
+@libar-docs
 @libar-docs-pattern:ReleaseAssociationRules
 @libar-docs-status:roadmap
 @libar-docs-phase:100

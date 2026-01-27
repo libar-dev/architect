@@ -1,4 +1,5 @@
 @opportunity-6
+@libar-docs
 @libar-docs-pattern:ProgressiveGovernance
 @libar-docs-status:roadmap
 @libar-docs-phase:100

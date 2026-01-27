@@ -1,4 +1,5 @@
 @opportunity-5
+@libar-docs
 @libar-docs-pattern:ArchitectureDelta
 @libar-docs-status:roadmap
 @libar-docs-phase:100

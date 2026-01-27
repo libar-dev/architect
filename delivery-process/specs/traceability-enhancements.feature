@@ -1,4 +1,5 @@
 @opportunity-4
+@libar-docs
 @libar-docs-pattern:TraceabilityEnhancements
 @libar-docs-status:roadmap
 @libar-docs-phase:100

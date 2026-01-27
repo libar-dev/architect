@@ -1,4 +1,5 @@
 @opportunity-3
+@libar-docs
 @libar-docs-pattern:EffortVarianceTracking
 @libar-docs-status:roadmap
 @libar-docs-phase:100

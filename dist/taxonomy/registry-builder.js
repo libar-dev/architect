@@ -273,7 +273,7 @@ export function buildRegistry() {
             {
                 tag: 'api-ref',
                 format: 'csv',
-                purpose: "File paths to implementation APIs (replaces 'See:' markdown text in Rules)",
+                purpose: "File paths to implementation APIs (replaces 'See:' Markdown text in Rules)",
                 example: '@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts',
             },
             // Architecture diagram generation tags

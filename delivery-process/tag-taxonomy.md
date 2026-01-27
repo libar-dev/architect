@@ -1,6 +1,6 @@
 # Tag Taxonomy Reference
 
-> ⚠️ **Auto-generated from `/Users/darkomijic/dev-projects/delivery-process/delivery-process.config.ts`** - Do not edit manually.
+> ⚠️ **Auto-generated from `delivery-process.config.ts`** - Do not edit manually.
 
 ## File Opt-In
 
@@ -61,7 +61,7 @@ Sorted by priority (lower number = higher priority):
 | `@libar-docs-executable-specs`  | csv          | Links roadmap spec to package executable spec locations (PDR-007)          | No       | `@libar-docs-executable-specs platform-decider/tests/features/behavior` |
 | `@libar-docs-roadmap-spec`      | value        | Links package spec back to roadmap pattern for traceability (PDR-007)      | No       | `@libar-docs-roadmap-spec DeciderPattern`                               |
 | `@libar-docs-see-also`          | csv          | Related patterns for cross-reference without dependency implication        | No       | `@libar-docs-see-also AgentAsBoundedContext, CrossContextIntegration`   |
-| `@libar-docs-api-ref`           | csv          | File paths to implementation APIs (replaces 'See:' markdown text in Rules) | No       | `@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts` |
+| `@libar-docs-api-ref`           | csv          | File paths to implementation APIs (replaces 'See:' Markdown text in Rules) | No       | `@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts` |
 | `@libar-docs-arch-role`         | enum         | Architectural role for diagram generation (component type)                 | No       | `@libar-docs-arch-role projection`                                      |
 | `@libar-docs-arch-context`      | value        | Bounded context this component belongs to (for subgraph grouping)          | No       | `@libar-docs-arch-context orders`                                       |
 | `@libar-docs-arch-layer`        | enum         | Architectural layer for layered diagrams                                   | No       | `@libar-docs-arch-layer application`                                    |
