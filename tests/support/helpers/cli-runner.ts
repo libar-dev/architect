@@ -9,6 +9,7 @@
 
 import { spawn } from 'node:child_process';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // =============================================================================
 // Types
@@ -48,7 +49,9 @@ const DEFAULT_TIMEOUT = 30000;
  * Path to the project root directory.
  * CLI sources are located relative to this.
  */
-const PROJECT_ROOT = path.resolve(import.meta.dirname, '../../..');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 
 // =============================================================================
 // CLI Runner

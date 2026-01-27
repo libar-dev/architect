@@ -291,7 +291,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           throw new Error('No JSON object found in output');
         }
         const jsonStr = output.substring(jsonStart);
-        expect(() => JSON.parse(jsonStr)).not.toThrow();
+        expect(() => JSON.parse(jsonStr) as unknown).not.toThrow();
       });
     });
 

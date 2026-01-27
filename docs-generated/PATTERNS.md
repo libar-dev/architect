@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 71/104 (68% complete)
+**Overall:** [█████████████░░░░░░░] 71/108 (66% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 71 |
 | 🚧 Active | 13 |
-| 📋 Planned | 20 |
-| **Total** | 104 |
+| 📋 Planned | 24 |
+| **Total** | 108 |
 
 ---
 
@@ -23,7 +23,7 @@
 - [Cli](#cli) (6)
 - [Config](#config) (1)
 - [Core](#core) (45)
-- [DDD](#ddd) (17)
+- [DDD](#ddd) (21)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
 - [Infra](#infra) (1)
@@ -131,10 +131,13 @@
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 | 📋 Business Rules Codec | Core | planned | Transforms MasterDataset into a RenderableDocument for business rules output. |
 | 📋 Business Rules Generator | DDD | planned | Business Value: Enable stakeholders to understand domain constraints without reading implementation details or full... |
+| 📋 Cli Behavior Testing | DDD | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
+| 📋 Codec Behavior Testing | DDD | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
 |  Document Codecs | Core | planned | Barrel export for all document codecs. |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
+| 📋 Generator Infrastructure Testing | DDD | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
@@ -145,6 +148,7 @@
 |  Renderable Document Model (RDM) | Core | planned | Unified document generation using codecs and a universal renderer. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
+| 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
 
@@ -225,7 +229,7 @@
 
 ### DDD
 
-6/17 complete (35%)
+6/21 complete (29%)
 
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -235,7 +239,10 @@
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
+- [📋 Cli Behavior Testing](patterns/cli-behavior-testing.md)
+- [📋 Codec Behavior Testing](patterns/codec-behavior-testing.md)
 - [📋 Cross Source Validation](patterns/cross-source-validation.md)
+- [📋 Generator Infrastructure Testing](patterns/generator-infrastructure-testing.md)
 - [📋 Phase Numbering Conventions](patterns/phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](patterns/prd-implementation-section.md)
 - [📋 Process State API CLI](patterns/process-state-apicli.md)
@@ -243,6 +250,7 @@
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
+- [📋 Step Definition Completion](patterns/step-definition-completion.md)
 - [📋 Traceability Generator](patterns/traceability-generator.md)
 
 ---
@@ -413,18 +421,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -438,6 +434,18 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset

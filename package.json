@@ -94,7 +94,9 @@
     "release:patch": "npm version patch",
     "release:minor": "npm version minor",
     "release:major": "npm version major",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pr:comments": "node scripts/fetch-pr-comments.mjs",
+    "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread"
   },
   "keywords": [
     "source-first",
