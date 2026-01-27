@@ -10,6 +10,12 @@
  * existing DocumentGenerator interface. This allows codec-based document
  * generation to work seamlessly with the existing orchestrator.
  *
+ * ### When to Use
+ *
+ * - When creating a new document type generator using the RDM codec pattern
+ * - When adapting a Zod codec to the DocumentGenerator interface
+ * - When understanding how codec-based generation integrates with the orchestrator
+ *
  * Architecture:
  * ```
  * GeneratorContext.masterDataset → Codec.decode() → RenderableDocument → renderDocumentWithFiles() → OutputFile[]

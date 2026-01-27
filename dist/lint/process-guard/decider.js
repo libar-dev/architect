@@ -10,6 +10,12 @@
  * Pure function that validates changes against process rules.
  * Follows the Decider pattern from platform-core: no I/O, no side effects.
  *
+ * ### When to Use
+ *
+ * - When validating proposed changes against delivery process rules
+ * - When implementing custom validation rules for the process guard
+ * - When building pre-commit hooks that enforce FSM transitions
+ *
  * ### Design Principles
  *
  * - **Pure Function**: (state, changes, options) => result
@@ -154,6 +160,7 @@ function checkProtectionLevel(state, changes, registry) {
  * Check status transition validity.
  *
  * Uses FSM validation from phase-state-machine module.
+ * Enhanced error messages include line numbers and docstring context.
  */
 function checkStatusTransitions(state, changes) {
     const violations = [];
@@ -161,7 +168,25 @@ function checkStatusTransitions(state, changes) {
         const validationResult = validateTransition(transition.from, transition.to);
         if (!validationResult.valid) {
             const validTransitions = getValidTransitionsFrom(transition.from);
-            violations.push(createViolation('invalid-status-transition', 'error', `Invalid status transition in '${file}': ${transition.from} → ${transition.to}`, file, `Valid transitions from '${transition.from}': ${validTransitions.join(', ')}`));
+            // Build detailed message with context
+            const fileContext = transition.isNewFile === true ? ' (new file)' : '';
+            const lineInfo = transition.toLocation ? ` at line ${transition.toLocation.lineNumber}` : '';
+            const message = `Invalid status transition in '${file}'${fileContext}${lineInfo}: ${transition.from} → ${transition.to}`;
+            // Build suggestion with debugging hints
+            let suggestion = `Valid transitions from '${transition.from}': ${validTransitions.join(', ')}`;
+            // Add docstring debugging info if multiple tags were found
+            if (transition.allDetectedTags && transition.allDetectedTags.length > 1) {
+                const docstringTags = transition.allDetectedTags.filter((t) => t.insideDocstring);
+                if (docstringTags.length > 0) {
+                    suggestion += `\n    Note: ${docstringTags.length} status tag(s) inside docstrings were ignored`;
+                    suggestion += '\n    Detected tags:';
+                    for (const tag of transition.allDetectedTags) {
+                        const context = tag.insideDocstring ? ' [inside docstring - ignored]' : ' [file-level]';
+                        suggestion += `\n      Line ${tag.lineNumber}${context}`;
+                    }
+                }
+            }
+            violations.push(createViolation('invalid-status-transition', 'error', message, file, suggestion));
         }
     }
     return violations;

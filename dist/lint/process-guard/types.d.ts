@@ -13,6 +13,12 @@
  * - Validation results (violations and warnings)
  * - Session scoping types
  *
+ * ### When to Use
+ *
+ * - When importing types for process guard implementations
+ * - When implementing custom validation rules or decider functions
+ * - When working with process state or change detection results
+ *
  * ### Design Principles
  *
  * - Types enable pure Decider pattern (no I/O in validation)
@@ -88,11 +94,29 @@ export interface ChangeDetection {
     readonly deliverableChanges: ReadonlyMap<string, DeliverableChange>;
 }
 /**
+ * Location of a detected status tag in the git diff.
+ * Used for debugging false positives and enhancing error messages.
+ */
+export interface StatusTagLocation {
+    /** Line number in the new file version */
+    readonly lineNumber: number;
+    /** Whether this tag was inside a docstring (""") */
+    readonly insideDocstring: boolean;
+    /** The raw line from git diff (for debugging) */
+    readonly rawLine: string;
+}
+/**
  * A status transition detected in a file.
  */
 export interface StatusTransition {
     readonly from: ProcessStatusValue;
     readonly to: ProcessStatusValue;
+    /** True if this is a new file (no previous status, defaults from 'roadmap') */
+    readonly isNewFile?: boolean;
+    /** Location of the 'to' status tag */
+    readonly toLocation?: StatusTagLocation;
+    /** All status tags found in diff (for debugging false positives) */
+    readonly allDetectedTags?: readonly StatusTagLocation[];
 }
 /**
  * Deliverable changes detected in a file's Background table.

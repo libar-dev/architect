@@ -1,7 +1,19 @@
 /**
- * Registry Builder
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern TagRegistryBuilder
+ * @libar-docs-status completed
+ *
+ * ## Tag Registry Builder
  *
  * Constructs a complete TagRegistry from TypeScript constants.
+ * Provides the default tag definitions for the delivery-process annotation system.
+ *
+ * ### When to Use
+ *
+ * - When building custom tag registries with modified definitions
+ * - When accessing tag metadata (format, purpose, values)
+ * - When initializing the taxonomy for pattern extraction
  */
 import { CATEGORIES } from './categories.js';
 import { ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, GLOBAL_FORMAT_OPTIONS, PRIORITY_VALUES, WORKFLOW_VALUES, } from './generator-options.js';

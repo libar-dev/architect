@@ -9,6 +9,12 @@
  * Barrel export for all document codecs.
  * Each codec transforms MasterDataset → RenderableDocument.
  *
+ * ### When to Use
+ *
+ * - When importing codecs for document generation
+ * - When accessing codec factory functions with custom options
+ * - When using shared helpers for rich content rendering
+ *
  * ### Factory Pattern
  *
  * Each codec exports both:

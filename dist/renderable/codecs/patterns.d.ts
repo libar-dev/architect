@@ -9,6 +9,12 @@
  * Transforms MasterDataset into a RenderableDocument for pattern registry output.
  * Generates PATTERNS.md and category detail files (patterns/*.md).
  *
+ * ### When to Use
+ *
+ * - When generating the pattern registry documentation (PATTERNS.md)
+ * - When creating category-specific pattern detail files
+ * - When building pattern overview reports with status tracking
+ *
  * ### Factory Pattern
  *
  * Use `createPatternsCodec(options)` to create a configured codec:
@@ -104,9 +110,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -163,9 +169,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -260,9 +266,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             scenarioCount: z.ZodNumber;
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
-        archRole: z.ZodOptional<z.ZodString>;
+        archRole: z.ZodOptional<z.ZodEnum<{
+            "bounded-context": "bounded-context";
+            "command-handler": "command-handler";
+            projection: "projection";
+            saga: "saga";
+            "process-manager": "process-manager";
+            infrastructure: "infrastructure";
+            repository: "repository";
+            decider: "decider";
+            "read-model": "read-model";
+            service: "service";
+        }>>;
         archContext: z.ZodOptional<z.ZodString>;
-        archLayer: z.ZodOptional<z.ZodString>;
+        archLayer: z.ZodOptional<z.ZodEnum<{
+            domain: "domain";
+            infrastructure: "infrastructure";
+            application: "application";
+        }>>;
     }, z.core.$strict>>;
     tagRegistry: z.ZodObject<{
         $schema: z.ZodOptional<z.ZodString>;
@@ -315,9 +336,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -374,9 +395,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -471,9 +492,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
         active: z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -489,9 +525,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -548,9 +584,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -645,9 +681,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
         planned: z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -663,9 +714,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -722,9 +773,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -819,9 +870,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
     }, z.core.$strip>;
     byPhase: z.ZodArray<z.ZodObject<{
@@ -841,9 +907,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -900,9 +966,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -997,9 +1063,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
         counts: z.ZodObject<{
             completed: z.ZodNumber;
@@ -1022,9 +1103,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1081,9 +1162,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1178,9 +1259,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             scenarioCount: z.ZodNumber;
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
-        archRole: z.ZodOptional<z.ZodString>;
+        archRole: z.ZodOptional<z.ZodEnum<{
+            "bounded-context": "bounded-context";
+            "command-handler": "command-handler";
+            projection: "projection";
+            saga: "saga";
+            "process-manager": "process-manager";
+            infrastructure: "infrastructure";
+            repository: "repository";
+            decider: "decider";
+            "read-model": "read-model";
+            service: "service";
+        }>>;
         archContext: z.ZodOptional<z.ZodString>;
-        archLayer: z.ZodOptional<z.ZodString>;
+        archLayer: z.ZodOptional<z.ZodEnum<{
+            domain: "domain";
+            infrastructure: "infrastructure";
+            application: "application";
+        }>>;
     }, z.core.$strict>>>;
     byCategory: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
         id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -1196,9 +1292,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1255,9 +1351,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
             completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1352,9 +1448,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             scenarioCount: z.ZodNumber;
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
-        archRole: z.ZodOptional<z.ZodString>;
+        archRole: z.ZodOptional<z.ZodEnum<{
+            "bounded-context": "bounded-context";
+            "command-handler": "command-handler";
+            projection: "projection";
+            saga: "saga";
+            "process-manager": "process-manager";
+            infrastructure: "infrastructure";
+            repository: "repository";
+            decider: "decider";
+            "read-model": "read-model";
+            service: "service";
+        }>>;
         archContext: z.ZodOptional<z.ZodString>;
-        archLayer: z.ZodOptional<z.ZodString>;
+        archLayer: z.ZodOptional<z.ZodEnum<{
+            domain: "domain";
+            infrastructure: "infrastructure";
+            application: "application";
+        }>>;
     }, z.core.$strict>>>;
     bySource: z.ZodObject<{
         typescript: z.ZodArray<z.ZodObject<{
@@ -1371,9 +1482,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1430,9 +1541,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1527,9 +1638,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
         gherkin: z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -1545,9 +1671,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1604,9 +1730,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1701,9 +1827,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
         roadmap: z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -1719,9 +1860,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1778,9 +1919,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1875,9 +2016,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
         prd: z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -1893,9 +2049,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1952,9 +2108,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2049,9 +2205,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
     }, z.core.$strip>;
     counts: z.ZodObject<{
@@ -2093,9 +2264,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2152,9 +2323,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2249,9 +2420,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>>;
         byContext: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -2267,9 +2453,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2326,9 +2512,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2423,9 +2609,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>>;
         byLayer: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -2441,9 +2642,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2500,9 +2701,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2597,9 +2798,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>>;
         all: z.ZodArray<z.ZodObject<{
             id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
@@ -2615,9 +2831,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
                     completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2674,9 +2890,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
                 completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2771,9 +2987,24 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 scenarioCount: z.ZodNumber;
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
-            archRole: z.ZodOptional<z.ZodString>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
             archContext: z.ZodOptional<z.ZodString>;
-            archLayer: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
         }, z.core.$strict>>;
     }, z.core.$strip>>;
 }, z.core.$strip>, z.ZodObject<{

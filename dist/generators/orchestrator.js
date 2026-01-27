@@ -3,7 +3,7 @@
  * @libar-docs-core @libar-docs-infra
  * @libar-docs-pattern Documentation Generation Orchestrator
  * @libar-docs-status completed
- * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer application
  * @libar-docs-uses Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor, Generator Registry, JSON Output Codec
@@ -47,6 +47,21 @@ import { detectBranchChanges, getAllChangedFiles } from '../lint/process-guard/d
  * Codec for serializing registry metadata to JSON
  */
 const RegistryMetadataCodec = createJsonOutputCodec(RegistryMetadataOutputSchema);
+/**
+ * Validate that a file path resolves within a base directory.
+ *
+ * Prevents path traversal attacks where a malicious file path like "../../../etc/passwd"
+ * could escape the intended output directory.
+ *
+ * @param filePath - Relative file path to validate
+ * @param baseDir - Base directory that the path must stay within
+ * @returns true if resolved path is within baseDir, false otherwise
+ */
+function isPathWithinDir(filePath, baseDir) {
+    const resolvedPath = path.resolve(baseDir, filePath);
+    const normalizedBase = path.resolve(baseDir) + path.sep;
+    return resolvedPath.startsWith(normalizedBase) || resolvedPath === path.resolve(baseDir);
+}
 /**
  * Generate documentation from TypeScript source code
  *
@@ -281,6 +296,16 @@ export async function generateDocumentation(options) {
         // Write files
         for (const file of output.files) {
             const fullPath = path.join(options.outputDir, file.path);
+            // Security: Validate path stays within output directory (prevent path traversal)
+            if (!isPathWithinDir(file.path, options.outputDir)) {
+                errors.push({
+                    type: 'file-write',
+                    message: `Path traversal attempt blocked: ${file.path}`,
+                    filePath: file.path,
+                    generator: trimmedName,
+                });
+                continue;
+            }
             const dir = path.dirname(fullPath);
             // Check if file exists and overwrite is disabled
             let fileExists = false;
@@ -365,6 +390,15 @@ export async function generateDocumentation(options) {
         // Handle file cleanup (for session file lifecycle management)
         if (output.filesToDelete && output.filesToDelete.length > 0) {
             for (const fileToDelete of output.filesToDelete) {
+                // Security: Validate path stays within output directory (prevent path traversal)
+                if (!isPathWithinDir(fileToDelete, options.outputDir)) {
+                    warnings.push({
+                        type: 'cleanup',
+                        message: `Path traversal blocked in cleanup: ${fileToDelete}`,
+                        filePath: fileToDelete,
+                    });
+                    continue;
+                }
                 const fullPath = path.join(options.outputDir, fileToDelete);
                 try {
                     await fs.unlink(fullPath);

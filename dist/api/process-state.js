@@ -3,16 +3,22 @@
  * @libar-docs-core
  * @libar-docs-pattern ProcessStateAPI
  * @libar-docs-status active
- * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context api
  * @libar-docs-arch-layer application
- * @libar-docs-depends-on:MasterDataset
- * @libar-docs-depends-on:FSMValidator
+ * @libar-docs-uses MasterDataset, FSMValidator
  *
  * ## Process State API - Programmatic Query Interface
  *
  * TypeScript interface for querying delivery process state.
  * Designed for Claude Code integration and programmatic access.
+ *
+ * ### When to Use
+ *
+ * - When querying patterns by status, phase, or relationships
+ * - When validating FSM transitions before making changes
+ * - When building dashboards or reports on delivery progress
+ * - When Claude Code needs real-time delivery state (prefer over reading Markdown)
  *
  * ### Key Features
  *
