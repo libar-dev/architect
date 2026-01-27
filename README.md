@@ -349,14 +349,26 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for custom presets.
 
 ## Documentation
 
-| Document                                             | Purpose                        |
-| ---------------------------------------------------- | ------------------------------ |
-| [docs/INDEX.md](docs/INDEX.md)                       | Documentation navigation hub   |
-| [docs/METHODOLOGY.md](docs/METHODOLOGY.md)           | Core thesis and FSM workflow   |
-| [docs/PROCESS-GUARD.md](docs/PROCESS-GUARD.md)       | Workflow enforcement rules     |
-| [docs/GHERKIN-PATTERNS.md](docs/GHERKIN-PATTERNS.md) | Writing effective specs        |
-| [docs/CONFIGURATION.md](docs/CONFIGURATION.md)       | Presets and custom tags        |
-| [INSTRUCTIONS.md](INSTRUCTIONS.md)                   | Complete tag reference and CLI |
+**[docs/INDEX.md](docs/INDEX.md)** provides a complete table of contents with section links, line numbers, and reading paths by role.
+
+**Start here:**
+
+| Document                               | When to read                 |
+| -------------------------------------- | ---------------------------- |
+| [README](README.md)                    | Installation and quick start |
+| [CONFIGURATION](docs/CONFIGURATION.md) | Setting up presets and tags  |
+| [METHODOLOGY](docs/METHODOLOGY.md)     | Understanding the "why"      |
+
+**Go deeper:**
+
+| Document                                     | Audience   | Focus                     |
+| -------------------------------------------- | ---------- | ------------------------- |
+| [ARCHITECTURE](docs/ARCHITECTURE.md)         | Developers | Pipeline, codecs, schemas |
+| [SESSION-GUIDES](docs/SESSION-GUIDES.md)     | AI/Devs    | Day-to-day workflows      |
+| [GHERKIN-PATTERNS](docs/GHERKIN-PATTERNS.md) | Writers    | Writing effective specs   |
+| [PROCESS-GUARD](docs/PROCESS-GUARD.md)       | Team Leads | FSM enforcement rules     |
+| [VALIDATION](docs/VALIDATION.md)             | CI/CD      | Automated quality checks  |
+| [INSTRUCTIONS](INSTRUCTIONS.md)              | Reference  | Tag and CLI reference     |
 
 ---
 

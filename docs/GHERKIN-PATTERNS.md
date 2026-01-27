@@ -1,209 +1,243 @@
-# Delivery Process Methodology
+# Gherkin Patterns Guide
 
-> **Git is the event store. Documentation artifacts are projections. Annotated code is the single source of truth.**
+Practical patterns for writing Gherkin specs that work with `delivery-process` generators.
 
-This document explains the _why_ behind `@libar-dev/delivery-process`. For _how_, see [INSTRUCTIONS.md](../INSTRUCTIONS.md).
-
----
-
-## Core Thesis
-
-Traditional documentation fails because it exists outside the code. Developers update code, forget to update docs, and the gap widens until docs become fiction.
-
-**The USDP (Unified Software Delivery Process) inverts this:**
-
-| Traditional Approach           | USDP Approach                      |
-| ------------------------------ | ---------------------------------- |
-| Docs are written               | Docs are generated                 |
-| Status is tracked manually     | Status is FSM-enforced             |
-| Requirements live in Jira      | Requirements are Gherkin scenarios |
-| AI agents parse stale Markdown | AI agents query typed APIs         |
-
-### The Insight
-
-Event sourcing teaches us: **derive state, don't store it**. Apply this to documentation:
-
-- **Events** = Git commits (changes to annotated code)
-- **Projections** = Generated docs (PATTERNS.md, ROADMAP.md)
-- **Read Model** = ProcessStateAPI (typed queries)
-
-When you run `generate-docs`, you're rebuilding read models from the event stream. The source annotations are always authoritative.
+> **Tag Reference:** For the complete tag list, see [INSTRUCTIONS.md](../INSTRUCTIONS.md#category-tags).
 
 ---
 
-## Dogfooding: This Package Documents Itself
+## Essential Patterns
 
-Every pattern in this package uses its own annotation system. Real examples:
+### 1. Roadmap Spec Structure
 
-**ProcessGuardDecider** (pure validation logic):
-
-```typescript
-/**
- * @libar-docs
- * @libar-docs-pattern ProcessGuardDecider
- * @libar-docs-status completed
- * @libar-docs-uses FSMTransitions, FSMStates
- * @libar-docs-used-by LintModule
- */
-export function validateChanges(input: ValidationInput): ValidationOutput { ... }
-```
-
-**PatternScanner** (file discovery):
-
-```typescript
-/**
- * @libar-docs
- * @libar-docs-pattern PatternScanner
- * @libar-docs-status completed
- * @libar-docs-uses GherkinASTParser, TypeScriptASTParser
- * @libar-docs-used-by Orchestrator, DualSourceExtractor
- */
-export async function scanPatterns(config: ScanConfig): Promise<ScannedFile[]> { ... }
-```
-
-Run `pnpm docs:patterns` and these annotations become a searchable pattern registry with dependency graphs.
-
----
-
-## Four-Stage Workflow
-
-| Stage        | Input               | Output                    | FSM State                            |
-| ------------ | ------------------- | ------------------------- | ------------------------------------ |
-| **Ideation** | Pattern brief       | Roadmap spec (`.feature`) | `roadmap`                            |
-| **Design**   | Complex requirement | Design document           | `roadmap`                            |
-| **Planning** | Roadmap spec        | Implementation plan       | `roadmap`                            |
-| **Coding**   | Implementation plan | Code + tests              | `roadmap` -> `active` -> `completed` |
-
-**When to skip stages:**
-
-| Skip     | When                                                  |
-| -------- | ----------------------------------------------------- |
-| Design   | Single valid approach, straightforward implementation |
-| Planning | Single-session work, clear scope                      |
-| Neither  | Multi-session work, architectural decisions           |
-
----
-
-## Annotation Ownership Strategy
-
-> **Split-Ownership Principle:** Feature files own _what_ and _when_ (planning). Code stubs own _how_ and _with what_ (implementation). Neither duplicates the other.
-
-### Feature Files Own (Planning)
-
-| Tag                    | Purpose                                                  |
-| ---------------------- | -------------------------------------------------------- |
-| `@<prefix>-status`     | FSM state (`roadmap`, `active`, `completed`, `deferred`) |
-| `@<prefix>-phase`      | Milestone sequencing                                     |
-| `@<prefix>-depends-on` | Pattern-level roadmap dependencies                       |
-| `@<prefix>-enables`    | What this unblocks                                       |
-| `@<prefix>-release`    | Version targeting                                        |
-
-### Code Stubs Own (Implementation)
-
-| Tag                 | Purpose                                              |
-| ------------------- | ---------------------------------------------------- |
-| `@<prefix>-uses`    | Technical dependencies (what this calls)             |
-| `@<prefix>-used-by` | Technical consumers (what calls this)                |
-| `@<prefix>-usecase` | When/how to use                                      |
-| Category flags      | Domain classification (`core`, `api`, `infra`, etc.) |
-
-### Example Split
-
-**Feature file** (specs/my-pattern.feature):
+Roadmap specs define planned work with Problem/Solution descriptions and a Background deliverables table.
 
 ```gherkin
-@libar-docs
-@libar-docs-pattern:EventStoreDurability
+@libar-docs-pattern:ProcessGuardLinter
 @libar-docs-status:roadmap
-@libar-docs-phase:18
-@libar-docs-depends-on:EventStoreFoundation
-@libar-docs-enables:SagaEngine
-Feature: Event Store Durability
+@libar-docs-phase:99
+Feature: Process Guard Linter
+
+  **Problem:**
+  During planning and implementation sessions, accidental modifications occur:
+  - Specs outside the intended scope get modified in bulk
+  - Completed/approved work gets inadvertently changed
+
+  **Solution:**
+  Implement a Decider-based linter that:
+  1. Derives process state from existing file annotations
+  2. Validates proposed changes against derived state
+  3. Enforces file protection levels per PDR-005
+
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable                   | Status  | Location                           |
+      | State derivation              | Pending | src/lint/process-guard/derive.ts   |
+      | Git diff change detection     | Pending | src/lint/process-guard/detect.ts   |
+      | CLI integration               | Pending | src/cli/lint-process.ts            |
 ```
 
-**Code stub** (src/event-store/durability.ts):
+**Key elements:**
 
-```typescript
-/**
- * @libar-docs
- * @libar-docs-status roadmap
- * @libar-docs-event-sourcing
- * @libar-docs-uses EventStoreFoundation, Workpool
- * @libar-docs-used-by SagaEngine, CommandOrchestrator
- */
+- `@libar-docs-pattern:Name` - Unique identifier (required)
+- `@libar-docs-status:roadmap` - FSM state
+- `**Problem:**` / `**Solution:**` - Extracted by generators
+- Background deliverables table - Tracks implementation progress
+
+### 2. Rule Blocks for Business Constraints
+
+Use `Rule:` to group related scenarios under a business constraint.
+
+```gherkin
+Rule: Status transitions must follow PDR-005 FSM
+
+  @happy-path
+  Scenario Outline: Valid transitions pass validation
+    Given a file with status "<from>"
+    When the status changes to "<to>"
+    Then validation passes
+
+    Examples:
+      | from     | to        |
+      | roadmap  | active    |
+      | roadmap  | deferred  |
+      | active   | completed |
+      | deferred | roadmap   |
+
+  @edge-case
+  Scenario Outline: Invalid transitions fail validation
+    Given a file with status "<from>"
+    When the status changes to "<to>"
+    Then validation fails with "invalid-status-transition"
+
+    Examples:
+      | from      | to        |
+      | roadmap   | completed |
+      | deferred  | active    |
+      | completed | roadmap   |
 ```
 
-Note: Code stubs must NOT use `@<prefix>-pattern`. The feature file is the canonical pattern definition.
+Rules provide semantic grouping - generators extract them for business rules documentation.
+
+### 3. Scenario Outline for Variations
+
+When the same pattern applies with different inputs, use `Scenario Outline` with an `Examples` table.
+
+```gherkin
+Scenario Outline: Protection levels by status
+  Given a file with status "<status>"
+  When checking protection level
+  Then protection is "<protection>"
+  And unlock required is "<unlock>"
+
+  Examples:
+    | status    | protection | unlock |
+    | roadmap   | none       | no     |
+    | active    | scope      | no     |
+    | completed | hard       | yes    |
+    | deferred  | none       | no     |
+```
+
+### 4. Executable Test Feature
+
+Test features focus on behavior verification with section dividers for organization.
+
+```gherkin
+@behavior @scanner-core
+@libar-docs-pattern:ScannerCore
+Feature: Scanner Core Integration
+  The scanPatterns function orchestrates file discovery and AST parsing.
+
+  **Problem:**
+  - Need to scan codebases for documentation directives efficiently
+  - Files without @libar-docs opt-in should be skipped
+
+  **Solution:**
+  - Two-phase filtering: quick regex check, then file opt-in validation
+  - Result monad pattern captures errors without failing entire scan
+
+  Background:
+    Given a scanner integration context with temp directory
+
+  # ==========================================================================
+  # Basic Scanning
+  # ==========================================================================
+
+  @happy-path
+  Scenario: Scan files and extract directives
+    Given a file "src/auth.ts" with content:
+      """
+      /** @libar-docs */
+
+      /** @libar-docs-core */
+      export function authenticate() {}
+      """
+    When scanning with pattern "src/**/*.ts"
+    Then the scan should succeed with 1 file
+
+  # ==========================================================================
+  # Error Handling
+  # ==========================================================================
+
+  @error-handling
+  Scenario: Collect errors for files that fail to parse
+    Given a file "src/valid.ts" with valid content
+    And a file "src/invalid.ts" with syntax errors
+    When scanning with pattern "src/**/*.ts"
+    Then the scan should succeed with 1 file
+    And the scan should have 1 error
+```
+
+Section comments (`# ===`) improve readability in large feature files.
 
 ---
 
-## Two-Tier Spec Architecture
+## DataTable and DocString Usage
 
-| Tier        | Location                | Purpose                                     | Executable |
-| ----------- | ----------------------- | ------------------------------------------- | ---------- |
-| **Roadmap** | `specs/{area}/`         | Planning, deliverables, acceptance criteria | No         |
-| **Package** | `{pkg}/tests/features/` | Implementation proof, regression testing    | Yes        |
+### Background DataTable (Reference Data)
 
-**Traceability:**
+Use for data that applies to all scenarios - deliverables, definitions, etc.
 
-- Roadmap spec: `@<prefix>-executable-specs:{package}/tests/features/behavior/{feature}`
-- Package spec: `@<prefix>-implements:{PatternName}`
+```gherkin
+Background: Deliverables
+  Given the following deliverables:
+    | Deliverable        | Status  | Location               | Tests |
+    | Category types     | Done    | src/types.ts           | Yes   |
+    | Validation logic   | Pending | src/validate.ts        | Yes   |
+```
 
-This separation keeps test output clean (no roadmap noise) while maintaining bidirectional traceability.
+### Scenario DataTable (Test Data)
+
+Use for scenario-specific test inputs.
+
+```gherkin
+Scenario: Session file defines modification scope
+  Given a session file with in-scope specs:
+    | spec                        | intent |
+    | mvp-workflow-implementation | modify |
+    | short-form-tag-migration    | review |
+  When deriving process state
+  Then "mvp-workflow-implementation" is modifiable
+```
+
+### DocString for Code Examples
+
+Use `"""typescript` for code blocks. Essential when content contains pipes or special characters.
+
+```gherkin
+Scenario: Extract directive from TypeScript
+  Given a file with content:
+    """typescript
+    /** @libar-docs */
+
+    /**
+     * @libar-docs-core
+     * Authentication utilities
+     */
+    export function authenticate() {}
+    """
+  When scanning the file
+  Then directive should have tag "@libar-docs-core"
+```
 
 ---
 
-## Code Stubs
+## Tag Conventions
 
-Code is the source of truth. Feature files reference code, not duplicate it.
+| Tag               | Purpose                              |
+| ----------------- | ------------------------------------ |
+| `@happy-path`     | Primary success scenario             |
+| `@edge-case`      | Boundary conditions, unusual inputs  |
+| `@error-handling` | Error recovery, graceful degradation |
+| `@validation`     | Input validation, constraint checks  |
+| `@integration`    | Cross-component behavior             |
+| `@poc`            | Proof of concept, experimental       |
 
-```typescript
-/**
- * @libar-docs
- * @libar-docs-status roadmap
- *
- * ## Reservation Pattern - TTL-Based Pre-Creation Uniqueness
- */
-export function reserve(ctx: MutationCtx, args: ReserveArgs): Promise<ReservationResult> {
-  throw new Error('Not yet implemented - roadmap pattern');
-}
+Combine with feature-level tags for filtering:
+
+```gherkin
+@behavior @scanner-core
+@libar-docs-pattern:ScannerCore
+Feature: Scanner Core Integration
 ```
-
-| Level         | Contains                  | When                       |
-| ------------- | ------------------------- | -------------------------- |
-| **Minimal**   | JSDoc annotations only    | Quick exploration          |
-| **Interface** | Types + stub functions    | API contracts              |
-| **Partial**   | Working code + some stubs | Progressive implementation |
 
 ---
 
-## Planning Stubs Architecture
+## Quick Reference
 
-Step definitions created during Planning sessions go in a separate directory excluded from test execution:
-
-```
-tests/
-├── steps/              # Executable (included in test runner)
-├── planning-stubs/     # Not yet implemented (excluded)
-└── features/           # Feature files
-```
-
-| Phase          | Location          | Status                               |
-| -------------- | ----------------- | ------------------------------------ |
-| Planning       | `planning-stubs/` | `throw new Error("Not implemented")` |
-| Implementation | Move to `steps/`  | Replace with real logic              |
-| Completed      | `steps/`          | Fully executable                     |
-
-This avoids `.skip()` (forbidden by test safety policy) while preserving planning artifacts.
+| Element              | Use For                                | Example Location                            |
+| -------------------- | -------------------------------------- | ------------------------------------------- |
+| Background DataTable | Deliverables, shared reference data    | `specs/process-guard-linter.feature`        |
+| Rule:                | Group scenarios by business constraint | `tests/features/validation/*.feature`       |
+| Scenario Outline     | Same pattern with variations           | `tests/features/behavior/fsm-*.feature`     |
+| DocString `"""`      | Code examples, content with pipes      | `tests/features/behavior/scanner-*.feature` |
+| Section comments `#` | Organize large feature files           | Most test features                          |
 
 ---
 
 ## Related Documentation
 
-| Document                                     | Purpose                                         |
-| -------------------------------------------- | ----------------------------------------------- |
-| [README.md](../README.md)                    | Quick start, FSM diagram, ProcessStateAPI usage |
-| [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM validation rules, protection levels, CLI    |
-| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets, customization            |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Writing effective specs                         |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | Complete tag reference                          |
+| Document                                    | Purpose                             |
+| ------------------------------------------- | ----------------------------------- |
+| [INSTRUCTIONS.md](../INSTRUCTIONS.md)       | Complete tag reference and CLI      |
+| [docs/CONFIGURATION.md](./CONFIGURATION.md) | Preset and tag prefix configuration |
