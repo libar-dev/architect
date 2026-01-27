@@ -184,10 +184,10 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // Tag Duplication Detection
   // ===========================================================================
 
-  Rule(
-    'Code-only tags should not appear in feature files',
-    ({ RuleScenario, RuleScenarioOutline }) => {
-      RuleScenario('Feature without code-only tags passes', ({ Given, When, Then }) => {
+  Rule('Code-only tags should not appear in feature files', ({ RuleScenario }) => {
+    RuleScenario(
+      'Feature with any tags passes when no code-only tags defined',
+      ({ Given, When, Then }) => {
         Given('a feature file with tags:', (_ctx, table: Array<{ tag: string }>) => {
           state = initState();
           const tags = table.map((row) => row.tag);
@@ -201,72 +201,9 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         Then('no violations are found', () => {
           expect(state!.violations).toHaveLength(0);
         });
-      });
-
-      RuleScenarioOutline(
-        'Code-only dependency tags in features are flagged',
-        ({ Given, When, Then, And }, variables: { code_tag: string }) => {
-          Given('a feature file with code-only tag {string}', () => {
-            state = initState();
-            state.featureFiles = [createMockFeature([variables.code_tag])];
-          });
-
-          When('detecting tag duplication', () => {
-            state!.violations = detectTagDuplication(state!.featureFiles);
-          });
-
-          Then('a "tag-duplication" violation is found', () => {
-            expect(
-              state!.violations.some((v: AntiPatternViolation) => v.id === 'tag-duplication')
-            ).toBe(true);
-          });
-
-          And('the violation severity is "error"', () => {
-            const violation = state!.violations.find(
-              (v: AntiPatternViolation) => v.id === 'tag-duplication'
-            );
-            expect(violation?.severity).toBe('error');
-          });
-
-          And('the fix suggests moving to code', () => {
-            const violation = state!.violations.find(
-              (v: AntiPatternViolation) => v.id === 'tag-duplication'
-            );
-            expect(violation?.fix).toContain('@libar-docs-depends-on');
-          });
-        }
-      );
-
-      RuleScenario(
-        'Scenario-level code-only tags are also flagged',
-        ({ Given, When, Then, And }) => {
-          Given('a feature file with feature tags:', (_ctx, table: Array<{ tag: string }>) => {
-            state = initState();
-            const featureTags = table.map((row) => row.tag);
-            // Store for later combination with scenario tags
-            state.featureFiles = [createMockFeature(featureTags)];
-          });
-
-          And('scenario tags:', (_ctx, table: Array<{ tag: string }>) => {
-            const scenarioTags = table.map((row) => row.tag);
-            // Get existing feature tags and recreate with scenario tags
-            const featureTags = state!.featureFiles[0]!.feature.tags;
-            state!.featureFiles = [createMockFeature([...featureTags], scenarioTags)];
-          });
-
-          When('detecting tag duplication', () => {
-            state!.violations = detectTagDuplication(state!.featureFiles);
-          });
-
-          Then('a "tag-duplication" violation is found', () => {
-            expect(
-              state!.violations.some((v: AntiPatternViolation) => v.id === 'tag-duplication')
-            ).toBe(true);
-          });
-        }
-      );
-    }
-  );
+      }
+    );
+  });
 
   // ===========================================================================
   // Process-in-Code Detection
@@ -578,38 +515,35 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule('All anti-patterns can be detected in one pass', ({ RuleScenario }) => {
-    RuleScenario('Combined detection finds multiple issues', ({ Given, When, Then, And }) => {
-      Given('a TypeScript file with directive tags:', (_ctx, table: Array<{ tag: string }>) => {
-        state = initState();
-        const tags = table.map((row) => row.tag);
-        state.scannedFiles = [createMockScannedFile(tags)];
-      });
+    RuleScenario(
+      'Combined detection finds process-in-code issues',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with directive tags:', (_ctx, table: Array<{ tag: string }>) => {
+          state = initState();
+          const tags = table.map((row) => row.tag);
+          state.scannedFiles = [createMockScannedFile(tags)];
+        });
 
-      And('a feature file with tags:', (_ctx, table: Array<{ tag: string }>) => {
-        const tags = table.map((row) => row.tag);
-        state!.featureFiles = [createMockFeature(tags)];
-      });
+        And('a feature file with tags:', (_ctx, table: Array<{ tag: string }>) => {
+          const tags = table.map((row) => row.tag);
+          state!.featureFiles = [createMockFeature(tags)];
+        });
 
-      When('detecting all anti-patterns', () => {
-        state!.violations = detectAntiPatterns(state!.scannedFiles, state!.featureFiles);
-      });
+        When('detecting all anti-patterns', () => {
+          state!.violations = detectAntiPatterns(state!.scannedFiles, state!.featureFiles);
+        });
 
-      Then('{int} violations are found', (_ctx, count: number) => {
-        expect(state!.violations).toHaveLength(count);
-      });
+        Then('{int} violation is found', (_ctx, count: number) => {
+          expect(state!.violations).toHaveLength(count);
+        });
 
-      And('violations include "process-in-code"', () => {
-        expect(
-          state!.violations.some((v: AntiPatternViolation) => v.id === 'process-in-code')
-        ).toBe(true);
-      });
-
-      And('violations include "tag-duplication"', () => {
-        expect(
-          state!.violations.some((v: AntiPatternViolation) => v.id === 'tag-duplication')
-        ).toBe(true);
-      });
-    });
+        And('violations include "process-in-code"', () => {
+          expect(
+            state!.violations.some((v: AntiPatternViolation) => v.id === 'process-in-code')
+          ).toBe(true);
+        });
+      }
+    );
   });
 
   // ===========================================================================

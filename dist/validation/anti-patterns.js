@@ -31,14 +31,10 @@ import { DEFAULT_THRESHOLDS } from './types.js';
 import { DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 /**
  * Tags that should NOT appear in feature files (belong in code only).
- * These are kept for backward compatibility with the deprecated libar-process- prefix.
- * Gherkin parser strips @ prefix from tags.
+ * Currently empty - all deprecated libar-process-* tags have been migrated.
+ * Array kept for API stability and future extensibility.
  */
-const CODE_ONLY_TAGS = [
-    'libar-process-depends-on',
-    'libar-process-enables',
-    // Note: ${tagPrefix}depends-on and ${tagPrefix}enables ARE correct in code
-];
+const CODE_ONLY_TAGS = [];
 /**
  * Tag suffixes that should only appear in feature files, not TypeScript code.
  * These are process metadata tags that track delivery workflow state.
@@ -73,12 +69,13 @@ const MAGIC_COMMENT_PATTERNS = [
 /**
  * Detect tag duplication anti-pattern
  *
- * Finds deprecated libar-process-* tags in feature files.
- * These dependency tags belong in code using the configured tag prefix, not features.
+ * Finds code-only tags that should not appear in feature files.
+ * Currently returns empty array as all deprecated tags have been migrated.
+ * Kept for API stability and future extensibility.
  *
  * @param features - Array of scanned feature files
  * @param registry - Optional tag registry for prefix-aware messages (defaults to @libar-docs-)
- * @returns Array of anti-pattern violations
+ * @returns Array of anti-pattern violations (currently always empty)
  */
 export function detectTagDuplication(features, registry) {
     const violations = [];

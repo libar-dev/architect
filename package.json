@@ -81,7 +81,6 @@
     "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
     "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
     "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog",
-    "migrate-tags": "tsx scripts/migrate-tags.ts",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "preversion": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check",

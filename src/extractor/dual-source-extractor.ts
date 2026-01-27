@@ -93,7 +93,7 @@ export interface DualSourcePattern extends ExtractedPattern {
 export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMetadata | null {
   const tags = feature.feature.tags;
 
-  // Extract normalized tags (scanner strips @ and libar-docs-/libar-process- prefixes)
+  // Extract normalized tags (scanner strips @ and configured prefix like @libar-docs-)
   const patternTag = tags.find((t) => t.startsWith('pattern:'));
   const phaseTag = tags.find((t) => t.startsWith('phase:'));
   const statusTag = tags.find((t) => t.startsWith('status:'));

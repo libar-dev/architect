@@ -41,12 +41,13 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
 /**
  * Detect tag duplication anti-pattern
  *
- * Finds deprecated libar-process-* tags in feature files.
- * These dependency tags belong in code using the configured tag prefix, not features.
+ * Finds code-only tags that should not appear in feature files.
+ * Currently returns empty array as all deprecated tags have been migrated.
+ * Kept for API stability and future extensibility.
  *
  * @param features - Array of scanned feature files
  * @param registry - Optional tag registry for prefix-aware messages (defaults to @libar-docs-)
- * @returns Array of anti-pattern violations
+ * @returns Array of anti-pattern violations (currently always empty)
  */
 export declare function detectTagDuplication(features: readonly ScannedGherkinFile[], registry?: TagRegistry): AntiPatternViolation[];
 /**
