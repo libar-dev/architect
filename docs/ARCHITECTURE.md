@@ -110,8 +110,8 @@ createDeliveryProcess(options)
          │
          ▼
 ┌────────────────────────────────────┐
-│ 3. Build merged registry           │
-│    mergeTagRegistries(base, custom)│
+│ 3. Build registry                  │
+│    buildRegistry(categories)       │
 └────────────────────────────────────┘
          │
          ▼
@@ -181,7 +181,7 @@ interface ExtractedPattern {
 
   // Metadata from annotations
   patternName?: string;
-  status?: PatternStatus; // implemented|partial|roadmap|completed|active
+  status?: PatternStatus; // roadmap|active|completed|deferred
   phase?: number;
   quarter?: string; // Q1-2025
   release?: string; // v0.1.0 or vNEXT
@@ -260,8 +260,8 @@ interface MasterDataset {
 
   // ─── Pre-computed Views (O(1) access) ───────────────────────────────────
   byStatus: {
-    completed: ExtractedPattern[]; // status: implemented|completed
-    active: ExtractedPattern[]; // status: active|partial|in-progress
+    completed: ExtractedPattern[]; // status: completed
+    active: ExtractedPattern[]; // status: active
     planned: ExtractedPattern[]; // status: roadmap|planned|undefined
   };
 
@@ -671,7 +671,7 @@ The `detailLevel` option controls output verbosity:
  * @libar-docs                              // Required opt-in (file level)
  * @libar-docs-core @libar-docs-infra       // Category tags
  * @libar-docs-pattern MyPatternName        // Pattern name
- * @libar-docs-status implemented           // Status: implemented|partial|roadmap
+ * @libar-docs-status completed             // Status: roadmap|active|completed|deferred
  * @libar-docs-phase 14                     // Roadmap phase number
  * @libar-docs-uses OtherPattern, Another   // Dependencies (CSV)
  * @libar-docs-usecase "When doing X"       // Use cases (repeatable)
@@ -730,11 +730,11 @@ Feature: My Pattern Implementation
 
 All codecs normalize status to three canonical values:
 
-| Input Status                             | Normalized To |
-| ---------------------------------------- | ------------- |
-| `"completed"`, `"implemented"`           | `"completed"` |
-| `"active"`, `"partial"`, `"in-progress"` | `"active"`    |
-| `"roadmap"`, `"planned"`, or undefined   | `"planned"`   |
+| Input Status                            | Normalized To |
+| --------------------------------------- | ------------- |
+| `"completed"`                           | `"completed"` |
+| `"active"`                              | `"active"`    |
+| `"roadmap"`, `"deferred"`, or undefined | `"planned"`   |
 
 ---
 
@@ -802,7 +802,7 @@ Data-driven configuration for pattern categorization:
     { "tag": "generator", "domain": "Generator", "priority": 20, "aliases": ["gen"] }
   ],
   "metadataTags": [
-    { "tag": "status", "format": "enum", "values": ["implemented", "partial", "roadmap"] },
+    { "tag": "status", "format": "enum", "values": ["roadmap", "active", "completed", "deferred"] },
     { "tag": "phase", "format": "number" },
     { "tag": "release", "format": "value" },
     { "tag": "usecase", "format": "quoted-value", "repeatable": true }
@@ -829,7 +829,7 @@ Data-driven configuration for pattern categorization:
 │                                                                                  │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐│
 │  │ Step 1: Load Tag Registry                                                   ││
-│  │         loadTagRegistry() → TagRegistry                                     ││
+│  │         buildRegistry() → TagRegistry                                       ││
 │  └─────────────────────────────────────────────────────────────────────────────┘│
 │                                        │                                         │
 │                                        ▼                                         │

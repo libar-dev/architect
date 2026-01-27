@@ -99,8 +99,6 @@ Enrich patterns with structured data.
 
 **Status values:** `roadmap` (default), `active`, `completed`, `deferred`
 
-- Legacy values also accepted: `implemented`, `partial`, `in-progress`
-
 ### Relationship Tags
 
 | Tag                      | Format | Purpose                      |

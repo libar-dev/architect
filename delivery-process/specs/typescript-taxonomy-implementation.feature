@@ -51,7 +51,6 @@ Feature: TypeScript Taxonomy Implementation
   Scenario: Status values match registry purpose
     Given the package-level taxonomy
     Then PROCESS_STATUS_VALUES contains ["roadmap", "active", "completed", "deferred"]
-    And ACCEPTED_STATUS_VALUES includes legacy values for backward compatibility
     And the repo-level taxonomy follows PDR-005 FSM
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -131,7 +130,7 @@ Feature: TypeScript Taxonomy Implementation
   Scenario: Status field validation uses constant
     Given a pattern with status field
     When validated against schema
-    Then the schema references ACCEPTED_STATUS_VALUES
+    Then the schema references PROCESS_STATUS_VALUES
     And invalid status values are rejected
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -150,17 +149,11 @@ Feature: TypeScript Taxonomy Implementation
     Then all TypeScript usages are updated automatically
 
   # ─────────────────────────────────────────────────────────────────────────────
-  # Migration Compatibility
+  # Registry Builder
   # ─────────────────────────────────────────────────────────────────────────────
 
-  Scenario: Existing loadTagRegistry works unchanged
-    Given the updated taxonomy module
-    When createDefaultTagRegistry() is called
-    Then it returns the same structure as before
+  Scenario: buildRegistry returns expected structure
+    Given the taxonomy module
+    When buildRegistry() is called
+    Then it returns the expected TagRegistry structure
     And all existing generators work without modification
-
-  Scenario: External JSON overrides still work
-    Given a user-provided tag-registry.json
-    When merged with TypeScript defaults via mergeTagRegistries()
-    Then user values override defaults as before
-    And the merge logic is unchanged

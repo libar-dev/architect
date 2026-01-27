@@ -354,7 +354,6 @@ const dp = createDeliveryProcess({
 For advanced use cases requiring direct registry manipulation:
 
 ```typescript
-import { mergeTagRegistries } from '@libar-dev/delivery-process';
 import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
 ```
 

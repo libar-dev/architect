@@ -35,13 +35,13 @@ Starting from pattern brief?
 
 ### Session Overview
 
-| Session Type | Input | Output | FSM Impact |
-|--------------|-------|--------|------------|
-| **Planning** | Pattern brief | Roadmap spec (Tier 1) | Creates `roadmap` spec |
-| **Design** | Complex requirement | Design document | None |
-| **Implementation** | Roadmap spec | Code + tests | `roadmap→active→completed` |
-| **Planning + Design** | Pattern brief | Roadmap spec + Tier 2 stubs | Creates `roadmap` spec |
-| **Handoff** | Session state | Handoff documentation | None |
+| Session Type          | Input               | Output                      | FSM Impact                 |
+| --------------------- | ------------------- | --------------------------- | -------------------------- |
+| **Planning**          | Pattern brief       | Roadmap spec (Tier 1)       | Creates `roadmap` spec     |
+| **Design**            | Complex requirement | Design document             | None                       |
+| **Implementation**    | Roadmap spec        | Code + tests                | `roadmap→active→completed` |
+| **Planning + Design** | Pattern brief       | Roadmap spec + Tier 2 stubs | Creates `roadmap` spec     |
+| **Handoff**           | Session state       | Handoff documentation       | None                       |
 
 ---
 
@@ -133,13 +133,13 @@ A planning session is complete when:
 
 ### When to Use Design Session
 
-| Use Design Session When... | Skip When... |
-|---------------------------|--------------|
-| Multiple valid approaches exist | Roadmap spec is straightforward |
-| Architectural changes needed | Single obvious implementation path |
-| New patterns or capabilities | Bug fix or documentation update |
-| Cross-context coordination | Feature with clear requirements |
-| Performance-critical decisions | — |
+| Use Design Session When...      | Skip When...                       |
+| ------------------------------- | ---------------------------------- |
+| Multiple valid approaches exist | Roadmap spec is straightforward    |
+| Architectural changes needed    | Single obvious implementation path |
+| New patterns or capabilities    | Bug fix or documentation update    |
+| Cross-context coordination      | Feature with clear requirements    |
+| Performance-critical decisions  | —                                  |
 
 ### What You MUST Do
 
@@ -158,16 +158,16 @@ A planning session is complete when:
 
 ### Design Document Sections
 
-| Section | Purpose |
-|---------|---------|
-| **Problem Statement** | What problem does this design solve? |
-| **Related Roadmap Spec** | Link to the `.feature` spec being implemented |
-| **Current State Analysis** | Honest assessment of what exists |
-| **Strategic Context** | How this fits with architecture/roadmap |
-| **Options Considered** | Each option with pros/cons |
-| **Recommended Approach** | Which option and WHY |
-| **Impact Assessment** | High-level affected areas |
-| **Open Questions** | What still needs resolution |
+| Section                    | Purpose                                       |
+| -------------------------- | --------------------------------------------- |
+| **Problem Statement**      | What problem does this design solve?          |
+| **Related Roadmap Spec**   | Link to the `.feature` spec being implemented |
+| **Current State Analysis** | Honest assessment of what exists              |
+| **Strategic Context**      | How this fits with architecture/roadmap       |
+| **Options Considered**     | Each option with pros/cons                    |
+| **Recommended Approach**   | Which option and WHY                          |
+| **Impact Assessment**      | High-level affected areas                     |
+| **Open Questions**         | What still needs resolution                   |
 
 ### Code Stubs in Design Sessions
 
@@ -194,7 +194,7 @@ export function withCircuitBreaker<T>(
   operation: () => Promise<T>,
   config?: Partial<CircuitBreakerConfig>
 ): Promise<T> {
-  throw new Error("CircuitBreaker not yet implemented - roadmap pattern");
+  throw new Error('CircuitBreaker not yet implemented - roadmap pattern');
 }
 ```
 
@@ -289,12 +289,12 @@ npx generate-docs -g patterns,roadmap -i "src/**/*.ts" --features "specs/**/*.fe
 
 ### Session Constraints
 
-| MUST DO | MUST NOT DO |
-|---------|-------------|
-| Transition roadmap spec to `active` BEFORE coding | Add new deliverables to an `active` spec |
+| MUST DO                                                  | MUST NOT DO                                    |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| Transition roadmap spec to `active` BEFORE coding        | Add new deliverables to an `active` spec       |
 | Create executable spec stubs with `@<prefix>-implements` | Transition to `completed` with incomplete work |
-| Update deliverable statuses as work progresses | Skip the FSM transitions |
-| Transition to `completed` only when ALL done | Modify generated docs directly |
+| Update deliverable statuses as work progresses           | Skip the FSM transitions                       |
+| Transition to `completed` only when ALL done             | Modify generated docs directly                 |
 
 ---
 
@@ -306,10 +306,10 @@ Use this workflow when you need to complete ALL spec artifacts before handing of
 
 ### When to Use This Workflow
 
-| Use This Guide When... | Use Planning Session Instead When... |
-|------------------------|-------------------------------------|
-| Need executable spec stubs for implementation | Only enhancing roadmap spec |
-| Want complete two-tier spec architecture | Don't need Tier 2 stubs yet |
+| Use This Guide When...                         | Use Planning Session Instead When...  |
+| ---------------------------------------------- | ------------------------------------- |
+| Need executable spec stubs for implementation  | Only enhancing roadmap spec           |
+| Want complete two-tier spec architecture       | Don't need Tier 2 stubs yet           |
 | Preparing for immediate implementation handoff | Still exploring/defining requirements |
 
 ### Step 1: Assess Current State
@@ -345,7 +345,7 @@ export interface MyResult {
 }
 
 export function myFunction(args: MyArgs): Promise<MyResult> {
-  throw new Error("MyPattern not yet implemented - roadmap pattern");
+  throw new Error('MyPattern not yet implemented - roadmap pattern');
 }
 ```
 
@@ -430,6 +430,7 @@ function resetState(): void {
 ### Handoff Criteria
 
 **Tier 1 Complete:**
+
 - [ ] All required `@<prefix>-*` tags present
 - [ ] `@<prefix>-executable-specs` points to Tier 2 location
 - [ ] Deliverables table has Tests and Test Type columns
@@ -438,12 +439,14 @@ function resetState(): void {
 - [ ] Status remains `roadmap`
 
 **Tier 2 Complete:**
+
 - [ ] Directory created with `.feature` files
 - [ ] Each file has `@<prefix>-implements` linking to Tier 1
 - [ ] Stub scenarios with placeholder comments
 - [ ] Step definitions stub compiles without errors
 
 **Validation Complete:**
+
 - [ ] Lint passes
 - [ ] TypeScript compiles
 - [ ] Documentation regenerates without errors
@@ -484,32 +487,32 @@ For multi-session work:
 ### Deliverable Status Workflow
 
 ```
-planned → in-progress → completed
-    │          │
-    │          ↓
-    │      blocked → planned (rescheduled)
+roadmap → active → completed
+    │        │
+    │        ↓
+    │    blocked → roadmap (rescheduled)
     ↓
-deferred → planned (resumed)
+deferred → roadmap (resumed)
 ```
 
 ---
 
 ## Quick Reference: FSM States
 
-| State | Protection | What's Allowed |
-|-------|------------|----------------|
-| `roadmap` | None | Full editing |
-| `active` | Scope-locked | Implementation only, no new deliverables |
-| `completed` | Hard-locked | Requires `@<prefix>-unlock-reason` to modify |
-| `deferred` | None | Full editing |
+| State       | Protection   | What's Allowed                               |
+| ----------- | ------------ | -------------------------------------------- |
+| `roadmap`   | None         | Full editing                                 |
+| `active`    | Scope-locked | Implementation only, no new deliverables     |
+| `completed` | Hard-locked  | Requires `@<prefix>-unlock-reason` to modify |
+| `deferred`  | None         | Full editing                                 |
 
 ---
 
 ## Related Documentation
 
-| Document | Purpose |
-|----------|---------|
-| [METHODOLOGY.md](./METHODOLOGY.md) | Core thesis, FSM, two-tier architecture |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Rich Gherkin patterns for BDD specs |
-| [CONFIGURATION.md](./CONFIGURATION.md) | Tag prefixes, presets |
-| [../INSTRUCTIONS.md](../INSTRUCTIONS.md) | Complete tag reference, CLI commands |
+| Document                                     | Purpose                                 |
+| -------------------------------------------- | --------------------------------------- |
+| [METHODOLOGY.md](./METHODOLOGY.md)           | Core thesis, FSM, two-tier architecture |
+| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Rich Gherkin patterns for BDD specs     |
+| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets                   |
+| [../INSTRUCTIONS.md](../INSTRUCTIONS.md)     | Complete tag reference, CLI commands    |

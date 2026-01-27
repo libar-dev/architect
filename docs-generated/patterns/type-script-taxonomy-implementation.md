@@ -42,7 +42,6 @@ As a delivery-process developer
 
 - Given the package-level taxonomy
 - Then PROCESS_STATUS_VALUES contains ["roadmap", "active", "completed", "deferred"]
-- And ACCEPTED_STATUS_VALUES includes legacy values for backward compatibility
 - And the repo-level taxonomy follows PDR-005 FSM
 
 **Define format types as TypeScript constant**
@@ -112,7 +111,7 @@ As a delivery-process developer
 
 - Given a pattern with status field
 - When validated against schema
-- Then the schema references ACCEPTED_STATUS_VALUES
+- Then the schema references PROCESS_STATUS_VALUES
 - And invalid status values are rejected
 
 **IDE autocomplete for status values**
@@ -128,19 +127,12 @@ As a delivery-process developer
 - When I rename it to "planned" using IDE refactor
 - Then all TypeScript usages are updated automatically
 
-**Existing loadTagRegistry works unchanged**
+**buildRegistry returns expected structure**
 
-- Given the updated taxonomy module
-- When createDefaultTagRegistry() is called
-- Then it returns the same structure as before
+- Given the taxonomy module
+- When buildRegistry() is called
+- Then it returns the expected TagRegistry structure
 - And all existing generators work without modification
-
-**External JSON overrides still work**
-
-- Given a user-provided tag-registry.json
-- When merged with TypeScript defaults via mergeTagRegistries()
-- Then user values override defaults as before
-- And the merge logic is unchanged
 
 ---
 
