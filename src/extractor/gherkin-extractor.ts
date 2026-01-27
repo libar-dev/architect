@@ -154,7 +154,7 @@ export function extractPatternsFromGherkin(
     }
 
     // Skip if no status tag (pattern reference for scenario mapping, not a pattern definition)
-    // Roadmap patterns MUST have @status:roadmap, @status:implemented, or @status:partial
+    // Roadmap patterns MUST have @status:roadmap, @status:active, or @status:completed
     if (!metadata.status) {
       continue;
     }

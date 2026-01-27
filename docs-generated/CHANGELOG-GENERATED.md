@@ -14,10 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- **Lint Process CLI**: :ProcessGuardModule Validates git changes against delivery process rules.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
 - **Process State API**: :FSMValidator TypeScript interface for querying delivery process state.
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
-- **Lint Process CLI**: :ProcessGuardModule Validates git changes against delivery process rules.
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -66,10 +66,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
 - **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
 - **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
-- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
-- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
-- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
-- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
 - **Configuration Types**: Type definitions for the delivery process configuration system.
 - **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
@@ -77,6 +73,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
 - **Configuration Defaults**: Centralized default constants for the delivery-process package.
 - **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
+- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
+- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
+- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
+- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
 - **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
 - **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.

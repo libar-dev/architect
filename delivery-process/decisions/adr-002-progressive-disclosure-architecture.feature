@@ -43,7 +43,7 @@ Feature: ADR-002 - Progressive Disclosure Information Architecture
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location | Release |
-      | Progressive disclosure schema | Complete | Yes | src/validation-schemas/generator-config.ts | v0.3.0 |
+      | Progressive disclosure schema | Complete | Yes | src/config/types.ts | v0.3.0 |
       | PrdFeaturesSection split logic | Complete | Yes | src/generators/sections/prd-features.ts | v0.3.0 |
       | Multi-file output via additionalFiles | Complete | Yes | src/generators/sections/prd-features.ts | v0.3.0 |
 

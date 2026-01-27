@@ -69,11 +69,11 @@ export interface ScanResults {
  *
  * @example
  * ```typescript
- * const registry = await loadTagRegistry('tag-registry.json');
+ * const config = await loadConfig();
  * const result = await scanPatterns({
  *   patterns: ['src/**\/*.ts'],
  *   baseDir: '/path/to/project'
- * }, registry);
+ * }, config.tagRegistry);
  *
  * if (result.ok) {
  *   const { files, errors } = result.value;

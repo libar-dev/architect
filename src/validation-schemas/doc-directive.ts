@@ -121,9 +121,9 @@ export type PatternStatus = AcceptedStatusValue;
  *
  * @example
  * ```typescript
- * const registry = await loadTagRegistry("tag-registry.json", "/project");
- * const statusSchema = createPatternStatusSchema(registry);
- * const result = statusSchema.safeParse("implemented"); // Validates against registry values
+ * const config = await loadConfig();
+ * const statusSchema = createPatternStatusSchema(config.tagRegistry);
+ * const result = statusSchema.safeParse("completed"); // Validates against registry values
  * ```
  */
 export function createPatternStatusSchema(registry: TagRegistry): z.ZodType<string> {

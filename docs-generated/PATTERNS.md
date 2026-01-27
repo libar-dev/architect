@@ -413,19 +413,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> TagRegistryLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -438,6 +425,19 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
