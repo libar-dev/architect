@@ -121,11 +121,11 @@ function createMockFeature(
     feature: {
       name: patternName,
       description: `Test feature for ${patternName}`,
-      // Use libar-process-* tags (required by extractProcessMetadata)
+      // Use normalized tags (scanner strips prefixes before extractProcessMetadata sees them)
       tags: [
-        `libar-process-pattern:${patternName}`,
-        `libar-process-phase:${String(phase).padStart(2, '0')}`,
-        `libar-process-status:${status}`,
+        `pattern:${patternName}`,
+        `phase:${String(phase).padStart(2, '0')}`,
+        `status:${status}`,
       ],
       language: 'en',
       line: 1,

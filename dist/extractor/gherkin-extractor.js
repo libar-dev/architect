@@ -214,7 +214,7 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         assignIfNonEmpty(rawPattern, 'discoveredImprovements', metadata.discoveredImprovements);
         assignIfNonEmpty(rawPattern, 'discoveredRisks', metadata.discoveredRisks);
         assignIfNonEmpty(rawPattern, 'discoveredLearnings', metadata.discoveredLearnings);
-        // Technical constraints from @libar-process-constraint tags
+        // Technical constraints from @libar-docs-constraint tags
         assignIfNonEmpty(rawPattern, 'constraints', metadata.constraints);
         // ADR (Architecture Decision Record) fields
         assignIfDefined(rawPattern, 'adr', metadata.adr);

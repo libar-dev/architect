@@ -462,33 +462,33 @@ Scenario: Orphan scenario
 
   const lines: string[] = [];
 
-  // Process metadata tags
+  // Process metadata tags (using @libar-docs-* prefix per PDR-004)
   if (phase !== undefined) {
-    lines.push(`@libar-process-phase:${phase}`);
+    lines.push(`@libar-docs-phase:${phase}`);
   }
   if (status) {
-    lines.push(`@libar-process-status:${status}`);
+    lines.push(`@libar-docs-status:${status}`);
   }
   if (quarter) {
-    lines.push(`@libar-process-quarter:${quarter}`);
+    lines.push(`@libar-docs-quarter:${quarter}`);
   }
   if (effort) {
-    lines.push(`@libar-process-effort:${effort}`);
+    lines.push(`@libar-docs-effort:${effort}`);
   }
   if (team) {
-    lines.push(`@libar-process-team:${team}`);
+    lines.push(`@libar-docs-team:${team}`);
   }
   if (patternName) {
-    lines.push(`@libar-pattern:${patternName}`);
+    lines.push(`@libar-docs-pattern:${patternName}`);
   }
   if (briefPath) {
-    lines.push(`@libar-process-brief:${briefPath}`);
+    lines.push(`@libar-docs-brief:${briefPath}`);
   }
   for (const dep of dependencies) {
-    lines.push(`@libar-process-depends-on:${dep}`);
+    lines.push(`@libar-docs-depends-on:${dep}`);
   }
   for (const enable of enables) {
-    lines.push(`@libar-process-enables:${enable}`);
+    lines.push(`@libar-docs-enables:${enable}`);
   }
   for (const cat of categories) {
     lines.push(`@${cat}`);
@@ -502,7 +502,7 @@ Scenario: Orphan scenario
   // Scenarios
   for (const scenario of scenarios) {
     if (scenario.status) {
-      lines.push(`  @libar-process-status:${scenario.status}`);
+      lines.push(`  @libar-docs-status:${scenario.status}`);
     }
     lines.push(`  Scenario: ${scenario.name}`);
     lines.push(`    Given some precondition`);

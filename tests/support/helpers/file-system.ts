@@ -276,12 +276,12 @@ export function createFeatureFile(options: {
 
   const lines: string[] = [];
 
-  // Process tags
-  lines.push(`@libar-process-phase:${phase}`);
-  lines.push(`@libar-process-status:${status}`);
-  lines.push(`@libar-process-quarter:${quarter}`);
-  lines.push(`@libar-process-effort:${effort}`);
-  lines.push(`@libar-process-team:${team}`);
+  // Process tags (using @libar-docs-* prefix per PDR-004)
+  lines.push(`@libar-docs-phase:${phase}`);
+  lines.push(`@libar-docs-status:${status}`);
+  lines.push(`@libar-docs-quarter:${quarter}`);
+  lines.push(`@libar-docs-effort:${effort}`);
+  lines.push(`@libar-docs-team:${team}`);
   lines.push(`Feature: ${name}`);
   lines.push(`  ${description}`);
   lines.push('');

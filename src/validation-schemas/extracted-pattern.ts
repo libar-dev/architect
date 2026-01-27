@@ -213,26 +213,26 @@ export const ExtractedPatternSchema = z
     /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
     apiRef: z.array(z.string()).readonly().optional(),
 
-    // Process metadata from Gherkin @libar-process-* tags
-    /** Quarter assignment (from @libar-process-quarter tag, e.g., "Q1-2025") */
+    // Process metadata from Gherkin @libar-docs-* tags
+    /** Quarter assignment (from @libar-docs-quarter tag, e.g., "Q1-2025") */
     quarter: z.string().optional(),
 
-    /** Completion date (from @libar-process-completed tag, ISO format) */
+    /** Completion date (from @libar-docs-completed tag, ISO format) */
     completed: z.string().optional(),
 
-    /** Effort estimate (from @libar-process-effort tag, e.g., "2w", "4d") */
+    /** Effort estimate (from @libar-docs-effort tag, e.g., "2w", "4d") */
     effort: z.string().optional(),
 
-    /** Team assignment (from @libar-process-team tag) */
+    /** Team assignment (from @libar-docs-team tag) */
     team: z.string().optional(),
 
-    /** Product area for PRD grouping (from @libar-process-product-area tag) */
+    /** Product area for PRD grouping (from @libar-docs-product-area tag) */
     productArea: z.string().optional(),
 
-    /** Target user persona (from @libar-process-user-role tag) */
+    /** Target user persona (from @libar-docs-user-role tag) */
     userRole: z.string().optional(),
 
-    /** Business value statement (from @libar-process-business-value tag) */
+    /** Business value statement (from @libar-docs-business-value tag) */
     businessValue: z.string().optional(),
 
     /**
@@ -244,13 +244,13 @@ export const ExtractedPatternSchema = z
      */
     deliverables: z.array(DeliverableSchema).readonly().optional(),
 
-    /** Workflow type for process tracking (from @libar-process-workflow tag) */
+    /** Workflow type for process tracking (from @libar-docs-workflow tag) */
     workflow: z.string().optional(),
 
-    /** Risk level for process tracking (from @libar-process-risk tag) */
+    /** Risk level for process tracking (from @libar-docs-risk tag) */
     risk: z.string().optional(),
 
-    /** Priority level for process tracking (from @libar-process-priority tag) */
+    /** Priority level for process tracking (from @libar-docs-priority tag) */
     priority: z.string().optional(),
 
     // NOTE: Release version is tracked at BOTH pattern level (above) AND deliverable level
@@ -260,7 +260,7 @@ export const ExtractedPatternSchema = z
     // Hierarchy support for multi-level organization (epic/phase/task)
 
     /**
-     * Hierarchy level for this pattern (from @libar-process-level tag)
+     * Hierarchy level for this pattern (from @libar-docs-level tag)
      *
      * Three-level hierarchy:
      * - **epic**: Multi-quarter strategic initiatives
@@ -272,7 +272,7 @@ export const ExtractedPatternSchema = z
     level: HierarchyLevelSchema.optional(),
 
     /**
-     * Parent pattern name for hierarchy navigation (from @libar-process-parent tag)
+     * Parent pattern name for hierarchy navigation (from @libar-docs-parent tag)
      *
      * Links this pattern to its parent in the hierarchy, enabling:
      * - Epic → Phase → Task navigation
@@ -285,38 +285,38 @@ export const ExtractedPatternSchema = z
      * Child pattern names (computed from parent references)
      *
      * Auto-populated by the extractor from patterns that reference this one
-     * via their @libar-process-parent tag. Not set directly in feature files.
+     * via their @libar-docs-parent tag. Not set directly in feature files.
      */
     children: z.array(z.string()).readonly().optional(),
 
-    // Discovery findings from Gherkin @libar-process-discovered-* tags (Retrospective phase)
+    // Discovery findings from Gherkin @libar-docs-discovered-* tags (Retrospective phase)
 
     /**
-     * Gaps identified during implementation (from @libar-process-discovered-gap tags)
+     * Gaps identified during implementation (from @libar-docs-discovered-gap tags)
      * Missing features or capabilities that were not anticipated.
      */
     discoveredGaps: z.array(z.string()).readonly().optional(),
 
     /**
-     * Improvements identified during implementation (from @libar-process-discovered-improvement tags)
+     * Improvements identified during implementation (from @libar-docs-discovered-improvement tags)
      * Better approaches or optimizations discovered while working.
      */
     discoveredImprovements: z.array(z.string()).readonly().optional(),
 
     /**
-     * Risks identified during implementation (from @libar-process-discovered-risk tags)
+     * Risks identified during implementation (from @libar-docs-discovered-risk tags)
      * Technical debt, architectural concerns, or potential issues discovered.
      */
     discoveredRisks: z.array(z.string()).readonly().optional(),
 
     /**
-     * Learnings captured during implementation (from @libar-process-discovered-learning tags)
+     * Learnings captured during implementation (from @libar-docs-discovered-learning tags)
      * Key insights, patterns, or institutional knowledge gained.
      */
     discoveredLearnings: z.array(z.string()).readonly().optional(),
 
     /**
-     * Technical constraints affecting feature implementation (from @libar-process-constraint tags)
+     * Technical constraints affecting feature implementation (from @libar-docs-constraint tags)
      * Documents requirements, assumptions, and boundaries for implementation.
      */
     constraints: z.array(z.string()).readonly().optional(),
@@ -358,10 +358,10 @@ export const ExtractedPatternSchema = z
     // Rules named "Context - ...", "Decision - ...", "Consequences - ..." are
     // semantically detected and rendered by the ADR codec.
 
-    // Display and traceability fields (from @libar-process-title, @libar-process-behavior-file)
+    // Display and traceability fields (from @libar-docs-title, @libar-docs-behavior-file)
 
     /**
-     * Explicit human-readable title for display (from @libar-process-title tag)
+     * Explicit human-readable title for display (from @libar-docs-title tag)
      *
      * Overrides the auto-transformation of CamelCase patternName.
      * Use for edge cases like "OAuth 2.0 Integration" where auto-transform
@@ -369,13 +369,13 @@ export const ExtractedPatternSchema = z
      *
      * @example
      * ```gherkin
-     * @libar-process-title:"OAuth 2.0 Integration"
+     * @libar-docs-title:"OAuth 2.0 Integration"
      * ```
      */
     title: z.string().optional(),
 
     /**
-     * Path to corresponding behavior feature file (from @libar-process-behavior-file tag)
+     * Path to corresponding behavior feature file (from @libar-docs-behavior-file tag)
      *
      * Enables traceability from timeline phases to their behavioral tests.
      * If not specified, convention-based matching is used:
@@ -383,7 +383,7 @@ export const ExtractedPatternSchema = z
      *
      * @example
      * ```gherkin
-     * @libar-process-behavior-file:tests/features/behavior/remaining-work-enhancement.feature
+     * @libar-docs-behavior-file:tests/features/behavior/remaining-work-enhancement.feature
      * ```
      */
     behaviorFile: z.string().optional(),
@@ -394,7 +394,7 @@ export const ExtractedPatternSchema = z
      * Set during extraction when inferring behavior file from convention:
      * - `true` = file was found at inferred path
      * - `false` = file not found at inferred path
-     * - `undefined` = explicit @libar-process-behavior-file tag used (trust it)
+     * - `undefined` = explicit @libar-docs-behavior-file tag used (trust it)
      *
      * Used by TraceabilitySection to determine coverage without filesystem access.
      */

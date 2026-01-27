@@ -216,25 +216,25 @@ export const DocDirectiveSchema = z
     /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
     apiRef: z.array(z.string()).readonly().optional(),
 
-    /** Delivery quarter for timeline workflow (from @libar-process-quarter tag) */
+    /** Delivery quarter for timeline workflow (from @libar-docs-quarter tag) */
     quarter: z.string().optional(),
 
-    /** Completion date for timeline workflow (from @libar-process-completed tag) */
+    /** Completion date for timeline workflow (from @libar-docs-completed tag) */
     completed: z.string().optional(),
 
-    /** Effort estimate for timeline workflow (from @libar-process-effort tag) */
+    /** Effort estimate for timeline workflow (from @libar-docs-effort tag) */
     effort: z.string().optional(),
 
-    /** Responsible team for process workflow (from @libar-process-team tag) */
+    /** Responsible team for process workflow (from @libar-docs-team tag) */
     team: z.string().optional(),
 
-    /** Workflow/discipline for process workflow (from @libar-process-workflow tag) */
+    /** Workflow/discipline for process workflow (from @libar-docs-workflow tag) */
     workflow: z.string().optional(),
 
-    /** Risk level for process workflow (from @libar-process-risk tag) */
+    /** Risk level for process workflow (from @libar-docs-risk tag) */
     risk: z.string().optional(),
 
-    /** Priority level for process workflow (from @libar-process-priority tag) */
+    /** Priority level for process workflow (from @libar-docs-priority tag) */
     priority: z.string().optional(),
 
     // Architecture diagram generation fields (from @libar-docs-arch-* tags)

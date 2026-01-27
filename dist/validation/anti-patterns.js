@@ -131,7 +131,7 @@ export function detectProcessInCode(scannedFiles, registry) {
                             file: file.filePath,
                             line: directive.position.startLine,
                             severity: 'error',
-                            fix: `Move to corresponding .feature file using @libar-process-${suffix} tag.`,
+                            fix: `Move to corresponding .feature file using @libar-docs-${suffix} tag.`,
                         });
                     }
                 }

@@ -73,9 +73,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         }, z.core.$strict>;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
             roadmap: "roadmap";
             active: "active";
+            completed: "completed";
             deferred: "deferred";
             implemented: "implemented";
             partial: "partial";
@@ -135,9 +135,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     extractedAt: z.ZodISODateTime;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
-        completed: "completed";
         roadmap: "roadmap";
         active: "active";
+        completed: "completed";
         deferred: "deferred";
         implemented: "implemented";
         partial: "partial";
@@ -168,8 +168,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
-            domain: "domain";
             unknown: "unknown";
+            domain: "domain";
             timeline: "timeline";
             integration: "integration";
             e2e: "e2e";
@@ -218,9 +218,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     adr: z.ZodOptional<z.ZodString>;
     adrStatus: z.ZodOptional<z.ZodEnum<{
+        deprecated: "deprecated";
         proposed: "proposed";
         accepted: "accepted";
-        deprecated: "deprecated";
         superseded: "superseded";
     }>>;
     adrCategory: z.ZodOptional<z.ZodString>;

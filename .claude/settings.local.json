@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue view:*)",
+      "Bash(gh api:*)",
+      "Bash(pnpm docs:roadmap:*)",
+      "Bash(pnpm tsx:*)",
+      "Bash(node -e:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm format:check:*)",
+      "Bash(./dist/cli/generate-docs.js:*)",
+      "Bash(node dist/cli/generate-tag-taxonomy.js:*)",
+      "Bash(node dist/cli/lint-patterns.js:*)",
+      "Bash(node dist/cli/validate-patterns.js:*)"
+    ]
+  }
+}

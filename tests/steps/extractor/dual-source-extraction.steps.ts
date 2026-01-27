@@ -137,9 +137,9 @@ function createMockFeatureFile(
   status = 'active'
 ): ScannedGherkinFile {
   return createMockFeature([
-    `libar-process-pattern:${patternName}`,
-    `libar-process-phase:${String(phase).padStart(2, '0')}`,
-    `libar-process-status:${status}`,
+    `pattern:${patternName}`,
+    `phase:${String(phase).padStart(2, '0')}`,
+    `status:${status}`,
   ]);
 }
 

@@ -9,7 +9,7 @@
  * ## DualSourceExtractor - Compose Pattern Data from Code + Features
  *
  * Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
- * and Gherkin feature files (@libar-process-*), validates consistency,
+ * and Gherkin feature files (@libar-docs-*), validates consistency,
  * and composes unified pattern data for documentation generation.
  *
  * ### When to Use
@@ -22,7 +22,7 @@
  * ### Key Concepts
  *
  * - **Code Source**: @libar-docs-* tags define timeless pattern graph
- * - **Feature Source**: @libar-process-* tags add temporal process metadata
+ * - **Feature Source**: @libar-docs-* tags add temporal process metadata
  * - **Cross-Validation**: Pattern name + phase must match across sources
  * - **Deliverables**: Parsed from Gherkin Background tables in features
  */
@@ -93,46 +93,46 @@ export interface DualSourcePattern extends ExtractedPattern {
 export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMetadata | null {
   const tags = feature.feature.tags;
 
-  // Extract @libar-process-* tags (without @ prefix - parser strips it)
-  const patternTag = tags.find((t) => t.startsWith('libar-process-pattern:'));
-  const phaseTag = tags.find((t) => t.startsWith('libar-process-phase:'));
-  const statusTag = tags.find((t) => t.startsWith('libar-process-status:'));
+  // Extract normalized tags (scanner strips @ and libar-docs-/libar-process- prefixes)
+  const patternTag = tags.find((t) => t.startsWith('pattern:'));
+  const phaseTag = tags.find((t) => t.startsWith('phase:'));
+  const statusTag = tags.find((t) => t.startsWith('status:'));
 
   if (!patternTag || !phaseTag) {
     // Missing required tags
     return null;
   }
 
-  const pattern = patternTag.replace('libar-process-pattern:', '');
-  const phaseStr = phaseTag.replace('libar-process-phase:', '');
+  const pattern = patternTag.replace('pattern:', '');
+  const phaseStr = phaseTag.replace('phase:', '');
   const phase = parseInt(phaseStr, 10);
-  const status = statusTag?.replace('libar-process-status:', '') ?? 'roadmap';
+  const status = statusTag?.replace('status:', '') ?? 'roadmap';
 
   // Extract optional tags
-  const quarterTag = tags.find((t) => t.startsWith('libar-process-quarter:'));
-  const effortTag = tags.find((t) => t.startsWith('libar-process-effort:'));
-  const teamTag = tags.find((t) => t.startsWith('libar-process-team:'));
-  const workflowTag = tags.find((t) => t.startsWith('libar-process-workflow:'));
-  const completedTag = tags.find((t) => t.startsWith('libar-process-completed:'));
-  const effortActualTag = tags.find((t) => t.startsWith('libar-process-effort-actual:'));
-  const riskTag = tags.find((t) => t.startsWith('libar-process-risk:'));
-  const briefTag = tags.find((t) => t.startsWith('libar-process-brief:'));
-  const productAreaTag = tags.find((t) => t.startsWith('libar-process-product-area:'));
-  const userRoleTag = tags.find((t) => t.startsWith('libar-process-user-role:'));
-  const businessValueTag = tags.find((t) => t.startsWith('libar-process-business-value:'));
+  const quarterTag = tags.find((t) => t.startsWith('quarter:'));
+  const effortTag = tags.find((t) => t.startsWith('effort:'));
+  const teamTag = tags.find((t) => t.startsWith('team:'));
+  const workflowTag = tags.find((t) => t.startsWith('workflow:'));
+  const completedTag = tags.find((t) => t.startsWith('completed:'));
+  const effortActualTag = tags.find((t) => t.startsWith('effort-actual:'));
+  const riskTag = tags.find((t) => t.startsWith('risk:'));
+  const briefTag = tags.find((t) => t.startsWith('brief:'));
+  const productAreaTag = tags.find((t) => t.startsWith('product-area:'));
+  const userRoleTag = tags.find((t) => t.startsWith('user-role:'));
+  const businessValueTag = tags.find((t) => t.startsWith('business-value:'));
 
-  const quarter = quarterTag?.replace('libar-process-quarter:', '');
-  const effort = effortTag?.replace('libar-process-effort:', '');
-  const team = teamTag?.replace('libar-process-team:', '');
-  const workflow = workflowTag?.replace('libar-process-workflow:', '');
-  const completed = completedTag?.replace('libar-process-completed:', '');
-  const effortActual = effortActualTag?.replace('libar-process-effort-actual:', '');
-  const risk = riskTag?.replace('libar-process-risk:', '');
-  const brief = briefTag?.replace('libar-process-brief:', '');
-  const productArea = productAreaTag?.replace('libar-process-product-area:', '');
-  const userRole = userRoleTag?.replace('libar-process-user-role:', '');
+  const quarter = quarterTag?.replace('quarter:', '');
+  const effort = effortTag?.replace('effort:', '');
+  const team = teamTag?.replace('team:', '');
+  const workflow = workflowTag?.replace('workflow:', '');
+  const completed = completedTag?.replace('completed:', '');
+  const effortActual = effortActualTag?.replace('effort-actual:', '');
+  const risk = riskTag?.replace('risk:', '');
+  const brief = briefTag?.replace('brief:', '');
+  const productArea = productAreaTag?.replace('product-area:', '');
+  const userRole = userRoleTag?.replace('user-role:', '');
   // Business value may have surrounding quotes - strip them
-  const businessValueRaw = businessValueTag?.replace('libar-process-business-value:', '');
+  const businessValueRaw = businessValueTag?.replace('business-value:', '');
   const businessValue = businessValueRaw?.replace(/^["']|["']$/g, '');
 
   // Build raw metadata object (no type assertions)

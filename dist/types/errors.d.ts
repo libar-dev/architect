@@ -94,7 +94,7 @@ export interface ConfigError extends BaseDocError {
     readonly value?: unknown;
 }
 /**
- * Process metadata validation error - invalid @libar-process-* tag values
+ * Process metadata validation error - invalid @libar-docs-* tag values
  *
  * Raised when extracting process metadata from Gherkin feature tags
  * and the values don't conform to ProcessMetadataSchema.

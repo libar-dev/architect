@@ -21,7 +21,7 @@
 import { z } from 'zod';
 import { type HierarchyLevel as TaxonomyHierarchyLevel, type ProcessStatusValue, type RiskLevel as TaxonomyRiskLevel } from '../taxonomy/index.js';
 /**
- * Process status values from Gherkin @libar-process-status tag
+ * Process status values from Gherkin @libar-docs-status tag
  *
  * Per PDR-005 MVP Workflow State Machine:
  * - roadmap: Planned work, fully editable
@@ -32,14 +32,14 @@ import { type HierarchyLevel as TaxonomyHierarchyLevel, type ProcessStatusValue,
  * @see delivery-process/src/taxonomy/status-values.ts
  */
 export declare const ProcessStatusSchema: z.ZodEnum<{
-    completed: "completed";
-    active: "active";
     roadmap: "roadmap";
+    active: "active";
+    completed: "completed";
     deferred: "deferred";
 }>;
 export type ProcessStatus = ProcessStatusValue;
 /**
- * Hierarchy level values from Gherkin @libar-process-level tag
+ * Hierarchy level values from Gherkin @libar-docs-level tag
  *
  * Three-level hierarchy for organizing work:
  * - **epic**: Multi-quarter strategic initiatives
@@ -57,7 +57,7 @@ export declare const HierarchyLevelSchema: z.ZodEnum<{
 }>;
 export type HierarchyLevel = TaxonomyHierarchyLevel;
 /**
- * Risk level values from Gherkin @libar-process-risk tag
+ * Risk level values from Gherkin @libar-docs-risk tag
  *
  * @see delivery-process/src/taxonomy/risk-levels.ts
  */
@@ -68,7 +68,7 @@ export declare const RiskLevelSchema: z.ZodEnum<{
 }>;
 export type RiskLevel = TaxonomyRiskLevel;
 /**
- * Process metadata from Gherkin feature tags (@libar-process-*)
+ * Process metadata from Gherkin feature tags (@libar-docs-*)
  *
  * Extracted from timeline feature files to provide temporal process data
  * (quarter, effort, team, workflow) that complements the timeless pattern
@@ -78,9 +78,9 @@ export declare const ProcessMetadataSchema: z.ZodObject<{
     pattern: z.ZodString;
     phase: z.ZodNumber;
     status: z.ZodEnum<{
-        completed: "completed";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
+        completed: "completed";
         deferred: "deferred";
     }>;
     level: z.ZodDefault<z.ZodEnum<{
