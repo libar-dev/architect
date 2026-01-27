@@ -111,6 +111,9 @@
     "url": "https://github.com/libar-dev/delivery-process/issues"
   },
   "homepage": "https://github.com/libar-dev/delivery-process#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@cucumber/gherkin": "^29.0.0",
     "@cucumber/messages": "^25.0.1",
