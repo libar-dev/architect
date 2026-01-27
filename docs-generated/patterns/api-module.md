@@ -13,8 +13,6 @@
 
 ## Description
 
-## API Module - Programmatic Process State Interface
-
 Central export for the Process State API, providing a TypeScript
 interface for querying delivery process state.
 

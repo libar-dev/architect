@@ -13,8 +13,6 @@
 
 ## Description
 
-## ValidationModule - DoD Validation and Anti-Pattern Detection
-
 Barrel export for validation module providing:
 - Definition of Done (DoD) validation for completed phases
 - Anti-pattern detection for documentation architecture violations

@@ -13,8 +13,6 @@
 
 ## Description
 
-## Regex Builders
-
 Type-safe regex factory functions for tag detection and normalization.
 Creates regex patterns based on configured tag prefix.
 

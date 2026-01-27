@@ -11,13 +11,14 @@
  * - SESSION-PLAN.md (implementation plans for phases)
  * - SESSION-FINDINGS.md (retrospective discoveries)
  */
-import { z } from "zod";
-import { MasterDatasetSchema, } from "../../validation-schemas/master-dataset.js";
-import { heading, paragraph, separator, table, list, document, } from "../schema.js";
-import { renderScenarioContent, renderBusinessRulesSection } from "./helpers.js";
-import { getStatusEmoji, getDisplayName, groupBy } from "../utils.js";
-import { normalizeStatus } from "../../taxonomy/index.js";
-import { DEFAULT_BASE_OPTIONS, mergeOptions, } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
+import { heading, paragraph, separator, table, list, document, } from '../schema.js';
+import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
+import { getStatusEmoji, getDisplayName } from '../utils.js';
+import { normalizeStatus } from '../../taxonomy/index.js';
+import { groupBy } from '../../utils/index.js';
+import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 /**
  * Default options for PlanningChecklistCodec
  */
@@ -41,7 +42,7 @@ export const DEFAULT_SESSION_PLAN_OPTIONS = {
     includeExecutionSteps: true,
     includePrePlanning: true,
     includeRiskAssessment: true,
-    statusFilter: ["planned", "active"],
+    statusFilter: ['planned', 'active'],
 };
 /**
  * Default options for SessionFindingsCodec
@@ -54,9 +55,9 @@ export const DEFAULT_SESSION_FINDINGS_OPTIONS = {
     includeLearnings: true,
     showSourcePhase: true,
     includeLinks: true,
-    groupBy: "category",
+    groupBy: 'category',
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Planning Checklist Codec
 // ═══════════════════════════════════════════════════════════════════════════
@@ -71,7 +72,7 @@ export function createPlanningChecklistCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("PlanningChecklistCodec is decode-only. See zod-codecs.md");
+            throw new Error('PlanningChecklistCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -90,7 +91,7 @@ export function createSessionPlanCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("SessionPlanCodec is decode-only. See zod-codecs.md");
+            throw new Error('SessionPlanCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -109,7 +110,7 @@ export function createSessionFindingsCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("SessionFindingsCodec is decode-only. See zod-codecs.md");
+            throw new Error('SessionFindingsCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -137,28 +138,28 @@ function buildPlanningChecklistDocument(dataset, options) {
         }
     }
     if (phasesToCheck.length === 0) {
-        sections.push(heading(2, "Planning Checklists"), paragraph("*No active or actionable phases found.*"));
-        return document("Planning Checklist", sections, {
-            purpose: "Pre-planning questions and Definition of Done validation",
+        sections.push(heading(2, 'Planning Checklists'), paragraph('*No active or actionable phases found.*'));
+        return document('Planning Checklist', sections, {
+            purpose: 'Pre-planning questions and Definition of Done validation',
         });
     }
     // Sort by phase number
     phasesToCheck.sort((a, b) => (a.phase ?? 0) - (b.phase ?? 0));
     // Summary
-    sections.push(heading(2, "Summary"), table(["Metric", "Value"], [
-        ["Phases to Plan", String(phasesToCheck.length)],
-        ["Active", String(dataset.byStatus.active.filter((p) => phasesToCheck.includes(p)).length)],
+    sections.push(heading(2, 'Summary'), table(['Metric', 'Value'], [
+        ['Phases to Plan', String(phasesToCheck.length)],
+        ['Active', String(dataset.byStatus.active.filter((p) => phasesToCheck.includes(p)).length)],
         [
-            "Next Actionable",
-            String(phasesToCheck.filter((p) => normalizeStatus(p.status) === "planned").length),
+            'Next Actionable',
+            String(phasesToCheck.filter((p) => normalizeStatus(p.status) === 'planned').length),
         ],
     ]), separator());
     // Generate checklist for each phase
     for (const pattern of phasesToCheck) {
         sections.push(...buildPhaseChecklist(pattern, options, completedNames));
     }
-    return document("Planning Checklist", sections, {
-        purpose: "Pre-planning questions and Definition of Done validation",
+    return document('Planning Checklist', sections, {
+        purpose: 'Pre-planning questions and Definition of Done validation',
     });
 }
 function buildPhaseChecklist(pattern, options, completedNames) {
@@ -169,50 +170,50 @@ function buildPhaseChecklist(pattern, options, completedNames) {
     // Pre-planning questions
     if (options.includePrePlanning) {
         const prePlanningItems = [
-            "- [ ] Context and requirements understood?",
-            "- [ ] Dependencies identified and verified?",
-            "- [ ] Implementation approach chosen?",
-            "- [ ] Risks assessed and mitigated?",
+            '- [ ] Context and requirements understood?',
+            '- [ ] Dependencies identified and verified?',
+            '- [ ] Implementation approach chosen?',
+            '- [ ] Risks assessed and mitigated?',
         ];
         // Add dependency status
         if (pattern.dependsOn && pattern.dependsOn.length > 0) {
             const depStatus = pattern.dependsOn.map((dep) => {
                 const met = completedNames.has(dep);
-                return `  - ${met ? "✅" : "⏳"} ${dep}`;
+                return `  - ${met ? '✅' : '⏳'} ${dep}`;
             });
-            prePlanningItems.push("**Dependencies:**");
+            prePlanningItems.push('**Dependencies:**');
             prePlanningItems.push(...depStatus);
         }
-        sections.push(heading(4, "Pre-Planning"), paragraph(prePlanningItems.join("\n")));
+        sections.push(heading(4, 'Pre-Planning'), paragraph(prePlanningItems.join('\n')));
     }
     // Definition of Done
     if (options.includeDoD) {
-        const dodItems = ["**Deliverables:**"];
+        const dodItems = ['**Deliverables:**'];
         if (pattern.deliverables && pattern.deliverables.length > 0) {
             for (const d of pattern.deliverables) {
-                const status = d.status === "complete" ? "✅" : "- [ ]";
+                const status = d.status === 'complete' ? '✅' : '- [ ]';
                 dodItems.push(`${status} ${d.name}`);
             }
         }
         else {
-            dodItems.push("- [ ] (No deliverables defined)");
+            dodItems.push('- [ ] (No deliverables defined)');
         }
         // Acceptance criteria from scenarios
         if (pattern.scenarios && pattern.scenarios.length > 0) {
-            dodItems.push("\n**Acceptance Criteria:**");
+            dodItems.push('\n**Acceptance Criteria:**');
             for (const s of pattern.scenarios) {
                 dodItems.push(`- [ ] ${s.scenarioName}`);
             }
         }
-        sections.push(heading(4, "Definition of Done"), paragraph(dodItems.join("\n")));
+        sections.push(heading(4, 'Definition of Done'), paragraph(dodItems.join('\n')));
     }
     // Risk assessment
     if (options.includeRiskAssessment) {
-        sections.push(heading(4, "Risk Assessment"), paragraph([
-            "- [ ] Technical risks identified?",
-            "- [ ] Scope creep controls in place?",
-            "- [ ] Fallback options available?",
-        ].join("\n")));
+        sections.push(heading(4, 'Risk Assessment'), paragraph([
+            '- [ ] Technical risks identified?',
+            '- [ ] Scope creep controls in place?',
+            '- [ ] Fallback options available?',
+        ].join('\n')));
     }
     sections.push(separator());
     return sections;
@@ -225,26 +226,26 @@ function buildSessionPlanDocument(dataset, options) {
     // Filter by status
     const patterns = dataset.patterns.filter((p) => options.statusFilter.includes(normalizeStatus(p.status)));
     if (patterns.length === 0) {
-        sections.push(heading(2, "No Phases to Plan"), paragraph("*No phases match the status filter.*"));
-        return document("Session Implementation Plan", sections, {
-            purpose: "Structured implementation plan for coding sessions",
+        sections.push(heading(2, 'No Phases to Plan'), paragraph('*No phases match the status filter.*'));
+        return document('Session Implementation Plan', sections, {
+            purpose: 'Structured implementation plan for coding sessions',
         });
     }
     // Sort by phase
     patterns.sort((a, b) => (a.phase ?? 0) - (b.phase ?? 0));
     // Summary
     const byStatus = groupBy(patterns, (p) => normalizeStatus(p.status));
-    sections.push(heading(2, "Summary"), table(["Status", "Count"], [
-        ["Active", String(byStatus.get("active")?.length ?? 0)],
-        ["Planned", String(byStatus.get("planned")?.length ?? 0)],
-        ["Total", String(patterns.length)],
+    sections.push(heading(2, 'Summary'), table(['Status', 'Count'], [
+        ['Active', String(byStatus.get('active')?.length ?? 0)],
+        ['Planned', String(byStatus.get('planned')?.length ?? 0)],
+        ['Total', String(patterns.length)],
     ]), separator());
     // Implementation plans by phase
     for (const pattern of patterns) {
         sections.push(...buildPhasePlan(pattern, options));
     }
-    return document("Session Implementation Plan", sections, {
-        purpose: "Structured implementation plan for coding sessions",
+    return document('Session Implementation Plan', sections, {
+        purpose: 'Structured implementation plan for coding sessions',
     });
 }
 function buildPhasePlan(pattern, options) {
@@ -253,31 +254,31 @@ function buildPhasePlan(pattern, options) {
     const emoji = getStatusEmoji(pattern.status);
     sections.push(heading(3, `${emoji} ${name}`));
     // Metadata
-    const metaRows = [["Status", normalizeStatus(pattern.status)]];
+    const metaRows = [['Status', normalizeStatus(pattern.status)]];
     if (pattern.phase !== undefined)
-        metaRows.push(["Phase", String(pattern.phase)]);
+        metaRows.push(['Phase', String(pattern.phase)]);
     if (pattern.effort)
-        metaRows.push(["Effort", pattern.effort]);
-    sections.push(table(["Property", "Value"], metaRows));
+        metaRows.push(['Effort', pattern.effort]);
+    sections.push(table(['Property', 'Value'], metaRows));
     // Description
     if (pattern.directive.description) {
         sections.push(paragraph(pattern.directive.description));
     }
     // Implementation approach
     if (options.includeImplementationApproach && pattern.useCases && pattern.useCases.length > 0) {
-        sections.push(heading(4, "Implementation Approach"), list([...pattern.useCases]));
+        sections.push(heading(4, 'Implementation Approach'), list([...pattern.useCases]));
     }
     // Deliverables
     if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
         const items = pattern.deliverables.map((d) => {
-            const emoji = d.status === "complete" ? "✅" : d.status === "in-progress" ? "🚧" : "📋";
+            const emoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
             return `${emoji} ${d.name}`;
         });
-        sections.push(heading(4, "Deliverables"), list(items));
+        sections.push(heading(4, 'Deliverables'), list(items));
     }
     // Acceptance criteria with full steps, DataTables, and DocStrings
     if (options.includeAcceptanceCriteria && pattern.scenarios && pattern.scenarios.length > 0) {
-        sections.push(heading(4, "Acceptance Criteria"));
+        sections.push(heading(4, 'Acceptance Criteria'));
         for (const scenario of pattern.scenarios) {
             sections.push(...renderScenarioContent(scenario));
         }
@@ -301,7 +302,7 @@ function buildSessionFindingsDocument(dataset, options) {
         if (options.includeGaps && pattern.discoveredGaps) {
             for (const gapText of pattern.discoveredGaps) {
                 findings.push({
-                    type: "gap",
+                    type: 'gap',
                     text: gapText,
                     ...(sourcePhase !== undefined && { sourcePhase }),
                     sourceName,
@@ -312,7 +313,7 @@ function buildSessionFindingsDocument(dataset, options) {
         if (options.includeImprovements && pattern.discoveredImprovements) {
             for (const improvementText of pattern.discoveredImprovements) {
                 findings.push({
-                    type: "improvement",
+                    type: 'improvement',
                     text: improvementText,
                     ...(sourcePhase !== undefined && { sourcePhase }),
                     sourceName,
@@ -324,7 +325,7 @@ function buildSessionFindingsDocument(dataset, options) {
             if (pattern.discoveredRisks) {
                 for (const riskText of pattern.discoveredRisks) {
                     findings.push({
-                        type: "risk",
+                        type: 'risk',
                         text: riskText,
                         ...(sourcePhase !== undefined && { sourcePhase }),
                         sourceName,
@@ -334,7 +335,7 @@ function buildSessionFindingsDocument(dataset, options) {
             // Also include the single risk field if present
             if (pattern.risk) {
                 findings.push({
-                    type: "risk",
+                    type: 'risk',
                     text: pattern.risk,
                     ...(sourcePhase !== undefined && { sourcePhase }),
                     sourceName,
@@ -345,7 +346,7 @@ function buildSessionFindingsDocument(dataset, options) {
         if (options.includeLearnings && pattern.discoveredLearnings) {
             for (const learningText of pattern.discoveredLearnings) {
                 findings.push({
-                    type: "learning",
+                    type: 'learning',
                     text: learningText,
                     ...(sourcePhase !== undefined && { sourcePhase }),
                     sourceName,
@@ -354,30 +355,30 @@ function buildSessionFindingsDocument(dataset, options) {
         }
     }
     if (findings.length === 0) {
-        sections.push(heading(2, "No Findings"), paragraph("*No gaps, improvements, risks, or learnings discovered yet.*"));
-        return document("Session Findings", sections, {
-            purpose: "Retrospective discoveries for roadmap refinement",
+        sections.push(heading(2, 'No Findings'), paragraph('*No gaps, improvements, risks, or learnings discovered yet.*'));
+        return document('Session Findings', sections, {
+            purpose: 'Retrospective discoveries for roadmap refinement',
         });
     }
     // Summary
     const byType = groupBy(findings, (f) => f.type);
-    sections.push(heading(2, "Summary"), table(["Finding Type", "Count"], [
-        ["Gaps", String(byType.get("gap")?.length ?? 0)],
-        ["Improvements", String(byType.get("improvement")?.length ?? 0)],
-        ["Risks", String(byType.get("risk")?.length ?? 0)],
-        ["Learnings", String(byType.get("learning")?.length ?? 0)],
-        ["**Total**", String(findings.length)],
+    sections.push(heading(2, 'Summary'), table(['Finding Type', 'Count'], [
+        ['Gaps', String(byType.get('gap')?.length ?? 0)],
+        ['Improvements', String(byType.get('improvement')?.length ?? 0)],
+        ['Risks', String(byType.get('risk')?.length ?? 0)],
+        ['Learnings', String(byType.get('learning')?.length ?? 0)],
+        ['**Total**', String(findings.length)],
     ]), separator());
     // Group by category or type
-    if (options.groupBy === "category" || options.groupBy === "type") {
+    if (options.groupBy === 'category' || options.groupBy === 'type') {
         for (const [type, typeFindings] of byType.entries()) {
-            const emoji = type === "gap" ? "🔍" : type === "improvement" ? "💡" : type === "risk" ? "⚠️" : "📚";
-            const title = type.charAt(0).toUpperCase() + type.slice(1) + "s";
+            const emoji = type === 'gap' ? '🔍' : type === 'improvement' ? '💡' : type === 'risk' ? '⚠️' : '📚';
+            const title = type.charAt(0).toUpperCase() + type.slice(1) + 's';
             sections.push(heading(3, `${emoji} ${title}`));
             const items = typeFindings.map((f) => {
                 const source = options.showSourcePhase && f.sourcePhase !== undefined
                     ? ` *(Phase ${f.sourcePhase})*`
-                    : "";
+                    : '';
                 return `${f.text}${source}`;
             });
             sections.push(list(items));
@@ -391,21 +392,21 @@ function buildSessionFindingsDocument(dataset, options) {
             const phaseFindings = byPhase.get(phase) ?? [];
             sections.push(heading(3, `Phase ${phase}`));
             const items = phaseFindings.map((f) => {
-                const emoji = f.type === "gap"
-                    ? "🔍"
-                    : f.type === "improvement"
-                        ? "💡"
-                        : f.type === "risk"
-                            ? "⚠️"
-                            : "📚";
+                const emoji = f.type === 'gap'
+                    ? '🔍'
+                    : f.type === 'improvement'
+                        ? '💡'
+                        : f.type === 'risk'
+                            ? '⚠️'
+                            : '📚';
                 return `${emoji} ${f.text}`;
             });
             sections.push(list(items));
         }
     }
     sections.push(separator());
-    return document("Session Findings", sections, {
-        purpose: "Retrospective discoveries for roadmap refinement",
+    return document('Session Findings', sections, {
+        purpose: 'Retrospective discoveries for roadmap refinement',
     });
 }
 //# sourceMappingURL=planning.js.map

@@ -4,24 +4,24 @@
  * BDD step definitions for testing the transformToMasterDataset function
  * and related utility functions (completionPercentage, isFullyCompleted).
  */
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
 import {
   transformToMasterDataset,
   completionPercentage,
   isFullyCompleted,
   type RuntimeMasterDataset,
   type RawDataset,
-} from "../../../src/generators/pipeline/transform-dataset.js";
-import type { StatusCounts } from "../../../src/validation-schemas/master-dataset.js";
-import type { ExtractedPattern } from "../../../src/validation-schemas/index.js";
-import type { LoadedWorkflow } from "../../../src/config/workflow-loader.js";
+} from '../../../src/generators/pipeline/transform-dataset.js';
+import type { StatusCounts } from '../../../src/validation-schemas/master-dataset.js';
+import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
+import type { LoadedWorkflow } from '../../../src/config/workflow-loader.js';
 import {
   createTestPattern,
   createDefaultTagRegistry,
   resetPatternCounter,
-} from "../../fixtures/dataset-factories.js";
-import type { DataTableRow } from "../../support/world.js";
+} from '../../fixtures/dataset-factories.js';
+import type { DataTableRow } from '../../support/world.js';
 
 // =============================================================================
 // State Types
@@ -79,7 +79,7 @@ function addPattern(options: Partial<Parameters<typeof createTestPattern>[0]> = 
 // Feature: Transform Dataset Pipeline
 // =============================================================================
 
-const feature = await loadFeature("tests/features/behavior/transform-dataset.feature");
+const feature = await loadFeature('tests/features/behavior/transform-dataset.feature');
 
 describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScenario }) => {
   AfterEachScenario(() => {
@@ -87,7 +87,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   });
 
   Background(({ Given }) => {
-    Given("a transform dataset test context", () => {
+    Given('a transform dataset test context', () => {
       state = initState();
     });
   });
@@ -96,31 +96,31 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Empty Dataset Edge Case
   // ===========================================================================
 
-  Scenario("Transform empty dataset", ({ Given, When, Then, And }) => {
-    Given("an empty raw dataset", () => {
+  Scenario('Transform empty dataset', ({ Given, When, Then, And }) => {
+    Given('an empty raw dataset', () => {
       // state.patterns is already empty
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("the dataset has {int} patterns", (_ctx: unknown, count: number) => {
+    Then('the dataset has {int} patterns', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.patterns.length).toBe(count);
     });
 
-    And("all status counts are 0", () => {
+    And('all status counts are 0', () => {
       expect(state!.dataset!.counts.completed).toBe(0);
       expect(state!.dataset!.counts.active).toBe(0);
       expect(state!.dataset!.counts.planned).toBe(0);
       expect(state!.dataset!.counts.total).toBe(0);
     });
 
-    And("the phase count is {int}", (_ctx: unknown, count: number) => {
+    And('the phase count is {int}', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.phaseCount).toBe(count);
     });
 
-    And("the category count is {int}", (_ctx: unknown, count: number) => {
+    And('the category count is {int}', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.categoryCount).toBe(count);
     });
   });
@@ -129,59 +129,59 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Status Grouping
   // ===========================================================================
 
-  Scenario("Group patterns by status", ({ Given, When, Then, And }) => {
-    Given("a raw dataset with status distribution:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Scenario('Group patterns by status', ({ Given, When, Then, And }) => {
+    Given('a raw dataset with status distribution:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       for (const row of dataTable) {
         const count = parseInt(row.count);
         // Status values now match directly (roadmap, active, completed, deferred)
-        const status = row.status as "roadmap" | "active" | "completed" | "deferred";
+        const status = row.status as 'roadmap' | 'active' | 'completed' | 'deferred';
         for (let i = 0; i < count; i++) {
           addPattern({ status });
         }
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("byStatus.completed has {int} patterns", (_ctx: unknown, count: number) => {
+    Then('byStatus.completed has {int} patterns', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.byStatus.completed.length).toBe(count);
     });
 
-    And("byStatus.active has {int} patterns", (_ctx: unknown, count: number) => {
+    And('byStatus.active has {int} patterns', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.byStatus.active.length).toBe(count);
     });
 
-    And("byStatus.planned has {int} patterns", (_ctx: unknown, count: number) => {
+    And('byStatus.planned has {int} patterns', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.byStatus.planned.length).toBe(count);
     });
 
-    And("counts.total is {int}", (_ctx: unknown, count: number) => {
+    And('counts.total is {int}', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.counts.total).toBe(count);
     });
   });
 
-  Scenario("Normalize status variants to canonical values", ({ Given, When, Then }) => {
+  Scenario('Normalize status variants to canonical values', ({ Given, When, Then }) => {
     const statusMappings: Array<{ status: string; expected: string }> = [];
 
-    Given("patterns with various status values:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+    Given('patterns with various status values:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       for (const row of dataTable) {
-        const status = row.status ?? "";
-        const expected = row.expected ?? "";
+        const status = row.status ?? '';
+        const expected = row.expected ?? '';
         statusMappings.push({ status, expected });
         addPattern({
           name: `Pattern with ${status}`,
-          status: status as "roadmap" | "active" | "completed" | "deferred",
+          status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
         });
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("each pattern is grouped in the expected status bucket", () => {
+    Then('each pattern is grouped in the expected status bucket', () => {
       for (const mapping of statusMappings) {
         const bucket =
           state!.dataset!.byStatus[mapping.expected as keyof typeof state.dataset.byStatus];
@@ -198,8 +198,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Phase Grouping
   // ===========================================================================
 
-  Scenario("Group patterns by phase", ({ Given, When, Then }) => {
-    Given("patterns in multiple phases:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Scenario('Group patterns by phase', ({ Given, When, Then }) => {
+    Given('patterns in multiple phases:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       for (const row of dataTable) {
         const phase = parseInt(row.phase);
         const count = parseInt(row.count);
@@ -209,12 +209,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
     Then(
-      "byPhase has {int} phase groups with counts:",
+      'byPhase has {int} phase groups with counts:',
       (_ctx: unknown, count: number, dataTable: DataTableRow[]) => {
         expect(state!.dataset!.byPhase.length).toBe(count);
         for (const row of dataTable) {
@@ -228,35 +228,35 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
     );
   });
 
-  Scenario("Sort phases by phase number", ({ Given, When, Then }) => {
-    Given("patterns in phases 3, 1, 2 (out of order)", () => {
-      addPattern({ phase: 3, name: "Phase 3 Pattern" });
-      addPattern({ phase: 1, name: "Phase 1 Pattern" });
-      addPattern({ phase: 2, name: "Phase 2 Pattern" });
+  Scenario('Sort phases by phase number', ({ Given, When, Then }) => {
+    Given('patterns in phases 3, 1, 2 (out of order)', () => {
+      addPattern({ phase: 3, name: 'Phase 3 Pattern' });
+      addPattern({ phase: 1, name: 'Phase 1 Pattern' });
+      addPattern({ phase: 2, name: 'Phase 2 Pattern' });
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("byPhase is sorted as [1, 2, 3]", () => {
+    Then('byPhase is sorted as [1, 2, 3]', () => {
       const phaseNumbers = state!.dataset!.byPhase.map((p) => p.phaseNumber);
       expect(phaseNumbers).toEqual([1, 2, 3]);
     });
   });
 
-  Scenario("Compute per-phase status counts", ({ Given, When, Then }) => {
-    Given("phase 1 with 2 completed and 1 active patterns", () => {
-      addPattern({ phase: 1, status: "completed" });
-      addPattern({ phase: 1, status: "completed" });
-      addPattern({ phase: 1, status: "active" });
+  Scenario('Compute per-phase status counts', ({ Given, When, Then }) => {
+    Given('phase 1 with 2 completed and 1 active patterns', () => {
+      addPattern({ phase: 1, status: 'completed' });
+      addPattern({ phase: 1, status: 'completed' });
+      addPattern({ phase: 1, status: 'active' });
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("phase 1 counts are:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+    Then('phase 1 counts are:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       const phase1 = state!.dataset!.byPhase.find((p) => p.phaseNumber === 1);
       expect(phase1).toBeDefined();
 
@@ -268,28 +268,28 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
     });
   });
 
-  Scenario("Patterns without phase are not in byPhase", ({ Given, When, Then, And }) => {
-    Given("{int} patterns without phase metadata", (_ctx: unknown, count: number) => {
+  Scenario('Patterns without phase are not in byPhase', ({ Given, When, Then, And }) => {
+    Given('{int} patterns without phase metadata', (_ctx: unknown, count: number) => {
       for (let i = 0; i < count; i++) {
         addPattern({ name: `No Phase Pattern ${i}` });
       }
     });
 
-    And("{int} patterns in phase {int}", (_ctx: unknown, count: number, phase: number) => {
+    And('{int} patterns in phase {int}', (_ctx: unknown, count: number, phase: number) => {
       for (let i = 0; i < count; i++) {
         addPattern({ phase, name: `Phase ${phase} Pattern ${i}` });
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("byPhase has {int} phase group", (_ctx: unknown, count: number) => {
+    Then('byPhase has {int} phase group', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.byPhase.length).toBe(count);
     });
 
-    And("phaseCount is {int}", (_ctx: unknown, count: number) => {
+    And('phaseCount is {int}', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.phaseCount).toBe(count);
     });
   });
@@ -298,8 +298,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Quarter Grouping
   // ===========================================================================
 
-  Scenario("Group patterns by quarter", ({ Given, When, Then }) => {
-    Given("patterns in multiple quarters:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Scenario('Group patterns by quarter', ({ Given, When, Then }) => {
+    Given('patterns in multiple quarters:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       for (const row of dataTable) {
         const count = parseInt(row.count);
         for (let i = 0; i < count; i++) {
@@ -308,17 +308,17 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
     Then(
-      "byQuarter has {int} quarters with counts:",
+      'byQuarter has {int} quarters with counts:',
       (_ctx: unknown, count: number, dataTable: DataTableRow[]) => {
         expect(Object.keys(state!.dataset!.byQuarter).length).toBe(count);
         for (const row of dataTable) {
-          const quarter = row.quarter ?? "";
-          const expectedCount = parseInt(row.count ?? "0");
+          const quarter = row.quarter ?? '';
+          const expectedCount = parseInt(row.count ?? '0');
           const quarterPatterns = state!.dataset!.byQuarter[quarter];
           expect(quarterPatterns?.length).toBe(expectedCount);
         }
@@ -326,24 +326,24 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
     );
   });
 
-  Scenario("Patterns without quarter are not in byQuarter", ({ Given, When, Then, And }) => {
-    Given("{int} patterns without quarter", (_ctx: unknown, count: number) => {
+  Scenario('Patterns without quarter are not in byQuarter', ({ Given, When, Then, And }) => {
+    Given('{int} patterns without quarter', (_ctx: unknown, count: number) => {
       for (let i = 0; i < count; i++) {
         addPattern({ name: `No Quarter Pattern ${i}` });
       }
     });
 
-    And("{int} patterns in quarter {string}", (_ctx: unknown, count: number, quarter: string) => {
+    And('{int} patterns in quarter {string}', (_ctx: unknown, count: number, quarter: string) => {
       for (let i = 0; i < count; i++) {
         addPattern({ quarter, name: `${quarter} Pattern ${i}` });
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("byQuarter has {int} quarter", (_ctx: unknown, count: number) => {
+    Then('byQuarter has {int} quarter', (_ctx: unknown, count: number) => {
       expect(Object.keys(state!.dataset!.byQuarter).length).toBe(count);
     });
   });
@@ -352,8 +352,8 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Category Grouping
   // ===========================================================================
 
-  Scenario("Group patterns by category", ({ Given, When, Then, And }) => {
-    Given("patterns in categories:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Scenario('Group patterns by category', ({ Given, When, Then, And }) => {
+    Given('patterns in categories:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       for (const row of dataTable) {
         const count = parseInt(row.count);
         for (let i = 0; i < count; i++) {
@@ -362,24 +362,24 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
     Then(
-      "byCategory has {int} categories with counts:",
+      'byCategory has {int} categories with counts:',
       (_ctx: unknown, count: number, dataTable: DataTableRow[]) => {
         expect(Object.keys(state!.dataset!.byCategory).length).toBe(count);
         for (const row of dataTable) {
-          const category = row.category ?? "";
-          const expectedCount = parseInt(row.count ?? "0");
+          const category = row.category ?? '';
+          const expectedCount = parseInt(row.count ?? '0');
           const categoryPatterns = state!.dataset!.byCategory[category];
           expect(categoryPatterns?.length).toBe(expectedCount);
         }
       }
     );
 
-    And("categoryCount is {int}", (_ctx: unknown, count: number) => {
+    And('categoryCount is {int}', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.categoryCount).toBe(count);
     });
   });
@@ -388,10 +388,10 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Source Grouping
   // ===========================================================================
 
-  Scenario("Group patterns by source file type", ({ Given, When, Then, And }) => {
-    Given("patterns from different sources:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Scenario('Group patterns by source file type', ({ Given, When, Then, And }) => {
+    Given('patterns from different sources:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       for (const row of dataTable) {
-        const source = row.source ?? "";
+        const source = row.source ?? '';
         addPattern({
           filePath: source,
           name: `Pattern from ${source}`,
@@ -399,37 +399,37 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("bySource.typescript has {int} patterns", (_ctx: unknown, count: number) => {
+    Then('bySource.typescript has {int} patterns', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.bySource.typescript.length).toBe(count);
     });
 
-    And("bySource.gherkin has {int} pattern", (_ctx: unknown, count: number) => {
+    And('bySource.gherkin has {int} pattern', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.bySource.gherkin.length).toBe(count);
     });
   });
 
-  Scenario("Patterns with phase are also in roadmap view", ({ Given, When, Then, And }) => {
-    Given("{int} patterns with phase metadata", (_ctx: unknown, count: number) => {
+  Scenario('Patterns with phase are also in roadmap view', ({ Given, When, Then, And }) => {
+    Given('{int} patterns with phase metadata', (_ctx: unknown, count: number) => {
       for (let i = 0; i < count; i++) {
         addPattern({ phase: 1, name: `Phase Pattern ${i}` });
       }
     });
 
-    And("{int} patterns without phase", (_ctx: unknown, count: number) => {
+    And('{int} patterns without phase', (_ctx: unknown, count: number) => {
       for (let i = 0; i < count; i++) {
         addPattern({ name: `No Phase Pattern ${i}` });
       }
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("bySource.roadmap has {int} patterns", (_ctx: unknown, count: number) => {
+    Then('bySource.roadmap has {int} patterns', (_ctx: unknown, count: number) => {
       expect(state!.dataset!.bySource.roadmap.length).toBe(count);
     });
   });
@@ -441,43 +441,43 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Relationship Index
   // ===========================================================================
 
-  Scenario("Build relationship index from patterns", ({ Given, When, Then, And }) => {
+  Scenario('Build relationship index from patterns', ({ Given, When, Then, And }) => {
     Given(
-      "a pattern {string} that uses {string}",
+      'a pattern {string} that uses {string}',
       (_ctx: unknown, name: string, target: string) => {
         addPattern({ name, patternName: name, uses: [target] });
       }
     );
 
     And(
-      "a pattern {string} that is used by {string}",
+      'a pattern {string} that is used by {string}',
       (_ctx: unknown, name: string, user: string) => {
         addPattern({ name, patternName: name, usedBy: [user] });
       }
     );
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
     Then(
-      "the relationship index for {string} uses contains {string}",
+      'the relationship index for {string} uses contains {string}',
       (_ctx: unknown, name: string, target: string) => {
         expect(state!.dataset!.relationshipIndex[name]?.uses).toContain(target);
       }
     );
 
     And(
-      "the relationship index for {string} usedBy contains {string}",
+      'the relationship index for {string} usedBy contains {string}',
       (_ctx: unknown, name: string, user: string) => {
         expect(state!.dataset!.relationshipIndex[name]?.usedBy).toContain(user);
       }
     );
   });
 
-  Scenario("Build relationship index with all relationship types", ({ Given, When, Then }) => {
+  Scenario('Build relationship index with all relationship types', ({ Given, When, Then }) => {
     Given(
-      "a pattern {string} with relationships:",
+      'a pattern {string} with relationships:',
       (_ctx: unknown, name: string, dataTable: DataTableRow[]) => {
         const uses: string[] = [];
         const usedBy: string[] = [];
@@ -486,16 +486,16 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
 
         for (const row of dataTable) {
           switch (row.type) {
-            case "uses":
+            case 'uses':
               uses.push(row.targets);
               break;
-            case "usedBy":
+            case 'usedBy':
               usedBy.push(row.targets);
               break;
-            case "dependsOn":
+            case 'dependsOn':
               dependsOn.push(row.targets);
               break;
-            case "enables":
+            case 'enables':
               enables.push(row.targets);
               break;
           }
@@ -505,12 +505,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     );
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
     Then(
-      "the relationship index for {string} contains:",
+      'the relationship index for {string} contains:',
       (_ctx: unknown, name: string, dataTable: DataTableRow[]) => {
         const rel = state!.dataset!.relationshipIndex[name];
         expect(rel).toBeDefined();
@@ -528,12 +528,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // ===========================================================================
 
   ScenarioOutline(
-    "Calculate completion percentage",
+    'Calculate completion percentage',
     (
       { Given, When, Then },
       variables: { completed: string; total: string; percentage: string }
     ) => {
-      Given("status counts with completed {string} of total {string}", () => {
+      Given('status counts with completed {string} of total {string}', () => {
         const completed = parseInt(variables.completed);
         const total = parseInt(variables.total);
         state!.statusCounts = {
@@ -544,11 +544,11 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
         };
       });
 
-      When("calculating completion percentage", () => {
+      When('calculating completion percentage', () => {
         state!.percentageResult = completionPercentage(state!.statusCounts!);
       });
 
-      Then("the result is {string} percent", () => {
+      Then('the result is {string} percent', () => {
         expect(state!.percentageResult).toBe(parseInt(variables.percentage));
       });
     }
@@ -559,7 +559,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // ===========================================================================
 
   ScenarioOutline(
-    "Check if fully completed",
+    'Check if fully completed',
     (
       { Given, When, Then },
       variables: {
@@ -571,7 +571,7 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     ) => {
       Given(
-        "status counts {string} completed {string} active {string} planned of {string} total",
+        'status counts {string} completed {string} active {string} planned of {string} total',
         () => {
           state!.statusCounts = {
             completed: parseInt(variables.completed),
@@ -582,12 +582,12 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
         }
       );
 
-      When("checking if fully completed", () => {
+      When('checking if fully completed', () => {
         state!.isCompletedResult = isFullyCompleted(state!.statusCounts!);
       });
 
-      Then("the result is {string}", () => {
-        const expected = variables.expected === "true";
+      Then('the result is {string}', () => {
+        const expected = variables.expected === 'true';
         expect(state!.isCompletedResult).toBe(expected);
       });
     }
@@ -597,18 +597,18 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   // Workflow Integration
   // ===========================================================================
 
-  Scenario("Include workflow in result when provided", ({ Given, When, Then, And }) => {
-    Given("a workflow with phases:", (_ctx: unknown, dataTable: DataTableRow[]) => {
+  Scenario('Include workflow in result when provided', ({ Given, When, Then, And }) => {
+    Given('a workflow with phases:', (_ctx: unknown, dataTable: DataTableRow[]) => {
       const phases = dataTable.map((row) => ({
-        order: parseInt(row.order ?? "0"),
-        name: row.name ?? "",
-        description: `${row.name ?? ""} phase`,
+        order: parseInt(row.order ?? '0'),
+        name: row.name ?? '',
+        description: `${row.name ?? ''} phase`,
       }));
 
       state!.workflow = {
         config: {
-          name: "Test Workflow",
-          version: "1.0",
+          name: 'Test Workflow',
+          version: '1.0',
           phases,
         },
         // Simplified LoadedWorkflow with just what we need
@@ -616,17 +616,17 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       } as LoadedWorkflow;
     });
 
-    And("patterns in phases 1 and 2", () => {
-      addPattern({ phase: 1, name: "Phase 1 Pattern" });
-      addPattern({ phase: 2, name: "Phase 2 Pattern" });
+    And('patterns in phases 1 and 2', () => {
+      addPattern({ phase: 1, name: 'Phase 1 Pattern' });
+      addPattern({ phase: 2, name: 'Phase 2 Pattern' });
     });
 
-    When("transforming with the workflow", () => {
+    When('transforming with the workflow', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
     Then(
-      "the result includes the workflow with phase names:",
+      'the result includes the workflow with phase names:',
       (_ctx: unknown, dataTable: DataTableRow[]) => {
         expect(state!.dataset!.workflow).toBeDefined();
         for (const row of dataTable) {
@@ -639,17 +639,17 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
     );
   });
 
-  Scenario("Result omits workflow when not provided", ({ Given, When, Then }) => {
-    Given("patterns without a workflow", () => {
-      addPattern({ name: "Pattern 1" });
-      addPattern({ name: "Pattern 2" });
+  Scenario('Result omits workflow when not provided', ({ Given, When, Then }) => {
+    Given('patterns without a workflow', () => {
+      addPattern({ name: 'Pattern 1' });
+      addPattern({ name: 'Pattern 2' });
     });
 
-    When("transforming to MasterDataset", () => {
+    When('transforming to MasterDataset', () => {
       state!.dataset = transformToMasterDataset(createRawDataset());
     });
 
-    Then("the result does not include workflow", () => {
+    Then('the result does not include workflow', () => {
       expect(state!.dataset!.workflow).toBeUndefined();
     });
   });

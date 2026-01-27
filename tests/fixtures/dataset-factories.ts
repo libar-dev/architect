@@ -9,12 +9,12 @@
  * @libar-docs
  */
 
-import type { ExtractedPattern } from "../../src/validation-schemas/index.js";
-import type { StatusCounts } from "../../src/validation-schemas/master-dataset.js";
-import type { RuntimeMasterDataset } from "../../src/generators/pipeline/transform-dataset.js";
+import type { ExtractedPattern } from '../../src/validation-schemas/index.js';
+import type { StatusCounts } from '../../src/validation-schemas/master-dataset.js';
+import type { RuntimeMasterDataset } from '../../src/generators/pipeline/transform-dataset.js';
 
-import { transformToMasterDataset } from "../../src/generators/pipeline/transform-dataset.js";
-import { createDefaultTagRegistry } from "../../src/validation-schemas/tag-registry.js";
+import { transformToMasterDataset } from '../../src/generators/pipeline/transform-dataset.js';
+import { createDefaultTagRegistry } from '../../src/validation-schemas/tag-registry.js';
 import {
   createTestPattern,
   createTestPatternSet,
@@ -24,7 +24,7 @@ import {
   resetPatternCounter,
   type TestPatternOptions,
   type PatternSetOptions,
-} from "./pattern-factories.js";
+} from './pattern-factories.js';
 
 // ============================================================================
 // Types
@@ -118,7 +118,7 @@ export function createTestMasterDataset(
   const {
     patterns: providedPatterns,
     patternCount = 0,
-    categories = ["core"],
+    categories = ['core'],
     withRelationships = false,
     withTimeline = false,
     withRoadmap = false,
@@ -281,10 +281,10 @@ export function createMasterDatasetWithADRs(count = 3): RuntimeMasterDataset {
   for (let i = 1; i <= count; i++) {
     patterns.push(
       createTestPattern({
-        id: `pattern-ad2${String(i).padStart(5, "0")}`,
-        name: `ADR-${String(i).padStart(3, "0")}: Decision ${i}`,
-        category: "decision",
-        status: i <= count / 2 ? "completed" : "active",
+        id: `pattern-ad2${String(i).padStart(5, '0')}`,
+        name: `ADR-${String(i).padStart(3, '0')}: Decision ${i}`,
+        category: 'decision',
+        status: i <= count / 2 ? 'completed' : 'active',
         // ADR-specific fields would go in the directive metadata
       })
     );
@@ -311,7 +311,7 @@ export function createMasterDatasetWithADRs(count = 3): RuntimeMasterDataset {
  * @returns Valid pattern ID string
  */
 function generateValidPatternId(index: number): string {
-  return `pattern-${index.toString(16).padStart(8, "0")}`;
+  return `pattern-${index.toString(16).padStart(8, '0')}`;
 }
 
 function createPatternsWithStatusDistribution(
@@ -333,7 +333,7 @@ function createPatternsWithStatusDistribution(
         id: generateValidPatternId(patternIndex),
         name: `Completed Pattern ${i + 1}`,
         category: getCategory(),
-        status: "completed",
+        status: 'completed',
       })
     );
   }
@@ -346,7 +346,7 @@ function createPatternsWithStatusDistribution(
         id: generateValidPatternId(patternIndex),
         name: `Active Pattern ${i + 1}`,
         category: getCategory(),
-        status: "active",
+        status: 'active',
       })
     );
   }
@@ -359,7 +359,7 @@ function createPatternsWithStatusDistribution(
         id: generateValidPatternId(patternIndex),
         name: `Planned Pattern ${i + 1}`,
         category: getCategory(),
-        status: "roadmap",
+        status: 'roadmap',
       })
     );
   }
@@ -385,4 +385,4 @@ export {
 };
 
 // Re-export TagRegistry factory for tests that need custom registries
-export { createDefaultTagRegistry } from "../../src/validation-schemas/tag-registry.js";
+export { createDefaultTagRegistry } from '../../src/validation-schemas/tag-registry.js';

@@ -13,8 +13,6 @@
 
 ## Description
 
-## DocDirectiveSchema - Parsed JSDoc Directive Validation
-
 Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
 Enforces tag format, position validity, and metadata extraction.
 

@@ -11,9 +11,9 @@
  *
  * Flow: MasterDataset → Codec → RenderableDocument → Renderer → Markdown
  */
-import type { MasterDataset } from "../validation-schemas/master-dataset.js";
-import { type OutputFile } from "./render.js";
-import type { PatternsCodecOptions, RoadmapCodecOptions, CompletedMilestonesCodecOptions, CurrentWorkCodecOptions, RequirementsCodecOptions, SessionCodecOptions, RemainingWorkCodecOptions, PrChangesCodecOptions, AdrCodecOptions, PlanningChecklistCodecOptions, SessionPlanCodecOptions, SessionFindingsCodecOptions, ChangelogCodecOptions, TraceabilityCodecOptions, OverviewCodecOptions, BusinessRulesCodecOptions, ArchitectureCodecOptions } from "./codecs/index.js";
+import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import { type OutputFile } from './render.js';
+import type { PatternsCodecOptions, RoadmapCodecOptions, CompletedMilestonesCodecOptions, CurrentWorkCodecOptions, RequirementsCodecOptions, SessionCodecOptions, RemainingWorkCodecOptions, PrChangesCodecOptions, AdrCodecOptions, PlanningChecklistCodecOptions, SessionPlanCodecOptions, SessionFindingsCodecOptions, ChangelogCodecOptions, TraceabilityCodecOptions, OverviewCodecOptions, BusinessRulesCodecOptions, ArchitectureCodecOptions } from './codecs/index.js';
 /**
  * Available document types and their output paths
  */
@@ -46,7 +46,7 @@ export declare const DOCUMENT_TYPES: {
         readonly outputPath: "REMAINING-WORK.md";
         readonly description: "Aggregate view of incomplete work";
     };
-    readonly "pr-changes": {
+    readonly 'pr-changes': {
         readonly outputPath: "working/PR-CHANGES.md";
         readonly description: "PR-scoped changes for review";
     };
@@ -54,15 +54,15 @@ export declare const DOCUMENT_TYPES: {
         readonly outputPath: "DECISIONS.md";
         readonly description: "Architecture Decision Records";
     };
-    readonly "planning-checklist": {
+    readonly 'planning-checklist': {
         readonly outputPath: "PLANNING-CHECKLIST.md";
         readonly description: "Pre-planning questions and Definition of Done";
     };
-    readonly "session-plan": {
+    readonly 'session-plan': {
         readonly outputPath: "SESSION-PLAN.md";
         readonly description: "Implementation plans for phases";
     };
-    readonly "session-findings": {
+    readonly 'session-findings': {
         readonly outputPath: "SESSION-FINDINGS.md";
         readonly description: "Retrospective discoveries for roadmap refinement";
     };
@@ -78,7 +78,7 @@ export declare const DOCUMENT_TYPES: {
         readonly outputPath: "OVERVIEW.md";
         readonly description: "Project architecture overview";
     };
-    readonly "business-rules": {
+    readonly 'business-rules': {
         readonly outputPath: "BUSINESS-RULES.md";
         readonly description: "Business rules and invariants by domain";
     };
@@ -113,15 +113,15 @@ export interface CodecOptions {
     requirements?: RequirementsCodecOptions;
     session?: SessionCodecOptions;
     remaining?: RemainingWorkCodecOptions;
-    "pr-changes"?: PrChangesCodecOptions;
+    'pr-changes'?: PrChangesCodecOptions;
     adrs?: AdrCodecOptions;
-    "planning-checklist"?: PlanningChecklistCodecOptions;
-    "session-plan"?: SessionPlanCodecOptions;
-    "session-findings"?: SessionFindingsCodecOptions;
+    'planning-checklist'?: PlanningChecklistCodecOptions;
+    'session-plan'?: SessionPlanCodecOptions;
+    'session-findings'?: SessionFindingsCodecOptions;
     changelog?: ChangelogCodecOptions;
     traceability?: TraceabilityCodecOptions;
     overview?: OverviewCodecOptions;
-    "business-rules"?: BusinessRulesCodecOptions;
+    'business-rules'?: BusinessRulesCodecOptions;
     architecture?: ArchitectureCodecOptions;
 }
 /**

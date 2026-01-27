@@ -16,7 +16,7 @@
  * - Validating tag registry configuration at load time
  * - Merging user registry with default registry
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Category definition schema
  *

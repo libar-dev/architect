@@ -19,7 +19,7 @@
  * return type to become `any`. Using a simplified schema here keeps
  * codec return types clean while still validating the structure.
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Simplified output schema for codec decode results.
  *

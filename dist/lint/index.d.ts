@@ -15,9 +15,10 @@
  * - Use when importing lint functionality into CLI or other consumers
  * - Use for accessing both rules and engine from a single import
  */
-export type { LintSeverity, LintViolation, LintRule, LintContext } from "./rules.js";
-export { defaultRules, filterRulesBySeverity, missingPatternName, invalidStatus, missingStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget, } from "./rules.js";
-export type { LintResult, LintSummary, DirectiveWithLocation } from "./engine.js";
-export { lintDirective, lintFiles, hasFailures, sortViolationsBySeverity, formatPretty, formatJson, } from "./engine.js";
-export * from "./process-guard/index.js";
+export type { LintSeverity, LintViolation } from '../validation-schemas/lint.js';
+export type { LintRule, LintContext } from './rules.js';
+export { defaultRules, filterRulesBySeverity, missingPatternName, invalidStatus, missingStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget, } from './rules.js';
+export type { LintResult, LintSummary, DirectiveWithLocation } from './engine.js';
+export { lintDirective, lintFiles, hasFailures, sortViolationsBySeverity, formatPretty, formatJson, } from './engine.js';
+export * from './process-guard/index.js';
 //# sourceMappingURL=index.d.ts.map

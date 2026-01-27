@@ -10,10 +10,10 @@
  * Individual codec files define their own specific option types that extend BaseCodecOptions.
  */
 
-import type { z } from "zod";
-import type { NormalizedStatus } from "../../../taxonomy/index.js";
-import type { MasterDatasetSchema } from "../../../validation-schemas/master-dataset.js";
-import type { RenderableDocumentOutputSchema } from "../shared-schema.js";
+import type { z } from 'zod';
+import type { NormalizedStatus } from '../../../taxonomy/index.js';
+import type { MasterDatasetSchema } from '../../../validation-schemas/master-dataset.js';
+import type { RenderableDocumentOutputSchema } from '../shared-schema.js';
 
 /**
  * Detail level for progressive disclosure
@@ -21,7 +21,7 @@ import type { RenderableDocumentOutputSchema } from "../shared-schema.js";
  * - standard: Default behavior with detail files
  * - detailed: Maximum detail, all optional sections included
  */
-export type DetailLevel = "summary" | "standard" | "detailed";
+export type DetailLevel = 'summary' | 'standard' | 'detailed';
 
 /**
  * Normalized status values that match normalizeStatus() output.
@@ -75,7 +75,7 @@ export const DEFAULT_LIMITS: Required<CodecLimits> = {
  */
 export const DEFAULT_BASE_OPTIONS: Required<BaseCodecOptions> = {
   generateDetailFiles: true,
-  detailLevel: "standard",
+  detailLevel: 'standard',
   limits: DEFAULT_LIMITS,
 };
 

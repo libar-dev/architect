@@ -16,7 +16,7 @@
  * - When extending anti-pattern detection rules
  * - When consuming validation results in CLI or reports
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Zod schema for anti-pattern thresholds
  *
@@ -45,20 +45,20 @@ export const DEFAULT_THRESHOLDS = {
  */
 export const COMPLETION_PATTERNS = [
     // Text patterns (case-insensitive)
-    "complete",
-    "completed",
-    "done",
-    "finished",
-    "yes",
+    'complete',
+    'completed',
+    'done',
+    'finished',
+    'yes',
     // Emoji/symbol patterns
-    "✓",
-    "✔",
-    "✅",
-    "☑",
+    '✓',
+    '✔',
+    '✅',
+    '☑',
     // Checkmark unicode variants
-    "\u2713", // ✓
-    "\u2714", // ✔
-    "\u2611", // ☑
+    '\u2713', // ✓
+    '\u2714', // ✔
+    '\u2611', // ☑
 ];
 /**
  * In-progress status detection patterns
@@ -66,16 +66,16 @@ export const COMPLETION_PATTERNS = [
  * Status values that indicate work is ongoing.
  */
 export const IN_PROGRESS_PATTERNS = [
-    "in-progress",
-    "in progress",
-    "active",
-    "wip",
-    "partial",
-    "started",
+    'in-progress',
+    'in progress',
+    'active',
+    'wip',
+    'partial',
+    'started',
     // Emoji patterns
-    "🔄",
-    "⏳",
-    "🚧",
+    '🔄',
+    '⏳',
+    '🚧',
 ];
 /**
  * Pending status detection patterns
@@ -83,14 +83,14 @@ export const IN_PROGRESS_PATTERNS = [
  * Status values that indicate work hasn't started.
  */
 export const PENDING_PATTERNS = [
-    "pending",
-    "todo",
-    "planned",
-    "not started",
-    "no",
+    'pending',
+    'todo',
+    'planned',
+    'not started',
+    'no',
     // Emoji patterns
-    "⏹",
-    "⬜",
-    "❌",
+    '⏹',
+    '⬜',
+    '❌',
 ];
 //# sourceMappingURL=types.js.map

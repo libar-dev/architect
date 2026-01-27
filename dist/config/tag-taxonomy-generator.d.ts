@@ -9,7 +9,7 @@
  * - Aggregation tags (with target documents)
  * - Format options for templates
  */
-import type { TagRegistry } from "../validation-schemas/index.js";
+import type { TagRegistry } from '../validation-schemas/index.js';
 /**
  * Configuration for tag taxonomy generation
  */

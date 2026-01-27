@@ -13,8 +13,6 @@
 
 ## Description
 
-## Delivery Process Factory
-
 Main factory function for creating configured delivery process instances.
 Supports presets, custom configuration, and configuration overrides.
 

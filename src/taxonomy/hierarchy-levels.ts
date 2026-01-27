@@ -6,11 +6,11 @@
  * - phase: Standard work units (2-5 days)
  * - task: Fine-grained session-level work (1-4 hours)
  */
-export const HIERARCHY_LEVELS = ["epic", "phase", "task"] as const;
+export const HIERARCHY_LEVELS = ['epic', 'phase', 'task'] as const;
 
 export type HierarchyLevel = (typeof HIERARCHY_LEVELS)[number];
 
 /**
  * Default hierarchy level (for backward compatibility)
  */
-export const DEFAULT_HIERARCHY_LEVEL: HierarchyLevel = "phase";
+export const DEFAULT_HIERARCHY_LEVEL: HierarchyLevel = 'phase';

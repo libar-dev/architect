@@ -18,12 +18,12 @@
  * - When customizing the taxonomy for a specific project
  */
 
-import type { DeliveryProcessConfig, DeliveryProcessInstance } from "./types.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import { buildRegistry } from "../taxonomy/registry-builder.js";
-import { mergeTagRegistries } from "../validation-schemas/tag-registry.js";
-import { createRegexBuilders } from "./regex-builders.js";
-import { DDD_ES_CQRS_PRESET, PRESETS, type PresetName } from "./presets.js";
+import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import { buildRegistry } from '../taxonomy/registry-builder.js';
+import { mergeTagRegistries } from '../validation-schemas/tag-registry.js';
+import { createRegexBuilders } from './regex-builders.js';
+import { DDD_ES_CQRS_PRESET, PRESETS, type PresetName } from './presets.js';
 
 /**
  * Options for creating a delivery process instance
@@ -36,7 +36,7 @@ export interface CreateDeliveryProcessOptions {
   /** Custom file opt-in tag (overrides preset) */
   fileOptInTag?: string;
   /** Custom categories (merged with or replaces preset) */
-  categories?: DeliveryProcessConfig["categories"];
+  categories?: DeliveryProcessConfig['categories'];
 }
 
 /**

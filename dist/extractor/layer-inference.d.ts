@@ -28,7 +28,7 @@
  * - `component`: Tooling/infrastructure component tests
  * - `unknown`: Unclassified features (fallback)
  */
-export type FeatureLayer = "timeline" | "domain" | "integration" | "e2e" | "component" | "unknown";
+export type FeatureLayer = 'timeline' | 'domain' | 'integration' | 'e2e' | 'component' | 'unknown';
 /**
  * All valid feature layers as a readonly array
  *

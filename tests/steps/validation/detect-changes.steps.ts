@@ -7,10 +7,10 @@
  * @libar-docs
  */
 
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-import { detectDeliverableChanges } from "../../../src/lint/process-guard/index.js";
-import type { DeliverableChange } from "../../../src/lint/process-guard/index.js";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
+import { detectDeliverableChanges } from '../../../src/lint/process-guard/index.js';
+import type { DeliverableChange } from '../../../src/lint/process-guard/index.js';
 
 // =============================================================================
 // Type Definitions
@@ -33,7 +33,7 @@ let state: DetectChangesTestState | null = null;
 
 function initState(): DetectChangesTestState {
   return {
-    diff: "",
+    diff: '',
     files: [],
     result: null,
   };
@@ -43,7 +43,7 @@ function initState(): DetectChangesTestState {
 // Helper Functions
 // =============================================================================
 
-const TEST_FILE = "specs/test.feature";
+const TEST_FILE = 'specs/test.feature';
 
 /**
  * Create a git diff string for testing.
@@ -75,7 +75,7 @@ function getResult(): DeliverableChange | undefined {
 // Feature Loading
 // =============================================================================
 
-const feature = await loadFeature("tests/features/validation/detect-changes.feature");
+const feature = await loadFeature('tests/features/validation/detect-changes.feature');
 
 // =============================================================================
 // Step Definitions
@@ -83,7 +83,7 @@ const feature = await loadFeature("tests/features/validation/detect-changes.feat
 
 describeFeature(feature, ({ Background, Rule }) => {
   Background(({ Given }) => {
-    Given("a detect changes test context", () => {
+    Given('a detect changes test context', () => {
       state = initState();
     });
   });
@@ -92,70 +92,70 @@ describeFeature(feature, ({ Background, Rule }) => {
   // Modification Detection Rule
   // ===========================================================================
 
-  Rule("Status changes are detected as modifications not additions", ({ RuleScenario }) => {
+  Rule('Status changes are detected as modifications not additions', ({ RuleScenario }) => {
     RuleScenario(
-      "Single deliverable status change is detected as modification",
+      'Single deliverable status change is detected as modification',
       ({ Given, When, Then, And }) => {
         Given(
           'a git diff with deliverable "Type definitions" changed from "planned" to "completed"',
           () => {
             state!.files = [TEST_FILE];
             state!.diff = `${createDiffHeader(TEST_FILE)}
--${createDeliverableRow("Type definitions", "planned")}
-+${createDeliverableRow("Type definitions", "completed")}`;
+-${createDeliverableRow('Type definitions', 'planned')}
++${createDeliverableRow('Type definitions', 'completed')}`;
           }
         );
 
-        When("detecting deliverable changes", () => {
+        When('detecting deliverable changes', () => {
           state!.result = detectDeliverableChanges(state!.diff, state!.files);
         });
 
         Then('the deliverable "Type definitions" is in the "modified" list', () => {
           const result = getResult();
           expect(result).toBeDefined();
-          expect(result!.modified).toContain("Type definitions");
+          expect(result!.modified).toContain('Type definitions');
         });
 
         And('the deliverable "Type definitions" is not in the "added" list', () => {
           const result = getResult();
-          expect(result!.added).not.toContain("Type definitions");
+          expect(result!.added).not.toContain('Type definitions');
         });
 
         And('the deliverable "Type definitions" is not in the "removed" list', () => {
           const result = getResult();
-          expect(result!.removed).not.toContain("Type definitions");
+          expect(result!.removed).not.toContain('Type definitions');
         });
       }
     );
 
     RuleScenario(
-      "Multiple deliverable status changes are all modifications",
+      'Multiple deliverable status changes are all modifications',
       ({ Given, When, Then, And }) => {
         Given(
           'a git diff with deliverables "Type definitions" and "Unit tests" both changing status',
           () => {
             state!.files = [TEST_FILE];
             state!.diff = `${createDiffHeader(TEST_FILE)}
--${createDeliverableRow("Type definitions", "planned")}
--${createDeliverableRow("Unit tests", "planned")}
-+${createDeliverableRow("Type definitions", "completed")}
-+${createDeliverableRow("Unit tests", "completed")}`;
+-${createDeliverableRow('Type definitions', 'planned')}
+-${createDeliverableRow('Unit tests', 'planned')}
++${createDeliverableRow('Type definitions', 'completed')}
++${createDeliverableRow('Unit tests', 'completed')}`;
           }
         );
 
-        When("detecting deliverable changes", () => {
+        When('detecting deliverable changes', () => {
           state!.result = detectDeliverableChanges(state!.diff, state!.files);
         });
 
         Then('the deliverable "Type definitions" is in the "modified" list', () => {
           const result = getResult();
           expect(result).toBeDefined();
-          expect(result!.modified).toContain("Type definitions");
+          expect(result!.modified).toContain('Type definitions');
         });
 
         And('the deliverable "Unit tests" is in the "modified" list', () => {
           const result = getResult();
-          expect(result!.modified).toContain("Unit tests");
+          expect(result!.modified).toContain('Unit tests');
         });
 
         And('no deliverables are in the "added" list', () => {
@@ -175,32 +175,32 @@ describeFeature(feature, ({ Background, Rule }) => {
   // Addition Detection Rule
   // ===========================================================================
 
-  Rule("New deliverables are detected as additions", ({ RuleScenario }) => {
-    RuleScenario("New deliverable is detected as addition", ({ Given, When, Then, And }) => {
+  Rule('New deliverables are detected as additions', ({ RuleScenario }) => {
+    RuleScenario('New deliverable is detected as addition', ({ Given, When, Then, And }) => {
       Given('a git diff with new deliverable "New feature" added', () => {
         state!.files = [TEST_FILE];
         state!.diff = `${createDiffHeader(TEST_FILE)}
-+${createDeliverableRow("New feature", "planned")}`;
++${createDeliverableRow('New feature', 'planned')}`;
       });
 
-      When("detecting deliverable changes", () => {
+      When('detecting deliverable changes', () => {
         state!.result = detectDeliverableChanges(state!.diff, state!.files);
       });
 
       Then('the deliverable "New feature" is in the "added" list', () => {
         const result = getResult();
         expect(result).toBeDefined();
-        expect(result!.added).toContain("New feature");
+        expect(result!.added).toContain('New feature');
       });
 
       And('the deliverable "New feature" is not in the "modified" list', () => {
         const result = getResult();
-        expect(result!.modified).not.toContain("New feature");
+        expect(result!.modified).not.toContain('New feature');
       });
 
       And('the deliverable "New feature" is not in the "removed" list', () => {
         const result = getResult();
-        expect(result!.removed).not.toContain("New feature");
+        expect(result!.removed).not.toContain('New feature');
       });
     });
   });
@@ -209,32 +209,32 @@ describeFeature(feature, ({ Background, Rule }) => {
   // Removal Detection Rule
   // ===========================================================================
 
-  Rule("Removed deliverables are detected as removals", ({ RuleScenario }) => {
-    RuleScenario("Removed deliverable is detected as removal", ({ Given, When, Then, And }) => {
+  Rule('Removed deliverables are detected as removals', ({ RuleScenario }) => {
+    RuleScenario('Removed deliverable is detected as removal', ({ Given, When, Then, And }) => {
       Given('a git diff with deliverable "Deprecated feature" removed', () => {
         state!.files = [TEST_FILE];
         state!.diff = `${createDiffHeader(TEST_FILE)}
--${createDeliverableRow("Deprecated feature", "completed")}`;
+-${createDeliverableRow('Deprecated feature', 'completed')}`;
       });
 
-      When("detecting deliverable changes", () => {
+      When('detecting deliverable changes', () => {
         state!.result = detectDeliverableChanges(state!.diff, state!.files);
       });
 
       Then('the deliverable "Deprecated feature" is in the "removed" list', () => {
         const result = getResult();
         expect(result).toBeDefined();
-        expect(result!.removed).toContain("Deprecated feature");
+        expect(result!.removed).toContain('Deprecated feature');
       });
 
       And('the deliverable "Deprecated feature" is not in the "modified" list', () => {
         const result = getResult();
-        expect(result!.modified).not.toContain("Deprecated feature");
+        expect(result!.modified).not.toContain('Deprecated feature');
       });
 
       And('the deliverable "Deprecated feature" is not in the "added" list', () => {
         const result = getResult();
-        expect(result!.added).not.toContain("Deprecated feature");
+        expect(result!.added).not.toContain('Deprecated feature');
       });
     });
   });
@@ -243,27 +243,27 @@ describeFeature(feature, ({ Background, Rule }) => {
   // Mixed Changes Rule
   // ===========================================================================
 
-  Rule("Mixed changes are correctly categorized", ({ RuleScenario }) => {
+  Rule('Mixed changes are correctly categorized', ({ RuleScenario }) => {
     RuleScenario(
-      "Mixed additions, removals, and modifications are handled correctly",
+      'Mixed additions, removals, and modifications are handled correctly',
       ({ Given, When, Then, And }) => {
         Given(
-          "a git diff with:",
+          'a git diff with:',
           (_ctx: unknown, table: Array<{ change_type: string; deliverable: string }>) => {
             state!.files = [TEST_FILE];
             // Build diff with mixed changes
-            let removedLines = "";
-            let addedLines = "";
+            let removedLines = '';
+            let addedLines = '';
 
             for (const row of table) {
-              if (row.change_type === "status_change") {
+              if (row.change_type === 'status_change') {
                 // Status change: appears in both removed and added
-                removedLines += `-${createDeliverableRow(row.deliverable, "planned")}\n`;
-                addedLines += `+${createDeliverableRow(row.deliverable, "completed")}\n`;
-              } else if (row.change_type === "added") {
-                addedLines += `+${createDeliverableRow(row.deliverable, "planned")}\n`;
-              } else if (row.change_type === "removed") {
-                removedLines += `-${createDeliverableRow(row.deliverable, "completed")}\n`;
+                removedLines += `-${createDeliverableRow(row.deliverable, 'planned')}\n`;
+                addedLines += `+${createDeliverableRow(row.deliverable, 'completed')}\n`;
+              } else if (row.change_type === 'added') {
+                addedLines += `+${createDeliverableRow(row.deliverable, 'planned')}\n`;
+              } else if (row.change_type === 'removed') {
+                removedLines += `-${createDeliverableRow(row.deliverable, 'completed')}\n`;
               }
             }
 
@@ -272,24 +272,24 @@ ${removedLines}${addedLines}`;
           }
         );
 
-        When("detecting deliverable changes", () => {
+        When('detecting deliverable changes', () => {
           state!.result = detectDeliverableChanges(state!.diff, state!.files);
         });
 
         Then('the deliverable "Existing feature" is in the "modified" list', () => {
           const result = getResult();
           expect(result).toBeDefined();
-          expect(result!.modified).toContain("Existing feature");
+          expect(result!.modified).toContain('Existing feature');
         });
 
         And('the deliverable "New feature" is in the "added" list', () => {
           const result = getResult();
-          expect(result!.added).toContain("New feature");
+          expect(result!.added).toContain('New feature');
         });
 
         And('the deliverable "Old feature" is in the "removed" list', () => {
           const result = getResult();
-          expect(result!.removed).toContain("Old feature");
+          expect(result!.removed).toContain('Old feature');
         });
       }
     );

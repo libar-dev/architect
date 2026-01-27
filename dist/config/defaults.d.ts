@@ -21,7 +21,7 @@
  * - Use `DEFAULT_REGEX_BUILDERS` for opt-in detection when no registry is provided
  * - Use `DEFAULT_TAG_PREFIX` in error messages when no registry context exists
  */
-import { type RegexBuilders } from "./regex-builders.js";
+import { type RegexBuilders } from './regex-builders.js';
 /**
  * Default tag prefix for @libar-docs-* annotations.
  *

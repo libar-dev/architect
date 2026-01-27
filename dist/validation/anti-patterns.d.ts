@@ -26,11 +26,11 @@
  * - CI pipeline to enforce documentation standards
  * - Code review checklists for documentation quality
  */
-import type { ScannedGherkinFile } from "../validation-schemas/feature.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import type { ScannedFile } from "../scanner/index.js";
-import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from "./types.js";
-export type { AntiPatternViolation, AntiPatternThresholds } from "./types.js";
+import type { ScannedGherkinFile } from '../validation-schemas/feature.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import type { ScannedFile } from '../scanner/index.js';
+import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from './types.js';
+export type { AntiPatternViolation, AntiPatternThresholds } from './types.js';
 /**
  * Configuration options for anti-pattern detection
  */
@@ -38,17 +38,6 @@ export interface AntiPatternDetectionOptions extends WithTagRegistry {
     /** Thresholds for warning triggers */
     readonly thresholds?: Partial<AntiPatternThresholds>;
 }
-/**
- * Detect tag duplication anti-pattern
- *
- * Finds deprecated libar-process-* tags in feature files.
- * These dependency tags belong in code using the configured tag prefix, not features.
- *
- * @param features - Array of scanned feature files
- * @param registry - Optional tag registry for prefix-aware messages (defaults to @libar-docs-)
- * @returns Array of anti-pattern violations
- */
-export declare function detectTagDuplication(features: readonly ScannedGherkinFile[], registry?: TagRegistry): AntiPatternViolation[];
 /**
  * Detect process metadata in code anti-pattern
  *
@@ -132,9 +121,9 @@ export declare function formatAntiPatternReport(violations: AntiPatternViolation
  * For integration with the existing validate-patterns CLI.
  */
 export declare function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<{
-    severity: "error" | "warning" | "info";
+    severity: 'error' | 'warning' | 'info';
     message: string;
-    source: "typescript" | "gherkin" | "cross-source";
+    source: 'typescript' | 'gherkin' | 'cross-source';
     pattern?: string;
     file?: string;
 }>;

@@ -24,8 +24,8 @@
  * - **Multi-Source**: Patterns can be defined in TypeScript stubs OR Gherkin features
  * - **Conflict Detection**: Same pattern name in both sources triggers error
  */
-import type { Result } from "../types/index.js";
-import type { GherkinScanResults } from "../validation-schemas/feature.js";
+import type { Result } from '../types/index.js';
+import type { GherkinScanResults } from '../validation-schemas/feature.js';
 /**
  * Configuration for Gherkin scanner
  */
@@ -97,6 +97,6 @@ export declare function findFeatureFiles(config: GherkinScannerConfig): Promise<
  * ```
  */
 export declare function scanGherkinFiles(config: GherkinScannerConfig): Promise<Result<GherkinScanResults, never>>;
-export { parseFeatureFile, extractPatternTags } from "./gherkin-ast-parser.js";
-export type { ScannedGherkinFile, GherkinFileError, GherkinScanResults, GherkinBackground, GherkinRule, GherkinStep, GherkinDataTable, GherkinDataTableRow, } from "../validation-schemas/feature.js";
+export { parseFeatureFile, extractPatternTags } from './gherkin-ast-parser.js';
+export type { ScannedGherkinFile, GherkinFileError, GherkinScanResults, GherkinBackground, GherkinRule, GherkinStep, GherkinDataTable, GherkinDataTableRow, } from '../validation-schemas/feature.js';
 //# sourceMappingURL=gherkin-scanner.d.ts.map

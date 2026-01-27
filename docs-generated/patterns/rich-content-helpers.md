@@ -13,8 +13,6 @@
 
 ## Description
 
-## Rich Content Rendering Helpers
-
 Shared helper functions for rendering Gherkin rich content in document codecs.
 Provides granular and composite helpers for DataTables, DocStrings, steps,
 scenarios, and business rules.

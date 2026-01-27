@@ -26,9 +26,9 @@
  * - **Schema-First Validation**: All directives validated against Zod schemas
  * - **Result Monad**: Returns Result<T, E> for explicit error handling
  */
-import { Result } from "../types/index.js";
-import type { DocDirective, ExportInfo, DirectiveValidationError, FileParseError } from "../types/index.js";
-import { type TagRegistry } from "../validation-schemas/index.js";
+import { Result } from '../types/index.js';
+import type { DocDirective, ExportInfo, DirectiveValidationError, FileParseError } from '../types/index.js';
+import { type TagRegistry } from '../validation-schemas/index.js';
 /**
  * Result of parsing a file for directives
  */

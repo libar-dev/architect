@@ -11,9 +11,9 @@
  * - SESSION-PLAN.md (implementation plans for phases)
  * - SESSION-FINDINGS.md (retrospective discoveries)
  */
-import { z } from "zod";
-import { MasterDatasetSchema } from "../../validation-schemas/master-dataset.js";
-import { type BaseCodecOptions, type NormalizedStatusFilter } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema } from '../../validation-schemas/master-dataset.js';
+import { type BaseCodecOptions, type NormalizedStatusFilter } from './types/base.js';
 /**
  * Options for PlanningChecklistCodec
  */
@@ -75,13 +75,13 @@ export interface SessionFindingsCodecOptions extends BaseCodecOptions {
     /** Include links to patterns (default: true) */
     includeLinks?: boolean;
     /** Group by (default: "category") */
-    groupBy?: "category" | "phase" | "type";
+    groupBy?: 'category' | 'phase' | 'type';
 }
 /**
  * Default options for SessionFindingsCodec
  */
 export declare const DEFAULT_SESSION_FINDINGS_OPTIONS: Required<SessionFindingsCodecOptions>;
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 /**
  * Create a PlanningChecklistCodec with custom options.
  */
@@ -101,13 +101,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -163,13 +160,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -196,12 +190,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -233,8 +227,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -281,8 +275,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -318,13 +312,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -380,13 +371,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -413,12 +401,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -450,8 +438,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -498,13 +486,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -560,13 +545,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -593,12 +575,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -630,8 +612,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -678,13 +660,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -740,13 +719,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -773,12 +749,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -810,8 +786,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -862,13 +838,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -924,13 +897,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -957,12 +927,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -994,8 +964,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1049,13 +1019,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1111,13 +1078,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1144,12 +1108,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1181,8 +1145,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1229,13 +1193,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1291,13 +1252,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1324,12 +1282,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1361,8 +1319,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1410,13 +1368,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1472,13 +1427,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1505,12 +1457,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1542,8 +1494,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1590,13 +1542,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1652,13 +1601,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1685,12 +1631,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1722,8 +1668,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1770,13 +1716,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1832,13 +1775,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1865,12 +1805,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1902,8 +1842,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1950,13 +1890,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2012,13 +1949,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2045,12 +1979,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2082,8 +2016,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2156,13 +2090,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2218,13 +2149,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2251,12 +2179,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2288,8 +2216,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2336,13 +2264,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2398,13 +2323,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2431,12 +2353,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2468,8 +2390,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2516,13 +2438,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2578,13 +2497,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2611,12 +2527,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2648,8 +2564,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2696,13 +2612,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2758,13 +2671,10 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2791,12 +2701,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2828,8 +2738,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2889,13 +2799,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2951,13 +2858,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2984,12 +2888,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -3021,8 +2925,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -3069,8 +2973,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -3106,13 +3010,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3168,13 +3069,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3201,12 +3099,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3238,8 +3136,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3286,13 +3184,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3348,13 +3243,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3381,12 +3273,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3418,8 +3310,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3466,13 +3358,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3528,13 +3417,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3561,12 +3447,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3598,8 +3484,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3650,13 +3536,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3712,13 +3595,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3745,12 +3625,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3782,8 +3662,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3837,13 +3717,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3899,13 +3776,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3932,12 +3806,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -3969,8 +3843,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -4017,13 +3891,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4079,13 +3950,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4112,12 +3980,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -4149,8 +4017,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -4198,13 +4066,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4260,13 +4125,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4293,12 +4155,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4330,8 +4192,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4378,13 +4240,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4440,13 +4299,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4473,12 +4329,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4510,8 +4366,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4558,13 +4414,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4620,13 +4473,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4653,12 +4503,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4690,8 +4540,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4738,13 +4588,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4800,13 +4647,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4833,12 +4677,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4870,8 +4714,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4944,13 +4788,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5006,13 +4847,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5039,12 +4877,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5076,8 +4914,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5124,13 +4962,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5186,13 +5021,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5219,12 +5051,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5256,8 +5088,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5304,13 +5136,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5366,13 +5195,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5399,12 +5225,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5436,8 +5262,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5484,13 +5310,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5546,13 +5369,10 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5579,12 +5399,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5616,8 +5436,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5677,13 +5497,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5739,13 +5556,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5772,12 +5586,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -5809,8 +5623,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -5857,8 +5671,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -5894,13 +5708,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5956,13 +5767,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5989,12 +5797,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -6026,8 +5834,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -6074,13 +5882,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6136,13 +5941,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6169,12 +5971,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -6206,8 +6008,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -6254,13 +6056,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6316,13 +6115,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6349,12 +6145,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -6386,8 +6182,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -6438,13 +6234,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6500,13 +6293,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6533,12 +6323,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -6570,8 +6360,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -6625,13 +6415,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6687,13 +6474,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6720,12 +6504,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -6757,8 +6541,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -6805,13 +6589,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6867,13 +6648,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
-            completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
-            "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6900,12 +6678,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
+                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -6937,8 +6715,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             epic: "epic";
+            phase: "phase";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -6986,13 +6764,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7048,13 +6823,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7081,12 +6853,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -7118,8 +6890,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -7166,13 +6938,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7228,13 +6997,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7261,12 +7027,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -7298,8 +7064,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -7346,13 +7112,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7408,13 +7171,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7441,12 +7201,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -7478,8 +7238,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -7526,13 +7286,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7588,13 +7345,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7621,12 +7375,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -7658,8 +7412,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -7732,13 +7486,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7794,13 +7545,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7827,12 +7575,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -7864,8 +7612,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -7912,13 +7660,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7974,13 +7719,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8007,12 +7749,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -8044,8 +7786,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -8092,13 +7834,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8154,13 +7893,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8187,12 +7923,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -8224,8 +7960,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -8272,13 +8008,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
-                    completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
-                    "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8334,13 +8067,10 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
-                completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
-                "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8367,12 +8097,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
+                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -8404,8 +8134,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 epic: "epic";
+                phase: "phase";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;

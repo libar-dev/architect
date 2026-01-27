@@ -24,7 +24,7 @@ export type {
   DoDValidationResult,
   DoDValidationSummary,
   WithTagRegistry,
-} from "./types.js";
+} from './types.js';
 
 export {
   AntiPatternThresholdsSchema,
@@ -32,7 +32,7 @@ export {
   COMPLETION_PATTERNS,
   IN_PROGRESS_PATTERNS,
   PENDING_PATTERNS,
-} from "./types.js";
+} from './types.js';
 
 // DoD Validator
 export {
@@ -42,12 +42,11 @@ export {
   validateDoDForPhase,
   validateDoD,
   formatDoDSummary,
-} from "./dod-validator.js";
+} from './dod-validator.js';
 
 // Anti-Pattern Detector
 export {
   type AntiPatternDetectionOptions,
-  detectTagDuplication,
   detectProcessInCode,
   detectMagicComments,
   detectScenarioBloat,
@@ -55,7 +54,7 @@ export {
   detectAntiPatterns,
   formatAntiPatternReport,
   toValidationIssues,
-} from "./anti-patterns.js";
+} from './anti-patterns.js';
 
 // FSM Module - Phase State Machine (PDR-005)
-export * from "./fsm/index.js";
+export * from './fsm/index.js';

@@ -24,10 +24,10 @@
  * - **Multi-Source**: Patterns can be defined in TypeScript stubs OR Gherkin features
  * - **Conflict Detection**: Same pattern name in both sources triggers error
  */
-import * as fs from "fs/promises";
-import { glob } from "glob";
-import { Result as R } from "../types/index.js";
-import { parseFeatureFile } from "./gherkin-ast-parser.js";
+import * as fs from 'fs/promises';
+import { glob } from 'glob';
+import { Result as R } from '../types/index.js';
+import { parseFeatureFile } from './gherkin-ast-parser.js';
 /**
  * Find all .feature files matching the scanner configuration
  *
@@ -44,7 +44,7 @@ import { parseFeatureFile } from "./gherkin-ast-parser.js";
  * ```
  */
 export async function findFeatureFiles(config) {
-    const defaultExclude = ["node_modules/**", "dist/**"];
+    const defaultExclude = ['node_modules/**', 'dist/**'];
     const excludePatterns = config.exclude ? [...defaultExclude, ...config.exclude] : defaultExclude;
     const patterns = Array.isArray(config.patterns) ? config.patterns : [config.patterns];
     const files = await glob(patterns, {
@@ -53,7 +53,7 @@ export async function findFeatureFiles(config) {
         absolute: true,
     });
     // Filter to only .feature and .feature.md files (MDG format)
-    return files.filter((file) => file.endsWith(".feature") || file.endsWith(".feature.md"));
+    return files.filter((file) => file.endsWith('.feature') || file.endsWith('.feature.md'));
 }
 /**
  * Scan Gherkin feature files and extract pattern metadata
@@ -106,7 +106,7 @@ export async function scanGherkinFiles(config) {
     for (const filePath of files) {
         try {
             // Read feature file content
-            const content = await fs.readFile(filePath, "utf-8");
+            const content = await fs.readFile(filePath, 'utf-8');
             // Parse the feature file
             const parseResult = parseFeatureFile(content, filePath);
             if (R.isErr(parseResult)) {
@@ -141,5 +141,5 @@ export async function scanGherkinFiles(config) {
         errors,
     });
 }
-export { parseFeatureFile, extractPatternTags } from "./gherkin-ast-parser.js";
+export { parseFeatureFile, extractPatternTags } from './gherkin-ast-parser.js';
 //# sourceMappingURL=gherkin-scanner.js.map

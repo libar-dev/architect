@@ -18,6 +18,9 @@ Thumbs.db
 docs/test-decider/
 docs/test-progressive/
 
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+
 # Logs
 *.log
 npm-debug.log*

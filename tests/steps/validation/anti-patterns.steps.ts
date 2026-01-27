@@ -7,13 +7,12 @@
  * @libar-docs
  */
 
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-import * as fs from "fs";
-import * as path from "path";
-import * as os from "os";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 import {
-  detectTagDuplication,
   detectProcessInCode,
   detectMagicComments,
   detectScenarioBloat,
@@ -21,9 +20,9 @@ import {
   detectAntiPatterns,
   formatAntiPatternReport,
   type AntiPatternViolation,
-} from "../../../src/validation/anti-patterns.js";
-import type { ScannedFile } from "../../../src/scanner/index.js";
-import type { ScannedGherkinFile } from "../../../src/validation-schemas/feature.js";
+} from '../../../src/validation/anti-patterns.js';
+import type { ScannedFile } from '../../../src/scanner/index.js';
+import type { ScannedGherkinFile } from '../../../src/validation-schemas/feature.js';
 
 // =============================================================================
 // Type Definitions
@@ -52,7 +51,7 @@ function initState(): AntiPatternState {
     featureFiles: [],
     scannedFiles: [],
     violations: [],
-    report: "",
+    report: '',
     tempDir: null,
     tempFiles: [],
   };
@@ -78,12 +77,12 @@ function createMockFeature(
   }));
 
   return {
-    filePath: "/test/feature.feature",
+    filePath: '/test/feature.feature',
     feature: {
-      name: "Test Feature",
-      description: "Test description",
+      name: 'Test Feature',
+      description: 'Test description',
       tags: featureTags,
-      language: "en",
+      language: 'en',
       line: 1,
     },
     scenarios,
@@ -95,16 +94,16 @@ function createMockFeature(
  */
 function createMockScannedFile(tags: string[]): ScannedFile {
   return {
-    filePath: "/test/file.ts",
+    filePath: '/test/file.ts',
     directives: [
       {
         directive: {
           tags: tags as ReadonlyArray<`@libar-docs-${string}`>,
-          description: "Test directive",
+          description: 'Test directive',
           examples: [],
           position: { startLine: 1, endLine: 10 },
         },
-        code: "export function test() {}",
+        code: 'export function test() {}',
         exports: [],
       },
     ],
@@ -115,7 +114,7 @@ function createMockScannedFile(tags: string[]): ScannedFile {
  * Dedent a multi-line string by removing common leading whitespace
  */
 function dedent(content: string): string {
-  const lines = content.split("\n");
+  const lines = content.split('\n');
   // Find minimum indentation (ignoring empty lines)
   const nonEmptyLines = lines.filter((l) => l.trim().length > 0);
   if (nonEmptyLines.length === 0) return content;
@@ -128,7 +127,7 @@ function dedent(content: string): string {
   );
 
   // Remove that indentation from all lines
-  return lines.map((line) => line.slice(minIndent)).join("\n");
+  return lines.map((line) => line.slice(minIndent)).join('\n');
 }
 
 /**
@@ -136,7 +135,7 @@ function dedent(content: string): string {
  */
 function createTempFeatureFile(content: string): string {
   if (!state!.tempDir) {
-    state!.tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "anti-pattern-test-"));
+    state!.tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'anti-pattern-test-'));
   }
   const filePath = path.join(state!.tempDir, `test-${Date.now()}.feature`);
   // Dedent and trim the content to handle Gherkin docstring indentation
@@ -172,7 +171,7 @@ function cleanupTempFiles(): void {
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature("tests/features/validation/anti-patterns.feature");
+const feature = await loadFeature('tests/features/validation/anti-patterns.feature');
 
 describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
@@ -181,146 +180,58 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   });
 
   // ===========================================================================
-  // Tag Duplication Detection
-  // ===========================================================================
-
-  Rule(
-    "Code-only tags should not appear in feature files",
-    ({ RuleScenario, RuleScenarioOutline }) => {
-      RuleScenario("Feature without code-only tags passes", ({ Given, When, Then }) => {
-        Given("a feature file with tags:", (_ctx, table: Array<{ tag: string }>) => {
-          state = initState();
-          const tags = table.map((row) => row.tag);
-          state.featureFiles = [createMockFeature(tags)];
-        });
-
-        When("detecting tag duplication", () => {
-          state!.violations = detectTagDuplication(state!.featureFiles);
-        });
-
-        Then("no violations are found", () => {
-          expect(state!.violations).toHaveLength(0);
-        });
-      });
-
-      RuleScenarioOutline(
-        "Code-only dependency tags in features are flagged",
-        ({ Given, When, Then, And }, variables: { code_tag: string }) => {
-          Given("a feature file with code-only tag {string}", () => {
-            state = initState();
-            state.featureFiles = [createMockFeature([variables.code_tag])];
-          });
-
-          When("detecting tag duplication", () => {
-            state!.violations = detectTagDuplication(state!.featureFiles);
-          });
-
-          Then('a "tag-duplication" violation is found', () => {
-            expect(
-              state!.violations.some((v: AntiPatternViolation) => v.id === "tag-duplication")
-            ).toBe(true);
-          });
-
-          And('the violation severity is "error"', () => {
-            const violation = state!.violations.find(
-              (v: AntiPatternViolation) => v.id === "tag-duplication"
-            );
-            expect(violation?.severity).toBe("error");
-          });
-
-          And("the fix suggests moving to code", () => {
-            const violation = state!.violations.find(
-              (v: AntiPatternViolation) => v.id === "tag-duplication"
-            );
-            expect(violation?.fix).toContain("@libar-docs-depends-on");
-          });
-        }
-      );
-
-      RuleScenario(
-        "Scenario-level code-only tags are also flagged",
-        ({ Given, When, Then, And }) => {
-          Given("a feature file with feature tags:", (_ctx, table: Array<{ tag: string }>) => {
-            state = initState();
-            const featureTags = table.map((row) => row.tag);
-            // Store for later combination with scenario tags
-            state.featureFiles = [createMockFeature(featureTags)];
-          });
-
-          And("scenario tags:", (_ctx, table: Array<{ tag: string }>) => {
-            const scenarioTags = table.map((row) => row.tag);
-            // Get existing feature tags and recreate with scenario tags
-            const featureTags = state!.featureFiles[0]!.feature.tags;
-            state!.featureFiles = [createMockFeature([...featureTags], scenarioTags)];
-          });
-
-          When("detecting tag duplication", () => {
-            state!.violations = detectTagDuplication(state!.featureFiles);
-          });
-
-          Then('a "tag-duplication" violation is found', () => {
-            expect(
-              state!.violations.some((v: AntiPatternViolation) => v.id === "tag-duplication")
-            ).toBe(true);
-          });
-        }
-      );
-    }
-  );
-
-  // ===========================================================================
   // Process-in-Code Detection
   // ===========================================================================
 
   Rule(
-    "Process metadata should not appear in TypeScript code",
+    'Process metadata should not appear in TypeScript code',
     ({ RuleScenario, RuleScenarioOutline }) => {
-      RuleScenario("Code without process tags passes", ({ Given, When, Then }) => {
-        Given("a TypeScript file with directive tags:", (_ctx, table: Array<{ tag: string }>) => {
+      RuleScenario('Code without process tags passes', ({ Given, When, Then }) => {
+        Given('a TypeScript file with directive tags:', (_ctx, table: Array<{ tag: string }>) => {
           state = initState();
           const tags = table.map((row) => row.tag);
           state.scannedFiles = [createMockScannedFile(tags)];
         });
 
-        When("detecting process-in-code anti-patterns", () => {
+        When('detecting process-in-code anti-patterns', () => {
           state!.violations = detectProcessInCode(state!.scannedFiles);
         });
 
-        Then("no violations are found", () => {
+        Then('no violations are found', () => {
           expect(state!.violations).toHaveLength(0);
         });
       });
 
       RuleScenarioOutline(
-        "Feature-only process tags in code are flagged",
+        'Feature-only process tags in code are flagged',
         ({ Given, When, Then, And }, variables: { process_tag: string }) => {
-          Given("a TypeScript file with process tag {string}", () => {
+          Given('a TypeScript file with process tag {string}', () => {
             state = initState();
-            state.scannedFiles = [createMockScannedFile(["@libar-docs", variables.process_tag])];
+            state.scannedFiles = [createMockScannedFile(['@libar-docs', variables.process_tag])];
           });
 
-          When("detecting process-in-code anti-patterns", () => {
+          When('detecting process-in-code anti-patterns', () => {
             state!.violations = detectProcessInCode(state!.scannedFiles);
           });
 
           Then('a "process-in-code" violation is found', () => {
             expect(
-              state!.violations.some((v: AntiPatternViolation) => v.id === "process-in-code")
+              state!.violations.some((v: AntiPatternViolation) => v.id === 'process-in-code')
             ).toBe(true);
           });
 
           And('the violation severity is "error"', () => {
             const violation = state!.violations.find(
-              (v: AntiPatternViolation) => v.id === "process-in-code"
+              (v: AntiPatternViolation) => v.id === 'process-in-code'
             );
-            expect(violation?.severity).toBe("error");
+            expect(violation?.severity).toBe('error');
           });
 
-          And("the fix suggests moving to feature file", () => {
+          And('the fix suggests moving to feature file', () => {
             const violation = state!.violations.find(
-              (v: AntiPatternViolation) => v.id === "process-in-code"
+              (v: AntiPatternViolation) => v.id === 'process-in-code'
             );
-            expect(violation?.fix).toContain("feature file");
+            expect(violation?.fix).toContain('feature file');
           });
         }
       );
@@ -331,63 +242,63 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // Magic Comments Detection
   // ===========================================================================
 
-  Rule("Generator hints should not appear in feature files", ({ RuleScenario }) => {
-    RuleScenario("Feature without magic comments passes", ({ Given, When, Then }) => {
-      Given("a feature file content:", (_ctx, docString: string) => {
+  Rule('Generator hints should not appear in feature files', ({ RuleScenario }) => {
+    RuleScenario('Feature without magic comments passes', ({ Given, When, Then }) => {
+      Given('a feature file content:', (_ctx, docString: string) => {
         state = initState();
         const filePath = createTempFeatureFile(docString);
         state.featureFiles = [
           {
             filePath,
             feature: {
-              name: "Normal Feature",
-              description: "",
+              name: 'Normal Feature',
+              description: '',
               tags: [],
-              language: "en",
+              language: 'en',
               line: 1,
             },
-            scenarios: [{ name: "Normal scenario", tags: [], steps: [], line: 5 }],
+            scenarios: [{ name: 'Normal scenario', tags: [], steps: [], line: 5 }],
           },
         ];
       });
 
-      When("detecting magic comments with threshold {int}", (_ctx, threshold: number) => {
+      When('detecting magic comments with threshold {int}', (_ctx, threshold: number) => {
         state!.violations = detectMagicComments(state!.featureFiles, threshold);
       });
 
-      Then("no violations are found", () => {
+      Then('no violations are found', () => {
         expect(state!.violations).toHaveLength(0);
       });
     });
 
     RuleScenario(
-      "Features with excessive magic comments are flagged",
+      'Features with excessive magic comments are flagged',
       ({ Given, When, Then, And }) => {
-        Given("a feature file with {int} magic comments", (_ctx, count: number) => {
+        Given('a feature file with {int} magic comments', (_ctx, count: number) => {
           state = initState();
           // Create content with magic comments programmatically (Gherkin strips # comments from docstrings)
           const magicComments = [
-            "# GENERATOR: skip-this-section",
-            "# PARSER: use-alt-parser",
-            "# AUTO-GEN: header",
-            "# DO NOT EDIT: managed",
-            "# GENERATOR: footer",
-            "# GENERATOR: sidebar",
+            '# GENERATOR: skip-this-section',
+            '# PARSER: use-alt-parser',
+            '# AUTO-GEN: header',
+            '# DO NOT EDIT: managed',
+            '# GENERATOR: footer',
+            '# GENERATOR: sidebar',
           ].slice(0, count);
           const content = [
             ...magicComments,
-            "Feature: Over-coupled Feature",
-            "  Too many generator hints.",
-          ].join("\n");
+            'Feature: Over-coupled Feature',
+            '  Too many generator hints.',
+          ].join('\n');
           const filePath = createTempFeatureFile(content);
           state.featureFiles = [
             {
               filePath,
               feature: {
-                name: "Over-coupled Feature",
-                description: "",
+                name: 'Over-coupled Feature',
+                description: '',
                 tags: [],
-                language: "en",
+                language: 'en',
                 line: 1,
               },
               scenarios: [],
@@ -395,44 +306,44 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
           ];
         });
 
-        When("detecting magic comments with threshold {int}", (_ctx, threshold: number) => {
+        When('detecting magic comments with threshold {int}', (_ctx, threshold: number) => {
           state!.violations = detectMagicComments(state!.featureFiles, threshold);
         });
 
         Then('a "magic-comments" violation is found', () => {
           expect(
-            state!.violations.some((v: AntiPatternViolation) => v.id === "magic-comments")
+            state!.violations.some((v: AntiPatternViolation) => v.id === 'magic-comments')
           ).toBe(true);
         });
 
         And('the violation severity is "warning"', () => {
           const violation = state!.violations.find(
-            (v: AntiPatternViolation) => v.id === "magic-comments"
+            (v: AntiPatternViolation) => v.id === 'magic-comments'
           );
-          expect(violation?.severity).toBe("warning");
+          expect(violation?.severity).toBe('warning');
         });
 
         And('the violation message mentions "6 magic comments"', () => {
           const violation = state!.violations.find(
-            (v: AntiPatternViolation) => v.id === "magic-comments"
+            (v: AntiPatternViolation) => v.id === 'magic-comments'
           );
-          expect(violation?.message).toContain("6 magic comments");
+          expect(violation?.message).toContain('6 magic comments');
         });
       }
     );
 
-    RuleScenario("Magic comments within threshold pass", ({ Given, When, Then }) => {
-      Given("a feature file content:", (_ctx, docString: string) => {
+    RuleScenario('Magic comments within threshold pass', ({ Given, When, Then }) => {
+      Given('a feature file content:', (_ctx, docString: string) => {
         state = initState();
         const filePath = createTempFeatureFile(docString);
         state.featureFiles = [
           {
             filePath,
             feature: {
-              name: "Acceptable Feature",
-              description: "",
+              name: 'Acceptable Feature',
+              description: '',
               tags: [],
-              language: "en",
+              language: 'en',
               line: 1,
             },
             scenarios: [],
@@ -440,11 +351,11 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
         ];
       });
 
-      When("detecting magic comments with threshold {int}", (_ctx, threshold: number) => {
+      When('detecting magic comments with threshold {int}', (_ctx, threshold: number) => {
         state!.violations = detectMagicComments(state!.featureFiles, threshold);
       });
 
-      Then("no violations are found", () => {
+      Then('no violations are found', () => {
         expect(state!.violations).toHaveLength(0);
       });
     });
@@ -454,52 +365,52 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // Scenario Bloat Detection
   // ===========================================================================
 
-  Rule("Feature files should not have excessive scenarios", ({ RuleScenario }) => {
-    RuleScenario("Feature with few scenarios passes", ({ Given, When, Then }) => {
-      Given("a feature with {int} scenarios", (_ctx, count: number) => {
+  Rule('Feature files should not have excessive scenarios', ({ RuleScenario }) => {
+    RuleScenario('Feature with few scenarios passes', ({ Given, When, Then }) => {
+      Given('a feature with {int} scenarios', (_ctx, count: number) => {
         state = initState();
         state.featureFiles = [createMockFeature([], [], count)];
       });
 
-      When("detecting scenario bloat with threshold {int}", (_ctx, threshold: number) => {
+      When('detecting scenario bloat with threshold {int}', (_ctx, threshold: number) => {
         state!.violations = detectScenarioBloat(state!.featureFiles, threshold);
       });
 
-      Then("no violations are found", () => {
+      Then('no violations are found', () => {
         expect(state!.violations).toHaveLength(0);
       });
     });
 
     RuleScenario(
-      "Feature exceeding scenario threshold is flagged",
+      'Feature exceeding scenario threshold is flagged',
       ({ Given, When, Then, And }) => {
-        Given("a feature with {int} scenarios", (_ctx, count: number) => {
+        Given('a feature with {int} scenarios', (_ctx, count: number) => {
           state = initState();
           state.featureFiles = [createMockFeature([], [], count)];
         });
 
-        When("detecting scenario bloat with threshold {int}", (_ctx, threshold: number) => {
+        When('detecting scenario bloat with threshold {int}', (_ctx, threshold: number) => {
           state!.violations = detectScenarioBloat(state!.featureFiles, threshold);
         });
 
         Then('a "scenario-bloat" violation is found', () => {
           expect(
-            state!.violations.some((v: AntiPatternViolation) => v.id === "scenario-bloat")
+            state!.violations.some((v: AntiPatternViolation) => v.id === 'scenario-bloat')
           ).toBe(true);
         });
 
         And('the violation severity is "warning"', () => {
           const violation = state!.violations.find(
-            (v: AntiPatternViolation) => v.id === "scenario-bloat"
+            (v: AntiPatternViolation) => v.id === 'scenario-bloat'
           );
-          expect(violation?.severity).toBe("warning");
+          expect(violation?.severity).toBe('warning');
         });
 
-        And("the fix suggests splitting the feature", () => {
+        And('the fix suggests splitting the feature', () => {
           const violation = state!.violations.find(
-            (v: AntiPatternViolation) => v.id === "scenario-bloat"
+            (v: AntiPatternViolation) => v.id === 'scenario-bloat'
           );
-          expect(violation?.fix).toContain("Split");
+          expect(violation?.fix).toContain('Split');
         });
       }
     );
@@ -509,66 +420,66 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // Mega-Feature Detection
   // ===========================================================================
 
-  Rule("Feature files should not exceed size thresholds", ({ RuleScenario }) => {
-    RuleScenario("Normal-sized feature passes", ({ Given, When, Then }) => {
-      Given("a feature file with {int} lines", (_ctx, lineCount: number) => {
+  Rule('Feature files should not exceed size thresholds', ({ RuleScenario }) => {
+    RuleScenario('Normal-sized feature passes', ({ Given, When, Then }) => {
+      Given('a feature file with {int} lines', (_ctx, lineCount: number) => {
         state = initState();
-        const content = "Feature: Test\n" + "  Scenario: Test\n".repeat(lineCount - 2);
+        const content = 'Feature: Test\n' + '  Scenario: Test\n'.repeat(lineCount - 2);
         const filePath = createTempFeatureFile(content);
         state.featureFiles = [
           {
             filePath,
-            feature: { name: "Test", description: "", tags: [], language: "en", line: 1 },
+            feature: { name: 'Test', description: '', tags: [], language: 'en', line: 1 },
             scenarios: [],
           },
         ];
       });
 
-      When("detecting mega-feature with threshold {int}", (_ctx, threshold: number) => {
+      When('detecting mega-feature with threshold {int}', (_ctx, threshold: number) => {
         state!.violations = detectMegaFeature(state!.featureFiles, threshold);
       });
 
-      Then("no violations are found", () => {
+      Then('no violations are found', () => {
         expect(state!.violations).toHaveLength(0);
       });
     });
 
-    RuleScenario("Oversized feature is flagged", ({ Given, When, Then, And }) => {
-      Given("a feature file with {int} lines", (_ctx, lineCount: number) => {
+    RuleScenario('Oversized feature is flagged', ({ Given, When, Then, And }) => {
+      Given('a feature file with {int} lines', (_ctx, lineCount: number) => {
         state = initState();
-        const content = "Feature: Test\n" + "  Line content\n".repeat(lineCount - 1);
+        const content = 'Feature: Test\n' + '  Line content\n'.repeat(lineCount - 1);
         const filePath = createTempFeatureFile(content);
         state.featureFiles = [
           {
             filePath,
-            feature: { name: "Test", description: "", tags: [], language: "en", line: 1 },
+            feature: { name: 'Test', description: '', tags: [], language: 'en', line: 1 },
             scenarios: [],
           },
         ];
       });
 
-      When("detecting mega-feature with threshold {int}", (_ctx, threshold: number) => {
+      When('detecting mega-feature with threshold {int}', (_ctx, threshold: number) => {
         state!.violations = detectMegaFeature(state!.featureFiles, threshold);
       });
 
       Then('a "mega-feature" violation is found', () => {
-        expect(state!.violations.some((v: AntiPatternViolation) => v.id === "mega-feature")).toBe(
+        expect(state!.violations.some((v: AntiPatternViolation) => v.id === 'mega-feature')).toBe(
           true
         );
       });
 
       And('the violation severity is "warning"', () => {
         const violation = state!.violations.find(
-          (v: AntiPatternViolation) => v.id === "mega-feature"
+          (v: AntiPatternViolation) => v.id === 'mega-feature'
         );
-        expect(violation?.severity).toBe("warning");
+        expect(violation?.severity).toBe('warning');
       });
 
       And('the violation message mentions "lines"', () => {
         const violation = state!.violations.find(
-          (v: AntiPatternViolation) => v.id === "mega-feature"
+          (v: AntiPatternViolation) => v.id === 'mega-feature'
         );
-        expect(violation?.message).toContain("lines");
+        expect(violation?.message).toContain('lines');
       });
     });
   });
@@ -577,86 +488,83 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
   // Combined Detection
   // ===========================================================================
 
-  Rule("All anti-patterns can be detected in one pass", ({ RuleScenario }) => {
-    RuleScenario("Combined detection finds multiple issues", ({ Given, When, Then, And }) => {
-      Given("a TypeScript file with directive tags:", (_ctx, table: Array<{ tag: string }>) => {
-        state = initState();
-        const tags = table.map((row) => row.tag);
-        state.scannedFiles = [createMockScannedFile(tags)];
-      });
+  Rule('All anti-patterns can be detected in one pass', ({ RuleScenario }) => {
+    RuleScenario(
+      'Combined detection finds process-in-code issues',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript file with directive tags:', (_ctx, table: Array<{ tag: string }>) => {
+          state = initState();
+          const tags = table.map((row) => row.tag);
+          state.scannedFiles = [createMockScannedFile(tags)];
+        });
 
-      And("a feature file with tags:", (_ctx, table: Array<{ tag: string }>) => {
-        const tags = table.map((row) => row.tag);
-        state!.featureFiles = [createMockFeature(tags)];
-      });
+        And('a feature file with tags:', (_ctx, table: Array<{ tag: string }>) => {
+          const tags = table.map((row) => row.tag);
+          state!.featureFiles = [createMockFeature(tags)];
+        });
 
-      When("detecting all anti-patterns", () => {
-        state!.violations = detectAntiPatterns(state!.scannedFiles, state!.featureFiles);
-      });
+        When('detecting all anti-patterns', () => {
+          state!.violations = detectAntiPatterns(state!.scannedFiles, state!.featureFiles);
+        });
 
-      Then("{int} violations are found", (_ctx, count: number) => {
-        expect(state!.violations).toHaveLength(count);
-      });
+        Then('{int} violation is found', (_ctx, count: number) => {
+          expect(state!.violations).toHaveLength(count);
+        });
 
-      And('violations include "process-in-code"', () => {
-        expect(
-          state!.violations.some((v: AntiPatternViolation) => v.id === "process-in-code")
-        ).toBe(true);
-      });
-
-      And('violations include "tag-duplication"', () => {
-        expect(
-          state!.violations.some((v: AntiPatternViolation) => v.id === "tag-duplication")
-        ).toBe(true);
-      });
-    });
+        And('violations include "process-in-code"', () => {
+          expect(
+            state!.violations.some((v: AntiPatternViolation) => v.id === 'process-in-code')
+          ).toBe(true);
+        });
+      }
+    );
   });
 
   // ===========================================================================
   // Report Formatting
   // ===========================================================================
 
-  Rule("Violations can be formatted for console output", ({ RuleScenario }) => {
-    RuleScenario("Empty violations produce clean report", ({ Given, When, Then }) => {
-      Given("no violations", () => {
+  Rule('Violations can be formatted for console output', ({ RuleScenario }) => {
+    RuleScenario('Empty violations produce clean report', ({ Given, When, Then }) => {
+      Given('no violations', () => {
         state = initState();
         state.violations = [];
       });
 
-      When("formatting the anti-pattern report", () => {
+      When('formatting the anti-pattern report', () => {
         state!.report = formatAntiPatternReport(state!.violations);
       });
 
       Then('the report contains "No anti-patterns detected"', () => {
-        expect(state!.report).toContain("No anti-patterns detected");
+        expect(state!.report).toContain('No anti-patterns detected');
       });
     });
 
-    RuleScenario("Violations are grouped by severity", ({ Given, When, Then, And }) => {
-      Given("violations:", (_ctx, table: Array<{ id: string; severity: string }>) => {
+    RuleScenario('Violations are grouped by severity', ({ Given, When, Then, And }) => {
+      Given('violations:', (_ctx, table: Array<{ id: string; severity: string }>) => {
         state = initState();
         state.violations = table.map((row) => ({
-          id: row.id as AntiPatternViolation["id"],
-          severity: row.severity as "error" | "warning",
+          id: row.id as AntiPatternViolation['id'],
+          severity: row.severity as 'error' | 'warning',
           message: `Test ${row.id} violation`,
-          file: "/test/file.ts",
+          file: '/test/file.ts',
         }));
       });
 
-      When("formatting the anti-pattern report", () => {
+      When('formatting the anti-pattern report', () => {
         state!.report = formatAntiPatternReport(state!.violations);
       });
 
       Then('the report contains "Errors (architectural violations)"', () => {
-        expect(state!.report).toContain("Errors (architectural violations)");
+        expect(state!.report).toContain('Errors (architectural violations)');
       });
 
       And('the report contains "Warnings (hygiene issues)"', () => {
-        expect(state!.report).toContain("Warnings (hygiene issues)");
+        expect(state!.report).toContain('Warnings (hygiene issues)');
       });
 
       And('the report shows "2 errors, 1 warning"', () => {
-        expect(state!.report).toContain("2 errors, 1 warning");
+        expect(state!.report).toContain('2 errors, 1 warning');
       });
     });
   });

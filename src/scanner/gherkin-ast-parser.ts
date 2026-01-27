@@ -39,8 +39,8 @@ import {
   AstBuilder,
   GherkinClassicTokenMatcher,
   GherkinInMarkdownTokenMatcher,
-} from "@cucumber/gherkin";
-import * as Messages from "@cucumber/messages";
+} from '@cucumber/gherkin';
+import * as Messages from '@cucumber/messages';
 import {
   GherkinFeatureSchema,
   GherkinScenarioSchema,
@@ -54,9 +54,9 @@ import {
   type GherkinDataTable,
   type GherkinDataTableRow,
   type GherkinRule,
-} from "../validation-schemas/feature.js";
-import type { Result } from "../types/index.js";
-import { Result as R } from "../types/index.js";
+} from '../validation-schemas/feature.js';
+import type { Result } from '../types/index.js';
+import { Result as R } from '../types/index.js';
 import {
   PROCESS_STATUS_VALUES,
   ADR_STATUS_VALUES,
@@ -64,9 +64,9 @@ import {
   type ProcessStatusValue,
   type AdrStatusValue,
   type HierarchyLevel,
-} from "../taxonomy/index.js";
-import { createRegexBuilders } from "../config/regex-builders.js";
-import { createDefaultTagRegistry, type TagRegistry } from "../validation-schemas/tag-registry.js";
+} from '../taxonomy/index.js';
+import { createRegexBuilders } from '../config/regex-builders.js';
+import { createDefaultTagRegistry, type TagRegistry } from '../validation-schemas/tag-registry.js';
 
 /**
  * Default regex builders for tag normalization.
@@ -78,16 +78,10 @@ const DEFAULT_BUILDERS = (() => {
 })();
 
 /**
- * Legacy prefix for backward compatibility with old files.
- * The `libar-process-` prefix was deprecated in PDR-004.
- */
-const LEGACY_PREFIX = "libar-process-";
-
-/**
  * Normalize a Gherkin tag by stripping prefixes
  *
  * Removes `@` prefix and then the configured tag prefix (from registry)
- * or the legacy `libar-process-` prefix to produce a canonical tag name.
+ * to produce a canonical tag name.
  *
  * @param tag - Tag string to normalize (e.g., "@libar-docs-pattern:MyPattern")
  * @param registry - Optional TagRegistry for custom prefix configuration
@@ -96,7 +90,6 @@ const LEGACY_PREFIX = "libar-process-";
  * @example
  * normalizeTag("@libar-docs-pattern:MyPattern") // "pattern:MyPattern"
  * normalizeTag("@acceptance-criteria")          // "acceptance-criteria"
- * normalizeTag("@libar-process-phase:15")       // "phase:15" (legacy compat)
  *
  * // With custom registry
  * const registry = { tagPrefix: "@docs-", fileOptInTag: "@docs", ... };
@@ -108,17 +101,12 @@ function normalizeTag(tag: string, registry?: TagRegistry): string {
     ? createRegexBuilders(registry.tagPrefix, registry.fileOptInTag)
     : DEFAULT_BUILDERS;
 
-  // First normalize using the registry-configured prefix
+  // Normalize using the registry-configured prefix
   let normalized = builders.normalizeTag(tag);
 
-  // Handle legacy libar-process- prefix for backward compatibility
-  // This is checked AFTER primary normalization to handle cases where
-  // the tag doesn't match the current registry prefix
-  if (normalized.startsWith("@")) {
+  // Strip @ prefix if still present after normalization
+  if (normalized.startsWith('@')) {
     normalized = normalized.substring(1);
-  }
-  if (normalized.startsWith(LEGACY_PREFIX)) {
-    normalized = normalized.substring(LEGACY_PREFIX.length);
   }
 
   return normalized;
@@ -166,7 +154,7 @@ function extractDataTable(dataTable: Messages.DataTable): GherkinDataTable {
       const header = headers[j];
       const cell = row.cells[j];
       if (header !== undefined) {
-        rowObj[header] = cell?.value ?? "";
+        rowObj[header] = cell?.value ?? '';
       }
     }
     dataRows.push(rowObj);
@@ -235,7 +223,7 @@ export function parseFeatureFile(
   try {
     // Detect MDG (Markdown with Gherkin) format based on file extension
     // MDG files use .feature.md extension and require GherkinInMarkdownTokenMatcher
-    const isMDG = filePath.endsWith(".feature.md");
+    const isMDG = filePath.endsWith('.feature.md');
     const tokenMatcher = isMDG
       ? new GherkinInMarkdownTokenMatcher()
       : new GherkinClassicTokenMatcher();
@@ -248,7 +236,7 @@ export function parseFeatureFile(
       return R.err({
         file: filePath,
         error: {
-          message: "No feature found in file",
+          message: 'No feature found in file',
         },
       });
     }
@@ -323,7 +311,7 @@ export function parseFeatureFile(
 
             // Also add to flat scenarios for backward compat
             // Include rule context in scenario tags for traceability
-            const ruleNameTag = `rule:${cucumberRule.name.replace(/\s+/g, "-")}`;
+            const ruleNameTag = `rule:${cucumberRule.name.replace(/\s+/g, '-')}`;
             scenarios.push({
               ...parsedScenario,
               // Merge rule tags with scenario tags, add rule context
@@ -360,7 +348,7 @@ export function parseFeatureFile(
       return R.err({
         file: filePath,
         error: {
-          message: `Feature validation failed: ${featureValidation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ")}`,
+          message: `Feature validation failed: ${featureValidation.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
           line: feature.line,
         },
       });
@@ -373,7 +361,7 @@ export function parseFeatureFile(
         return R.err({
           file: filePath,
           error: {
-            message: `Background validation failed: ${backgroundValidation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ")}`,
+            message: `Background validation failed: ${backgroundValidation.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
             line: background.line,
           },
         });
@@ -387,7 +375,7 @@ export function parseFeatureFile(
         return R.err({
           file: filePath,
           error: {
-            message: `Scenario "${scenario.name}" validation failed: ${scenarioValidation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ")}`,
+            message: `Scenario "${scenario.name}" validation failed: ${scenarioValidation.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
             line: scenario.line,
           },
         });
@@ -401,7 +389,7 @@ export function parseFeatureFile(
         return R.err({
           file: filePath,
           error: {
-            message: `Rule "${rule.name}" validation failed: ${ruleValidation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", ")}`,
+            message: `Rule "${rule.name}" validation failed: ${ruleValidation.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', ')}`,
             line: rule.line,
           },
         });
@@ -416,7 +404,7 @@ export function parseFeatureFile(
     });
   } catch (error) {
     // Handle Gherkin parse errors
-    if (error !== null && typeof error === "object" && "errors" in error) {
+    if (error !== null && typeof error === 'object' && 'errors' in error) {
       const gherkinError = error as {
         errors: Array<{ message: string; location?: { line: number; column: number } }>;
       };
@@ -425,7 +413,7 @@ export function parseFeatureFile(
       const errorObj: GherkinFileError = {
         file: filePath,
         error: {
-          message: firstError?.message ?? "Unknown Gherkin parse error",
+          message: firstError?.message ?? 'Unknown Gherkin parse error',
           ...(firstError?.location?.line !== undefined && { line: firstError.location.line }),
           ...(firstError?.location?.column !== undefined && { column: firstError.location.column }),
         },
@@ -547,199 +535,198 @@ export function extractPatternTags(tags: readonly string[]): {
   } = {};
 
   for (const tag of tags) {
-    // Normalize tag using same logic as parseFeatureFile (strips @, libar-docs-, libar-process-)
+    // Normalize tag (strips @ and configured prefix like @libar-docs-)
     const normalized = normalizeTag(tag);
 
-    // @pattern:Name or @libar-process-pattern:Name
-    if (normalized.startsWith("pattern:")) {
+    // @pattern:Name
+    if (normalized.startsWith('pattern:')) {
       metadata.pattern = normalized.substring(8);
     }
-    // @phase:N or @libar-process-phase:N
-    else if (normalized.startsWith("phase:")) {
+    // @phase:N
+    else if (normalized.startsWith('phase:')) {
       const phaseNum = parseInt(normalized.substring(6), 10);
       if (!isNaN(phaseNum)) {
         metadata.phase = phaseNum;
       }
     }
-    // @release:v0.1.0 or @libar-process-release:v0.1.0 or @release:vNEXT
-    else if (normalized.startsWith("release:")) {
+    // @release:v0.1.0 or @release:vNEXT
+    else if (normalized.startsWith('release:')) {
       metadata.release = normalized.substring(8);
     }
     // @status:roadmap|active|completed|deferred (per PDR-005 FSM, from taxonomy)
-    else if (normalized.startsWith("status:")) {
+    else if (normalized.startsWith('status:')) {
       const status = normalized.substring(7);
       if ((PROCESS_STATUS_VALUES as readonly string[]).includes(status)) {
         metadata.status = status as (typeof PROCESS_STATUS_VALUES)[number];
       }
     }
-    // @depends-on:Pattern or @libar-process-depends-on:Pattern
-    else if (normalized.startsWith("depends-on:")) {
+    // @depends-on:Pattern
+    else if (normalized.startsWith('depends-on:')) {
       const deps = normalized
         .substring(11)
-        .split(",")
+        .split(',')
         .map((s) => s.trim());
       metadata.dependsOn = [...(metadata.dependsOn ?? []), ...deps];
     }
-    // @enables:Pattern or @libar-process-enables:Pattern
-    else if (normalized.startsWith("enables:")) {
+    // @enables:Pattern
+    else if (normalized.startsWith('enables:')) {
       const enables = normalized
         .substring(8)
-        .split(",")
+        .split(',')
         .map((s) => s.trim());
       metadata.enables = [...(metadata.enables ?? []), ...enables];
     }
     // @implements:Pattern1,Pattern2 (UML-inspired realization relationship)
-    else if (normalized.startsWith("implements:")) {
+    else if (normalized.startsWith('implements:')) {
       const impl = normalized
         .substring(11)
-        .split(",")
+        .split(',')
         .map((s) => s.trim());
       metadata.implementsPatterns = [...(metadata.implementsPatterns ?? []), ...impl];
     }
     // @extends:BasePattern (UML-inspired generalization relationship)
-    else if (normalized.startsWith("extends:")) {
+    else if (normalized.startsWith('extends:')) {
       metadata.extendsPattern = normalized.substring(8);
     }
     // @see-also:Pattern1,Pattern2 (cross-reference without dependency)
-    else if (normalized.startsWith("see-also:")) {
+    else if (normalized.startsWith('see-also:')) {
       const related = normalized
         .substring(9)
-        .split(",")
+        .split(',')
         .map((s) => s.trim());
       metadata.seeAlso = [...(metadata.seeAlso ?? []), ...related];
     }
     // @api-ref:path/to/file.ts,another/file.ts (implementation API paths)
-    else if (normalized.startsWith("api-ref:")) {
+    else if (normalized.startsWith('api-ref:')) {
       const refs = normalized
         .substring(8)
-        .split(",")
+        .split(',')
         .map((s) => s.trim());
       metadata.apiRef = [...(metadata.apiRef ?? []), ...refs];
     }
-    // @brief:path or @libar-process-brief:path
-    else if (normalized.startsWith("brief:")) {
+    // @brief:path
+    else if (normalized.startsWith('brief:')) {
       metadata.brief = normalized.substring(6);
     }
-    // @quarter:Q4-2024 or @libar-process-quarter:Q4-2024
-    else if (normalized.startsWith("quarter:")) {
+    // @quarter:Q4-2024
+    else if (normalized.startsWith('quarter:')) {
       metadata.quarter = normalized.substring(8);
     }
-    // @completed:2024-12-15 or @libar-process-completed:2024-12-15
-    else if (normalized.startsWith("completed:")) {
+    // @completed:2024-12-15
+    else if (normalized.startsWith('completed:')) {
       metadata.completed = normalized.substring(10);
     }
-    // @effort:4w or @libar-process-effort:4w
-    else if (normalized.startsWith("effort:")) {
+    // @effort:4w
+    else if (normalized.startsWith('effort:')) {
       metadata.effort = normalized.substring(7);
     }
-    // @team:platform or @libar-process-team:platform
-    else if (normalized.startsWith("team:")) {
+    // @team:platform
+    else if (normalized.startsWith('team:')) {
       metadata.team = normalized.substring(5);
     }
-    // @workflow:implementation or @libar-process-workflow:implementation
-    else if (normalized.startsWith("workflow:")) {
+    // @workflow:implementation
+    else if (normalized.startsWith('workflow:')) {
       metadata.workflow = normalized.substring(9);
     }
-    // @risk:medium or @libar-process-risk:medium
-    else if (normalized.startsWith("risk:")) {
+    // @risk:medium
+    else if (normalized.startsWith('risk:')) {
       metadata.risk = normalized.substring(5);
     }
-    // @priority:high or @libar-process-priority:high
-    else if (normalized.startsWith("priority:")) {
+    // @priority:high
+    else if (normalized.startsWith('priority:')) {
       metadata.priority = normalized.substring(9);
     }
-    // @product-area:Generators or @libar-process-product-area:Generators
-    else if (normalized.startsWith("product-area:")) {
+    // @product-area:Generators
+    else if (normalized.startsWith('product-area:')) {
       metadata.productArea = normalized.substring(13);
     }
-    // @user-role:Developer or @libar-process-user-role:Developer
-    else if (normalized.startsWith("user-role:")) {
+    // @user-role:Developer
+    else if (normalized.startsWith('user-role:')) {
       metadata.userRole = normalized.substring(10);
     }
-    // @business-value:Transform-features... or @libar-process-business-value:...
-    else if (normalized.startsWith("business-value:")) {
+    // @business-value:Transform-features...
+    else if (normalized.startsWith('business-value:')) {
       // Business value may use hyphens for spaces - convert back for display
-      metadata.businessValue = normalized.substring(15).replace(/-/g, " ");
+      metadata.businessValue = normalized.substring(15).replace(/-/g, ' ');
     }
-    // @level:epic|phase|task or @libar-process-level:epic|phase|task (from taxonomy)
-    else if (normalized.startsWith("level:")) {
+    // @level:epic|phase|task (from taxonomy)
+    else if (normalized.startsWith('level:')) {
       const level = normalized.substring(6);
       if ((HIERARCHY_LEVELS as readonly string[]).includes(level)) {
         metadata.level = level as HierarchyLevel;
       }
     }
-    // @parent:ParentPatternName or @libar-process-parent:ParentPatternName
-    else if (normalized.startsWith("parent:")) {
+    // @parent:ParentPatternName
+    else if (normalized.startsWith('parent:')) {
       metadata.parent = normalized.substring(7);
     }
-    // @title:"Human Readable Title" or @libar-process-title:"Human Readable Title"
-    // Supports quoted values for titles with spaces
-    else if (normalized.startsWith("title:")) {
+    // @title:"Human Readable Title" - supports quoted values for titles with spaces
+    else if (normalized.startsWith('title:')) {
       const value = normalized.substring(6);
       // Remove surrounding quotes if present
-      metadata.title = value.replace(/^["']|["']$/g, "");
+      metadata.title = value.replace(/^["']|["']$/g, '');
     }
-    // @behavior-file:path/to/file.feature or @libar-process-behavior-file:path/to/file.feature
-    else if (normalized.startsWith("behavior-file:")) {
+    // @behavior-file:path/to/file.feature
+    else if (normalized.startsWith('behavior-file:')) {
       metadata.behaviorFile = normalized.substring(14);
     }
-    // @libar-process-discovered-gap:Value or @discovered-gap:Value
-    else if (normalized.startsWith("discovered-gap:")) {
-      const value = normalized.substring(15).replace(/-/g, " ");
+    // @discovered-gap:Value
+    else if (normalized.startsWith('discovered-gap:')) {
+      const value = normalized.substring(15).replace(/-/g, ' ');
       metadata.discoveredGaps = [...(metadata.discoveredGaps ?? []), value];
     }
-    // @libar-process-discovered-improvement:Value
-    else if (normalized.startsWith("discovered-improvement:")) {
-      const value = normalized.substring(23).replace(/-/g, " ");
+    // @discovered-improvement:Value
+    else if (normalized.startsWith('discovered-improvement:')) {
+      const value = normalized.substring(23).replace(/-/g, ' ');
       metadata.discoveredImprovements = [...(metadata.discoveredImprovements ?? []), value];
     }
-    // @libar-process-discovered-risk:Value
-    else if (normalized.startsWith("discovered-risk:")) {
-      const value = normalized.substring(16).replace(/-/g, " ");
+    // @discovered-risk:Value
+    else if (normalized.startsWith('discovered-risk:')) {
+      const value = normalized.substring(16).replace(/-/g, ' ');
       metadata.discoveredRisks = [...(metadata.discoveredRisks ?? []), value];
     }
-    // @libar-process-discovered-learning:Value
-    else if (normalized.startsWith("discovered-learning:")) {
-      const value = normalized.substring(20).replace(/-/g, " ");
+    // @discovered-learning:Value
+    else if (normalized.startsWith('discovered-learning:')) {
+      const value = normalized.substring(20).replace(/-/g, ' ');
       metadata.discoveredLearnings = [...(metadata.discoveredLearnings ?? []), value];
     }
-    // @libar-process-constraint:Value or @constraint:Value
-    else if (normalized.startsWith("constraint:")) {
-      const value = normalized.substring(11).replace(/-/g, " ");
+    // @constraint:Value
+    else if (normalized.startsWith('constraint:')) {
+      const value = normalized.substring(11).replace(/-/g, ' ');
       metadata.constraints = [...(metadata.constraints ?? []), value];
     }
     // @libar-docs-adr:001 or @adr:001 (ADR number)
-    else if (normalized.startsWith("adr:")) {
+    else if (normalized.startsWith('adr:')) {
       // Pad to 3 digits for consistent formatting (e.g., "1" -> "001")
-      metadata.adr = normalized.substring(4).padStart(3, "0");
+      metadata.adr = normalized.substring(4).padStart(3, '0');
     }
     // @libar-docs-adr-status:accepted or @adr-status:accepted (from taxonomy)
-    else if (normalized.startsWith("adr-status:")) {
+    else if (normalized.startsWith('adr-status:')) {
       const status = normalized.substring(11);
       if ((ADR_STATUS_VALUES as readonly string[]).includes(status)) {
         metadata.adrStatus = status as AdrStatusValue;
       }
     }
     // @libar-docs-adr-category:process or @adr-category:process
-    else if (normalized.startsWith("adr-category:")) {
+    else if (normalized.startsWith('adr-category:')) {
       metadata.adrCategory = normalized.substring(13);
     }
     // @libar-docs-adr-supersedes:001 or @adr-supersedes:001
-    else if (normalized.startsWith("adr-supersedes:")) {
-      metadata.adrSupersedes = normalized.substring(15).padStart(3, "0");
+    else if (normalized.startsWith('adr-supersedes:')) {
+      metadata.adrSupersedes = normalized.substring(15).padStart(3, '0');
     }
     // @libar-docs-adr-superseded-by:005 or @adr-superseded-by:005
-    else if (normalized.startsWith("adr-superseded-by:")) {
-      metadata.adrSupersededBy = normalized.substring(18).padStart(3, "0");
+    else if (normalized.startsWith('adr-superseded-by:')) {
+      metadata.adrSupersededBy = normalized.substring(18).padStart(3, '0');
     }
     // Category tags: @ddd, @core, @event-sourcing, etc.
     // These don't have a colon, so treat them as category tags
     // Skip "libar-docs" (the bare opt-in marker) - it's not a domain category
     else if (
-      !normalized.includes(":") &&
-      !normalized.startsWith("acceptance-criteria") &&
-      !normalized.startsWith("happy-path") &&
-      normalized !== "libar-docs"
+      !normalized.includes(':') &&
+      !normalized.startsWith('acceptance-criteria') &&
+      !normalized.startsWith('happy-path') &&
+      normalized !== 'libar-docs'
     ) {
       metadata.categories = [...(metadata.categories ?? []), normalized];
     }

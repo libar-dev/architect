@@ -17,9 +17,9 @@
  * - When consuming validation results in CLI or reports
  */
 
-import { z } from "zod";
-import type { Deliverable } from "../validation-schemas/dual-source.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
+import { z } from 'zod';
+import type { Deliverable } from '../validation-schemas/dual-source.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 
 // ============================================================================
 // Common Options Interfaces
@@ -62,11 +62,11 @@ export interface WithTagRegistry {
  * documentation architecture or process hygiene.
  */
 export type AntiPatternId =
-  | "tag-duplication" // Dependencies in features (should be code-only)
-  | "process-in-code" // Process metadata in code (should be features-only)
-  | "magic-comments" // Generator hints in features
-  | "scenario-bloat" // Too many scenarios per feature
-  | "mega-feature"; // Feature file too large
+  | 'tag-duplication' // Dependencies in features (should be code-only)
+  | 'process-in-code' // Process metadata in code (should be features-only)
+  | 'magic-comments' // Generator hints in features
+  | 'scenario-bloat' // Too many scenarios per feature
+  | 'mega-feature'; // Feature file too large
 
 /**
  * Zod schema for anti-pattern thresholds
@@ -109,7 +109,7 @@ export interface AntiPatternViolation {
   /** Line number (if applicable) */
   readonly line?: number;
   /** Severity (error = architectural violation, warning = hygiene issue) */
-  readonly severity: "error" | "warning";
+  readonly severity: 'error' | 'warning';
   /** Fix guidance */
   readonly fix?: string;
 }
@@ -161,20 +161,20 @@ export interface DoDValidationSummary {
  */
 export const COMPLETION_PATTERNS = [
   // Text patterns (case-insensitive)
-  "complete",
-  "completed",
-  "done",
-  "finished",
-  "yes",
+  'complete',
+  'completed',
+  'done',
+  'finished',
+  'yes',
   // Emoji/symbol patterns
-  "✓",
-  "✔",
-  "✅",
-  "☑",
+  '✓',
+  '✔',
+  '✅',
+  '☑',
   // Checkmark unicode variants
-  "\u2713", // ✓
-  "\u2714", // ✔
-  "\u2611", // ☑
+  '\u2713', // ✓
+  '\u2714', // ✔
+  '\u2611', // ☑
 ] as const;
 
 /**
@@ -183,16 +183,16 @@ export const COMPLETION_PATTERNS = [
  * Status values that indicate work is ongoing.
  */
 export const IN_PROGRESS_PATTERNS = [
-  "in-progress",
-  "in progress",
-  "active",
-  "wip",
-  "partial",
-  "started",
+  'in-progress',
+  'in progress',
+  'active',
+  'wip',
+  'partial',
+  'started',
   // Emoji patterns
-  "🔄",
-  "⏳",
-  "🚧",
+  '🔄',
+  '⏳',
+  '🚧',
 ] as const;
 
 /**
@@ -201,13 +201,13 @@ export const IN_PROGRESS_PATTERNS = [
  * Status values that indicate work hasn't started.
  */
 export const PENDING_PATTERNS = [
-  "pending",
-  "todo",
-  "planned",
-  "not started",
-  "no",
+  'pending',
+  'todo',
+  'planned',
+  'not started',
+  'no',
   // Emoji patterns
-  "⏹",
-  "⬜",
-  "❌",
+  '⏹',
+  '⬜',
+  '❌',
 ] as const;

@@ -13,8 +13,6 @@
 
 ## Description
 
-## CLIVersionHelper - Package Version Reader
-
 Reads package version from package.json for CLI --version flag.
 
 ### When to Use

@@ -13,8 +13,6 @@
 
 ## Description
 
-## LayerInference - Directory-Based Feature Classification
-
 Infers feature file layer (timeline, domain, integration, e2e, component)
 from directory path patterns. Enables filtering without explicit annotations.
 

@@ -8,7 +8,7 @@ type Branded<T, Brand extends string> = T & { readonly __brand: Brand };
  * Unique identifier for a documentation pattern
  * Format: pattern-{8-char-hex}
  */
-export type PatternId = Branded<string, "PatternId">;
+export type PatternId = Branded<string, 'PatternId'>;
 
 /**
  * Convert string to PatternId
@@ -38,7 +38,7 @@ export function asModuleId(id: string): ModuleId {
  * Category name for organizing patterns
  * Examples: core, domain, arch, infra, validation
  */
-export type CategoryName = Branded<string, "CategoryName">;
+export type CategoryName = Branded<string, 'CategoryName'>;
 
 /**
  * Convert string to CategoryName
@@ -53,7 +53,7 @@ export function asCategoryName(name: string): CategoryName {
  * Source file path relative to base directory
  * Examples: src/types/index.ts, packages/core/src/index.ts
  */
-export type SourceFilePath = Branded<string, "SourceFilePath">;
+export type SourceFilePath = Branded<string, 'SourceFilePath'>;
 
 /**
  * Convert string to SourceFilePath
@@ -68,7 +68,7 @@ export function asSourceFilePath(path: string): SourceFilePath {
  * Output file path for generated documentation
  * Examples: docs/core/pattern-name.md
  */
-export type OutputFilePath = Branded<string, "OutputFilePath">;
+export type OutputFilePath = Branded<string, 'OutputFilePath'>;
 
 /**
  * Convert string to OutputFilePath
@@ -83,7 +83,7 @@ export function asOutputFilePath(path: string): OutputFilePath {
  * Registry file path
  * Examples: registry.json, docs/registry.json
  */
-export type RegistryFilePath = Branded<string, "RegistryFilePath">;
+export type RegistryFilePath = Branded<string, 'RegistryFilePath'>;
 
 /**
  * Convert string to RegistryFilePath
@@ -98,7 +98,7 @@ export function asRegistryFilePath(path: string): RegistryFilePath {
  * Directive tag name
  * Format: @libar-docs-{category} or @libar-docs-{category}-{subcategory}
  */
-export type DirectiveTag = Branded<string, "DirectiveTag">;
+export type DirectiveTag = Branded<string, 'DirectiveTag'>;
 
 /**
  * Convert string to DirectiveTag

@@ -29,22 +29,23 @@
  * - **Decision**: The chosen solution
  * - **Consequences**: Positive and negative outcomes
  */
-import { z } from "zod";
-import { MasterDatasetSchema, } from "../../validation-schemas/master-dataset.js";
-import { heading, paragraph, separator, table, collapsible, linkOut, document, } from "../schema.js";
-import { getDisplayName, groupBy } from "../utils.js";
-import { DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
+import { heading, paragraph, separator, table, collapsible, linkOut, document, } from '../schema.js';
+import { getDisplayName } from '../utils.js';
+import { groupBy } from '../../utils/index.js';
+import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 /**
  * Default options for AdrDocumentCodec
  */
 export const DEFAULT_ADR_OPTIONS = {
     ...DEFAULT_BASE_OPTIONS,
-    groupBy: "category",
+    groupBy: 'category',
     includeContext: true,
     includeDecision: true,
     includeConsequences: true,
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // ADR Document Codec
 // ═══════════════════════════════════════════════════════════════════════════
@@ -74,7 +75,7 @@ export function createAdrCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("AdrDocumentCodec is decode-only. See zod-codecs.md");
+            throw new Error('AdrDocumentCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -96,18 +97,18 @@ function buildAdrDocument(dataset, options) {
     // Filter to patterns with ADR metadata
     const adrPatterns = dataset.patterns.filter((p) => p.adr !== undefined);
     if (adrPatterns.length === 0) {
-        sections.push(heading(2, "No Architecture Decisions"), paragraph("No patterns have @libar-docs-adr tags."));
-        return document("Architecture Decision Records", sections, {
-            purpose: "Architectural decisions extracted from feature files",
+        sections.push(heading(2, 'No Architecture Decisions'), paragraph('No patterns have @libar-docs-adr tags.'));
+        return document('Architecture Decision Records', sections, {
+            purpose: 'Architectural decisions extracted from feature files',
         });
     }
     // 1. Summary
     sections.push(...buildAdrSummary(adrPatterns));
     // 2. ADRs by grouping
-    if (options.groupBy === "phase") {
+    if (options.groupBy === 'phase') {
         sections.push(...buildAdrsByPhase(adrPatterns, options));
     }
-    else if (options.groupBy === "date") {
+    else if (options.groupBy === 'date') {
         sections.push(...buildAdrsByDate(adrPatterns, options));
     }
     else {
@@ -121,15 +122,15 @@ function buildAdrDocument(dataset, options) {
         ? buildAdrDetailFiles(adrPatterns, options)
         : {};
     const docOpts = {
-        purpose: "Architectural decisions extracted from feature files",
+        purpose: 'Architectural decisions extracted from feature files',
         detailLevel: options.generateDetailFiles
-            ? "Summary with links to category details"
-            : "Compact summary",
+            ? 'Summary with links to category details'
+            : 'Compact summary',
     };
     if (Object.keys(additionalFiles).length > 0) {
         docOpts.additionalFiles = additionalFiles;
     }
-    return document("Architecture Decision Records", sections, docOpts);
+    return document('Architecture Decision Records', sections, docOpts);
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Section Builders
@@ -139,22 +140,22 @@ function buildAdrDocument(dataset, options) {
  */
 function buildAdrSummary(patterns) {
     // Count by status
-    const byStatus = groupBy(patterns.filter((p) => p.adrStatus), (p) => p.adrStatus ?? "proposed");
-    const accepted = byStatus.get("accepted")?.length ?? 0;
-    const proposed = byStatus.get("proposed")?.length ?? 0;
-    const deprecated = byStatus.get("deprecated")?.length ?? 0;
-    const superseded = byStatus.get("superseded")?.length ?? 0;
+    const byStatus = groupBy(patterns.filter((p) => p.adrStatus), (p) => p.adrStatus ?? 'proposed');
+    const accepted = byStatus.get('accepted')?.length ?? 0;
+    const proposed = byStatus.get('proposed')?.length ?? 0;
+    const deprecated = byStatus.get('deprecated')?.length ?? 0;
+    const superseded = byStatus.get('superseded')?.length ?? 0;
     // Count by category
-    const byCategory = groupBy(patterns.filter((p) => p.adrCategory), (p) => p.adrCategory ?? "uncategorized");
+    const byCategory = groupBy(patterns.filter((p) => p.adrCategory), (p) => p.adrCategory ?? 'uncategorized');
     return [
-        heading(2, "Summary"),
-        table(["Metric", "Value"], [
-            ["Total ADRs", String(patterns.length)],
-            ["Accepted", String(accepted)],
-            ["Proposed", String(proposed)],
-            ["Deprecated", String(deprecated)],
-            ["Superseded", String(superseded)],
-            ["Categories", String(byCategory.size)],
+        heading(2, 'Summary'),
+        table(['Metric', 'Value'], [
+            ['Total ADRs', String(patterns.length)],
+            ['Accepted', String(accepted)],
+            ['Proposed', String(proposed)],
+            ['Deprecated', String(deprecated)],
+            ['Superseded', String(superseded)],
+            ['Categories', String(byCategory.size)],
         ]),
         separator(),
     ];
@@ -165,11 +166,11 @@ function buildAdrSummary(patterns) {
  */
 function buildAdrsByCategory(patterns, options) {
     const sections = [];
-    const byCategory = groupBy(patterns, (p) => p.adrCategory ?? "uncategorized");
+    const byCategory = groupBy(patterns, (p) => p.adrCategory ?? 'uncategorized');
     if (byCategory.size === 0) {
         return [];
     }
-    sections.push(heading(2, "By Category"));
+    sections.push(heading(2, 'By Category'));
     const sortedCategories = [...byCategory.keys()].sort();
     for (const category of sortedCategories) {
         const categoryPatterns = byCategory.get(category) ?? [];
@@ -187,14 +188,14 @@ function buildAdrsByCategory(patterns, options) {
                 return aNum - bNum;
             });
             const adrRows = sorted.map((p) => {
-                const adrNum = p.adr ?? "???";
+                const adrNum = p.adr ?? '???';
                 const name = getDisplayName(p);
-                const status = p.adrStatus ?? "proposed";
+                const status = p.adrStatus ?? 'proposed';
                 const statusEmoji = getAdrStatusEmoji(status);
                 const slug = adrToSlug(p);
                 return [`[${statusEmoji} ADR-${adrNum}](decisions/${slug}.md)`, name, status];
             });
-            sections.push(table(["ADR", "Title", "Status"], adrRows), separator());
+            sections.push(table(['ADR', 'Title', 'Status'], adrRows), separator());
         }
     }
     return sections;
@@ -224,26 +225,26 @@ function buildCategorySection(category, patterns, options) {
 function buildAdrEntry(pattern, options) {
     const sections = [];
     const name = getDisplayName(pattern);
-    const adrNum = pattern.adr ?? "???";
-    const status = pattern.adrStatus ?? "proposed";
+    const adrNum = pattern.adr ?? '???';
+    const status = pattern.adrStatus ?? 'proposed';
     // Status emoji
     const statusEmoji = getAdrStatusEmoji(status);
     sections.push(heading(4, `${statusEmoji} ADR-${adrNum}: ${name}`));
     // Metadata
-    const metaRows = [["Status", status]];
+    const metaRows = [['Status', status]];
     if (pattern.adrCategory) {
-        metaRows.push(["Category", pattern.adrCategory]);
+        metaRows.push(['Category', pattern.adrCategory]);
     }
     if (pattern.phase !== undefined) {
-        metaRows.push(["Phase", String(pattern.phase)]);
+        metaRows.push(['Phase', String(pattern.phase)]);
     }
     if (pattern.adrSupersedes) {
-        metaRows.push(["Supersedes", `ADR-${pattern.adrSupersedes}`]);
+        metaRows.push(['Supersedes', `ADR-${pattern.adrSupersedes}`]);
     }
     if (pattern.adrSupersededBy) {
-        metaRows.push(["Superseded By", `ADR-${pattern.adrSupersededBy}`]);
+        metaRows.push(['Superseded By', `ADR-${pattern.adrSupersededBy}`]);
     }
-    sections.push(table(["Property", "Value"], metaRows));
+    sections.push(table(['Property', 'Value'], metaRows));
     // ADR Content sections from Gherkin Rule: keywords
     // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
     const partitioned = partitionAdrRules(pattern.rules, name);
@@ -259,7 +260,7 @@ function buildAdrsByPhase(patterns, options) {
     if (byPhase.size === 0) {
         return [];
     }
-    sections.push(heading(2, "By Phase"));
+    sections.push(heading(2, 'By Phase'));
     const sortedPhases = [...byPhase.keys()].sort((a, b) => a - b);
     for (const phaseNum of sortedPhases) {
         const phasePatterns = byPhase.get(phaseNum) ?? [];
@@ -277,11 +278,11 @@ function buildAdrsByPhase(patterns, options) {
  */
 function buildAdrsByDate(patterns, options) {
     const sections = [];
-    const byQuarter = groupBy(patterns.filter((p) => p.quarter), (p) => p.quarter ?? "undated");
+    const byQuarter = groupBy(patterns.filter((p) => p.quarter), (p) => p.quarter ?? 'undated');
     if (byQuarter.size === 0) {
         return [];
     }
-    sections.push(heading(2, "By Date"));
+    sections.push(heading(2, 'By Date'));
     const sortedQuarters = [...byQuarter.keys()].sort().reverse(); // Most recent first
     for (const quarter of sortedQuarters) {
         const quarterPatterns = byQuarter.get(quarter) ?? [];
@@ -306,10 +307,10 @@ function buildAdrIndexTable(patterns, options) {
         return aNum - bNum;
     });
     const rows = sorted.map((p) => {
-        const adrNum = p.adr ?? "???";
+        const adrNum = p.adr ?? '???';
         const name = getDisplayName(p);
-        const status = p.adrStatus ?? "proposed";
-        const category = p.adrCategory ?? "-";
+        const status = p.adrStatus ?? 'proposed';
+        const category = p.adrCategory ?? '-';
         const statusEmoji = getAdrStatusEmoji(status);
         if (options.generateDetailFiles) {
             const slug = adrToSlug(p);
@@ -318,8 +319,8 @@ function buildAdrIndexTable(patterns, options) {
         return [`${statusEmoji} ADR-${adrNum}`, name, status, category];
     });
     return [
-        heading(2, "ADR Index"),
-        table(["ADR", "Title", "Status", "Category"], rows),
+        heading(2, 'ADR Index'),
+        table(['ADR', 'Title', 'Status', 'Category'], rows),
         separator(),
     ];
 }
@@ -338,15 +339,15 @@ function buildAdrIndexTable(patterns, options) {
  * @returns URL-safe slug like "adr-001-my-decision"
  */
 function adrToSlug(pattern) {
-    const adrNum = pattern.adr ?? "000";
+    const adrNum = pattern.adr ?? '000';
     const displayName = getDisplayName(pattern);
     const sluggedName = displayName
         .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "");
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
     // Fallback to "unnamed" if the slug would be empty
-    const name = sluggedName.length > 0 ? sluggedName : "unnamed";
-    return `adr-${adrNum.padStart(3, "0")}-${name}`;
+    const name = sluggedName.length > 0 ? sluggedName : 'unnamed';
+    return `adr-${adrNum.padStart(3, '0')}-${name}`;
 }
 /**
  * Parse ADR number for sorting, handling non-numeric values
@@ -383,30 +384,30 @@ function buildAdrDetailFiles(patterns, options) {
 function buildSingleAdrDocument(pattern, options) {
     const sections = [];
     const name = getDisplayName(pattern);
-    const adrNum = pattern.adr ?? "???";
-    const status = pattern.adrStatus ?? "proposed";
+    const adrNum = pattern.adr ?? '???';
+    const status = pattern.adrStatus ?? 'proposed';
     const statusEmoji = getAdrStatusEmoji(status);
     // Metadata
-    const metaRows = [["Status", status]];
+    const metaRows = [['Status', status]];
     if (pattern.adrCategory) {
-        metaRows.push(["Category", pattern.adrCategory]);
+        metaRows.push(['Category', pattern.adrCategory]);
     }
     if (pattern.phase !== undefined) {
-        metaRows.push(["Phase", String(pattern.phase)]);
+        metaRows.push(['Phase', String(pattern.phase)]);
     }
     if (pattern.adrSupersedes) {
-        metaRows.push(["Supersedes", `ADR-${pattern.adrSupersedes}`]);
+        metaRows.push(['Supersedes', `ADR-${pattern.adrSupersedes}`]);
     }
     if (pattern.adrSupersededBy) {
-        metaRows.push(["Superseded By", `ADR-${pattern.adrSupersededBy}`]);
+        metaRows.push(['Superseded By', `ADR-${pattern.adrSupersededBy}`]);
     }
-    sections.push(heading(2, "Overview"), table(["Property", "Value"], metaRows));
+    sections.push(heading(2, 'Overview'), table(['Property', 'Value'], metaRows));
     // ADR Content sections from Gherkin Rule: keywords
     // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
     const partitioned = partitionAdrRules(pattern.rules, name);
     sections.push(...renderPartitionedAdrSections(partitioned, options, 2));
     // Back link
-    sections.push(separator(), linkOut("← Back to All Decisions", "../DECISIONS.md"));
+    sections.push(separator(), linkOut('← Back to All Decisions', '../DECISIONS.md'));
     return document(`${statusEmoji} ADR-${adrNum}: ${name}`, sections, {
         purpose: `Architecture decision record for ${name}`,
     });
@@ -434,13 +435,13 @@ function partitionAdrRules(rules, patternName) {
     const other = [];
     for (const rule of rules) {
         const nameLower = rule.name.toLowerCase();
-        if (nameLower.startsWith("context")) {
+        if (nameLower.startsWith('context')) {
             context.push(rule);
         }
-        else if (nameLower.startsWith("decision")) {
+        else if (nameLower.startsWith('decision')) {
             decision.push(rule);
         }
-        else if (nameLower.startsWith("consequence")) {
+        else if (nameLower.startsWith('consequence')) {
             consequences.push(rule);
         }
         else {
@@ -449,8 +450,8 @@ function partitionAdrRules(rules, patternName) {
     }
     // Warn about rules that don't match expected ADR prefixes
     if (other.length > 0) {
-        const otherNames = other.map((r) => `"${r.name}"`).join(", ");
-        const patternContext = patternName ? ` in pattern "${patternName}"` : "";
+        const otherNames = other.map((r) => `"${r.name}"`).join(', ');
+        const patternContext = patternName ? ` in pattern "${patternName}"` : '';
         console.warn(`[adr-codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`);
     }
     return { context, decision, consequences, other };
@@ -469,7 +470,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
     const sections = [];
     // Render Context section
     if (options.includeContext && partitioned.context.length > 0) {
-        sections.push(heading(headingLevel, "Context"));
+        sections.push(heading(headingLevel, 'Context'));
         for (const rule of partitioned.context) {
             if (rule.description) {
                 sections.push(paragraph(rule.description));
@@ -478,7 +479,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
     }
     // Render Decision section
     if (options.includeDecision && partitioned.decision.length > 0) {
-        sections.push(heading(headingLevel, "Decision"));
+        sections.push(heading(headingLevel, 'Decision'));
         for (const rule of partitioned.decision) {
             if (rule.description) {
                 sections.push(paragraph(rule.description));
@@ -487,7 +488,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
     }
     // Render Consequences section
     if (options.includeConsequences && partitioned.consequences.length > 0) {
-        sections.push(heading(headingLevel, "Consequences"));
+        sections.push(heading(headingLevel, 'Consequences'));
         for (const rule of partitioned.consequences) {
             if (rule.description) {
                 sections.push(paragraph(rule.description));
@@ -501,16 +502,16 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
  */
 function getAdrStatusEmoji(status) {
     switch (status) {
-        case "accepted":
-            return "✅";
-        case "proposed":
-            return "📋";
-        case "deprecated":
-            return "⚠️";
-        case "superseded":
-            return "🔄";
+        case 'accepted':
+            return '✅';
+        case 'proposed':
+            return '📋';
+        case 'deprecated':
+            return '⚠️';
+        case 'superseded':
+            return '🔄';
         default:
-            return "📋";
+            return '📋';
     }
 }
 //# sourceMappingURL=adr.js.map

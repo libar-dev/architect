@@ -13,8 +13,6 @@
 
 ## Description
 
-## Planning Document Codecs
-
 Transforms MasterDataset into RenderableDocuments for planning outputs:
 - PLANNING-CHECKLIST.md (pre-planning questions and DoD)
 - SESSION-PLAN.md (implementation plans for phases)

@@ -28,11 +28,11 @@ Feature: Dual-Source Extraction
     Scenario: Complete process metadata extraction
       Given a feature with process tags:
         | tag                                    |
-        | libar-process-pattern:MyPattern        |
-        | libar-process-phase:15                 |
-        | libar-process-status:active            |
-        | libar-process-quarter:Q1-2024          |
-        | libar-process-effort:medium            |
+        | pattern:MyPattern        |
+        | phase:15                 |
+        | status:active            |
+        | quarter:Q1-2024          |
+        | effort:medium            |
       When extracting process metadata
       Then metadata is extracted successfully
       And the pattern name is "MyPattern"
@@ -43,8 +43,8 @@ Feature: Dual-Source Extraction
     Scenario: Minimal required tags extraction
       Given a feature with process tags:
         | tag                             |
-        | libar-process-pattern:MinPattern|
-        | libar-process-phase:01          |
+        | pattern:MinPattern|
+        | phase:01          |
       When extracting process metadata
       Then metadata is extracted successfully
       And the status defaults to "roadmap"
@@ -53,7 +53,7 @@ Feature: Dual-Source Extraction
     Scenario: Missing pattern tag returns null
       Given a feature with process tags:
         | tag                    |
-        | libar-process-phase:10 |
+        | phase:10 |
       When extracting process metadata
       Then no metadata is extracted
 
@@ -61,7 +61,7 @@ Feature: Dual-Source Extraction
     Scenario: Missing phase tag returns null
       Given a feature with process tags:
         | tag                            |
-        | libar-process-pattern:NoPhase  |
+        | pattern:NoPhase  |
       When extracting process metadata
       Then no metadata is extracted
 

@@ -23,19 +23,19 @@
  * - CI pipeline to catch documentation drift early
  * - Strict mode (`--strict`) for production readiness checks
  */
-import type { ExtractedPattern } from "../validation-schemas/index.js";
-import type { Deliverable } from "../validation-schemas/index.js";
+import type { ExtractedPattern } from '../validation-schemas/index.js';
+import type { Deliverable } from '../validation-schemas/index.js';
 /**
  * Validation issue severity
  */
-export type IssueSeverity = "error" | "warning" | "info";
+export type IssueSeverity = 'error' | 'warning' | 'info';
 /**
  * Validation issue
  */
 export interface ValidationIssue {
     severity: IssueSeverity;
     message: string;
-    source: "typescript" | "gherkin" | "cross-source";
+    source: 'typescript' | 'gherkin' | 'cross-source';
     pattern?: string;
     file?: string;
 }
@@ -77,9 +77,7 @@ export interface ValidateCLIConfig {
     /** Treat warnings as errors */
     strict: boolean;
     /** Output format */
-    format: "pretty" | "json";
-    /** Path to tag registry JSON */
-    tagRegistryPath: string | null;
+    format: 'pretty' | 'json';
     /** Show help */
     help: boolean;
     /** Enable DoD validation mode */

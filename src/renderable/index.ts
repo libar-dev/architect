@@ -59,13 +59,13 @@ export {
   collapsible,
   linkOut,
   document,
-} from "./schema.js";
+} from './schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Renderer Exports
 // ═══════════════════════════════════════════════════════════════════════════
 
-export { renderToMarkdown, renderDocumentWithFiles, type OutputFile } from "./render.js";
+export { renderToMarkdown, renderDocumentWithFiles, type OutputFile } from './render.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Exports
@@ -78,7 +78,7 @@ export {
   RequirementsDocumentCodec,
   SessionContextCodec,
   RemainingWorkCodec,
-} from "./codecs/index.js";
+} from './codecs/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Generation Exports
@@ -93,24 +93,23 @@ export {
   getDocumentTypeInfo,
   DOCUMENT_TYPES,
   type DocumentType,
-} from "./generate.js";
+} from './generate.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Utility Exports
 // ═══════════════════════════════════════════════════════════════════════════
 
-export { normalizeStatus } from "../taxonomy/index.js";
+export { normalizeStatus } from '../taxonomy/index.js';
 export {
   getStatusEmoji,
   getDisplayName,
   formatCategoryName,
-  extractFirstParagraph,
   extractSummary,
   computeStatusCounts,
   completionPercentage,
   renderProgressBar,
-  groupBy,
   sortByPhaseAndName,
   sortByStatusAndName,
   formatBusinessValue,
-} from "./utils.js";
+} from './utils.js';
+export { groupBy } from '../utils/index.js';

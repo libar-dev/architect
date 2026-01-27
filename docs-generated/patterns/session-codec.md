@@ -13,8 +13,6 @@
 
 ## Description
 
-## Session Document Codec
-
 Transforms MasterDataset into RenderableDocuments for session/planning outputs:
 - SESSION-CONTEXT.md (current session context)
 - REMAINING-WORK.md (incomplete work aggregation)

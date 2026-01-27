@@ -18,7 +18,7 @@ export declare const CATEGORIES: readonly CategoryDefinition[];
 /**
  * Category tags as a union type
  */
-export type CategoryTag = (typeof CATEGORIES)[number]["tag"];
+export type CategoryTag = (typeof CATEGORIES)[number]['tag'];
 /**
  * Extract all category tags as an array
  */

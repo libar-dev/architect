@@ -24,8 +24,8 @@
  * - Use DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy (default)
  * - Use as base for custom configurations
  */
-import type { DeliveryProcessConfig } from "./types.js";
-import { type CategoryDefinition } from "../taxonomy/categories.js";
+import type { DeliveryProcessConfig } from './types.js';
+import { type CategoryDefinition } from '../taxonomy/categories.js';
 /**
  * Generic preset for non-DDD projects.
  *
@@ -135,7 +135,7 @@ export declare const DDD_ES_CQRS_PRESET: {
 /**
  * Available preset names
  */
-export type PresetName = "generic" | "libar-generic" | "ddd-es-cqrs";
+export type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
 /**
  * Preset lookup map
  *

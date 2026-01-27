@@ -24,8 +24,8 @@
  * - Use `isValidTransition()` to validate proposed status changes
  * - Use `getValidTransitionsFrom()` to show available options
  */
-import type { ProcessStatusValue } from "../../taxonomy/index.js";
-import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
+import type { ProcessStatusValue } from '../../taxonomy/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 /**
  * Options for transition functions that generate messages
  */

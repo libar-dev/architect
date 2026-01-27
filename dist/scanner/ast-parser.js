@@ -26,11 +26,11 @@
  * - **Schema-First Validation**: All directives validated against Zod schemas
  * - **Result Monad**: Returns Result<T, E> for explicit error handling
  */
-import { Result } from "../types/index.js";
-import { parse } from "@typescript-eslint/typescript-estree";
-import { asDirectiveTag, createDirectiveValidationError, createFileParseError, } from "../types/index.js";
-import { DocDirectiveSchema, createDefaultTagRegistry, } from "../validation-schemas/index.js";
-import { createRegexBuilders } from "../config/regex-builders.js";
+import { Result } from '../types/index.js';
+import { parse } from '@typescript-eslint/typescript-estree';
+import { asDirectiveTag, createDirectiveValidationError, createFileParseError, } from '../types/index.js';
+import { DocDirectiveSchema, createDefaultTagRegistry, } from '../validation-schemas/index.js';
+import { createRegexBuilders } from '../config/regex-builders.js';
 /**
  * Module-level regex cache for performance optimization.
  *
@@ -85,7 +85,7 @@ function extractSingleValue(commentText, fullTag) {
  * ```
  */
 function extractEnumValue(commentText, fullTag, validValues) {
-    const valuesPattern = validValues.join("|");
+    const valuesPattern = validValues.join('|');
     const regex = getCachedRegex(`${escapeRegex(fullTag)}\\s+(${valuesPattern})`);
     const match = regex.exec(commentText);
     return match?.[1];
@@ -99,7 +99,7 @@ function extractEnumValue(commentText, fullTag, validValues) {
  * ```
  */
 function extractQuotedValue(commentText, fullTag) {
-    const regex = getCachedRegex(`${escapeRegex(fullTag)}\\s+(?:"([^"]+)"|([^\\n*]+?)(?:\\n|\\*|$))`, "g");
+    const regex = getCachedRegex(`${escapeRegex(fullTag)}\\s+(?:"([^"]+)"|([^\\n*]+?)(?:\\n|\\*|$))`, 'g');
     const values = [];
     let match;
     while ((match = regex.exec(commentText)) !== null) {
@@ -124,7 +124,7 @@ function extractCsvValue(commentText, fullTag) {
     if (!match?.[1])
         return undefined;
     return match[1]
-        .split(",")
+        .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
 }
@@ -157,7 +157,7 @@ function checkFlagPresent(commentText, fullTag) {
  * Escape special regex characters
  */
 function escapeRegex(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 /**
  * Build regex patterns for directive parsing from registry configuration.
@@ -169,24 +169,24 @@ function escapeRegex(str) {
  */
 function buildDirectivePatterns(registry) {
     // Extract prefix without @ for pattern construction
-    const prefixWithoutAt = registry.tagPrefix.startsWith("@")
+    const prefixWithoutAt = registry.tagPrefix.startsWith('@')
         ? registry.tagPrefix.substring(1)
         : registry.tagPrefix;
     const escapedPrefixWithoutAt = escapeRegex(prefixWithoutAt);
     // Extract opt-in tag without @ for pattern construction
-    const optInWithoutAt = registry.fileOptInTag.startsWith("@")
+    const optInWithoutAt = registry.fileOptInTag.startsWith('@')
         ? registry.fileOptInTag.substring(1)
         : registry.fileOptInTag;
     const escapedOptInWithoutAt = escapeRegex(optInWithoutAt);
     return {
         // Match directive tags: @prefix-pattern, @prefix-core, etc. (prefix includes trailing -)
-        tagRegex: new RegExp(`@${escapedPrefixWithoutAt}[\\w-]+`, "g"),
+        tagRegex: new RegExp(`@${escapedPrefixWithoutAt}[\\w-]+`, 'g'),
         // Check if line starts with opt-in or directive
         // e.g., ^@libar-docs or ^@libar-docs-pattern
         startsWithOptInOrDirective: new RegExp(`^@${escapedOptInWithoutAt}(?:-[\\w-]+)?`),
         // Match opt-in tag for removal (not followed by -)
         // e.g., @libar-docs followed by whitespace or end
-        optInTagPattern: new RegExp(`@${escapedOptInWithoutAt}(?!-)(\\s|$)?`, "g"),
+        optInTagPattern: new RegExp(`@${escapedOptInWithoutAt}(?!-)(\\s|$)?`, 'g'),
         // Match any @ tag that is NOT our prefix
         // e.g., @param, @returns, @example (not @libar-docs)
         nonOptInAtTagPattern: new RegExp(`^@(?!${escapedOptInWithoutAt})`),
@@ -206,10 +206,10 @@ function buildDirectivePatterns(registry) {
  */
 function buildValueTakingTagsPattern(registry) {
     const valueTakingTags = registry.metadataTags
-        .filter((tag) => tag.format !== "flag")
+        .filter((tag) => tag.format !== 'flag')
         .map((tag) => escapeRegex(tag.tag));
     const tagPrefix = escapeRegex(registry.tagPrefix);
-    return `${tagPrefix}(?:${valueTakingTags.join("|")})\\s`;
+    return `${tagPrefix}(?:${valueTakingTags.join('|')})\\s`;
 }
 /**
  * Pre-compiled regex for detecting value-taking metadata directives.
@@ -241,11 +241,11 @@ const _VALUE_TAKING_TAGS_REGEX = (() => {
 function extractMetadataTag(commentText, tagDef, prefix) {
     const fullTag = `${prefix}${tagDef.tag}`;
     switch (tagDef.format) {
-        case "value":
+        case 'value':
             return extractSingleValue(commentText, fullTag);
-        case "enum":
+        case 'enum':
             return extractEnumValue(commentText, fullTag, tagDef.values ?? []);
-        case "quoted-value":
+        case 'quoted-value':
             // For repeatable tags, return array; otherwise return single value
             if (tagDef.repeatable) {
                 const values = extractQuotedValue(commentText, fullTag);
@@ -255,11 +255,11 @@ function extractMetadataTag(commentText, tagDef, prefix) {
                 const values = extractQuotedValue(commentText, fullTag);
                 return values[0];
             }
-        case "csv":
+        case 'csv':
             return extractCsvValue(commentText, fullTag);
-        case "number":
+        case 'number':
             return extractNumberValue(commentText, fullTag);
-        case "flag":
+        case 'flag':
             return checkFlagPresent(commentText, fullTag);
         default:
             return undefined;
@@ -306,10 +306,10 @@ export function parseFileDirectives(content, filePath, registry) {
     catch (error) {
         // Surface parse errors instead of silently returning empty
         const tsError = error;
-        const location = "lineNumber" in tsError && "column" in tsError
+        const location = 'lineNumber' in tsError && 'column' in tsError
             ? { line: tsError.lineNumber, column: tsError.column }
             : undefined;
-        return Result.err(createFileParseError(filePath, tsError.message || "Unknown parse error", location, error));
+        return Result.err(createFileParseError(filePath, tsError.message || 'Unknown parse error', location, error));
     }
     const results = [];
     const skippedDirectives = [];
@@ -317,7 +317,7 @@ export function parseFileDirectives(content, filePath, registry) {
     // Create regex builders for directive detection using registry configuration
     const builders = createRegexBuilders(effectiveRegistry.tagPrefix, effectiveRegistry.fileOptInTag);
     for (const comment of comments) {
-        if (comment.type !== "Block")
+        if (comment.type !== 'Block')
             continue;
         const commentText = comment.value;
         if (!builders.hasDocDirectives(commentText))
@@ -370,7 +370,7 @@ export function parseFileDirectives(content, filePath, registry) {
  * ```
  */
 function parseDirective(commentText, loc, filePath, registry) {
-    const lines = commentText.split("\n").map((l) => l.trim().replace(/^\*\s?/, ""));
+    const lines = commentText.split('\n').map((l) => l.trim().replace(/^\*\s?/, ''));
     // Build registry-based regex patterns for directive parsing
     const patterns = buildDirectivePatterns(registry);
     const valueTakingTagsRegex = new RegExp(buildValueTakingTagsPattern(registry));
@@ -379,14 +379,14 @@ function parseDirective(commentText, loc, filePath, registry) {
     // A directive tag line: "@libar-docs-core @libar-docs-api Some brief description"
     // A description line: "This works with @libar-docs-api patterns" (tag not at start)
     const tags = [];
-    let inlineDescription = ""; // Capture description on same line as tags
+    let inlineDescription = ''; // Capture description on same line as tags
     for (const line of lines) {
         const trimmedLine = line.trim();
         // Skip empty lines at the start (before we've found any tags)
-        if (trimmedLine === "" && tags.length === 0)
+        if (trimmedLine === '' && tags.length === 0)
             continue;
         // Stop at empty lines after we've found tags (description section started)
-        if (trimmedLine === "" && tags.length > 0)
+        if (trimmedLine === '' && tags.length > 0)
             break;
         // Check if line starts with a standard JSDoc tag (@param, @returns, @example, etc.)
         // but NOT our doc directives
@@ -408,8 +408,8 @@ function parseDirective(commentText, loc, filePath, registry) {
                 // Only extract tags that are at the start (consecutive, separated by whitespace or opt-in)
                 const textBefore = trimmedLine.slice(lastTagEnd, match.index).trim();
                 // Allow opt-in tag and whitespace between directive tags
-                const cleanedBefore = textBefore.replace(patterns.optInTagPattern, "").trim();
-                if (lastTagEnd > 0 && cleanedBefore !== "") {
+                const cleanedBefore = textBefore.replace(patterns.optInTagPattern, '').trim();
+                if (lastTagEnd > 0 && cleanedBefore !== '') {
                     // There's non-whitespace content between tags - this tag is in description
                     break;
                 }
@@ -425,7 +425,7 @@ function parseDirective(commentText, loc, filePath, registry) {
             if (!hasMetadataDirective) {
                 const textAfterTags = trimmedLine
                     .slice(lastTagEnd)
-                    .replace(patterns.optInTagPattern, "") // Remove any opt-in markers
+                    .replace(patterns.optInTagPattern, '') // Remove any opt-in markers
                     .trim();
                 if (textAfterTags) {
                     inlineDescription = textAfterTags;
@@ -449,26 +449,26 @@ function parseDirective(commentText, loc, filePath, registry) {
     }
     // Map extracted metadata to directive fields
     // This mapping translates registry tag names to DocDirective field names
-    const patternName = metadataResults.get("pattern");
-    const status = metadataResults.get("status");
-    const isCore = metadataResults.get("core");
-    const useCases = metadataResults.get("usecase");
-    const uses = metadataResults.get("uses");
-    const usedBy = metadataResults.get("used-by");
-    const phase = metadataResults.get("phase");
-    const brief = metadataResults.get("brief");
-    const dependsOn = metadataResults.get("depends-on");
-    const enables = metadataResults.get("enables");
+    const patternName = metadataResults.get('pattern');
+    const status = metadataResults.get('status');
+    const isCore = metadataResults.get('core');
+    const useCases = metadataResults.get('usecase');
+    const uses = metadataResults.get('uses');
+    const usedBy = metadataResults.get('used-by');
+    const phase = metadataResults.get('phase');
+    const brief = metadataResults.get('brief');
+    const dependsOn = metadataResults.get('depends-on');
+    const enables = metadataResults.get('enables');
     // UML-inspired relationship tags (PatternRelationshipModel)
-    const implementsPatterns = metadataResults.get("implements");
-    const extendsPattern = metadataResults.get("extends");
+    const implementsPatterns = metadataResults.get('implements');
+    const extendsPattern = metadataResults.get('extends');
     // Cross-reference and API navigation tags (PatternRelationshipModel enhancement)
-    const seeAlso = metadataResults.get("see-also");
-    const apiRef = metadataResults.get("api-ref");
+    const seeAlso = metadataResults.get('see-also');
+    const apiRef = metadataResults.get('api-ref');
     // Architecture diagram generation tags
-    const archRole = metadataResults.get("arch-role");
-    const archContext = metadataResults.get("arch-context");
-    const archLayer = metadataResults.get("arch-layer");
+    const archRole = metadataResults.get('arch-role');
+    const archContext = metadataResults.get('arch-context');
+    const archLayer = metadataResults.get('arch-layer');
     // Extract "### When to Use" section or "**When to use:**" inline format
     // Returns array of bullet points, stopping at section boundaries
     // This is a special format that extracts from description, not a metadata tag
@@ -479,17 +479,17 @@ function parseDirective(commentText, loc, filePath, registry) {
     let inExample = false;
     let exampleBuffer = [];
     for (const line of lines) {
-        if (line.startsWith("@example")) {
+        if (line.startsWith('@example')) {
             inExample = true;
             if (exampleBuffer.length > 0) {
-                examples.push(exampleBuffer.join("\n"));
+                examples.push(exampleBuffer.join('\n'));
                 exampleBuffer = [];
             }
             continue;
         }
-        if (line.startsWith("@param") || line.startsWith("@returns") || line.startsWith("@")) {
+        if (line.startsWith('@param') || line.startsWith('@returns') || line.startsWith('@')) {
             if (inExample && exampleBuffer.length > 0) {
-                examples.push(exampleBuffer.join("\n"));
+                examples.push(exampleBuffer.join('\n'));
                 exampleBuffer = [];
             }
             inExample = false;
@@ -497,22 +497,22 @@ function parseDirective(commentText, loc, filePath, registry) {
         }
         if (inExample) {
             // Remove code fence markers
-            if (!line.startsWith("```")) {
+            if (!line.startsWith('```')) {
                 exampleBuffer.push(line);
             }
         }
-        else if (!line.startsWith("@")) {
+        else if (!line.startsWith('@')) {
             descriptionLines.push(line);
         }
     }
     if (exampleBuffer.length > 0) {
-        examples.push(exampleBuffer.join("\n"));
+        examples.push(exampleBuffer.join('\n'));
     }
     // Build directive object
     // Combine inline description (from same line as tags) with multi-line description
     const fullDescription = inlineDescription
-        ? [inlineDescription, ...descriptionLines].join("\n").trim()
-        : descriptionLines.join("\n").trim();
+        ? [inlineDescription, ...descriptionLines].join('\n').trim()
+        : descriptionLines.join('\n').trim();
     const directive = {
         tags: tags.map((tag) => asDirectiveTag(tag)),
         description: fullDescription,
@@ -547,7 +547,7 @@ function parseDirective(commentText, loc, filePath, registry) {
     // Validate against schema (schema-first enforcement)
     const validation = DocDirectiveSchema.safeParse(directive);
     if (!validation.success) {
-        const error = createDirectiveValidationError(filePath, loc.start.line, "Invalid directive structure", commentText.substring(0, 100));
+        const error = createDirectiveValidationError(filePath, loc.start.line, 'Invalid directive structure', commentText.substring(0, 100));
         return Result.err(error);
     }
     return Result.ok(validation.data);
@@ -563,13 +563,13 @@ function extractCodeBlockAfterComment(content, ast, comment) {
     const nextNode = findNextNodeAfterPosition(ast, commentEnd);
     if (!nextNode?.range || !nextNode.loc)
         return null;
-    const lines = content.split("\n");
+    const lines = content.split('\n');
     const startLine = nextNode.loc.start.line;
     const endLine = nextNode.loc.end.line;
     // Extract the code block
     const codeLines = lines.slice(startLine - 1, endLine);
     return {
-        code: codeLines.join("\n"),
+        code: codeLines.join('\n'),
         startLine,
         endLine,
     };
@@ -595,7 +595,7 @@ function extractExportsFromBlock(ast, block) {
             continue;
         if (node.loc.start.line < block.startLine || node.loc.end.line > block.endLine)
             continue;
-        if (node.type === "ExportNamedDeclaration") {
+        if (node.type === 'ExportNamedDeclaration') {
             if (node.declaration) {
                 exports.push(...extractFromDeclaration(node.declaration));
             }
@@ -603,26 +603,26 @@ function extractExportsFromBlock(ast, block) {
             // or type exports: export type { Foo } from './module'
             if (node.specifiers) {
                 // Check if parent ExportNamedDeclaration is type-only
-                const isTypeExport = node.exportKind === "type";
+                const isTypeExport = node.exportKind === 'type';
                 for (const spec of node.specifiers) {
-                    if (spec.type === "ExportSpecifier") {
+                    if (spec.type === 'ExportSpecifier') {
                         // TypeScript 5.9.0+: exported can be Identifier or Literal (StringLiteral)
                         // Handles cases like: export { "foo-bar" as baz } from './module'
                         // Type union exhaustion: only Identifier and Literal are valid types here
-                        const exportedName = spec.exported.type === "Identifier"
+                        const exportedName = spec.exported.type === 'Identifier'
                             ? spec.exported.name
                             : spec.exported.value; // Literal type - extract value
                         exports.push({
                             name: exportedName,
-                            type: isTypeExport ? "type" : "const",
+                            type: isTypeExport ? 'type' : 'const',
                         });
                     }
                 }
             }
         }
-        else if (node.type === "ExportDefaultDeclaration") {
+        else if (node.type === 'ExportDefaultDeclaration') {
             exports.push({
-                name: "default",
+                name: 'default',
                 type: getExportType(node.declaration),
             });
         }
@@ -635,50 +635,50 @@ function extractExportsFromBlock(ast, block) {
 function extractFromDeclaration(declaration) {
     const exports = [];
     switch (declaration.type) {
-        case "FunctionDeclaration":
+        case 'FunctionDeclaration':
             if (declaration.id) {
                 exports.push({
                     name: declaration.id.name,
-                    type: "function",
-                    signature: `${declaration.id.name}(${declaration.params.map(() => "...").join(", ")})`,
+                    type: 'function',
+                    signature: `${declaration.id.name}(${declaration.params.map(() => '...').join(', ')})`,
                 });
             }
             break;
-        case "VariableDeclaration":
+        case 'VariableDeclaration':
             for (const declarator of declaration.declarations) {
-                if (declarator.id.type === "Identifier") {
+                if (declarator.id.type === 'Identifier') {
                     exports.push({
                         name: declarator.id.name,
-                        type: "const",
+                        type: 'const',
                     });
                 }
             }
             break;
-        case "TSTypeAliasDeclaration":
+        case 'TSTypeAliasDeclaration':
             exports.push({
                 name: declaration.id.name,
-                type: "type",
+                type: 'type',
             });
             break;
-        case "TSInterfaceDeclaration":
+        case 'TSInterfaceDeclaration':
             exports.push({
                 name: declaration.id.name,
-                type: "interface",
+                type: 'interface',
             });
             break;
-        case "ClassDeclaration":
+        case 'ClassDeclaration':
             if (declaration.id) {
                 exports.push({
                     name: declaration.id.name,
-                    type: "class",
+                    type: 'class',
                 });
             }
             break;
-        case "TSEnumDeclaration":
+        case 'TSEnumDeclaration':
             if (declaration.id) {
                 exports.push({
                     name: declaration.id.name,
-                    type: "enum",
+                    type: 'enum',
                 });
             }
             break;
@@ -690,16 +690,16 @@ function extractFromDeclaration(declaration) {
  */
 function getExportType(declaration) {
     switch (declaration.type) {
-        case "FunctionDeclaration":
-            return "function";
-        case "ClassDeclaration":
-            return "class";
-        case "TSInterfaceDeclaration":
-            return "interface";
-        case "TSTypeAliasDeclaration":
-            return "type";
+        case 'FunctionDeclaration':
+            return 'function';
+        case 'ClassDeclaration':
+            return 'class';
+        case 'TSInterfaceDeclaration':
+            return 'interface';
+        case 'TSTypeAliasDeclaration':
+            return 'type';
         default:
-            return "const";
+            return 'const';
     }
 }
 /**
@@ -730,28 +730,28 @@ function getExportType(declaration) {
  */
 function extractWhenToUse(commentText, fileOptInTag) {
     // Strip JSDoc markers and normalize lines
-    const cleanedLines = commentText.split("\n").map((line) => line
+    const cleanedLines = commentText.split('\n').map((line) => line
         .trim()
-        .replace(/^\*\s?/, "")
+        .replace(/^\*\s?/, '')
         .trim());
-    const cleanedText = cleanedLines.join("\n");
+    const cleanedText = cleanedLines.join('\n');
     // Try heading format first: ### When to Use
     const headingMatch = /###\s*When to Use\s*\n/i.exec(cleanedText);
     if (headingMatch) {
         const startIndex = headingMatch.index + headingMatch[0].length;
         const afterHeading = cleanedText.slice(startIndex);
-        const lines = afterHeading.split("\n");
+        const lines = afterHeading.split('\n');
         const bullets = [];
         for (const line of lines) {
             const trimmed = line.trim();
             // Stop conditions: empty line, new heading, table, JSDoc tag (but not doc directives)
-            if (trimmed === "")
+            if (trimmed === '')
                 break;
-            if (trimmed.startsWith("#"))
+            if (trimmed.startsWith('#'))
                 break;
-            if (trimmed.startsWith("|"))
+            if (trimmed.startsWith('|'))
                 break;
-            if (trimmed.startsWith("@") && !trimmed.startsWith(fileOptInTag))
+            if (trimmed.startsWith('@') && !trimmed.startsWith(fileOptInTag))
                 break;
             // Extract bullet point content (must start with - or * followed by space)
             const bulletMatch = /^[-*]\s+(.+)$/.exec(trimmed);

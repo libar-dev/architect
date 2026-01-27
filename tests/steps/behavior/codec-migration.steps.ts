@@ -6,9 +6,9 @@
  * - createJsonOutputCodec - JSON serialization with validation
  * - Output schemas for CLI tools
  */
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-import { z } from "zod";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
+import { z } from 'zod';
 import {
   createJsonInputCodec,
   createJsonOutputCodec,
@@ -17,16 +17,16 @@ import {
   type CodecError,
   type JsonInputCodec,
   type JsonOutputCodec,
-} from "../../../src/validation-schemas/codec-utils.js";
+} from '../../../src/validation-schemas/codec-utils.js';
 import {
   LintOutputSchema,
   ValidationSummaryOutputSchema,
   RegistryMetadataOutputSchema,
   type LintOutput,
   type ValidationSummaryOutput,
-} from "../../../src/validation-schemas/output-schemas.js";
-import type { Result } from "../../../src/types/index.js";
-import type { DataTableRow } from "../../support/world.js";
+} from '../../../src/validation-schemas/output-schemas.js';
+import type { Result } from '../../../src/types/index.js';
+import type { DataTableRow } from '../../support/world.js';
 
 // =============================================================================
 // Type Definitions
@@ -89,9 +89,9 @@ function initState(): CodecMigrationScenarioState {
     parseResult: null,
     serializeResult: null,
     parsedValue: null,
-    serializedJson: "",
+    serializedJson: '',
     codecError: null,
-    formattedError: "",
+    formattedError: '',
     safeParsedValue: undefined,
     mockFileReader: null,
     fileLoadResult: null,
@@ -103,7 +103,7 @@ function initState(): CodecMigrationScenarioState {
 // Feature: Codec Migration
 // =============================================================================
 
-const feature = await loadFeature("tests/features/behavior/codec-migration.feature");
+const feature = await loadFeature('tests/features/behavior/codec-migration.feature');
 
 describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   AfterEachScenario(() => {
@@ -111,7 +111,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   });
 
   Background(({ Given }) => {
-    Given("a codec test context", () => {
+    Given('a codec test context', () => {
       state = initState();
     });
   });
@@ -120,113 +120,113 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // Input Codec Tests
   // ===========================================================================
 
-  Scenario("Input codec parses valid JSON to typed object", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('Input codec parses valid JSON to typed object', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    When("I parse valid JSON {string}", (_ctx: unknown, json: string) => {
+    When('I parse valid JSON {string}', (_ctx: unknown, json: string) => {
       state!.parseResult = state!.inputCodec!.parse(json);
     });
 
-    Then("the parse result should be successful", () => {
+    Then('the parse result should be successful', () => {
       expect(state!.parseResult!.ok).toBe(true);
       if (state!.parseResult!.ok) {
         state!.parsedValue = state!.parseResult!.value;
       }
     });
 
-    And("the parsed value should have name {string}", (_ctx: unknown, name: string) => {
+    And('the parsed value should have name {string}', (_ctx: unknown, name: string) => {
       expect(state!.parsedValue!.name).toBe(name);
     });
 
-    And("the parsed value should have count {int}", (_ctx: unknown, count: number) => {
+    And('the parsed value should have count {int}', (_ctx: unknown, count: number) => {
       expect(state!.parsedValue!.count).toBe(count);
     });
   });
 
-  Scenario("Input codec returns error for malformed JSON", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('Input codec returns error for malformed JSON', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
     When(
-      "I parse malformed JSON {string} with source {string}",
+      'I parse malformed JSON {string} with source {string}',
       (_ctx: unknown, json: string, source: string) => {
         state!.parseResult = state!.inputCodec!.parse(json, source);
       }
     );
 
-    Then("the parse result should be an error", () => {
+    Then('the parse result should be an error', () => {
       expect(state!.parseResult!.ok).toBe(false);
       if (!state!.parseResult!.ok) {
         state!.codecError = state!.parseResult!.error;
       }
     });
 
-    And("the error operation should be {string}", (_ctx: unknown, operation: string) => {
+    And('the error operation should be {string}', (_ctx: unknown, operation: string) => {
       expect(state!.codecError!.operation).toBe(operation);
     });
 
-    And("the error message should contain {string}", (_ctx: unknown, substring: string) => {
+    And('the error message should contain {string}', (_ctx: unknown, substring: string) => {
       expect(state!.codecError!.message).toContain(substring);
     });
 
-    And("the error source should be {string}", (_ctx: unknown, source: string) => {
+    And('the error source should be {string}', (_ctx: unknown, source: string) => {
       expect(state!.codecError!.source).toBe(source);
     });
   });
 
   Scenario(
-    "Input codec returns validation errors for schema violations",
+    'Input codec returns validation errors for schema violations',
     ({ Given, When, Then, And }) => {
-      Given("a simple test schema for objects with name and count", () => {
+      Given('a simple test schema for objects with name and count', () => {
         // Schema is defined at module level
       });
 
-      And("the codec is created for the test schema", () => {
+      And('the codec is created for the test schema', () => {
         state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
       });
 
       When(
-        "I parse JSON {string} with source {string}",
+        'I parse JSON {string} with source {string}',
         (_ctx: unknown, json: string, source: string) => {
           state!.parseResult = state!.inputCodec!.parse(json, source);
         }
       );
 
-      Then("the parse result should be an error", () => {
+      Then('the parse result should be an error', () => {
         expect(state!.parseResult!.ok).toBe(false);
         if (!state!.parseResult!.ok) {
           state!.codecError = state!.parseResult!.error;
         }
       });
 
-      And("the error operation should be {string}", (_ctx: unknown, operation: string) => {
+      And('the error operation should be {string}', (_ctx: unknown, operation: string) => {
         expect(state!.codecError!.operation).toBe(operation);
       });
 
-      And("the error message should contain {string}", (_ctx: unknown, substring: string) => {
+      And('the error message should contain {string}', (_ctx: unknown, substring: string) => {
         expect(state!.codecError!.message).toContain(substring);
       });
 
-      And("the error should have validation errors", () => {
+      And('the error should have validation errors', () => {
         expect(state!.codecError!.validationErrors).toBeDefined();
         expect(state!.codecError!.validationErrors!.length).toBeGreaterThan(0);
       });
 
       And(
-        "the validation errors should mention fields:",
+        'the validation errors should mention fields:',
         (_ctx: unknown, table: DataTableRow[]) => {
-          const errorsText = state!.codecError!.validationErrors!.join("\n");
+          const errorsText = state!.codecError!.validationErrors!.join('\n');
           for (const row of table) {
             expect(errorsText).toContain(row.field);
           }
@@ -235,33 +235,33 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
     }
   );
 
-  Scenario("Input codec strips $schema field before validation", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('Input codec strips $schema field before validation', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    When("I parse JSON {string}", (_ctx: unknown, json: string) => {
+    When('I parse JSON {string}', (_ctx: unknown, json: string) => {
       state!.parseResult = state!.inputCodec!.parse(json);
     });
 
-    Then("the parse result should be successful", () => {
+    Then('the parse result should be successful', () => {
       expect(state!.parseResult!.ok).toBe(true);
       if (state!.parseResult!.ok) {
         state!.parsedValue = state!.parseResult!.value;
       }
     });
 
-    And("the parsed value should have name {string}", (_ctx: unknown, name: string) => {
+    And('the parsed value should have name {string}', (_ctx: unknown, name: string) => {
       expect(state!.parsedValue!.name).toBe(name);
     });
 
-    And("the parsed value should not have a $schema property", () => {
+    And('the parsed value should not have a $schema property', () => {
       // TypeScript type doesn't include $schema, but we verify runtime behavior
-      expect(Object.prototype.hasOwnProperty.call(state!.parsedValue, "$schema")).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(state!.parsedValue, '$schema')).toBe(false);
     });
   });
 
@@ -269,88 +269,88 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // Output Codec Tests
   // ===========================================================================
 
-  Scenario("Output codec serializes valid object to JSON", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('Output codec serializes valid object to JSON', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the output codec is created for the test schema", () => {
+    And('the output codec is created for the test schema', () => {
       state!.outputCodec = createJsonOutputCodec(SimpleTestSchema);
     });
 
     When(
-      "I serialize a valid object with name {string} and count {int}",
+      'I serialize a valid object with name {string} and count {int}',
       (_ctx: unknown, name: string, count: number) => {
         state!.serializeResult = state!.outputCodec!.serialize({ name, count });
       }
     );
 
-    Then("the serialize result should be successful", () => {
+    Then('the serialize result should be successful', () => {
       expect(state!.serializeResult!.ok).toBe(true);
       if (state!.serializeResult!.ok) {
         state!.serializedJson = state!.serializeResult!.value;
       }
     });
 
-    And("the serialized JSON should be valid", () => {
+    And('the serialized JSON should be valid', () => {
       expect(() => {
         JSON.parse(state!.serializedJson);
       }).not.toThrow();
     });
 
-    And("the serialized JSON should contain {string}", (_ctx: unknown, substring: string) => {
+    And('the serialized JSON should contain {string}', (_ctx: unknown, substring: string) => {
       expect(state!.serializedJson).toContain(substring);
     });
   });
 
-  Scenario("Output codec returns error for schema violations", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('Output codec returns error for schema violations', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the output codec is created for the test schema", () => {
+    And('the output codec is created for the test schema', () => {
       state!.outputCodec = createJsonOutputCodec(SimpleTestSchema);
     });
 
     When(
-      "I serialize an invalid object with wrong types and source {string}",
+      'I serialize an invalid object with wrong types and source {string}',
       (_ctx: unknown, source: string) => {
         // @ts-expect-error - intentionally passing invalid type for test
         state!.serializeResult = state!.outputCodec!.serialize({ name: 123 }, source);
       }
     );
 
-    Then("the serialize result should be an error", () => {
+    Then('the serialize result should be an error', () => {
       expect(state!.serializeResult!.ok).toBe(false);
       if (!state!.serializeResult!.ok) {
         state!.codecError = state!.serializeResult!.error;
       }
     });
 
-    And("the error operation should be {string}", (_ctx: unknown, operation: string) => {
+    And('the error operation should be {string}', (_ctx: unknown, operation: string) => {
       expect(state!.codecError!.operation).toBe(operation);
     });
 
-    And("the error message should contain {string}", (_ctx: unknown, substring: string) => {
+    And('the error message should contain {string}', (_ctx: unknown, substring: string) => {
       expect(state!.codecError!.message).toContain(substring);
     });
 
-    And("the error source should be {string}", (_ctx: unknown, source: string) => {
+    And('the error source should be {string}', (_ctx: unknown, source: string) => {
       expect(state!.codecError!.source).toBe(source);
     });
   });
 
-  Scenario("Output codec respects indent option", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('Output codec respects indent option', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the output codec is created for the test schema", () => {
+    And('the output codec is created for the test schema', () => {
       state!.outputCodec = createJsonOutputCodec(SimpleTestSchema);
     });
 
     When(
-      "I serialize with name {string} count {int} and indent {int}",
+      'I serialize with name {string} count {int} and indent {int}',
       (_ctx: unknown, name: string, count: number, indent: number) => {
         state!.serializeResult = state!.outputCodec!.serializeWithOptions(
           { name, count },
@@ -359,7 +359,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       }
     );
 
-    Then("the serialize result should be successful", () => {
+    Then('the serialize result should be successful', () => {
       expect(state!.serializeResult!.ok).toBe(true);
       if (state!.serializeResult!.ok) {
         state!.serializedJson = state!.serializeResult!.value;
@@ -367,9 +367,9 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
     });
 
     And(
-      "the serialized JSON should use {int}-space indentation",
+      'the serialized JSON should use {int}-space indentation',
       (_ctx: unknown, spaces: number) => {
-        const indentPattern = new RegExp(`^\\s{${spaces}}"name"`, "m");
+        const indentPattern = new RegExp(`^\\s{${spaces}}"name"`, 'm');
         expect(state!.serializedJson).toMatch(indentPattern);
       }
     );
@@ -379,12 +379,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // LintOutputSchema Tests
   // ===========================================================================
 
-  Scenario("LintOutputSchema validates correct lint output", ({ Given, When, Then, And }) => {
-    Given("the LintOutputSchema codec", () => {
+  Scenario('LintOutputSchema validates correct lint output', ({ Given, When, Then, And }) => {
+    Given('the LintOutputSchema codec', () => {
       state!.lintOutputCodec = createJsonOutputCodec(LintOutputSchema);
     });
 
-    When("I serialize a valid lint output:", (_ctx: unknown, table: DataTableRow[]) => {
+    When('I serialize a valid lint output:', (_ctx: unknown, table: DataTableRow[]) => {
       // Parse field-value table format
       const data: Record<string, number> = {};
       for (const row of table) {
@@ -403,38 +403,38 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       state!.serializeResult = state!.lintOutputCodec!.serialize(lintOutput);
     });
 
-    Then("the serialize result should be successful", () => {
+    Then('the serialize result should be successful', () => {
       expect(state!.serializeResult!.ok).toBe(true);
       if (state!.serializeResult!.ok) {
         state!.serializedJson = state!.serializeResult!.value;
       }
     });
 
-    And("the serialized JSON should be parseable", () => {
+    And('the serialized JSON should be parseable', () => {
       expect(() => {
         JSON.parse(state!.serializedJson);
       }).not.toThrow();
     });
   });
 
-  Scenario("LintOutputSchema rejects invalid severity", ({ Given, When, Then, And }) => {
-    Given("the LintOutputSchema codec", () => {
+  Scenario('LintOutputSchema rejects invalid severity', ({ Given, When, Then, And }) => {
+    Given('the LintOutputSchema codec', () => {
       state!.lintOutputCodec = createJsonOutputCodec(LintOutputSchema);
     });
 
     When(
-      "I serialize a lint output with invalid severity {string}",
+      'I serialize a lint output with invalid severity {string}',
       (_ctx: unknown, severity: string) => {
         // Create an object that will fail schema validation
         const invalidOutput = {
           results: [
             {
-              file: "/test.ts",
+              file: '/test.ts',
               violations: [
                 {
-                  rule: "test",
+                  rule: 'test',
                   severity: severity, // Invalid severity from step parameter
-                  message: "test",
+                  message: 'test',
                   line: 1,
                 },
               ],
@@ -453,14 +453,14 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       }
     );
 
-    Then("the serialize result should be an error", () => {
+    Then('the serialize result should be an error', () => {
       expect(state!.serializeResult!.ok).toBe(false);
       if (!state!.serializeResult!.ok) {
         state!.codecError = state!.serializeResult!.error;
       }
     });
 
-    And("the error should have validation errors", () => {
+    And('the error should have validation errors', () => {
       expect(state!.codecError!.validationErrors).toBeDefined();
       expect(state!.codecError!.validationErrors!.length).toBeGreaterThan(0);
     });
@@ -471,13 +471,13 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ===========================================================================
 
   Scenario(
-    "ValidationSummaryOutputSchema validates correct validation output",
+    'ValidationSummaryOutputSchema validates correct validation output',
     ({ Given, When, Then, And }) => {
-      Given("the ValidationSummaryOutputSchema codec", () => {
+      Given('the ValidationSummaryOutputSchema codec', () => {
         state!.validationOutputCodec = createJsonOutputCodec(ValidationSummaryOutputSchema);
       });
 
-      When("I serialize a valid validation summary:", (_ctx: unknown, table: DataTableRow[]) => {
+      When('I serialize a valid validation summary:', (_ctx: unknown, table: DataTableRow[]) => {
         // Parse field-value table format
         const data: Record<string, number> = {};
         for (const row of table) {
@@ -496,14 +496,14 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
         state!.serializeResult = state!.validationOutputCodec!.serialize(validationOutput);
       });
 
-      Then("the serialize result should be successful", () => {
+      Then('the serialize result should be successful', () => {
         expect(state!.serializeResult!.ok).toBe(true);
         if (state!.serializeResult!.ok) {
           state!.serializedJson = state!.serializeResult!.value;
         }
       });
 
-      And("the serialized JSON should be parseable", () => {
+      And('the serialized JSON should be parseable', () => {
         expect(() => {
           JSON.parse(state!.serializedJson);
         }).not.toThrow();
@@ -512,20 +512,20 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   );
 
   Scenario(
-    "ValidationSummaryOutputSchema rejects invalid issue source",
+    'ValidationSummaryOutputSchema rejects invalid issue source',
     ({ Given, When, Then, And }) => {
-      Given("the ValidationSummaryOutputSchema codec", () => {
+      Given('the ValidationSummaryOutputSchema codec', () => {
         state!.validationOutputCodec = createJsonOutputCodec(ValidationSummaryOutputSchema);
       });
 
       When(
-        "I serialize a validation summary with invalid source {string}",
+        'I serialize a validation summary with invalid source {string}',
         (_ctx: unknown, source: string) => {
           const invalidOutput = {
             issues: [
               {
-                severity: "error",
-                message: "test",
+                severity: 'error',
+                message: 'test',
                 source: source, // Invalid source from step parameter
               },
             ],
@@ -542,14 +542,14 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
         }
       );
 
-      Then("the serialize result should be an error", () => {
+      Then('the serialize result should be an error', () => {
         expect(state!.serializeResult!.ok).toBe(false);
         if (!state!.serializeResult!.ok) {
           state!.codecError = state!.serializeResult!.error;
         }
       });
 
-      And("the error should have validation errors", () => {
+      And('the error should have validation errors', () => {
         expect(state!.codecError!.validationErrors).toBeDefined();
         expect(state!.codecError!.validationErrors!.length).toBeGreaterThan(0);
       });
@@ -561,27 +561,27 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ===========================================================================
 
   Scenario(
-    "RegistryMetadataOutputSchema accepts arbitrary metadata",
+    'RegistryMetadataOutputSchema accepts arbitrary metadata',
     ({ Given, When, Then, And }) => {
-      Given("the RegistryMetadataOutputSchema codec", () => {
+      Given('the RegistryMetadataOutputSchema codec', () => {
         state!.registryMetadataCodec = createJsonOutputCodec(RegistryMetadataOutputSchema);
       });
 
-      When("I serialize arbitrary nested metadata", () => {
+      When('I serialize arbitrary nested metadata', () => {
         state!.serializeResult = state!.registryMetadataCodec!.serialize({
-          custom: "value",
+          custom: 'value',
           nested: { deep: true },
         });
       });
 
-      Then("the serialize result should be successful", () => {
+      Then('the serialize result should be successful', () => {
         expect(state!.serializeResult!.ok).toBe(true);
         if (state!.serializeResult!.ok) {
           state!.serializedJson = state!.serializeResult!.value;
         }
       });
 
-      And("the serialized JSON should be parseable", () => {
+      And('the serialized JSON should be parseable', () => {
         expect(() => {
           JSON.parse(state!.serializedJson);
         }).not.toThrow();
@@ -593,22 +593,22 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // formatCodecError Tests
   // ===========================================================================
 
-  Scenario("formatCodecError includes validation errors in output", ({ Given, When, Then }) => {
-    Given("a codec error with validation errors:", (_ctx: unknown, table: DataTableRow[]) => {
-      const validationErrors = table.map((row) => `  - ${row.path ?? ""}: ${row.message ?? ""}`);
+  Scenario('formatCodecError includes validation errors in output', ({ Given, When, Then }) => {
+    Given('a codec error with validation errors:', (_ctx: unknown, table: DataTableRow[]) => {
+      const validationErrors = table.map((row) => `  - ${row.path ?? ''}: ${row.message ?? ''}`);
       state!.codecError = {
-        type: "codec-error",
-        operation: "parse",
-        message: "Schema validation failed",
+        type: 'codec-error',
+        operation: 'parse',
+        message: 'Schema validation failed',
         validationErrors,
       };
     });
 
-    When("I format the codec error", () => {
+    When('I format the codec error', () => {
       state!.formattedError = formatCodecError(state!.codecError!);
     });
 
-    Then("the formatted output should contain all of:", (_ctx: unknown, table: DataTableRow[]) => {
+    Then('the formatted output should contain all of:', (_ctx: unknown, table: DataTableRow[]) => {
       for (const row of table) {
         expect(state!.formattedError).toContain(row.text);
       }
@@ -619,64 +619,64 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // safeParse Tests
   // ===========================================================================
 
-  Scenario("safeParse returns typed value on valid JSON", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('safeParse returns typed value on valid JSON', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    When("I safeParse valid JSON {string}", (_ctx: unknown, json: string) => {
+    When('I safeParse valid JSON {string}', (_ctx: unknown, json: string) => {
       state!.safeParsedValue = state!.inputCodec!.safeParse(json);
     });
 
-    Then("safeParse should return a value", () => {
+    Then('safeParse should return a value', () => {
       expect(state!.safeParsedValue).toBeDefined();
     });
 
-    And("the safeParsed value should have name {string}", (_ctx: unknown, name: string) => {
+    And('the safeParsed value should have name {string}', (_ctx: unknown, name: string) => {
       expect(state!.safeParsedValue!.name).toBe(name);
     });
 
-    And("the safeParsed value should have count {int}", (_ctx: unknown, count: number) => {
+    And('the safeParsed value should have count {int}', (_ctx: unknown, count: number) => {
       expect(state!.safeParsedValue!.count).toBe(count);
     });
   });
 
-  Scenario("safeParse returns undefined on malformed JSON", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('safeParse returns undefined on malformed JSON', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    When("I safeParse malformed JSON {string}", (_ctx: unknown, json: string) => {
+    When('I safeParse malformed JSON {string}', (_ctx: unknown, json: string) => {
       state!.safeParsedValue = state!.inputCodec!.safeParse(json);
     });
 
-    Then("safeParse should return undefined", () => {
+    Then('safeParse should return undefined', () => {
       expect(state!.safeParsedValue).toBeUndefined();
     });
   });
 
-  Scenario("safeParse returns undefined on schema violation", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('safeParse returns undefined on schema violation', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    When("I safeParse JSON with wrong types {string}", (_ctx: unknown, json: string) => {
+    When('I safeParse JSON with wrong types {string}', (_ctx: unknown, json: string) => {
       state!.safeParsedValue = state!.inputCodec!.safeParse(json);
     });
 
-    Then("safeParse should return undefined", () => {
+    Then('safeParse should return undefined', () => {
       expect(state!.safeParsedValue).toBeUndefined();
     });
   });
@@ -685,177 +685,177 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // createFileLoader Tests
   // ===========================================================================
 
-  Scenario("createFileLoader loads and parses valid JSON file", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('createFileLoader loads and parses valid JSON file', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    And("a mock file reader that returns {string}", (_ctx: unknown, content: string) => {
+    And('a mock file reader that returns {string}', (_ctx: unknown, content: string) => {
       state!.mockFileReader = () => Promise.resolve(content);
     });
 
-    When("I create a file loader and load {string}", async (_ctx: unknown, path: string) => {
+    When('I create a file loader and load {string}', async (_ctx: unknown, path: string) => {
       const loader = createFileLoader(state!.inputCodec!, state!.mockFileReader!);
       state!.fileLoadResult = await loader(path);
     });
 
-    Then("the file load result should be successful", () => {
+    Then('the file load result should be successful', () => {
       expect(state!.fileLoadResult!.ok).toBe(true);
       if (state!.fileLoadResult!.ok) {
         state!.loadedValue = state!.fileLoadResult!.value;
       }
     });
 
-    And("the loaded value should have name {string}", (_ctx: unknown, name: string) => {
+    And('the loaded value should have name {string}', (_ctx: unknown, name: string) => {
       expect(state!.loadedValue!.name).toBe(name);
     });
 
-    And("the loaded value should have count {int}", (_ctx: unknown, count: number) => {
+    And('the loaded value should have count {int}', (_ctx: unknown, count: number) => {
       expect(state!.loadedValue!.count).toBe(count);
     });
   });
 
-  Scenario("createFileLoader handles ENOENT error", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('createFileLoader handles ENOENT error', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
     And(
-      "a mock file reader that throws ENOENT for {string}",
+      'a mock file reader that throws ENOENT for {string}',
       (_ctx: unknown, _expectedPath: string) => {
         state!.mockFileReader = () => {
-          const error = new Error("ENOENT: no such file or directory") as NodeJS.ErrnoException;
-          error.code = "ENOENT";
+          const error = new Error('ENOENT: no such file or directory') as NodeJS.ErrnoException;
+          error.code = 'ENOENT';
           return Promise.reject(error);
         };
       }
     );
 
-    When("I create a file loader and load {string}", async (_ctx: unknown, path: string) => {
+    When('I create a file loader and load {string}', async (_ctx: unknown, path: string) => {
       const loader = createFileLoader(state!.inputCodec!, state!.mockFileReader!);
       state!.fileLoadResult = await loader(path);
     });
 
-    Then("the file load result should be an error", () => {
+    Then('the file load result should be an error', () => {
       expect(state!.fileLoadResult!.ok).toBe(false);
       if (!state!.fileLoadResult!.ok) {
         state!.codecError = state!.fileLoadResult!.error;
       }
     });
 
-    And("the error message should contain {string}", (_ctx: unknown, text: string) => {
+    And('the error message should contain {string}', (_ctx: unknown, text: string) => {
       expect(state!.codecError!.message).toContain(text);
     });
 
-    And("the error source should be {string}", (_ctx: unknown, source: string) => {
+    And('the error source should be {string}', (_ctx: unknown, source: string) => {
       expect(state!.codecError!.source).toBe(source);
     });
   });
 
-  Scenario("createFileLoader handles EACCES error", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('createFileLoader handles EACCES error', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
     And(
-      "a mock file reader that throws EACCES for {string}",
+      'a mock file reader that throws EACCES for {string}',
       (_ctx: unknown, _expectedPath: string) => {
         state!.mockFileReader = () => {
-          const error = new Error("EACCES: permission denied") as NodeJS.ErrnoException;
-          error.code = "EACCES";
+          const error = new Error('EACCES: permission denied') as NodeJS.ErrnoException;
+          error.code = 'EACCES';
           return Promise.reject(error);
         };
       }
     );
 
-    When("I create a file loader and load {string}", async (_ctx: unknown, path: string) => {
+    When('I create a file loader and load {string}', async (_ctx: unknown, path: string) => {
       const loader = createFileLoader(state!.inputCodec!, state!.mockFileReader!);
       state!.fileLoadResult = await loader(path);
     });
 
-    Then("the file load result should be an error", () => {
+    Then('the file load result should be an error', () => {
       expect(state!.fileLoadResult!.ok).toBe(false);
       if (!state!.fileLoadResult!.ok) {
         state!.codecError = state!.fileLoadResult!.error;
       }
     });
 
-    And("the error message should contain {string}", (_ctx: unknown, text: string) => {
+    And('the error message should contain {string}', (_ctx: unknown, text: string) => {
       expect(state!.codecError!.message).toContain(text);
     });
   });
 
-  Scenario("createFileLoader handles general read error", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('createFileLoader handles general read error', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
     And(
-      "a mock file reader that throws generic error {string}",
+      'a mock file reader that throws generic error {string}',
       (_ctx: unknown, message: string) => {
         state!.mockFileReader = () => Promise.reject(new Error(message));
       }
     );
 
-    When("I create a file loader and load {string}", async (_ctx: unknown, path: string) => {
+    When('I create a file loader and load {string}', async (_ctx: unknown, path: string) => {
       const loader = createFileLoader(state!.inputCodec!, state!.mockFileReader!);
       state!.fileLoadResult = await loader(path);
     });
 
-    Then("the file load result should be an error", () => {
+    Then('the file load result should be an error', () => {
       expect(state!.fileLoadResult!.ok).toBe(false);
       if (!state!.fileLoadResult!.ok) {
         state!.codecError = state!.fileLoadResult!.error;
       }
     });
 
-    And("the error message should contain {string}", (_ctx: unknown, text: string) => {
+    And('the error message should contain {string}', (_ctx: unknown, text: string) => {
       expect(state!.codecError!.message).toContain(text);
     });
   });
 
-  Scenario("createFileLoader handles invalid JSON in file", ({ Given, When, Then, And }) => {
-    Given("a simple test schema for objects with name and count", () => {
+  Scenario('createFileLoader handles invalid JSON in file', ({ Given, When, Then, And }) => {
+    Given('a simple test schema for objects with name and count', () => {
       // Schema is defined at module level
     });
 
-    And("the codec is created for the test schema", () => {
+    And('the codec is created for the test schema', () => {
       state!.inputCodec = createJsonInputCodec(SimpleTestSchema);
     });
 
-    And("a mock file reader that returns {string}", (_ctx: unknown, content: string) => {
+    And('a mock file reader that returns {string}', (_ctx: unknown, content: string) => {
       state!.mockFileReader = () => Promise.resolve(content);
     });
 
-    When("I create a file loader and load {string}", async (_ctx: unknown, path: string) => {
+    When('I create a file loader and load {string}', async (_ctx: unknown, path: string) => {
       const loader = createFileLoader(state!.inputCodec!, state!.mockFileReader!);
       state!.fileLoadResult = await loader(path);
     });
 
-    Then("the file load result should be an error", () => {
+    Then('the file load result should be an error', () => {
       expect(state!.fileLoadResult!.ok).toBe(false);
       if (!state!.fileLoadResult!.ok) {
         state!.codecError = state!.fileLoadResult!.error;
       }
     });
 
-    And("the error message should contain {string}", (_ctx: unknown, text: string) => {
+    And('the error message should contain {string}', (_ctx: unknown, text: string) => {
       expect(state!.codecError!.message).toContain(text);
     });
   });

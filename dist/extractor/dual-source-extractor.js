@@ -9,7 +9,7 @@
  * ## DualSourceExtractor - Compose Pattern Data from Code + Features
  *
  * Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*)
- * and Gherkin feature files (@libar-process-*), validates consistency,
+ * and Gherkin feature files (@libar-docs-*), validates consistency,
  * and composes unified pattern data for documentation generation.
  *
  * ### When to Use
@@ -22,12 +22,12 @@
  * ### Key Concepts
  *
  * - **Code Source**: @libar-docs-* tags define timeless pattern graph
- * - **Feature Source**: @libar-process-* tags add temporal process metadata
+ * - **Feature Source**: @libar-docs-* tags add temporal process metadata
  * - **Cross-Validation**: Pattern name + phase must match across sources
  * - **Deliverables**: Parsed from Gherkin Background tables in features
  */
 // Import Zod schemas and inferred types (schema-first pattern)
-import { ProcessMetadataSchema, DeliverableSchema, } from "../validation-schemas/index.js";
+import { ProcessMetadataSchema, DeliverableSchema, } from '../validation-schemas/index.js';
 /**
  * Extract process metadata from Gherkin feature tags
  *
@@ -39,43 +39,43 @@ import { ProcessMetadataSchema, DeliverableSchema, } from "../validation-schemas
  */
 export function extractProcessMetadata(feature) {
     const tags = feature.feature.tags;
-    // Extract @libar-process-* tags (without @ prefix - parser strips it)
-    const patternTag = tags.find((t) => t.startsWith("libar-process-pattern:"));
-    const phaseTag = tags.find((t) => t.startsWith("libar-process-phase:"));
-    const statusTag = tags.find((t) => t.startsWith("libar-process-status:"));
+    // Extract normalized tags (scanner strips @ and configured prefix like @libar-docs-)
+    const patternTag = tags.find((t) => t.startsWith('pattern:'));
+    const phaseTag = tags.find((t) => t.startsWith('phase:'));
+    const statusTag = tags.find((t) => t.startsWith('status:'));
     if (!patternTag || !phaseTag) {
         // Missing required tags
         return null;
     }
-    const pattern = patternTag.replace("libar-process-pattern:", "");
-    const phaseStr = phaseTag.replace("libar-process-phase:", "");
+    const pattern = patternTag.replace('pattern:', '');
+    const phaseStr = phaseTag.replace('phase:', '');
     const phase = parseInt(phaseStr, 10);
-    const status = statusTag?.replace("libar-process-status:", "") ?? "roadmap";
+    const status = statusTag?.replace('status:', '') ?? 'roadmap';
     // Extract optional tags
-    const quarterTag = tags.find((t) => t.startsWith("libar-process-quarter:"));
-    const effortTag = tags.find((t) => t.startsWith("libar-process-effort:"));
-    const teamTag = tags.find((t) => t.startsWith("libar-process-team:"));
-    const workflowTag = tags.find((t) => t.startsWith("libar-process-workflow:"));
-    const completedTag = tags.find((t) => t.startsWith("libar-process-completed:"));
-    const effortActualTag = tags.find((t) => t.startsWith("libar-process-effort-actual:"));
-    const riskTag = tags.find((t) => t.startsWith("libar-process-risk:"));
-    const briefTag = tags.find((t) => t.startsWith("libar-process-brief:"));
-    const productAreaTag = tags.find((t) => t.startsWith("libar-process-product-area:"));
-    const userRoleTag = tags.find((t) => t.startsWith("libar-process-user-role:"));
-    const businessValueTag = tags.find((t) => t.startsWith("libar-process-business-value:"));
-    const quarter = quarterTag?.replace("libar-process-quarter:", "");
-    const effort = effortTag?.replace("libar-process-effort:", "");
-    const team = teamTag?.replace("libar-process-team:", "");
-    const workflow = workflowTag?.replace("libar-process-workflow:", "");
-    const completed = completedTag?.replace("libar-process-completed:", "");
-    const effortActual = effortActualTag?.replace("libar-process-effort-actual:", "");
-    const risk = riskTag?.replace("libar-process-risk:", "");
-    const brief = briefTag?.replace("libar-process-brief:", "");
-    const productArea = productAreaTag?.replace("libar-process-product-area:", "");
-    const userRole = userRoleTag?.replace("libar-process-user-role:", "");
+    const quarterTag = tags.find((t) => t.startsWith('quarter:'));
+    const effortTag = tags.find((t) => t.startsWith('effort:'));
+    const teamTag = tags.find((t) => t.startsWith('team:'));
+    const workflowTag = tags.find((t) => t.startsWith('workflow:'));
+    const completedTag = tags.find((t) => t.startsWith('completed:'));
+    const effortActualTag = tags.find((t) => t.startsWith('effort-actual:'));
+    const riskTag = tags.find((t) => t.startsWith('risk:'));
+    const briefTag = tags.find((t) => t.startsWith('brief:'));
+    const productAreaTag = tags.find((t) => t.startsWith('product-area:'));
+    const userRoleTag = tags.find((t) => t.startsWith('user-role:'));
+    const businessValueTag = tags.find((t) => t.startsWith('business-value:'));
+    const quarter = quarterTag?.replace('quarter:', '');
+    const effort = effortTag?.replace('effort:', '');
+    const team = teamTag?.replace('team:', '');
+    const workflow = workflowTag?.replace('workflow:', '');
+    const completed = completedTag?.replace('completed:', '');
+    const effortActual = effortActualTag?.replace('effort-actual:', '');
+    const risk = riskTag?.replace('risk:', '');
+    const brief = briefTag?.replace('brief:', '');
+    const productArea = productAreaTag?.replace('product-area:', '');
+    const userRole = userRoleTag?.replace('user-role:', '');
     // Business value may have surrounding quotes - strip them
-    const businessValueRaw = businessValueTag?.replace("libar-process-business-value:", "");
-    const businessValue = businessValueRaw?.replace(/^["']|["']$/g, "");
+    const businessValueRaw = businessValueTag?.replace('business-value:', '');
+    const businessValue = businessValueRaw?.replace(/^["']|["']$/g, '');
     // Build raw metadata object (no type assertions)
     const rawMetadata = {
         pattern,
@@ -98,7 +98,7 @@ export function extractProcessMetadata(feature) {
     if (!validation.success) {
         // Log validation failure for debugging (but don't fail silently)
         console.warn(`Process metadata validation failed in ${feature.filePath}: ` +
-            validation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", "));
+            validation.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', '));
         return null;
     }
     return validation.data;
@@ -117,14 +117,14 @@ export function extractProcessMetadata(feature) {
 function parseTestsValue(value) {
     const trimmed = value.trim().toLowerCase();
     // Handle Yes/No/True/False
-    if (trimmed === "yes" || trimmed === "true" || trimmed === "✓" || trimmed === "✅") {
+    if (trimmed === 'yes' || trimmed === 'true' || trimmed === '✓' || trimmed === '✅') {
         return 1;
     }
-    if (trimmed === "no" ||
-        trimmed === "false" ||
-        trimmed === "✗" ||
-        trimmed === "" ||
-        trimmed === "-") {
+    if (trimmed === 'no' ||
+        trimmed === 'false' ||
+        trimmed === '✗' ||
+        trimmed === '' ||
+        trimmed === '-') {
         return 0;
     }
     // Try to parse as number
@@ -169,16 +169,16 @@ export function extractDeliverables(feature) {
         }
         const { headers, rows } = step.dataTable;
         // Check if this table has a "Deliverable" column (case-insensitive)
-        const deliverableIdx = headers.findIndex((h) => h.toLowerCase() === "deliverable");
+        const deliverableIdx = headers.findIndex((h) => h.toLowerCase() === 'deliverable');
         if (deliverableIdx === -1) {
             continue;
         }
         // Find other columns (case-insensitive)
-        const statusIdx = headers.findIndex((h) => h.toLowerCase() === "status");
-        const testsIdx = headers.findIndex((h) => h.toLowerCase() === "tests");
-        const locationIdx = headers.findIndex((h) => h.toLowerCase() === "location");
-        const findingIdx = headers.findIndex((h) => h.toLowerCase() === "finding");
-        const releaseIdx = headers.findIndex((h) => h.toLowerCase() === "release");
+        const statusIdx = headers.findIndex((h) => h.toLowerCase() === 'status');
+        const testsIdx = headers.findIndex((h) => h.toLowerCase() === 'tests');
+        const locationIdx = headers.findIndex((h) => h.toLowerCase() === 'location');
+        const findingIdx = headers.findIndex((h) => h.toLowerCase() === 'finding');
+        const releaseIdx = headers.findIndex((h) => h.toLowerCase() === 'release');
         // Store header names for reliable lookup (avoid empty-string key match)
         const deliverableHeader = headers[deliverableIdx];
         const statusHeader = statusIdx >= 0 ? headers[statusIdx] : undefined;
@@ -190,14 +190,14 @@ export function extractDeliverables(feature) {
             continue;
         // Parse each row with schema validation
         for (const row of rows) {
-            const name = row[deliverableHeader]?.trim() ?? "";
-            const status = statusHeader ? (row[statusHeader]?.trim() ?? "") : "";
-            const testsValue = testsHeader ? (row[testsHeader]?.trim() ?? "0") : "0";
-            const location = locationHeader ? (row[locationHeader]?.trim() ?? "") : "";
+            const name = row[deliverableHeader]?.trim() ?? '';
+            const status = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+            const testsValue = testsHeader ? (row[testsHeader]?.trim() ?? '0') : '0';
+            const location = locationHeader ? (row[locationHeader]?.trim() ?? '') : '';
             const findingRaw = findingHeader ? row[findingHeader]?.trim() : undefined;
-            const finding = findingRaw !== "" ? findingRaw : undefined;
+            const finding = findingRaw !== '' ? findingRaw : undefined;
             const releaseRaw = releaseHeader ? row[releaseHeader]?.trim() : undefined;
-            const release = releaseRaw !== "" ? releaseRaw : undefined;
+            const release = releaseRaw !== '' ? releaseRaw : undefined;
             // Build raw deliverable object (no type assertions)
             const rawDeliverable = {
                 name,
@@ -212,7 +212,7 @@ export function extractDeliverables(feature) {
             if (!validation.success) {
                 // Skip invalid deliverables with warning (name might be empty or tests negative)
                 console.warn(`Deliverable validation failed in ${feature.filePath}: ` +
-                    validation.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join(", "));
+                    validation.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join(', '));
                 continue;
             }
             deliverables.push(validation.data);
@@ -346,7 +346,7 @@ export function combineSources(codePatterns, featureFiles) {
         // Collect warning about collision (structured, not console.warn)
         if (hasCollision) {
             warnings.push(`Pattern name collision: "${patternName}" defined in ${codePatternArray.length} files: ` +
-                codePatternArray.map((p) => p.source.file).join(", "));
+                codePatternArray.map((p) => p.source.file).join(', '));
         }
         // Remove from feature index (mark as matched)
         featureIndex.delete(patternName);
@@ -381,14 +381,14 @@ export function validateDualSource(results) {
     }
     // Warnings: Orphaned stubs (code without feature)
     for (const pattern of results.codeOnly) {
-        if (pattern.status === "roadmap") {
+        if (pattern.status === 'roadmap') {
             const name = pattern.patternName ?? pattern.name;
             warnings.push(`Roadmap pattern "${name}" has code stub but no feature file`);
         }
     }
     // Warnings: Features without code stubs
     for (const metadata of results.featureOnly) {
-        if (metadata.status === "roadmap") {
+        if (metadata.status === 'roadmap') {
             warnings.push(`Feature "${metadata.pattern}" (phase ${metadata.phase}) has no code stub`);
         }
     }

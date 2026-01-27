@@ -17,10 +17,9 @@
  * - Use `filterRulesBySeverity()` to customize which rules apply
  * - Use individual rules for targeted validation
  */
-import type { DocDirective } from "../validation-schemas/doc-directive.js";
-import type { LintSeverity, LintViolation } from "../validation-schemas/lint.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-export type { LintSeverity, LintViolation };
+import type { DocDirective } from '../validation-schemas/doc-directive.js';
+import type { LintSeverity, LintViolation } from '../validation-schemas/lint.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 /**
  * Context for lint rules that need access to the full pattern registry.
  * Used for "strict mode" validation where relationships are checked

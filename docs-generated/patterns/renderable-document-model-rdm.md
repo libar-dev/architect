@@ -13,8 +13,6 @@
 
 ## Description
 
-## Renderable Document Model (RDM)
-
 Unified document generation using codecs and a universal renderer.
 
 Architecture:

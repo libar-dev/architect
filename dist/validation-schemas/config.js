@@ -1,7 +1,7 @@
-import * as fs from "fs";
-import * as path from "path";
-import { z } from "zod";
-import { asRegistryFilePath } from "../types/branded.js";
+import * as fs from 'fs';
+import * as path from 'path';
+import { z } from 'zod';
+import { asRegistryFilePath } from '../types/branded.js';
 /**
  * Safely resolve a path, following symlinks if possible
  *
@@ -23,16 +23,16 @@ function safeRealpathSync(filePath) {
  */
 const GlobPatternSchema = z
     .string()
-    .min(1, "Glob pattern cannot be empty")
-    .refine((pattern) => !pattern.includes(".."), {
-    message: "Glob patterns cannot contain parent directory traversal (..)",
+    .min(1, 'Glob pattern cannot be empty')
+    .refine((pattern) => !pattern.includes('..'), {
+    message: 'Glob patterns cannot contain parent directory traversal (..)',
 });
 /**
  * Base directory validation with normalization
  */
 const BaseDirSchema = z
     .string()
-    .min(1, "Base directory cannot be empty")
+    .min(1, 'Base directory cannot be empty')
     .transform((dir) => path.resolve(dir)); // Normalize to absolute path
 /**
  * Create output directory validator with explicit base directory
@@ -47,20 +47,20 @@ const BaseDirSchema = z
 function createOutputDirSchema(baseDir) {
     return z
         .string()
-        .min(1, "Output directory cannot be empty")
+        .min(1, 'Output directory cannot be empty')
         .transform((dir) => path.normalize(path.resolve(dir)))
         .refine((dir) => {
         // Resolve symlinks for the base directory to prevent bypass attacks
         const resolvedBase = safeRealpathSync(baseDir);
         const resolvedDir = safeRealpathSync(dir);
         // Prevent parent directory traversal
-        if (dir.includes("..")) {
+        if (dir.includes('..')) {
             return false;
         }
         // Must be within resolvedBase or be a relative path
         return resolvedDir.startsWith(resolvedBase) || !path.isAbsolute(dir);
     }, {
-        message: "Output directory must be within project (no parent traversal)",
+        message: 'Output directory must be within project (no parent traversal)',
     });
 }
 /**
@@ -69,9 +69,9 @@ function createOutputDirSchema(baseDir) {
  */
 const RegistryFilePathSchema = z
     .string()
-    .min(1, "Registry path cannot be empty")
-    .refine((p) => p.endsWith(".json"), {
-    message: "Registry file must be a JSON file (.json)",
+    .min(1, 'Registry path cannot be empty')
+    .refine((p) => p.endsWith('.json'), {
+    message: 'Registry file must be a JSON file (.json)',
 })
     .transform((p) => asRegistryFilePath(path.normalize(p)));
 /**
@@ -91,7 +91,7 @@ const RegistryFilePathSchema = z
 export const ScannerConfigSchema = z
     .object({
     /** Glob patterns to scan (e.g., 'src/**\/*.ts') */
-    patterns: z.array(GlobPatternSchema).min(1, "At least one glob pattern required").readonly(),
+    patterns: z.array(GlobPatternSchema).min(1, 'At least one glob pattern required').readonly(),
     /** Directories to exclude (optional) */
     exclude: z.array(GlobPatternSchema).readonly().optional(),
     /** Base directory for scanning (normalized to absolute path) */
@@ -143,14 +143,6 @@ export function createGeneratorConfigSchema(baseDir) {
         .strict();
 }
 /**
- * Generator configuration (backward compatibility)
- *
- * **Deprecated**: Use createGeneratorConfigSchema(baseDir) instead for better security.
- *
- * This version uses process.cwd() which can be manipulated.
- */
-export const GeneratorConfigSchema = createGeneratorConfigSchema(process.cwd());
-/**
  * Runtime type guard for ScannerConfig
  *
  * @param value - Value to check
@@ -180,7 +172,7 @@ export function isScannerConfig(value) {
  * ```
  */
 export function isGeneratorConfig(value) {
-    const result = GeneratorConfigSchema.safeParse(value);
-    return result.success;
+    const schema = createGeneratorConfigSchema(process.cwd());
+    return schema.safeParse(value).success;
 }
 //# sourceMappingURL=config.js.map

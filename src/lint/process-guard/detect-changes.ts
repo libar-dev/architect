@@ -29,14 +29,14 @@
  * - When detecting scope creep (new deliverables)
  */
 
-import { execSync } from "child_process";
-import * as path from "path";
-import type { Result } from "../../types/index.js";
-import { Result as R } from "../../types/index.js";
-import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from "../../taxonomy/index.js";
-import type { ChangeDetection, StatusTransition, DeliverableChange } from "./types.js";
-import { DEFAULT_TAG_PREFIX } from "../../config/defaults.js";
-import type { WithTagRegistry } from "../../validation/types.js";
+import { execSync } from 'child_process';
+import * as path from 'path';
+import type { Result } from '../../types/index.js';
+import { Result as R } from '../../types/index.js';
+import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
+import type { ChangeDetection, StatusTransition, DeliverableChange } from './types.js';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
+import type { WithTagRegistry } from '../../validation/types.js';
 
 /**
  * Options for change detection functions.
@@ -73,11 +73,11 @@ export function detectStagedChanges(
 
   try {
     // Get list of staged files with status
-    const nameStatus = execGit("diff --cached --name-status", baseDir);
+    const nameStatus = execGit('diff --cached --name-status', baseDir);
     const { modified, added, deleted } = parseNameStatus(nameStatus);
 
     // Get full diff for content analysis
-    const diff = execGit("diff --cached", baseDir);
+    const diff = execGit('diff --cached', baseDir);
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
@@ -91,7 +91,6 @@ export function detectStagedChanges(
       deletedFiles: deleted,
       statusTransitions: new Map(statusTransitions),
       deliverableChanges: new Map(deliverableChanges),
-      taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
     });
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));
@@ -108,7 +107,7 @@ export function detectStagedChanges(
  */
 export function detectBranchChanges(
   baseDir: string,
-  baseBranch = "main",
+  baseBranch = 'main',
   options?: ChangeDetectionOptions
 ): Result<ChangeDetection> {
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
@@ -136,7 +135,6 @@ export function detectBranchChanges(
       deletedFiles: deleted,
       statusTransitions: new Map(statusTransitions),
       deliverableChanges: new Map(deliverableChanges),
-      taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
     });
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));
@@ -177,7 +175,7 @@ export function detectFileChanges(
     }
 
     // Get diff for modified files
-    const diff = modified.length > 0 ? execGit(`diff HEAD -- ${modified.join(" ")}`, baseDir) : "";
+    const diff = modified.length > 0 ? execGit(`diff HEAD -- ${modified.join(' ')}`, baseDir) : '';
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, modified, tagPrefix);
@@ -191,7 +189,6 @@ export function detectFileChanges(
       deletedFiles: [],
       statusTransitions: new Map(statusTransitions),
       deliverableChanges: new Map(deliverableChanges),
-      taxonomyModified: false, // Deprecated: taxonomy is now TypeScript-based
     });
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));
@@ -208,8 +205,8 @@ export function detectFileChanges(
 function execGit(command: string, cwd: string): string {
   return execSync(`git ${command}`, {
     cwd,
-    encoding: "utf-8",
-    stdio: ["pipe", "pipe", "pipe"],
+    encoding: 'utf-8',
+    stdio: ['pipe', 'pipe', 'pipe'],
   });
 }
 
@@ -225,29 +222,29 @@ function parseNameStatus(output: string): {
   const added: string[] = [];
   const deleted: string[] = [];
 
-  for (const line of output.split("\n")) {
+  for (const line of output.split('\n')) {
     const trimmed = line.trim();
     if (!trimmed) continue;
 
     const [status, ...pathParts] = trimmed.split(/\s+/);
-    const filePath = pathParts.join(" ");
+    const filePath = pathParts.join(' ');
 
     if (!filePath) continue;
 
     switch (status) {
-      case "M":
+      case 'M':
         modified.push(filePath);
         break;
-      case "A":
+      case 'A':
         added.push(filePath);
         break;
-      case "D":
+      case 'D':
         deleted.push(filePath);
         break;
-      case "R":
-      case "C":
+      case 'R':
+      case 'C':
         // Renamed/Copied: path is "old -> new"
-        const newPath = filePath.includes("->") ? filePath.split("->")[1]?.trim() : filePath;
+        const newPath = filePath.includes('->') ? filePath.split('->')[1]?.trim() : filePath;
         if (newPath) modified.push(newPath);
         break;
     }
@@ -264,7 +261,7 @@ function parseNameStatus(output: string): {
  * Escape special regex characters in a string
  */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
@@ -284,17 +281,17 @@ function detectStatusTransitions(
   tagPrefix: string = DEFAULT_TAG_PREFIX
 ): Array<[string, StatusTransition]> {
   const transitions: Array<[string, StatusTransition]> = [];
-  let currentFile = "";
+  let currentFile = '';
 
   // Build regex pattern with configurable prefix
   const escapedPrefix = escapeRegex(tagPrefix);
   const statusPattern = new RegExp(`${escapedPrefix}status:(\\w+)`);
 
-  for (const line of diff.split("\n")) {
+  for (const line of diff.split('\n')) {
     // Track current file
-    if (line.startsWith("diff --git")) {
+    if (line.startsWith('diff --git')) {
       const match = /diff --git a\/(.+) b\/(.+)/.exec(line);
-      currentFile = match?.[2] ?? "";
+      currentFile = match?.[2] ?? '';
       continue;
     }
 
@@ -304,12 +301,14 @@ function detectStatusTransitions(
     // Skip generated docs directories - they contain embedded status examples
     // that look like status transitions but are just content, not real tags
     // Common patterns: docs-living/, docs-generated/, docs/generated/
-    const generatedDocsPatterns = ["docs-living/", "docs-generated/", "docs/generated/"];
-    if (generatedDocsPatterns.some((p) => currentFile.startsWith(p) || currentFile.includes(`/${p}`)))
+    const generatedDocsPatterns = ['docs-living/', 'docs-generated/', 'docs/generated/'];
+    if (
+      generatedDocsPatterns.some((p) => currentFile.startsWith(p) || currentFile.includes(`/${p}`))
+    )
       continue;
 
     // Look for status changes
-    if (line.startsWith("-") && !line.startsWith("---")) {
+    if (line.startsWith('-') && !line.startsWith('---')) {
       const oldMatch = statusPattern.exec(line);
       if (oldMatch?.[1]) {
         // Found a removed status, look for the added status
@@ -329,7 +328,7 @@ function detectStatusTransitions(
       }
     }
 
-    if (line.startsWith("+") && !line.startsWith("+++")) {
+    if (line.startsWith('+') && !line.startsWith('+++')) {
       const newMatch = statusPattern.exec(line);
       if (newMatch?.[1]) {
         const toStatus = newMatch[1].toLowerCase();
@@ -351,7 +350,7 @@ function detectStatusTransitions(
           transitions.push([
             currentFile,
             {
-              from: "roadmap" as ProcessStatusValue, // Default for new files
+              from: 'roadmap' as ProcessStatusValue, // Default for new files
               to: toStatus as ProcessStatusValue,
             },
           ]);
@@ -380,7 +379,7 @@ export function detectDeliverableChanges(
   files: readonly string[]
 ): Array<[string, DeliverableChange]> {
   const changes: Array<[string, DeliverableChange]> = [];
-  let currentFile = "";
+  let currentFile = '';
 
   // Regex for DataTable row with Deliverable column
   // Matches: | Deliverable Name | Status | ... |
@@ -388,11 +387,11 @@ export function detectDeliverableChanges(
 
   const fileChanges = new Map<string, { added: string[]; removed: string[]; modified: string[] }>();
 
-  for (const line of diff.split("\n")) {
+  for (const line of diff.split('\n')) {
     // Track current file
-    if (line.startsWith("diff --git")) {
+    if (line.startsWith('diff --git')) {
       const match = /diff --git a\/(.+) b\/(.+)/.exec(line);
-      currentFile = match?.[2] ?? "";
+      currentFile = match?.[2] ?? '';
       if (currentFile && !fileChanges.has(currentFile)) {
         fileChanges.set(currentFile, { added: [], removed: [], modified: [] });
       }
@@ -403,14 +402,14 @@ export function detectDeliverableChanges(
     if (!currentFile || !files.includes(currentFile)) continue;
 
     // Skip header rows (first row in DataTable)
-    if (line.includes("Deliverable") && line.includes("Status")) continue;
+    if (line.includes('Deliverable') && line.includes('Status')) continue;
 
     // Look for added deliverables
-    if (line.startsWith("+") && line.includes("|")) {
+    if (line.startsWith('+') && line.includes('|')) {
       const match = deliverablePattern.exec(line.substring(1));
       if (match?.[1]) {
         const deliverable = match[1].trim();
-        if (deliverable && !deliverable.includes("---")) {
+        if (deliverable && !deliverable.includes('---')) {
           const fc = fileChanges.get(currentFile);
           if (fc) fc.added.push(deliverable);
         }
@@ -418,11 +417,11 @@ export function detectDeliverableChanges(
     }
 
     // Look for removed deliverables
-    if (line.startsWith("-") && line.includes("|")) {
+    if (line.startsWith('-') && line.includes('|')) {
       const match = deliverablePattern.exec(line.substring(1));
       if (match?.[1]) {
         const deliverable = match[1].trim();
-        if (deliverable && !deliverable.includes("---")) {
+        if (deliverable && !deliverable.includes('---')) {
           const fc = fileChanges.get(currentFile);
           if (fc) fc.removed.push(deliverable);
         }

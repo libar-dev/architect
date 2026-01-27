@@ -15,9 +15,9 @@
  * - When creating type-safe factory functions
  * - When extending the configuration system
  */
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import type { CategoryDefinition } from "../taxonomy/categories.js";
-import type { MetadataTagDefinitionForRegistry } from "../taxonomy/registry-builder.js";
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import type { CategoryDefinition } from '../taxonomy/categories.js';
+import type { MetadataTagDefinitionForRegistry } from '../taxonomy/registry-builder.js';
 /**
  * Configuration for creating a delivery process instance.
  * Uses generics to preserve literal types from presets.

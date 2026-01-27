@@ -13,8 +13,6 @@
 
 ## Description
 
-## CLIErrorHandler - Unified CLI Error Handling Utilities
-
 Provides type-safe error handling for all CLI commands using the
 DocError discriminated union pattern. Ensures structured error
 context is preserved and formatted consistently.

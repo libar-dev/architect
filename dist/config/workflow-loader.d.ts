@@ -17,8 +17,8 @@
  * - Use when validating custom workflow configuration files
  * - Use when loading default 6-phase-standard workflow
  */
-import { Result } from "../types/result.js";
-import { type LoadedWorkflow, type WorkflowConfig } from "../validation-schemas/workflow-config.js";
+import { Result } from '../types/result.js';
+import { type LoadedWorkflow, type WorkflowConfig } from '../validation-schemas/workflow-config.js';
 /**
  * Workflow load error
  *
@@ -27,7 +27,7 @@ import { type LoadedWorkflow, type WorkflowConfig } from "../validation-schemas/
  */
 export interface WorkflowLoadError {
     /** Error type identifier */
-    type: "workflow-load-error";
+    type: 'workflow-load-error';
     /** Path or name of the workflow that failed to load */
     source: string;
     /** Human-readable error message */
@@ -105,39 +105,5 @@ export declare function loadDefaultWorkflow(): Promise<LoadedWorkflow>;
  * ```
  */
 export declare function formatWorkflowLoadError(error: WorkflowLoadError): string;
-/**
- * Get status emoji from loaded workflow
- *
- * Provides a convenient way to look up emoji for a status from a LoadedWorkflow.
- * Returns empty string if status not found.
- *
- * @param workflow - LoadedWorkflow instance
- * @param status - Status name to look up
- * @returns Emoji string or empty string if not found
- *
- * @example
- * ```typescript
- * const workflow = await loadDefaultWorkflow();
- * const emoji = getWorkflowStatusEmoji(workflow, "completed"); // "✅"
- * ```
- */
-export declare function getWorkflowStatusEmoji(workflow: LoadedWorkflow, status: string | undefined): string;
-/**
- * Get status label from loaded workflow
- *
- * Returns the human-readable label for a status, or the capitalized
- * status name if no label is defined.
- *
- * @param workflow - LoadedWorkflow instance
- * @param status - Status name to look up
- * @returns Label string
- *
- * @example
- * ```typescript
- * const workflow = await loadDefaultWorkflow();
- * const label = getWorkflowStatusLabel(workflow, "roadmap"); // "Planned"
- * ```
- */
-export declare function getWorkflowStatusLabel(workflow: LoadedWorkflow, status: string | undefined): string;
 export type { LoadedWorkflow, WorkflowConfig };
 //# sourceMappingURL=workflow-loader.d.ts.map

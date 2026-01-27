@@ -7,7 +7,7 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 75/108 (69%)
+**Overall Progress:** [██████████████░░░░░░] 71/104 (68%)
 
 | Status | Count |
 | --- | --- |

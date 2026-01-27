@@ -13,8 +13,6 @@
 
 ## Description
 
-## DoDValidator - Definition of Done Validation
-
 Validates that completed phases meet Definition of Done criteria:
 1. All deliverables must have "complete" status
 2. At least one @acceptance-criteria scenario must exist

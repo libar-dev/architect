@@ -27,8 +27,8 @@
  * - **Workflow integration**: Uses workflow config for phase names
  */
 
-import type { ExtractedPattern, TagRegistry } from "../../validation-schemas/index.js";
-import type { LoadedWorkflow } from "../../config/workflow-loader.js";
+import type { ExtractedPattern, TagRegistry } from '../../validation-schemas/index.js';
+import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import type {
   StatusGroups,
   StatusCounts,
@@ -37,10 +37,10 @@ import type {
   RelationshipEntry,
   ImplementationRef,
   ArchIndex,
-} from "../../validation-schemas/master-dataset.js";
+} from '../../validation-schemas/master-dataset.js';
 
-import type { MasterDataset } from "../../validation-schemas/master-dataset.js";
-import { normalizeStatus } from "../../taxonomy/index.js";
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import { normalizeStatus } from '../../taxonomy/index.js';
 
 /**
  * Runtime MasterDataset with optional workflow
@@ -167,7 +167,7 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
     byCategoryMap.set(category, categoryPatterns);
 
     // ─── Source grouping ───────────────────────────────────────────────────
-    if (pattern.source.file.endsWith(".feature")) {
+    if (pattern.source.file.endsWith('.feature')) {
       bySource.gherkin.push(p);
     } else {
       bySource.typescript.push(p);
@@ -244,10 +244,10 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
         if (!alreadyAdded) {
           // Extract first line of description if available, truncate to 100 chars
           const desc = pattern.directive.description;
-          const firstLine = desc ? desc.split("\n")[0]?.trim() : undefined;
+          const firstLine = desc ? desc.split('\n')[0]?.trim() : undefined;
           const description =
             firstLine && firstLine.length > 0
-              ? firstLine.slice(0, 100) + (firstLine.length > 100 ? "..." : "")
+              ? firstLine.slice(0, 100) + (firstLine.length > 100 ? '...' : '')
               : undefined;
 
           target.implementedBy.push({
@@ -354,8 +354,8 @@ function computeCounts(patterns: readonly ExtractedPattern[]): StatusCounts {
 
   for (const p of patterns) {
     const s = normalizeStatus(p.status);
-    if (s === "completed") completed++;
-    else if (s === "active") active++;
+    if (s === 'completed') completed++;
+    else if (s === 'active') active++;
     else planned++;
   }
 

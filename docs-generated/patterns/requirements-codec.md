@@ -13,8 +13,6 @@
 
 ## Description
 
-## Requirements Document Codec
-
 Transforms MasterDataset into RenderableDocument for PRD/requirements output.
 Generates PRODUCT-REQUIREMENTS.md and detail files (requirements/*.md).
 

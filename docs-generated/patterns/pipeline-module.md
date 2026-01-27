@@ -13,8 +13,6 @@
 
 ## Description
 
-## Pipeline Module - Unified Transformation Infrastructure
-
 Barrel export for the unified transformation pipeline components.
 This module provides single-pass pattern transformation.
 

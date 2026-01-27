@@ -9,17 +9,17 @@
  * Shared types, interfaces, and utilities for all document codecs.
  * Individual codec files define their own specific option types that extend BaseCodecOptions.
  */
-import type { z } from "zod";
-import type { NormalizedStatus } from "../../../taxonomy/index.js";
-import type { MasterDatasetSchema } from "../../../validation-schemas/master-dataset.js";
-import type { RenderableDocumentOutputSchema } from "../shared-schema.js";
+import type { z } from 'zod';
+import type { NormalizedStatus } from '../../../taxonomy/index.js';
+import type { MasterDatasetSchema } from '../../../validation-schemas/master-dataset.js';
+import type { RenderableDocumentOutputSchema } from '../shared-schema.js';
 /**
  * Detail level for progressive disclosure
  * - summary: Minimal output, no detail files
  * - standard: Default behavior with detail files
  * - detailed: Maximum detail, all optional sections included
  */
-export type DetailLevel = "summary" | "standard" | "detailed";
+export type DetailLevel = 'summary' | 'standard' | 'detailed';
 /**
  * Normalized status values that match normalizeStatus() output.
  * Use this type for filterStatus options to ensure type safety.

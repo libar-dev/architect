@@ -13,8 +13,6 @@
 
 ## Description
 
-## GherkinASTParser - Parse Feature Files Using Cucumber Gherkin
-
 Parses Gherkin feature files using @cucumber/gherkin and extracts structured data
 including feature metadata, tags, scenarios, and steps.
 

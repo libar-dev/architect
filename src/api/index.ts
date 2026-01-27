@@ -46,10 +46,10 @@ export type {
   QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
-} from "./types.js";
+} from './types.js';
 
-export { createSuccess, createError } from "./types.js";
+export { createSuccess, createError } from './types.js';
 
 // Process State API
-export type { ProcessStateAPI } from "./process-state.js";
-export { createProcessStateAPI } from "./process-state.js";
+export type { ProcessStateAPI } from './process-state.js';
+export { createProcessStateAPI } from './process-state.js';

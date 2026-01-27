@@ -12,50 +12,10 @@ Feature: Anti-Pattern Detection
   - Large feature files are hard to maintain
 
   **Solution:**
-  - detectTagDuplication() finds code-only tags in features
   - detectProcessInCode() finds feature-only tags in code
   - detectMagicComments() finds generator hints in features
   - detectScenarioBloat() warns about too many scenarios
   - detectMegaFeature() warns about large feature files
-
-  # ==========================================================================
-  # Tag Duplication Detection
-  # ==========================================================================
-
-  Rule: Code-only tags should not appear in feature files
-
-    @happy-path
-    Scenario: Feature without code-only tags passes
-      Given a feature file with tags:
-        | tag                          |
-        | libar-process-pattern:MyTest |
-        | libar-process-phase:01       |
-      When detecting tag duplication
-      Then no violations are found
-
-    @edge-case
-    Scenario Outline: Code-only dependency tags in features are flagged
-      Given a feature file with code-only tag "<code_tag>"
-      When detecting tag duplication
-      Then a "tag-duplication" violation is found
-      And the violation severity is "error"
-      And the fix suggests moving to code
-
-      Examples:
-        | code_tag                           |
-        | libar-process-depends-on:PatternA  |
-        | libar-process-enables:PatternB     |
-
-    @edge-case
-    Scenario: Scenario-level code-only tags are also flagged
-      Given a feature file with feature tags:
-        | tag                          |
-        | libar-process-pattern:MyTest |
-      And scenario tags:
-        | tag                           |
-        | libar-process-depends-on:Foo  |
-      When detecting tag duplication
-      Then a "tag-duplication" violation is found
 
   # ==========================================================================
   # Process-in-Code Detection
@@ -177,18 +137,17 @@ Feature: Anti-Pattern Detection
   Rule: All anti-patterns can be detected in one pass
 
     @integration
-    Scenario: Combined detection finds multiple issues
+    Scenario: Combined detection finds process-in-code issues
       Given a TypeScript file with directive tags:
         | tag                 |
         | @libar-docs         |
         | @libar-docs-quarter |
       And a feature file with tags:
-        | tag                            |
-        | libar-process-depends-on:Other |
+        | tag                       |
+        | libar-docs-pattern:MyTest |
       When detecting all anti-patterns
-      Then 2 violations are found
+      Then 1 violation is found
       And violations include "process-in-code"
-      And violations include "tag-duplication"
 
   # ==========================================================================
   # Report Formatting

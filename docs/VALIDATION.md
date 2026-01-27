@@ -6,11 +6,11 @@ This guide covers the validation tools for ensuring annotation quality and proce
 
 The package provides three complementary validation systems:
 
-| Tool | Purpose | Use Case |
-|------|---------|----------|
-| **Lint Patterns** | Annotation quality checking | Ensure patterns have required metadata |
-| **Anti-Pattern Detection** | Architecture violation detection | Enforce dual-source ownership rules |
-| **DoD Validation** | Definition of Done checks | Validate phases are truly complete |
+| Tool                       | Purpose                          | Use Case                               |
+| -------------------------- | -------------------------------- | -------------------------------------- |
+| **Lint Patterns**          | Annotation quality checking      | Ensure patterns have required metadata |
+| **Anti-Pattern Detection** | Architecture violation detection | Enforce dual-source ownership rules    |
+| **DoD Validation**         | Definition of Done checks        | Validate phases are truly complete     |
 
 ---
 
@@ -20,24 +20,24 @@ The lint-patterns tool validates `@<prefix>-*` annotations for completeness and 
 
 ### Rules Reference
 
-| Rule | Severity | Description |
-|------|----------|-------------|
-| `missing-pattern-name` | error | Pattern must have explicit `@<prefix>-pattern` name |
-| `invalid-status` | error | Status must be a valid FSM value |
-| `tautological-description` | error | Description should not simply repeat the pattern name |
-| `pattern-conflict-in-implements` | error | Implementation files must not also define patterns |
-| `missing-relationship-target` | warning | Relationship targets must reference existing patterns |
-| `missing-status` | warning | Pattern should have `@<prefix>-status` tag |
-| `missing-when-to-use` | warning | Pattern should have "When to Use" section |
-| `missing-relationships` | info | Consider adding `@<prefix>-uses` and `@<prefix>-used-by` |
+| Rule                             | Severity | Description                                              |
+| -------------------------------- | -------- | -------------------------------------------------------- |
+| `missing-pattern-name`           | error    | Pattern must have explicit `@<prefix>-pattern` name      |
+| `invalid-status`                 | error    | Status must be a valid FSM value                         |
+| `tautological-description`       | error    | Description should not simply repeat the pattern name    |
+| `pattern-conflict-in-implements` | error    | Implementation files must not also define patterns       |
+| `missing-relationship-target`    | warning  | Relationship targets must reference existing patterns    |
+| `missing-status`                 | warning  | Pattern should have `@<prefix>-status` tag               |
+| `missing-when-to-use`            | warning  | Pattern should have "When to Use" section                |
+| `missing-relationships`          | info     | Consider adding `@<prefix>-uses` and `@<prefix>-used-by` |
 
 ### Severity Levels
 
-| Level | Meaning | Default Behavior |
-|-------|---------|------------------|
-| `error` | Blocks commit/CI | Always reported |
+| Level     | Meaning                   | Default Behavior         |
+| --------- | ------------------------- | ------------------------ |
+| `error`   | Blocks commit/CI          | Always reported          |
 | `warning` | Should fix, doesn't block | Reported unless filtered |
-| `info` | Suggestion only | Reported unless filtered |
+| `info`    | Suggestion only           | Reported unless filtered |
 
 ### CLI Usage
 
@@ -60,13 +60,13 @@ npx lint-patterns -i "src/**/*.ts" --known-patterns patterns.json
 
 ### CLI Options
 
-| Flag | Description |
-|------|-------------|
-| `-i, --input <glob>` | Glob pattern for files to lint (required) |
-| `-o, --output <file>` | Output file for results (optional) |
-| `--strict` | Treat warnings as errors (exit 1 on warnings) |
-| `--min-severity <level>` | Minimum severity to report: error, warning, info |
-| `--format <type>` | Output format: pretty (default) or json |
+| Flag                      | Description                                                    |
+| ------------------------- | -------------------------------------------------------------- |
+| `-i, --input <glob>`      | Glob pattern for files to lint (required)                      |
+| `-o, --output <file>`     | Output file for results (optional)                             |
+| `--strict`                | Treat warnings as errors (exit 1 on warnings)                  |
+| `--min-severity <level>`  | Minimum severity to report: error, warning, info               |
+| `--format <type>`         | Output format: pretty (default) or json                        |
 | `--known-patterns <file>` | JSON file with known pattern names for relationship validation |
 
 ### Programmatic API
@@ -80,11 +80,11 @@ import {
   filterRulesBySeverity,
   formatPretty,
   formatJson,
-} from "@libar-dev/delivery-process/lint";
+} from '@libar-dev/delivery-process/lint';
 
 // Lint files with default rules
 const result = await lintFiles({
-  include: ["src/**/*.ts"],
+  include: ['src/**/*.ts'],
   rules: defaultRules,
 });
 
@@ -94,15 +94,15 @@ if (hasFailures(result)) {
 }
 
 // Filter to errors only
-const errorRules = filterRulesBySeverity(defaultRules, "error");
+const errorRules = filterRulesBySeverity(defaultRules, 'error');
 const strictResult = await lintFiles({
-  include: ["src/**/*.ts"],
+  include: ['src/**/*.ts'],
   rules: errorRules,
 });
 
 // Lint a single directive
-const directive = { patternName: "MyPattern", status: "active" };
-const violations = lintDirective(directive, "src/file.ts", 10);
+const directive = { patternName: 'MyPattern', status: 'active' };
+const violations = lintDirective(directive, 'src/file.ts', 10);
 ```
 
 ---
@@ -113,34 +113,34 @@ Detects violations of the dual-source documentation architecture and process hyg
 
 ### Detection Rules
 
-| ID | Severity | Description | Fix |
-|----|----------|-------------|-----|
-| `tag-duplication` | error | Dependency tags found in feature files | Move to TypeScript code with `@<prefix>-depends-on` |
-| `process-in-code` | error | Process metadata found in TypeScript code | Move `@<prefix>-quarter`, `@<prefix>-team` to `.feature` files |
-| `magic-comments` | warning | Generator hints like `# GENERATOR:` in features | Use standard Gherkin tags instead |
-| `scenario-bloat` | warning | Too many scenarios per feature (>20 default) | Split feature file by component/domain |
-| `mega-feature` | warning | Feature file too large (>500 lines default) | Split into smaller feature files |
+| ID                | Severity | Description                                     | Fix                                                            |
+| ----------------- | -------- | ----------------------------------------------- | -------------------------------------------------------------- |
+| `tag-duplication` | error    | Dependency tags found in feature files          | Move to TypeScript code with `@<prefix>-depends-on`            |
+| `process-in-code` | error    | Process metadata found in TypeScript code       | Move `@<prefix>-quarter`, `@<prefix>-team` to `.feature` files |
+| `magic-comments`  | warning  | Generator hints like `# GENERATOR:` in features | Use standard Gherkin tags instead                              |
+| `scenario-bloat`  | warning  | Too many scenarios per feature (>20 default)    | Split feature file by component/domain                         |
+| `mega-feature`    | warning  | Feature file too large (>500 lines default)     | Split into smaller feature files                               |
 
 ### Dual-Source Architecture
 
 The anti-pattern detector enforces ownership rules:
 
-| Tag Type | Correct Location | Wrong Location |
-|----------|-----------------|----------------|
-| `@<prefix>-depends-on` | TypeScript code | Feature files |
-| `@<prefix>-enables` | TypeScript code | Feature files |
-| `@<prefix>-quarter` | Feature files | TypeScript code |
-| `@<prefix>-team` | Feature files | TypeScript code |
-| `@<prefix>-effort` | Feature files | TypeScript code |
-| `@<prefix>-completed` | Feature files | TypeScript code |
+| Tag Type               | Correct Location | Wrong Location  |
+| ---------------------- | ---------------- | --------------- |
+| `@<prefix>-depends-on` | TypeScript code  | Feature files   |
+| `@<prefix>-enables`    | TypeScript code  | Feature files   |
+| `@<prefix>-quarter`    | Feature files    | TypeScript code |
+| `@<prefix>-team`       | Feature files    | TypeScript code |
+| `@<prefix>-effort`     | Feature files    | TypeScript code |
+| `@<prefix>-completed`  | Feature files    | TypeScript code |
 
 ### Configurable Thresholds
 
-| Threshold | Default | Description |
-|-----------|---------|-------------|
-| `magicCommentThreshold` | 5 | Max magic comments before warning |
-| `scenarioBloatThreshold` | 20 | Max scenarios per feature |
-| `megaFeatureLineThreshold` | 500 | Max lines per feature file |
+| Threshold                  | Default | Description                       |
+| -------------------------- | ------- | --------------------------------- |
+| `magicCommentThreshold`    | 5       | Max magic comments before warning |
+| `scenarioBloatThreshold`   | 20      | Max scenarios per feature         |
+| `megaFeatureLineThreshold` | 500     | Max lines per feature file        |
 
 ### CLI Usage
 
@@ -158,14 +158,13 @@ npx validate-patterns -i "**/*.feature" -t "src/**/*.ts" --anti-patterns \
 ```typescript
 import {
   detectAntiPatterns,
-  detectTagDuplication,
   detectProcessInCode,
   detectMagicComments,
   detectScenarioBloat,
   detectMegaFeature,
   formatAntiPatternReport,
   toValidationIssues,
-} from "@libar-dev/delivery-process/validation";
+} from '@libar-dev/delivery-process/validation';
 
 // Detect all anti-patterns
 const violations = detectAntiPatterns(scannedTsFiles, scannedFeatures, {
@@ -184,7 +183,6 @@ console.log(formatAntiPatternReport(violations));
 const issues = toValidationIssues(violations);
 
 // Individual detectors
-const tagDups = detectTagDuplication(features, registry);
 const processInCode = detectProcessInCode(tsFiles, registry);
 const magicComments = detectMagicComments(features, 5);
 const bloat = detectScenarioBloat(features, 20);
@@ -201,9 +199,9 @@ Validates that completed phases meet Definition of Done criteria before release.
 
 For each phase/pattern with `completed` status:
 
-| Criterion | Requirement |
-|-----------|-------------|
-| **Deliverables** | All deliverables must have "complete" status |
+| Criterion               | Requirement                                             |
+| ----------------------- | ------------------------------------------------------- |
+| **Deliverables**        | All deliverables must have "complete" status            |
 | **Acceptance Criteria** | At least one `@acceptance-criteria` scenario must exist |
 
 ### Completion Status Detection
@@ -233,7 +231,7 @@ import {
   isDeliverableComplete,
   hasAcceptanceCriteria,
   extractAcceptanceCriteriaScenarios,
-} from "@libar-dev/delivery-process/validation";
+} from '@libar-dev/delivery-process/validation';
 
 // Validate all completed phases
 const summary = validateDoD(scannedFeatures);
@@ -257,14 +255,14 @@ console.log(formatDoDSummary(summary));
 //          - "Documentation" (status: Planned)
 
 // Validate single phase
-const result = validateDoDForPhase("ProjectionCategories", 15, feature);
+const result = validateDoDForPhase('ProjectionCategories', 15, feature);
 if (!result.isDoDMet) {
-  console.log("Incomplete deliverables:", result.incompleteDeliverables);
-  console.log("Missing AC:", result.missingAcceptanceCriteria);
+  console.log('Incomplete deliverables:', result.incompleteDeliverables);
+  console.log('Missing AC:', result.missingAcceptanceCriteria);
 }
 
 // Check individual deliverable
-const deliverable = { name: "Query API", status: "Complete", tests: 5, location: "src/" };
+const deliverable = { name: 'Query API', status: 'Complete', tests: 5, location: 'src/' };
 const isComplete = isDeliverableComplete(deliverable); // true
 
 // Check for acceptance criteria
@@ -312,23 +310,23 @@ npx validate-patterns \
 
 ### CLI Options
 
-| Flag | Description |
-|------|-------------|
-| `-i, --input <glob>` | Glob pattern for feature files |
-| `-t, --typescript <glob>` | Glob pattern for TypeScript files |
-| `--dod` | Run Definition of Done validation |
-| `--anti-patterns` | Run anti-pattern detection |
-| `--cross-source` | Validate feature/TypeScript consistency |
-| `--phases <list>` | Specific phases for DoD (comma-separated) |
-| `--strict` | Treat warnings as errors |
-| `--format <type>` | Output format: pretty or json |
+| Flag                      | Description                               |
+| ------------------------- | ----------------------------------------- |
+| `-i, --input <glob>`      | Glob pattern for feature files            |
+| `-t, --typescript <glob>` | Glob pattern for TypeScript files         |
+| `--dod`                   | Run Definition of Done validation         |
+| `--anti-patterns`         | Run anti-pattern detection                |
+| `--cross-source`          | Validate feature/TypeScript consistency   |
+| `--phases <list>`         | Specific phases for DoD (comma-separated) |
+| `--strict`                | Treat warnings as errors                  |
+| `--format <type>`         | Output format: pretty or json             |
 
 ### Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | All validations passed |
-| `1` | Errors found (or warnings with `--strict`) |
+| Code | Meaning                                    |
+| ---- | ------------------------------------------ |
+| `0`  | All validations passed                     |
+| `1`  | Errors found (or warnings with `--strict`) |
 
 ---
 

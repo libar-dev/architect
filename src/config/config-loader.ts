@@ -28,12 +28,11 @@
  * ```
  */
 
-import * as fs from "fs/promises";
-import { existsSync } from "fs";
-import * as path from "path";
-import { pathToFileURL } from "url";
-import { createDeliveryProcess } from "./factory.js";
-import type { DeliveryProcessInstance } from "./types.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { pathToFileURL } from 'url';
+import { createDeliveryProcess } from './factory.js';
+import type { DeliveryProcessInstance } from './types.js';
 
 /**
  * Type for dynamic config module import
@@ -45,12 +44,12 @@ interface ConfigModule {
 /**
  * Config file name to search for
  */
-const CONFIG_FILE_NAME = "delivery-process.config.ts";
+const CONFIG_FILE_NAME = 'delivery-process.config.ts';
 
 /**
  * Compiled JavaScript variant (for projects that pre-compile configs)
  */
-const CONFIG_FILE_NAME_JS = "delivery-process.config.js";
+const CONFIG_FILE_NAME_JS = 'delivery-process.config.js';
 
 /**
  * Result of config file discovery
@@ -70,7 +69,7 @@ export interface ConfigDiscoveryResult {
  * Error during config loading
  */
 export interface ConfigLoadError {
-  type: "config-load-error";
+  type: 'config-load-error';
   path: string;
   message: string;
   /** The underlying error that caused the failure (if any) */
@@ -89,7 +88,7 @@ export type ConfigLoadResult =
  */
 async function isRepoRoot(dir: string): Promise<boolean> {
   try {
-    const gitPath = path.join(dir, ".git");
+    const gitPath = path.join(dir, '.git');
     const stat = await fs.stat(gitPath);
     return stat.isDirectory() || stat.isFile(); // .git can be a file (worktree)
   } catch {
@@ -169,11 +168,7 @@ async function importConfigFile(configPath: string): Promise<DeliveryProcessInst
   const config = module.default as Record<string, unknown>;
 
   // Validate that it's a DeliveryProcessInstance (has required properties)
-  if (
-    typeof config !== "object" ||
-    !("registry" in config) ||
-    !("regexBuilders" in config)
-  ) {
+  if (typeof config !== 'object' || !('registry' in config) || !('regexBuilders' in config)) {
     throw new Error(
       `Config file must export a DeliveryProcessInstance (use createDeliveryProcess()): ${configPath}`
     );
@@ -243,7 +238,7 @@ export async function loadConfig(baseDir: string): Promise<ConfigLoadResult> {
     return {
       ok: false,
       error: {
-        type: "config-load-error",
+        type: 'config-load-error',
         path: configPath,
         message: `Failed to load config: ${message}`,
         cause: error instanceof Error ? error : undefined,
@@ -265,45 +260,5 @@ export function formatConfigError(error: ConfigLoadError): string {
     lines.push(`  Cause: ${error.cause.message}`);
   }
 
-  return lines.join("\n");
-}
-
-/**
- * Synchronous check for config file (for non-async contexts)
- *
- * Note: This only checks if the file exists, not if it's valid.
- * Use loadConfig() for full validation.
- *
- * @param startDir - Directory to start searching from
- * @returns Path to config file or null
- */
-export function findConfigFileSync(startDir: string): string | null {
-  let currentDir = path.resolve(startDir);
-  const root = path.parse(currentDir).root;
-
-  while (currentDir !== root) {
-    const tsConfigPath = path.join(currentDir, CONFIG_FILE_NAME);
-    if (existsSync(tsConfigPath)) {
-      return tsConfigPath;
-    }
-
-    const jsConfigPath = path.join(currentDir, CONFIG_FILE_NAME_JS);
-    if (existsSync(jsConfigPath)) {
-      return jsConfigPath;
-    }
-
-    // Check for .git to stop at repo root
-    const gitPath = path.join(currentDir, ".git");
-    if (existsSync(gitPath)) {
-      break;
-    }
-
-    const parentDir = path.dirname(currentDir);
-    if (parentDir === currentDir) {
-      break;
-    }
-    currentDir = parentDir;
-  }
-
-  return null;
+  return lines.join('\n');
 }

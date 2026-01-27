@@ -2,7 +2,7 @@
  * @libar-docs
  */
 
-import type { DocumentGenerator } from "./types";
+import type { DocumentGenerator } from './types';
 
 /**
  * @libar-docs-generator
@@ -40,7 +40,7 @@ export class GeneratorRegistry {
     if (this.generators.has(generator.name)) {
       throw new Error(
         `Generator "${generator.name}" is already registered. ` +
-          `Available generators: ${this.available().join(", ")}`
+          `Available generators: ${this.available().join(', ')}`
       );
     }
     this.generators.set(generator.name, generator);

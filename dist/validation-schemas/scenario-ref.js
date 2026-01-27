@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { LAYER_TYPES } from "../taxonomy/index.js";
+import { z } from 'zod';
+import { LAYER_TYPES } from '../taxonomy/index.js';
 /**
  * Schema for DataTable attached to scenario steps
  */

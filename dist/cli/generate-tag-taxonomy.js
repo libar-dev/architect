@@ -4,7 +4,7 @@
  * @libar-docs-cli
  * @libar-docs-pattern TagTaxonomyCLI
  * @libar-docs-status completed
- * @libar-docs-uses TagRegistryLoader, TagTaxonomyGenerator
+ * @libar-docs-uses ConfigLoader, TagTaxonomyGenerator
  *
  * ## TagTaxonomyCLI - Tag Registry Documentation Generator
  *
@@ -17,11 +17,11 @@
  * - Use to generate human-readable tag reference from JSON config
  * - Use in documentation regeneration workflows
  */
-import * as fs from "fs/promises";
-import * as path from "path";
-import { loadConfig, formatConfigError } from "../config/config-loader.js";
-import { generateTagTaxonomy } from "../config/tag-taxonomy-generator.js";
-import { printVersionAndExit } from "./version.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { generateTagTaxonomy } from '../config/tag-taxonomy-generator.js';
+import { printVersionAndExit } from './version.js';
 /**
  * Parse command line arguments
  *
@@ -30,7 +30,7 @@ import { printVersionAndExit } from "./version.js";
  */
 function parseArgs(argv = process.argv.slice(2)) {
     const config = {
-        output: "docs/architecture/TAG_TAXONOMY.md",
+        output: 'docs/architecture/TAG_TAXONOMY.md',
         baseDir: process.cwd(),
         overwrite: false,
         help: false,
@@ -38,30 +38,30 @@ function parseArgs(argv = process.argv.slice(2)) {
     };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
-        if (arg === "--help" || arg === "-h") {
+        if (arg === '--help' || arg === '-h') {
             config.help = true;
         }
-        else if (arg === "--output" || arg === "-o") {
+        else if (arg === '--output' || arg === '-o') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.output = nextArg;
         }
-        else if (arg === "--base-dir" || arg === "-b") {
+        else if (arg === '--base-dir' || arg === '-b') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.baseDir = nextArg;
         }
-        else if (arg === "--overwrite" || arg === "-f") {
+        else if (arg === '--overwrite' || arg === '-f') {
             config.overwrite = true;
         }
-        else if (arg === "--version" || arg === "-v") {
+        else if (arg === '--version' || arg === '-v') {
             config.version = true;
         }
-        else if (arg?.startsWith("-") === true) {
+        else if (arg?.startsWith('-') === true) {
             console.warn(`Warning: Unknown flag '${arg}' ignored`);
         }
     }
@@ -105,14 +105,14 @@ Examples:
 async function main() {
     const config = parseArgs();
     if (config.version) {
-        printVersionAndExit("generate-tag-taxonomy");
+        printVersionAndExit('generate-tag-taxonomy');
     }
     if (config.help) {
         printHelp();
         process.exit(0);
     }
     try {
-        console.log("Loading configuration...");
+        console.log('Loading configuration...');
         // Load configuration (discovers delivery-process.config.ts)
         const configResult = await loadConfig(config.baseDir);
         if (!configResult.ok) {
@@ -121,7 +121,7 @@ async function main() {
         }
         const { instance: dpInstance, isDefault, path: configPath } = configResult.value;
         const tagRegistry = dpInstance.registry;
-        const sourcePath = !isDefault && configPath ? configPath : "(default DDD-ES-CQRS taxonomy)";
+        const sourcePath = !isDefault && configPath ? configPath : '(default DDD-ES-CQRS taxonomy)';
         console.log(`  Loaded: ${sourcePath}`);
         // Check if output file exists
         const outputPath = path.isAbsolute(config.output)
@@ -131,7 +131,7 @@ async function main() {
             try {
                 await fs.access(outputPath);
                 console.error(`Error: Output file already exists: ${outputPath}`);
-                console.error("Use --overwrite (-f) to replace it");
+                console.error('Use --overwrite (-f) to replace it');
                 process.exit(1);
             }
             catch {
@@ -139,14 +139,14 @@ async function main() {
             }
         }
         // Generate taxonomy markdown
-        console.log("Generating TAG_TAXONOMY.md...");
+        console.log('Generating TAG_TAXONOMY.md...');
         const markdown = generateTagTaxonomy(tagRegistry, {
             sourcePath: sourcePath,
         });
         // Ensure output directory exists
         await fs.mkdir(path.dirname(outputPath), { recursive: true });
         // Write file
-        await fs.writeFile(outputPath, markdown, "utf-8");
+        await fs.writeFile(outputPath, markdown, 'utf-8');
         console.log(`\n✓ Generated: ${path.relative(config.baseDir, outputPath)}`);
         console.log(`  Categories: ${tagRegistry.categories.length}`);
         console.log(`  Metadata tags: ${tagRegistry.metadataTags.length}`);
@@ -154,13 +154,13 @@ async function main() {
     }
     catch (error) {
         if (error instanceof Error) {
-            console.error("Error:", error.message);
-            if (process.env["DEBUG"]) {
-                console.error("Stack trace:", error.stack);
+            console.error('Error:', error.message);
+            if (process.env['DEBUG']) {
+                console.error('Stack trace:', error.stack);
             }
         }
         else {
-            console.error("Error:", String(error));
+            console.error('Error:', String(error));
         }
         process.exit(1);
     }

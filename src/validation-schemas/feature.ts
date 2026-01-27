@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // =============================================================================
 // RUNTIME GHERKIN TYPES (from Cucumber parser)
@@ -148,7 +148,7 @@ export const GherkinFeatureSchema = z
     /** Tags applied to the feature */
     tags: z.array(z.string()).readonly(),
     /** Language of the feature file (default: 'en') */
-    language: z.string().default("en"),
+    language: z.string().default('en'),
     /** Line number where feature starts */
     line: z.number().int().positive(),
   })
@@ -223,7 +223,7 @@ export type GherkinScanResults = z.infer<typeof GherkinScanResultsSchema>;
  * Uses enum for keyword to enforce valid step types after processing.
  */
 export const ParsedStepSchema = z.object({
-  keyword: z.enum(["Given", "When", "Then", "And", "But"]),
+  keyword: z.enum(['Given', 'When', 'Then', 'And', 'But']),
   text: z.string().min(1),
   dataTable: z.array(z.record(z.string(), z.string())).optional(),
   docString: GherkinDocStringSchema.optional(),

@@ -13,8 +13,6 @@
 
 ## Description
 
-## TagTaxonomyCLI - Tag Registry Documentation Generator
-
 Generates TAG_TAXONOMY.md from tag-registry.json.
 Use to auto-generate comprehensive tag reference documentation.
 

@@ -13,8 +13,6 @@
 
 ## Description
 
-## ADR Document Codec
-
 Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
 Extracts ADRs from patterns with `@libar-docs-adr` tags.
 

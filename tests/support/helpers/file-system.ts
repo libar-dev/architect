@@ -7,9 +7,9 @@
  * @libar-docs
  */
 
-import * as fs from "node:fs/promises";
-import * as os from "node:os";
-import * as path from "node:path";
+import * as fs from 'node:fs/promises';
+import * as os from 'node:os';
+import * as path from 'node:path';
 
 // =============================================================================
 // Types
@@ -54,7 +54,7 @@ export interface TempDirOptions {
  * ```
  */
 export async function createTempDir(options: TempDirOptions = {}): Promise<TempDirContext> {
-  const { prefix = "delivery-process-test-", keepOnCleanup = false } = options;
+  const { prefix = 'delivery-process-test-', keepOnCleanup = false } = options;
 
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
 
@@ -96,7 +96,7 @@ export async function writeTempFile(
  */
 export async function readTempFile(dir: string, relativePath: string): Promise<string> {
   const fullPath = path.join(dir, relativePath);
-  return fs.readFile(fullPath, "utf-8");
+  return fs.readFile(fullPath, 'utf-8');
 }
 
 /**
@@ -172,9 +172,9 @@ export function createTsFileWithDirective(options: {
   includeFileOptIn?: boolean;
 }): string {
   const {
-    category = "core",
+    category = 'core',
     patternName,
-    description = "A test pattern.",
+    description = 'A test pattern.',
     status,
     useCases = [],
     usedBy = [],
@@ -186,12 +186,12 @@ export function createTsFileWithDirective(options: {
 
   // File-level opt-in
   if (includeFileOptIn) {
-    lines.push("/** @libar-docs */");
-    lines.push("");
+    lines.push('/** @libar-docs */');
+    lines.push('');
   }
 
   // Pattern directive
-  lines.push("/**");
+  lines.push('/**');
   lines.push(` * @libar-docs-${category}`);
 
   if (patternName) {
@@ -214,17 +214,17 @@ export function createTsFileWithDirective(options: {
     lines.push(` * @libar-docs-used-by ${usedBy_}`);
   }
 
-  lines.push(" *");
-  lines.push(` * ## ${patternName || "Test Pattern"}`);
-  lines.push(" *");
+  lines.push(' *');
+  lines.push(` * ## ${patternName || 'Test Pattern'}`);
+  lines.push(' *');
   lines.push(` * ${description}`);
-  lines.push(" */");
-  lines.push(`export interface ${(patternName || "TestPattern").replace(/\s+/g, "")} {`);
-  lines.push("  id: string;");
-  lines.push("}");
-  lines.push("");
+  lines.push(' */');
+  lines.push(`export interface ${(patternName || 'TestPattern').replace(/\s+/g, '')} {`);
+  lines.push('  id: string;');
+  lines.push('}');
+  lines.push('');
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**
@@ -241,7 +241,7 @@ export interface RegularType {
 }
 
 /**
- * Create a Gherkin feature file with @libar-process tags.
+ * Create a Gherkin feature file with @libar-docs-* tags.
  *
  * @example
  * ```typescript
@@ -265,37 +265,37 @@ export function createFeatureFile(options: {
 }): string {
   const {
     phase = 1,
-    status = "completed",
-    quarter = "Q4-2025",
-    effort = "1w",
-    team = "platform",
-    name = "Test Feature",
-    description = "A test feature for validation.",
+    status = 'completed',
+    quarter = 'Q4-2025',
+    effort = '1w',
+    team = 'platform',
+    name = 'Test Feature',
+    description = 'A test feature for validation.',
     deliverables = [],
   } = options;
 
   const lines: string[] = [];
 
-  // Process tags
-  lines.push(`@libar-process-phase:${phase}`);
-  lines.push(`@libar-process-status:${status}`);
-  lines.push(`@libar-process-quarter:${quarter}`);
-  lines.push(`@libar-process-effort:${effort}`);
-  lines.push(`@libar-process-team:${team}`);
+  // Process tags (using @libar-docs-* prefix per PDR-004)
+  lines.push(`@libar-docs-phase:${phase}`);
+  lines.push(`@libar-docs-status:${status}`);
+  lines.push(`@libar-docs-quarter:${quarter}`);
+  lines.push(`@libar-docs-effort:${effort}`);
+  lines.push(`@libar-docs-team:${team}`);
   lines.push(`Feature: ${name}`);
   lines.push(`  ${description}`);
-  lines.push("");
+  lines.push('');
 
   if (deliverables.length > 0) {
-    lines.push("  Background:");
-    lines.push("    Given the following deliverables:");
-    lines.push("      | Deliverable | Status | Tests | Location |");
+    lines.push('  Background:');
+    lines.push('    Given the following deliverables:');
+    lines.push('      | Deliverable | Status | Tests | Location |');
     for (const d of deliverables) {
-      lines.push(`      | ${d.name} | ${d.status} | ${d.tests} | ${d.location || ""} |`);
+      lines.push(`      | ${d.name} | ${d.status} | ${d.tests} | ${d.location || ''} |`);
     }
   }
 
-  lines.push("");
+  lines.push('');
 
-  return lines.join("\n");
+  return lines.join('\n');
 }

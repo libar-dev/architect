@@ -18,11 +18,11 @@
  * - Manual DoD checks during code review
  */
 
-import type { Deliverable, ScannedGherkinFile } from "../validation-schemas/index.js";
-import { extractProcessMetadata, extractDeliverables } from "../extractor/dual-source-extractor.js";
-import { normalizeStatus } from "../taxonomy/index.js";
-import type { DoDValidationResult, DoDValidationSummary } from "./types.js";
-import { COMPLETION_PATTERNS } from "./types.js";
+import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
+import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
+import { normalizeStatus } from '../taxonomy/index.js';
+import type { DoDValidationResult, DoDValidationSummary } from './types.js';
+import { COMPLETION_PATTERNS } from './types.js';
 
 /**
  * Check if a deliverable status indicates completion
@@ -65,7 +65,7 @@ export function isDeliverableComplete(deliverable: Deliverable): boolean {
  */
 export function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean {
   return feature.scenarios.some((scenario) =>
-    scenario.tags.some((tag) => tag.toLowerCase() === "acceptance-criteria")
+    scenario.tags.some((tag) => tag.toLowerCase() === 'acceptance-criteria')
   );
 }
 
@@ -77,7 +77,7 @@ export function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean {
  */
 export function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile): readonly string[] {
   return feature.scenarios
-    .filter((scenario) => scenario.tags.some((tag) => tag.toLowerCase() === "acceptance-criteria"))
+    .filter((scenario) => scenario.tags.some((tag) => tag.toLowerCase() === 'acceptance-criteria'))
     .map((scenario) => scenario.name);
 }
 
@@ -119,7 +119,7 @@ export function validateDoDForPhase(
   // Check acceptance criteria
   const missingAcceptanceCriteria = !hasAcceptanceCriteria(feature);
   if (missingAcceptanceCriteria) {
-    messages.push("No @acceptance-criteria scenarios found");
+    messages.push('No @acceptance-criteria scenarios found');
   }
 
   const isDoDMet = allDeliverablesComplete && !missingAcceptanceCriteria && deliverables.length > 0;
@@ -171,7 +171,7 @@ export function validateDoD(
 
     // Only validate completed phases (or phases matching filter)
     const status = normalizeStatus(metadata.status);
-    const isCompleted = status === "completed";
+    const isCompleted = status === 'completed';
 
     // If phase filter specified, validate those specific phases
     // Otherwise, only validate completed phases
@@ -203,18 +203,18 @@ export function validateDoD(
 export function formatDoDSummary(summary: DoDValidationSummary): string {
   const lines: string[] = [];
 
-  lines.push("");
-  lines.push("DoD Validation Summary");
-  lines.push("======================");
-  lines.push("");
+  lines.push('');
+  lines.push('DoD Validation Summary');
+  lines.push('======================');
+  lines.push('');
   lines.push(`Total phases validated: ${summary.totalPhases}`);
   lines.push(`Passed: ${summary.passedPhases}`);
   lines.push(`Failed: ${summary.failedPhases}`);
-  lines.push("");
+  lines.push('');
 
   if (summary.results.length === 0) {
-    lines.push("No completed phases found to validate.");
-    return lines.join("\n");
+    lines.push('No completed phases found to validate.');
+    return lines.join('\n');
   }
 
   // Group by pass/fail
@@ -222,28 +222,28 @@ export function formatDoDSummary(summary: DoDValidationSummary): string {
   const failed = summary.results.filter((r) => !r.isDoDMet);
 
   if (failed.length > 0) {
-    lines.push("Failed Phases:");
+    lines.push('Failed Phases:');
     for (const result of failed) {
       lines.push(`  [FAIL] Phase ${result.phase}: ${result.patternName}`);
       for (const msg of result.messages) {
-        if (!msg.startsWith("DoD met")) {
+        if (!msg.startsWith('DoD met')) {
           lines.push(`         ${msg}`);
         }
       }
     }
-    lines.push("");
+    lines.push('');
   }
 
   if (passed.length > 0) {
-    lines.push("Passed Phases:");
+    lines.push('Passed Phases:');
     for (const result of passed) {
       const deliverableCount = result.deliverables.length;
       lines.push(
         `  [PASS] Phase ${result.phase}: ${result.patternName} (${deliverableCount} deliverables)`
       );
     }
-    lines.push("");
+    lines.push('');
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }

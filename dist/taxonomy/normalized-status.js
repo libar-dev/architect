@@ -23,32 +23,26 @@
  * - active: Work in progress
  * - planned: Future work (includes roadmap and deferred)
  */
-export const NORMALIZED_STATUS_VALUES = ["completed", "active", "planned"];
+export const NORMALIZED_STATUS_VALUES = ['completed', 'active', 'planned'];
 /**
  * Maps raw status values → normalized display status
  *
  * Includes both:
- * - Current taxonomy values (per PDR-005)
- * - Legacy values (for display backward compatibility)
+ * Canonical taxonomy values (per PDR-005 FSM)
  */
 export const STATUS_NORMALIZATION_MAP = {
-    // Current taxonomy values (per PDR-005 FSM)
-    completed: "completed",
-    active: "active",
-    roadmap: "planned",
-    deferred: "planned",
-    // Legacy values (for display backward compat with existing data)
-    implemented: "completed",
-    partial: "active",
-    "in-progress": "active",
-    planned: "planned",
+    completed: 'completed',
+    active: 'active',
+    roadmap: 'planned',
+    deferred: 'planned',
+    planned: 'planned',
 };
 /**
  * Normalize any status string to a display bucket
  *
- * Maps various status values to three canonical display states:
- * - "completed": implemented, completed
- * - "active": active, partial, in-progress
+ * Maps status values to three canonical display states:
+ * - "completed": completed
+ * - "active": active
  * - "planned": roadmap, deferred, planned, or any unknown value
  *
  * Per PDR-005: deferred items are treated as planned (not actively worked on)
@@ -59,9 +53,7 @@ export const STATUS_NORMALIZATION_MAP = {
  * @example
  * ```typescript
  * normalizeStatus("completed")   // → "completed"
- * normalizeStatus("implemented") // → "completed" (legacy)
  * normalizeStatus("active")      // → "active"
- * normalizeStatus("partial")     // → "active" (legacy)
  * normalizeStatus("roadmap")     // → "planned"
  * normalizeStatus("deferred")    // → "planned"
  * normalizeStatus(undefined)     // → "planned"
@@ -69,7 +61,7 @@ export const STATUS_NORMALIZATION_MAP = {
  */
 export function normalizeStatus(status) {
     if (!status)
-        return "planned";
-    return STATUS_NORMALIZATION_MAP[status.toLowerCase()] ?? "planned";
+        return 'planned';
+    return STATUS_NORMALIZATION_MAP[status.toLowerCase()] ?? 'planned';
 }
 //# sourceMappingURL=normalized-status.js.map

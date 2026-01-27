@@ -27,27 +27,27 @@
  * - **Deterministic IDs**: MD5 hash of file path + line number ensures stable identifiers
  */
 
-import * as path from "path";
-import type { ScannedFile } from "../scanner/index.js";
+import * as path from 'path';
+import type { ScannedFile } from '../scanner/index.js';
 import type {
   ExtractedPattern,
   DocDirective,
   ExportInfo,
   PatternValidationError,
-} from "../types/index.js";
-import { Result } from "../types/index.js";
+} from '../types/index.js';
+import { Result } from '../types/index.js';
 import {
   asPatternId,
   asCategoryName,
   asSourceFilePath,
   createPatternValidationError,
-} from "../types/index.js";
+} from '../types/index.js';
 import {
   ExtractedPatternSchema,
   createDefaultTagRegistry,
   type TagRegistry,
-} from "../validation-schemas/index.js";
-import { generatePatternId } from "../utils/index.js";
+} from '../validation-schemas/index.js';
+import { generatePatternId } from '../utils/index.js';
 
 /**
  * Results of pattern extraction with error collection
@@ -208,12 +208,12 @@ export function buildPattern(
 
   if (!validation.success) {
     const errorMessages = validation.error.issues.map(
-      (issue) => `${issue.path.join(".")}: ${issue.message}`
+      (issue) => `${issue.path.join('.')}: ${issue.message}`
     );
     const error = createPatternValidationError(
       asSourceFilePath(relativePath),
       name,
-      "Pattern validation failed",
+      'Pattern validation failed',
       errorMessages
     );
     return Result.err(error);
@@ -282,11 +282,11 @@ export function inferPatternName(
   }
 
   // Priority 2: Try to extract name from first line of description
-  const lines = directive.description.split("\n");
+  const lines = directive.description.split('\n');
   const firstLine = lines[0];
-  if (firstLine?.trim() && !firstLine.trim().startsWith("@")) {
+  if (firstLine?.trim() && !firstLine.trim().startsWith('@')) {
     // Strip markdown header prefixes (##, ###, etc.)
-    const cleanedName = firstLine.trim().replace(/^#+\s*/, "");
+    const cleanedName = firstLine.trim().replace(/^#+\s*/, '');
     if (cleanedName) {
       return cleanedName;
     }
@@ -301,7 +301,7 @@ export function inferPatternName(
   // Last resort: generate from tags using registry prefix
   const tagPrefix = registry.tagPrefix;
   const firstTag = directive.tags[0] as string | undefined;
-  const primaryTag = firstTag?.replace(tagPrefix, "") ?? "unknown";
+  const primaryTag = firstTag?.replace(tagPrefix, '') ?? 'unknown';
   return `${primaryTag}-pattern`;
 }
 
@@ -369,12 +369,12 @@ export function inferCategory(tags: readonly string[], registry: TagRegistry): s
     } else {
       // Check all possible contiguous subsequences for category matches
       // e.g., for "utils-validation" check: "utils-validation", "utils", "validation"
-      const parts = withoutPrefix.split("-");
+      const parts = withoutPrefix.split('-');
 
       // Try all contiguous subsequences from longest to shortest
       for (let len = parts.length; len > 0; len--) {
         for (let start = 0; start <= parts.length - len; start++) {
-          const candidate = parts.slice(start, start + len).join("-");
+          const candidate = parts.slice(start, start + len).join('-');
           if (priorityMap.has(candidate)) {
             matches.push(candidate);
           }
@@ -409,14 +409,14 @@ export function inferCategory(tags: readonly string[], registry: TagRegistry): s
   const firstTag = tags[0];
   if (firstTag?.startsWith(prefix) === true) {
     const withoutPrefix = firstTag.substring(prefix.length);
-    const parts = withoutPrefix.split("-");
+    const parts = withoutPrefix.split('-');
     const firstPart = parts[0];
     if (firstPart) {
       return firstPart;
     }
   }
 
-  return "uncategorized";
+  return 'uncategorized';
 }
 
 /**
@@ -486,8 +486,8 @@ export function getAggregationTags(
   registry: TagRegistry
 ): AggregationTags {
   return {
-    overview: hasAggregationTag(tags, "overview", registry),
-    decision: hasAggregationTag(tags, "decision", registry),
-    intro: hasAggregationTag(tags, "intro", registry),
+    overview: hasAggregationTag(tags, 'overview', registry),
+    decision: hasAggregationTag(tags, 'decision', registry),
+    intro: hasAggregationTag(tags, 'intro', registry),
   };
 }

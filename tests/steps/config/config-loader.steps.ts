@@ -8,18 +8,18 @@
  * @libar-docs
  */
 
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-import * as fs from "fs/promises";
-import * as os from "os";
-import * as path from "path";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
 import {
   findConfigFile,
   loadConfig,
   formatConfigError,
   type ConfigLoadError,
   type ConfigLoadResult,
-} from "../../../src/config/config-loader.js";
+} from '../../../src/config/config-loader.js';
 
 // =============================================================================
 // Types
@@ -72,7 +72,7 @@ function initState(): ConfigLoaderState {
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature("tests/features/config/config-loader.feature");
+const feature = await loadFeature('tests/features/config/config-loader.feature');
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -91,9 +91,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Background(({ Given }) => {
-    Given("a config loader test context with temp directory", async () => {
+    Given('a config loader test context with temp directory', async () => {
       state = initState();
-      state.tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "config-loader-test-"));
+      state.tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'config-loader-test-'));
     });
   });
 
@@ -101,17 +101,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Config File Discovery
   // ===========================================================================
 
-  Rule("Config files are discovered by walking up directories", ({ RuleScenario }) => {
-    RuleScenario("Find config file in current directory", ({ Given, When, Then, And }) => {
-      Given("a directory structure:", async (_ctx: unknown, table: DataTableRow[]) => {
+  Rule('Config files are discovered by walking up directories', ({ RuleScenario }) => {
+    RuleScenario('Find config file in current directory', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', async (_ctx: unknown, table: DataTableRow[]) => {
         await createDirectoryStructure(table);
       });
 
-      When("finding config file from the base directory", async () => {
+      When('finding config file from the base directory', async () => {
         state!.configPath = await findConfigFile(state!.tempDir!);
       });
 
-      Then("config file should be found", () => {
+      Then('config file should be found', () => {
         expect(state!.configPath).not.toBeNull();
       });
 
@@ -120,17 +120,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario("Find config file in parent directory", ({ Given, When, Then, And }) => {
-      Given("a directory structure:", async (_ctx: unknown, table: DataTableRow[]) => {
+    RuleScenario('Find config file in parent directory', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', async (_ctx: unknown, table: DataTableRow[]) => {
         await createDirectoryStructure(table);
       });
 
       When('finding config file from "nested/src"', async () => {
-        const searchDir = path.join(state!.tempDir!, "nested/src");
+        const searchDir = path.join(state!.tempDir!, 'nested/src');
         state!.configPath = await findConfigFile(searchDir);
       });
 
-      Then("config file should be found", () => {
+      Then('config file should be found', () => {
         expect(state!.configPath).not.toBeNull();
       });
 
@@ -139,16 +139,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario("Prefer TypeScript config over JavaScript", ({ Given, When, Then, And }) => {
-      Given("a directory structure:", async (_ctx: unknown, table: DataTableRow[]) => {
+    RuleScenario('Prefer TypeScript config over JavaScript', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', async (_ctx: unknown, table: DataTableRow[]) => {
         await createDirectoryStructure(table);
       });
 
-      When("finding config file from the base directory", async () => {
+      When('finding config file from the base directory', async () => {
         state!.configPath = await findConfigFile(state!.tempDir!);
       });
 
-      Then("config file should be found", () => {
+      Then('config file should be found', () => {
         expect(state!.configPath).not.toBeNull();
       });
 
@@ -157,17 +157,17 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
     });
 
-    RuleScenario("Return null when no config file exists", ({ Given, When, Then }) => {
-      Given("a directory structure:", async (_ctx: unknown, table: DataTableRow[]) => {
+    RuleScenario('Return null when no config file exists', ({ Given, When, Then }) => {
+      Given('a directory structure:', async (_ctx: unknown, table: DataTableRow[]) => {
         await createDirectoryStructure(table);
       });
 
       When('finding config file from "src"', async () => {
-        const searchDir = path.join(state!.tempDir!, "src");
+        const searchDir = path.join(state!.tempDir!, 'src');
         state!.configPath = await findConfigFile(searchDir);
       });
 
-      Then("config file should NOT be found", () => {
+      Then('config file should NOT be found', () => {
         expect(state!.configPath).toBeNull();
       });
     });
@@ -177,24 +177,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Repo Root Boundary
   // ===========================================================================
 
-  Rule("Config discovery stops at repo root", ({ RuleScenario }) => {
-    RuleScenario("Stop at .git directory marker", ({ Given, When, Then, And }) => {
-      Given("a directory structure:", async (_ctx: unknown, table: DataTableRow[]) => {
+  Rule('Config discovery stops at repo root', ({ RuleScenario }) => {
+    RuleScenario('Stop at .git directory marker', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', async (_ctx: unknown, table: DataTableRow[]) => {
         await createDirectoryStructure(table);
       });
 
       When('finding config file from "project/nested/src"', async () => {
-        const searchDir = path.join(state!.tempDir!, "project/nested/src");
+        const searchDir = path.join(state!.tempDir!, 'project/nested/src');
         state!.configPath = await findConfigFile(searchDir);
       });
 
-      Then("config file should be found", () => {
+      Then('config file should be found', () => {
         expect(state!.configPath).not.toBeNull();
       });
 
       And('config path should NOT contain "project/nested"', () => {
         // Config should be found at root, not in nested path
-        expect(state!.configPath!).not.toContain("project/nested");
+        expect(state!.configPath!).not.toContain('project/nested');
       });
     });
   });
@@ -203,32 +203,32 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Config Loading
   // ===========================================================================
 
-  Rule("Config is loaded and validated", ({ RuleScenario }) => {
-    RuleScenario("Load valid config with default fallback", ({ Given, When, Then, And }) => {
-      Given("no config file exists", () => {
+  Rule('Config is loaded and validated', ({ RuleScenario }) => {
+    RuleScenario('Load valid config with default fallback', ({ Given, When, Then, And }) => {
+      Given('no config file exists', () => {
         // temp dir has no config file - this is the default state
       });
 
-      When("loading config from base directory", async () => {
+      When('loading config from base directory', async () => {
         state!.configResult = await loadConfig(state!.tempDir!);
       });
 
-      Then("config loading should succeed", () => {
+      Then('config loading should succeed', () => {
         expect(state!.configResult!.ok).toBe(true);
       });
 
-      And("loaded config should be the default", () => {
-        if (!state!.configResult!.ok) throw new Error("Expected success");
+      And('loaded config should be the default', () => {
+        if (!state!.configResult!.ok) throw new Error('Expected success');
         expect(state!.configResult!.value.isDefault).toBe(true);
       });
 
       And('loaded registry tagPrefix should be "@libar-docs-"', () => {
-        if (!state!.configResult!.ok) throw new Error("Expected success");
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe("@libar-docs-");
+        if (!state!.configResult!.ok) throw new Error('Expected success');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@libar-docs-');
       });
     });
 
-    RuleScenario("Load valid config file", ({ Given, When, Then, And }) => {
+    RuleScenario('Load valid config file', ({ Given, When, Then, And }) => {
       Given('a valid config file with preset "generic"', async () => {
         // Create a config file that uses generic preset
         // We need to create a minimal working config that can be imported
@@ -253,66 +253,66 @@ export default {
   }
 };
 `.trim();
-        const configPath = path.join(state!.tempDir!, "delivery-process.config.js");
+        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
         await fs.writeFile(configPath, configContent);
       });
 
-      When("loading config from base directory", async () => {
+      When('loading config from base directory', async () => {
         state!.configResult = await loadConfig(state!.tempDir!);
       });
 
-      Then("config loading should succeed", () => {
+      Then('config loading should succeed', () => {
         expect(state!.configResult!.ok).toBe(true);
       });
 
-      And("loaded config should NOT be the default", () => {
-        if (!state!.configResult!.ok) throw new Error("Expected success");
+      And('loaded config should NOT be the default', () => {
+        if (!state!.configResult!.ok) throw new Error('Expected success');
         expect(state!.configResult!.value.isDefault).toBe(false);
       });
 
       And('loaded registry tagPrefix should be "@docs-"', () => {
-        if (!state!.configResult!.ok) throw new Error("Expected success");
-        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe("@docs-");
+        if (!state!.configResult!.ok) throw new Error('Expected success');
+        expect(state!.configResult!.value.instance.registry.tagPrefix).toBe('@docs-');
       });
     });
 
-    RuleScenario("Error on config without default export", ({ Given, When, Then, And }) => {
-      Given("a config file without default export", async () => {
-        const configPath = path.join(state!.tempDir!, "delivery-process.config.js");
+    RuleScenario('Error on config without default export', ({ Given, When, Then, And }) => {
+      Given('a config file without default export', async () => {
+        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
         await fs.writeFile(configPath, NO_DEFAULT_EXPORT_CONFIG);
       });
 
-      When("loading config from base directory", async () => {
+      When('loading config from base directory', async () => {
         state!.configResult = await loadConfig(state!.tempDir!);
       });
 
-      Then("config loading should fail", () => {
+      Then('config loading should fail', () => {
         expect(state!.configResult!.ok).toBe(false);
       });
 
       And('config error message should contain "default export"', () => {
-        if (state!.configResult!.ok) throw new Error("Expected failure");
-        expect(state!.configResult!.error.message.toLowerCase()).toContain("default export");
+        if (state!.configResult!.ok) throw new Error('Expected failure');
+        expect(state!.configResult!.error.message.toLowerCase()).toContain('default export');
       });
     });
 
-    RuleScenario("Error on config with wrong type", ({ Given, When, Then, And }) => {
-      Given("a config file exporting wrong type", async () => {
-        const configPath = path.join(state!.tempDir!, "delivery-process.config.js");
+    RuleScenario('Error on config with wrong type', ({ Given, When, Then, And }) => {
+      Given('a config file exporting wrong type', async () => {
+        const configPath = path.join(state!.tempDir!, 'delivery-process.config.js');
         await fs.writeFile(configPath, WRONG_TYPE_CONFIG);
       });
 
-      When("loading config from base directory", async () => {
+      When('loading config from base directory', async () => {
         state!.configResult = await loadConfig(state!.tempDir!);
       });
 
-      Then("config loading should fail", () => {
+      Then('config loading should fail', () => {
         expect(state!.configResult!.ok).toBe(false);
       });
 
       And('config error message should contain "DeliveryProcessInstance"', () => {
-        if (state!.configResult!.ok) throw new Error("Expected failure");
-        expect(state!.configResult!.error.message).toContain("DeliveryProcessInstance");
+        if (state!.configResult!.ok) throw new Error('Expected failure');
+        expect(state!.configResult!.error.message).toContain('DeliveryProcessInstance');
       });
     });
   });
@@ -321,33 +321,30 @@ export default {
   // Error Formatting
   // ===========================================================================
 
-  Rule("Config errors are formatted for display", ({ RuleScenario }) => {
-    RuleScenario("Format error with path and message", ({ Given, When, Then, And }) => {
-      Given(
-        'a config load error with path "/test/config.ts" and message "Invalid export"',
-        () => {
-          state!.error = {
-            type: "config-load-error",
-            path: "/test/config.ts",
-            message: "Invalid export",
-          };
-        }
-      );
+  Rule('Config errors are formatted for display', ({ RuleScenario }) => {
+    RuleScenario('Format error with path and message', ({ Given, When, Then, And }) => {
+      Given('a config load error with path "/test/config.ts" and message "Invalid export"', () => {
+        state!.error = {
+          type: 'config-load-error',
+          path: '/test/config.ts',
+          message: 'Invalid export',
+        };
+      });
 
-      When("formatting the config error", () => {
+      When('formatting the config error', () => {
         state!.formattedError = formatConfigError(state!.error!);
       });
 
       Then('formatted error should contain "Config error"', () => {
-        expect(state!.formattedError!).toContain("Config error");
+        expect(state!.formattedError!).toContain('Config error');
       });
 
       And('formatted error should contain "/test/config.ts"', () => {
-        expect(state!.formattedError!).toContain("/test/config.ts");
+        expect(state!.formattedError!).toContain('/test/config.ts');
       });
 
       And('formatted error should contain "Invalid export"', () => {
-        expect(state!.formattedError!).toContain("Invalid export");
+        expect(state!.formattedError!).toContain('Invalid export');
       });
     });
   });
@@ -361,7 +358,7 @@ export default {
  * Create directory structure from DataTable
  */
 async function createDirectoryStructure(table: DataTableRow[]): Promise<void> {
-  if (!state?.tempDir) throw new Error("State not initialized");
+  if (!state?.tempDir) throw new Error('State not initialized');
 
   for (const row of table) {
     const filePath = path.join(state.tempDir, row.path);
@@ -370,15 +367,15 @@ async function createDirectoryStructure(table: DataTableRow[]): Promise<void> {
     // Determine content based on type
     let content: string;
     switch (row.type) {
-      case "config":
+      case 'config':
         content = VALID_GENERIC_CONFIG;
         break;
-      case "git":
-        content = "[core]\n\trepositoryformatversion = 0";
+      case 'git':
+        content = '[core]\n\trepositoryformatversion = 0';
         break;
-      case "source":
+      case 'source':
       default:
-        content = "// source file";
+        content = '// source file';
         break;
     }
 

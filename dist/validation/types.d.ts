@@ -16,9 +16,9 @@
  * - When extending anti-pattern detection rules
  * - When consuming validation results in CLI or reports
  */
-import { z } from "zod";
-import type { Deliverable } from "../validation-schemas/dual-source.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
+import { z } from 'zod';
+import type { Deliverable } from '../validation-schemas/dual-source.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 /**
  * Base interface for options that accept a TagRegistry for prefix-aware behavior.
  *
@@ -50,7 +50,7 @@ export interface WithTagRegistry {
  * Each ID corresponds to a specific violation of the dual-source
  * documentation architecture or process hygiene.
  */
-export type AntiPatternId = "tag-duplication" | "process-in-code" | "magic-comments" | "scenario-bloat" | "mega-feature";
+export type AntiPatternId = 'tag-duplication' | 'process-in-code' | 'magic-comments' | 'scenario-bloat' | 'mega-feature';
 /**
  * Zod schema for anti-pattern thresholds
  *
@@ -82,7 +82,7 @@ export interface AntiPatternViolation {
     /** Line number (if applicable) */
     readonly line?: number;
     /** Severity (error = architectural violation, warning = hygiene issue) */
-    readonly severity: "error" | "warning";
+    readonly severity: 'error' | 'warning';
     /** Fix guidance */
     readonly fix?: string;
 }

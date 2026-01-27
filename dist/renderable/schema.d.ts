@@ -16,7 +16,7 @@
  * - Content: table, list, code, mermaid
  * - Progressive: collapsible, link-out
  */
-import { z } from "zod";
+import { z } from 'zod';
 /** Heading block - markdown headers */
 export declare const HeadingBlockSchema: z.ZodObject<{
     type: z.ZodLiteral<"heading">;
@@ -140,7 +140,7 @@ export type ListBlock = z.infer<typeof ListBlockSchema>;
 export type CodeBlock = z.infer<typeof CodeBlockSchema>;
 export type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
 export type CollapsibleBlock = {
-    type: "collapsible";
+    type: 'collapsible';
     summary: string;
     content: SectionBlock[];
 };

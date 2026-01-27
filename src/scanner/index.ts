@@ -1,4 +1,4 @@
-import * as fs from "fs/promises";
+import * as fs from 'fs/promises';
 import type {
   Result,
   ScannerConfig,
@@ -6,11 +6,11 @@ import type {
   ExportInfo,
   FileParseError,
   DirectiveValidationError,
-} from "../types/index.js";
-import { Result as R, createFileParseError } from "../types/index.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import { parseFileDirectives } from "./ast-parser.js";
-import { findFilesToScan, hasDocDirectives, hasFileOptIn } from "./pattern-scanner.js";
+} from '../types/index.js';
+import { Result as R, createFileParseError } from '../types/index.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import { parseFileDirectives } from './ast-parser.js';
+import { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
 
 /**
  * Result of scanning a single file
@@ -69,11 +69,11 @@ export interface ScanResults {
  *
  * @example
  * ```typescript
- * const registry = await loadTagRegistry('tag-registry.json');
+ * const config = await loadConfig();
  * const result = await scanPatterns({
  *   patterns: ['src/**\/*.ts'],
  *   baseDir: '/path/to/project'
- * }, registry);
+ * }, config.tagRegistry);
  *
  * if (result.ok) {
  *   const { files, errors } = result.value;
@@ -109,7 +109,7 @@ export async function scanPatterns(
   for (const filePath of files) {
     try {
       // Read file content once - passed to all functions (no double read!)
-      const content = await fs.readFile(filePath, "utf-8");
+      const content = await fs.readFile(filePath, 'utf-8');
 
       // Check for file-level opt-in (requires opt-in tag from registry)
       if (!hasFileOptIn(content, registry)) continue;
@@ -166,5 +166,5 @@ export async function scanPatterns(
   });
 }
 
-export { findFilesToScan, hasDocDirectives, hasFileOptIn } from "./pattern-scanner.js";
-export { parseFileDirectives, type ParseDirectivesResult } from "./ast-parser.js";
+export { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
+export { parseFileDirectives, type ParseDirectivesResult } from './ast-parser.js';

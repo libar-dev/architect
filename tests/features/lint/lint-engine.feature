@@ -22,7 +22,7 @@ Feature: Lint Engine
     Given a directive with all required fields:
       | field       | value                                      |
       | patternName | TestPattern                                |
-      | status      | implemented                                |
+      | status      | completed                                  |
       | whenToUse   | When testing                               |
       | uses        | OtherPattern                               |
       | description | A meaningful description for testing.      |

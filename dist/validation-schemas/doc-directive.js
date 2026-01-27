@@ -15,22 +15,22 @@
  * - Use when parsing JSDoc comments for @libar-docs-* tags
  * - Use when validating directive structure at boundaries
  */
-import { z } from "zod";
-import { ACCEPTED_STATUS_VALUES, PROCESS_STATUS_VALUES, } from "../taxonomy/index.js";
-import { asDirectiveTag } from "../types/branded.js";
+import { z } from 'zod';
+import { ACCEPTED_STATUS_VALUES, PROCESS_STATUS_VALUES, } from '../taxonomy/index.js';
+import { asDirectiveTag } from '../types/branded.js';
 /**
  * Position information for a directive in source code
  */
 export const PositionSchema = z
     .object({
     /** Starting line number (1-indexed) */
-    startLine: z.number().int().positive("Line numbers must be positive"),
+    startLine: z.number().int().positive('Line numbers must be positive'),
     /** Ending line number (1-indexed) */
-    endLine: z.number().int().positive("Line numbers must be positive"),
+    endLine: z.number().int().positive('Line numbers must be positive'),
 })
     .strict()
     .refine((pos) => pos.endLine >= pos.startLine, {
-    message: "End line must be >= start line",
+    message: 'End line must be >= start line',
 });
 /**
  * Creates a DirectiveTag schema for a given tag prefix.
@@ -54,7 +54,7 @@ export const PositionSchema = z
 export function createDirectiveTagSchema(tagPrefix) {
     return z
         .string()
-        .min(1, "Tag cannot be empty")
+        .min(1, 'Tag cannot be empty')
         .refine((tag) => tag.startsWith(tagPrefix), {
         message: `Tags must start with ${tagPrefix}`,
     })
@@ -66,7 +66,7 @@ export function createDirectiveTagSchema(tagPrefix) {
  *
  * For custom prefixes, use createDirectiveTagSchema().
  */
-const DirectiveTagSchema = createDirectiveTagSchema("@libar-docs-");
+const DirectiveTagSchema = createDirectiveTagSchema('@libar-docs-');
 /**
  * Default status values for pattern implementation state
  *
@@ -104,13 +104,13 @@ export const PatternStatusSchema = AcceptedPatternStatusSchema;
  *
  * @example
  * ```typescript
- * const registry = await loadTagRegistry("tag-registry.json", "/project");
- * const statusSchema = createPatternStatusSchema(registry);
- * const result = statusSchema.safeParse("implemented"); // Validates against registry values
+ * const config = await loadConfig();
+ * const statusSchema = createPatternStatusSchema(config.tagRegistry);
+ * const result = statusSchema.safeParse("completed"); // Validates against registry values
  * ```
  */
 export function createPatternStatusSchema(registry) {
-    const statusTag = registry.metadataTags.find((t) => t.tag === "status");
+    const statusTag = registry.metadataTags.find((t) => t.tag === 'status');
     if (statusTag?.values && statusTag.values.length > 0) {
         // Zod enum requires at least one value, and the type is [string, ...string[]]
         const [first, ...rest] = statusTag.values;
@@ -142,7 +142,7 @@ export const DocDirectiveSchema = z
     /** Tags found in comment (e.g., ['@libar-docs-core', '@libar-docs-types']). Empty allowed for Gherkin-sourced patterns. */
     tags: z.array(DirectiveTagSchema).readonly(),
     /** Full description text from JSDoc (defaults to empty for tag-only directives) */
-    description: z.string().default(""),
+    description: z.string().default(''),
     /** Examples found in JSDoc @example tags */
     examples: z.array(z.string()).readonly().default([]),
     /** Position in source file */
@@ -177,19 +177,19 @@ export const DocDirectiveSchema = z
     seeAlso: z.array(z.string()).readonly().optional(),
     /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
     apiRef: z.array(z.string()).readonly().optional(),
-    /** Delivery quarter for timeline workflow (from @libar-process-quarter tag) */
+    /** Delivery quarter for timeline workflow (from @libar-docs-quarter tag) */
     quarter: z.string().optional(),
-    /** Completion date for timeline workflow (from @libar-process-completed tag) */
+    /** Completion date for timeline workflow (from @libar-docs-completed tag) */
     completed: z.string().optional(),
-    /** Effort estimate for timeline workflow (from @libar-process-effort tag) */
+    /** Effort estimate for timeline workflow (from @libar-docs-effort tag) */
     effort: z.string().optional(),
-    /** Responsible team for process workflow (from @libar-process-team tag) */
+    /** Responsible team for process workflow (from @libar-docs-team tag) */
     team: z.string().optional(),
-    /** Workflow/discipline for process workflow (from @libar-process-workflow tag) */
+    /** Workflow/discipline for process workflow (from @libar-docs-workflow tag) */
     workflow: z.string().optional(),
-    /** Risk level for process workflow (from @libar-process-risk tag) */
+    /** Risk level for process workflow (from @libar-docs-risk tag) */
     risk: z.string().optional(),
-    /** Priority level for process workflow (from @libar-process-priority tag) */
+    /** Priority level for process workflow (from @libar-docs-priority tag) */
     priority: z.string().optional(),
     // Architecture diagram generation fields (from @libar-docs-arch-* tags)
     /** Architectural role for diagram generation (from @libar-docs-arch-role tag) */

@@ -13,8 +13,6 @@
 
 ## Description
 
-## Codec-Based Generator
-
 Adapts the new RenderableDocument Model (RDM) codec system to the
 existing DocumentGenerator interface. This allows codec-based document
 generation to work seamlessly with the existing orchestrator.

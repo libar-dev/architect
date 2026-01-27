@@ -17,7 +17,7 @@
  * - Use locally to check annotations before committing
  * - Use with `--strict` flag to treat warnings as errors
  */
-import { type LintSeverity } from "../lint/index.js";
+import { type LintSeverity } from '../lint/index.js';
 /**
  * CLI configuration
  */
@@ -31,13 +31,11 @@ export interface LintCLIConfig {
     /** Treat warnings as errors */
     strict: boolean;
     /** Output format */
-    format: "pretty" | "json";
+    format: 'pretty' | 'json';
     /** Only show errors (suppress warnings/info) */
     quiet: boolean;
     /** Minimum severity to report */
     minSeverity: LintSeverity;
-    /** Path to tag registry JSON (auto-discovers if not specified) */
-    tagRegistryPath: string | null;
     /** Show help */
     help: boolean;
     /** Show version */

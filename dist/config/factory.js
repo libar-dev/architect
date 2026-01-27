@@ -17,10 +17,10 @@
  * - When switching between different tag prefixes
  * - When customizing the taxonomy for a specific project
  */
-import { buildRegistry } from "../taxonomy/registry-builder.js";
-import { mergeTagRegistries } from "../validation-schemas/tag-registry.js";
-import { createRegexBuilders } from "./regex-builders.js";
-import { DDD_ES_CQRS_PRESET, PRESETS } from "./presets.js";
+import { buildRegistry } from '../taxonomy/registry-builder.js';
+import { mergeTagRegistries } from '../validation-schemas/tag-registry.js';
+import { createRegexBuilders } from './regex-builders.js';
+import { DDD_ES_CQRS_PRESET, PRESETS } from './presets.js';
 /**
  * Creates a configured delivery process instance.
  *

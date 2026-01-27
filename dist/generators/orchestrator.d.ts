@@ -27,8 +27,8 @@
  * - **Generator Registry**: Looks up registered generators by name
  * - **Result Monad**: Returns detailed errors for partial failures
  */
-import type { TagRegistry, ExtractedPattern } from "../validation-schemas/index.js";
-import type { Result } from "../types/index.js";
+import type { TagRegistry, ExtractedPattern } from '../validation-schemas/index.js';
+import type { Result } from '../types/index.js';
 /**
  * Options for documentation generation
  */
@@ -41,12 +41,6 @@ export interface GenerateOptions {
     baseDir: string;
     /** Output directory for generated files */
     outputDir: string;
-    /**
-     * @deprecated Since v1.0.0 - Use `delivery-process.config.ts` files instead.
-     * Config discovery now uses TypeScript configuration files.
-     * This option is ignored.
-     */
-    tagRegistryPath?: string | null;
     /** Generator names to run (e.g., ['patterns', 'adrs']) */
     generators: string[];
     /** Overwrite existing files (default: false) */
@@ -106,7 +100,7 @@ export interface GeneratedFile {
  * Generation error
  */
 export interface GenerationError {
-    type: "scan" | "extraction" | "generator" | "file-write";
+    type: 'scan' | 'extraction' | 'generator' | 'file-write';
     message: string;
     generator?: string;
     filePath?: string;
@@ -124,7 +118,7 @@ export interface WarningDetail {
  * Generation warning
  */
 export interface GenerationWarning {
-    type: "scan" | "extraction" | "overwrite-skipped" | "config" | "cleanup";
+    type: 'scan' | 'extraction' | 'overwrite-skipped' | 'config' | 'cleanup';
     message: string;
     count?: number;
     filePath?: string;

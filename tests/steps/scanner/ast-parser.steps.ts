@@ -8,18 +8,18 @@
  * @libar-docs
  */
 
-import { expect } from "vitest";
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
+import { expect } from 'vitest';
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 
-import { parseFileDirectives } from "../../../src/scanner/ast-parser.js";
-import { Result } from "../../../src/types/index.js";
-import { createTempDir, writeTempFile } from "../../support/helpers/file-system.js";
+import { parseFileDirectives } from '../../../src/scanner/ast-parser.js';
+import { Result } from '../../../src/types/index.js';
+import { createTempDir, writeTempFile } from '../../support/helpers/file-system.js';
 import type {
   AstParserScenarioState,
   ParsedDirectiveResult,
   DataTableRow,
-} from "../../support/world.js";
-import { initAstParserState } from "../../support/world.js";
+} from '../../support/world.js';
+import { initAstParserState } from '../../support/world.js';
 
 // =============================================================================
 // Module-Level State
@@ -31,7 +31,7 @@ let state: AstParserScenarioState | null = null;
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature("tests/features/scanner/ast-parser.feature");
+const feature = await loadFeature('tests/features/scanner/ast-parser.feature');
 
 describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -51,8 +51,8 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Background(({ Given }) => {
-    Given("a scanner context with temp directory", async () => {
-      const tempContext = await createTempDir({ prefix: "ast-parser-test-" });
+    Given('a scanner context with temp directory', async () => {
+      const tempContext = await createTempDir({ prefix: 'ast-parser-test-' });
       state = {
         ...initAstParserState(),
         tempDir: tempContext.tempDir,
@@ -66,28 +66,28 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const givenTypeScriptFileWithContent = async (_ctx: unknown, content: string) => {
-    if (!state?.tempDir) throw new Error("State not initialized");
+    if (!state?.tempDir) throw new Error('State not initialized');
 
     // Trim the content and normalize line endings
     const normalizedContent = content.trim();
     state.fileContent = normalizedContent;
-    state.filePath = await writeTempFile(state.tempDir, "test.ts", normalizedContent);
+    state.filePath = await writeTempFile(state.tempDir, 'test.ts', normalizedContent);
   };
 
   const givenMalformedTypeScriptFile = async (_ctx: unknown, content: string) => {
-    if (!state?.tempDir) throw new Error("State not initialized");
+    if (!state?.tempDir) throw new Error('State not initialized');
 
     // Keep malformed content as-is (don't trim - preserves broken syntax)
     const normalizedContent = content.trim();
     state.fileContent = normalizedContent;
-    state.filePath = await writeTempFile(state.tempDir, "malformed.ts", normalizedContent);
+    state.filePath = await writeTempFile(state.tempDir, 'malformed.ts', normalizedContent);
   };
 
   const givenEmptyTypeScriptFile = async () => {
-    if (!state?.tempDir) throw new Error("State not initialized");
+    if (!state?.tempDir) throw new Error('State not initialized');
 
-    state.fileContent = "";
-    state.filePath = await writeTempFile(state.tempDir, "empty.ts", "");
+    state.fileContent = '';
+    state.filePath = await writeTempFile(state.tempDir, 'empty.ts', '');
   };
 
   // ---------------------------------------------------------------------------
@@ -95,7 +95,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const whenFileIsParsed = () => {
-    if (!state?.filePath) throw new Error("File path not set");
+    if (!state?.filePath) throw new Error('File path not set');
 
     const result = parseFileDirectives(state.fileContent, state.filePath);
 
@@ -116,7 +116,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenDirectiveCountShouldBe = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives).toHaveLength(count);
   };
 
@@ -125,12 +125,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenDirectiveShouldHaveTag = (_ctx: unknown, tag: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.tags).toContain(tag);
   };
 
   const thenDirectiveShouldHaveTags = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expectedTags = table.map((row) => row.value);
     for (const tag of expectedTags) {
       expect(state.directives[0]?.directive.tags).toContain(tag);
@@ -138,23 +138,23 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const thenDirectiveShouldHaveTagCount = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.tags).toHaveLength(count);
   };
 
   const _thenDirectiveShouldNotHaveTag = (_ctx: unknown, tag: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.tags).not.toContain(tag);
   };
 
   const _thenDirectiveNShouldHaveTag = (_ctx: unknown, n: number, tag: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const index = n - 1; // Convert 1-based to 0-based
     expect(state.directives[index]?.directive.tags).toContain(tag);
   };
 
   const thenDirectivesShouldHaveDetails = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
 
     for (const row of table) {
       const index = parseInt(row.index, 10) - 1; // Convert 1-based to 0-based
@@ -175,35 +175,35 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenDescriptionShouldContain = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.description).toContain(text);
   };
 
   const thenDescriptionShouldBe = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.description).toBe(text);
   };
 
   const _thenDescriptionShouldNotContain = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.description).not.toContain(text);
   };
 
   const thenDescriptionShouldStartWith = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.description).toMatch(new RegExp(`^${escapeRegex(text)}`));
   };
 
   const _thenDescriptionShouldNotStartWith = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.description).not.toMatch(
       new RegExp(`^${escapeRegex(text)}`)
     );
   };
 
   const thenDescriptionShouldNotStartWithAny = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
-    const description = state.directives[0]?.directive.description || "";
+    if (!state) throw new Error('State not initialized');
+    const description = state.directives[0]?.directive.description || '';
     for (const row of table) {
       expect(description).not.toMatch(new RegExp(`^${escapeRegex(row.value)}`));
     }
@@ -214,7 +214,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenFirstExportShouldBe = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expected: Record<string, string> = {};
     for (const row of table) {
       expected[row.field] = row.value;
@@ -232,12 +232,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const thenExportCountShouldBe = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.exports).toHaveLength(count);
   };
 
   const thenExportsShouldIncludeNames = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expectedNames = table.map((row) => row.value);
     const actualNames = state.directives[0]?.exports.map((e) => e.name) || [];
 
@@ -247,13 +247,13 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const _thenDirectiveNExportNameShouldBe = (_ctx: unknown, n: number, name: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const index = n - 1;
     expect(state.directives[index]?.exports[0]?.name).toBe(name);
   };
 
   const thenFirstExportSignatureShouldContain = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.exports[0]?.signature).toContain(text);
   };
 
@@ -262,7 +262,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenCodeShouldContain = (_ctx: unknown, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.code).toContain(text);
   };
 
@@ -271,7 +271,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenPositionShouldBe = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expected: Record<string, number> = {};
     for (const row of table) {
       expected[row.field] = parseInt(row.value, 10);
@@ -293,18 +293,18 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenDirectiveShouldHaveExampleCount = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.examples).toHaveLength(count);
   };
 
   const _thenExampleNShouldContain = (_ctx: unknown, n: number, text: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const index = n - 1;
     expect(state.directives[0]?.directive.examples[index]).toContain(text);
   };
 
   const thenExamplesShouldContain = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const examples = state.directives[0]?.directive.examples || [];
     const expectedTexts = table.map((row) => row.value);
 
@@ -319,8 +319,8 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenDescriptionShouldContainAll = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
-    const description = state.directives[0]?.directive.description || "";
+    if (!state) throw new Error('State not initialized');
+    const description = state.directives[0]?.directive.description || '';
     const expectedTexts = table.map((row) => row.value);
 
     for (const text of expectedTexts) {
@@ -329,8 +329,8 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const thenDescriptionShouldNotContainAny = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
-    const description = state.directives[0]?.directive.description || "";
+    if (!state) throw new Error('State not initialized');
+    const description = state.directives[0]?.directive.description || '';
     const forbiddenTexts = table.map((row) => row.value);
 
     for (const text of forbiddenTexts) {
@@ -343,7 +343,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenDirectiveShouldNotHaveAnyTags = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const tags = state.directives[0]?.directive.tags || [];
     const forbiddenTags = table.map((row) => row.value);
 
@@ -357,12 +357,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenWhenToUseShouldHaveItemCount = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.whenToUse).toHaveLength(count);
   };
 
   const thenWhenToUseShouldContain = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expectedItems = table.map((row) => row.value);
     const actual = state.directives[0]?.directive.whenToUse || [];
 
@@ -372,7 +372,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const thenWhenToUseShouldBeUndefined = () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.whenToUse).toBeUndefined();
   };
 
@@ -381,7 +381,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenUsesShouldContain = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expectedItems = table.map((row) => row.value);
     const actual = state.directives[0]?.directive.uses || [];
 
@@ -391,17 +391,17 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const thenUsesShouldHaveItemCount = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.uses).toHaveLength(count);
   };
 
   const thenUsesShouldBeUndefined = () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.uses).toBeUndefined();
   };
 
   const thenUsedByShouldContain = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     const expectedItems = table.map((row) => row.value);
     const actual = state.directives[0]?.directive.usedBy || [];
 
@@ -411,12 +411,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const thenUsedByShouldHaveItemCount = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.usedBy).toHaveLength(count);
   };
 
   const thenUsedByShouldBeUndefined = () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.directives[0]?.directive.usedBy).toBeUndefined();
   };
 
@@ -425,12 +425,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenParsingShouldFail = () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.parseError).not.toBeNull();
   };
 
   const thenParseErrorShouldContainFilePath = () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.parseError?.file).toBe(state.filePath);
   };
 
@@ -439,342 +439,342 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   // Export Type Detection Scenarios
-  Scenario("Parse function export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have tag {string}", thenDirectiveShouldHaveTag);
-    And("the directive description should contain {string}", thenDescriptionShouldContain);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse function export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+    And('the directive description should contain {string}', thenDescriptionShouldContain);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse type export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have tags:", thenDirectiveShouldHaveTags);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse type export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have tags:', thenDirectiveShouldHaveTags);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse interface export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse interface export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse const export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse const export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse class export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse class export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse enum export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
-    And("the directive code should contain {string}", thenCodeShouldContain);
+  Scenario('Parse enum export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
+    And('the directive code should contain {string}', thenCodeShouldContain);
   });
 
-  Scenario("Parse const enum export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
-    And("the directive code should contain {string}", thenCodeShouldContain);
+  Scenario('Parse const enum export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
+    And('the directive code should contain {string}', thenCodeShouldContain);
   });
 
-  Scenario("Parse abstract class export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse abstract class export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse arrow function export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse arrow function export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse async function export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
-    And("the directive code should contain {string}", thenCodeShouldContain);
+  Scenario('Parse async function export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
+    And('the directive code should contain {string}', thenCodeShouldContain);
   });
 
-  Scenario("Parse generic function export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
-    And("the directive code should contain {string}", thenCodeShouldContain);
+  Scenario('Parse generic function export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
+    And('the directive code should contain {string}', thenCodeShouldContain);
   });
 
-  Scenario("Parse default export with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the first export should be:", thenFirstExportShouldBe);
+  Scenario('Parse default export with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the first export should be:', thenFirstExportShouldBe);
   });
 
-  Scenario("Parse re-exports with directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("{int} exports should be found", thenExportCountShouldBe);
-    And("the exports should include names:", thenExportsShouldIncludeNames);
+  Scenario('Parse re-exports with directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('{int} exports should be found', thenExportCountShouldBe);
+    And('the exports should include names:', thenExportsShouldIncludeNames);
   });
 
-  Scenario("Parse multiple exports in single statement", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("{int} exports should be found", thenExportCountShouldBe);
-    And("the exports should include names:", thenExportsShouldIncludeNames);
+  Scenario('Parse multiple exports in single statement', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('{int} exports should be found', thenExportCountShouldBe);
+    And('the exports should include names:', thenExportsShouldIncludeNames);
   });
 
-  Scenario("Parse multiple directives in same file", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
-    And("the directives should have details:", thenDirectivesShouldHaveDetails);
+  Scenario('Parse multiple directives in same file', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
+    And('the directives should have details:', thenDirectivesShouldHaveDetails);
   });
 
   // Metadata Extraction Scenarios
-  Scenario("Extract examples from directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have {int} examples", thenDirectiveShouldHaveExampleCount);
-    And("the examples should contain:", thenExamplesShouldContain);
+  Scenario('Extract examples from directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have {int} examples', thenDirectiveShouldHaveExampleCount);
+    And('the examples should contain:', thenExamplesShouldContain);
   });
 
-  Scenario("Extract multi-line description", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive description should contain all:", thenDescriptionShouldContainAll);
+  Scenario('Extract multi-line description', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive description should contain all:', thenDescriptionShouldContainAll);
   });
 
-  Scenario("Track line numbers correctly", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive position should be:", thenPositionShouldBe);
+  Scenario('Track line numbers correctly', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive position should be:', thenPositionShouldBe);
   });
 
-  Scenario("Extract function signature information", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
+  Scenario('Extract function signature information', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
     And(
-      "the first export signature should contain {string}",
+      'the first export signature should contain {string}',
       thenFirstExportSignatureShouldContain
     );
   });
 
-  Scenario("Ignore @param and @returns in description", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive description should be {string}", thenDescriptionShouldBe);
-    And("the directive description should not contain any:", thenDescriptionShouldNotContainAny);
+  Scenario('Ignore @param and @returns in description', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive description should be {string}', thenDescriptionShouldBe);
+    And('the directive description should not contain any:', thenDescriptionShouldNotContainAny);
   });
 
   // Tag Extraction Scenarios
-  Scenario("Extract multiple tags from directive section", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have {int} tags", thenDirectiveShouldHaveTagCount);
-    And("the directive should have tags:", thenDirectiveShouldHaveTags);
+  Scenario('Extract multiple tags from directive section', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have {int} tags', thenDirectiveShouldHaveTagCount);
+    And('the directive should have tags:', thenDirectiveShouldHaveTags);
   });
 
-  Scenario("Extract tag with description on same line", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have {int} tag", thenDirectiveShouldHaveTagCount);
-    And("the directive should have tag {string}", thenDirectiveShouldHaveTag);
+  Scenario('Extract tag with description on same line', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
+    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
   });
 
-  Scenario("NOT extract tags mentioned in description", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have {int} tag", thenDirectiveShouldHaveTagCount);
-    And("the directive should have tag {string}", thenDirectiveShouldHaveTag);
-    And("the directive should not have any tags:", thenDirectiveShouldNotHaveAnyTags);
+  Scenario('NOT extract tags mentioned in description', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
+    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+    And('the directive should not have any tags:', thenDirectiveShouldNotHaveAnyTags);
   });
 
-  Scenario("NOT extract tags mentioned in @example sections", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive should have {int} tag", thenDirectiveShouldHaveTagCount);
-    And("the directive should have tag {string}", thenDirectiveShouldHaveTag);
-    And("the directive should not have any tags:", thenDirectiveShouldNotHaveAnyTags);
+  Scenario('NOT extract tags mentioned in @example sections', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive should have {int} tag', thenDirectiveShouldHaveTagCount);
+    And('the directive should have tag {string}', thenDirectiveShouldHaveTag);
+    And('the directive should not have any tags:', thenDirectiveShouldNotHaveAnyTags);
   });
 
   // When to Use Scenarios
   Scenario(
-    "Extract When to Use heading format with bullet points",
+    'Extract When to Use heading format with bullet points',
     ({ Given, When, Then, And }) => {
-      Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-      When("the file is parsed for directives", whenFileIsParsed);
-      Then("{int} directive should be found", thenDirectiveCountShouldBe);
-      And("the directive whenToUse should have {int} items", thenWhenToUseShouldHaveItemCount);
-      And("the directive whenToUse should contain:", thenWhenToUseShouldContain);
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive whenToUse should have {int} items', thenWhenToUseShouldHaveItemCount);
+      And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
     }
   );
 
-  Scenario("Extract When to use inline format", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive whenToUse should have {int} item", thenWhenToUseShouldHaveItemCount);
-    And("the directive whenToUse should contain:", thenWhenToUseShouldContain);
+  Scenario('Extract When to use inline format', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive whenToUse should have {int} item', thenWhenToUseShouldHaveItemCount);
+    And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
   });
 
-  Scenario("Extract asterisk bullets in When to Use section", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive whenToUse should contain:", thenWhenToUseShouldContain);
+  Scenario('Extract asterisk bullets in When to Use section', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive whenToUse should contain:', thenWhenToUseShouldContain);
   });
 
-  Scenario("Not set whenToUse when section is missing", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive whenToUse should be undefined", thenWhenToUseShouldBeUndefined);
+  Scenario('Not set whenToUse when section is missing', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive whenToUse should be undefined', thenWhenToUseShouldBeUndefined);
   });
 
   // Relationship Tag Scenarios
-  Scenario("Extract @libar-docs-uses with single value", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive uses should contain:", thenUsesShouldContain);
+  Scenario('Extract @libar-docs-uses with single value', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive uses should contain:', thenUsesShouldContain);
   });
 
-  Scenario("Extract @libar-docs-uses with comma-separated values", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive uses should have {int} items", thenUsesShouldHaveItemCount);
-    And("the directive uses should contain:", thenUsesShouldContain);
+  Scenario('Extract @libar-docs-uses with comma-separated values', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive uses should have {int} items', thenUsesShouldHaveItemCount);
+    And('the directive uses should contain:', thenUsesShouldContain);
   });
 
-  Scenario("Extract @libar-docs-used-by with single value", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive usedBy should contain:", thenUsedByShouldContain);
+  Scenario('Extract @libar-docs-used-by with single value', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive usedBy should contain:', thenUsedByShouldContain);
   });
 
   Scenario(
-    "Extract @libar-docs-used-by with comma-separated values",
+    'Extract @libar-docs-used-by with comma-separated values',
     ({ Given, When, Then, And }) => {
-      Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-      When("the file is parsed for directives", whenFileIsParsed);
-      Then("{int} directive should be found", thenDirectiveCountShouldBe);
-      And("the directive usedBy should have {int} items", thenUsedByShouldHaveItemCount);
-      And("the directive usedBy should contain:", thenUsedByShouldContain);
+      Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+      When('the file is parsed for directives', whenFileIsParsed);
+      Then('{int} directive should be found', thenDirectiveCountShouldBe);
+      And('the directive usedBy should have {int} items', thenUsedByShouldHaveItemCount);
+      And('the directive usedBy should contain:', thenUsedByShouldContain);
     }
   );
 
-  Scenario("Extract both uses and usedBy from same directive", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive uses should contain:", thenUsesShouldContain);
-    And("the directive usedBy should contain:", thenUsedByShouldContain);
+  Scenario('Extract both uses and usedBy from same directive', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive uses should contain:', thenUsesShouldContain);
+    And('the directive usedBy should contain:', thenUsedByShouldContain);
   });
 
-  Scenario("NOT capture uses/usedBy values in description", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive description should start with {string}", thenDescriptionShouldStartWith);
+  Scenario('NOT capture uses/usedBy values in description', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive description should start with {string}', thenDescriptionShouldStartWith);
     And(
-      "the directive description should not start with any:",
+      'the directive description should not start with any:',
       thenDescriptionShouldNotStartWithAny
     );
-    And("the directive uses should contain:", thenUsesShouldContain);
-    And("the directive usedBy should contain:", thenUsedByShouldContain);
+    And('the directive uses should contain:', thenUsesShouldContain);
+    And('the directive usedBy should contain:', thenUsedByShouldContain);
   });
 
-  Scenario("Not set uses/usedBy when no relationship tags exist", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive uses should be undefined", thenUsesShouldBeUndefined);
-    And("the directive usedBy should be undefined", thenUsedByShouldBeUndefined);
+  Scenario('Not set uses/usedBy when no relationship tags exist', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive uses should be undefined', thenUsesShouldBeUndefined);
+    And('the directive usedBy should be undefined', thenUsedByShouldBeUndefined);
   });
 
   // Edge Case Scenarios
-  Scenario("Skip comments without @libar-docs-* tags", ({ Given, When, Then }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
+  Scenario('Skip comments without @libar-docs-* tags', ({ Given, When, Then }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
   });
 
-  Scenario("Skip invalid directive with incomplete tag", ({ Given, When, Then }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
+  Scenario('Skip invalid directive with incomplete tag', ({ Given, When, Then }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
   });
 
-  Scenario("Handle malformed TypeScript gracefully", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with malformed content:", givenMalformedTypeScriptFile);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("parsing should fail with error", thenParsingShouldFail);
-    And("the parse error should contain the file path", thenParseErrorShouldContainFilePath);
+  Scenario('Handle malformed TypeScript gracefully', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with malformed content:', givenMalformedTypeScriptFile);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('parsing should fail with error', thenParsingShouldFail);
+    And('the parse error should contain the file path', thenParseErrorShouldContainFilePath);
   });
 
-  Scenario("Handle empty file gracefully", ({ Given, When, Then }) => {
-    Given("an empty TypeScript file", givenEmptyTypeScriptFile);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
+  Scenario('Handle empty file gracefully', ({ Given, When, Then }) => {
+    Given('an empty TypeScript file', givenEmptyTypeScriptFile);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
   });
 
-  Scenario("Handle whitespace-only file", ({ Given, When, Then }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
+  Scenario('Handle whitespace-only file', ({ Given, When, Then }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
   });
 
-  Scenario("Handle file with only comments and no exports", ({ Given, When, Then }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
+  Scenario('Handle file with only comments and no exports', ({ Given, When, Then }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
   });
 
-  Scenario("Skip inline comments (non-block)", ({ Given, When, Then }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directives should be found", thenDirectiveCountShouldBe);
+  Scenario('Skip inline comments (non-block)', ({ Given, When, Then }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directives should be found', thenDirectiveCountShouldBe);
   });
 
-  Scenario("Handle unicode characters in descriptions", ({ Given, When, Then, And }) => {
-    Given("a TypeScript file with content:", givenTypeScriptFileWithContent);
-    When("the file is parsed for directives", whenFileIsParsed);
-    Then("{int} directive should be found", thenDirectiveCountShouldBe);
-    And("the directive description should contain all:", thenDescriptionShouldContainAll);
+  Scenario('Handle unicode characters in descriptions', ({ Given, When, Then, And }) => {
+    Given('a TypeScript file with content:', givenTypeScriptFileWithContent);
+    When('the file is parsed for directives', whenFileIsParsed);
+    Then('{int} directive should be found', thenDirectiveCountShouldBe);
+    And('the directive description should contain all:', thenDescriptionShouldContainAll);
   });
 });
 
@@ -786,5 +786,5 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
  * Escape special regex characters in a string.
  */
 function escapeRegex(str: string): string {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

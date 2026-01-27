@@ -19,7 +19,7 @@
  * - Use `isTerminalState()` to check if state allows transitions
  * - Use `PROTECTION_LEVELS` for direct lookups
  */
-import { PROCESS_STATUS_VALUES } from "../../taxonomy/index.js";
+import { PROCESS_STATUS_VALUES } from '../../taxonomy/index.js';
 /**
  * Protection level mapping per PDR-005
  *
@@ -31,10 +31,10 @@ import { PROCESS_STATUS_VALUES } from "../../taxonomy/index.js";
  * | deferred  | none       | Parked, fully editable           |
  */
 export const PROTECTION_LEVELS = {
-    roadmap: "none",
-    active: "scope",
-    completed: "hard",
-    deferred: "none",
+    roadmap: 'none',
+    active: 'scope',
+    completed: 'hard',
+    deferred: 'none',
 };
 /**
  * Get the protection level for a status
@@ -66,7 +66,7 @@ export function getProtectionLevel(status) {
  * ```
  */
 export function isTerminalState(status) {
-    return status === "completed";
+    return status === 'completed';
 }
 /**
  * Check if a status is fully editable (no protection)
@@ -75,7 +75,7 @@ export function isTerminalState(status) {
  * @returns true if the status has no protection
  */
 export function isFullyEditable(status) {
-    return PROTECTION_LEVELS[status] === "none";
+    return PROTECTION_LEVELS[status] === 'none';
 }
 /**
  * Check if a status is scope-locked
@@ -84,7 +84,7 @@ export function isFullyEditable(status) {
  * @returns true if the status prevents scope changes
  */
 export function isScopeLocked(status) {
-    return PROTECTION_LEVELS[status] === "scope";
+    return PROTECTION_LEVELS[status] === 'scope';
 }
 /**
  * Re-export status values for convenience

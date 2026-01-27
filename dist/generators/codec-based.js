@@ -15,7 +15,7 @@
  * GeneratorContext.masterDataset → Codec.decode() → RenderableDocument → renderDocumentWithFiles() → OutputFile[]
  * ```
  */
-import { generateDocument, DOCUMENT_TYPES } from "../renderable/generate.js";
+import { generateDocument, DOCUMENT_TYPES } from '../renderable/generate.js';
 /**
  * Codec-based generator that wraps the new RDM system.
  *
@@ -39,7 +39,7 @@ export class CodecBasedGenerator {
                 files: [],
                 errors: [
                     {
-                        type: "generator",
+                        type: 'generator',
                         message: `Generator "${this.name}" requires MasterDataset in context but none was provided. Ensure the orchestrator creates a MasterDataset before running codec-based generators.`,
                     },
                 ],
@@ -75,5 +75,5 @@ export function createCodecGenerator(name, documentType) {
  * Available codec-based document types.
  * Re-exported from generate.ts for convenience.
  */
-export { DOCUMENT_TYPES } from "../renderable/generate.js";
+export { DOCUMENT_TYPES } from '../renderable/generate.js';
 //# sourceMappingURL=codec-based.js.map

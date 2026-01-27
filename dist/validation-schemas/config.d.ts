@@ -1,5 +1,5 @@
-import { z } from "zod";
-import type { RegistryFilePath } from "../types/branded.js";
+import { z } from 'zod';
+import type { RegistryFilePath } from '../types/branded.js';
 /**
  * Scanner configuration
  *
@@ -68,14 +68,6 @@ export interface GeneratorConfig {
  * ```
  */
 export declare function createGeneratorConfigSchema(baseDir: string): z.ZodType<GeneratorConfig>;
-/**
- * Generator configuration (backward compatibility)
- *
- * **Deprecated**: Use createGeneratorConfigSchema(baseDir) instead for better security.
- *
- * This version uses process.cwd() which can be manipulated.
- */
-export declare const GeneratorConfigSchema: z.ZodType<GeneratorConfig>;
 /**
  * Runtime type guard for ScannerConfig
  *

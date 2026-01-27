@@ -32,7 +32,7 @@ export const Result = {
             throw result.error;
         }
         // Wrap non-Error objects to preserve information and provide stack trace
-        const errorMessage = typeof result.error === "object" && result.error !== null
+        const errorMessage = typeof result.error === 'object' && result.error !== null
             ? JSON.stringify(result.error)
             : String(result.error);
         throw new Error(errorMessage);

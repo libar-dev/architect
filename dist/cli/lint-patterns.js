@@ -17,12 +17,12 @@
  * - Use locally to check annotations before committing
  * - Use with `--strict` flag to treat warnings as errors
  */
-import { printVersionAndExit } from "./version.js";
-import { handleCliError } from "./error-handler.js";
-import { scanPatterns } from "../scanner/index.js";
-import { ScannerConfigSchema } from "../validation-schemas/index.js";
-import { loadConfig, formatConfigError } from "../config/config-loader.js";
-import { defaultRules, filterRulesBySeverity, lintFiles, hasFailures, formatPretty, formatJson, } from "../lint/index.js";
+import { printVersionAndExit } from './version.js';
+import { handleCliError } from './error-handler.js';
+import { scanPatterns } from '../scanner/index.js';
+import { ScannerConfigSchema } from '../validation-schemas/index.js';
+import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { defaultRules, filterRulesBySeverity, lintFiles, hasFailures, formatPretty, formatJson, } from '../lint/index.js';
 /**
  * Parse command line arguments
  *
@@ -36,76 +36,68 @@ export function parseArgs(argv = process.argv.slice(2)) {
         exclude: [],
         baseDir: process.cwd(),
         strict: false,
-        format: "pretty",
+        format: 'pretty',
         quiet: false,
-        minSeverity: "info",
-        tagRegistryPath: null,
+        minSeverity: 'info',
         help: false,
         version: false,
     };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
-        if (arg === "--help" || arg === "-h") {
+        if (arg === '--help' || arg === '-h') {
             config.help = true;
         }
-        else if (arg === "--input" || arg === "-i") {
+        else if (arg === '--input' || arg === '-i') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.input.push(nextArg);
         }
-        else if (arg === "--exclude" || arg === "-e") {
+        else if (arg === '--exclude' || arg === '-e') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.exclude.push(nextArg);
         }
-        else if (arg === "--base-dir" || arg === "-b") {
+        else if (arg === '--base-dir' || arg === '-b') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.baseDir = nextArg;
         }
-        else if (arg === "--strict") {
+        else if (arg === '--strict') {
             config.strict = true;
         }
-        else if (arg === "--format" || arg === "-f") {
+        else if (arg === '--format' || arg === '-f') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
-            if (nextArg !== "pretty" && nextArg !== "json") {
+            if (nextArg !== 'pretty' && nextArg !== 'json') {
                 throw new Error(`Invalid format: ${nextArg}. Use "pretty" or "json"`);
             }
             config.format = nextArg;
         }
-        else if (arg === "--quiet" || arg === "-q") {
+        else if (arg === '--quiet' || arg === '-q') {
             config.quiet = true;
         }
-        else if (arg === "--min-severity") {
+        else if (arg === '--min-severity') {
             const nextArg = argv[++i];
             if (!nextArg) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
-            if (nextArg !== "error" && nextArg !== "warning" && nextArg !== "info") {
+            if (nextArg !== 'error' && nextArg !== 'warning' && nextArg !== 'info') {
                 throw new Error(`Invalid severity: ${nextArg}. Use "error", "warning", or "info"`);
             }
             config.minSeverity = nextArg;
         }
-        else if (arg === "--tag-registry" || arg === "-R") {
-            const nextArg = argv[++i];
-            if (!nextArg) {
-                throw new Error(`Missing value for ${arg} flag`);
-            }
-            config.tagRegistryPath = nextArg;
-        }
-        else if (arg === "--version" || arg === "-v") {
+        else if (arg === '--version' || arg === '-v') {
             config.version = true;
         }
-        else if (arg?.startsWith("-") === true) {
+        else if (arg?.startsWith('-') === true) {
             console.warn(`Warning: Unknown flag '${arg}' ignored`);
         }
     }
@@ -125,7 +117,6 @@ Options:
   -i, --input <pattern>     Glob pattern for TypeScript files (required, repeatable)
   -e, --exclude <pattern>   Glob pattern to exclude (repeatable)
   -b, --base-dir <dir>      Base directory for paths (default: cwd)
-  -R, --tag-registry <file> Tag registry JSON file (auto-discovers if not specified)
   --strict                  Treat warnings as errors (exit 1 on warnings)
   -f, --format <type>       Output format: "pretty" (default) or "json"
   -q, --quiet               Only show errors (suppress warnings/info)
@@ -164,14 +155,14 @@ Examples:
 async function main() {
     const config = parseArgs();
     if (config.version) {
-        printVersionAndExit("lint-patterns");
+        printVersionAndExit('lint-patterns');
     }
     if (config.help) {
         printHelp();
         process.exit(0);
     }
     if (config.input.length === 0) {
-        console.error("Error: No input patterns specified. Use --input <pattern>");
+        console.error('Error: No input patterns specified. Use --input <pattern>');
         printHelp();
         process.exit(1);
     }
@@ -187,11 +178,8 @@ async function main() {
         if (!isDefault && configPath) {
             console.log(`  Config: ${configPath}`);
         }
-        else if (config.tagRegistryPath) {
-            console.log(`  Tag Registry: ${config.tagRegistryPath}`);
-        }
         else {
-            console.log("  Config: (default DDD-ES-CQRS taxonomy)");
+            console.log('  Config: (default DDD-ES-CQRS taxonomy)');
         }
         // Scan files for directives
         const scannerConfig = ScannerConfigSchema.parse({
@@ -205,24 +193,24 @@ async function main() {
         // The `ok` check narrows the type to access `.value`
         if (!scanResult.ok) {
             // This branch is unreachable (never type), but satisfies TypeScript
-            throw new Error("Unexpected scan failure");
+            throw new Error('Unexpected scan failure');
         }
         const { files: scanned, errors: scanErrors, skippedDirectives } = scanResult.value;
         // Report scan errors
-        if (scanErrors.length > 0 && config.format === "pretty") {
+        if (scanErrors.length > 0 && config.format === 'pretty') {
             console.log(`Warning: ${scanErrors.length} files failed to scan:`);
             for (const { file, error } of scanErrors) {
                 console.log(`  - ${file}: ${error.reason}`);
             }
-            console.log("");
+            console.log('');
         }
         // Report skipped directives (these are already validation failures)
-        if (skippedDirectives.length > 0 && config.format === "pretty") {
+        if (skippedDirectives.length > 0 && config.format === 'pretty') {
             console.log(`Warning: ${skippedDirectives.length} directives skipped due to validation:`);
             for (const { file, error } of skippedDirectives) {
                 console.log(`  - ${file}:${error.line}: ${error.reason}`);
             }
-            console.log("");
+            console.log('');
         }
         // Build map of files to directives
         const fileDirectives = new Map();
@@ -240,7 +228,7 @@ async function main() {
         // Run lint
         const summary = lintFiles(fileDirectives, rules);
         // Format and output results
-        if (config.format === "json") {
+        if (config.format === 'json') {
             const jsonResult = formatJson(summary);
             if (!jsonResult.ok) {
                 handleCliError(jsonResult.error, 1);

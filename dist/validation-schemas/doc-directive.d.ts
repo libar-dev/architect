@@ -15,9 +15,9 @@
  * - Use when parsing JSDoc comments for @libar-docs-* tags
  * - Use when validating directive structure at boundaries
  */
-import { z } from "zod";
-import { type AcceptedStatusValue } from "../taxonomy/index.js";
-import type { TagRegistry } from "./tag-registry.js";
+import { z } from 'zod';
+import { type AcceptedStatusValue } from '../taxonomy/index.js';
+import type { TagRegistry } from './tag-registry.js';
 /**
  * Position information for a directive in source code
  */
@@ -73,9 +73,6 @@ export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
     active: "active";
     completed: "completed";
     deferred: "deferred";
-    implemented: "implemented";
-    partial: "partial";
-    "in-progress": "in-progress";
 }>;
 /**
  * Pattern status schema for directive validation
@@ -88,9 +85,6 @@ export declare const PatternStatusSchema: z.ZodEnum<{
     active: "active";
     completed: "completed";
     deferred: "deferred";
-    implemented: "implemented";
-    partial: "partial";
-    "in-progress": "in-progress";
 }>;
 export type PatternStatus = AcceptedStatusValue;
 /**
@@ -104,9 +98,9 @@ export type PatternStatus = AcceptedStatusValue;
  *
  * @example
  * ```typescript
- * const registry = await loadTagRegistry("tag-registry.json", "/project");
- * const statusSchema = createPatternStatusSchema(registry);
- * const result = statusSchema.safeParse("implemented"); // Validates against registry values
+ * const config = await loadConfig();
+ * const statusSchema = createPatternStatusSchema(config.tagRegistry);
+ * const result = statusSchema.safeParse("completed"); // Validates against registry values
  * ```
  */
 export declare function createPatternStatusSchema(registry: TagRegistry): z.ZodType<string>;
@@ -140,9 +134,6 @@ export declare const DocDirectiveSchema: z.ZodObject<{
         active: "active";
         completed: "completed";
         deferred: "deferred";
-        implemented: "implemented";
-        partial: "partial";
-        "in-progress": "in-progress";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
     useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;

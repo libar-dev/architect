@@ -13,8 +13,6 @@
 
 ## Description
 
-## Renderable Utilities
-
 Utility functions for document codecs. These are pure functions that
 transform pattern data into display-ready strings.
 

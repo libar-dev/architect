@@ -13,8 +13,6 @@
 
 ## Description
 
-## Reporting Document Codecs
-
 Transforms MasterDataset into RenderableDocuments for reporting outputs:
 - CHANGELOG-GENERATED.md (Keep a Changelog format)
 - TRACEABILITY.md (Timeline to behavior file coverage)

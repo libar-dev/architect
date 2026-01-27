@@ -12,9 +12,9 @@
  * Flow: MasterDataset → Codec → RenderableDocument → Renderer → Markdown
  */
 
-import type { MasterDataset } from "../validation-schemas/master-dataset.js";
-import type { RenderableDocument } from "./schema.js";
-import { renderDocumentWithFiles, type OutputFile } from "./render.js";
+import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import type { RenderableDocument } from './schema.js';
+import { renderDocumentWithFiles, type OutputFile } from './render.js';
 
 // Default codec instances
 import {
@@ -35,7 +35,7 @@ import {
   OverviewCodec,
   BusinessRulesCodec,
   ArchitectureDocumentCodec,
-} from "./codecs/index.js";
+} from './codecs/index.js';
 
 // Factory functions for creating codecs with options
 import {
@@ -56,7 +56,7 @@ import {
   createOverviewCodec,
   createBusinessRulesCodec,
   createArchitectureCodec,
-} from "./codecs/index.js";
+} from './codecs/index.js';
 
 // Codec options types
 import type {
@@ -77,10 +77,10 @@ import type {
   OverviewCodecOptions,
   BusinessRulesCodecOptions,
   ArchitectureCodecOptions,
-} from "./codecs/index.js";
+} from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
-import type { DocumentCodec, BaseCodecOptions } from "./codecs/types/base.js";
+import type { DocumentCodec, BaseCodecOptions } from './codecs/types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Types
@@ -91,72 +91,72 @@ import type { DocumentCodec, BaseCodecOptions } from "./codecs/types/base.js";
  */
 export const DOCUMENT_TYPES = {
   patterns: {
-    outputPath: "PATTERNS.md",
-    description: "Pattern registry with category details",
+    outputPath: 'PATTERNS.md',
+    description: 'Pattern registry with category details',
   },
   roadmap: {
-    outputPath: "ROADMAP.md",
-    description: "Development roadmap by phase",
+    outputPath: 'ROADMAP.md',
+    description: 'Development roadmap by phase',
   },
   milestones: {
-    outputPath: "COMPLETED-MILESTONES.md",
-    description: "Historical completed milestones",
+    outputPath: 'COMPLETED-MILESTONES.md',
+    description: 'Historical completed milestones',
   },
   current: {
-    outputPath: "CURRENT-WORK.md",
-    description: "Active development work in progress",
+    outputPath: 'CURRENT-WORK.md',
+    description: 'Active development work in progress',
   },
   requirements: {
-    outputPath: "PRODUCT-REQUIREMENTS.md",
-    description: "Product requirements by area/role",
+    outputPath: 'PRODUCT-REQUIREMENTS.md',
+    description: 'Product requirements by area/role',
   },
   session: {
-    outputPath: "SESSION-CONTEXT.md",
-    description: "Current session context and focus",
+    outputPath: 'SESSION-CONTEXT.md',
+    description: 'Current session context and focus',
   },
   remaining: {
-    outputPath: "REMAINING-WORK.md",
-    description: "Aggregate view of incomplete work",
+    outputPath: 'REMAINING-WORK.md',
+    description: 'Aggregate view of incomplete work',
   },
-  "pr-changes": {
-    outputPath: "working/PR-CHANGES.md",
-    description: "PR-scoped changes for review",
+  'pr-changes': {
+    outputPath: 'working/PR-CHANGES.md',
+    description: 'PR-scoped changes for review',
   },
   adrs: {
-    outputPath: "DECISIONS.md",
-    description: "Architecture Decision Records",
+    outputPath: 'DECISIONS.md',
+    description: 'Architecture Decision Records',
   },
-  "planning-checklist": {
-    outputPath: "PLANNING-CHECKLIST.md",
-    description: "Pre-planning questions and Definition of Done",
+  'planning-checklist': {
+    outputPath: 'PLANNING-CHECKLIST.md',
+    description: 'Pre-planning questions and Definition of Done',
   },
-  "session-plan": {
-    outputPath: "SESSION-PLAN.md",
-    description: "Implementation plans for phases",
+  'session-plan': {
+    outputPath: 'SESSION-PLAN.md',
+    description: 'Implementation plans for phases',
   },
-  "session-findings": {
-    outputPath: "SESSION-FINDINGS.md",
-    description: "Retrospective discoveries for roadmap refinement",
+  'session-findings': {
+    outputPath: 'SESSION-FINDINGS.md',
+    description: 'Retrospective discoveries for roadmap refinement',
   },
   changelog: {
-    outputPath: "CHANGELOG-GENERATED.md",
-    description: "Keep a Changelog format changelog",
+    outputPath: 'CHANGELOG-GENERATED.md',
+    description: 'Keep a Changelog format changelog',
   },
   traceability: {
-    outputPath: "TRACEABILITY.md",
-    description: "Timeline to behavior file coverage",
+    outputPath: 'TRACEABILITY.md',
+    description: 'Timeline to behavior file coverage',
   },
   overview: {
-    outputPath: "OVERVIEW.md",
-    description: "Project architecture overview",
+    outputPath: 'OVERVIEW.md',
+    description: 'Project architecture overview',
   },
-  "business-rules": {
-    outputPath: "BUSINESS-RULES.md",
-    description: "Business rules and invariants by domain",
+  'business-rules': {
+    outputPath: 'BUSINESS-RULES.md',
+    description: 'Business rules and invariants by domain',
   },
   architecture: {
-    outputPath: "ARCHITECTURE.md",
-    description: "Architecture diagrams (component and layered views)",
+    outputPath: 'ARCHITECTURE.md',
+    description: 'Architecture diagrams (component and layered views)',
   },
 } as const;
 
@@ -191,15 +191,15 @@ export interface CodecOptions {
   requirements?: RequirementsCodecOptions;
   session?: SessionCodecOptions;
   remaining?: RemainingWorkCodecOptions;
-  "pr-changes"?: PrChangesCodecOptions;
+  'pr-changes'?: PrChangesCodecOptions;
   adrs?: AdrCodecOptions;
-  "planning-checklist"?: PlanningChecklistCodecOptions;
-  "session-plan"?: SessionPlanCodecOptions;
-  "session-findings"?: SessionFindingsCodecOptions;
+  'planning-checklist'?: PlanningChecklistCodecOptions;
+  'session-plan'?: SessionPlanCodecOptions;
+  'session-findings'?: SessionFindingsCodecOptions;
   changelog?: ChangelogCodecOptions;
   traceability?: TraceabilityCodecOptions;
   overview?: OverviewCodecOptions;
-  "business-rules"?: BusinessRulesCodecOptions;
+  'business-rules'?: BusinessRulesCodecOptions;
   architecture?: ArchitectureCodecOptions;
 }
 
@@ -218,15 +218,15 @@ const CODEC_MAP = {
   requirements: RequirementsDocumentCodec,
   session: SessionContextCodec,
   remaining: RemainingWorkCodec,
-  "pr-changes": PrChangesCodec,
+  'pr-changes': PrChangesCodec,
   adrs: AdrDocumentCodec,
-  "planning-checklist": PlanningChecklistCodec,
-  "session-plan": SessionPlanCodec,
-  "session-findings": SessionFindingsCodec,
+  'planning-checklist': PlanningChecklistCodec,
+  'session-plan': SessionPlanCodec,
+  'session-findings': SessionFindingsCodec,
   changelog: ChangelogCodec,
   traceability: TraceabilityCodec,
   overview: OverviewCodec,
-  "business-rules": BusinessRulesCodec,
+  'business-rules': BusinessRulesCodec,
   architecture: ArchitectureDocumentCodec,
 } as const;
 
@@ -242,15 +242,15 @@ const CODEC_FACTORY_MAP = {
   requirements: createRequirementsCodec,
   session: createSessionContextCodec,
   remaining: createRemainingWorkCodec,
-  "pr-changes": createPrChangesCodec,
+  'pr-changes': createPrChangesCodec,
   adrs: createAdrCodec,
-  "planning-checklist": createPlanningChecklistCodec,
-  "session-plan": createSessionPlanCodec,
-  "session-findings": createSessionFindingsCodec,
+  'planning-checklist': createPlanningChecklistCodec,
+  'session-plan': createSessionPlanCodec,
+  'session-findings': createSessionFindingsCodec,
   changelog: createChangelogCodec,
   traceability: createTraceabilityCodec,
   overview: createOverviewCodec,
-  "business-rules": createBusinessRulesCodec,
+  'business-rules': createBusinessRulesCodec,
   architecture: createArchitectureCodec,
 } as const;
 

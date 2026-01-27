@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Discriminated union of all export types
  *

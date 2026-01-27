@@ -13,8 +13,6 @@
 
 ## Description
 
-## Business Rules Document Codec
-
 Transforms MasterDataset into a RenderableDocument for business rules output.
 Generates BUSINESS-RULES.md organized by product area, phase, and feature.
 

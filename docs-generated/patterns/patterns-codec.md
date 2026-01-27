@@ -13,8 +13,6 @@
 
 ## Description
 
-## Patterns Document Codec
-
 Transforms MasterDataset into a RenderableDocument for pattern registry output.
 Generates PATTERNS.md and category detail files (patterns/*.md).
 

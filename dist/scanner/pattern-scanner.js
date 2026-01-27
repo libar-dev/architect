@@ -25,9 +25,9 @@
  * - **Glob Patterns**: Uses glob for flexible file matching
  * - **Exclusion Support**: Configurable exclude patterns for node_modules, tests, etc.
  */
-import { glob } from "glob";
-import { createRegexBuilders } from "../config/regex-builders.js";
-import { DEFAULT_REGEX_BUILDERS } from "../config/defaults.js";
+import { glob } from 'glob';
+import { createRegexBuilders } from '../config/regex-builders.js';
+import { DEFAULT_REGEX_BUILDERS } from '../config/defaults.js';
 /**
  * Finds all TypeScript files matching the scanner configuration
  *
@@ -36,11 +36,11 @@ import { DEFAULT_REGEX_BUILDERS } from "../config/defaults.js";
  */
 export async function findFilesToScan(config) {
     const defaultExclude = [
-        "node_modules/**",
-        "dist/**",
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/*.d.ts",
+        'node_modules/**',
+        'dist/**',
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/*.d.ts',
     ];
     const excludePatterns = config.exclude ? [...defaultExclude, ...config.exclude] : defaultExclude;
     const files = await glob([...config.patterns], {
@@ -49,7 +49,7 @@ export async function findFilesToScan(config) {
         absolute: true,
     });
     // Filter to only TypeScript source files
-    return files.filter((file) => file.endsWith(".ts") && !file.endsWith(".d.ts"));
+    return files.filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'));
 }
 /**
  * Checks if file has opted-in to documentation generation

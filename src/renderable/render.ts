@@ -18,7 +18,7 @@ import type {
   ListBlock,
   ListItem,
   CollapsibleBlock,
-} from "./schema.js";
+} from './schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Escape Utilities
@@ -28,7 +28,7 @@ import type {
  * Escape HTML entities to prevent injection in generated docs.
  */
 function escapeHtml(text: string): string {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /**
@@ -36,7 +36,7 @@ function escapeHtml(text: string): string {
  * Newlines are converted to <br> for proper rendering.
  */
 function escapeTableCell(cell: string): string {
-  return cell.replace(/\|/g, "\\|").replace(/\n/g, "<br>");
+  return cell.replace(/\|/g, '\\|').replace(/\n/g, '<br>');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -53,7 +53,7 @@ export function renderToMarkdown(doc: RenderableDocument): string {
   const lines: string[] = [];
 
   // Title (H1)
-  lines.push(`# ${doc.title}`, "");
+  lines.push(`# ${doc.title}`, '');
 
   // Frontmatter (purpose, detail level as plain text)
   if (doc.purpose || doc.detailLevel) {
@@ -63,7 +63,7 @@ export function renderToMarkdown(doc: RenderableDocument): string {
     if (doc.detailLevel) {
       lines.push(`**Detail Level:** ${doc.detailLevel}`);
     }
-    lines.push("", "---", "");
+    lines.push('', '---', '');
   }
 
   // Sections
@@ -72,7 +72,7 @@ export function renderToMarkdown(doc: RenderableDocument): string {
   }
 
   // Ensure single trailing newline
-  return lines.join("\n").trimEnd() + "\n";
+  return lines.join('\n').trimEnd() + '\n';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -84,36 +84,36 @@ export function renderToMarkdown(doc: RenderableDocument): string {
  */
 function renderBlock(block: SectionBlock): string[] {
   switch (block.type) {
-    case "heading": {
+    case 'heading': {
       // Clamp heading level to valid markdown range (1-6)
       const level = Math.max(1, Math.min(6, block.level));
-      return [`${"#".repeat(level)} ${block.text}`, ""];
+      return [`${'#'.repeat(level)} ${block.text}`, ''];
     }
 
-    case "paragraph":
-      return [block.text, ""];
+    case 'paragraph':
+      return [block.text, ''];
 
-    case "separator":
-      return ["---", ""];
+    case 'separator':
+      return ['---', ''];
 
-    case "table":
+    case 'table':
       return renderTable(block);
 
-    case "list":
+    case 'list':
       return renderList(block);
 
-    case "code":
-      return [`\`\`\`${block.language ?? ""}`, block.content, "\`\`\`", ""];
+    case 'code':
+      return [`\`\`\`${block.language ?? ''}`, block.content, '\`\`\`', ''];
 
-    case "mermaid":
-      return ["\`\`\`mermaid", block.content, "\`\`\`", ""];
+    case 'mermaid':
+      return ['\`\`\`mermaid', block.content, '\`\`\`', ''];
 
-    case "collapsible":
+    case 'collapsible':
       return renderCollapsible(block);
 
-    case "link-out":
+    case 'link-out':
       // URL-encode path for links with spaces or special characters
-      return [`[${block.text}](${encodeURI(block.path)})`, ""];
+      return [`[${block.text}](${encodeURI(block.path)})`, ''];
 
     default:
       // Type-safe exhaustive check
@@ -138,35 +138,35 @@ function renderTable(block: TableBlock): string[] {
 
   // Header row - escape pipes and newlines in column names
   const escapedColumns = block.columns.map(escapeTableCell);
-  lines.push(`| ${escapedColumns.join(" | ")} |`);
+  lines.push(`| ${escapedColumns.join(' | ')} |`);
 
   // Separator row with alignment
   const separators = block.columns.map((_, i) => {
-    const align = block.alignment?.[i] ?? "left";
+    const align = block.alignment?.[i] ?? 'left';
     switch (align) {
-      case "center":
-        return ":---:";
-      case "right":
-        return "---:";
+      case 'center':
+        return ':---:';
+      case 'right':
+        return '---:';
       default:
-        return "---";
+        return '---';
     }
   });
-  lines.push(`| ${separators.join(" | ")} |`);
+  lines.push(`| ${separators.join(' | ')} |`);
 
   // Data rows
   for (const row of block.rows) {
     // Pad row to match columns if needed
     const paddedRow = [...row];
     while (paddedRow.length < block.columns.length) {
-      paddedRow.push("");
+      paddedRow.push('');
     }
     // Escape pipe characters and newlines in cell content
     const escapedRow = paddedRow.map(escapeTableCell);
-    lines.push(`| ${escapedRow.join(" | ")} |`);
+    lines.push(`| ${escapedRow.join(' | ')} |`);
   }
 
-  lines.push("");
+  lines.push('');
   return lines;
 }
 
@@ -183,11 +183,11 @@ function renderList(block: ListBlock): string[] {
   for (let i = 0; i < block.items.length; i++) {
     const item = block.items[i];
     if (item === undefined) continue;
-    const prefix = block.ordered ? `${i + 1}.` : "-";
+    const prefix = block.ordered ? `${i + 1}.` : '-';
     lines.push(...renderListItem(item, prefix, 0));
   }
 
-  lines.push("");
+  lines.push('');
   return lines;
 }
 
@@ -196,20 +196,20 @@ function renderList(block: ListBlock): string[] {
  */
 function renderListItem(item: ListItem, prefix: string, indent: number): string[] {
   const lines: string[] = [];
-  const indentStr = "  ".repeat(indent);
+  const indentStr = '  '.repeat(indent);
 
-  if (typeof item === "string") {
+  if (typeof item === 'string') {
     lines.push(`${indentStr}${prefix} ${item}`);
   } else {
     // Structured item with optional checkbox
-    const checkbox = item.checked !== undefined ? (item.checked ? "[x] " : "[ ] ") : "";
+    const checkbox = item.checked !== undefined ? (item.checked ? '[x] ' : '[ ] ') : '';
     lines.push(`${indentStr}${prefix} ${checkbox}${item.text}`);
 
     // Render children
     if (item.children) {
       for (let i = 0; i < item.children.length; i++) {
         const child = item.children[i] as ListItem;
-        const childPrefix = /^\d/.exec(prefix) !== null ? `${i + 1}.` : "-";
+        const childPrefix = /^\d/.exec(prefix) !== null ? `${i + 1}.` : '-';
         lines.push(...renderListItem(child, childPrefix, indent + 1));
       }
     }
@@ -228,18 +228,18 @@ function renderListItem(item: ListItem, prefix: string, indent: number): string[
 function renderCollapsible(block: CollapsibleBlock): string[] {
   const lines: string[] = [];
 
-  lines.push("<details>");
+  lines.push('<details>');
   // Escape HTML entities in summary to prevent injection
   lines.push(`<summary>${escapeHtml(block.summary)}</summary>`);
-  lines.push("");
+  lines.push('');
 
   // Render nested content
   for (const contentBlock of block.content) {
     lines.push(...renderBlock(contentBlock));
   }
 
-  lines.push("</details>");
-  lines.push("");
+  lines.push('</details>');
+  lines.push('');
 
   return lines;
 }

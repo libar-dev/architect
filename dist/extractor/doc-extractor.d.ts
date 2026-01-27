@@ -26,10 +26,10 @@
  * - **Name Inference**: Extracts from exports or JSDoc title when not explicit
  * - **Deterministic IDs**: MD5 hash of file path + line number ensures stable identifiers
  */
-import type { ScannedFile } from "../scanner/index.js";
-import type { ExtractedPattern, DocDirective, ExportInfo, PatternValidationError } from "../types/index.js";
-import { Result } from "../types/index.js";
-import { type TagRegistry } from "../validation-schemas/index.js";
+import type { ScannedFile } from '../scanner/index.js';
+import type { ExtractedPattern, DocDirective, ExportInfo, PatternValidationError } from '../types/index.js';
+import { Result } from '../types/index.js';
+import { type TagRegistry } from '../validation-schemas/index.js';
 /**
  * Results of pattern extraction with error collection
  */

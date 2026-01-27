@@ -44,7 +44,7 @@
 - And the relationship type is "implements"
 - And the file's `uses` metadata is preserved
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-implements EventStoreDurability
@@ -60,7 +60,7 @@
 - Then the file is linked to both "EventStoreDurability" and "IdempotentAppend"
 - And both patterns list this file as an implementation
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-implements EventStoreDurability, IdempotentAppend
@@ -89,7 +89,7 @@
 - Then the pattern "ReactiveProjections" is linked to base "ProjectionCategories"
 - And the relationship type is "extends"
 
-```markdown
+```gherkin
 @libar-docs
 @libar-docs-pattern:ReactiveProjections
 @libar-docs-extends:ProjectionCategories

@@ -1,0 +1,179 @@
+# CodeRabbit Configuration for delivery-process
+# Documentation: https://docs.coderabbit.ai/guides/configure-coderabbit
+
+language: en-US
+early_access: true
+
+reviews:
+  profile: assertive # More thorough feedback for a documentation tool
+  high_level_summary: true
+  poem: true
+
+  # Exclude build artifacts and generated content from reviews
+  path_filters:
+    - '!dist/**'
+    - '!node_modules/**'
+    - '!*.tsbuildinfo'
+    - '!pnpm-lock.yaml'
+    - '!docs-generated/**'
+    - '!catalogue/artefact-sets/**'
+    - 'src/**'
+    - 'tests/**'
+    - 'docs/**'
+    - '.github/**'
+
+  # Path-specific review guidance
+  path_instructions:
+    - path: 'src/**/*.ts'
+      instructions: |
+        Focus on TypeScript best practices, type safety, and maintainability.
+        Check for proper JSDoc annotations, especially `@libar-docs` markers and pattern tags.
+        Verify Result monad usage for error handling.
+        Ensure Zod schemas are used for validation.
+        Check that annotations follow the opt-in system with `@libar-docs` marker.
+
+    - path: 'tests/**/*.ts'
+      instructions: |
+        Verify test coverage and quality.
+        Ensure tests use Vitest best practices.
+        Check that step definitions properly map to feature files.
+        Validate fixture usage and test data setup.
+
+    - path: 'tests/features/**/*.feature'
+      instructions: |
+        Validate Gherkin syntax and best practices.
+        Ensure scenarios are clear and follow BDD patterns.
+        Check that feature files align with implemented step definitions.
+
+    - path: 'docs/**/*.md'
+      instructions: |
+        Ensure documentation is clear, accurate, and up-to-date.
+        Check for proper formatting and consistency.
+        Validate that code examples are correct.
+
+    - path: '.github/workflows/*.yml'
+      instructions: |
+        Verify GitHub Actions best practices.
+        Ensure proper Node.js version matrix.
+        Check that CI steps match npm scripts in package.json.
+        Validate caching strategies.
+
+  # Enable automatic incremental reviews
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    drafts: false
+
+  # Tools configuration - disable irrelevant language tools
+  tools:
+    # Keep JavaScript/TypeScript tools
+    eslint:
+      enabled: true
+    biome:
+      enabled: true
+    oxc:
+      enabled: true
+
+    # Keep general tools
+    markdownlint:
+      enabled: true
+    shellcheck:
+      enabled: true
+    actionlint:
+      enabled: true
+    yamllint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    github-checks:
+      enabled: true
+      timeout_ms: 120000 # 2 minutes for comprehensive test suite
+
+    # Disable irrelevant language-specific tools
+    ruff:
+      enabled: false
+    flake8:
+      enabled: false
+    pylint:
+      enabled: false
+    phpstan:
+      enabled: false
+    phpmd:
+      enabled: false
+    phpcs:
+      enabled: false
+    golangci-lint:
+      enabled: false
+    rubocop:
+      enabled: false
+    brakeman:
+      enabled: false
+    swiftlint:
+      enabled: false
+    detekt:
+      enabled: false
+    pmd:
+      enabled: false
+    clang:
+      enabled: false
+    cppcheck:
+      enabled: false
+    clippy:
+      enabled: false
+    fortitudeLint:
+      enabled: false
+    sqlfluff:
+      enabled: false
+    prismaLint:
+      enabled: false
+    shopifyThemeCheck:
+      enabled: false
+    luacheck:
+      enabled: false
+    dotenvLint:
+      enabled: false
+    htmlhint:
+      enabled: false
+    checkmake:
+      enabled: false
+    buf:
+      enabled: false
+    regal:
+      enabled: false
+    circleci:
+      enabled: false
+
+# Knowledge base configuration
+knowledge_base:
+  opt_out: false
+
+  # Use repository coding guidelines
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - '**/CLAUDE.md'
+      - '**/INSTRUCTIONS.md'
+
+  learnings:
+    scope: local # Keep learnings repository-specific
+
+  issues:
+    scope: local
+
+  pull_requests:
+    scope: local
+
+# Chat configuration
+chat:
+  auto_reply: true
+
+# Code generation settings
+code_generation:
+  docstrings:
+    language: en-US
+    path_instructions:
+      - path: 'src/**/*.ts'
+        instructions: |
+          Generate JSDoc comments following the repository's annotation system.
+          Include `@libar-docs` marker when documenting public APIs.
+          Document pattern, status, uses, and other relevant tags.

@@ -13,8 +13,6 @@
 
 ## Description
 
-## Configuration Defaults
-
 Centralized default constants for the delivery-process package.
 These defaults are used when no custom configuration or registry is provided.
 

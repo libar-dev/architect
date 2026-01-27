@@ -20,7 +20,7 @@
  * - Use `PROTECTION_LEVELS` for direct lookups
  */
 
-import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from "../../taxonomy/index.js";
+import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
 
 /**
  * Protection level types for FSM states
@@ -29,7 +29,7 @@ import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from "../../taxonomy/i
  * - `scope`: Scope-locked, prevents adding new deliverables
  * - `hard`: Hard-locked, requires explicit unlock-reason annotation
  */
-export type ProtectionLevel = "none" | "scope" | "hard";
+export type ProtectionLevel = 'none' | 'scope' | 'hard';
 
 /**
  * Protection level mapping per PDR-005
@@ -42,10 +42,10 @@ export type ProtectionLevel = "none" | "scope" | "hard";
  * | deferred  | none       | Parked, fully editable           |
  */
 export const PROTECTION_LEVELS: Readonly<Record<ProcessStatusValue, ProtectionLevel>> = {
-  roadmap: "none",
-  active: "scope",
-  completed: "hard",
-  deferred: "none",
+  roadmap: 'none',
+  active: 'scope',
+  completed: 'hard',
+  deferred: 'none',
 } as const;
 
 /**
@@ -79,7 +79,7 @@ export function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel 
  * ```
  */
 export function isTerminalState(status: ProcessStatusValue): boolean {
-  return status === "completed";
+  return status === 'completed';
 }
 
 /**
@@ -89,7 +89,7 @@ export function isTerminalState(status: ProcessStatusValue): boolean {
  * @returns true if the status has no protection
  */
 export function isFullyEditable(status: ProcessStatusValue): boolean {
-  return PROTECTION_LEVELS[status] === "none";
+  return PROTECTION_LEVELS[status] === 'none';
 }
 
 /**
@@ -99,7 +99,7 @@ export function isFullyEditable(status: ProcessStatusValue): boolean {
  * @returns true if the status prevents scope changes
  */
 export function isScopeLocked(status: ProcessStatusValue): boolean {
-  return PROTECTION_LEVELS[status] === "scope";
+  return PROTECTION_LEVELS[status] === 'scope';
 }
 
 /**

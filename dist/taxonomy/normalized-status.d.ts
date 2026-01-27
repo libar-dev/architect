@@ -29,16 +29,15 @@ export type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];
  * Maps raw status values → normalized display status
  *
  * Includes both:
- * - Current taxonomy values (per PDR-005)
- * - Legacy values (for display backward compatibility)
+ * Canonical taxonomy values (per PDR-005 FSM)
  */
 export declare const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>>;
 /**
  * Normalize any status string to a display bucket
  *
- * Maps various status values to three canonical display states:
- * - "completed": implemented, completed
- * - "active": active, partial, in-progress
+ * Maps status values to three canonical display states:
+ * - "completed": completed
+ * - "active": active
  * - "planned": roadmap, deferred, planned, or any unknown value
  *
  * Per PDR-005: deferred items are treated as planned (not actively worked on)
@@ -49,9 +48,7 @@ export declare const STATUS_NORMALIZATION_MAP: Readonly<Record<string, Normalize
  * @example
  * ```typescript
  * normalizeStatus("completed")   // → "completed"
- * normalizeStatus("implemented") // → "completed" (legacy)
  * normalizeStatus("active")      // → "active"
- * normalizeStatus("partial")     // → "active" (legacy)
  * normalizeStatus("roadmap")     // → "planned"
  * normalizeStatus("deferred")    // → "planned"
  * normalizeStatus(undefined)     // → "planned"

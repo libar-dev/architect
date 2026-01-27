@@ -19,7 +19,7 @@
  * - Use `isTerminalState()` to check if state allows transitions
  * - Use `PROTECTION_LEVELS` for direct lookups
  */
-import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from "../../taxonomy/index.js";
+import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
 /**
  * Protection level types for FSM states
  *
@@ -27,7 +27,7 @@ import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from "../../taxonomy/i
  * - `scope`: Scope-locked, prevents adding new deliverables
  * - `hard`: Hard-locked, requires explicit unlock-reason annotation
  */
-export type ProtectionLevel = "none" | "scope" | "hard";
+export type ProtectionLevel = 'none' | 'scope' | 'hard';
 /**
  * Protection level mapping per PDR-005
  *

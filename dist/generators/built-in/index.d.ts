@@ -18,5 +18,5 @@
  * - Use when setting up documentation generation for a project
  * - Import this module to register all default generators
  */
-import "./codec-generators.js";
+import './codec-generators.js';
 //# sourceMappingURL=index.d.ts.map

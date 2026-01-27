@@ -27,9 +27,9 @@
  * - **Aggregate statistics**: Counts, completion percentages, phase/category counts
  * - **Type-safe views**: All views are typed via Zod schema inference
  */
-import { z } from "zod";
-import { ExtractedPatternSchema } from "./extracted-pattern.js";
-import { TagRegistrySchema } from "./tag-registry.js";
+import { z } from 'zod';
+import { ExtractedPatternSchema } from './extracted-pattern.js';
+import { TagRegistrySchema } from './tag-registry.js';
 // Note: We don't include workflow in the schema because LoadedWorkflow contains Maps
 // which aren't JSON-serializable. The workflow is accessed via context, not stored.
 // ═══════════════════════════════════════════════════════════════════════════

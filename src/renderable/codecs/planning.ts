@@ -12,12 +12,12 @@
  * - SESSION-FINDINGS.md (retrospective discoveries)
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 import {
   MasterDatasetSchema,
   type MasterDataset,
-} from "../../validation-schemas/master-dataset.js";
-import type { ExtractedPattern } from "../../validation-schemas/index.js";
+} from '../../validation-schemas/master-dataset.js';
+import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -27,16 +27,17 @@ import {
   table,
   list,
   document,
-} from "../schema.js";
-import { renderScenarioContent, renderBusinessRulesSection } from "./helpers.js";
-import { getStatusEmoji, getDisplayName, groupBy } from "../utils.js";
-import { normalizeStatus } from "../../taxonomy/index.js";
+} from '../schema.js';
+import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
+import { getStatusEmoji, getDisplayName } from '../utils.js';
+import { normalizeStatus } from '../../taxonomy/index.js';
+import { groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,
   DEFAULT_BASE_OPTIONS,
   mergeOptions,
-} from "./types/base.js";
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Planning Codec Options (co-located with codecs)
@@ -115,7 +116,7 @@ export const DEFAULT_SESSION_PLAN_OPTIONS: Required<SessionPlanCodecOptions> = {
   includeExecutionSteps: true,
   includePrePlanning: true,
   includeRiskAssessment: true,
-  statusFilter: ["planned", "active"],
+  statusFilter: ['planned', 'active'],
 };
 
 /**
@@ -141,7 +142,7 @@ export interface SessionFindingsCodecOptions extends BaseCodecOptions {
   includeLinks?: boolean;
 
   /** Group by (default: "category") */
-  groupBy?: "category" | "phase" | "type";
+  groupBy?: 'category' | 'phase' | 'type';
 }
 
 /**
@@ -155,9 +156,9 @@ export const DEFAULT_SESSION_FINDINGS_OPTIONS: Required<SessionFindingsCodecOpti
   includeLearnings: true,
   showSourcePhase: true,
   includeLinks: true,
-  groupBy: "category",
+  groupBy: 'category',
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Planning Checklist Codec
@@ -177,7 +178,7 @@ export function createPlanningChecklistCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("PlanningChecklistCodec is decode-only. See zod-codecs.md");
+      throw new Error('PlanningChecklistCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -202,7 +203,7 @@ export function createSessionPlanCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("SessionPlanCodec is decode-only. See zod-codecs.md");
+      throw new Error('SessionPlanCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -227,7 +228,7 @@ export function createSessionFindingsCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("SessionFindingsCodec is decode-only. See zod-codecs.md");
+      throw new Error('SessionFindingsCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -266,11 +267,11 @@ function buildPlanningChecklistDocument(
 
   if (phasesToCheck.length === 0) {
     sections.push(
-      heading(2, "Planning Checklists"),
-      paragraph("*No active or actionable phases found.*")
+      heading(2, 'Planning Checklists'),
+      paragraph('*No active or actionable phases found.*')
     );
-    return document("Planning Checklist", sections, {
-      purpose: "Pre-planning questions and Definition of Done validation",
+    return document('Planning Checklist', sections, {
+      purpose: 'Pre-planning questions and Definition of Done validation',
     });
   }
 
@@ -279,15 +280,15 @@ function buildPlanningChecklistDocument(
 
   // Summary
   sections.push(
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     table(
-      ["Metric", "Value"],
+      ['Metric', 'Value'],
       [
-        ["Phases to Plan", String(phasesToCheck.length)],
-        ["Active", String(dataset.byStatus.active.filter((p) => phasesToCheck.includes(p)).length)],
+        ['Phases to Plan', String(phasesToCheck.length)],
+        ['Active', String(dataset.byStatus.active.filter((p) => phasesToCheck.includes(p)).length)],
         [
-          "Next Actionable",
-          String(phasesToCheck.filter((p) => normalizeStatus(p.status) === "planned").length),
+          'Next Actionable',
+          String(phasesToCheck.filter((p) => normalizeStatus(p.status) === 'planned').length),
         ],
       ]
     ),
@@ -299,8 +300,8 @@ function buildPlanningChecklistDocument(
     sections.push(...buildPhaseChecklist(pattern, options, completedNames));
   }
 
-  return document("Planning Checklist", sections, {
-    purpose: "Pre-planning questions and Definition of Done validation",
+  return document('Planning Checklist', sections, {
+    purpose: 'Pre-planning questions and Definition of Done validation',
   });
 }
 
@@ -318,58 +319,58 @@ function buildPhaseChecklist(
   // Pre-planning questions
   if (options.includePrePlanning) {
     const prePlanningItems = [
-      "- [ ] Context and requirements understood?",
-      "- [ ] Dependencies identified and verified?",
-      "- [ ] Implementation approach chosen?",
-      "- [ ] Risks assessed and mitigated?",
+      '- [ ] Context and requirements understood?',
+      '- [ ] Dependencies identified and verified?',
+      '- [ ] Implementation approach chosen?',
+      '- [ ] Risks assessed and mitigated?',
     ];
 
     // Add dependency status
     if (pattern.dependsOn && pattern.dependsOn.length > 0) {
       const depStatus = pattern.dependsOn.map((dep) => {
         const met = completedNames.has(dep);
-        return `  - ${met ? "✅" : "⏳"} ${dep}`;
+        return `  - ${met ? '✅' : '⏳'} ${dep}`;
       });
-      prePlanningItems.push("**Dependencies:**");
+      prePlanningItems.push('**Dependencies:**');
       prePlanningItems.push(...depStatus);
     }
 
-    sections.push(heading(4, "Pre-Planning"), paragraph(prePlanningItems.join("\n")));
+    sections.push(heading(4, 'Pre-Planning'), paragraph(prePlanningItems.join('\n')));
   }
 
   // Definition of Done
   if (options.includeDoD) {
-    const dodItems: string[] = ["**Deliverables:**"];
+    const dodItems: string[] = ['**Deliverables:**'];
     if (pattern.deliverables && pattern.deliverables.length > 0) {
       for (const d of pattern.deliverables) {
-        const status = d.status === "complete" ? "✅" : "- [ ]";
+        const status = d.status === 'complete' ? '✅' : '- [ ]';
         dodItems.push(`${status} ${d.name}`);
       }
     } else {
-      dodItems.push("- [ ] (No deliverables defined)");
+      dodItems.push('- [ ] (No deliverables defined)');
     }
 
     // Acceptance criteria from scenarios
     if (pattern.scenarios && pattern.scenarios.length > 0) {
-      dodItems.push("\n**Acceptance Criteria:**");
+      dodItems.push('\n**Acceptance Criteria:**');
       for (const s of pattern.scenarios) {
         dodItems.push(`- [ ] ${s.scenarioName}`);
       }
     }
 
-    sections.push(heading(4, "Definition of Done"), paragraph(dodItems.join("\n")));
+    sections.push(heading(4, 'Definition of Done'), paragraph(dodItems.join('\n')));
   }
 
   // Risk assessment
   if (options.includeRiskAssessment) {
     sections.push(
-      heading(4, "Risk Assessment"),
+      heading(4, 'Risk Assessment'),
       paragraph(
         [
-          "- [ ] Technical risks identified?",
-          "- [ ] Scope creep controls in place?",
-          "- [ ] Fallback options available?",
-        ].join("\n")
+          '- [ ] Technical risks identified?',
+          '- [ ] Scope creep controls in place?',
+          '- [ ] Fallback options available?',
+        ].join('\n')
       )
     );
   }
@@ -395,11 +396,11 @@ function buildSessionPlanDocument(
 
   if (patterns.length === 0) {
     sections.push(
-      heading(2, "No Phases to Plan"),
-      paragraph("*No phases match the status filter.*")
+      heading(2, 'No Phases to Plan'),
+      paragraph('*No phases match the status filter.*')
     );
-    return document("Session Implementation Plan", sections, {
-      purpose: "Structured implementation plan for coding sessions",
+    return document('Session Implementation Plan', sections, {
+      purpose: 'Structured implementation plan for coding sessions',
     });
   }
 
@@ -409,13 +410,13 @@ function buildSessionPlanDocument(
   // Summary
   const byStatus = groupBy(patterns, (p) => normalizeStatus(p.status));
   sections.push(
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     table(
-      ["Status", "Count"],
+      ['Status', 'Count'],
       [
-        ["Active", String(byStatus.get("active")?.length ?? 0)],
-        ["Planned", String(byStatus.get("planned")?.length ?? 0)],
-        ["Total", String(patterns.length)],
+        ['Active', String(byStatus.get('active')?.length ?? 0)],
+        ['Planned', String(byStatus.get('planned')?.length ?? 0)],
+        ['Total', String(patterns.length)],
       ]
     ),
     separator()
@@ -426,8 +427,8 @@ function buildSessionPlanDocument(
     sections.push(...buildPhasePlan(pattern, options));
   }
 
-  return document("Session Implementation Plan", sections, {
-    purpose: "Structured implementation plan for coding sessions",
+  return document('Session Implementation Plan', sections, {
+    purpose: 'Structured implementation plan for coding sessions',
   });
 }
 
@@ -442,10 +443,10 @@ function buildPhasePlan(
   sections.push(heading(3, `${emoji} ${name}`));
 
   // Metadata
-  const metaRows: string[][] = [["Status", normalizeStatus(pattern.status)]];
-  if (pattern.phase !== undefined) metaRows.push(["Phase", String(pattern.phase)]);
-  if (pattern.effort) metaRows.push(["Effort", pattern.effort]);
-  sections.push(table(["Property", "Value"], metaRows));
+  const metaRows: string[][] = [['Status', normalizeStatus(pattern.status)]];
+  if (pattern.phase !== undefined) metaRows.push(['Phase', String(pattern.phase)]);
+  if (pattern.effort) metaRows.push(['Effort', pattern.effort]);
+  sections.push(table(['Property', 'Value'], metaRows));
 
   // Description
   if (pattern.directive.description) {
@@ -454,21 +455,21 @@ function buildPhasePlan(
 
   // Implementation approach
   if (options.includeImplementationApproach && pattern.useCases && pattern.useCases.length > 0) {
-    sections.push(heading(4, "Implementation Approach"), list([...pattern.useCases]));
+    sections.push(heading(4, 'Implementation Approach'), list([...pattern.useCases]));
   }
 
   // Deliverables
   if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
     const items = pattern.deliverables.map((d) => {
-      const emoji = d.status === "complete" ? "✅" : d.status === "in-progress" ? "🚧" : "📋";
+      const emoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
       return `${emoji} ${d.name}`;
     });
-    sections.push(heading(4, "Deliverables"), list(items));
+    sections.push(heading(4, 'Deliverables'), list(items));
   }
 
   // Acceptance criteria with full steps, DataTables, and DocStrings
   if (options.includeAcceptanceCriteria && pattern.scenarios && pattern.scenarios.length > 0) {
-    sections.push(heading(4, "Acceptance Criteria"));
+    sections.push(heading(4, 'Acceptance Criteria'));
     for (const scenario of pattern.scenarios) {
       sections.push(...renderScenarioContent(scenario));
     }
@@ -493,7 +494,7 @@ function buildSessionFindingsDocument(
 
   // Collect findings from completed patterns
   const findings: Array<{
-    type: "gap" | "improvement" | "risk" | "learning";
+    type: 'gap' | 'improvement' | 'risk' | 'learning';
     text: string;
     sourcePhase?: number;
     sourceName?: string;
@@ -507,7 +508,7 @@ function buildSessionFindingsDocument(
     if (options.includeGaps && pattern.discoveredGaps) {
       for (const gapText of pattern.discoveredGaps) {
         findings.push({
-          type: "gap",
+          type: 'gap',
           text: gapText,
           ...(sourcePhase !== undefined && { sourcePhase }),
           sourceName,
@@ -519,7 +520,7 @@ function buildSessionFindingsDocument(
     if (options.includeImprovements && pattern.discoveredImprovements) {
       for (const improvementText of pattern.discoveredImprovements) {
         findings.push({
-          type: "improvement",
+          type: 'improvement',
           text: improvementText,
           ...(sourcePhase !== undefined && { sourcePhase }),
           sourceName,
@@ -532,7 +533,7 @@ function buildSessionFindingsDocument(
       if (pattern.discoveredRisks) {
         for (const riskText of pattern.discoveredRisks) {
           findings.push({
-            type: "risk",
+            type: 'risk',
             text: riskText,
             ...(sourcePhase !== undefined && { sourcePhase }),
             sourceName,
@@ -542,7 +543,7 @@ function buildSessionFindingsDocument(
       // Also include the single risk field if present
       if (pattern.risk) {
         findings.push({
-          type: "risk",
+          type: 'risk',
           text: pattern.risk,
           ...(sourcePhase !== undefined && { sourcePhase }),
           sourceName,
@@ -554,7 +555,7 @@ function buildSessionFindingsDocument(
     if (options.includeLearnings && pattern.discoveredLearnings) {
       for (const learningText of pattern.discoveredLearnings) {
         findings.push({
-          type: "learning",
+          type: 'learning',
           text: learningText,
           ...(sourcePhase !== undefined && { sourcePhase }),
           sourceName,
@@ -565,37 +566,37 @@ function buildSessionFindingsDocument(
 
   if (findings.length === 0) {
     sections.push(
-      heading(2, "No Findings"),
-      paragraph("*No gaps, improvements, risks, or learnings discovered yet.*")
+      heading(2, 'No Findings'),
+      paragraph('*No gaps, improvements, risks, or learnings discovered yet.*')
     );
-    return document("Session Findings", sections, {
-      purpose: "Retrospective discoveries for roadmap refinement",
+    return document('Session Findings', sections, {
+      purpose: 'Retrospective discoveries for roadmap refinement',
     });
   }
 
   // Summary
   const byType = groupBy(findings, (f) => f.type);
   sections.push(
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     table(
-      ["Finding Type", "Count"],
+      ['Finding Type', 'Count'],
       [
-        ["Gaps", String(byType.get("gap")?.length ?? 0)],
-        ["Improvements", String(byType.get("improvement")?.length ?? 0)],
-        ["Risks", String(byType.get("risk")?.length ?? 0)],
-        ["Learnings", String(byType.get("learning")?.length ?? 0)],
-        ["**Total**", String(findings.length)],
+        ['Gaps', String(byType.get('gap')?.length ?? 0)],
+        ['Improvements', String(byType.get('improvement')?.length ?? 0)],
+        ['Risks', String(byType.get('risk')?.length ?? 0)],
+        ['Learnings', String(byType.get('learning')?.length ?? 0)],
+        ['**Total**', String(findings.length)],
       ]
     ),
     separator()
   );
 
   // Group by category or type
-  if (options.groupBy === "category" || options.groupBy === "type") {
+  if (options.groupBy === 'category' || options.groupBy === 'type') {
     for (const [type, typeFindings] of byType.entries()) {
       const emoji =
-        type === "gap" ? "🔍" : type === "improvement" ? "💡" : type === "risk" ? "⚠️" : "📚";
-      const title = type.charAt(0).toUpperCase() + type.slice(1) + "s";
+        type === 'gap' ? '🔍' : type === 'improvement' ? '💡' : type === 'risk' ? '⚠️' : '📚';
+      const title = type.charAt(0).toUpperCase() + type.slice(1) + 's';
 
       sections.push(heading(3, `${emoji} ${title}`));
 
@@ -603,7 +604,7 @@ function buildSessionFindingsDocument(
         const source =
           options.showSourcePhase && f.sourcePhase !== undefined
             ? ` *(Phase ${f.sourcePhase})*`
-            : "";
+            : '';
         return `${f.text}${source}`;
       });
 
@@ -620,13 +621,13 @@ function buildSessionFindingsDocument(
 
       const items = phaseFindings.map((f) => {
         const emoji =
-          f.type === "gap"
-            ? "🔍"
-            : f.type === "improvement"
-              ? "💡"
-              : f.type === "risk"
-                ? "⚠️"
-                : "📚";
+          f.type === 'gap'
+            ? '🔍'
+            : f.type === 'improvement'
+              ? '💡'
+              : f.type === 'risk'
+                ? '⚠️'
+                : '📚';
         return `${emoji} ${f.text}`;
       });
 
@@ -636,7 +637,7 @@ function buildSessionFindingsDocument(
 
   sections.push(separator());
 
-  return document("Session Findings", sections, {
-    purpose: "Retrospective discoveries for roadmap refinement",
+  return document('Session Findings', sections, {
+    purpose: 'Retrospective discoveries for roadmap refinement',
   });
 }

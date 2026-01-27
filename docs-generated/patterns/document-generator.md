@@ -13,8 +13,6 @@
 
 ## Description
 
-## Document Generation
-
 Simplified document generation using codecs.
 Replaces the complex BuiltInGenerator + SectionRegistry pattern.
 

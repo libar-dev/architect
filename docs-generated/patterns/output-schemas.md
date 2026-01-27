@@ -13,8 +13,6 @@
 
 ## Description
 
-## OutputSchemas - JSON Output Format Schemas
-
 Zod schemas for JSON output formats used by CLI tools.
 These schemas document the contract for JSON consumers (CI tools, IDE integrations)
 and provide pre-serialization validation for type safety.

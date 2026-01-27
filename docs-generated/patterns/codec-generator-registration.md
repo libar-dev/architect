@@ -13,8 +13,6 @@
 
 ## Description
 
-## Codec-Based Generator Registration
-
 Registers codec-based generators for the RenderableDocument Model (RDM) system.
 These generators use Zod 4 codecs to transform MasterDataset into RenderableDocuments,
 which are then rendered to markdown via the universal renderer.

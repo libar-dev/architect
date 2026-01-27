@@ -18,14 +18,11 @@
  * - Use individual rules for targeted validation
  */
 
-import type { DocDirective } from "../validation-schemas/doc-directive.js";
-import type { LintSeverity, LintViolation } from "../validation-schemas/lint.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import { STATUS_NORMALIZATION_MAP, PROCESS_STATUS_VALUES } from "../taxonomy/index.js";
-import { DEFAULT_TAG_PREFIX } from "../config/defaults.js";
-
-// Re-export types from schema for backwards compatibility
-export type { LintSeverity, LintViolation };
+import type { DocDirective } from '../validation-schemas/doc-directive.js';
+import type { LintSeverity, LintViolation } from '../validation-schemas/lint.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import { STATUS_NORMALIZATION_MAP, PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
+import { DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 
 /**
  * Context for lint rules that need access to the full pattern registry.
@@ -100,9 +97,9 @@ function getTagPrefix(context?: LintContext): string {
  * or indexed properly.
  */
 export const missingPatternName: LintRule = {
-  id: "missing-pattern-name",
-  severity: "error",
-  description: "Pattern must have explicit pattern name tag",
+  id: 'missing-pattern-name',
+  severity: 'error',
+  description: 'Pattern must have explicit pattern name tag',
   check: (directive, file, line, context) => {
     // Skip if this is an implementation-only file (has implements tag)
     // Implementation files realize patterns defined elsewhere and don't need their own name
@@ -111,11 +108,11 @@ export const missingPatternName: LintRule = {
       return null;
     }
 
-    if (!directive.patternName || directive.patternName.trim() === "") {
+    if (!directive.patternName || directive.patternName.trim() === '') {
       const tagPrefix = getTagPrefix(context);
       return violation(
-        "missing-pattern-name",
-        "error",
+        'missing-pattern-name',
+        'error',
         `Pattern missing explicit name. Add ${tagPrefix}pattern YourPatternName`,
         file,
         line
@@ -132,15 +129,15 @@ export const missingPatternName: LintRule = {
  * This helps readers understand if the pattern is ready for use.
  */
 export const missingStatus: LintRule = {
-  id: "missing-status",
-  severity: "warning",
-  description: "Pattern should have status tag (completed|active|roadmap)",
+  id: 'missing-status',
+  severity: 'warning',
+  description: 'Pattern should have status tag (completed|active|roadmap)',
   check: (directive, file, line, context) => {
     if (!directive.status) {
       const tagPrefix = getTagPrefix(context);
       return violation(
-        "missing-status",
-        "warning",
+        'missing-status',
+        'warning',
         `No ${tagPrefix}status found. Add: ${tagPrefix}status completed|active|roadmap`,
         file,
         line
@@ -159,10 +156,10 @@ export const missingStatus: LintRule = {
  * Accepted legacy aliases: implemented → completed, partial → active, in-progress → active, planned → planned
  */
 export const invalidStatus: LintRule = {
-  id: "invalid-status",
-  severity: "error",
+  id: 'invalid-status',
+  severity: 'error',
   description:
-    "Status must be a valid FSM state (roadmap, active, completed, deferred) or legacy alias",
+    'Status must be a valid FSM state (roadmap, active, completed, deferred) or legacy alias',
   check: (directive, file, line) => {
     // Skip if no status (handled by missing-status rule)
     if (!directive.status) {
@@ -174,15 +171,15 @@ export const invalidStatus: LintRule = {
     if (!normalizedStatus) {
       const validValues = [
         ...PROCESS_STATUS_VALUES,
-        "implemented",
-        "partial",
-        "in-progress",
-        "planned",
+        'implemented',
+        'partial',
+        'in-progress',
+        'planned',
       ];
       return violation(
-        "invalid-status",
-        "error",
-        `Invalid status '${directive.status}'. Valid values: ${validValues.join(", ")}.`,
+        'invalid-status',
+        'error',
+        `Invalid status '${directive.status}'. Valid values: ${validValues.join(', ')}.`,
         file,
         line
       );
@@ -198,15 +195,15 @@ export const invalidStatus: LintRule = {
  * This helps developers understand when the pattern applies.
  */
 export const missingWhenToUse: LintRule = {
-  id: "missing-when-to-use",
-  severity: "warning",
+  id: 'missing-when-to-use',
+  severity: 'warning',
   description: 'Pattern should have "When to Use" section in description',
   check: (directive, file, line) => {
     // whenToUse is now an array of bullet points
     if (!directive.whenToUse || directive.whenToUse.length === 0) {
       return violation(
-        "missing-when-to-use",
-        "warning",
+        'missing-when-to-use',
+        'warning',
         'No "When to Use" section found. Add ### When to Use or **When to use:** in description',
         file,
         line
@@ -223,27 +220,27 @@ export const missingWhenToUse: LintRule = {
  * A tautological description provides no useful information.
  */
 export const tautologicalDescription: LintRule = {
-  id: "tautological-description",
-  severity: "error",
-  description: "Description should not simply repeat the pattern name",
+  id: 'tautological-description',
+  severity: 'error',
+  description: 'Description should not simply repeat the pattern name',
   check: (directive, file, line) => {
     if (!directive.patternName || !directive.description) {
       return null;
     }
 
     // Get first meaningful line of description (skip empty lines and headings)
-    const lines = directive.description.split("\n");
+    const lines = directive.description.split('\n');
     const firstLine = lines
       .map((l) => l.trim())
-      .find((l) => l.length > 0 && !l.startsWith("#") && !l.startsWith("**When"));
+      .find((l) => l.length > 0 && !l.startsWith('#') && !l.startsWith('**When'));
 
     if (!firstLine) {
       return null;
     }
 
     // Normalize for comparison (lowercase, remove punctuation)
-    const normalizedName = directive.patternName.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const normalizedDesc = firstLine.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const normalizedName = directive.patternName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const normalizedDesc = firstLine.toLowerCase().replace(/[^a-z0-9]/g, '');
 
     // Check if description starts with or equals the pattern name
     if (normalizedDesc === normalizedName || normalizedDesc.startsWith(normalizedName)) {
@@ -252,8 +249,8 @@ export const tautologicalDescription: LintRule = {
         return null;
       }
       return violation(
-        "tautological-description",
-        "error",
+        'tautological-description',
+        'error',
         `Description repeats pattern name "${directive.patternName}". Provide meaningful context.`,
         file,
         line
@@ -270,9 +267,9 @@ export const tautologicalDescription: LintRule = {
  * dependency tracking. This is informational only.
  */
 export const missingRelationships: LintRule = {
-  id: "missing-relationships",
-  severity: "info",
-  description: "Consider adding uses and used-by tags",
+  id: 'missing-relationships',
+  severity: 'info',
+  description: 'Consider adding uses and used-by tags',
   check: (directive, file, line, context) => {
     const hasUses = (directive.uses?.length ?? 0) > 0;
     const hasUsedBy = (directive.usedBy?.length ?? 0) > 0;
@@ -280,8 +277,8 @@ export const missingRelationships: LintRule = {
     if (!hasUses && !hasUsedBy) {
       const tagPrefix = getTagPrefix(context);
       return violation(
-        "missing-relationships",
-        "info",
+        'missing-relationships',
+        'info',
         `Consider adding relationship tags: ${tagPrefix}uses and/or ${tagPrefix}used-by`,
         file,
         line
@@ -303,9 +300,9 @@ export const missingRelationships: LintRule = {
  * Having both would create conflicting definitions.
  */
 export const patternConflictInImplements: LintRule = {
-  id: "pattern-conflict-in-implements",
-  severity: "error",
-  description: "Implementation files must not define patterns",
+  id: 'pattern-conflict-in-implements',
+  severity: 'error',
+  description: 'Implementation files must not define patterns',
   check: (directive, file, line, context) => {
     const hasImplements = (directive.implements?.length ?? 0) > 0;
     const hasPattern = directive.patternName !== undefined;
@@ -313,10 +310,10 @@ export const patternConflictInImplements: LintRule = {
     if (hasImplements && hasPattern) {
       const tagPrefix = getTagPrefix(context);
       return violation(
-        "pattern-conflict-in-implements",
-        "error",
+        'pattern-conflict-in-implements',
+        'error',
         `Files with ${tagPrefix}implements must not also define ${tagPrefix}pattern. ` +
-          "Implementation files realize patterns defined elsewhere.",
+          'Implementation files realize patterns defined elsewhere.',
         file,
         line
       );
@@ -335,9 +332,9 @@ export const patternConflictInImplements: LintRule = {
  * This is a context-aware rule that requires access to the pattern registry.
  */
 export const missingRelationshipTarget: LintRule = {
-  id: "missing-relationship-target",
-  severity: "warning",
-  description: "Relationship targets must reference existing patterns",
+  id: 'missing-relationship-target',
+  severity: 'warning',
+  description: 'Relationship targets must reference existing patterns',
   check: (directive, file, line, context) => {
     // Skip if no context provided (non-strict mode)
     if (!context?.knownPatterns) {
@@ -351,8 +348,8 @@ export const missingRelationshipTarget: LintRule = {
       if (!context.knownPatterns.has(target)) {
         violations.push(
           violation(
-            "missing-relationship-target",
-            "warning",
+            'missing-relationship-target',
+            'warning',
             `Relationship target '${target}' not found in known patterns`,
             file,
             line
@@ -366,8 +363,8 @@ export const missingRelationshipTarget: LintRule = {
       if (!context.knownPatterns.has(target)) {
         violations.push(
           violation(
-            "missing-relationship-target",
-            "warning",
+            'missing-relationship-target',
+            'warning',
             `Implementation target '${target}' not found in known patterns`,
             file,
             line

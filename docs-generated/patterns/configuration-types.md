@@ -13,8 +13,6 @@
 
 ## Description
 
-## Configuration Types
-
 Type definitions for the delivery process configuration system.
 Provides fully type-safe configuration with generics to preserve literal types from presets.
 

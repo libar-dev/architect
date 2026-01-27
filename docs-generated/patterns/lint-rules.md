@@ -13,8 +13,6 @@
 
 ## Description
 
-## LintRules - Annotation Quality Rules
-
 Defines lint rules that check @libar-docs-* directives for completeness
 and quality. Rules include: missing-pattern-name, missing-status,
 missing-when-to-use, tautological-description, and missing-relationships.

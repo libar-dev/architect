@@ -27,25 +27,24 @@
  * export default createDeliveryProcess({ preset: "libar-generic" });
  * ```
  */
-import * as fs from "fs/promises";
-import { existsSync } from "fs";
-import * as path from "path";
-import { pathToFileURL } from "url";
-import { createDeliveryProcess } from "./factory.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { pathToFileURL } from 'url';
+import { createDeliveryProcess } from './factory.js';
 /**
  * Config file name to search for
  */
-const CONFIG_FILE_NAME = "delivery-process.config.ts";
+const CONFIG_FILE_NAME = 'delivery-process.config.ts';
 /**
  * Compiled JavaScript variant (for projects that pre-compile configs)
  */
-const CONFIG_FILE_NAME_JS = "delivery-process.config.js";
+const CONFIG_FILE_NAME_JS = 'delivery-process.config.js';
 /**
  * Check if a directory contains a .git folder (repo root marker)
  */
 async function isRepoRoot(dir) {
     try {
-        const gitPath = path.join(dir, ".git");
+        const gitPath = path.join(dir, '.git');
         const stat = await fs.stat(gitPath);
         return stat.isDirectory() || stat.isFile(); // .git can be a file (worktree)
     }
@@ -115,9 +114,7 @@ async function importConfigFile(configPath) {
     }
     const config = module.default;
     // Validate that it's a DeliveryProcessInstance (has required properties)
-    if (typeof config !== "object" ||
-        !("registry" in config) ||
-        !("regexBuilders" in config)) {
+    if (typeof config !== 'object' || !('registry' in config) || !('regexBuilders' in config)) {
         throw new Error(`Config file must export a DeliveryProcessInstance (use createDeliveryProcess()): ${configPath}`);
     }
     return config;
@@ -182,7 +179,7 @@ export async function loadConfig(baseDir) {
         return {
             ok: false,
             error: {
-                type: "config-load-error",
+                type: 'config-load-error',
                 path: configPath,
                 message: `Failed to load config: ${message}`,
                 cause: error instanceof Error ? error : undefined,
@@ -201,40 +198,6 @@ export function formatConfigError(error) {
     if (error.cause) {
         lines.push(`  Cause: ${error.cause.message}`);
     }
-    return lines.join("\n");
-}
-/**
- * Synchronous check for config file (for non-async contexts)
- *
- * Note: This only checks if the file exists, not if it's valid.
- * Use loadConfig() for full validation.
- *
- * @param startDir - Directory to start searching from
- * @returns Path to config file or null
- */
-export function findConfigFileSync(startDir) {
-    let currentDir = path.resolve(startDir);
-    const root = path.parse(currentDir).root;
-    while (currentDir !== root) {
-        const tsConfigPath = path.join(currentDir, CONFIG_FILE_NAME);
-        if (existsSync(tsConfigPath)) {
-            return tsConfigPath;
-        }
-        const jsConfigPath = path.join(currentDir, CONFIG_FILE_NAME_JS);
-        if (existsSync(jsConfigPath)) {
-            return jsConfigPath;
-        }
-        // Check for .git to stop at repo root
-        const gitPath = path.join(currentDir, ".git");
-        if (existsSync(gitPath)) {
-            break;
-        }
-        const parentDir = path.dirname(currentDir);
-        if (parentDir === currentDir) {
-            break;
-        }
-        currentDir = parentDir;
-    }
-    return null;
+    return lines.join('\n');
 }
 //# sourceMappingURL=config-loader.js.map

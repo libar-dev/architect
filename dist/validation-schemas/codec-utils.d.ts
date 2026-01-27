@@ -4,7 +4,7 @@
  * @libar-docs-pattern CodecUtils
  * @libar-docs-status completed
  * @libar-docs-uses Zod
- * @libar-docs-used-by TagRegistryLoader, ArtefactSetLoader, WorkflowLoader, Orchestrator
+ * @libar-docs-used-by WorkflowLoader, Orchestrator
  * @libar-docs-usecase "When loading JSON config files with type-safe validation"
  * @libar-docs-usecase "When serializing typed objects to formatted JSON"
  *
@@ -26,16 +26,16 @@
  * - **Output Codec**: Validates object → serializes → returns formatted JSON string
  * - **Error Context**: Adds file path and validation details to error messages
  */
-import type { ZodType } from "zod";
-import type { Result } from "../types/index.js";
+import type { ZodType } from 'zod';
+import type { Result } from '../types/index.js';
 /**
  * Error details for codec operations
  */
 export interface CodecError {
     /** Error type identifier */
-    type: "codec-error";
+    type: 'codec-error';
     /** Operation that failed: 'parse' or 'serialize' */
-    operation: "parse" | "serialize";
+    operation: 'parse' | 'serialize';
     /** Optional source identifier (file path, URL, etc.) */
     source?: string | undefined;
     /** Human-readable error message */

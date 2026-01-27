@@ -41,7 +41,7 @@
 - And output should include rationale "Check-then-create patterns..."
 - And output should include verification link to "Concurrent reservations scenario"
 
-```markdown
+```gherkin
 Rule: Reservations prevent race conditions
 
   **Invariant:** Only one reservation can exist for a given key at a time.
@@ -59,7 +59,7 @@ Rule: Reservations prevent race conditions
 - And output should include description "Events cannot be modified..."
 - And invariant should be marked as "not specified"
 
-```markdown
+```gherkin
 Rule: Events are immutable
   Events cannot be modified after creation.
 ```
@@ -114,7 +114,7 @@ Rule: Events are immutable
 - And output should link to "Concurrent reservations" scenario
 - And output should link to "Expired reservation cleanup" scenario
 
-```markdown
+```gherkin
 Rule: Reservations prevent race conditions
   **Verified by:** Concurrent reservations, Expired reservation cleanup
 ```

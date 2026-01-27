@@ -18,8 +18,8 @@
  * - Use when building CI pipelines for documentation standards
  * - Use for formatting lint results (pretty or JSON output)
  */
-import { severityOrder, } from "./rules.js";
-import { createJsonOutputCodec, LintOutputSchema, } from "../validation-schemas/index.js";
+import { severityOrder } from './rules.js';
+import { createJsonOutputCodec, LintOutputSchema, } from '../validation-schemas/index.js';
 /**
  * Codec for serializing lint output to JSON
  */
@@ -74,13 +74,13 @@ export function lintFiles(files, rules, context) {
         // Count by severity
         for (const violation of fileViolations) {
             switch (violation.severity) {
-                case "error":
+                case 'error':
                     errorCount++;
                     break;
-                case "warning":
+                case 'warning':
                     warningCount++;
                     break;
-                case "info":
+                case 'info':
                     infoCount++;
                     break;
             }
@@ -142,7 +142,7 @@ export function formatPretty(summary, options = {}) {
     for (const result of summary.results) {
         const sorted = sortViolationsBySeverity(result.violations);
         // Filter based on quiet mode
-        const filtered = options.quiet === true ? sorted.filter((v) => v.severity === "error") : sorted;
+        const filtered = options.quiet === true ? sorted.filter((v) => v.severity === 'error') : sorted;
         if (filtered.length === 0)
             continue;
         lines.push(result.file);
@@ -150,39 +150,39 @@ export function formatPretty(summary, options = {}) {
             const severityColor = getSeverityPrefix(v.severity);
             lines.push(`  ${v.line}:1  ${severityColor}  ${v.rule}  ${v.message}`);
         }
-        lines.push(""); // Blank line between files
+        lines.push(''); // Blank line between files
     }
     // Summary line
     const parts = [];
     if (summary.errorCount > 0) {
-        parts.push(`${summary.errorCount} error${summary.errorCount === 1 ? "" : "s"}`);
+        parts.push(`${summary.errorCount} error${summary.errorCount === 1 ? '' : 's'}`);
     }
     if (summary.warningCount > 0 && options.quiet !== true) {
-        parts.push(`${summary.warningCount} warning${summary.warningCount === 1 ? "" : "s"}`);
+        parts.push(`${summary.warningCount} warning${summary.warningCount === 1 ? '' : 's'}`);
     }
     if (summary.infoCount > 0 && options.quiet !== true) {
         parts.push(`${summary.infoCount} info`);
     }
     if (parts.length > 0) {
-        const icon = summary.errorCount > 0 ? "\u2717" : summary.warningCount > 0 ? "\u26a0" : "\u2713";
-        lines.push(`${icon} ${parts.join(", ")}`);
+        const icon = summary.errorCount > 0 ? '\u2717' : summary.warningCount > 0 ? '\u26a0' : '\u2713';
+        lines.push(`${icon} ${parts.join(', ')}`);
     }
     else {
         lines.push(`\u2713 No issues found (${summary.directivesChecked} directives checked)`);
     }
-    return lines.join("\n");
+    return lines.join('\n');
 }
 /**
  * Get severity prefix for output
  */
 function getSeverityPrefix(severity) {
     switch (severity) {
-        case "error":
-            return "error  ";
-        case "warning":
-            return "warning";
-        case "info":
-            return "info   ";
+        case 'error':
+            return 'error  ';
+        case 'warning':
+            return 'warning';
+        case 'info':
+            return 'info   ';
     }
 }
 /**

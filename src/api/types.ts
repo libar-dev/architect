@@ -16,9 +16,9 @@
  * - Use QueryResult<T> for typed response handling
  */
 
-import type { ProcessStatusValue } from "../taxonomy/index.js";
-import type { ExtractedPattern } from "../validation-schemas/extracted-pattern.js";
-import type { ImplementationRef } from "../validation-schemas/master-dataset.js";
+import type { ProcessStatusValue } from '../taxonomy/index.js';
+import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
+import type { ImplementationRef } from '../validation-schemas/master-dataset.js';
 
 // =============================================================================
 // Query Response Types
@@ -40,12 +40,12 @@ export interface QuerySuccess<T> {
  * Error codes for query failures
  */
 export type QueryErrorCode =
-  | "INVALID_STATUS"
-  | "INVALID_TRANSITION"
-  | "PATTERN_NOT_FOUND"
-  | "PHASE_NOT_FOUND"
-  | "QUARTER_NOT_FOUND"
-  | "CATEGORY_NOT_FOUND";
+  | 'INVALID_STATUS'
+  | 'INVALID_TRANSITION'
+  | 'PATTERN_NOT_FOUND'
+  | 'PHASE_NOT_FOUND'
+  | 'QUARTER_NOT_FOUND'
+  | 'CATEGORY_NOT_FOUND';
 
 /**
  * Failed query response
@@ -214,7 +214,7 @@ export interface TransitionCheck {
  */
 export interface ProtectionInfo {
   status: ProcessStatusValue;
-  level: "none" | "scope" | "hard";
+  level: 'none' | 'scope' | 'hard';
   description: string;
   canAddDeliverables: boolean;
   requiresUnlock: boolean;

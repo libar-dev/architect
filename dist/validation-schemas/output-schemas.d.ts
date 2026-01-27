@@ -25,7 +25,7 @@
  * - **Output Schemas**: Define the shape of JSON output for external consumers
  * - **Codec Pattern**: Validate before serialize, not just after parse
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Schema for individual lint violation in JSON output
  *

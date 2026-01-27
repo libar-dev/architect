@@ -13,8 +13,6 @@
 
 ## Description
 
-## CollectionUtilities - Array and Map Operations
-
 Provides shared utilities for working with arrays and collections,
 such as grouping items by a key function.
 

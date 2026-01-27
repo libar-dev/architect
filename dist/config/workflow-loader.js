@@ -17,18 +17,18 @@
  * - Use when validating custom workflow configuration files
  * - Use when loading default 6-phase-standard workflow
  */
-import * as fs from "fs/promises";
-import * as path from "path";
-import { fileURLToPath } from "url";
-import { Result } from "../types/result.js";
-import { WorkflowConfigSchema, createLoadedWorkflow, } from "../validation-schemas/workflow-config.js";
-import { createJsonInputCodec } from "../validation-schemas/codec-utils.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { Result } from '../types/result.js';
+import { WorkflowConfigSchema, createLoadedWorkflow, } from '../validation-schemas/workflow-config.js';
+import { createJsonInputCodec } from '../validation-schemas/codec-utils.js';
 /**
  * Codec for parsing and validating workflow configuration JSON
  */
 const WorkflowConfigCodec = createJsonInputCodec(WorkflowConfigSchema);
 /** Default workflow name */
-const DEFAULT_WORKFLOW_NAME = "6-phase-standard";
+const DEFAULT_WORKFLOW_NAME = '6-phase-standard';
 /**
  * Get the path to the catalogue/workflows directory
  *
@@ -37,8 +37,8 @@ const DEFAULT_WORKFLOW_NAME = "6-phase-standard";
 function getCatalogueWorkflowsPath() {
     // Handle both ESM and CJS module resolution
     const currentFile = fileURLToPath(import.meta.url);
-    const packageRoot = path.resolve(path.dirname(currentFile), "../..");
-    return path.join(packageRoot, "catalogue", "workflows");
+    const packageRoot = path.resolve(path.dirname(currentFile), '../..');
+    return path.join(packageRoot, 'catalogue', 'workflows');
 }
 /**
  * Load workflow configuration by name from catalogue
@@ -85,22 +85,22 @@ export async function loadWorkflowFromPath(configPath, source) {
     // Read file
     let content;
     try {
-        content = await fs.readFile(configPath, "utf-8");
+        content = await fs.readFile(configPath, 'utf-8');
     }
     catch (error) {
         // Handle file read errors
-        if (error instanceof Error && "code" in error) {
+        if (error instanceof Error && 'code' in error) {
             const nodeError = error;
-            if (nodeError.code === "ENOENT") {
+            if (nodeError.code === 'ENOENT') {
                 return Result.err({
-                    type: "workflow-load-error",
+                    type: 'workflow-load-error',
                     source: errorSource,
                     message: `Workflow file not found: ${configPath}`,
                 });
             }
-            if (nodeError.code === "EACCES") {
+            if (nodeError.code === 'EACCES') {
                 return Result.err({
-                    type: "workflow-load-error",
+                    type: 'workflow-load-error',
                     source: errorSource,
                     message: `Permission denied reading workflow: ${configPath}`,
                 });
@@ -108,7 +108,7 @@ export async function loadWorkflowFromPath(configPath, source) {
         }
         const message = error instanceof Error ? error.message : String(error);
         return Result.err({
-            type: "workflow-load-error",
+            type: 'workflow-load-error',
             source: errorSource,
             message: `Failed to load workflow: ${message}`,
         });
@@ -117,7 +117,7 @@ export async function loadWorkflowFromPath(configPath, source) {
     const parseResult = WorkflowConfigCodec.parse(content, errorSource);
     if (!parseResult.ok) {
         const error = {
-            type: "workflow-load-error",
+            type: 'workflow-load-error',
             source: errorSource,
             message: parseResult.error.message,
         };
@@ -171,57 +171,9 @@ export async function loadDefaultWorkflow() {
 export function formatWorkflowLoadError(error) {
     const lines = [`Workflow error: ${error.message}`, `  Source: ${error.source}`];
     if (error.validationErrors && error.validationErrors.length > 0) {
-        lines.push("  Validation errors:");
+        lines.push('  Validation errors:');
         lines.push(...error.validationErrors);
     }
-    return lines.join("\n");
-}
-/**
- * Get status emoji from loaded workflow
- *
- * Provides a convenient way to look up emoji for a status from a LoadedWorkflow.
- * Returns empty string if status not found.
- *
- * @param workflow - LoadedWorkflow instance
- * @param status - Status name to look up
- * @returns Emoji string or empty string if not found
- *
- * @example
- * ```typescript
- * const workflow = await loadDefaultWorkflow();
- * const emoji = getWorkflowStatusEmoji(workflow, "completed"); // "✅"
- * ```
- */
-export function getWorkflowStatusEmoji(workflow, status) {
-    if (!status)
-        return "";
-    const statusDef = workflow.statusMap.get(status.toLowerCase());
-    return statusDef?.emoji ?? "";
-}
-/**
- * Get status label from loaded workflow
- *
- * Returns the human-readable label for a status, or the capitalized
- * status name if no label is defined.
- *
- * @param workflow - LoadedWorkflow instance
- * @param status - Status name to look up
- * @returns Label string
- *
- * @example
- * ```typescript
- * const workflow = await loadDefaultWorkflow();
- * const label = getWorkflowStatusLabel(workflow, "roadmap"); // "Planned"
- * ```
- */
-export function getWorkflowStatusLabel(workflow, status) {
-    if (!status)
-        return "Unknown";
-    const statusDef = workflow.statusMap.get(status.toLowerCase());
-    if (statusDef?.label) {
-        return statusDef.label;
-    }
-    // Capitalize status name as fallback
-    return status.charAt(0).toUpperCase() + status.slice(1);
+    return lines.join('\n');
 }
 //# sourceMappingURL=workflow-loader.js.map

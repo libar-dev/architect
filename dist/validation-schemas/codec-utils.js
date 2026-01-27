@@ -4,7 +4,7 @@
  * @libar-docs-pattern CodecUtils
  * @libar-docs-status completed
  * @libar-docs-uses Zod
- * @libar-docs-used-by TagRegistryLoader, ArtefactSetLoader, WorkflowLoader, Orchestrator
+ * @libar-docs-used-by WorkflowLoader, Orchestrator
  * @libar-docs-usecase "When loading JSON config files with type-safe validation"
  * @libar-docs-usecase "When serializing typed objects to formatted JSON"
  *
@@ -26,7 +26,7 @@
  * - **Output Codec**: Validates object → serializes → returns formatted JSON string
  * - **Error Context**: Adds file path and validation details to error messages
  */
-import { Result as R } from "../types/index.js";
+import { Result as R } from '../types/index.js';
 /**
  * Format Zod validation errors for display
  *
@@ -35,7 +35,7 @@ import { Result as R } from "../types/index.js";
  */
 function formatZodErrors(error) {
     return error.issues.map((issue) => {
-        const pathStr = issue.path.length > 0 ? issue.path.join(".") : "(root)";
+        const pathStr = issue.path.length > 0 ? issue.path.join('.') : '(root)';
         return `  - ${pathStr}: ${issue.message}`;
     });
 }
@@ -78,14 +78,14 @@ export function createJsonInputCodec(schema) {
             catch (e) {
                 const message = e instanceof Error ? e.message : String(e);
                 return R.err({
-                    type: "codec-error",
-                    operation: "parse",
+                    type: 'codec-error',
+                    operation: 'parse',
                     source,
                     message: source ? `Invalid JSON in ${source}: ${message}` : `Invalid JSON: ${message}`,
                 });
             }
             // Step 2: Strip $schema field if present (JSON Schema references)
-            const configData = typeof data === "object" && data !== null && "$schema" in data
+            const configData = typeof data === 'object' && data !== null && '$schema' in data
                 ? (({ $schema: _, ...rest }) => rest)(data)
                 : data;
             // Step 3: Validate with Zod
@@ -93,10 +93,10 @@ export function createJsonInputCodec(schema) {
             if (!parseResult.success) {
                 const validationErrors = formatZodErrors(parseResult.error);
                 return R.err({
-                    type: "codec-error",
-                    operation: "parse",
+                    type: 'codec-error',
+                    operation: 'parse',
                     source,
-                    message: source ? `Schema validation failed for ${source}` : "Schema validation failed",
+                    message: source ? `Schema validation failed for ${source}` : 'Schema validation failed',
                     validationErrors,
                 });
             }
@@ -144,12 +144,12 @@ export function createJsonOutputCodec(schema, defaultIndent = 2) {
             if (!parseResult.success) {
                 const validationErrors = formatZodErrors(parseResult.error);
                 return R.err({
-                    type: "codec-error",
-                    operation: "serialize",
+                    type: 'codec-error',
+                    operation: 'serialize',
                     source,
                     message: source
                         ? `Schema validation failed before serializing ${source}`
-                        : "Schema validation failed before serialization",
+                        : 'Schema validation failed before serialization',
                     validationErrors,
                 });
             }
@@ -161,8 +161,8 @@ export function createJsonOutputCodec(schema, defaultIndent = 2) {
             catch (e) {
                 const message = e instanceof Error ? e.message : String(e);
                 return R.err({
-                    type: "codec-error",
-                    operation: "serialize",
+                    type: 'codec-error',
+                    operation: 'serialize',
                     source,
                     message: source
                         ? `JSON serialization failed for ${source}: ${message}`
@@ -190,10 +190,10 @@ export function createJsonOutputCodec(schema, defaultIndent = 2) {
 export function formatCodecError(error) {
     const lines = [`Codec error (${error.operation}): ${error.message}`];
     if (error.validationErrors && error.validationErrors.length > 0) {
-        lines.push("Validation errors:");
+        lines.push('Validation errors:');
         lines.push(...error.validationErrors);
     }
-    return lines.join("\n");
+    return lines.join('\n');
 }
 /**
  * Create a file loader that uses a codec for validation
@@ -227,28 +227,28 @@ export function createFileLoader(codec, readFile) {
         catch (e) {
             const message = e instanceof Error ? e.message : String(e);
             // Check for common file errors
-            if (e instanceof Error && "code" in e) {
+            if (e instanceof Error && 'code' in e) {
                 const nodeError = e;
-                if (nodeError.code === "ENOENT") {
+                if (nodeError.code === 'ENOENT') {
                     return R.err({
-                        type: "codec-error",
-                        operation: "parse",
+                        type: 'codec-error',
+                        operation: 'parse',
                         source: path,
                         message: `File not found: ${path}`,
                     });
                 }
-                if (nodeError.code === "EACCES") {
+                if (nodeError.code === 'EACCES') {
                     return R.err({
-                        type: "codec-error",
-                        operation: "parse",
+                        type: 'codec-error',
+                        operation: 'parse',
                         source: path,
                         message: `Permission denied: ${path}`,
                     });
                 }
             }
             return R.err({
-                type: "codec-error",
-                operation: "parse",
+                type: 'codec-error',
+                operation: 'parse',
                 source: path,
                 message: `Failed to read file ${path}: ${message}`,
             });

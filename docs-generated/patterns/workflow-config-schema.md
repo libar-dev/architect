@@ -13,8 +13,6 @@
 
 ## Description
 
-## WorkflowConfigSchema - Workflow Configuration Validation
-
 Zod schemas for validating workflow configuration files that define
 status models, phase definitions, and artifact mappings.
 

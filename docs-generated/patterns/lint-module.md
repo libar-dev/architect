@@ -13,8 +13,6 @@
 
 ## Description
 
-## LintModule - Annotation Quality Checking
-
 Provides lint rules and engine for pattern annotation quality checking.
 Exports the complete lint API including rules, engine, and formatters.
 

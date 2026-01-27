@@ -7,19 +7,19 @@
  *
  * Uses Rule() + RuleScenario() pattern as feature file uses Rule: blocks.
  */
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-import { createPatternsCodec } from "../../../src/renderable/codecs/patterns.js";
-import { renderToMarkdown } from "../../../src/renderable/render.js";
-import type { RenderableDocument } from "../../../src/renderable/schema.js";
-import type { RuntimeMasterDataset } from "../../../src/generators/pipeline/transform-dataset.js";
-import { transformToMasterDataset } from "../../../src/generators/pipeline/transform-dataset.js";
-import { createDefaultTagRegistry } from "../../../src/validation-schemas/tag-registry.js";
-import type { ExtractedPattern } from "../../../src/validation-schemas/index.js";
-import { createTestPattern, resetPatternCounter } from "../../fixtures/dataset-factories.js";
-import { findHeadings } from "../../support/helpers/document-assertions.js";
-import type { DataTableRow } from "../../support/world.js";
-import { toKebabCase } from "../../../src/utils/index.js";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
+import { createPatternsCodec } from '../../../src/renderable/codecs/patterns.js';
+import { renderToMarkdown } from '../../../src/renderable/render.js';
+import type { RenderableDocument } from '../../../src/renderable/schema.js';
+import type { RuntimeMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { transformToMasterDataset } from '../../../src/generators/pipeline/transform-dataset.js';
+import { createDefaultTagRegistry } from '../../../src/validation-schemas/tag-registry.js';
+import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
+import { createTestPattern, resetPatternCounter } from '../../fixtures/dataset-factories.js';
+import { findHeadings } from '../../support/helpers/document-assertions.js';
+import type { DataTableRow } from '../../support/world.js';
+import { toKebabCase } from '../../../src/utils/index.js';
 
 // =============================================================================
 // State Types
@@ -43,7 +43,7 @@ function initState(): PrdImplementationState {
   return {
     dataset: null,
     document: null,
-    markdown: "",
+    markdown: '',
     patterns: [],
   };
 }
@@ -63,8 +63,8 @@ function createRoadmapPattern(options: {
 }): ExtractedPattern {
   return createTestPattern({
     name: options.name,
-    category: options.category ?? "core",
-    status: (options.status ?? "roadmap") as "roadmap" | "active" | "completed",
+    category: options.category ?? 'core',
+    status: (options.status ?? 'roadmap') as 'roadmap' | 'active' | 'completed',
     filePath: options.filePath ?? `specs/${options.name.toLowerCase()}.feature`,
   });
 }
@@ -80,8 +80,8 @@ function createImplementationPattern(options: {
 }): ExtractedPattern {
   const pattern = createTestPattern({
     name: options.name,
-    category: "event-sourcing",
-    status: "roadmap",
+    category: 'event-sourcing',
+    status: 'roadmap',
     filePath: options.filePath,
     implementsPatterns: [options.implements],
   });
@@ -164,7 +164,7 @@ function markdownContainsLink(filePath: string): boolean {
 // Feature: PRD Implementation Section
 // =============================================================================
 
-const feature = await loadFeature("tests/features/generators/prd-implementation-section.feature");
+const feature = await loadFeature('tests/features/generators/prd-implementation-section.feature');
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   AfterEachScenario(() => {
@@ -172,7 +172,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   });
 
   Background(({ Given }) => {
-    Given("a pattern generator test context", () => {
+    Given('a pattern generator test context', () => {
       state = initState();
     });
   });
@@ -182,13 +182,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ===========================================================================
 
   Rule(
-    "Implementation files appear in pattern docs via @libar-docs-implements",
+    'Implementation files appear in pattern docs via @libar-docs-implements',
     ({ RuleScenario }) => {
       RuleScenario(
-        "Implementations section renders with file links",
+        'Implementations section renders with file links',
         ({ Given, When, Then, And }) => {
           Given(
-            "a pattern {string} defined with:",
+            'a pattern {string} defined with:',
             (_ctx: unknown, patternName: string, dataTable: DataTableRow[]) => {
               const fields: Record<string, string> = {};
               for (const row of dataTable) {
@@ -206,7 +206,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           And(
-            "a TypeScript file {string} that implements {string} with:",
+            'a TypeScript file {string} that implements {string} with:',
             (
               _ctx: unknown,
               filePath: string,
@@ -220,7 +220,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
               state!.patterns.push(
                 createImplementationPattern({
-                  name: fields.name ?? "Implementation",
+                  name: fields.name ?? 'Implementation',
                   filePath,
                   implements: implementedPattern,
                   description: fields.description,
@@ -230,22 +230,22 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           When(
-            "generating the pattern document for {string}",
+            'generating the pattern document for {string}',
             (_ctx: unknown, patternName: string) => {
               generatePatternDocument(patternName);
             }
           );
 
-          Then("the document contains heading {string}", (_ctx: unknown, heading: string) => {
+          Then('the document contains heading {string}', (_ctx: unknown, heading: string) => {
             expect(headingExists(heading)).toBe(true);
           });
 
-          And("the document contains file link to {string}", (_ctx: unknown, filePath: string) => {
+          And('the document contains file link to {string}', (_ctx: unknown, filePath: string) => {
             expect(markdownContainsLink(filePath)).toBe(true);
           });
 
           And(
-            "the document contains implementation description {string}",
+            'the document contains implementation description {string}',
             (_ctx: unknown, description: string) => {
               expect(markdownContains(description)).toBe(true);
             }
@@ -254,10 +254,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
 
       RuleScenario(
-        "Implementation includes description when available",
+        'Implementation includes description when available',
         ({ Given, When, Then, And }) => {
           Given(
-            "a pattern {string} defined with:",
+            'a pattern {string} defined with:',
             (_ctx: unknown, patternName: string, dataTable: DataTableRow[]) => {
               const fields: Record<string, string> = {};
               for (const row of dataTable) {
@@ -275,7 +275,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           And(
-            "a TypeScript file {string} that implements {string} with:",
+            'a TypeScript file {string} that implements {string} with:',
             (
               _ctx: unknown,
               filePath: string,
@@ -289,7 +289,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
               state!.patterns.push(
                 createImplementationPattern({
-                  name: fields.name ?? "Implementation",
+                  name: fields.name ?? 'Implementation',
                   filePath,
                   implements: implementedPattern,
                   description: fields.description,
@@ -299,14 +299,14 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           );
 
           When(
-            "generating the pattern document for {string}",
+            'generating the pattern document for {string}',
             (_ctx: unknown, patternName: string) => {
               generatePatternDocument(patternName);
             }
           );
 
           Then(
-            "the document contains implementation description {string}",
+            'the document contains implementation description {string}',
             (_ctx: unknown, description: string) => {
               expect(markdownContains(description)).toBe(true);
             }
@@ -320,10 +320,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule 2: Multiple implementations are listed alphabetically
   // ===========================================================================
 
-  Rule("Multiple implementations are listed alphabetically", ({ RuleScenario }) => {
-    RuleScenario("Multiple implementations sorted by file path", ({ Given, When, Then, And }) => {
+  Rule('Multiple implementations are listed alphabetically', ({ RuleScenario }) => {
+    RuleScenario('Multiple implementations sorted by file path', ({ Given, When, Then, And }) => {
       Given(
-        "a pattern {string} defined with:",
+        'a pattern {string} defined with:',
         (_ctx: unknown, patternName: string, dataTable: DataTableRow[]) => {
           const fields: Record<string, string> = {};
           for (const row of dataTable) {
@@ -341,7 +341,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
 
       And(
-        "TypeScript files that implement {string}:",
+        'TypeScript files that implement {string}:',
         (_ctx: unknown, implementedPattern: string, dataTable: DataTableRow[]) => {
           for (const row of dataTable) {
             state!.patterns.push(
@@ -355,18 +355,18 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      When("generating the pattern document for {string}", (_ctx: unknown, patternName: string) => {
+      When('generating the pattern document for {string}', (_ctx: unknown, patternName: string) => {
         generatePatternDocument(patternName);
       });
 
       Then(
-        "implementations appear in file path order:",
+        'implementations appear in file path order:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
           const expectedOrder = dataTable.map((row) => row.File);
 
           // Find the positions of each file in the markdown
           const positions = expectedOrder.map((file) => {
-            const fileName = file.split("/").pop() ?? file;
+            const fileName = file.split('/').pop() ?? file;
             return state!.markdown.indexOf(fileName);
           });
 
@@ -388,10 +388,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule 3: Patterns without implementations omit the section
   // ===========================================================================
 
-  Rule("Patterns without implementations omit the section", ({ RuleScenario }) => {
-    RuleScenario("No implementations section when none exist", ({ Given, When, Then, And }) => {
+  Rule('Patterns without implementations omit the section', ({ RuleScenario }) => {
+    RuleScenario('No implementations section when none exist', ({ Given, When, Then, And }) => {
       Given(
-        "a pattern {string} defined with:",
+        'a pattern {string} defined with:',
         (_ctx: unknown, patternName: string, dataTable: DataTableRow[]) => {
           const fields: Record<string, string> = {};
           for (const row of dataTable) {
@@ -408,15 +408,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      And("no TypeScript files implement {string}", (_ctx: unknown, _patternName: string) => {
+      And('no TypeScript files implement {string}', (_ctx: unknown, _patternName: string) => {
         // No action needed - no implementation patterns added
       });
 
-      When("generating the pattern document for {string}", (_ctx: unknown, patternName: string) => {
+      When('generating the pattern document for {string}', (_ctx: unknown, patternName: string) => {
         generatePatternDocument(patternName);
       });
 
-      Then("the document does not contain heading {string}", (_ctx: unknown, heading: string) => {
+      Then('the document does not contain heading {string}', (_ctx: unknown, heading: string) => {
         expect(headingExists(heading)).toBe(false);
       });
     });
@@ -426,10 +426,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule 4: Implementation references use relative file links
   // ===========================================================================
 
-  Rule("Implementation references use relative file links", ({ RuleScenario }) => {
-    RuleScenario("Links are relative from patterns directory", ({ Given, When, Then, And }) => {
+  Rule('Implementation references use relative file links', ({ RuleScenario }) => {
+    RuleScenario('Links are relative from patterns directory', ({ Given, When, Then, And }) => {
       Given(
-        "a pattern {string} defined with:",
+        'a pattern {string} defined with:',
         (_ctx: unknown, patternName: string, dataTable: DataTableRow[]) => {
           const fields: Record<string, string> = {};
           for (const row of dataTable) {
@@ -447,7 +447,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       );
 
       And(
-        "a TypeScript file {string} that implements {string} with:",
+        'a TypeScript file {string} that implements {string} with:',
         (
           _ctx: unknown,
           filePath: string,
@@ -461,7 +461,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
           state!.patterns.push(
             createImplementationPattern({
-              name: fields.name ?? "Implementation",
+              name: fields.name ?? 'Implementation',
               filePath,
               implements: implementedPattern,
               description: fields.description,
@@ -470,16 +470,16 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       );
 
-      When("generating the pattern document for {string}", (_ctx: unknown, patternName: string) => {
+      When('generating the pattern document for {string}', (_ctx: unknown, patternName: string) => {
         generatePatternDocument(patternName);
       });
 
-      Then("the implementation link path starts with {string}", (_ctx: unknown, prefix: string) => {
+      Then('the implementation link path starts with {string}', (_ctx: unknown, prefix: string) => {
         // Check that the markdown contains a link starting with the prefix
         expect(state!.markdown).toContain(`](${prefix}`);
       });
 
-      And("the implementation link path contains {string}", (_ctx: unknown, pathPart: string) => {
+      And('the implementation link path contains {string}', (_ctx: unknown, pathPart: string) => {
         expect(state!.markdown).toContain(pathPart);
       });
     });

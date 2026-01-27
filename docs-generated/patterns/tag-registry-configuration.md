@@ -13,8 +13,6 @@
 
 ## Description
 
-## Tag Registry Configuration Schema
-
 Defines the structure and validation for external tag taxonomy configuration.
 Enables repos to define their own taxonomy (categories, metadata tags, etc.)
 without hardcoding values in the delivery-process package.

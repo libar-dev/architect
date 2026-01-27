@@ -1,5 +1,5 @@
-import type { Result, ScannerConfig, DocDirective, ExportInfo, FileParseError, DirectiveValidationError } from "../types/index.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
+import type { Result, ScannerConfig, DocDirective, ExportInfo, FileParseError, DirectiveValidationError } from '../types/index.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 /**
  * Result of scanning a single file
  */
@@ -53,11 +53,11 @@ export interface ScanResults {
  *
  * @example
  * ```typescript
- * const registry = await loadTagRegistry('tag-registry.json');
+ * const config = await loadConfig();
  * const result = await scanPatterns({
  *   patterns: ['src/**\/*.ts'],
  *   baseDir: '/path/to/project'
- * }, registry);
+ * }, config.tagRegistry);
  *
  * if (result.ok) {
  *   const { files, errors } = result.value;
@@ -80,6 +80,6 @@ export interface ScanResults {
  * ```
  */
 export declare function scanPatterns(config: ScannerConfig, registry?: TagRegistry): Promise<Result<ScanResults, never>>;
-export { findFilesToScan, hasDocDirectives, hasFileOptIn } from "./pattern-scanner.js";
-export { parseFileDirectives, type ParseDirectivesResult } from "./ast-parser.js";
+export { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
+export { parseFileDirectives, type ParseDirectivesResult } from './ast-parser.js';
 //# sourceMappingURL=index.d.ts.map

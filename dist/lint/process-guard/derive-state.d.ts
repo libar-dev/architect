@@ -22,9 +22,9 @@
  * - When computing protection levels for files
  * - When determining session scope
  */
-import type { Result } from "../../types/index.js";
-import { type ProtectionLevel } from "../../validation/fsm/index.js";
-import type { ProcessState, FileState } from "./types.js";
+import type { Result } from '../../types/index.js';
+import { type ProtectionLevel } from '../../validation/fsm/index.js';
+import type { ProcessState, FileState } from './types.js';
 /**
  * Configuration for deriving process state.
  */
@@ -33,8 +33,6 @@ export interface DeriveStateConfig {
     readonly baseDir: string;
     /** Glob patterns for spec files */
     readonly specPatterns?: readonly string[];
-    /** Optional path to tag-registry.json for hash computation (deprecated - TypeScript is source of truth) */
-    readonly taxonomyPath?: string | null;
     /** Path to sessions directory */
     readonly sessionsDir?: string;
 }

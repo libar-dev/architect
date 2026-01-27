@@ -1,8 +1,8 @@
-import * as fs from "fs";
-import * as path from "path";
-import { z } from "zod";
-import type { RegistryFilePath } from "../types/branded.js";
-import { asRegistryFilePath } from "../types/branded.js";
+import * as fs from 'fs';
+import * as path from 'path';
+import { z } from 'zod';
+import type { RegistryFilePath } from '../types/branded.js';
+import { asRegistryFilePath } from '../types/branded.js';
 
 /**
  * Safely resolve a path, following symlinks if possible
@@ -25,9 +25,9 @@ function safeRealpathSync(filePath: string): string {
  */
 const GlobPatternSchema = z
   .string()
-  .min(1, "Glob pattern cannot be empty")
-  .refine((pattern) => !pattern.includes(".."), {
-    message: "Glob patterns cannot contain parent directory traversal (..)",
+  .min(1, 'Glob pattern cannot be empty')
+  .refine((pattern) => !pattern.includes('..'), {
+    message: 'Glob patterns cannot contain parent directory traversal (..)',
   });
 
 /**
@@ -35,7 +35,7 @@ const GlobPatternSchema = z
  */
 const BaseDirSchema = z
   .string()
-  .min(1, "Base directory cannot be empty")
+  .min(1, 'Base directory cannot be empty')
   .transform((dir) => path.resolve(dir)); // Normalize to absolute path
 
 /**
@@ -51,7 +51,7 @@ const BaseDirSchema = z
 function createOutputDirSchema(baseDir: string): z.ZodType<string> {
   return z
     .string()
-    .min(1, "Output directory cannot be empty")
+    .min(1, 'Output directory cannot be empty')
     .transform((dir) => path.normalize(path.resolve(dir)))
     .refine(
       (dir) => {
@@ -60,7 +60,7 @@ function createOutputDirSchema(baseDir: string): z.ZodType<string> {
         const resolvedDir = safeRealpathSync(dir);
 
         // Prevent parent directory traversal
-        if (dir.includes("..")) {
+        if (dir.includes('..')) {
           return false;
         }
 
@@ -68,7 +68,7 @@ function createOutputDirSchema(baseDir: string): z.ZodType<string> {
         return resolvedDir.startsWith(resolvedBase) || !path.isAbsolute(dir);
       },
       {
-        message: "Output directory must be within project (no parent traversal)",
+        message: 'Output directory must be within project (no parent traversal)',
       }
     );
 }
@@ -79,9 +79,9 @@ function createOutputDirSchema(baseDir: string): z.ZodType<string> {
  */
 const RegistryFilePathSchema = z
   .string()
-  .min(1, "Registry path cannot be empty")
-  .refine((p) => p.endsWith(".json"), {
-    message: "Registry file must be a JSON file (.json)",
+  .min(1, 'Registry path cannot be empty')
+  .refine((p) => p.endsWith('.json'), {
+    message: 'Registry file must be a JSON file (.json)',
   })
   .transform((p) => asRegistryFilePath(path.normalize(p)));
 
@@ -102,7 +102,7 @@ const RegistryFilePathSchema = z
 export const ScannerConfigSchema = z
   .object({
     /** Glob patterns to scan (e.g., 'src/**\/*.ts') */
-    patterns: z.array(GlobPatternSchema).min(1, "At least one glob pattern required").readonly(),
+    patterns: z.array(GlobPatternSchema).min(1, 'At least one glob pattern required').readonly(),
 
     /** Directories to exclude (optional) */
     exclude: z.array(GlobPatternSchema).readonly().optional(),
@@ -182,17 +182,6 @@ export function createGeneratorConfigSchema(baseDir: string): z.ZodType<Generato
 }
 
 /**
- * Generator configuration (backward compatibility)
- *
- * **Deprecated**: Use createGeneratorConfigSchema(baseDir) instead for better security.
- *
- * This version uses process.cwd() which can be manipulated.
- */
-export const GeneratorConfigSchema: z.ZodType<GeneratorConfig> = createGeneratorConfigSchema(
-  process.cwd()
-);
-
-/**
  * Runtime type guard for ScannerConfig
  *
  * @param value - Value to check
@@ -223,6 +212,6 @@ export function isScannerConfig(value: unknown): value is ScannerConfig {
  * ```
  */
 export function isGeneratorConfig(value: unknown): value is GeneratorConfig {
-  const result = GeneratorConfigSchema.safeParse(value);
-  return result.success;
+  const schema = createGeneratorConfigSchema(process.cwd());
+  return schema.safeParse(value).success;
 }

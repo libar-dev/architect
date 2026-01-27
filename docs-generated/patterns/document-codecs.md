@@ -13,8 +13,6 @@
 
 ## Description
 
-## Document Codecs
-
 Barrel export for all document codecs.
 Each codec transforms MasterDataset → RenderableDocument.
 

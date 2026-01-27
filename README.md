@@ -3,6 +3,7 @@
 Documentation generator that extracts patterns from TypeScript and Gherkin sources using configurable annotations.
 
 **Features:**
+
 - Configurable tag prefix (`@docs-`, `@libar-docs-`, or custom)
 - Two presets: **Generic** (simple) and **DDD-ES-CQRS** (full taxonomy)
 - Four-stage pipeline: Scanner → Extractor → Transformer → Codec
@@ -52,21 +53,21 @@ import { createDeliveryProcess } from '@libar-dev/delivery-process';
 const dp = createDeliveryProcess();
 
 // Generic preset with @docs- prefix (simpler taxonomy)
-const dp = createDeliveryProcess({ preset: "generic" });
+const dp = createDeliveryProcess({ preset: 'generic' });
 
 // Custom prefix
 const dp = createDeliveryProcess({
-  tagPrefix: "@my-project-",
-  fileOptInTag: "@my-project"
+  tagPrefix: '@my-project-',
+  fileOptInTag: '@my-project',
 });
 ```
 
 ### Available Presets
 
-| Preset | Tag Prefix | Categories | Use Case |
-|--------|------------|------------|----------|
-| `ddd-es-cqrs` (default) | `@libar-docs-` | 21 | DDD/Event Sourcing architectures |
-| `generic` | `@docs-` | 3 | Simple projects |
+| Preset                  | Tag Prefix     | Categories | Use Case                         |
+| ----------------------- | -------------- | ---------- | -------------------------------- |
+| `ddd-es-cqrs` (default) | `@libar-docs-` | 21         | DDD/Event Sourcing architectures |
+| `generic`               | `@docs-`       | 3          | Simple projects                  |
 
 > **See:** [docs/CONFIGURATION.md](./docs/CONFIGURATION.md) for complete configuration guide.
 
@@ -109,20 +110,29 @@ npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
 ## Documentation
 
 ### Getting Started
+
 - **[docs/CONFIGURATION.md](./docs/CONFIGURATION.md)** - Configuration guide, presets, customization
 - **[INSTRUCTIONS.md](./INSTRUCTIONS.md)** - Complete tag reference and CLI details
 
 ### Methodology
+
 - **[docs/METHODOLOGY.md](./docs/METHODOLOGY.md)** - Core thesis, FSM workflow, two-tier architecture
 - **[docs/SESSION-GUIDES.md](./docs/SESSION-GUIDES.md)** - Planning, design, and implementation session workflows
 - **[docs/GHERKIN-PATTERNS.md](./docs/GHERKIN-PATTERNS.md)** - Rich Gherkin patterns for BDD specs
 
 ### Architecture
+
 - **[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Pipeline architecture and codec system
 
 ### Validation & Quality
+
 - **[docs/PROCESS-GUARD.md](./docs/PROCESS-GUARD.md)** - FSM validation, protection levels, change detection
 - **[docs/VALIDATION.md](./docs/VALIDATION.md)** - Lint rules, anti-patterns, Definition of Done
 
+### Contributing & Publishing
+
+- **[docs/PUBLISHING.md](./docs/PUBLISHING.md)** - npm publishing workflow, pre-releases, GitHub Actions
+
 ### Reference
+
 - **[docs/TAXONOMY.md](./docs/TAXONOMY.md)** - Tag taxonomy reference (status, categories, formats)

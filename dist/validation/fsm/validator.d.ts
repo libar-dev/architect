@@ -18,9 +18,9 @@
  * - Use `validateTransition()` to check proposed status changes
  * - Use `validateCompletionMetadata()` to enforce completed state requirements
  */
-import { type ProcessStatusValue } from "../../taxonomy/index.js";
-import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
-import { type ProtectionLevel } from "./states.js";
+import { type ProcessStatusValue } from '../../taxonomy/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
+import { type ProtectionLevel } from './states.js';
 /**
  * Result of validating a status value
  */

@@ -18,13 +18,13 @@
  * - Use `validateTransition()` to check proposed status changes
  * - Use `validateCompletionMetadata()` to enforce completed state requirements
  */
-import { PROCESS_STATUS_VALUES } from "../../taxonomy/index.js";
-import { VALID_TRANSITIONS, getValidTransitionsFrom, getTransitionErrorMessage, } from "./transitions.js";
-import { isTerminalState, getProtectionLevel } from "./states.js";
+import { PROCESS_STATUS_VALUES } from '../../taxonomy/index.js';
+import { VALID_TRANSITIONS, getValidTransitionsFrom, getTransitionErrorMessage, } from './transitions.js';
+import { isTerminalState, getProtectionLevel } from './states.js';
 /**
  * Default tag prefix for error messages when no registry is provided.
  */
-const DEFAULT_TAG_PREFIX = "@libar-docs-";
+const DEFAULT_TAG_PREFIX = '@libar-docs-';
 /**
  * Check if a string is a valid ProcessStatusValue
  */
@@ -50,7 +50,7 @@ export function validateStatus(status, options) {
         return {
             valid: false,
             status,
-            error: `Invalid status '${status}'. Valid values: ${PROCESS_STATUS_VALUES.join(", ")}.`,
+            error: `Invalid status '${status}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
         };
     }
     const warnings = [];
@@ -88,7 +88,7 @@ export function validateTransition(from, to) {
             valid: false,
             from: from, // Type assertion for interface compliance
             to: to,
-            error: `Invalid source status '${from}'. Valid values: ${PROCESS_STATUS_VALUES.join(", ")}.`,
+            error: `Invalid source status '${from}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
         };
     }
     if (!isValidStatusValue(to)) {
@@ -96,7 +96,7 @@ export function validateTransition(from, to) {
             valid: false,
             from,
             to: to,
-            error: `Invalid target status '${to}'. Valid values: ${PROCESS_STATUS_VALUES.join(", ")}.`,
+            error: `Invalid target status '${to}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
         };
     }
     // Check if transition is valid
@@ -141,7 +141,7 @@ export function validateCompletionMetadata(pattern, options) {
     const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
     const warnings = [];
     // Only check completion requirements for completed status
-    if (pattern.status !== "completed") {
+    if (pattern.status !== 'completed') {
         return { valid: true, warnings: [] };
     }
     // Check for completion date
@@ -151,7 +151,7 @@ export function validateCompletionMetadata(pattern, options) {
     // Check for effort tracking consistency
     if (pattern.effortPlanned && !pattern.effortActual) {
         warnings.push(`Pattern has ${tagPrefix}effort but missing ${tagPrefix}effort-actual. ` +
-            "Consider adding actual effort for tracking.");
+            'Consider adding actual effort for tracking.');
     }
     return {
         valid: true,
@@ -189,15 +189,15 @@ export function getProtectionSummary(status, options) {
     const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
     const level = getProtectionLevel(status);
     const descriptions = {
-        none: "Fully editable - no restrictions",
-        scope: "Scope-locked - cannot add new deliverables",
+        none: 'Fully editable - no restrictions',
+        scope: 'Scope-locked - cannot add new deliverables',
         hard: `Hard-locked - requires ${tagPrefix}unlock-reason to modify`,
     };
     return {
         level,
         description: descriptions[level],
-        canAddDeliverables: level === "none",
-        requiresUnlock: level === "hard",
+        canAddDeliverables: level === 'none',
+        requiresUnlock: level === 'hard',
     };
 }
 //# sourceMappingURL=validator.js.map

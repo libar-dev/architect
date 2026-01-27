@@ -1,4 +1,4 @@
-import type { SourceFilePath } from "./branded.js";
+import type { SourceFilePath } from './branded.js';
 
 /**
  * Base error interface for all documentation errors
@@ -14,9 +14,9 @@ export interface BaseDocError {
  * File system error - file not found, permission denied, etc.
  */
 export interface FileSystemError extends BaseDocError {
-  readonly type: "FILE_SYSTEM_ERROR";
+  readonly type: 'FILE_SYSTEM_ERROR';
   readonly file: string;
-  readonly reason: "NOT_FOUND" | "NO_PERMISSION" | "NOT_A_FILE" | "OTHER";
+  readonly reason: 'NOT_FOUND' | 'NO_PERMISSION' | 'NOT_A_FILE' | 'OTHER';
   readonly originalError?: unknown;
 }
 
@@ -24,7 +24,7 @@ export interface FileSystemError extends BaseDocError {
  * File parsing error - invalid TypeScript, malformed syntax
  */
 export interface FileParseError extends BaseDocError {
-  readonly type: "FILE_PARSE_ERROR";
+  readonly type: 'FILE_PARSE_ERROR';
   readonly file: string;
   readonly reason: string;
   readonly line?: number;
@@ -36,7 +36,7 @@ export interface FileParseError extends BaseDocError {
  * Directive validation error - invalid @libar-docs-* format
  */
 export interface DirectiveValidationError extends BaseDocError {
-  readonly type: "DIRECTIVE_VALIDATION_ERROR";
+  readonly type: 'DIRECTIVE_VALIDATION_ERROR';
   readonly file: string;
   readonly line: number;
   readonly reason: string;
@@ -47,7 +47,7 @@ export interface DirectiveValidationError extends BaseDocError {
  * Pattern validation error - pattern doesn't conform to schema
  */
 export interface PatternValidationError extends BaseDocError {
-  readonly type: "PATTERN_VALIDATION_ERROR";
+  readonly type: 'PATTERN_VALIDATION_ERROR';
   readonly file: SourceFilePath;
   readonly patternName: string;
   readonly reason: string;
@@ -58,7 +58,7 @@ export interface PatternValidationError extends BaseDocError {
  * Registry validation error - invalid registry format or data
  */
 export interface RegistryValidationError extends BaseDocError {
-  readonly type: "REGISTRY_VALIDATION_ERROR";
+  readonly type: 'REGISTRY_VALIDATION_ERROR';
   readonly registryPath: string;
   readonly reason: string;
   readonly validationErrors?: string[];
@@ -68,7 +68,7 @@ export interface RegistryValidationError extends BaseDocError {
  * Markdown generation error - failed to generate output
  */
 export interface MarkdownGenerationError extends BaseDocError {
-  readonly type: "MARKDOWN_GENERATION_ERROR";
+  readonly type: 'MARKDOWN_GENERATION_ERROR';
   readonly patternId: string;
   readonly reason: string;
   readonly originalError?: unknown;
@@ -78,7 +78,7 @@ export interface MarkdownGenerationError extends BaseDocError {
  * File write error - failed to write markdown or registry
  */
 export interface FileWriteError extends BaseDocError {
-  readonly type: "FILE_WRITE_ERROR";
+  readonly type: 'FILE_WRITE_ERROR';
   readonly file: string;
   readonly reason: string;
   readonly originalError?: unknown;
@@ -88,7 +88,7 @@ export interface FileWriteError extends BaseDocError {
  * Feature file parse error - failed to parse .feature file
  */
 export interface FeatureParseError extends BaseDocError {
-  readonly type: "FEATURE_PARSE_ERROR";
+  readonly type: 'FEATURE_PARSE_ERROR';
   readonly file: string;
   readonly reason: string;
   readonly originalError?: unknown;
@@ -98,20 +98,20 @@ export interface FeatureParseError extends BaseDocError {
  * Configuration error - invalid scanner or generator config
  */
 export interface ConfigError extends BaseDocError {
-  readonly type: "CONFIG_ERROR";
+  readonly type: 'CONFIG_ERROR';
   readonly field: string;
   readonly reason: string;
   readonly value?: unknown;
 }
 
 /**
- * Process metadata validation error - invalid @libar-process-* tag values
+ * Process metadata validation error - invalid @libar-docs-* tag values
  *
  * Raised when extracting process metadata from Gherkin feature tags
  * and the values don't conform to ProcessMetadataSchema.
  */
 export interface ProcessMetadataValidationError extends BaseDocError {
-  readonly type: "PROCESS_METADATA_VALIDATION_ERROR";
+  readonly type: 'PROCESS_METADATA_VALIDATION_ERROR';
   readonly file: string;
   readonly reason: string;
   readonly validationErrors?: readonly string[];
@@ -124,7 +124,7 @@ export interface ProcessMetadataValidationError extends BaseDocError {
  * and the data doesn't conform to DeliverableSchema.
  */
 export interface DeliverableValidationError extends BaseDocError {
-  readonly type: "DELIVERABLE_VALIDATION_ERROR";
+  readonly type: 'DELIVERABLE_VALIDATION_ERROR';
   readonly file: string;
   readonly deliverableName?: string;
   readonly reason: string;
@@ -138,7 +138,7 @@ export interface DeliverableValidationError extends BaseDocError {
  * the result doesn't conform to ExtractedPatternSchema.
  */
 export interface GherkinPatternValidationError extends BaseDocError {
-  readonly type: "GHERKIN_PATTERN_VALIDATION_ERROR";
+  readonly type: 'GHERKIN_PATTERN_VALIDATION_ERROR';
   readonly file: string;
   readonly patternName: string;
   readonly reason: string;
@@ -192,7 +192,7 @@ export type GenerationError = MarkdownGenerationError | FileWriteError | Registr
  * and others fail. Preserves all failure information for reporting.
  */
 export interface BatchError<E extends DocError> extends BaseDocError {
-  readonly type: "BATCH_ERROR";
+  readonly type: 'BATCH_ERROR';
   readonly errors: readonly E[];
   readonly successCount: number;
   readonly failureCount: number;
@@ -217,10 +217,10 @@ export interface BatchError<E extends DocError> extends BaseDocError {
  */
 export function createFileSystemError(
   file: string,
-  reason: FileSystemError["reason"],
+  reason: FileSystemError['reason'],
   originalError?: unknown
 ): FileSystemError {
-  const reasonMessages: Record<FileSystemError["reason"], string> = {
+  const reasonMessages: Record<FileSystemError['reason'], string> = {
     NOT_FOUND: `File not found: ${file}`,
     NO_PERMISSION: `Permission denied: ${file}`,
     NOT_A_FILE: `Not a file: ${file}`,
@@ -229,7 +229,7 @@ export function createFileSystemError(
 
   // Use spread to conditionally include optional fields
   return {
-    type: "FILE_SYSTEM_ERROR",
+    type: 'FILE_SYSTEM_ERROR',
     message: reasonMessages[reason],
     file,
     reason,
@@ -262,11 +262,11 @@ export function createFileParseError(
   location?: { line: number; column: number },
   originalError?: unknown
 ): FileParseError {
-  const locationStr = location ? ` at line ${location.line}, column ${location.column}` : "";
+  const locationStr = location ? ` at line ${location.line}, column ${location.column}` : '';
 
   // Use spread to conditionally include optional fields
   return {
-    type: "FILE_PARSE_ERROR",
+    type: 'FILE_PARSE_ERROR',
     message: `Failed to parse ${file}${locationStr}: ${reason}`,
     file,
     reason,
@@ -302,7 +302,7 @@ export function createDirectiveValidationError(
 ): DirectiveValidationError {
   // Use spread to conditionally include optional fields
   return {
-    type: "DIRECTIVE_VALIDATION_ERROR",
+    type: 'DIRECTIVE_VALIDATION_ERROR',
     message: `Directive validation failed at ${file}:${line}: ${reason}`,
     file,
     line,
@@ -338,7 +338,7 @@ export function createPatternValidationError(
 ): PatternValidationError {
   // Use spread to conditionally include optional fields
   return {
-    type: "PATTERN_VALIDATION_ERROR",
+    type: 'PATTERN_VALIDATION_ERROR',
     message: `Pattern validation failed for "${patternName}" in ${file}: ${reason}`,
     file,
     patternName,
@@ -370,7 +370,7 @@ export function createFeatureParseError(
   originalError?: unknown
 ): FeatureParseError {
   return {
-    type: "FEATURE_PARSE_ERROR",
+    type: 'FEATURE_PARSE_ERROR',
     message: `Failed to parse feature file ${file}: ${reason}`,
     file,
     reason,
@@ -401,7 +401,7 @@ export function createProcessMetadataValidationError(
   validationErrors?: readonly string[]
 ): ProcessMetadataValidationError {
   return {
-    type: "PROCESS_METADATA_VALIDATION_ERROR",
+    type: 'PROCESS_METADATA_VALIDATION_ERROR',
     message: `Process metadata validation failed in ${file}: ${reason}`,
     file,
     reason,
@@ -434,9 +434,9 @@ export function createDeliverableValidationError(
   deliverableName?: string,
   validationErrors?: readonly string[]
 ): DeliverableValidationError {
-  const nameStr = deliverableName ? ` "${deliverableName}"` : "";
+  const nameStr = deliverableName ? ` "${deliverableName}"` : '';
   return {
-    type: "DELIVERABLE_VALIDATION_ERROR",
+    type: 'DELIVERABLE_VALIDATION_ERROR',
     message: `Deliverable${nameStr} validation failed in ${file}: ${reason}`,
     file,
     reason,
@@ -471,7 +471,7 @@ export function createGherkinPatternValidationError(
   validationErrors?: readonly string[]
 ): GherkinPatternValidationError {
   return {
-    type: "GHERKIN_PATTERN_VALIDATION_ERROR",
+    type: 'GHERKIN_PATTERN_VALIDATION_ERROR',
     message: `Gherkin pattern "${patternName}" validation failed in ${file}: ${reason}`,
     file,
     patternName,

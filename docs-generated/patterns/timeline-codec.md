@@ -13,8 +13,6 @@
 
 ## Description
 
-## Timeline Document Codec
-
 Transforms MasterDataset into RenderableDocuments for timeline outputs:
 - ROADMAP.md (phase breakdown with progress)
 - COMPLETED-MILESTONES.md (historical completed phases)

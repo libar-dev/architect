@@ -19,7 +19,7 @@
  * - When formatting DocError for console output
  * - When checking if an unknown error is a DocError
  */
-import type { DocError } from "../types/errors.js";
+import type { DocError } from '../types/errors.js';
 /**
  * Type guard to check if an unknown value is a DocError
  *

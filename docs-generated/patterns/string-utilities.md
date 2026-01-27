@@ -13,8 +13,6 @@
 
 ## Description
 
-## StringUtilities - Text Transformation Functions
-
 Provides shared utilities for string manipulation used across the delivery-process package,
 including slugification for URLs/filenames and Markdown formatting cleanup.
 

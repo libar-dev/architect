@@ -2,10 +2,10 @@
  * @libar-docs
  */
 
-import type { ExtractedPattern, TagRegistry } from "../validation-schemas";
-import type { LoadedWorkflow } from "../validation-schemas/workflow-config.js";
-import type { RuntimeMasterDataset } from "./pipeline/index.js";
-import type { CodecOptions } from "../renderable/generate.js";
+import type { ExtractedPattern, TagRegistry } from '../validation-schemas';
+import type { LoadedWorkflow } from '../validation-schemas/workflow-config.js';
+import type { RuntimeMasterDataset } from './pipeline/index.js';
+import type { CodecOptions } from '../renderable/generate.js';
 
 /**
  * @libar-docs-generator

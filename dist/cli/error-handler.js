@@ -41,28 +41,28 @@
  * ```
  */
 export function isDocError(error) {
-    if (error === null || typeof error !== "object") {
+    if (error === null || typeof error !== 'object') {
         return false;
     }
     const maybeError = error;
     // Check for required DocError properties
-    if (typeof maybeError.type !== "string" || typeof maybeError.message !== "string") {
+    if (typeof maybeError.type !== 'string' || typeof maybeError.message !== 'string') {
         return false;
     }
     // Verify type is one of the known DocError discriminators
     const knownTypes = [
-        "FILE_SYSTEM_ERROR",
-        "FILE_PARSE_ERROR",
-        "DIRECTIVE_VALIDATION_ERROR",
-        "PATTERN_VALIDATION_ERROR",
-        "REGISTRY_VALIDATION_ERROR",
-        "MARKDOWN_GENERATION_ERROR",
-        "FILE_WRITE_ERROR",
-        "FEATURE_PARSE_ERROR",
-        "CONFIG_ERROR",
-        "PROCESS_METADATA_VALIDATION_ERROR",
-        "DELIVERABLE_VALIDATION_ERROR",
-        "GHERKIN_PATTERN_VALIDATION_ERROR",
+        'FILE_SYSTEM_ERROR',
+        'FILE_PARSE_ERROR',
+        'DIRECTIVE_VALIDATION_ERROR',
+        'PATTERN_VALIDATION_ERROR',
+        'REGISTRY_VALIDATION_ERROR',
+        'MARKDOWN_GENERATION_ERROR',
+        'FILE_WRITE_ERROR',
+        'FEATURE_PARSE_ERROR',
+        'CONFIG_ERROR',
+        'PROCESS_METADATA_VALIDATION_ERROR',
+        'DELIVERABLE_VALIDATION_ERROR',
+        'GHERKIN_PATTERN_VALIDATION_ERROR',
     ];
     return knownTypes.includes(maybeError.type);
 }
@@ -88,72 +88,72 @@ export function formatDocError(error) {
     lines.push(`[${error.type}] ${error.message}`);
     // Add structured context based on error type
     switch (error.type) {
-        case "FILE_SYSTEM_ERROR":
-        case "FILE_PARSE_ERROR":
-        case "FILE_WRITE_ERROR":
-        case "FEATURE_PARSE_ERROR":
-            if ("file" in error) {
+        case 'FILE_SYSTEM_ERROR':
+        case 'FILE_PARSE_ERROR':
+        case 'FILE_WRITE_ERROR':
+        case 'FEATURE_PARSE_ERROR':
+            if ('file' in error) {
                 lines.push(`  File: ${error.file}`);
             }
-            if ("line" in error && typeof error.line === "number") {
+            if ('line' in error && typeof error.line === 'number') {
                 lines.push(`  Line: ${error.line}`);
             }
             break;
-        case "DIRECTIVE_VALIDATION_ERROR":
+        case 'DIRECTIVE_VALIDATION_ERROR':
             lines.push(`  File: ${error.file}`);
             lines.push(`  Line: ${error.line}`);
             if (error.directive) {
                 lines.push(`  Directive: ${error.directive}`);
             }
             break;
-        case "PATTERN_VALIDATION_ERROR":
-        case "GHERKIN_PATTERN_VALIDATION_ERROR":
+        case 'PATTERN_VALIDATION_ERROR':
+        case 'GHERKIN_PATTERN_VALIDATION_ERROR':
             lines.push(`  File: ${error.file}`);
             lines.push(`  Pattern: ${error.patternName}`);
-            if ("validationErrors" in error &&
+            if ('validationErrors' in error &&
                 Array.isArray(error.validationErrors) &&
                 error.validationErrors.length > 0) {
-                lines.push("  Validation errors:");
+                lines.push('  Validation errors:');
                 for (const ve of error.validationErrors) {
                     lines.push(`    - ${ve}`);
                 }
             }
             break;
-        case "REGISTRY_VALIDATION_ERROR":
+        case 'REGISTRY_VALIDATION_ERROR':
             lines.push(`  Registry: ${error.registryPath}`);
             if (error.validationErrors !== undefined && error.validationErrors.length > 0) {
-                lines.push("  Validation errors:");
+                lines.push('  Validation errors:');
                 for (const ve of error.validationErrors) {
                     lines.push(`    - ${ve}`);
                 }
             }
             break;
-        case "PROCESS_METADATA_VALIDATION_ERROR":
-        case "DELIVERABLE_VALIDATION_ERROR":
+        case 'PROCESS_METADATA_VALIDATION_ERROR':
+        case 'DELIVERABLE_VALIDATION_ERROR':
             lines.push(`  File: ${error.file}`);
-            if ("deliverableName" in error && error.deliverableName) {
+            if ('deliverableName' in error && error.deliverableName) {
                 lines.push(`  Deliverable: ${error.deliverableName}`);
             }
-            if ("validationErrors" in error &&
+            if ('validationErrors' in error &&
                 Array.isArray(error.validationErrors) &&
                 error.validationErrors.length > 0) {
-                lines.push("  Validation errors:");
+                lines.push('  Validation errors:');
                 for (const ve of error.validationErrors) {
                     lines.push(`    - ${ve}`);
                 }
             }
             break;
-        case "CONFIG_ERROR":
+        case 'CONFIG_ERROR':
             lines.push(`  Field: ${error.field}`);
             if (error.value !== undefined) {
                 lines.push(`  Value: ${JSON.stringify(error.value)}`);
             }
             break;
-        case "MARKDOWN_GENERATION_ERROR":
+        case 'MARKDOWN_GENERATION_ERROR':
             lines.push(`  Pattern ID: ${error.patternId}`);
             break;
     }
-    return lines.join("\n");
+    return lines.join('\n');
 }
 /**
  * Unified CLI error handler that formats and exits
@@ -183,14 +183,14 @@ export function handleCliError(error, exitCode = 1) {
     }
     else if (error instanceof Error) {
         // Standard Error - use message and optionally stack
-        console.error("Error:", error.message);
-        if (process.env["DEBUG"]) {
-            console.error("Stack trace:", error.stack);
+        console.error('Error:', error.message);
+        if (process.env['DEBUG']) {
+            console.error('Stack trace:', error.stack);
         }
     }
     else {
         // Unknown error type - stringify
-        console.error("Error:", String(error));
+        console.error('Error:', String(error));
     }
     process.exit(exitCode);
 }

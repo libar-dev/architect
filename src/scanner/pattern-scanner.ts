@@ -26,11 +26,11 @@
  * - **Exclusion Support**: Configurable exclude patterns for node_modules, tests, etc.
  */
 
-import { glob } from "glob";
-import type { ScannerConfig } from "../types/index.js";
-import { createRegexBuilders } from "../config/regex-builders.js";
-import { DEFAULT_REGEX_BUILDERS } from "../config/defaults.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
+import { glob } from 'glob';
+import type { ScannerConfig } from '../types/index.js';
+import { createRegexBuilders } from '../config/regex-builders.js';
+import { DEFAULT_REGEX_BUILDERS } from '../config/defaults.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 
 /**
  * Finds all TypeScript files matching the scanner configuration
@@ -40,11 +40,11 @@ import type { TagRegistry } from "../validation-schemas/tag-registry.js";
  */
 export async function findFilesToScan(config: ScannerConfig): Promise<readonly string[]> {
   const defaultExclude = [
-    "node_modules/**",
-    "dist/**",
-    "**/*.test.ts",
-    "**/*.spec.ts",
-    "**/*.d.ts",
+    'node_modules/**',
+    'dist/**',
+    '**/*.test.ts',
+    '**/*.spec.ts',
+    '**/*.d.ts',
   ];
 
   const excludePatterns = config.exclude ? [...defaultExclude, ...config.exclude] : defaultExclude;
@@ -56,7 +56,7 @@ export async function findFilesToScan(config: ScannerConfig): Promise<readonly s
   });
 
   // Filter to only TypeScript source files
-  return files.filter((file) => file.endsWith(".ts") && !file.endsWith(".d.ts"));
+  return files.filter((file) => file.endsWith('.ts') && !file.endsWith('.d.ts'));
 }
 
 /**

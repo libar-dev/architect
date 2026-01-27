@@ -13,8 +13,6 @@
 
 ## Description
 
-## Architecture Diagram Codec
-
 Transforms MasterDataset into a RenderableDocument containing
 architecture diagrams (Mermaid) generated from source annotations.
 

@@ -23,12 +23,12 @@
  * Useful for validation and schema definitions
  */
 export const FEATURE_LAYERS = [
-    "timeline",
-    "domain",
-    "integration",
-    "e2e",
-    "component",
-    "unknown",
+    'timeline',
+    'domain',
+    'integration',
+    'e2e',
+    'component',
+    'unknown',
 ];
 /**
  * Infer feature layer from file path
@@ -58,36 +58,36 @@ export const FEATURE_LAYERS = [
  */
 export function inferFeatureLayer(filePath) {
     // Normalize path for cross-platform consistency
-    const normalizedPath = filePath.toLowerCase().replace(/\\/g, "/");
+    const normalizedPath = filePath.toLowerCase().replace(/\\/g, '/');
     // Timeline features (process documentation)
-    if (normalizedPath.includes("/timeline/")) {
-        return "timeline";
+    if (normalizedPath.includes('/timeline/')) {
+        return 'timeline';
     }
     // Decider features (pure domain logic)
-    if (normalizedPath.includes("/deciders/")) {
-        return "domain";
+    if (normalizedPath.includes('/deciders/')) {
+        return 'domain';
     }
     // Domain features (command handlers, but not integration tests)
     // Check for integration FIRST to avoid false positives
-    const isIntegration = normalizedPath.includes("/integration-features/") || normalizedPath.includes("/integration/");
+    const isIntegration = normalizedPath.includes('/integration-features/') || normalizedPath.includes('/integration/');
     if (!isIntegration) {
-        if (normalizedPath.includes("/orders/") || normalizedPath.includes("/inventory/")) {
-            return "domain";
+        if (normalizedPath.includes('/orders/') || normalizedPath.includes('/inventory/')) {
+            return 'domain';
         }
     }
     // Integration features
     if (isIntegration) {
-        return "integration";
+        return 'integration';
     }
     // E2E features (browser-based tests)
-    if (normalizedPath.includes("/e2e/")) {
-        return "e2e";
+    if (normalizedPath.includes('/e2e/')) {
+        return 'e2e';
     }
     // Component features (tooling tests)
-    if (normalizedPath.includes("/scanner/") || normalizedPath.includes("/lint/")) {
-        return "component";
+    if (normalizedPath.includes('/scanner/') || normalizedPath.includes('/lint/')) {
+        return 'component';
     }
     // Unknown - fallback for unclassified features
-    return "unknown";
+    return 'unknown';
 }
 //# sourceMappingURL=layer-inference.js.map

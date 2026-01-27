@@ -80,7 +80,7 @@ These patterns can be started immediately:
 - When the AST parser extracts metadata
 - Then the directive should have archRole "projection"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern MyProjection
@@ -95,7 +95,7 @@ These patterns can be started immediately:
 - When the AST parser extracts metadata
 - Then the directive should have archContext "orders"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern OrderHandler
@@ -110,7 +110,7 @@ These patterns can be started immediately:
 - When the AST parser extracts metadata
 - Then the directive should have archLayer "infrastructure"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern MyInfra
@@ -127,7 +127,7 @@ These patterns can be started immediately:
 - And the directive should have archContext "orders"
 - And the directive should have archLayer "application"
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern OrderCommandHandlers
@@ -146,7 +146,7 @@ These patterns can be started immediately:
 - And the directive should have archContext undefined
 - And the directive should have archLayer undefined
 
-```markdown
+```typescript
 /**
  * @libar-docs
  * @libar-docs-pattern NoArchTags

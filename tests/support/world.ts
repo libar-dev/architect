@@ -7,10 +7,10 @@
  * @libar-docs
  */
 
-import type { Result } from "../../src/types/result.js";
-import type { DocDirective, ExtractedPattern } from "../../src/types/index.js";
-import type { LintViolation, LintResult } from "../../src/lint/index.js";
-import type { ScanResults } from "../../src/scanner/index.js";
+import type { Result } from '../../src/types/result.js';
+import type { DocDirective, ExtractedPattern } from '../../src/types/index.js';
+import type { LintViolation, LintResult } from '../../src/lint/index.js';
+import type { ScanResults } from '../../src/scanner/index.js';
 
 // =============================================================================
 // Common Types
@@ -93,7 +93,7 @@ export function initScannerState(): ScannerScenarioState {
     files: new Map(),
     result: null,
     patterns: [],
-    baseDir: "",
+    baseDir: '',
   };
 }
 
@@ -101,7 +101,7 @@ export function initScannerState(): ScannerScenarioState {
 // AST Parser Domain State
 // =============================================================================
 
-import type { ExportInfo } from "../../src/types/index.js";
+import type { ExportInfo } from '../../src/types/index.js';
 
 /**
  * Parsed directive result from AST parser.
@@ -132,7 +132,7 @@ export function initAstParserState(): AstParserScenarioState {
     tempDir: null,
     cleanup: null,
     filePath: null,
-    fileContent: "",
+    fileContent: '',
     directives: [],
     parseError: null,
   };
@@ -163,8 +163,8 @@ export function initExtractorState(): ExtractorScenarioState {
     directives: [],
     pattern: null,
     patterns: [],
-    code: "",
-    filePath: "",
+    code: '',
+    filePath: '',
   };
 }
 
@@ -187,7 +187,7 @@ export interface GeneratorScenarioState {
 export function initGeneratorState(): GeneratorScenarioState {
   return {
     patterns: [],
-    output: "",
+    output: '',
     config: {},
   };
 }
@@ -211,10 +211,10 @@ export interface FragmentScenarioState {
  */
 export function initFragmentState(): FragmentScenarioState {
   return {
-    template: "",
+    template: '',
     data: {},
-    resolved: "",
-    fragmentName: "",
+    resolved: '',
+    fragmentName: '',
   };
 }
 
@@ -264,8 +264,8 @@ export function initCLIState(): CLIScenarioState {
   return {
     args: [],
     exitCode: 0,
-    stdout: "",
-    stderr: "",
-    cwd: "",
+    stdout: '',
+    stderr: '',
+    cwd: '',
   };
 }

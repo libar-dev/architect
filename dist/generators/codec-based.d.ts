@@ -15,9 +15,9 @@
  * GeneratorContext.masterDataset → Codec.decode() → RenderableDocument → renderDocumentWithFiles() → OutputFile[]
  * ```
  */
-import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from "./types.js";
-import type { ExtractedPattern } from "../validation-schemas/index.js";
-import { type DocumentType } from "../renderable/generate.js";
+import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from './types.js';
+import type { ExtractedPattern } from '../validation-schemas/index.js';
+import { type DocumentType } from '../renderable/generate.js';
 /**
  * Codec-based generator that wraps the new RDM system.
  *
@@ -50,5 +50,5 @@ export declare function createCodecGenerator(name: string, documentType: Documen
  * Available codec-based document types.
  * Re-exported from generate.ts for convenience.
  */
-export { DOCUMENT_TYPES, type DocumentType } from "../renderable/generate.js";
+export { DOCUMENT_TYPES, type DocumentType } from '../renderable/generate.js';
 //# sourceMappingURL=codec-based.d.ts.map

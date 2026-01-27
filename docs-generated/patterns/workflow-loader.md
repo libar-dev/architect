@@ -13,8 +13,6 @@
 
 ## Description
 
-## WorkflowLoader - Workflow Configuration Loading
-
 Loads and validates workflow configuration from JSON files in the catalogue.
 Supports loading by name from catalogue/workflows/ or by explicit path.
 

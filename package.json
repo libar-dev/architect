@@ -81,8 +81,16 @@
     "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
     "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
     "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog",
-    "migrate-tags": "tsx scripts/migrate-tags.ts",
-    "preversion": "pnpm test && pnpm typecheck && pnpm lint"
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
+    "preversion": "pnpm test && pnpm typecheck && pnpm lint && pnpm format:check",
+    "prepublishOnly": "pnpm build && pnpm test && pnpm typecheck && pnpm lint",
+    "postversion": "git push && git push --tags",
+    "release:pre": "npm version prerelease --preid=pre",
+    "release:patch": "npm version patch",
+    "release:minor": "npm version minor",
+    "release:major": "npm version major",
+    "prepare": "husky"
   },
   "keywords": [
     "libar",
@@ -103,6 +111,9 @@
     "url": "https://github.com/libar-dev/delivery-process/issues"
   },
   "homepage": "https://github.com/libar-dev/delivery-process#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@cucumber/gherkin": "^29.0.0",
     "@cucumber/messages": "^25.0.1",
@@ -114,7 +125,11 @@
     "@amiceli/vitest-cucumber": "^5.2.1",
     "@types/node": "20.10.0",
     "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "pixelmatch": "^7.1.0",
+    "prettier": "^3.8.1",
     "quickpickle": "^1.10.1",
     "tsx": "^4.7.0",
     "typescript": "^5.7.2",
@@ -128,5 +143,18 @@
     "README.md",
     "LICENSE"
   ],
-  "private": false
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
 }

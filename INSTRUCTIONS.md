@@ -25,11 +25,11 @@ Complete reference for documentation tags and CLI commands.
 
 Files must have an opt-in marker to be scanned. The marker depends on your configuration:
 
-| Preset | Opt-In Marker |
-|--------|---------------|
-| DDD_ES_CQRS (default) | `@libar-docs` |
-| GENERIC | `@docs` |
-| Custom | Configured `fileOptInTag` |
+| Preset                | Opt-In Marker             |
+| --------------------- | ------------------------- |
+| DDD_ES_CQRS (default) | `@libar-docs`             |
+| GENERIC               | `@docs`                   |
+| Custom                | Configured `fileOptInTag` |
 
 **Example (default preset):**
 
@@ -98,8 +98,6 @@ Enrich patterns with structured data.
 | `@libar-docs-release` | `v0.1.0`      | No          | Target release version       |
 
 **Status values:** `roadmap` (default), `active`, `completed`, `deferred`
-
-- Legacy values also accepted: `implemented`, `partial`, `in-progress`
 
 ### Relationship Tags
 
@@ -193,12 +191,8 @@ generate-docs [options]
 | `--output <dir>`             | `-o`  | Output directory                               | `docs/architecture` |
 | `--base-dir <path>`          | `-b`  | Base directory                                 | cwd                 |
 | `--overwrite`                | `-f`  | Overwrite existing files                       | false               |
-| `--tag-registry <file>`      | `-R`  | Tag registry JSON file                         | auto-discover       |
-| `--config <file>`            | `-c`  | Generator config JSON file                     | -                   |
-| `--artefact-set <name>`      | `-a`  | Predefined artefact set                        | -                   |
 | `--workflow <file>`          | `-w`  | Workflow config JSON file                      | -                   |
 | `--list-generators`          |       | List available generators                      | -                   |
-| `--list-artefact-sets`       |       | List available artefact sets                   | -                   |
 | `--git-diff-base <branch>`   |       | PR Changes: base branch for diff               | -                   |
 | `--changed-files <file>`     |       | PR Changes: explicit file list                 | -                   |
 | `--release-filter <version>` |       | PR Changes: filter by release                  | -                   |
@@ -227,16 +221,15 @@ Validate pattern annotation quality.
 lint-patterns [options]
 ```
 
-| Flag                     | Short | Description                         | Default       |
-| ------------------------ | ----- | ----------------------------------- | ------------- |
-| `--input <pattern>`      | `-i`  | Glob pattern (required, repeatable) | required      |
-| `--exclude <pattern>`    | `-e`  | Exclude pattern (repeatable)        | -             |
-| `--base-dir <dir>`       | `-b`  | Base directory                      | cwd           |
-| `--tag-registry <file>`  | `-R`  | Tag registry JSON file              | auto-discover |
-| `--strict`               |       | Treat warnings as errors            | false         |
-| `--format <type>`        | `-f`  | Output: `pretty` or `json`          | `pretty`      |
-| `--quiet`                | `-q`  | Only show errors                    | false         |
-| `--min-severity <level>` |       | `error`, `warning`, `info`          | -             |
+| Flag                     | Short | Description                         | Default  |
+| ------------------------ | ----- | ----------------------------------- | -------- |
+| `--input <pattern>`      | `-i`  | Glob pattern (required, repeatable) | required |
+| `--exclude <pattern>`    | `-e`  | Exclude pattern (repeatable)        | -        |
+| `--base-dir <dir>`       | `-b`  | Base directory                      | cwd      |
+| `--strict`               |       | Treat warnings as errors            | false    |
+| `--format <type>`        | `-f`  | Output: `pretty` or `json`          | `pretty` |
+| `--quiet`                | `-q`  | Only show errors                    | false    |
+| `--min-severity <level>` |       | `error`, `warning`, `info`          | -        |
 
 **Lint Rules:**
 
@@ -278,21 +271,20 @@ Cross-source pattern validator with DoD and anti-pattern detection.
 validate-patterns [options]
 ```
 
-| Flag                        | Short | Description                                      | Default       |
-| --------------------------- | ----- | ------------------------------------------------ | ------------- |
-| `--input`                   | `-i`  | Glob for TypeScript files (required, repeatable) | required      |
-| `--features`                | `-F`  | Glob for Gherkin files (required, repeatable)    | required      |
-| `--exclude`                 | `-e`  | Exclude pattern (repeatable)                     | -             |
-| `--base-dir`                | `-b`  | Base directory                                   | cwd           |
-| `--tag-registry`            | `-R`  | Tag registry JSON file                           | auto-discover |
-| `--strict`                  |       | Treat warnings as errors                         | false         |
-| `--format`                  | `-f`  | Output: `pretty` or `json`                       | `pretty`      |
-| `--dod`                     |       | Enable Definition of Done validation             | false         |
-| `--phase`                   |       | Validate specific phase (repeatable)             | -             |
-| `--anti-patterns`           |       | Enable anti-pattern detection                    | false         |
-| `--scenario-threshold`      |       | Max scenarios per feature                        | 20            |
-| `--mega-feature-threshold`  |       | Max lines per feature                            | 500           |
-| `--magic-comment-threshold` |       | Max magic comments                               | 5             |
+| Flag                        | Short | Description                                      | Default  |
+| --------------------------- | ----- | ------------------------------------------------ | -------- |
+| `--input`                   | `-i`  | Glob for TypeScript files (required, repeatable) | required |
+| `--features`                | `-F`  | Glob for Gherkin files (required, repeatable)    | required |
+| `--exclude`                 | `-e`  | Exclude pattern (repeatable)                     | -        |
+| `--base-dir`                | `-b`  | Base directory                                   | cwd      |
+| `--strict`                  |       | Treat warnings as errors                         | false    |
+| `--format`                  | `-f`  | Output: `pretty` or `json`                       | `pretty` |
+| `--dod`                     |       | Enable Definition of Done validation             | false    |
+| `--phase`                   |       | Validate specific phase (repeatable)             | -        |
+| `--anti-patterns`           |       | Enable anti-pattern detection                    | false    |
+| `--scenario-threshold`      |       | Max scenarios per feature                        | 20       |
+| `--mega-feature-threshold`  |       | Max lines per feature                            | 500      |
+| `--magic-comment-threshold` |       | Max magic comments                               | 5        |
 
 ### generate-tag-taxonomy
 
@@ -302,12 +294,11 @@ Generate TAG_TAXONOMY.md reference from TypeScript taxonomy.
 generate-tag-taxonomy [options]
 ```
 
-| Flag                    | Short | Description             | Default                             |
-| ----------------------- | ----- | ----------------------- | ----------------------------------- |
-| `--output <path>`       | `-o`  | Output file path        | `docs/architecture/TAG_TAXONOMY.md` |
-| `--overwrite`           | `-f`  | Overwrite existing file | false                               |
-| `--tag-registry <file>` | `-r`  | Tag registry JSON file  | auto-discover                       |
-| `--base-dir <dir>`      | `-b`  | Base directory          | cwd                                 |
+| Flag               | Short | Description             | Default                             |
+| ------------------ | ----- | ----------------------- | ----------------------------------- |
+| `--output <path>`  | `-o`  | Output file path        | `docs/architecture/TAG_TAXONOMY.md` |
+| `--overwrite`      | `-f`  | Overwrite existing file | false                               |
+| `--base-dir <dir>` | `-b`  | Base directory          | cwd                                 |
 
 ---
 
@@ -358,8 +349,8 @@ name: Pattern Documentation
 on:
   push:
     paths:
-      - "packages/**/*.ts"
-      - "specs/**/*.feature"
+      - 'packages/**/*.ts'
+      - 'specs/**/*.feature'
 
 jobs:
   validate:
@@ -369,8 +360,8 @@ jobs:
       - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: '20'
+          cache: 'pnpm'
       - run: pnpm install
       - name: Lint annotations
         run: npx lint-patterns -i "src/**/*.ts" --strict

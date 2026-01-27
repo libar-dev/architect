@@ -14,9 +14,9 @@
  * - Use in CLI entry points to display package version
  * - Call early in argument parsing before other operations
  */
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 /**
  * Get the package version from package.json
  *
@@ -27,12 +27,12 @@ export function getPackageVersion() {
         // Resolve path relative to this file: src/cli/version.ts -> package.json
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
-        const packagePath = join(__dirname, "..", "..", "package.json");
-        const packageJson = JSON.parse(readFileSync(packagePath, "utf-8"));
-        return packageJson.version ?? "unknown";
+        const packagePath = join(__dirname, '..', '..', 'package.json');
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+        return packageJson.version ?? 'unknown';
     }
     catch {
-        return "unknown";
+        return 'unknown';
     }
 }
 /**
@@ -44,12 +44,12 @@ export function getPackageName() {
     try {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = dirname(__filename);
-        const packagePath = join(__dirname, "..", "..", "package.json");
-        const packageJson = JSON.parse(readFileSync(packagePath, "utf-8"));
-        return packageJson.name ?? "delivery-process";
+        const packagePath = join(__dirname, '..', '..', 'package.json');
+        const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8'));
+        return packageJson.name ?? 'delivery-process';
     }
     catch {
-        return "delivery-process";
+        return 'delivery-process';
     }
 }
 /**

@@ -12,9 +12,8 @@
  * Ported from the original helpers.ts with the essential functions
  * needed by document codecs.
  */
-import type { ExtractedPattern, StatusCounts } from "../validation-schemas/index.js";
-import type { LoadedWorkflow } from "../validation-schemas/workflow-config.js";
-import { groupBy } from "../utils/index.js";
+import type { ExtractedPattern, StatusCounts } from '../validation-schemas/index.js';
+import type { LoadedWorkflow } from '../validation-schemas/workflow-config.js';
 /**
  * Get status emoji
  *
@@ -69,10 +68,6 @@ export declare function stripLeadingHeaders(text: string): string;
  */
 export declare function stripMarkdown(text: string): string;
 /**
- * Extract first paragraph from description
- */
-export declare function extractFirstParagraph(description: string, maxLength?: number): string;
-/**
  * Extract first sentence from description
  */
 export declare function extractFirstSentence(description: string, maxLength?: number): string;
@@ -104,8 +99,6 @@ export declare function isFullyCompleted(counts: StatusCounts): boolean;
  * @returns Progress bar string like "[████░░░░] 4/8"
  */
 export declare function renderProgressBar(completed: number, total: number, width?: number): string;
-/** @deprecated Import directly from `../utils/index.js` instead */
-export { groupBy };
 /**
  * Group patterns by category
  */

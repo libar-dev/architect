@@ -14,27 +14,20 @@
  * @see normalized-status.ts for normalization mapping
  */
 export const PROCESS_STATUS_VALUES = [
-    "roadmap", // Planned work, fully editable
-    "active", // In progress, scope-locked
-    "completed", // Done, hard-locked
-    "deferred", // On hold, fully editable
+    'roadmap', // Planned work, fully editable
+    'active', // In progress, scope-locked
+    'completed', // Done, hard-locked
+    'deferred', // On hold, fully editable
 ];
 /**
  * Extended status values accepted for extraction and validation
  *
- * Includes FSM states plus legacy values for backward compatibility.
- * Legacy values are normalized to FSM states via normalizeStatus().
- *
- * @see normalized-status.ts for normalization mapping
+ * FSM states that can be used in annotations.
+ * Use only these canonical values: roadmap, active, completed, deferred.
  */
-export const ACCEPTED_STATUS_VALUES = [
-    ...PROCESS_STATUS_VALUES,
-    "implemented", // Legacy → normalized to "completed"
-    "partial", // Legacy → normalized to "active"
-    "in-progress", // Legacy → normalized to "active"
-];
+export const ACCEPTED_STATUS_VALUES = [...PROCESS_STATUS_VALUES];
 /**
  * Default status for new items
  */
-export const DEFAULT_STATUS = "roadmap";
+export const DEFAULT_STATUS = 'roadmap';
 //# sourceMappingURL=status-values.js.map

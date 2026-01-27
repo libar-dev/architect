@@ -13,8 +13,6 @@
 
 ## Description
 
-## Pattern ID Generator - Deterministic ID Generation
-
 Generates unique, deterministic pattern IDs based on file path and line number.
 Uses MD5 hashing to produce stable 8-character identifiers.
 
