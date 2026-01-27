@@ -223,6 +223,106 @@ Feature: Scanner Core Integration
 
 ---
 
+## Feature File Rich Content
+
+Feature files serve dual purposes: **executable specs** and **documentation source**. Content in the Feature description section appears in generated docs.
+
+### Code-First Principle
+
+**Prefer code stubs over DocStrings for complex examples.** Feature files should reference code, not duplicate it.
+
+| Approach                     | When to Use                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| DocStrings (`"""typescript`) | Brief examples (5-10 lines), current/target state comparison |
+| Code stub reference          | Complex APIs, interfaces, full implementations               |
+
+**Instead of large DocStrings:**
+
+```gherkin
+Rule: Reservations use atomic claim
+  See `@libar-dev/platform-core/src/reservations/reserve.ts` for API.
+```
+
+Code stubs are annotated TypeScript files with `throw new Error("not yet implemented")`.
+
+### Rule Block Structure (Recommended)
+
+For features that define business constraints, use `Rule:` blocks with structured descriptions:
+
+```gherkin
+Rule: Reservations prevent race conditions
+
+  **Invariant:** Only one reservation can exist for a given key at a time.
+
+  **Rationale:** Check-then-create patterns have TOCTOU vulnerabilities.
+
+  **Verified by:** Concurrent reservations, Expired reservation cleanup
+
+  @acceptance-criteria @happy-path
+  Scenario: Concurrent reservations
+    ...
+```
+
+| Element            | Purpose                                 | Extracted By             |
+| ------------------ | --------------------------------------- | ------------------------ |
+| `**Invariant:**`   | Business constraint (what must be true) | Business Rules generator |
+| `**Rationale:**`   | Business justification (why it exists)  | Business Rules generator |
+| `**Verified by:**` | Comma-separated scenario names          | Traceability generator   |
+
+> **Note:** Rule blocks are optional. Use them when the feature defines business invariants that benefit from structured documentation.
+
+### Feature Description Patterns
+
+Choose headers that fit your pattern:
+
+| Structure        | Headers                                    | Best For                  |
+| ---------------- | ------------------------------------------ | ------------------------- |
+| Problem/Solution | `**Problem:**`, `**Solution:**`            | Pain point → fix          |
+| Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style, Gherkin spirit |
+| Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns        |
+
+The **Problem/Solution** pattern is the dominant style in this codebase.
+
+### Valid Rich Content
+
+| Content Type  | Syntax                  | Appears in Docs  |
+| ------------- | ----------------------- | ---------------- |
+| Plain text    | Regular paragraphs      | Yes              |
+| Bold/emphasis | `**bold**`, `*italic*`  | Yes              |
+| Tables        | Markdown pipe tables    | Yes              |
+| Lists         | `- item` or `1. item`   | Yes              |
+| DocStrings    | `"""typescript`...`"""` | Yes (code block) |
+| Comments      | `# comment`             | No (ignored)     |
+
+### Syntax Notes
+
+**Prefer DocStrings over code fences for portability:**
+
+```gherkin
+# Preferred - DocStrings with language hint
+Given the following code:
+  """typescript
+  const x = 1;
+  """
+
+# Avoid - markdown fences in descriptions may not render consistently
+```
+
+**Tag values cannot contain spaces.** Use hyphens:
+
+| Invalid                          | Valid                           |
+| -------------------------------- | ------------------------------- |
+| `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
+| `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
+
+For values with spaces, use the `quoted-value` format where supported:
+
+```gherkin
+@libar-docs-usecase "When handling command failures"
+```
+
+---
+
 ## Quick Reference
 
 | Element              | Use For                                | Example Location                            |

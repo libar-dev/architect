@@ -24,7 +24,7 @@
 | Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-210  |
 | Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1312 |
 | Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-338  |
-| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-243  |
+| Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-343  |
 | Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-335  |
 | Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-199  |
 | Look up tag definitions        | [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | 1-344  |
@@ -158,18 +158,19 @@
 
 ---
 
-### GHERKIN-PATTERNS.md (Lines 1-243)
+### GHERKIN-PATTERNS.md (Lines 1-343)
 
 | Section                     | Lines   | Key Topics                                  |
 | --------------------------- | ------- | ------------------------------------------- |
-| Essential Patterns          | 9-150   | Roadmap spec, Rule blocks, Scenario Outline |
+| Essential Patterns          | 9-152   | Roadmap spec, Rule blocks, Scenario Outline |
 | — Roadmap Spec Structure    | 11-45   | Tags, Problem/Solution, Background table    |
 | — Rule Blocks               | 46-79   | Business constraints, ScenarioOutline       |
 | — Scenario Outline          | 81-98   | Examples table for variations               |
 | — Executable Test Feature   | 100-150 | Section dividers, behavior verification     |
-| DataTable & DocString Usage | 154-201 | Background vs Scenario tables, code blocks  |
-| Tag Conventions             | 204-222 | @happy-path, @edge-case, @validation, etc.  |
-| Quick Reference             | 225-234 | Element-to-use-case mapping table           |
+| DataTable & DocString Usage | 155-202 | Background vs Scenario tables, code blocks  |
+| Tag Conventions             | 205-223 | @happy-path, @edge-case, @validation, etc.  |
+| Feature File Rich Content   | 226-323 | Code-first, Rule annotations, syntax notes  |
+| Quick Reference             | 326-335 | Element-to-use-case mapping table           |
 
 ---
 
