@@ -19,7 +19,9 @@
       "Bash(pnpm validate:all:*)",
       "Bash(git show:*)",
       "Bash(pnpm --version:*)",
-      "Bash(pnpm docs:all:*)"
+      "Bash(pnpm docs:all:*)",
+      "Bash(pnpm docs:patterns:*)",
+      "Bash(pnpm clean:*)"
     ]
   }
 }
