@@ -17,8 +17,8 @@
  * - Merging user registry with default registry
  */
 
-import { z } from "zod";
-import { buildRegistry, FORMAT_TYPES } from "../taxonomy/index.js";
+import { z } from 'zod';
+import { buildRegistry, FORMAT_TYPES } from '../taxonomy/index.js';
 
 /**
  * Category definition schema
@@ -41,11 +41,11 @@ import { buildRegistry, FORMAT_TYPES } from "../taxonomy/index.js";
 export const CategoryDefinitionSchema = z
   .object({
     /** Tag name (without prefix), e.g., "event-sourcing" */
-    tag: z.string().min(1, "Category tag cannot be empty").max(100),
+    tag: z.string().min(1, 'Category tag cannot be empty').max(100),
     /** Display name for the category, e.g., "Event Sourcing" */
-    domain: z.string().min(1, "Category domain cannot be empty").max(200),
+    domain: z.string().min(1, 'Category domain cannot be empty').max(200),
     /** Priority for category selection (lower number = higher priority) */
-    priority: z.number().int().positive("Priority must be a positive integer"),
+    priority: z.number().int().positive('Priority must be a positive integer'),
     /** Human-readable description of what this category represents */
     description: z.string().max(1000),
     /** Alternative tag names that map to this category */
@@ -77,7 +77,7 @@ export type CategoryDefinition = z.infer<typeof CategoryDefinitionSchema>;
 export const MetadataTagDefinitionSchema = z
   .object({
     /** Tag name (without prefix), e.g., "status" */
-    tag: z.string().min(1, "Metadata tag cannot be empty").max(100),
+    tag: z.string().min(1, 'Metadata tag cannot be empty').max(100),
     /** Format specifies how the tag value is parsed (from taxonomy/format-types.ts) */
     format: z.enum(FORMAT_TYPES),
     /** Human-readable description of the tag's purpose */
@@ -115,7 +115,7 @@ export type MetadataTagDefinition = z.infer<typeof MetadataTagDefinitionSchema>;
 export const AggregationTagDefinitionSchema = z
   .object({
     /** Tag name (without prefix), e.g., "overview" */
-    tag: z.string().min(1, "Aggregation tag cannot be empty").max(100),
+    tag: z.string().min(1, 'Aggregation tag cannot be empty').max(100),
     /** Target document filename, or null for template placeholders only */
     targetDoc: z.string().max(200).nullable(),
     /** Human-readable description of where patterns with this tag appear */
@@ -155,7 +155,7 @@ export const TagRegistrySchema = z
     /** JSON Schema reference (standard $schema property, optional) */
     $schema: z.string().max(500).optional(),
     /** Schema version for future compatibility */
-    version: z.string().max(20).default("1.0.0"),
+    version: z.string().max(20).default('1.0.0'),
     /** Category definitions for organizing patterns */
     categories: z.array(CategoryDefinitionSchema).max(1000),
     /** Metadata tag definitions for pattern enrichment */
@@ -163,11 +163,11 @@ export const TagRegistrySchema = z
     /** Aggregation tag definitions for document routing */
     aggregationTags: z.array(AggregationTagDefinitionSchema).max(50),
     /** Valid format options for template placeholders */
-    formatOptions: z.array(z.string().max(50)).max(20).default(["full", "list", "summary"]),
+    formatOptions: z.array(z.string().max(50)).max(20).default(['full', 'list', 'summary']),
     /** Prefix used for all delivery-process tags */
-    tagPrefix: z.string().max(50).default("@libar-docs-"),
+    tagPrefix: z.string().max(50).default('@libar-docs-'),
     /** File-level opt-in tag that gates extraction */
-    fileOptInTag: z.string().max(50).default("@libar-docs"),
+    fileOptInTag: z.string().max(50).default('@libar-docs'),
   })
   .strict();
 

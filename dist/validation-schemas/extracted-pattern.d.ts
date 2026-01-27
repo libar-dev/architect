@@ -16,7 +16,7 @@
  * - Use when validating extracted patterns from the extractor
  * - Use when serializing/deserializing pattern data
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Business rule extracted from Gherkin Rule: keyword
  *
@@ -73,12 +73,12 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         }, z.core.$strict>;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -135,12 +135,12 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     extractedAt: z.ZodISODateTime;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
-        implemented: "implemented";
         completed: "completed";
-        partial: "partial";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
         deferred: "deferred";
+        implemented: "implemented";
+        partial: "partial";
         "in-progress": "in-progress";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
@@ -168,9 +168,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
+            domain: "domain";
             unknown: "unknown";
             timeline: "timeline";
-            domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";

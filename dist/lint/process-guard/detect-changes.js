@@ -28,11 +28,11 @@
  * - When validating all changes against main branch
  * - When detecting scope creep (new deliverables)
  */
-import { execSync } from "child_process";
-import * as path from "path";
-import { Result as R } from "../../types/index.js";
-import { PROCESS_STATUS_VALUES } from "../../taxonomy/index.js";
-import { DEFAULT_TAG_PREFIX } from "../../config/defaults.js";
+import { execSync } from 'child_process';
+import * as path from 'path';
+import { Result as R } from '../../types/index.js';
+import { PROCESS_STATUS_VALUES } from '../../taxonomy/index.js';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 // =============================================================================
 // Core Functions
 // =============================================================================
@@ -55,10 +55,10 @@ export function detectStagedChanges(baseDir, options) {
     const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
     try {
         // Get list of staged files with status
-        const nameStatus = execGit("diff --cached --name-status", baseDir);
+        const nameStatus = execGit('diff --cached --name-status', baseDir);
         const { modified, added, deleted } = parseNameStatus(nameStatus);
         // Get full diff for content analysis
-        const diff = execGit("diff --cached", baseDir);
+        const diff = execGit('diff --cached', baseDir);
         // Detect status transitions
         const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
         // Detect deliverable changes
@@ -84,7 +84,7 @@ export function detectStagedChanges(baseDir, options) {
  * @param options - Optional change detection options with registry
  * @returns Result containing change detection or error
  */
-export function detectBranchChanges(baseDir, baseBranch = "main", options) {
+export function detectBranchChanges(baseDir, baseBranch = 'main', options) {
     const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
     try {
         // Get merge base
@@ -138,7 +138,7 @@ export function detectFileChanges(baseDir, files, options) {
             }
         }
         // Get diff for modified files
-        const diff = modified.length > 0 ? execGit(`diff HEAD -- ${modified.join(" ")}`, baseDir) : "";
+        const diff = modified.length > 0 ? execGit(`diff HEAD -- ${modified.join(' ')}`, baseDir) : '';
         // Detect status transitions
         const statusTransitions = detectStatusTransitions(diff, modified, tagPrefix);
         // Detect deliverable changes
@@ -165,8 +165,8 @@ export function detectFileChanges(baseDir, files, options) {
 function execGit(command, cwd) {
     return execSync(`git ${command}`, {
         cwd,
-        encoding: "utf-8",
-        stdio: ["pipe", "pipe", "pipe"],
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
     });
 }
 /**
@@ -176,28 +176,28 @@ function parseNameStatus(output) {
     const modified = [];
     const added = [];
     const deleted = [];
-    for (const line of output.split("\n")) {
+    for (const line of output.split('\n')) {
         const trimmed = line.trim();
         if (!trimmed)
             continue;
         const [status, ...pathParts] = trimmed.split(/\s+/);
-        const filePath = pathParts.join(" ");
+        const filePath = pathParts.join(' ');
         if (!filePath)
             continue;
         switch (status) {
-            case "M":
+            case 'M':
                 modified.push(filePath);
                 break;
-            case "A":
+            case 'A':
                 added.push(filePath);
                 break;
-            case "D":
+            case 'D':
                 deleted.push(filePath);
                 break;
-            case "R":
-            case "C":
+            case 'R':
+            case 'C':
                 // Renamed/Copied: path is "old -> new"
-                const newPath = filePath.includes("->") ? filePath.split("->")[1]?.trim() : filePath;
+                const newPath = filePath.includes('->') ? filePath.split('->')[1]?.trim() : filePath;
                 if (newPath)
                     modified.push(newPath);
                 break;
@@ -212,7 +212,7 @@ function parseNameStatus(output) {
  * Escape special regex characters in a string
  */
 function escapeRegex(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 /**
  * Detect status transitions from diff content.
@@ -227,15 +227,15 @@ function escapeRegex(str) {
  */
 function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
     const transitions = [];
-    let currentFile = "";
+    let currentFile = '';
     // Build regex pattern with configurable prefix
     const escapedPrefix = escapeRegex(tagPrefix);
     const statusPattern = new RegExp(`${escapedPrefix}status:(\\w+)`);
-    for (const line of diff.split("\n")) {
+    for (const line of diff.split('\n')) {
         // Track current file
-        if (line.startsWith("diff --git")) {
+        if (line.startsWith('diff --git')) {
             const match = /diff --git a\/(.+) b\/(.+)/.exec(line);
-            currentFile = match?.[2] ?? "";
+            currentFile = match?.[2] ?? '';
             continue;
         }
         // Skip if not a relevant file
@@ -244,11 +244,11 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
         // Skip generated docs directories - they contain embedded status examples
         // that look like status transitions but are just content, not real tags
         // Common patterns: docs-living/, docs-generated/, docs/generated/
-        const generatedDocsPatterns = ["docs-living/", "docs-generated/", "docs/generated/"];
+        const generatedDocsPatterns = ['docs-living/', 'docs-generated/', 'docs/generated/'];
         if (generatedDocsPatterns.some((p) => currentFile.startsWith(p) || currentFile.includes(`/${p}`)))
             continue;
         // Look for status changes
-        if (line.startsWith("-") && !line.startsWith("---")) {
+        if (line.startsWith('-') && !line.startsWith('---')) {
             const oldMatch = statusPattern.exec(line);
             if (oldMatch?.[1]) {
                 // Found a removed status, look for the added status
@@ -267,7 +267,7 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
                 }
             }
         }
-        if (line.startsWith("+") && !line.startsWith("+++")) {
+        if (line.startsWith('+') && !line.startsWith('+++')) {
             const newMatch = statusPattern.exec(line);
             if (newMatch?.[1]) {
                 const toStatus = newMatch[1].toLowerCase();
@@ -290,7 +290,7 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
                     transitions.push([
                         currentFile,
                         {
-                            from: "roadmap", // Default for new files
+                            from: 'roadmap', // Default for new files
                             to: toStatus,
                         },
                     ]);
@@ -313,16 +313,16 @@ function detectStatusTransitions(diff, files, tagPrefix = DEFAULT_TAG_PREFIX) {
  */
 export function detectDeliverableChanges(diff, files) {
     const changes = [];
-    let currentFile = "";
+    let currentFile = '';
     // Regex for DataTable row with Deliverable column
     // Matches: | Deliverable Name | Status | ... |
     const deliverablePattern = /^\s*\|([^|]+)\|([^|]+)\|/;
     const fileChanges = new Map();
-    for (const line of diff.split("\n")) {
+    for (const line of diff.split('\n')) {
         // Track current file
-        if (line.startsWith("diff --git")) {
+        if (line.startsWith('diff --git')) {
             const match = /diff --git a\/(.+) b\/(.+)/.exec(line);
-            currentFile = match?.[2] ?? "";
+            currentFile = match?.[2] ?? '';
             if (currentFile && !fileChanges.has(currentFile)) {
                 fileChanges.set(currentFile, { added: [], removed: [], modified: [] });
             }
@@ -332,14 +332,14 @@ export function detectDeliverableChanges(diff, files) {
         if (!currentFile || !files.includes(currentFile))
             continue;
         // Skip header rows (first row in DataTable)
-        if (line.includes("Deliverable") && line.includes("Status"))
+        if (line.includes('Deliverable') && line.includes('Status'))
             continue;
         // Look for added deliverables
-        if (line.startsWith("+") && line.includes("|")) {
+        if (line.startsWith('+') && line.includes('|')) {
             const match = deliverablePattern.exec(line.substring(1));
             if (match?.[1]) {
                 const deliverable = match[1].trim();
-                if (deliverable && !deliverable.includes("---")) {
+                if (deliverable && !deliverable.includes('---')) {
                     const fc = fileChanges.get(currentFile);
                     if (fc)
                         fc.added.push(deliverable);
@@ -347,11 +347,11 @@ export function detectDeliverableChanges(diff, files) {
             }
         }
         // Look for removed deliverables
-        if (line.startsWith("-") && line.includes("|")) {
+        if (line.startsWith('-') && line.includes('|')) {
             const match = deliverablePattern.exec(line.substring(1));
             if (match?.[1]) {
                 const deliverable = match[1].trim();
-                if (deliverable && !deliverable.includes("---")) {
+                if (deliverable && !deliverable.includes('---')) {
                     const fc = fileChanges.get(currentFile);
                     if (fc)
                         fc.removed.push(deliverable);

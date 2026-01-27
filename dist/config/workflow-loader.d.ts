@@ -17,8 +17,8 @@
  * - Use when validating custom workflow configuration files
  * - Use when loading default 6-phase-standard workflow
  */
-import { Result } from "../types/result.js";
-import { type LoadedWorkflow, type WorkflowConfig } from "../validation-schemas/workflow-config.js";
+import { Result } from '../types/result.js';
+import { type LoadedWorkflow, type WorkflowConfig } from '../validation-schemas/workflow-config.js';
 /**
  * Workflow load error
  *
@@ -27,7 +27,7 @@ import { type LoadedWorkflow, type WorkflowConfig } from "../validation-schemas/
  */
 export interface WorkflowLoadError {
     /** Error type identifier */
-    type: "workflow-load-error";
+    type: 'workflow-load-error';
     /** Path or name of the workflow that failed to load */
     source: string;
     /** Human-readable error message */

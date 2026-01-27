@@ -17,8 +17,8 @@
  * - When detecting doc directives in source code
  * - When normalizing tags for comparison
  */
-import type { RegexBuilders } from "./types.js";
-export type { RegexBuilders } from "./types.js";
+import type { RegexBuilders } from './types.js';
+export type { RegexBuilders } from './types.js';
 /**
  * Creates type-safe regex builders for a given tag prefix configuration.
  * These are used throughout the scanner and validation pipeline.

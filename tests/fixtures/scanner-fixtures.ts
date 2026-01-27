@@ -13,20 +13,20 @@
 // =============================================================================
 
 export type ExportType =
-  | "function"
-  | "type"
-  | "interface"
-  | "const"
-  | "class"
-  | "enum"
-  | "const-enum"
-  | "abstract-class"
-  | "arrow-function"
-  | "async-function"
-  | "generic-function"
-  | "default-function"
-  | "re-export"
-  | "multiple-const";
+  | 'function'
+  | 'type'
+  | 'interface'
+  | 'const'
+  | 'class'
+  | 'enum'
+  | 'const-enum'
+  | 'abstract-class'
+  | 'arrow-function'
+  | 'async-function'
+  | 'generic-function'
+  | 'default-function'
+  | 're-export'
+  | 'multiple-const';
 
 /**
  * Options for building TypeScript content with @libar-docs directives.
@@ -77,12 +77,12 @@ export interface TsContentOptions {
  */
 export function buildTsContent(options: TsContentOptions = {}): string {
   const {
-    exportType = "function",
-    name = "testExport",
-    category = "core",
+    exportType = 'function',
+    name = 'testExport',
+    category = 'core',
     patternName,
     status,
-    description = "Test description",
+    description = 'Test description',
     additionalTags = [],
     examples = [],
     uses = [],
@@ -97,19 +97,19 @@ export function buildTsContent(options: TsContentOptions = {}): string {
 
   // File-level opt-in (separate comment block)
   if (includeFileOptIn) {
-    lines.push("/** @libar-docs */");
-    lines.push("");
+    lines.push('/** @libar-docs */');
+    lines.push('');
   }
 
   // Build directive block
-  lines.push("/**");
+  lines.push('/**');
 
   // Category tags on first line
   const categoryTags = [
     `@libar-docs-${category}`,
     ...additionalTags.map((t) => `@libar-docs-${t}`),
   ];
-  lines.push(` * ${categoryTags.join(" ")}`);
+  lines.push(` * ${categoryTags.join(' ')}`);
 
   // Pattern name
   if (patternName) {
@@ -123,24 +123,24 @@ export function buildTsContent(options: TsContentOptions = {}): string {
 
   // Uses relationships
   if (uses.length > 0) {
-    lines.push(` * @libar-docs-uses ${uses.join(", ")}`);
+    lines.push(` * @libar-docs-uses ${uses.join(', ')}`);
   }
 
   // Used-by relationships
   if (usedBy.length > 0) {
-    lines.push(` * @libar-docs-used-by ${usedBy.join(", ")}`);
+    lines.push(` * @libar-docs-used-by ${usedBy.join(', ')}`);
   }
 
   // Description
-  lines.push(" *");
+  lines.push(' *');
   lines.push(` * ${description}`);
 
   // When to Use section (heading format with bullets)
   if (whenToUse.length > 0) {
-    lines.push(" *");
-    lines.push(" * ### When to Use");
-    lines.push(" *");
-    const bullet = useAsteriskBullets ? "*" : "-";
+    lines.push(' *');
+    lines.push(' * ### When to Use');
+    lines.push(' *');
+    const bullet = useAsteriskBullets ? '*' : '-';
     for (const item of whenToUse) {
       lines.push(` * ${bullet} ${item}`);
     }
@@ -148,27 +148,27 @@ export function buildTsContent(options: TsContentOptions = {}): string {
 
   // When to use inline format
   if (whenToUseInline) {
-    lines.push(" *");
+    lines.push(' *');
     lines.push(` * **When to use:** ${whenToUseInline}`);
   }
 
   // Examples
   for (const example of examples) {
-    lines.push(" *");
-    lines.push(" * @example");
-    lines.push(" * ```typescript");
-    for (const exampleLine of example.split("\n")) {
+    lines.push(' *');
+    lines.push(' * @example');
+    lines.push(' * ```typescript');
+    for (const exampleLine of example.split('\n')) {
       lines.push(` * ${exampleLine}`);
     }
-    lines.push(" * ```");
+    lines.push(' * ```');
   }
 
-  lines.push(" */");
+  lines.push(' */');
 
   // Generate export based on type
   lines.push(buildExportStatement(exportType, name));
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**
@@ -176,46 +176,46 @@ export function buildTsContent(options: TsContentOptions = {}): string {
  */
 function buildExportStatement(exportType: ExportType, name: string): string {
   switch (exportType) {
-    case "function":
+    case 'function':
       return `export function ${name}(input: string): string {\n  return input;\n}`;
 
-    case "type":
+    case 'type':
       return `export type ${name} = {\n  id: string;\n  name: string;\n};`;
 
-    case "interface":
+    case 'interface':
       return `export interface ${name} {\n  id: string;\n  value: number;\n}`;
 
-    case "const":
+    case 'const':
       return `export const ${name} = {\n  key: 'value'\n};`;
 
-    case "class":
+    case 'class':
       return `export class ${name} {\n  constructor(private value: string) {}\n  getValue() { return this.value; }\n}`;
 
-    case "enum":
+    case 'enum':
       return `export enum ${name} {\n  Active = 'active',\n  Inactive = 'inactive'\n}`;
 
-    case "const-enum":
+    case 'const-enum':
       return `export const enum ${name} {\n  Up = 1,\n  Down = 2\n}`;
 
-    case "abstract-class":
+    case 'abstract-class':
       return `export abstract class ${name} {\n  abstract process(): void;\n  log(msg: string) { console.log(msg); }\n}`;
 
-    case "arrow-function":
+    case 'arrow-function':
       return `export const ${name} = async (url: string): Promise<Response> => {\n  return fetch(url);\n};`;
 
-    case "async-function":
+    case 'async-function':
       return `export async function ${name}(id: string): Promise<Data> {\n  const response = await fetch(\`/api/\${id}\`);\n  return response.json();\n}`;
 
-    case "generic-function":
+    case 'generic-function':
       return `export function ${name}<T, U>(items: T[], fn: (item: T) => U): U[] {\n  return items.map(fn);\n}`;
 
-    case "default-function":
+    case 'default-function':
       return `export default function ${name}() {\n  return true;\n}`;
 
-    case "re-export":
+    case 're-export':
       return `export { foo, bar } from './utils';`;
 
-    case "multiple-const":
+    case 'multiple-const':
       return `export const ${name}_A = 'a', ${name}_B = 'b';`;
 
     default:
@@ -277,7 +277,7 @@ export function ${item.name}() {
   return '${item.name}';
 }`
     )
-    .join("\n\n");
+    .join('\n\n');
 }
 
 /**
@@ -431,8 +431,8 @@ export interface GherkinContentOptions {
  */
 export function buildGherkinContent(options: GherkinContentOptions = {}): string {
   const {
-    featureName = "Test Feature",
-    description = "A test feature",
+    featureName = 'Test Feature',
+    description = 'A test feature',
     phase,
     status,
     quarter,
@@ -497,7 +497,7 @@ Scenario: Orphan scenario
   // Feature line
   lines.push(`Feature: ${featureName}`);
   lines.push(`  ${description}`);
-  lines.push("");
+  lines.push('');
 
   // Scenarios
   for (const scenario of scenarios) {
@@ -508,17 +508,17 @@ Scenario: Orphan scenario
     lines.push(`    Given some precondition`);
     lines.push(`    When an action occurs`);
     lines.push(`    Then an outcome happens`);
-    lines.push("");
+    lines.push('');
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 // =============================================================================
 // State Factory for Scanner Tests
 // =============================================================================
 
-import type { ScannerScenarioState } from "../support/world.js";
+import type { ScannerScenarioState } from '../support/world.js';
 
 /**
  * Create initial scanner scenario state.
@@ -532,7 +532,7 @@ export function createScannerState(
     files: new Map(),
     result: null,
     patterns: [],
-    baseDir: "",
+    baseDir: '',
     ...overrides,
   };
 }

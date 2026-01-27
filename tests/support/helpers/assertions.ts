@@ -11,11 +11,11 @@
  * @libar-docs
  */
 
-import { expect } from "vitest";
-import type { Result } from "../../../src/types/result.js";
-import type { LintViolation, LintResult } from "../../../src/lint/index.js";
-import type { ExtractedPattern, DocDirective } from "../../../src/types/index.js";
-import type { ScanResults } from "../../../src/scanner/index.js";
+import { expect } from 'vitest';
+import type { Result } from '../../../src/types/result.js';
+import type { LintViolation, LintResult } from '../../../src/lint/index.js';
+import type { ExtractedPattern, DocDirective } from '../../../src/types/index.js';
+import type { ScanResults } from '../../../src/scanner/index.js';
 
 // =============================================================================
 // Result Monad Assertions
@@ -84,7 +84,7 @@ export function assertViolationProperties(
   violation: LintViolation | null,
   expected: {
     rule?: string;
-    severity?: "error" | "warning" | "info";
+    severity?: 'error' | 'warning' | 'info';
     messageContains?: string;
   }
 ): void {

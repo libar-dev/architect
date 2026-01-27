@@ -23,7 +23,7 @@
  * - active: Work in progress
  * - planned: Future work (includes roadmap and deferred)
  */
-export const NORMALIZED_STATUS_VALUES = ["completed", "active", "planned"];
+export const NORMALIZED_STATUS_VALUES = ['completed', 'active', 'planned'];
 /**
  * Maps raw status values → normalized display status
  *
@@ -33,15 +33,15 @@ export const NORMALIZED_STATUS_VALUES = ["completed", "active", "planned"];
  */
 export const STATUS_NORMALIZATION_MAP = {
     // Current taxonomy values (per PDR-005 FSM)
-    completed: "completed",
-    active: "active",
-    roadmap: "planned",
-    deferred: "planned",
+    completed: 'completed',
+    active: 'active',
+    roadmap: 'planned',
+    deferred: 'planned',
     // Legacy values (for display backward compat with existing data)
-    implemented: "completed",
-    partial: "active",
-    "in-progress": "active",
-    planned: "planned",
+    implemented: 'completed',
+    partial: 'active',
+    'in-progress': 'active',
+    planned: 'planned',
 };
 /**
  * Normalize any status string to a display bucket
@@ -69,7 +69,7 @@ export const STATUS_NORMALIZATION_MAP = {
  */
 export function normalizeStatus(status) {
     if (!status)
-        return "planned";
-    return STATUS_NORMALIZATION_MAP[status.toLowerCase()] ?? "planned";
+        return 'planned';
+    return STATUS_NORMALIZATION_MAP[status.toLowerCase()] ?? 'planned';
 }
 //# sourceMappingURL=normalized-status.js.map

@@ -25,7 +25,7 @@
  * - **Generators Array**: List of generator names (must be registered)
  * - **Metadata**: Optional author, lastUpdated, and tags for organization
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Schema for artefact set metadata
  */

@@ -16,7 +16,7 @@
  * - When validating custom workflow configurations
  * - When creating new workflow definitions
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Status definition within a workflow
  *

@@ -29,9 +29,9 @@ import type {
   ScenarioDataTable,
   ScenarioStep,
   ScenarioRef,
-} from "../../validation-schemas/scenario-ref.js";
-import type { BusinessRule } from "../../validation-schemas/extracted-pattern.js";
-import { type SectionBlock, table, code, list, paragraph, heading } from "../schema.js";
+} from '../../validation-schemas/scenario-ref.js';
+import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
 
 // Re-export BusinessRule for convenience (consumers can import from codecs/index.ts)
 export type { BusinessRule };
@@ -45,7 +45,7 @@ export type { BusinessRule };
  */
 export interface RichContentWarning {
   /** Warning code for programmatic handling */
-  code: "unclosed-docstring" | "invalid-content";
+  code: 'unclosed-docstring' | 'invalid-content';
   /** Human-readable warning message */
   message: string;
   /** Additional context about the warning */
@@ -105,7 +105,7 @@ export const DEFAULT_RICH_CONTENT_OPTIONS: ResolvedRichContentOptions = {
   includeDataTables: true,
   includeDocStrings: true,
   includeRules: true,
-  docStringLanguage: "markdown",
+  docStringLanguage: 'markdown',
   baseHeadingLevel: 4,
   onWarning: undefined,
 };
@@ -132,7 +132,7 @@ function emitWarning(warning: RichContentWarning, options?: RichContentOptions):
   if (options?.onWarning) {
     options.onWarning(warning);
   } else {
-    const contextSuffix = warning.context ? ` Context: ${warning.context}` : "";
+    const contextSuffix = warning.context ? ` Context: ${warning.context}` : '';
     console.warn(`[${warning.code}] ${warning.message}${contextSuffix}`);
   }
 }
@@ -155,7 +155,7 @@ function emitWarning(warning: RichContentWarning, options?: RichContentOptions):
  */
 export function renderDataTable(dt: ScenarioDataTable): SectionBlock {
   const rows = dt.rows.map((row) => {
-    return dt.headers.map((header) => row[header] ?? "");
+    return dt.headers.map((header) => row[header] ?? '');
   });
   return table(dt.headers as string[], rows);
 }
@@ -181,9 +181,9 @@ export function renderDataTable(dt: ScenarioDataTable): SectionBlock {
  */
 export function renderDocString(
   docString: string | { content: string; mediaType?: string | undefined },
-  language = "markdown"
+  language = 'markdown'
 ): SectionBlock {
-  if (typeof docString === "string") {
+  if (typeof docString === 'string') {
     // Legacy string format
     return code(docString, language);
   }
@@ -240,19 +240,19 @@ export function parseDescriptionWithDocStrings(
   }
 
   // Normalize line endings (Windows CRLF → LF)
-  const normalized = description.replace(/\r\n/g, "\n");
+  const normalized = description.replace(/\r\n/g, '\n');
 
   // Detect unclosed DocStrings (odd number of """)
   // Important: Exclude """ that appears inside backticks (inline code examples)
   // e.g., `"""typescript` should not be counted as a delimiter
-  const withoutInlineCode = normalized.replace(/`[^`]+`/g, "");
+  const withoutInlineCode = normalized.replace(/`[^`]+`/g, '');
   const docStringDelimiters = withoutInlineCode.match(/"""/g);
   if (docStringDelimiters && docStringDelimiters.length % 2 !== 0) {
     // Unclosed DocString detected - return as plain paragraph to avoid corruption
     // This is a defensive fallback; the content may not render as intended
     emitWarning(
       {
-        code: "unclosed-docstring",
+        code: 'unclosed-docstring',
         message: 'Unclosed DocString detected (odd number of """ delimiters)',
         context: `Found ${docStringDelimiters.length} delimiters in description`,
       },
@@ -275,8 +275,8 @@ export function parseDescriptionWithDocStrings(
     }
 
     // The DocString as a code block (empty string means no language hint)
-    const language = (match[1] ?? "").length > 0 ? match[1] : "text";
-    const content = (match[2] ?? "").trim();
+    const language = (match[1] ?? '').length > 0 ? match[1] : 'text';
+    const content = (match[2] ?? '').trim();
     sections.push(code(content, language));
 
     lastIndex = match.index + match[0].length;
@@ -324,7 +324,7 @@ export function protectBacktickContent(text: string): {
     return `__LIBAR_BT_${placeholders.length - 1}__`;
   });
   const restore = (s: string): string =>
-    s.replace(/__LIBAR_BT_(\d+)__/g, (_, i) => placeholders[Number(i)] ?? "");
+    s.replace(/__LIBAR_BT_(\d+)__/g, (_, i) => placeholders[Number(i)] ?? '');
   return { processed, restore };
 }
 
@@ -381,17 +381,17 @@ export interface BusinessRuleAnnotations {
  */
 export function truncateText(text: string, maxLength: number): string {
   if (!text || maxLength <= 0 || text.length <= maxLength) {
-    return text || "";
+    return text || '';
   }
 
   // Find the last space before maxLength to truncate at word boundary
   const truncateAt = maxLength - 3; // Reserve space for "..."
-  const lastSpace = text.lastIndexOf(" ", truncateAt);
+  const lastSpace = text.lastIndexOf(' ', truncateAt);
 
   // If no space found, truncate at exact position
   const cutPoint = lastSpace > 0 ? lastSpace : truncateAt;
 
-  return text.slice(0, cutPoint).trim() + "...";
+  return text.slice(0, cutPoint).trim() + '...';
 }
 
 /**
@@ -410,7 +410,7 @@ export function truncateText(text: string, maxLength: number): string {
  * ```
  */
 export function extractFirstSentence(text: string): string {
-  if (!text) return "";
+  if (!text) return '';
 
   // Find sentence-ending punctuation followed by:
   // - whitespace + uppercase letter (new sentence), OR
@@ -461,7 +461,7 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   }
 
   // Normalize line endings
-  const normalized = description.replace(/\r\n/g, "\n");
+  const normalized = description.replace(/\r\n/g, '\n');
 
   const result: BusinessRuleAnnotations = {};
   const codeExamples: SectionBlock[] = [];
@@ -473,8 +473,8 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   const docStringPattern = /"""(\w*)\n([\s\S]*?)"""/g;
   let docMatch;
   while ((docMatch = docStringPattern.exec(normalized)) !== null) {
-    const language = (docMatch[1] ?? "").length > 0 ? docMatch[1] : "text";
-    const content = (docMatch[2] ?? "").trim();
+    const language = (docMatch[1] ?? '').length > 0 ? docMatch[1] : 'text';
+    const content = (docMatch[2] ?? '').trim();
     if (content) {
       codeExamples.push(code(content, language));
     }
@@ -484,8 +484,8 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   const markdownCodePattern = /```(\w*)\n([\s\S]*?)```/g;
   let mdMatch;
   while ((mdMatch = markdownCodePattern.exec(normalized)) !== null) {
-    const language = (mdMatch[1] ?? "").length > 0 ? mdMatch[1] : "text";
-    const content = (mdMatch[2] ?? "").trim();
+    const language = (mdMatch[1] ?? '').length > 0 ? mdMatch[1] : 'text';
+    const content = (mdMatch[2] ?? '').trim();
     if (content) {
       codeExamples.push(code(content, language));
     }
@@ -498,8 +498,8 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   // Step 2: Remove code fences from text before parsing annotations
   // This ensures annotations don't accidentally capture code fence content
   let textWithoutCode = normalized;
-  textWithoutCode = textWithoutCode.replace(/"""(\w*)\n[\s\S]*?"""/g, "");
-  textWithoutCode = textWithoutCode.replace(/```(\w*)\n[\s\S]*?```/g, "");
+  textWithoutCode = textWithoutCode.replace(/"""(\w*)\n[\s\S]*?"""/g, '');
+  textWithoutCode = textWithoutCode.replace(/```(\w*)\n[\s\S]*?```/g, '');
 
   // Step 2.5: Protect backtick-quoted content from regex matching
   // This prevents `**Verified by:**` inside backticks from being treated as annotation boundary
@@ -515,8 +515,8 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
     // Clean up: remove trailing empty lines and normalize whitespace, then restore backticks
     result.invariant = restore(
       invariantText
-        .replace(/\n\s*\n/g, " ")
-        .replace(/\s+/g, " ")
+        .replace(/\n\s*\n/g, ' ')
+        .replace(/\s+/g, ' ')
         .trim()
     );
   }
@@ -528,8 +528,8 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
     const rationaleText = rationaleMatch[1].trim();
     result.rationale = restore(
       rationaleText
-        .replace(/\n\s*\n/g, " ")
-        .replace(/\s+/g, " ")
+        .replace(/\n\s*\n/g, ' ')
+        .replace(/\s+/g, ' ')
         .trim()
     );
   }
@@ -541,7 +541,7 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
     const verifiedByText = verifiedByMatch[1].trim();
     // Split by comma and clean up each entry (restore backticks in each item)
     result.verifiedBy = verifiedByText
-      .split(",")
+      .split(',')
       .map((s) => restore(s.trim()))
       .filter((s) => s.length > 0);
   }
@@ -567,16 +567,16 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   let remaining = protectedText;
 
   // Remove **Invariant:** block
-  remaining = remaining.replace(/\*\*Invariant:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, "");
+  remaining = remaining.replace(/\*\*Invariant:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
 
   // Remove **Rationale:** block
-  remaining = remaining.replace(/\*\*Rationale:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, "");
+  remaining = remaining.replace(/\*\*Rationale:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
 
   // Remove **Verified by:** block
-  remaining = remaining.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, "");
+  remaining = remaining.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
 
   // Remove **API:** See `path` references (use original pattern for protected text)
-  remaining = remaining.replace(/\*\*API:\*\*\s*See\s*__BT\d+__/g, "");
+  remaining = remaining.replace(/\*\*API:\*\*\s*See\s*__BT\d+__/g, '');
 
   // Clean up remaining content and restore backticks
   remaining = restore(remaining.trim());
@@ -612,14 +612,14 @@ export function stripMarkdownTables(text: string): string {
   if (!text) return text;
 
   return text
-    .split("\n")
+    .split('\n')
     .filter((line) => {
       const trimmed = line.trim();
       // Skip lines that are markdown table rows (start and end with |)
-      return !(trimmed.startsWith("|") && trimmed.endsWith("|"));
+      return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
     })
-    .join("\n")
-    .replace(/\n{3,}/g, "\n\n") // Clean up excess newlines
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n') // Clean up excess newlines
     .trim();
 }
 
@@ -647,7 +647,7 @@ export function renderBusinessRule(rule: BusinessRule): SectionBlock[] {
   }
 
   if (rule.scenarioNames.length > 0) {
-    sections.push(paragraph(`_Verified by: ${rule.scenarioNames.join(", ")}_`));
+    sections.push(paragraph(`_Verified by: ${rule.scenarioNames.join(', ')}_`));
   }
 
   return sections;
@@ -730,7 +730,7 @@ export function renderAcceptanceCriteria(
 
   const opts = mergeRichContentOptions(options);
   const sections: SectionBlock[] = [];
-  sections.push(heading(opts.baseHeadingLevel, "Acceptance Criteria"));
+  sections.push(heading(opts.baseHeadingLevel, 'Acceptance Criteria'));
 
   for (const scenario of scenarios) {
     sections.push(...renderScenarioContent(scenario, options));
@@ -770,7 +770,7 @@ export function renderBusinessRulesSection(
 
   const opts = mergeRichContentOptions(options);
   const sections: SectionBlock[] = [];
-  sections.push(heading(opts.baseHeadingLevel, "Business Rules"));
+  sections.push(heading(opts.baseHeadingLevel, 'Business Rules'));
 
   for (const rule of rules) {
     sections.push(...renderBusinessRule(rule));

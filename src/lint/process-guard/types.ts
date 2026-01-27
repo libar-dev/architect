@@ -20,9 +20,9 @@
  * - Protection levels from PDR-005 FSM
  */
 
-import type { ProcessStatusValue, NormalizedStatus } from "../../taxonomy/index.js";
-import type { ProtectionLevel } from "../../validation/fsm/index.js";
-import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
+import type { ProcessStatusValue, NormalizedStatus } from '../../taxonomy/index.js';
+import type { ProtectionLevel } from '../../validation/fsm/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 
 // =============================================================================
 // Core Process State Types
@@ -70,7 +70,7 @@ export interface FileState {
 // =============================================================================
 
 /** Session status lifecycle */
-export type SessionStatus = "draft" | "active" | "closed";
+export type SessionStatus = 'draft' | 'active' | 'closed';
 
 /**
  * State for a work session that scopes modifications.
@@ -136,7 +136,7 @@ export interface DeliverableChange {
 // =============================================================================
 
 /** Violation severity level */
-export type ViolationSeverity = "error" | "warning";
+export type ViolationSeverity = 'error' | 'warning';
 
 /**
  * A validation violation from the process guard linter.
@@ -182,12 +182,12 @@ export interface ValidationResult {
  * recompilation, making runtime validation unnecessary.
  */
 export type ProcessGuardRule =
-  | "completed-protection"
-  | "scope-creep"
-  | "invalid-status-transition"
-  | "session-scope"
-  | "session-excluded"
-  | "deliverable-removed";
+  | 'completed-protection'
+  | 'scope-creep'
+  | 'invalid-status-transition'
+  | 'session-scope'
+  | 'session-excluded'
+  | 'deliverable-removed';
 
 /**
  * A process guard validation rule.
@@ -214,7 +214,7 @@ export interface ProcessGuardRuleDefinition {
 // =============================================================================
 
 /** CLI validation mode */
-export type ValidationMode = "staged" | "all" | "files";
+export type ValidationMode = 'staged' | 'all' | 'files';
 
 /**
  * CLI options for lint:process command.
@@ -274,6 +274,6 @@ export interface DeciderOutput {
  * Events emitted by the decider for observability.
  */
 export type DeciderEvent =
-  | { type: "validation_started"; fileCount: number }
-  | { type: "rule_checked"; rule: ProcessGuardRule; passed: boolean }
-  | { type: "validation_completed"; valid: boolean; violationCount: number };
+  | { type: 'validation_started'; fileCount: number }
+  | { type: 'rule_checked'; rule: ProcessGuardRule; passed: boolean }
+  | { type: 'validation_completed'; valid: boolean; violationCount: number };

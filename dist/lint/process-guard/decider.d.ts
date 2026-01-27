@@ -24,7 +24,7 @@
  * 3. **Scope Creep** - Active specs cannot add new deliverables
  * 4. **Session Scope** - Modifications outside session scope warn
  */
-import type { ValidationResult, ProcessViolation, DeciderInput, DeciderOutput, ProcessGuardRule } from "./types.js";
+import type { ValidationResult, ProcessViolation, DeciderInput, DeciderOutput, ProcessGuardRule } from './types.js';
 /**
  * Validate changes against process rules.
  *

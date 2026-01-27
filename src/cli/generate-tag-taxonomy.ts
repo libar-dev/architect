@@ -19,11 +19,11 @@
  * - Use in documentation regeneration workflows
  */
 
-import * as fs from "fs/promises";
-import * as path from "path";
-import { loadConfig, formatConfigError } from "../config/config-loader.js";
-import { generateTagTaxonomy } from "../config/tag-taxonomy-generator.js";
-import { printVersionAndExit } from "./version.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { generateTagTaxonomy } from '../config/tag-taxonomy-generator.js';
+import { printVersionAndExit } from './version.js';
 
 /**
  * CLI configuration
@@ -44,7 +44,7 @@ interface CLIConfig {
  */
 function parseArgs(argv: string[] = process.argv.slice(2)): CLIConfig {
   const config: CLIConfig = {
-    output: "docs/architecture/TAG_TAXONOMY.md",
+    output: 'docs/architecture/TAG_TAXONOMY.md',
     baseDir: process.cwd(),
     overwrite: false,
     help: false,
@@ -54,25 +54,25 @@ function parseArgs(argv: string[] = process.argv.slice(2)): CLIConfig {
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
 
-    if (arg === "--help" || arg === "-h") {
+    if (arg === '--help' || arg === '-h') {
       config.help = true;
-    } else if (arg === "--output" || arg === "-o") {
+    } else if (arg === '--output' || arg === '-o') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.output = nextArg;
-    } else if (arg === "--base-dir" || arg === "-b") {
+    } else if (arg === '--base-dir' || arg === '-b') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.baseDir = nextArg;
-    } else if (arg === "--overwrite" || arg === "-f") {
+    } else if (arg === '--overwrite' || arg === '-f') {
       config.overwrite = true;
-    } else if (arg === "--version" || arg === "-v") {
+    } else if (arg === '--version' || arg === '-v') {
       config.version = true;
-    } else if (arg?.startsWith("-") === true) {
+    } else if (arg?.startsWith('-') === true) {
       console.warn(`Warning: Unknown flag '${arg}' ignored`);
     }
   }
@@ -120,7 +120,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit("generate-tag-taxonomy");
+    printVersionAndExit('generate-tag-taxonomy');
   }
 
   if (config.help) {
@@ -129,7 +129,7 @@ async function main(): Promise<void> {
   }
 
   try {
-    console.log("Loading configuration...");
+    console.log('Loading configuration...');
 
     // Load configuration (discovers delivery-process.config.ts)
     const configResult = await loadConfig(config.baseDir);
@@ -140,7 +140,7 @@ async function main(): Promise<void> {
 
     const { instance: dpInstance, isDefault, path: configPath } = configResult.value;
     const tagRegistry = dpInstance.registry;
-    const sourcePath = !isDefault && configPath ? configPath : "(default DDD-ES-CQRS taxonomy)";
+    const sourcePath = !isDefault && configPath ? configPath : '(default DDD-ES-CQRS taxonomy)';
     console.log(`  Loaded: ${sourcePath}`);
 
     // Check if output file exists
@@ -152,7 +152,7 @@ async function main(): Promise<void> {
       try {
         await fs.access(outputPath);
         console.error(`Error: Output file already exists: ${outputPath}`);
-        console.error("Use --overwrite (-f) to replace it");
+        console.error('Use --overwrite (-f) to replace it');
         process.exit(1);
       } catch {
         // File doesn't exist, proceed
@@ -160,7 +160,7 @@ async function main(): Promise<void> {
     }
 
     // Generate taxonomy markdown
-    console.log("Generating TAG_TAXONOMY.md...");
+    console.log('Generating TAG_TAXONOMY.md...');
     const markdown = generateTagTaxonomy(tagRegistry, {
       sourcePath: sourcePath,
     });
@@ -169,7 +169,7 @@ async function main(): Promise<void> {
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
     // Write file
-    await fs.writeFile(outputPath, markdown, "utf-8");
+    await fs.writeFile(outputPath, markdown, 'utf-8');
 
     console.log(`\n✓ Generated: ${path.relative(config.baseDir, outputPath)}`);
     console.log(`  Categories: ${tagRegistry.categories.length}`);
@@ -177,12 +177,12 @@ async function main(): Promise<void> {
     console.log(`  Aggregation tags: ${tagRegistry.aggregationTags.length}`);
   } catch (error) {
     if (error instanceof Error) {
-      console.error("Error:", error.message);
-      if (process.env["DEBUG"]) {
-        console.error("Stack trace:", error.stack);
+      console.error('Error:', error.message);
+      if (process.env['DEBUG']) {
+        console.error('Stack trace:', error.stack);
       }
     } else {
-      console.error("Error:", String(error));
+      console.error('Error:', String(error));
     }
     process.exit(1);
   }

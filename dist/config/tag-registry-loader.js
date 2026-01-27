@@ -17,10 +17,10 @@
  * - Use when validating custom tag registry files
  * - Use when auto-discovering tag-registry.json in standard locations
  */
-import * as fs from "fs/promises";
-import * as path from "path";
-import { TagRegistrySchema, createDefaultTagRegistry, mergeTagRegistries, } from "../validation-schemas/tag-registry.js";
-import { createJsonInputCodec } from "../validation-schemas/codec-utils.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { TagRegistrySchema, createDefaultTagRegistry, mergeTagRegistries, } from '../validation-schemas/tag-registry.js';
+import { createJsonInputCodec } from '../validation-schemas/codec-utils.js';
 /**
  * Codec for parsing and validating tag registry configuration JSON
  */
@@ -57,8 +57,8 @@ export async function loadTagRegistry(configPath, baseDir) {
     // If no path provided, try auto-discovery
     if (!configPath) {
         const candidates = [
-            path.join(baseDir, "tag-registry.json"),
-            path.join(baseDir, "docs/architecture/tag-registry.json"),
+            path.join(baseDir, 'tag-registry.json'),
+            path.join(baseDir, 'docs/architecture/tag-registry.json'),
         ];
         for (const candidate of candidates) {
             try {
@@ -80,27 +80,27 @@ export async function loadTagRegistry(configPath, baseDir) {
     // Read file
     let content;
     try {
-        content = await fs.readFile(absolutePath, "utf-8");
+        content = await fs.readFile(absolutePath, 'utf-8');
     }
     catch (error) {
         // Handle file read errors
-        if (error instanceof Error && "code" in error) {
+        if (error instanceof Error && 'code' in error) {
             const nodeError = error;
-            if (nodeError.code === "ENOENT") {
+            if (nodeError.code === 'ENOENT') {
                 return {
                     ok: false,
                     error: {
-                        type: "tag-registry-load-error",
+                        type: 'tag-registry-load-error',
                         path: absolutePath,
                         message: `Tag registry file not found: ${absolutePath}`,
                     },
                 };
             }
-            if (nodeError.code === "EACCES") {
+            if (nodeError.code === 'EACCES') {
                 return {
                     ok: false,
                     error: {
-                        type: "tag-registry-load-error",
+                        type: 'tag-registry-load-error',
                         path: absolutePath,
                         message: `Permission denied reading tag registry: ${absolutePath}`,
                     },
@@ -111,7 +111,7 @@ export async function loadTagRegistry(configPath, baseDir) {
         return {
             ok: false,
             error: {
-                type: "tag-registry-load-error",
+                type: 'tag-registry-load-error',
                 path: absolutePath,
                 message: `Failed to load tag registry: ${message}`,
             },
@@ -121,7 +121,7 @@ export async function loadTagRegistry(configPath, baseDir) {
     const parseResult = TagRegistryCodec.parse(content, absolutePath);
     if (!parseResult.ok) {
         const error = {
-            type: "tag-registry-load-error",
+            type: 'tag-registry-load-error',
             path: absolutePath,
             message: parseResult.error.message,
         };
@@ -152,9 +152,9 @@ export async function loadTagRegistry(configPath, baseDir) {
 export function formatTagRegistryError(error) {
     const lines = [`Tag registry error: ${error.message}`, `  Path: ${error.path}`];
     if (error.validationErrors && error.validationErrors.length > 0) {
-        lines.push("  Validation errors:");
+        lines.push('  Validation errors:');
         lines.push(...error.validationErrors);
     }
-    return lines.join("\n");
+    return lines.join('\n');
 }
 //# sourceMappingURL=tag-registry-loader.js.map

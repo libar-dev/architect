@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Function export with optional signature
  */
 const FunctionExportSchema = z
     .object({
-    type: z.literal("function"),
-    name: z.string().min(1, "Export name cannot be empty"),
+    type: z.literal('function'),
+    name: z.string().min(1, 'Export name cannot be empty'),
     signature: z.string().optional(),
 })
     .strict();
@@ -17,8 +17,8 @@ const FunctionExportSchema = z
  */
 const TypeExportSchema = z
     .object({
-    type: z.literal("type"),
-    name: z.string().min(1, "Export name cannot be empty"),
+    type: z.literal('type'),
+    name: z.string().min(1, 'Export name cannot be empty'),
 })
     .strict();
 /**
@@ -26,8 +26,8 @@ const TypeExportSchema = z
  */
 const ConstExportSchema = z
     .object({
-    type: z.literal("const"),
-    name: z.string().min(1, "Export name cannot be empty"),
+    type: z.literal('const'),
+    name: z.string().min(1, 'Export name cannot be empty'),
     signature: z.string().optional(),
 })
     .strict();
@@ -39,8 +39,8 @@ const ConstExportSchema = z
  */
 const InterfaceExportSchema = z
     .object({
-    type: z.literal("interface"),
-    name: z.string().min(1, "Export name cannot be empty"),
+    type: z.literal('interface'),
+    name: z.string().min(1, 'Export name cannot be empty'),
 })
     .strict();
 /**
@@ -48,8 +48,8 @@ const InterfaceExportSchema = z
  */
 const ClassExportSchema = z
     .object({
-    type: z.literal("class"),
-    name: z.string().min(1, "Export name cannot be empty"),
+    type: z.literal('class'),
+    name: z.string().min(1, 'Export name cannot be empty'),
     signature: z.string().optional(),
 })
     .strict();
@@ -62,8 +62,8 @@ const ClassExportSchema = z
  */
 const EnumExportSchema = z
     .object({
-    type: z.literal("enum"),
-    name: z.string().min(1, "Export name cannot be empty"),
+    type: z.literal('enum'),
+    name: z.string().min(1, 'Export name cannot be empty'),
 })
     .strict();
 /**
@@ -74,7 +74,7 @@ const EnumExportSchema = z
  * - Compile-time exhaustiveness checking
  * - Better error messages from Zod
  */
-export const ExportInfoSchema = z.discriminatedUnion("type", [
+export const ExportInfoSchema = z.discriminatedUnion('type', [
     FunctionExportSchema,
     TypeExportSchema,
     ConstExportSchema,

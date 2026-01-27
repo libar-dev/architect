@@ -20,4 +20,4 @@
  */
 
 // Import to register codec-based generators (RDM architecture)
-import "./codec-generators.js";
+import './codec-generators.js';

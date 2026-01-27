@@ -18,7 +18,7 @@
  * - CI/CD to validate all changes against main branch
  * - Development to check specific files
  */
-import { type ValidationMode } from "../lint/process-guard/index.js";
+import { type ValidationMode } from '../lint/process-guard/index.js';
 /**
  * CLI configuration
  */
@@ -36,7 +36,7 @@ export interface ProcessGuardCLIConfig {
     /** Base directory for relative paths */
     baseDir: string;
     /** Output format */
-    format: "pretty" | "json";
+    format: 'pretty' | 'json';
     /** Show help */
     help: boolean;
     /** Show version */

@@ -1,7 +1,7 @@
 /**
  * @libar-docs
  */
-import type { DocumentGenerator } from "./types";
+import type { DocumentGenerator } from './types';
 /**
  * @libar-docs-generator
  * @libar-docs-pattern GeneratorRegistry

@@ -25,9 +25,9 @@
  * - Use as base for custom configurations
  */
 
-import type { DeliveryProcessConfig } from "./types.js";
-import { CATEGORIES, type CategoryDefinition } from "../taxonomy/categories.js";
-import { buildRegistry } from "../taxonomy/registry-builder.js";
+import type { DeliveryProcessConfig } from './types.js';
+import { CATEGORIES, type CategoryDefinition } from '../taxonomy/categories.js';
+import { buildRegistry } from '../taxonomy/registry-builder.js';
 
 /**
  * Generic preset for non-DDD projects.
@@ -46,29 +46,29 @@ import { buildRegistry } from "../taxonomy/registry-builder.js";
  * ```
  */
 export const GENERIC_PRESET = {
-  tagPrefix: "@docs-",
-  fileOptInTag: "@docs",
+  tagPrefix: '@docs-',
+  fileOptInTag: '@docs',
   categories: [
     {
-      tag: "core",
-      domain: "Core",
+      tag: 'core',
+      domain: 'Core',
       priority: 1,
-      description: "Core patterns",
+      description: 'Core patterns',
       aliases: [],
     },
     {
-      tag: "api",
-      domain: "API",
+      tag: 'api',
+      domain: 'API',
       priority: 2,
-      description: "Public APIs",
+      description: 'Public APIs',
       aliases: [],
     },
     {
-      tag: "infra",
-      domain: "Infrastructure",
+      tag: 'infra',
+      domain: 'Infrastructure',
       priority: 3,
-      description: "Infrastructure",
-      aliases: ["infrastructure"],
+      description: 'Infrastructure',
+      aliases: ['infrastructure'],
     },
   ] as const satisfies readonly CategoryDefinition[],
 } as const satisfies DeliveryProcessConfig;
@@ -92,29 +92,29 @@ export const GENERIC_PRESET = {
  * ```
  */
 export const LIBAR_GENERIC_PRESET = {
-  tagPrefix: "@libar-docs-",
-  fileOptInTag: "@libar-docs",
+  tagPrefix: '@libar-docs-',
+  fileOptInTag: '@libar-docs',
   categories: [
     {
-      tag: "core",
-      domain: "Core",
+      tag: 'core',
+      domain: 'Core',
       priority: 1,
-      description: "Core patterns",
+      description: 'Core patterns',
       aliases: [],
     },
     {
-      tag: "api",
-      domain: "API",
+      tag: 'api',
+      domain: 'API',
       priority: 2,
-      description: "Public APIs",
+      description: 'Public APIs',
       aliases: [],
     },
     {
-      tag: "infra",
-      domain: "Infrastructure",
+      tag: 'infra',
+      domain: 'Infrastructure',
       priority: 3,
-      description: "Infrastructure",
-      aliases: ["infrastructure"],
+      description: 'Infrastructure',
+      aliases: ['infrastructure'],
     },
   ] as const satisfies readonly CategoryDefinition[],
 } as const satisfies DeliveryProcessConfig;
@@ -140,8 +140,8 @@ export const LIBAR_GENERIC_PRESET = {
  * ```
  */
 export const DDD_ES_CQRS_PRESET = {
-  tagPrefix: "@libar-docs-",
-  fileOptInTag: "@libar-docs",
+  tagPrefix: '@libar-docs-',
+  fileOptInTag: '@libar-docs',
   categories: CATEGORIES,
   metadataTags: buildRegistry().metadataTags,
 } as const satisfies DeliveryProcessConfig;
@@ -149,7 +149,7 @@ export const DDD_ES_CQRS_PRESET = {
 /**
  * Available preset names
  */
-export type PresetName = "generic" | "libar-generic" | "ddd-es-cqrs";
+export type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
 
 /**
  * Preset lookup map
@@ -165,6 +165,6 @@ export type PresetName = "generic" | "libar-generic" | "ddd-es-cqrs";
  */
 export const PRESETS: Record<PresetName, DeliveryProcessConfig> = {
   generic: GENERIC_PRESET,
-  "libar-generic": LIBAR_GENERIC_PRESET,
-  "ddd-es-cqrs": DDD_ES_CQRS_PRESET,
+  'libar-generic': LIBAR_GENERIC_PRESET,
+  'ddd-es-cqrs': DDD_ES_CQRS_PRESET,
 };

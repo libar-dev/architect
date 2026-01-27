@@ -25,7 +25,7 @@
  * - **Output Schemas**: Define the shape of JSON output for external consumers
  * - **Codec Pattern**: Validate before serialize, not just after parse
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Schema for individual lint violation in JSON output
  *
@@ -110,8 +110,8 @@ export declare const ValidationIssueSeveritySchema: z.ZodEnum<{
  * Schema for validation issue source
  */
 export declare const ValidationIssueSourceSchema: z.ZodEnum<{
-    gherkin: "gherkin";
     typescript: "typescript";
+    gherkin: "gherkin";
     "cross-source": "cross-source";
 }>;
 /**
@@ -125,8 +125,8 @@ export declare const ValidationIssueOutputSchema: z.ZodObject<{
     }>;
     message: z.ZodString;
     source: z.ZodEnum<{
-        gherkin: "gherkin";
         typescript: "typescript";
+        gherkin: "gherkin";
         "cross-source": "cross-source";
     }>;
     pattern: z.ZodOptional<z.ZodString>;
@@ -156,8 +156,8 @@ export declare const ValidationSummaryOutputSchema: z.ZodObject<{
         }>;
         message: z.ZodString;
         source: z.ZodEnum<{
-            gherkin: "gherkin";
             typescript: "typescript";
+            gherkin: "gherkin";
             "cross-source": "cross-source";
         }>;
         pattern: z.ZodOptional<z.ZodString>;

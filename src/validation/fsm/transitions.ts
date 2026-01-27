@@ -25,13 +25,13 @@
  * - Use `getValidTransitionsFrom()` to show available options
  */
 
-import type { ProcessStatusValue } from "../../taxonomy/index.js";
-import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
+import type { ProcessStatusValue } from '../../taxonomy/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 
 /**
  * Default tag prefix for error messages when no registry is provided.
  */
-const DEFAULT_TAG_PREFIX = "@libar-docs-";
+const DEFAULT_TAG_PREFIX = '@libar-docs-';
 
 /**
  * Options for transition functions that generate messages
@@ -56,10 +56,10 @@ export interface TransitionMessageOptions {
 export const VALID_TRANSITIONS: Readonly<
   Record<ProcessStatusValue, readonly ProcessStatusValue[]>
 > = {
-  roadmap: ["active", "deferred", "roadmap"], // Can start work, park, or stay in planning
-  active: ["completed", "roadmap"], // Can finish or regress if blocked
+  roadmap: ['active', 'deferred', 'roadmap'], // Can start work, park, or stay in planning
+  active: ['completed', 'roadmap'], // Can finish or regress if blocked
   completed: [], // Terminal state - no transitions allowed
-  deferred: ["roadmap"], // Must reactivate through roadmap first
+  deferred: ['roadmap'], // Must reactivate through roadmap first
 } as const;
 
 /**
@@ -122,17 +122,17 @@ export function getTransitionErrorMessage(
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
   // Handle terminal state
-  if (from === "completed") {
+  if (from === 'completed') {
     return `Cannot transition from 'completed' (terminal state). Use ${tagPrefix}unlock-reason to modify.`;
   }
 
   // Handle skipping active (roadmap → completed)
-  if (from === "roadmap" && to === "completed") {
+  if (from === 'roadmap' && to === 'completed') {
     return `Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first.`;
   }
 
   // Handle deferred shortcuts
-  if (from === "deferred" && (to === "active" || to === "completed")) {
+  if (from === 'deferred' && (to === 'active' || to === 'completed')) {
     return `Cannot transition from 'deferred' to '${to}'. Must reactivate to 'roadmap' first.`;
   }
 
@@ -142,5 +142,5 @@ export function getTransitionErrorMessage(
     return `Cannot transition from '${from}' (terminal state).`;
   }
 
-  return `Invalid transition from '${from}' to '${to}'. Valid targets: ${validTargets.join(", ")}.`;
+  return `Invalid transition from '${from}' to '${to}'. Valid targets: ${validTargets.join(', ')}.`;
 }

@@ -22,9 +22,9 @@
  * - When computing protection levels for files
  * - When determining session scope
  */
-import type { Result } from "../../types/index.js";
-import { type ProtectionLevel } from "../../validation/fsm/index.js";
-import type { ProcessState, FileState } from "./types.js";
+import type { Result } from '../../types/index.js';
+import { type ProtectionLevel } from '../../validation/fsm/index.js';
+import type { ProcessState, FileState } from './types.js';
 /**
  * Configuration for deriving process state.
  */

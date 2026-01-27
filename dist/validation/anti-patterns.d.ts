@@ -26,11 +26,11 @@
  * - CI pipeline to enforce documentation standards
  * - Code review checklists for documentation quality
  */
-import type { ScannedGherkinFile } from "../validation-schemas/feature.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import type { ScannedFile } from "../scanner/index.js";
-import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from "./types.js";
-export type { AntiPatternViolation, AntiPatternThresholds } from "./types.js";
+import type { ScannedGherkinFile } from '../validation-schemas/feature.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import type { ScannedFile } from '../scanner/index.js';
+import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from './types.js';
+export type { AntiPatternViolation, AntiPatternThresholds } from './types.js';
 /**
  * Configuration options for anti-pattern detection
  */
@@ -132,9 +132,9 @@ export declare function formatAntiPatternReport(violations: AntiPatternViolation
  * For integration with the existing validate-patterns CLI.
  */
 export declare function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<{
-    severity: "error" | "warning" | "info";
+    severity: 'error' | 'warning' | 'info';
     message: string;
-    source: "typescript" | "gherkin" | "cross-source";
+    source: 'typescript' | 'gherkin' | 'cross-source';
     pattern?: string;
     file?: string;
 }>;

@@ -50,9 +50,9 @@
 // States - Protection levels and state queries
 export { PROTECTION_LEVELS, getProtectionLevel, isTerminalState, isFullyEditable, isScopeLocked, 
 // Re-exported from taxonomy for convenience
-PROCESS_STATUS_VALUES, } from "./states.js";
+PROCESS_STATUS_VALUES, } from './states.js';
 // Transitions - Valid transition matrix and queries
-export { VALID_TRANSITIONS, isValidTransition, getValidTransitionsFrom, getTransitionErrorMessage, } from "./transitions.js";
+export { VALID_TRANSITIONS, isValidTransition, getValidTransitionsFrom, getTransitionErrorMessage, } from './transitions.js';
 // Validator - Pure validation functions
-export { validateStatus, validateTransition, validateCompletionMetadata, validatePatternStatus, getProtectionSummary, } from "./validator.js";
+export { validateStatus, validateTransition, validateCompletionMetadata, validatePatternStatus, getProtectionSummary, } from './validator.js';
 //# sourceMappingURL=index.js.map

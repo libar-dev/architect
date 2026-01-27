@@ -24,10 +24,10 @@
  * - **Tags → Metadata**: @pattern:Name, @phase:N map to pattern fields
  * - **Scenarios → Use Cases**: Acceptance criteria become "When to Use" examples
  */
-import type { ScannedGherkinFile } from "../validation-schemas/feature.js";
-import { type ExtractedPattern } from "../validation-schemas/extracted-pattern.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import { type GherkinPatternValidationError } from "../types/errors.js";
+import type { ScannedGherkinFile } from '../validation-schemas/feature.js';
+import { type ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import { type GherkinPatternValidationError } from '../types/errors.js';
 /**
  * Configuration for Gherkin extractor
  */

@@ -1,4 +1,5 @@
 import tseslint from "typescript-eslint";
+import eslintConfigPrettier from "eslint-config-prettier";
 
 export default tseslint.config(
   // Ignore patterns
@@ -243,5 +244,8 @@ export default tseslint.config(
       // Allow unused vars in step definitions (some steps are defined for documentation)
       "@typescript-eslint/no-unused-vars": "warn",
     },
-  }
+  },
+
+  // Prettier config - must be last to override style rules
+  eslintConfigPrettier
 );

@@ -40,14 +40,14 @@ import type {
   MasterDataset,
   ExtractedPattern,
   PhaseGroup as MasterPhaseGroup,
-} from "../validation-schemas/index.js";
-import type { ProcessStatusValue } from "../taxonomy/index.js";
+} from '../validation-schemas/index.js';
+import type { ProcessStatusValue } from '../taxonomy/index.js';
 import {
   validateTransition,
   getProtectionSummary,
   isValidTransition,
   getValidTransitionsFrom,
-} from "../validation/fsm/index.js";
+} from '../validation/fsm/index.js';
 import type {
   StatusCounts,
   StatusDistribution,
@@ -59,7 +59,7 @@ import type {
   QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
-} from "./types.js";
+} from './types.js';
 
 // =============================================================================
 // Process State API Interface
@@ -79,7 +79,7 @@ export interface ProcessStateAPI {
    * @param status - "completed" | "active" | "planned"
    * @returns Array of patterns with that status
    */
-  getPatternsByNormalizedStatus(status: "completed" | "active" | "planned"): ExtractedPattern[];
+  getPatternsByNormalizedStatus(status: 'completed' | 'active' | 'planned'): ExtractedPattern[];
 
   /**
    * Get all patterns with a specific FSM status value
@@ -533,9 +533,9 @@ export function createProcessStateAPI(dataset: MasterDataset): ProcessStateAPI {
       return Object.entries(dataset.byQuarter)
         .map(([quarter, patterns]) => {
           const counts = {
-            completed: patterns.filter((p) => p.status === "completed").length,
-            active: patterns.filter((p) => p.status === "active").length,
-            planned: patterns.filter((p) => p.status === "roadmap" || p.status === "deferred")
+            completed: patterns.filter((p) => p.status === 'completed').length,
+            active: patterns.filter((p) => p.status === 'active').length,
+            planned: patterns.filter((p) => p.status === 'roadmap' || p.status === 'deferred')
               .length,
             total: patterns.length,
           };
@@ -545,23 +545,23 @@ export function createProcessStateAPI(dataset: MasterDataset): ProcessStateAPI {
     },
 
     getCurrentWork() {
-      return filterByExactStatus("active");
+      return filterByExactStatus('active');
     },
 
     getRoadmapItems() {
-      const roadmap = filterByExactStatus("roadmap");
-      const deferred = filterByExactStatus("deferred");
+      const roadmap = filterByExactStatus('roadmap');
+      const deferred = filterByExactStatus('deferred');
       return [...roadmap, ...deferred];
     },
 
     getRecentlyCompleted(limit = 10) {
-      const completed = filterByExactStatus("completed");
+      const completed = filterByExactStatus('completed');
       // Sort by completion date if available
       return completed
         .filter((p) => p.completed)
         .sort((a, b) => {
-          const dateA = a.completed ?? "";
-          const dateB = b.completed ?? "";
+          const dateA = a.completed ?? '';
+          const dateB = b.completed ?? '';
           return dateB.localeCompare(dateA); // Descending
         })
         .slice(0, limit);

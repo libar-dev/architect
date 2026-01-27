@@ -8,7 +8,7 @@
  * @libar-docs
  */
 
-import { expect } from "vitest";
+import { expect } from 'vitest';
 import type {
   RenderableDocument,
   SectionBlock,
@@ -20,7 +20,7 @@ import type {
   MermaidBlock,
   CollapsibleBlock,
   LinkOutBlock,
-} from "../../../src/renderable/schema.js";
+} from '../../../src/renderable/schema.js';
 
 // ============================================================================
 // Block Type Guards
@@ -28,42 +28,42 @@ import type {
 
 /** Type guard for heading blocks */
 export function isHeading(block: SectionBlock): block is HeadingBlock {
-  return block.type === "heading";
+  return block.type === 'heading';
 }
 
 /** Type guard for paragraph blocks */
 export function isParagraph(block: SectionBlock): block is ParagraphBlock {
-  return block.type === "paragraph";
+  return block.type === 'paragraph';
 }
 
 /** Type guard for table blocks */
 export function isTable(block: SectionBlock): block is TableBlock {
-  return block.type === "table";
+  return block.type === 'table';
 }
 
 /** Type guard for list blocks */
 export function isList(block: SectionBlock): block is ListBlock {
-  return block.type === "list";
+  return block.type === 'list';
 }
 
 /** Type guard for code blocks */
 export function isCode(block: SectionBlock): block is CodeBlock {
-  return block.type === "code";
+  return block.type === 'code';
 }
 
 /** Type guard for mermaid blocks */
 export function isMermaid(block: SectionBlock): block is MermaidBlock {
-  return block.type === "mermaid";
+  return block.type === 'mermaid';
 }
 
 /** Type guard for collapsible blocks */
 export function isCollapsible(block: SectionBlock): block is CollapsibleBlock {
-  return block.type === "collapsible";
+  return block.type === 'collapsible';
 }
 
 /** Type guard for link-out blocks */
 export function isLinkOut(block: SectionBlock): block is LinkOutBlock {
-  return block.type === "link-out";
+  return block.type === 'link-out';
 }
 
 // ============================================================================
@@ -77,7 +77,7 @@ export function isLinkOut(block: SectionBlock): block is LinkOutBlock {
  * @param type - Block type to find
  * @returns Array of matching blocks
  */
-export function findBlocksByType<T extends SectionBlock["type"]>(
+export function findBlocksByType<T extends SectionBlock['type']>(
   doc: RenderableDocument,
   type: T
 ): Array<Extract<SectionBlock, { type: T }>> {
@@ -103,21 +103,21 @@ export function findBlocksByType<T extends SectionBlock["type"]>(
  * Find all heading blocks in a document
  */
 export function findHeadings(doc: RenderableDocument): HeadingBlock[] {
-  return findBlocksByType(doc, "heading");
+  return findBlocksByType(doc, 'heading');
 }
 
 /**
  * Find all table blocks in a document
  */
 export function findTables(doc: RenderableDocument): TableBlock[] {
-  return findBlocksByType(doc, "table");
+  return findBlocksByType(doc, 'table');
 }
 
 /**
  * Find all list blocks in a document
  */
 export function findLists(doc: RenderableDocument): ListBlock[] {
-  return findBlocksByType(doc, "list");
+  return findBlocksByType(doc, 'list');
 }
 
 /**
@@ -149,7 +149,7 @@ export function findTableWithColumns(
   const tables = findTables(doc);
   return tables.find((t) => {
     return columnPatterns.every((pattern) => {
-      if (typeof pattern === "string") {
+      if (typeof pattern === 'string') {
         return t.columns.includes(pattern);
       }
       return t.columns.some((col) => pattern.test(col));
@@ -176,21 +176,21 @@ export function findHeadingWithText(
  * Find all mermaid blocks in a document
  */
 export function findMermaidBlocks(doc: RenderableDocument): MermaidBlock[] {
-  return findBlocksByType(doc, "mermaid");
+  return findBlocksByType(doc, 'mermaid');
 }
 
 /**
  * Find all collapsible blocks in a document
  */
 export function findCollapsibles(doc: RenderableDocument): CollapsibleBlock[] {
-  return findBlocksByType(doc, "collapsible");
+  return findBlocksByType(doc, 'collapsible');
 }
 
 /**
  * Find all link-out blocks in a document
  */
 export function findLinkOuts(doc: RenderableDocument): LinkOutBlock[] {
-  return findBlocksByType(doc, "link-out");
+  return findBlocksByType(doc, 'link-out');
 }
 
 // ============================================================================
@@ -204,7 +204,7 @@ export function findLinkOuts(doc: RenderableDocument): LinkOutBlock[] {
  * @param type - Block type to count
  * @returns Number of matching blocks
  */
-export function countBlocksOfType(doc: RenderableDocument, type: SectionBlock["type"]): number {
+export function countBlocksOfType(doc: RenderableDocument, type: SectionBlock['type']): number {
   return findBlocksByType(doc, type).length;
 }
 
@@ -234,8 +234,8 @@ export interface ExpectedDocumentStructure {
   purpose?: string | RegExp;
   sectionCount?: number | { min?: number; max?: number };
   additionalFileCount?: number | { min?: number; max?: number };
-  hasBlockTypes?: Array<SectionBlock["type"]>;
-  blockCounts?: Partial<Record<SectionBlock["type"], number>>;
+  hasBlockTypes?: Array<SectionBlock['type']>;
+  blockCounts?: Partial<Record<SectionBlock['type'], number>>;
 }
 
 /**
@@ -264,7 +264,7 @@ export function assertDocumentStructure(
 
   // Title assertion
   if (expected.title !== undefined) {
-    if (typeof expected.title === "string") {
+    if (typeof expected.title === 'string') {
       expect(document.title).toBe(expected.title);
     } else {
       expect(document.title).toMatch(expected.title);
@@ -273,7 +273,7 @@ export function assertDocumentStructure(
 
   // Purpose assertion
   if (expected.purpose !== undefined) {
-    if (typeof expected.purpose === "string") {
+    if (typeof expected.purpose === 'string') {
       expect(document.purpose).toBe(expected.purpose);
     } else {
       expect(document.purpose).toMatch(expected.purpose);
@@ -282,7 +282,7 @@ export function assertDocumentStructure(
 
   // Section count assertion
   if (expected.sectionCount !== undefined) {
-    if (typeof expected.sectionCount === "number") {
+    if (typeof expected.sectionCount === 'number') {
       expect(document.sections.length).toBe(expected.sectionCount);
     } else {
       if (expected.sectionCount.min !== undefined) {
@@ -297,7 +297,7 @@ export function assertDocumentStructure(
   // Additional file count assertion
   if (expected.additionalFileCount !== undefined) {
     const fileCount = countAdditionalFiles(document);
-    if (typeof expected.additionalFileCount === "number") {
+    if (typeof expected.additionalFileCount === 'number') {
       expect(fileCount).toBe(expected.additionalFileCount);
     } else {
       if (expected.additionalFileCount.min !== undefined) {
@@ -320,7 +320,7 @@ export function assertDocumentStructure(
   // Block counts assertion
   if (expected.blockCounts !== undefined) {
     for (const [blockType, expectedCount] of Object.entries(expected.blockCounts)) {
-      const actualCount = countBlocksOfType(document, blockType as SectionBlock["type"]);
+      const actualCount = countBlocksOfType(document, blockType as SectionBlock['type']);
       expect(actualCount, `Expected ${expectedCount} '${blockType}' blocks`).toBe(expectedCount);
     }
   }
@@ -358,7 +358,7 @@ export function assertTableContainsRow(table: TableBlock | null, expectedValues:
     expectedValues.every((val) => row.some((cell) => cell.includes(val)))
   );
 
-  expect(found, `Expected table to contain row with: ${expectedValues.join(", ")}`).toBe(true);
+  expect(found, `Expected table to contain row with: ${expectedValues.join(', ')}`).toBe(true);
 }
 
 /**
@@ -399,34 +399,34 @@ function collectAllText(doc: RenderableDocument): string {
   function collectFromBlocks(sections: SectionBlock[]): void {
     for (const block of sections) {
       switch (block.type) {
-        case "heading":
-        case "paragraph":
+        case 'heading':
+        case 'paragraph':
           parts.push(block.text);
           break;
-        case "table":
+        case 'table':
           parts.push(...block.columns);
           for (const row of block.rows) {
             parts.push(...row);
           }
           break;
-        case "list":
+        case 'list':
           for (const item of block.items) {
-            if (typeof item === "string") {
+            if (typeof item === 'string') {
               parts.push(item);
             } else {
               parts.push(item.text);
             }
           }
           break;
-        case "code":
-        case "mermaid":
+        case 'code':
+        case 'mermaid':
           parts.push(block.content);
           break;
-        case "collapsible":
+        case 'collapsible':
           parts.push(block.summary);
           collectFromBlocks(block.content);
           break;
-        case "link-out":
+        case 'link-out':
           parts.push(block.text, block.path);
           break;
       }
@@ -442,7 +442,7 @@ function collectAllText(doc: RenderableDocument): string {
     }
   }
 
-  return parts.join(" ");
+  return parts.join(' ');
 }
 
 // ============================================================================
@@ -462,7 +462,7 @@ export function assertMarkdownContains(
   expect(markdown).not.toBeNull();
 
   for (const pattern of patterns) {
-    if (typeof pattern === "string") {
+    if (typeof pattern === 'string') {
       expect(markdown).toContain(pattern);
     } else {
       expect(markdown).toMatch(pattern);
@@ -483,7 +483,7 @@ export function assertMarkdownDoesNotContain(
   expect(markdown).not.toBeNull();
 
   for (const pattern of patterns) {
-    if (typeof pattern === "string") {
+    if (typeof pattern === 'string') {
       expect(markdown).not.toContain(pattern);
     } else {
       expect(markdown).not.toMatch(pattern);
@@ -506,13 +506,13 @@ export function assertMarkdownHeadings(
   const md = markdown!;
 
   for (const { level, text } of expectedHeadings) {
-    const prefix = "#".repeat(level) + " ";
-    const lines = md.split("\n");
+    const prefix = '#'.repeat(level) + ' ';
+    const lines = md.split('\n');
 
     const found = lines.some((line) => {
       if (!line.startsWith(prefix)) return false;
       const headingText = line.slice(prefix.length);
-      if (typeof text === "string") {
+      if (typeof text === 'string') {
         return headingText.includes(text);
       }
       return text.test(headingText);

@@ -18,8 +18,8 @@
  * - When validating deliverables from Background tables
  * - When performing cross-validation between code and feature files
  */
-import { z } from "zod";
-import { HIERARCHY_LEVELS, PROCESS_STATUS_VALUES, RISK_LEVELS, } from "../taxonomy/index.js";
+import { z } from 'zod';
+import { HIERARCHY_LEVELS, PROCESS_STATUS_VALUES, RISK_LEVELS, } from '../taxonomy/index.js';
 /**
  * Process status values from Gherkin @libar-process-status tag
  *
@@ -67,7 +67,7 @@ export const ProcessMetadataSchema = z
     /** Process status */
     status: ProcessStatusSchema,
     /** Hierarchy level (default: "phase" for backward compatibility) */
-    level: HierarchyLevelSchema.default("phase"),
+    level: HierarchyLevelSchema.default('phase'),
     /** Parent pattern name for hierarchy (from @libar-process-parent tag) */
     parent: z.string().optional(),
     /** Quarter assignment (e.g., "Q1-2025") */

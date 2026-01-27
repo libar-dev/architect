@@ -1,5 +1,5 @@
-import { z } from "zod";
-import type { RegistryFilePath } from "../types/branded.js";
+import { z } from 'zod';
+import type { RegistryFilePath } from '../types/branded.js';
 /**
  * Scanner configuration
  *

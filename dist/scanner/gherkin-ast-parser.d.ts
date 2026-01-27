@@ -33,9 +33,9 @@
  * - When converting acceptance criteria to documentation
  * - When building multi-source documentation pipelines
  */
-import { type GherkinFeature, type GherkinScenario, type GherkinFileError, type GherkinBackground, type GherkinRule } from "../validation-schemas/feature.js";
-import type { Result } from "../types/index.js";
-import { type ProcessStatusValue, type AdrStatusValue, type HierarchyLevel } from "../taxonomy/index.js";
+import { type GherkinFeature, type GherkinScenario, type GherkinFileError, type GherkinBackground, type GherkinRule } from '../validation-schemas/feature.js';
+import type { Result } from '../types/index.js';
+import { type ProcessStatusValue, type AdrStatusValue, type HierarchyLevel } from '../taxonomy/index.js';
 /**
  * Result of parsing a single feature file
  */

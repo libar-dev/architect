@@ -25,13 +25,13 @@
  * - **Registry Pattern:** Explicit registration for transparency
  */
 // Generator registry (singleton + class for custom instances)
-export { GeneratorRegistry, generatorRegistry } from "./registry.js";
+export { GeneratorRegistry, generatorRegistry } from './registry.js';
 // Codec-based generators (RDM architecture)
-export { CodecBasedGenerator, createCodecGenerator, DOCUMENT_TYPES, } from "./codec-based.js";
+export { CodecBasedGenerator, createCodecGenerator, DOCUMENT_TYPES, } from './codec-based.js';
 // Orchestrator - programmatic API for documentation generation
-export { generateDocumentation, } from "./orchestrator.js";
+export { generateDocumentation, } from './orchestrator.js';
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
-export { transformToMasterDataset, } from "./pipeline/index.js";
+export { transformToMasterDataset, } from './pipeline/index.js';
 /**
  * NOTE: Built-in generators are NOT auto-registered.
  * Import './built-in/index.js' explicitly to register them:

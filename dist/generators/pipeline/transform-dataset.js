@@ -26,7 +26,7 @@
  * - **Immutable output**: Returns a new MasterDataset object
  * - **Workflow integration**: Uses workflow config for phase names
  */
-import { normalizeStatus } from "../../taxonomy/index.js";
+import { normalizeStatus } from '../../taxonomy/index.js';
 /**
  * Transform raw extracted data into a MasterDataset with all pre-computed views.
  *
@@ -112,7 +112,7 @@ export function transformToMasterDataset(raw) {
         categoryPatterns.push(p);
         byCategoryMap.set(category, categoryPatterns);
         // ─── Source grouping ───────────────────────────────────────────────────
-        if (pattern.source.file.endsWith(".feature")) {
+        if (pattern.source.file.endsWith('.feature')) {
             bySource.gherkin.push(p);
         }
         else {
@@ -179,9 +179,9 @@ export function transformToMasterDataset(raw) {
                 if (!alreadyAdded) {
                     // Extract first line of description if available, truncate to 100 chars
                     const desc = pattern.directive.description;
-                    const firstLine = desc ? desc.split("\n")[0]?.trim() : undefined;
+                    const firstLine = desc ? desc.split('\n')[0]?.trim() : undefined;
                     const description = firstLine && firstLine.length > 0
-                        ? firstLine.slice(0, 100) + (firstLine.length > 100 ? "..." : "")
+                        ? firstLine.slice(0, 100) + (firstLine.length > 100 ? '...' : '')
                         : undefined;
                     target.implementedBy.push({
                         name: patternKey,
@@ -270,9 +270,9 @@ function computeCounts(patterns) {
     let planned = 0;
     for (const p of patterns) {
         const s = normalizeStatus(p.status);
-        if (s === "completed")
+        if (s === 'completed')
             completed++;
-        else if (s === "active")
+        else if (s === 'active')
             active++;
         else
             planned++;

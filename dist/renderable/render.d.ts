@@ -10,7 +10,7 @@
  * it knows nothing about patterns, phases, or domain concepts.
  * All logic lives in the codecs; this just renders blocks.
  */
-import type { RenderableDocument } from "./schema.js";
+import type { RenderableDocument } from './schema.js';
 /**
  * Render a RenderableDocument to markdown string.
  *

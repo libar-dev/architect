@@ -35,9 +35,9 @@
  * }
  * ```
  */
-import type { MasterDataset, ExtractedPattern } from "../validation-schemas/index.js";
-import type { ProcessStatusValue } from "../taxonomy/index.js";
-import type { StatusCounts, StatusDistribution, PhaseProgress, PhaseGroup, PatternDependencies, PatternRelationships, PatternDeliverable, QuarterGroup, TransitionCheck, ProtectionInfo } from "./types.js";
+import type { MasterDataset, ExtractedPattern } from '../validation-schemas/index.js';
+import type { ProcessStatusValue } from '../taxonomy/index.js';
+import type { StatusCounts, StatusDistribution, PhaseProgress, PhaseGroup, PatternDependencies, PatternRelationships, PatternDeliverable, QuarterGroup, TransitionCheck, ProtectionInfo } from './types.js';
 /**
  * Programmatic API for querying delivery process state
  */
@@ -48,7 +48,7 @@ export interface ProcessStateAPI {
      * @param status - "completed" | "active" | "planned"
      * @returns Array of patterns with that status
      */
-    getPatternsByNormalizedStatus(status: "completed" | "active" | "planned"): ExtractedPattern[];
+    getPatternsByNormalizedStatus(status: 'completed' | 'active' | 'planned'): ExtractedPattern[];
     /**
      * Get all patterns with a specific FSM status value
      *

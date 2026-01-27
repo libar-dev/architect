@@ -23,20 +23,20 @@
  * - When determining session scope
  */
 
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as crypto from "crypto";
-import { glob } from "glob";
-import type { Result } from "../../types/index.js";
-import { Result as R } from "../../types/index.js";
-import { scanGherkinFiles } from "../../scanner/gherkin-scanner.js";
-import { getProtectionLevel, type ProtectionLevel } from "../../validation/fsm/index.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import { glob } from 'glob';
+import type { Result } from '../../types/index.js';
+import { Result as R } from '../../types/index.js';
+import { scanGherkinFiles } from '../../scanner/gherkin-scanner.js';
+import { getProtectionLevel, type ProtectionLevel } from '../../validation/fsm/index.js';
 import {
   PROCESS_STATUS_VALUES,
   normalizeStatus,
   type ProcessStatusValue,
-} from "../../taxonomy/index.js";
-import type { ProcessState, FileState, SessionState, SessionStatus } from "./types.js";
+} from '../../taxonomy/index.js';
+import type { ProcessState, FileState, SessionState, SessionStatus } from './types.js';
 
 // =============================================================================
 // Configuration
@@ -58,8 +58,8 @@ export interface DeriveStateConfig {
 
 /** Default spec patterns - generic defaults that work for package-level usage */
 const DEFAULT_SPEC_PATTERNS = [
-  "delivery-process/**/*.feature",
-  "specs/**/*.feature",  // For consumers
+  'delivery-process/**/*.feature',
+  'specs/**/*.feature', // For consumers
 ];
 
 // =============================================================================
@@ -92,8 +92,7 @@ export async function deriveProcessState(config: DeriveStateConfig): Promise<Res
   const specPatterns = config.specPatterns ?? DEFAULT_SPEC_PATTERNS;
   // taxonomyPath is now optional - TypeScript is the source of truth for taxonomy
   const taxonomyPath = config.taxonomyPath ?? null;
-  const sessionsDir =
-    config.sessionsDir ?? path.join(config.baseDir, "sessions");
+  const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, 'sessions');
 
   // Derive file states
   const filesResult = await deriveFileStates(config.baseDir, specPatterns);
@@ -102,10 +101,10 @@ export async function deriveProcessState(config: DeriveStateConfig): Promise<Res
   }
 
   // Compute taxonomy hash (only if JSON path provided for backwards compatibility)
-  let taxonomyHash = "";
+  let taxonomyHash = '';
   if (taxonomyPath) {
     const hashResult = await computeTaxonomyHash(taxonomyPath);
-    taxonomyHash = hashResult.ok ? hashResult.value : "";
+    taxonomyHash = hashResult.ok ? hashResult.value : '';
   }
 
   // Find active session
@@ -189,7 +188,7 @@ async function deriveFileStates(
 function extractStatusFromTags(tags: readonly string[]): ProcessStatusValue {
   for (const tag of tags) {
     // Handle @libar-docs-status:value format
-    if (tag.includes("status:")) {
+    if (tag.includes('status:')) {
       const match = /status:(\w+)/.exec(tag);
       if (match?.[1]) {
         const status = match[1].toLowerCase();
@@ -200,7 +199,7 @@ function extractStatusFromTags(tags: readonly string[]): ProcessStatusValue {
     }
   }
   // Default to roadmap if no status found
-  return "roadmap";
+  return 'roadmap';
 }
 
 /**
@@ -208,7 +207,7 @@ function extractStatusFromTags(tags: readonly string[]): ProcessStatusValue {
  * Uses unknown type to handle exactOptionalPropertyTypes compatibility.
  */
 function extractDeliverablesFromBackground(background: unknown): readonly string[] {
-  if (background === null || background === undefined || typeof background !== "object") return [];
+  if (background === null || background === undefined || typeof background !== 'object') return [];
 
   const bg = background as {
     steps?: ReadonlyArray<{ dataTable?: { rows?: ReadonlyArray<Record<string, string>> } }>;
@@ -222,7 +221,7 @@ function extractDeliverablesFromBackground(background: unknown): readonly string
     if (rows) {
       for (const row of rows) {
         // Look for "Deliverable" column
-        const deliverable = row["Deliverable"] ?? row["deliverable"];
+        const deliverable = row['Deliverable'] ?? row['deliverable'];
         if (deliverable) {
           deliverables.push(deliverable);
         }
@@ -241,7 +240,7 @@ function extractUnlockReason(tags: readonly string[]): {
   unlockReason: string | undefined;
 } {
   for (const tag of tags) {
-    if (tag.includes("unlock-reason:")) {
+    if (tag.includes('unlock-reason:')) {
       const match = /unlock-reason:["']?([^"']+)["']?/.exec(tag);
       return {
         hasUnlockReason: true,
@@ -257,8 +256,8 @@ function extractUnlockReason(tags: readonly string[]): {
  */
 async function computeTaxonomyHash(taxonomyPath: string): Promise<Result<string>> {
   try {
-    const content = await fs.readFile(taxonomyPath, "utf-8");
-    const hash = crypto.createHash("sha256").update(content).digest("hex");
+    const content = await fs.readFile(taxonomyPath, 'utf-8');
+    const hash = crypto.createHash('sha256').update(content).digest('hex');
     return R.ok(hash.slice(0, 16)); // First 16 chars is enough
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(String(error)));
@@ -282,14 +281,14 @@ async function findActiveSession(
     }
 
     // Find session files
-    const sessionFiles = await glob("*.feature", {
+    const sessionFiles = await glob('*.feature', {
       cwd: sessionsDir,
       absolute: true,
     });
 
     for (const sessionFile of sessionFiles) {
       const session = await parseSessionFile(sessionFile, baseDir);
-      if (session?.status === "active") {
+      if (session?.status === 'active') {
         return R.ok(session);
       }
     }
@@ -322,13 +321,13 @@ async function parseSessionFile(
   const tags = file.feature.tags;
 
   // Extract session ID
-  const sessionId = extractTagValue(tags, "session-id");
+  const sessionId = extractTagValue(tags, 'session-id');
   if (!sessionId) return undefined;
 
   // Extract session status
-  const sessionStatusRaw = extractTagValue(tags, "session-status");
+  const sessionStatusRaw = extractTagValue(tags, 'session-status');
   const sessionStatus: SessionStatus =
-    sessionStatusRaw === "active" || sessionStatusRaw === "closed" ? sessionStatusRaw : "draft";
+    sessionStatusRaw === 'active' || sessionStatusRaw === 'closed' ? sessionStatusRaw : 'draft';
 
   // Extract scoped specs (from background table or tags)
   const scopedSpecs = extractScopedSpecs(file.background);
@@ -362,7 +361,7 @@ function extractTagValue(tags: readonly string[], key: string): string | undefin
  * Uses unknown type to handle exactOptionalPropertyTypes compatibility.
  */
 function extractScopedSpecs(background: unknown): readonly string[] {
-  if (background === null || background === undefined || typeof background !== "object") return [];
+  if (background === null || background === undefined || typeof background !== 'object') return [];
 
   const bg = background as {
     steps?: ReadonlyArray<{ dataTable?: { rows?: ReadonlyArray<Record<string, string>> } }>;
@@ -374,7 +373,7 @@ function extractScopedSpecs(background: unknown): readonly string[] {
     const rows = step.dataTable?.rows;
     if (rows) {
       for (const row of rows) {
-        const spec = row["spec"] ?? row["Spec"];
+        const spec = row['spec'] ?? row['Spec'];
         if (spec) {
           specs.push(spec);
         }

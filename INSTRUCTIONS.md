@@ -25,11 +25,11 @@ Complete reference for documentation tags and CLI commands.
 
 Files must have an opt-in marker to be scanned. The marker depends on your configuration:
 
-| Preset | Opt-In Marker |
-|--------|---------------|
-| DDD_ES_CQRS (default) | `@libar-docs` |
-| GENERIC | `@docs` |
-| Custom | Configured `fileOptInTag` |
+| Preset                | Opt-In Marker             |
+| --------------------- | ------------------------- |
+| DDD_ES_CQRS (default) | `@libar-docs`             |
+| GENERIC               | `@docs`                   |
+| Custom                | Configured `fileOptInTag` |
 
 **Example (default preset):**
 
@@ -358,8 +358,8 @@ name: Pattern Documentation
 on:
   push:
     paths:
-      - "packages/**/*.ts"
-      - "specs/**/*.feature"
+      - 'packages/**/*.ts'
+      - 'specs/**/*.feature'
 
 jobs:
   validate:
@@ -369,8 +369,8 @@ jobs:
       - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: '20'
+          cache: 'pnpm'
       - run: pnpm install
       - name: Lint annotations
         run: npx lint-patterns -i "src/**/*.ts" --strict

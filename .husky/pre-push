@@ -1,0 +1,24 @@
+set -e
+
+echo "Running tests..."
+pnpm test
+
+echo "Building dist/..."
+pnpm build
+
+# Check if dist/ has uncommitted changes after build
+if ! git diff --quiet dist/; then
+  echo ""
+  echo "ERROR: dist/ is out of sync with source code!"
+  echo ""
+  echo "The build produced changes in dist/. Please commit them:"
+  git diff --stat dist/
+  echo ""
+  echo "Run these commands to fix:"
+  echo "  git add dist/"
+  echo "  git commit --amend --no-edit"
+  echo ""
+  exit 1
+fi
+
+echo "All checks passed!"

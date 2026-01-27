@@ -15,9 +15,9 @@
  * - Use when parsing JSDoc comments for @libar-docs-* tags
  * - Use when validating directive structure at boundaries
  */
-import { z } from "zod";
-import { type AcceptedStatusValue } from "../taxonomy/index.js";
-import type { TagRegistry } from "./tag-registry.js";
+import { z } from 'zod';
+import { type AcceptedStatusValue } from '../taxonomy/index.js';
+import type { TagRegistry } from './tag-registry.js';
 /**
  * Position information for a directive in source code
  */
@@ -54,9 +54,9 @@ export declare function createDirectiveTagSchema(tagPrefix: string): z.ZodPipe<z
  * @see src/taxonomy/status-values.ts
  */
 export declare const DefaultPatternStatusSchema: z.ZodEnum<{
+    completed: "completed";
     roadmap: "roadmap";
     active: "active";
-    completed: "completed";
     deferred: "deferred";
 }>;
 /**
@@ -69,9 +69,9 @@ export declare const DefaultPatternStatusSchema: z.ZodEnum<{
  * @see src/taxonomy/normalized-status.ts
  */
 export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
+    completed: "completed";
     roadmap: "roadmap";
     active: "active";
-    completed: "completed";
     deferred: "deferred";
     implemented: "implemented";
     partial: "partial";
@@ -84,9 +84,9 @@ export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
  * Legacy values are normalized to display values via normalizeStatus().
  */
 export declare const PatternStatusSchema: z.ZodEnum<{
+    completed: "completed";
     roadmap: "roadmap";
     active: "active";
-    completed: "completed";
     deferred: "deferred";
     implemented: "implemented";
     partial: "partial";
@@ -136,9 +136,9 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     }, z.core.$strict>;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
+        completed: "completed";
         roadmap: "roadmap";
         active: "active";
-        completed: "completed";
         deferred: "deferred";
         implemented: "implemented";
         partial: "partial";

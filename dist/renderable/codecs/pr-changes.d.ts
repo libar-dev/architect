@@ -28,9 +28,9 @@
  *
  * If both are specified, patterns must match at least one criterion.
  */
-import { z } from "zod";
-import { MasterDatasetSchema } from "../../validation-schemas/master-dataset.js";
-import { type BaseCodecOptions } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema } from '../../validation-schemas/master-dataset.js';
+import { type BaseCodecOptions } from './types/base.js';
 /**
  * Options for PrChangesCodec
  *
@@ -50,13 +50,13 @@ export interface PrChangesCodecOptions extends BaseCodecOptions {
     /** Include dependencies (default: true) */
     includeDependencies?: boolean;
     /** Sort by (default: "phase") */
-    sortBy?: "phase" | "priority" | "workflow";
+    sortBy?: 'phase' | 'priority' | 'workflow';
 }
 /**
  * Default options for PrChangesCodec
  */
 export declare const DEFAULT_PR_CHANGES_OPTIONS: Required<PrChangesCodecOptions>;
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 /**
  * Create a PrChangesCodec with custom options.
  *
@@ -102,12 +102,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -164,12 +164,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -197,9 +197,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -282,8 +282,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -319,12 +319,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -381,12 +381,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -414,9 +414,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -499,12 +499,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -561,12 +561,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -594,9 +594,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -679,12 +679,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -741,12 +741,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -774,9 +774,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -863,12 +863,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -925,12 +925,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -958,9 +958,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1050,12 +1050,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1112,12 +1112,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1145,9 +1145,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1230,12 +1230,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1292,12 +1292,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1325,9 +1325,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1411,12 +1411,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1473,12 +1473,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1506,9 +1506,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1591,12 +1591,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1653,12 +1653,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1686,9 +1686,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1771,12 +1771,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1833,12 +1833,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1866,9 +1866,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1951,12 +1951,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2013,12 +2013,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2046,9 +2046,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2157,12 +2157,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2219,12 +2219,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2252,9 +2252,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2337,12 +2337,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2399,12 +2399,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2432,9 +2432,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2517,12 +2517,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2579,12 +2579,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2612,9 +2612,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2697,12 +2697,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2759,12 +2759,12 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2792,9 +2792,9 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";

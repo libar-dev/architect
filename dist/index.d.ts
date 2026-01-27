@@ -40,14 +40,14 @@
  * });
  * ```
  */
-export { createDeliveryProcess, type CreateDeliveryProcessOptions, } from "./config/factory.js";
-export type { DeliveryProcessConfig, DeliveryProcessInstance, RegexBuilders, } from "./config/types.js";
-export { createRegexBuilders } from "./config/regex-builders.js";
-export { GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, type PresetName, } from "./config/presets.js";
-export * from "./types/index.js";
-export * from "./scanner/index.js";
-export * from "./extractor/index.js";
-export * from "./validation-schemas/index.js";
+export { createDeliveryProcess, type CreateDeliveryProcessOptions } from './config/factory.js';
+export type { DeliveryProcessConfig, DeliveryProcessInstance, RegexBuilders, } from './config/types.js';
+export { createRegexBuilders } from './config/regex-builders.js';
+export { GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PRESETS, type PresetName, } from './config/presets.js';
+export * from './types/index.js';
+export * from './scanner/index.js';
+export * from './extractor/index.js';
+export * from './validation-schemas/index.js';
 /**
  * New section-based generator system.
  *
@@ -63,7 +63,7 @@ export * from "./validation-schemas/index.js";
  * const output = await generator.generate(patterns, context);
  * ```
  */
-export * as generators from "./generators/index.js";
+export * as generators from './generators/index.js';
 /**
  * RenderableDocument Model for codec-based document generation.
  *
@@ -81,7 +81,7 @@ export * as generators from "./generators/index.js";
  * const allFiles = generateAllDocuments(masterDataset);
  * ```
  */
-export * as renderable from "./renderable/index.js";
+export * as renderable from './renderable/index.js';
 /**
  * ProcessStateAPI for programmatic access to delivery process state.
  *
@@ -104,7 +104,7 @@ export * as renderable from "./renderable/index.js";
  * }
  * ```
  */
-export * as api from "./api/index.js";
+export * as api from './api/index.js';
 /**
  * Lint module for pattern annotation quality and process validation.
  *
@@ -126,5 +126,5 @@ export * as api from "./api/index.js";
  * }
  * ```
  */
-export * as lint from "./lint/index.js";
+export * as lint from './lint/index.js';
 //# sourceMappingURL=index.d.ts.map

@@ -37,9 +37,9 @@
  * const doc = codec.decode(dataset);
  * ```
  */
-import { z } from "zod";
-import { MasterDatasetSchema } from "../../validation-schemas/master-dataset.js";
-import { type BaseCodecOptions } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema } from '../../validation-schemas/master-dataset.js';
+import { type BaseCodecOptions } from './types/base.js';
 /**
  * Options for BusinessRulesCodec
  *
@@ -50,7 +50,7 @@ import { type BaseCodecOptions } from "./types/base.js";
  */
 export interface BusinessRulesCodecOptions extends BaseCodecOptions {
     /** Group rules by (default: "domain-then-phase") */
-    groupBy?: "domain" | "phase" | "domain-then-phase";
+    groupBy?: 'domain' | 'phase' | 'domain-then-phase';
     /** Include code examples from DocStrings (default: false, only in detailed mode) */
     includeCodeExamples?: boolean;
     /** Include markdown tables from rule descriptions (default: true) */
@@ -74,7 +74,7 @@ export interface BusinessRulesCodecOptions extends BaseCodecOptions {
  * Default options for BusinessRulesCodec
  */
 export declare const DEFAULT_BUSINESS_RULES_OPTIONS: Required<BusinessRulesCodecOptions>;
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 /**
  * Create a BusinessRulesCodec with custom options.
  *
@@ -118,12 +118,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -180,12 +180,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -213,9 +213,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -298,8 +298,8 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -335,12 +335,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -397,12 +397,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -430,9 +430,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -515,12 +515,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -577,12 +577,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -610,9 +610,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -695,12 +695,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -757,12 +757,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -790,9 +790,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -879,12 +879,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -941,12 +941,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -974,9 +974,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1066,12 +1066,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1128,12 +1128,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1161,9 +1161,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1246,12 +1246,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1308,12 +1308,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1341,9 +1341,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1427,12 +1427,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1489,12 +1489,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1522,9 +1522,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1607,12 +1607,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1669,12 +1669,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1702,9 +1702,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1787,12 +1787,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1849,12 +1849,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1882,9 +1882,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1967,12 +1967,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2029,12 +2029,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2062,9 +2062,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2173,12 +2173,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2235,12 +2235,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2268,9 +2268,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2353,12 +2353,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2415,12 +2415,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2448,9 +2448,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2533,12 +2533,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2595,12 +2595,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2628,9 +2628,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2713,12 +2713,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2775,12 +2775,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2808,9 +2808,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";

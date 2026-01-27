@@ -16,9 +16,9 @@
  * ```
  */
 
-import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from "./types.js";
-import type { ExtractedPattern } from "../validation-schemas/index.js";
-import { generateDocument, type DocumentType, DOCUMENT_TYPES } from "../renderable/generate.js";
+import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from './types.js';
+import type { ExtractedPattern } from '../validation-schemas/index.js';
+import { generateDocument, type DocumentType, DOCUMENT_TYPES } from '../renderable/generate.js';
 
 /**
  * Codec-based generator that wraps the new RDM system.
@@ -47,7 +47,7 @@ export class CodecBasedGenerator implements DocumentGenerator {
         files: [],
         errors: [
           {
-            type: "generator" as const,
+            type: 'generator' as const,
             message: `Generator "${this.name}" requires MasterDataset in context but none was provided. Ensure the orchestrator creates a MasterDataset before running codec-based generators.`,
           },
         ],
@@ -88,4 +88,4 @@ export function createCodecGenerator(name: string, documentType: DocumentType): 
  * Available codec-based document types.
  * Re-exported from generate.ts for convenience.
  */
-export { DOCUMENT_TYPES, type DocumentType } from "../renderable/generate.js";
+export { DOCUMENT_TYPES, type DocumentType } from '../renderable/generate.js';

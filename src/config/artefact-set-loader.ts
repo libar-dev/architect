@@ -26,13 +26,13 @@
  * - **Result Monad**: Returns Result<T, Error> for explicit error handling
  */
 
-import * as fs from "fs/promises";
-import * as path from "path";
-import { fileURLToPath } from "url";
-import { ArtefactSetSchema, type ArtefactSet } from "../validation-schemas/artefact-set.js";
-import type { Result } from "../types/index.js";
-import { Result as R } from "../types/index.js";
-import { createJsonInputCodec } from "../validation-schemas/codec-utils.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+import { ArtefactSetSchema, type ArtefactSet } from '../validation-schemas/artefact-set.js';
+import type { Result } from '../types/index.js';
+import { Result as R } from '../types/index.js';
+import { createJsonInputCodec } from '../validation-schemas/codec-utils.js';
 
 /**
  * Codec for parsing and validating artefact set configuration JSON
@@ -44,7 +44,7 @@ const ArtefactSetCodec = createJsonInputCodec(ArtefactSetSchema);
  */
 export interface ArtefactSetLoadError {
   /** Error type identifier */
-  type: "artefact-set-load-error";
+  type: 'artefact-set-load-error';
   /** Name of the artefact set that failed to load */
   name: string;
   /** Path where the file was expected */
@@ -65,7 +65,7 @@ function getCatalogueDir(): string {
   const configDir = path.dirname(currentFile); // .../src/config
   const srcDir = path.dirname(configDir); // .../src
   const packageRoot = path.dirname(srcDir); // .../@libar-dev/delivery-process
-  return path.join(packageRoot, "catalogue", "artefact-sets");
+  return path.join(packageRoot, 'catalogue', 'artefact-sets');
 }
 
 /**
@@ -93,28 +93,28 @@ export async function loadArtefactSet(
   const catalogueDir = getCatalogueDir();
 
   // Normalize name: add "-set" suffix if not present
-  const normalizedName = name.endsWith("-set") ? name : `${name}-set`;
+  const normalizedName = name.endsWith('-set') ? name : `${name}-set`;
   const filePath = path.join(catalogueDir, `${normalizedName}.json`);
 
   // Read file
   let content: string;
   try {
-    content = await fs.readFile(filePath, "utf-8");
+    content = await fs.readFile(filePath, 'utf-8');
   } catch (error) {
     // Handle file not found
-    if (error instanceof Error && "code" in error) {
+    if (error instanceof Error && 'code' in error) {
       const nodeError = error as NodeJS.ErrnoException;
-      if (nodeError.code === "ENOENT") {
+      if (nodeError.code === 'ENOENT') {
         return R.err({
-          type: "artefact-set-load-error",
+          type: 'artefact-set-load-error',
           name,
           path: filePath,
           message: `Artefact set "${name}" not found. Use --list-artefact-sets to see available sets.`,
         });
       }
-      if (nodeError.code === "EACCES") {
+      if (nodeError.code === 'EACCES') {
         return R.err({
-          type: "artefact-set-load-error",
+          type: 'artefact-set-load-error',
           name,
           path: filePath,
           message: `Permission denied reading artefact set: ${filePath}`,
@@ -124,7 +124,7 @@ export async function loadArtefactSet(
 
     const message = error instanceof Error ? error.message : String(error);
     return R.err({
-      type: "artefact-set-load-error",
+      type: 'artefact-set-load-error',
       name,
       path: filePath,
       message: `Failed to load artefact set "${name}": ${message}`,
@@ -136,7 +136,7 @@ export async function loadArtefactSet(
 
   if (!parseResult.ok) {
     const error: ArtefactSetLoadError = {
-      type: "artefact-set-load-error",
+      type: 'artefact-set-load-error',
       name,
       path: filePath,
       message: parseResult.error.message,
@@ -172,8 +172,8 @@ export async function listAvailableArtefactSets(): Promise<string[]> {
     const files = await fs.readdir(catalogueDir);
 
     return files
-      .filter((file) => file.endsWith(".json"))
-      .map((file) => file.replace(".json", ""))
+      .filter((file) => file.endsWith('.json'))
+      .map((file) => file.replace('.json', ''))
       .sort();
   } catch {
     // If directory doesn't exist or can't be read, return empty array
@@ -200,9 +200,9 @@ export function formatArtefactSetError(error: ArtefactSetLoadError): string {
   const lines = [`Artefact set error: ${error.message}`];
 
   if (error.validationErrors && error.validationErrors.length > 0) {
-    lines.push("Validation errors:");
+    lines.push('Validation errors:');
     lines.push(...error.validationErrors);
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }

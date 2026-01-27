@@ -25,8 +25,8 @@
  * 4. **Session Scope** - Modifications outside session scope warn
  */
 
-import { validateTransition, getValidTransitionsFrom } from "../../validation/fsm/index.js";
-import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
+import { validateTransition, getValidTransitionsFrom } from '../../validation/fsm/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import type {
   ProcessState,
   ChangeDetection,
@@ -37,13 +37,13 @@ import type {
   DeciderOutput,
   DeciderEvent,
   ProcessGuardRule,
-} from "./types.js";
-import { isInSessionScope, isSessionExcluded } from "./derive-state.js";
+} from './types.js';
+import { isInSessionScope, isSessionExcluded } from './derive-state.js';
 
 /**
  * Default tag prefix for error messages when no registry is provided.
  */
-const DEFAULT_TAG_PREFIX = "@libar-docs-";
+const DEFAULT_TAG_PREFIX = '@libar-docs-';
 
 // =============================================================================
 // Decider - Main Entry Point
@@ -81,25 +81,25 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
 
   // Emit start event
   const allFiles = [...changes.modifiedFiles, ...changes.addedFiles];
-  events.push({ type: "validation_started", fileCount: allFiles.length });
+  events.push({ type: 'validation_started', fileCount: allFiles.length });
 
   // Run each rule
   const rules = [
     {
-      rule: "completed-protection" as const,
+      rule: 'completed-protection' as const,
       fn: () => checkProtectionLevel(state, changes, options.registry),
     },
     {
-      rule: "invalid-status-transition" as const,
+      rule: 'invalid-status-transition' as const,
       fn: () => checkStatusTransitions(state, changes),
     },
-    { rule: "scope-creep" as const, fn: () => checkScopeCreep(state, changes) },
+    { rule: 'scope-creep' as const, fn: () => checkScopeCreep(state, changes) },
     {
-      rule: "session-scope" as const,
+      rule: 'session-scope' as const,
       fn: () => (options.ignoreSession ? [] : checkSessionScope(state, changes)),
     },
     {
-      rule: "session-excluded" as const,
+      rule: 'session-excluded' as const,
       fn: () => (options.ignoreSession ? [] : checkSessionExcluded(state, changes)),
     },
   ];
@@ -107,10 +107,10 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
   for (const { rule, fn } of rules) {
     const ruleViolations = fn();
     const passed = ruleViolations.length === 0;
-    events.push({ type: "rule_checked", rule, passed });
+    events.push({ type: 'rule_checked', rule, passed });
 
     for (const v of ruleViolations) {
-      if (v.severity === "error") {
+      if (v.severity === 'error') {
         violations.push(v);
       } else {
         warnings.push(v);
@@ -120,13 +120,13 @@ export function validateChanges(input: DeciderInput): DeciderOutput {
 
   // In strict mode, promote warnings to violations
   const finalViolations = options.strict
-    ? [...violations, ...warnings.map((w) => ({ ...w, severity: "error" as const }))]
+    ? [...violations, ...warnings.map((w) => ({ ...w, severity: 'error' as const }))]
     : violations;
   const finalWarnings = options.strict ? [] : warnings;
 
   const valid = finalViolations.length === 0;
   events.push({
-    type: "validation_completed",
+    type: 'validation_completed',
     valid,
     violationCount: finalViolations.length,
   });
@@ -170,11 +170,11 @@ function checkProtectionLevel(
     if (!fileState) continue;
 
     // Check hard protection (completed)
-    if (fileState.protection === "hard" && !fileState.hasUnlockReason) {
+    if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
       violations.push(
         createViolation(
-          "completed-protection",
-          "error",
+          'completed-protection',
+          'error',
           `Cannot modify completed spec '${file}' without unlock reason`,
           file,
           `Add ${tagPrefix}unlock-reason:'your reason' to proceed`
@@ -205,11 +205,11 @@ function checkStatusTransitions(state: ProcessState, changes: ChangeDetection): 
       const validTransitions = getValidTransitionsFrom(transition.from);
       violations.push(
         createViolation(
-          "invalid-status-transition",
-          "error",
+          'invalid-status-transition',
+          'error',
           `Invalid status transition in '${file}': ${transition.from} → ${transition.to}`,
           file,
-          `Valid transitions from '${transition.from}': ${validTransitions.join(", ")}`
+          `Valid transitions from '${transition.from}': ${validTransitions.join(', ')}`
         )
       );
     }
@@ -235,14 +235,14 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
     if (!fileState) continue;
 
     // Only check active specs (scope-locked)
-    if (fileState.protection === "scope" && deliverableChange.added.length > 0) {
+    if (fileState.protection === 'scope' && deliverableChange.added.length > 0) {
       violations.push(
         createViolation(
-          "scope-creep",
-          "error",
-          `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(", ")}`,
+          'scope-creep',
+          'error',
+          `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(', ')}`,
           file,
-          "Create new spec or revert to roadmap status first"
+          'Create new spec or revert to roadmap status first'
         )
       );
     }
@@ -251,11 +251,11 @@ function checkScopeCreep(state: ProcessState, changes: ChangeDetection): Process
     if (deliverableChange.removed.length > 0) {
       violations.push(
         createViolation(
-          "deliverable-removed",
-          "warning",
-          `Deliverable removed from '${file}': ${deliverableChange.removed.join(", ")}`,
+          'deliverable-removed',
+          'warning',
+          `Deliverable removed from '${file}': ${deliverableChange.removed.join(', ')}`,
           file,
-          "Was this completed or descoped? Consider documenting the reason."
+          'Was this completed or descoped? Consider documenting the reason.'
         )
       );
     }
@@ -284,8 +284,8 @@ function checkSessionScope(state: ProcessState, changes: ChangeDetection): Proce
     if (!isInSessionScope(state, file)) {
       violations.push(
         createViolation(
-          "session-scope",
-          "warning",
+          'session-scope',
+          'warning',
           `File '${file}' is not in session scope`,
           file,
           `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`
@@ -313,11 +313,11 @@ function checkSessionExcluded(state: ProcessState, changes: ChangeDetection): Pr
     if (isSessionExcluded(state, file)) {
       violations.push(
         createViolation(
-          "session-excluded",
-          "error",
+          'session-excluded',
+          'error',
           `File '${file}' is explicitly excluded from session '${state.activeSession.id}'`,
           file,
-          "This file was explicitly excluded and cannot be modified in this session"
+          'This file was explicitly excluded and cannot be modified in this session'
         )
       );
     }
@@ -394,16 +394,16 @@ export function summarizeResult(result: ValidationResult): string {
   const warningCount = result.warnings.length;
 
   if (result.valid && warningCount === 0) {
-    return "Process guard check passed";
+    return 'Process guard check passed';
   }
 
   const parts: string[] = [];
   if (errorCount > 0) {
-    parts.push(`${errorCount} error${errorCount !== 1 ? "s" : ""}`);
+    parts.push(`${errorCount} error${errorCount !== 1 ? 's' : ''}`);
   }
   if (warningCount > 0) {
-    parts.push(`${warningCount} warning${warningCount !== 1 ? "s" : ""}`);
+    parts.push(`${warningCount} warning${warningCount !== 1 ? 's' : ''}`);
   }
 
-  return `Process guard check: ${parts.join(", ")}`;
+  return `Process guard check: ${parts.join(', ')}`;
 }

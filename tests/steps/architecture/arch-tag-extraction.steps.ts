@@ -8,14 +8,14 @@
  * @libar-docs
  */
 
-import { expect } from "vitest";
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
+import { expect } from 'vitest';
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 
-import { buildRegistry } from "../../../src/taxonomy/index.js";
-import { parseFileDirectives } from "../../../src/scanner/ast-parser.js";
-import { Result } from "../../../src/types/index.js";
-import { createTempDir, writeTempFile } from "../../support/helpers/file-system.js";
-import type { TagRegistry } from "../../../src/taxonomy/index.js";
+import { buildRegistry } from '../../../src/taxonomy/index.js';
+import { parseFileDirectives } from '../../../src/scanner/ast-parser.js';
+import { Result } from '../../../src/types/index.js';
+import { createTempDir, writeTempFile } from '../../support/helpers/file-system.js';
+import type { TagRegistry } from '../../../src/taxonomy/index.js';
 
 // =============================================================================
 // Type Definitions
@@ -69,7 +69,7 @@ function initState(): ArchTagExtractionState {
 // =============================================================================
 
 const feature = await loadFeature(
-  "tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature"
+  'tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature'
 );
 
 describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
@@ -89,7 +89,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Background(({ Given }) => {
-    Given("the tag registry is loaded with architecture tags", () => {
+    Given('the tag registry is loaded with architecture tags', () => {
       state = initState();
       state.tagRegistry = buildRegistry();
     });
@@ -99,52 +99,52 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: arch-role tag is defined in the registry
   // ---------------------------------------------------------------------------
 
-  Rule("arch-role tag is defined in the registry", ({ RuleScenario }) => {
-    RuleScenario("arch-role tag exists with enum format", ({ When, Then, And }) => {
+  Rule('arch-role tag is defined in the registry', ({ RuleScenario }) => {
+    RuleScenario('arch-role tag exists with enum format', ({ When, Then, And }) => {
       When('querying for tag "arch-role"', () => {
-        if (!state?.tagRegistry) throw new Error("Tag registry not initialized");
+        if (!state?.tagRegistry) throw new Error('Tag registry not initialized');
         const tagRegistry = state.tagRegistry;
-        state.queriedTag = "arch-role";
-        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === "arch-role");
+        state.queriedTag = 'arch-role';
+        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === 'arch-role');
         state.queriedTagDef = tagDef ?? null;
       });
 
-      Then("the tag should exist", () => {
+      Then('the tag should exist', () => {
         expect(state?.queriedTagDef).not.toBeNull();
       });
 
       And('the tag format should be "enum"', () => {
-        expect(state?.queriedTagDef?.format).toBe("enum");
+        expect(state?.queriedTagDef?.format).toBe('enum');
       });
 
       And('the tag purpose should mention "diagram"', () => {
-        expect(state?.queriedTagDef?.purpose?.toLowerCase()).toContain("diagram");
+        expect(state?.queriedTagDef?.purpose?.toLowerCase()).toContain('diagram');
       });
     });
 
-    RuleScenario("arch-role has required enum values", ({ When, Then, And }) => {
+    RuleScenario('arch-role has required enum values', ({ When, Then, And }) => {
       When('querying for tag "arch-role"', () => {
-        if (!state?.tagRegistry) throw new Error("Tag registry not initialized");
+        if (!state?.tagRegistry) throw new Error('Tag registry not initialized');
         const tagRegistry = state.tagRegistry;
-        state.queriedTag = "arch-role";
-        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === "arch-role");
+        state.queriedTag = 'arch-role';
+        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === 'arch-role');
         state.queriedTagDef = tagDef ?? null;
       });
 
       Then('the tag values should include "command-handler"', () => {
-        expect(state?.queriedTagDef?.values).toContain("command-handler");
+        expect(state?.queriedTagDef?.values).toContain('command-handler');
       });
 
       And('the tag values should include "projection"', () => {
-        expect(state?.queriedTagDef?.values).toContain("projection");
+        expect(state?.queriedTagDef?.values).toContain('projection');
       });
 
       And('the tag values should include "saga"', () => {
-        expect(state?.queriedTagDef?.values).toContain("saga");
+        expect(state?.queriedTagDef?.values).toContain('saga');
       });
 
       And('the tag values should include "infrastructure"', () => {
-        expect(state?.queriedTagDef?.values).toContain("infrastructure");
+        expect(state?.queriedTagDef?.values).toContain('infrastructure');
       });
     });
   });
@@ -153,26 +153,26 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: arch-context tag is defined in the registry
   // ---------------------------------------------------------------------------
 
-  Rule("arch-context tag is defined in the registry", ({ RuleScenario }) => {
-    RuleScenario("arch-context tag exists with value format", ({ When, Then, And }) => {
+  Rule('arch-context tag is defined in the registry', ({ RuleScenario }) => {
+    RuleScenario('arch-context tag exists with value format', ({ When, Then, And }) => {
       When('querying for tag "arch-context"', () => {
-        if (!state?.tagRegistry) throw new Error("Tag registry not initialized");
+        if (!state?.tagRegistry) throw new Error('Tag registry not initialized');
         const tagRegistry = state.tagRegistry;
-        state.queriedTag = "arch-context";
-        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === "arch-context");
+        state.queriedTag = 'arch-context';
+        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === 'arch-context');
         state.queriedTagDef = tagDef ?? null;
       });
 
-      Then("the tag should exist", () => {
+      Then('the tag should exist', () => {
         expect(state?.queriedTagDef).not.toBeNull();
       });
 
       And('the tag format should be "value"', () => {
-        expect(state?.queriedTagDef?.format).toBe("value");
+        expect(state?.queriedTagDef?.format).toBe('value');
       });
 
       And('the tag purpose should mention "bounded context"', () => {
-        expect(state?.queriedTagDef?.purpose?.toLowerCase()).toContain("bounded context");
+        expect(state?.queriedTagDef?.purpose?.toLowerCase()).toContain('bounded context');
       });
     });
   });
@@ -181,47 +181,47 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: arch-layer tag is defined in the registry
   // ---------------------------------------------------------------------------
 
-  Rule("arch-layer tag is defined in the registry", ({ RuleScenario }) => {
-    RuleScenario("arch-layer tag exists with enum format", ({ When, Then, And }) => {
+  Rule('arch-layer tag is defined in the registry', ({ RuleScenario }) => {
+    RuleScenario('arch-layer tag exists with enum format', ({ When, Then, And }) => {
       When('querying for tag "arch-layer"', () => {
-        if (!state?.tagRegistry) throw new Error("Tag registry not initialized");
+        if (!state?.tagRegistry) throw new Error('Tag registry not initialized');
         const tagRegistry = state.tagRegistry;
-        state.queriedTag = "arch-layer";
-        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === "arch-layer");
+        state.queriedTag = 'arch-layer';
+        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === 'arch-layer');
         state.queriedTagDef = tagDef ?? null;
       });
 
-      Then("the tag should exist", () => {
+      Then('the tag should exist', () => {
         expect(state?.queriedTagDef).not.toBeNull();
       });
 
       And('the tag format should be "enum"', () => {
-        expect(state?.queriedTagDef?.format).toBe("enum");
+        expect(state?.queriedTagDef?.format).toBe('enum');
       });
     });
 
-    RuleScenario("arch-layer has exactly three values", ({ When, Then, And }) => {
+    RuleScenario('arch-layer has exactly three values', ({ When, Then, And }) => {
       When('querying for tag "arch-layer"', () => {
-        if (!state?.tagRegistry) throw new Error("Tag registry not initialized");
+        if (!state?.tagRegistry) throw new Error('Tag registry not initialized');
         const tagRegistry = state.tagRegistry;
-        state.queriedTag = "arch-layer";
-        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === "arch-layer");
+        state.queriedTag = 'arch-layer';
+        const tagDef = tagRegistry.metadataTags.find((t) => t.tag === 'arch-layer');
         state.queriedTagDef = tagDef ?? null;
       });
 
       Then('the tag values should include "domain"', () => {
-        expect(state?.queriedTagDef?.values).toContain("domain");
+        expect(state?.queriedTagDef?.values).toContain('domain');
       });
 
       And('the tag values should include "application"', () => {
-        expect(state?.queriedTagDef?.values).toContain("application");
+        expect(state?.queriedTagDef?.values).toContain('application');
       });
 
       And('the tag values should include "infrastructure"', () => {
-        expect(state?.queriedTagDef?.values).toContain("infrastructure");
+        expect(state?.queriedTagDef?.values).toContain('infrastructure');
       });
 
-      And("the tag values count should be 3", () => {
+      And('the tag values count should be 3', () => {
         expect(state?.queriedTagDef?.values).toHaveLength(3);
       });
     });
@@ -231,21 +231,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: AST parser extracts arch-role from TypeScript annotations
   // ---------------------------------------------------------------------------
 
-  Rule("AST parser extracts arch-role from TypeScript annotations", ({ RuleScenario }) => {
-    RuleScenario("Extract arch-role projection", ({ Given, When, Then }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+  Rule('AST parser extracts arch-role from TypeScript annotations', ({ RuleScenario }) => {
+    RuleScenario('Extract arch-role projection', ({ Given, When, Then }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -261,24 +261,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archRole should be "projection"', () => {
-        expect(state?.directive?.archRole).toBe("projection");
+        expect(state?.directive?.archRole).toBe('projection');
       });
     });
 
-    RuleScenario("Extract arch-role command-handler", ({ Given, When, Then }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+    RuleScenario('Extract arch-role command-handler', ({ Given, When, Then }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -294,7 +294,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archRole should be "command-handler"', () => {
-        expect(state?.directive?.archRole).toBe("command-handler");
+        expect(state?.directive?.archRole).toBe('command-handler');
       });
     });
   });
@@ -303,21 +303,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: AST parser extracts arch-context from TypeScript annotations
   // ---------------------------------------------------------------------------
 
-  Rule("AST parser extracts arch-context from TypeScript annotations", ({ RuleScenario }) => {
-    RuleScenario("Extract arch-context orders", ({ Given, When, Then }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+  Rule('AST parser extracts arch-context from TypeScript annotations', ({ RuleScenario }) => {
+    RuleScenario('Extract arch-context orders', ({ Given, When, Then }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -333,24 +333,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archContext should be "orders"', () => {
-        expect(state?.directive?.archContext).toBe("orders");
+        expect(state?.directive?.archContext).toBe('orders');
       });
     });
 
-    RuleScenario("Extract arch-context inventory", ({ Given, When, Then }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+    RuleScenario('Extract arch-context inventory', ({ Given, When, Then }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -366,7 +366,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archContext should be "inventory"', () => {
-        expect(state?.directive?.archContext).toBe("inventory");
+        expect(state?.directive?.archContext).toBe('inventory');
       });
     });
   });
@@ -375,21 +375,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: AST parser extracts arch-layer from TypeScript annotations
   // ---------------------------------------------------------------------------
 
-  Rule("AST parser extracts arch-layer from TypeScript annotations", ({ RuleScenario }) => {
-    RuleScenario("Extract arch-layer application", ({ Given, When, Then }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+  Rule('AST parser extracts arch-layer from TypeScript annotations', ({ RuleScenario }) => {
+    RuleScenario('Extract arch-layer application', ({ Given, When, Then }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -405,24 +405,24 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archLayer should be "application"', () => {
-        expect(state?.directive?.archLayer).toBe("application");
+        expect(state?.directive?.archLayer).toBe('application');
       });
     });
 
-    RuleScenario("Extract arch-layer infrastructure", ({ Given, When, Then }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+    RuleScenario('Extract arch-layer infrastructure', ({ Given, When, Then }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -438,7 +438,7 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archLayer should be "infrastructure"', () => {
-        expect(state?.directive?.archLayer).toBe("infrastructure");
+        expect(state?.directive?.archLayer).toBe('infrastructure');
       });
     });
   });
@@ -447,21 +447,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: AST parser handles multiple arch tags together
   // ---------------------------------------------------------------------------
 
-  Rule("AST parser handles multiple arch tags together", ({ RuleScenario }) => {
-    RuleScenario("Extract all three arch tags", ({ Given, When, Then, And }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+  Rule('AST parser handles multiple arch tags together', ({ RuleScenario }) => {
+    RuleScenario('Extract all three arch tags', ({ Given, When, Then, And }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -477,15 +477,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('the directive archRole should be "command-handler"', () => {
-        expect(state?.directive?.archRole).toBe("command-handler");
+        expect(state?.directive?.archRole).toBe('command-handler');
       });
 
       And('the directive archContext should be "orders"', () => {
-        expect(state?.directive?.archContext).toBe("orders");
+        expect(state?.directive?.archContext).toBe('orders');
       });
 
       And('the directive archLayer should be "application"', () => {
-        expect(state?.directive?.archLayer).toBe("application");
+        expect(state?.directive?.archLayer).toBe('application');
       });
     });
   });
@@ -494,21 +494,21 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   // Rule: Missing arch tags yield undefined values
   // ---------------------------------------------------------------------------
 
-  Rule("Missing arch tags yield undefined values", ({ RuleScenario }) => {
-    RuleScenario("Missing arch tags are undefined", ({ Given, When, Then, And }) => {
-      Given("TypeScript source:", async (_ctx: unknown, docString: string) => {
+  Rule('Missing arch tags yield undefined values', ({ RuleScenario }) => {
+    RuleScenario('Missing arch tags are undefined', ({ Given, When, Then, And }) => {
+      Given('TypeScript source:', async (_ctx: unknown, docString: string) => {
         if (!state) state = initState();
-        const tempContext = await createTempDir({ prefix: "arch-tag-test-" });
+        const tempContext = await createTempDir({ prefix: 'arch-tag-test-' });
         state.tempDir = tempContext.tempDir;
         state.cleanup = tempContext.cleanup;
         state.typeScriptSource = docString.trim();
-        state.filePath = await writeTempFile(state.tempDir, "test.ts", state.typeScriptSource);
+        state.filePath = await writeTempFile(state.tempDir, 'test.ts', state.typeScriptSource);
       });
 
-      When("the AST parser extracts the directive", () => {
-        if (!state) throw new Error("State not initialized");
+      When('the AST parser extracts the directive', () => {
+        if (!state) throw new Error('State not initialized');
         if (!state.filePath || !state.typeScriptSource) {
-          throw new Error("File path or TypeScript source not initialized");
+          throw new Error('File path or TypeScript source not initialized');
         }
         const result = parseFileDirectives(state.typeScriptSource, state.filePath);
         if (Result.isOk(result) && result.value.directives.length > 0) {
@@ -523,15 +523,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         }
       });
 
-      Then("the directive archRole should be undefined", () => {
+      Then('the directive archRole should be undefined', () => {
         expect(state?.directive?.archRole).toBeUndefined();
       });
 
-      And("the directive archContext should be undefined", () => {
+      And('the directive archContext should be undefined', () => {
         expect(state?.directive?.archContext).toBeUndefined();
       });
 
-      And("the directive archLayer should be undefined", () => {
+      And('the directive archLayer should be undefined', () => {
         expect(state?.directive?.archLayer).toBeUndefined();
       });
     });

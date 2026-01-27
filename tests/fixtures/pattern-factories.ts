@@ -5,13 +5,13 @@
  * and related types. Used across unit, integration, and property tests.
  */
 
-import type { ExtractedPattern, DocDirective, ExportInfo } from "../../src/types/index.js";
+import type { ExtractedPattern, DocDirective, ExportInfo } from '../../src/types/index.js';
 import {
   asPatternId,
   asCategoryName,
   asSourceFilePath,
   asDirectiveTag,
-} from "../../src/types/branded.js";
+} from '../../src/types/branded.js';
 
 // ============================================================================
 // Configuration Types
@@ -44,7 +44,7 @@ export interface TestPatternOptions {
   /** Override category (default: "core") */
   category?: string;
   /** Override status (default: "completed") */
-  status?: "roadmap" | "active" | "completed" | "deferred";
+  status?: 'roadmap' | 'active' | 'completed' | 'deferred';
   /** Mark as core pattern (default: false) */
   isCore?: boolean;
   /** Description text (default: generated) */
@@ -85,9 +85,9 @@ export interface TestPatternOptions {
   /** Workflow type for changelog mapping (default: none) */
   workflow?: string;
   /** Priority level for process tracking (default: none) */
-  priority?: "critical" | "high" | "medium" | "low";
+  priority?: 'critical' | 'high' | 'medium' | 'low';
   /** Hierarchy level for grouping (default: none) */
-  level?: "epic" | "phase" | "task";
+  level?: 'epic' | 'phase' | 'task';
   /** Patterns this code implements (realization relationship, default: none) */
   implementsPatterns?: string[];
 }
@@ -137,15 +137,15 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
   patternCounter++;
 
   const {
-    id = `pattern-${String(patternCounter).padStart(8, "0")}`,
-    name = "Test Pattern",
-    category = "core",
-    status = "completed",
+    id = `pattern-${String(patternCounter).padStart(8, '0')}`,
+    name = 'Test Pattern',
+    category = 'core',
+    status = 'completed',
     isCore = false,
     description = `Test description for ${name}.`,
     filePath = `packages/@libar-dev/platform-${category}/src/test.ts`,
     lines = [1, 10] as const,
-    exports = [{ name: name.replace(/\s+/g, ""), type: "function" as const }],
+    exports = [{ name: name.replace(/\s+/g, ''), type: 'function' as const }],
     useCases,
     uses,
     usedBy,
@@ -188,7 +188,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     status,
     isCore,
     directive,
-    code: `export function ${name.replace(/\s+/g, "")}() {}`,
+    code: `export function ${name.replace(/\s+/g, '')}() {}`,
     source: {
       file: asSourceFilePath(filePath),
       lines,
@@ -241,7 +241,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
 export function createTestPatternSet(options: PatternSetOptions = {}): ExtractedPattern[] {
   const {
     stable = false,
-    categories = ["core", "ddd"],
+    categories = ['core', 'ddd'],
     patternsPerCategory = 2,
     withRelationships = false,
     withUseCases = false,
@@ -257,10 +257,10 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
 
       // Stable mode uses deterministic IDs and timestamps
       const id = stable
-        ? `pattern-${String(patternIndex).padStart(8, "0")}`
+        ? `pattern-${String(patternIndex).padStart(8, '0')}`
         : `pattern-${Math.random().toString(36).slice(2, 10)}`;
 
-      const timestamp = stable ? "2024-01-01T00:00:00.000Z" : new Date().toISOString();
+      const timestamp = stable ? '2024-01-01T00:00:00.000Z' : new Date().toISOString();
 
       const name = `${capitalize(category)} Pattern ${i + 1}`;
       const isFirstInCategory = i === 0;
@@ -269,12 +269,12 @@ export function createTestPatternSet(options: PatternSetOptions = {}): Extracted
         id,
         name,
         category,
-        status: isFirstInCategory ? "completed" : "active",
+        status: isFirstInCategory ? 'completed' : 'active',
         isCore: isFirstInCategory,
         description: `Description for ${category} pattern ${i + 1}. This pattern demonstrates best practices.`,
         filePath: `src/${category}/pattern-${i + 1}.ts`,
         lines: [10 * patternIndex, 10 * patternIndex + 5],
-        exports: [{ name: name.replace(/\s+/g, ""), type: "function" as const }],
+        exports: [{ name: name.replace(/\s+/g, ''), type: 'function' as const }],
       };
 
       // Add use cases
@@ -344,31 +344,31 @@ export function resetPatternCounter(): void {
 export function createDependencyGraph(): ExtractedPattern[] {
   return [
     createTestPattern({
-      id: "pattern-b0770000",
-      name: "Bottom Pattern",
-      category: "core",
+      id: 'pattern-b0770000',
+      name: 'Bottom Pattern',
+      category: 'core',
       uses: [],
-      usedBy: ["Left Pattern", "Right Pattern"],
+      usedBy: ['Left Pattern', 'Right Pattern'],
     }),
     createTestPattern({
-      id: "pattern-1ef70001",
-      name: "Left Pattern",
-      category: "ddd",
-      uses: ["Bottom Pattern"],
-      usedBy: ["Top Pattern"],
+      id: 'pattern-1ef70001',
+      name: 'Left Pattern',
+      category: 'ddd',
+      uses: ['Bottom Pattern'],
+      usedBy: ['Top Pattern'],
     }),
     createTestPattern({
-      id: "pattern-f1907002",
-      name: "Right Pattern",
-      category: "ddd",
-      uses: ["Bottom Pattern"],
-      usedBy: ["Top Pattern"],
+      id: 'pattern-f1907002',
+      name: 'Right Pattern',
+      category: 'ddd',
+      uses: ['Bottom Pattern'],
+      usedBy: ['Top Pattern'],
     }),
     createTestPattern({
-      id: "pattern-70900003",
-      name: "Top Pattern",
-      category: "core",
-      uses: ["Left Pattern", "Right Pattern"],
+      id: 'pattern-70900003',
+      name: 'Top Pattern',
+      category: 'core',
+      uses: ['Left Pattern', 'Right Pattern'],
       usedBy: [],
     }),
   ];
@@ -380,35 +380,35 @@ export function createDependencyGraph(): ExtractedPattern[] {
 export function createRoadmapPatterns(): ExtractedPattern[] {
   return [
     createTestPattern({
-      id: "pattern-f0da0101",
-      name: "Foundation Types",
-      category: "core",
-      status: "completed",
+      id: 'pattern-f0da0101',
+      name: 'Foundation Types',
+      category: 'core',
+      status: 'completed',
       phase: 1,
     }),
     createTestPattern({
-      id: "pattern-ba5e0102",
-      name: "Base Utilities",
-      category: "core",
-      status: "completed",
+      id: 'pattern-ba5e0102',
+      name: 'Base Utilities',
+      category: 'core',
+      status: 'completed',
       phase: 1,
     }),
     createTestPattern({
-      id: "pattern-d0da0201",
-      name: "Domain Model",
-      category: "ddd",
-      status: "active",
+      id: 'pattern-d0da0201',
+      name: 'Domain Model',
+      category: 'ddd',
+      status: 'active',
       phase: 2,
-      dependsOn: ["Foundation Types"],
+      dependsOn: ['Foundation Types'],
     }),
     createTestPattern({
-      id: "pattern-adff0301",
-      name: "Advanced Features",
-      category: "saga",
-      status: "roadmap",
+      id: 'pattern-adff0301',
+      name: 'Advanced Features',
+      category: 'saga',
+      status: 'roadmap',
       phase: 3,
-      dependsOn: ["Domain Model", "Base Utilities"],
-      brief: "docs/briefs/advanced-features.md",
+      dependsOn: ['Domain Model', 'Base Utilities'],
+      brief: 'docs/briefs/advanced-features.md',
     }),
   ];
 }
@@ -419,26 +419,26 @@ export function createRoadmapPatterns(): ExtractedPattern[] {
 export function createUseCasePatterns(): ExtractedPattern[] {
   return [
     createTestPattern({
-      id: "pattern-c0a0d001",
-      name: "Command Handler",
-      category: "cqrs",
+      id: 'pattern-c0a0d001',
+      name: 'Command Handler',
+      category: 'cqrs',
       useCases: [
-        "When implementing a new command",
-        "When adding validation logic",
-        "When orchestrating multiple services",
+        'When implementing a new command',
+        'When adding validation logic',
+        'When orchestrating multiple services',
       ],
       whenToUse: [
-        "Complex business operations",
-        "Operations that modify state",
-        "Operations requiring transaction boundaries",
+        'Complex business operations',
+        'Operations that modify state',
+        'Operations requiring transaction boundaries',
       ],
     }),
     createTestPattern({
-      id: "pattern-00e27002",
-      name: "Query Handler",
-      category: "cqrs",
-      useCases: ["When implementing read operations", "When optimizing for performance"],
-      whenToUse: ["Read-only operations", "Operations that benefit from caching"],
+      id: 'pattern-00e27002',
+      name: 'Query Handler',
+      category: 'cqrs',
+      useCases: ['When implementing read operations', 'When optimizing for performance'],
+      whenToUse: ['Read-only operations', 'Operations that benefit from caching'],
     }),
   ];
 }
@@ -454,54 +454,54 @@ export function createUseCasePatterns(): ExtractedPattern[] {
 export function createTimelinePatterns(): ExtractedPattern[] {
   return [
     createTestPattern({
-      id: "pattern-71a10001",
-      name: "Foundation Types",
-      category: "core",
-      status: "completed",
+      id: 'pattern-71a10001',
+      name: 'Foundation Types',
+      category: 'core',
+      status: 'completed',
       phase: 1,
-      completed: "2025-12-15",
-      quarter: "Q4-2025",
-      effort: "2w",
-      team: "platform",
+      completed: '2025-12-15',
+      quarter: 'Q4-2025',
+      effort: '2w',
+      team: 'platform',
       deliverables: [
-        { name: "Decider interface", status: "Complete", tests: 1, location: "src/decider/" },
-        { name: "FSM module", status: "Complete", tests: 1, location: "src/fsm/" },
+        { name: 'Decider interface', status: 'Complete', tests: 1, location: 'src/decider/' },
+        { name: 'FSM module', status: 'Complete', tests: 1, location: 'src/fsm/' },
       ],
     }),
     createTestPattern({
-      id: "pattern-71a10002",
-      name: "CMS Integration",
-      category: "core",
-      status: "completed",
+      id: 'pattern-71a10002',
+      name: 'CMS Integration',
+      category: 'core',
+      status: 'completed',
       phase: 2,
-      completed: "2026-01-02",
-      quarter: "Q1-2026",
-      effort: "1w",
-      team: "platform",
-      deliverables: [{ name: "CMS types", status: "Complete", tests: 1, location: "src/cms/" }],
+      completed: '2026-01-02',
+      quarter: 'Q1-2026',
+      effort: '1w',
+      team: 'platform',
+      deliverables: [{ name: 'CMS types', status: 'Complete', tests: 1, location: 'src/cms/' }],
     }),
     createTestPattern({
-      id: "pattern-71a10003",
-      name: "Event Store Enhancement",
-      category: "event-sourcing",
-      status: "active",
+      id: 'pattern-71a10003',
+      name: 'Event Store Enhancement',
+      category: 'event-sourcing',
+      status: 'active',
       phase: 3,
-      quarter: "Q1-2026",
-      effort: "3w",
-      team: "platform",
-      dependsOn: ["Foundation Types", "CMS Integration"],
+      quarter: 'Q1-2026',
+      effort: '3w',
+      team: 'platform',
+      dependsOn: ['Foundation Types', 'CMS Integration'],
     }),
     createTestPattern({
-      id: "pattern-71a10004",
-      name: "Advanced Projections",
-      category: "projection",
-      status: "roadmap",
+      id: 'pattern-71a10004',
+      name: 'Advanced Projections',
+      category: 'projection',
+      status: 'roadmap',
       phase: 4,
-      quarter: "Q2-2026",
-      effort: "2w",
-      team: "platform",
-      dependsOn: ["Event Store Enhancement"],
-      brief: "docs/briefs/advanced-projections.md",
+      quarter: 'Q2-2026',
+      effort: '2w',
+      team: 'platform',
+      dependsOn: ['Event Store Enhancement'],
+      brief: 'docs/briefs/advanced-projections.md',
     }),
   ];
 }

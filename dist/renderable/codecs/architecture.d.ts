@@ -28,16 +28,16 @@
  * - **component**: System overview with bounded context subgraphs
  * - **layered**: Components organized by architectural layer
  */
-import { z } from "zod";
-import { MasterDatasetSchema } from "../../validation-schemas/master-dataset.js";
-import { type BaseCodecOptions } from "./types/base.js";
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { z } from 'zod';
+import { MasterDatasetSchema } from '../../validation-schemas/master-dataset.js';
+import { type BaseCodecOptions } from './types/base.js';
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 /**
  * Diagram type for architecture visualization
  * - component: System overview with bounded context subgraphs
  * - layered: Components organized by architectural layer
  */
-export type ArchitectureDiagramType = "component" | "layered";
+export type ArchitectureDiagramType = 'component' | 'layered';
 /**
  * Options for ArchitectureDocumentCodec
  */
@@ -101,12 +101,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -163,12 +163,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -196,9 +196,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -281,8 +281,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -318,12 +318,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -380,12 +380,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -413,9 +413,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -498,12 +498,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -560,12 +560,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -593,9 +593,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -678,12 +678,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -740,12 +740,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -773,9 +773,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -862,12 +862,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -924,12 +924,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -957,9 +957,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1049,12 +1049,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1111,12 +1111,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1144,9 +1144,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1229,12 +1229,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1291,12 +1291,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            implemented: "implemented";
             completed: "completed";
-            partial: "partial";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
+            implemented: "implemented";
+            partial: "partial";
             "in-progress": "in-progress";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1324,9 +1324,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1410,12 +1410,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1472,12 +1472,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1505,9 +1505,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1590,12 +1590,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1652,12 +1652,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1685,9 +1685,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1770,12 +1770,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1832,12 +1832,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1865,9 +1865,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1950,12 +1950,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2012,12 +2012,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2045,9 +2045,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2156,12 +2156,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2218,12 +2218,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2251,9 +2251,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2336,12 +2336,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2398,12 +2398,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2431,9 +2431,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2516,12 +2516,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2578,12 +2578,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2611,9 +2611,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2696,12 +2696,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    implemented: "implemented";
                     completed: "completed";
-                    partial: "partial";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
                     deferred: "deferred";
+                    implemented: "implemented";
+                    partial: "partial";
                     "in-progress": "in-progress";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2758,12 +2758,12 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                implemented: "implemented";
                 completed: "completed";
-                partial: "partial";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
                 deferred: "deferred";
+                implemented: "implemented";
+                partial: "partial";
                 "in-progress": "in-progress";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2791,9 +2791,9 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";

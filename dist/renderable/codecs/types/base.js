@@ -25,7 +25,7 @@ export const DEFAULT_LIMITS = {
  */
 export const DEFAULT_BASE_OPTIONS = {
     generateDetailFiles: true,
-    detailLevel: "standard",
+    detailLevel: 'standard',
     limits: DEFAULT_LIMITS,
 };
 // ═══════════════════════════════════════════════════════════════════════════

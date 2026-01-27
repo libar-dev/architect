@@ -26,8 +26,8 @@
  * - **Cross-Validation**: Pattern name + phase must match across sources
  * - **Deliverables**: Parsed from Gherkin Background tables in features
  */
-import type { ExtractedPattern } from "../types/index.js";
-import { type ScannedGherkinFile, type ProcessMetadata, type Deliverable, type CrossValidationError, type ValidationSummary } from "../validation-schemas/index.js";
+import type { ExtractedPattern } from '../types/index.js';
+import { type ScannedGherkinFile, type ProcessMetadata, type Deliverable, type CrossValidationError, type ValidationSummary } from '../validation-schemas/index.js';
 export type { ProcessMetadata, Deliverable, CrossValidationError, ValidationSummary };
 /**
  * Results from dual-source extraction

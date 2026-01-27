@@ -25,8 +25,8 @@
  * - **Glob Patterns**: Uses glob for flexible file matching
  * - **Exclusion Support**: Configurable exclude patterns for node_modules, tests, etc.
  */
-import type { ScannerConfig } from "../types/index.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
+import type { ScannerConfig } from '../types/index.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 /**
  * Finds all TypeScript files matching the scanner configuration
  *

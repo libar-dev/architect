@@ -24,7 +24,7 @@
  * - active: Work in progress
  * - planned: Future work (includes roadmap and deferred)
  */
-export const NORMALIZED_STATUS_VALUES = ["completed", "active", "planned"] as const;
+export const NORMALIZED_STATUS_VALUES = ['completed', 'active', 'planned'] as const;
 
 export type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];
 
@@ -37,15 +37,15 @@ export type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];
  */
 export const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>> = {
   // Current taxonomy values (per PDR-005 FSM)
-  completed: "completed",
-  active: "active",
-  roadmap: "planned",
-  deferred: "planned",
+  completed: 'completed',
+  active: 'active',
+  roadmap: 'planned',
+  deferred: 'planned',
   // Legacy values (for display backward compat with existing data)
-  implemented: "completed",
-  partial: "active",
-  "in-progress": "active",
-  planned: "planned",
+  implemented: 'completed',
+  partial: 'active',
+  'in-progress': 'active',
+  planned: 'planned',
 };
 
 /**
@@ -73,6 +73,6 @@ export const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>
  * ```
  */
 export function normalizeStatus(status: string | undefined): NormalizedStatus {
-  if (!status) return "planned";
-  return STATUS_NORMALIZATION_MAP[status.toLowerCase()] ?? "planned";
+  if (!status) return 'planned';
+  return STATUS_NORMALIZATION_MAP[status.toLowerCase()] ?? 'planned';
 }

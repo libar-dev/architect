@@ -19,19 +19,19 @@
  * - Use `validateCompletionMetadata()` to enforce completed state requirements
  */
 
-import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from "../../taxonomy/index.js";
-import type { TagRegistry } from "../../validation-schemas/tag-registry.js";
+import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
+import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import {
   VALID_TRANSITIONS,
   getValidTransitionsFrom,
   getTransitionErrorMessage,
-} from "./transitions.js";
-import { isTerminalState, getProtectionLevel, type ProtectionLevel } from "./states.js";
+} from './transitions.js';
+import { isTerminalState, getProtectionLevel, type ProtectionLevel } from './states.js';
 
 /**
  * Default tag prefix for error messages when no registry is provided.
  */
-const DEFAULT_TAG_PREFIX = "@libar-docs-";
+const DEFAULT_TAG_PREFIX = '@libar-docs-';
 
 /**
  * Result of validating a status value
@@ -121,7 +121,7 @@ export function validateStatus(
     return {
       valid: false,
       status,
-      error: `Invalid status '${status}'. Valid values: ${PROCESS_STATUS_VALUES.join(", ")}.`,
+      error: `Invalid status '${status}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }
 
@@ -165,7 +165,7 @@ export function validateTransition(from: string, to: string): TransitionValidati
       valid: false,
       from: from as ProcessStatusValue, // Type assertion for interface compliance
       to: to as ProcessStatusValue,
-      error: `Invalid source status '${from}'. Valid values: ${PROCESS_STATUS_VALUES.join(", ")}.`,
+      error: `Invalid source status '${from}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }
 
@@ -174,7 +174,7 @@ export function validateTransition(from: string, to: string): TransitionValidati
       valid: false,
       from,
       to: to as ProcessStatusValue,
-      error: `Invalid target status '${to}'. Valid values: ${PROCESS_STATUS_VALUES.join(", ")}.`,
+      error: `Invalid target status '${to}'. Valid values: ${PROCESS_STATUS_VALUES.join(', ')}.`,
     };
   }
 
@@ -226,7 +226,7 @@ export function validateCompletionMetadata(
   const warnings: string[] = [];
 
   // Only check completion requirements for completed status
-  if (pattern.status !== "completed") {
+  if (pattern.status !== 'completed') {
     return { valid: true, warnings: [] };
   }
 
@@ -239,7 +239,7 @@ export function validateCompletionMetadata(
   if (pattern.effortPlanned && !pattern.effortActual) {
     warnings.push(
       `Pattern has ${tagPrefix}effort but missing ${tagPrefix}effort-actual. ` +
-        "Consider adding actual effort for tracking."
+        'Consider adding actual effort for tracking.'
     );
   }
 
@@ -300,15 +300,15 @@ export function getProtectionSummary(
   const level = getProtectionLevel(status);
 
   const descriptions: Record<ProtectionLevel, string> = {
-    none: "Fully editable - no restrictions",
-    scope: "Scope-locked - cannot add new deliverables",
+    none: 'Fully editable - no restrictions',
+    scope: 'Scope-locked - cannot add new deliverables',
     hard: `Hard-locked - requires ${tagPrefix}unlock-reason to modify`,
   };
 
   return {
     level,
     description: descriptions[level],
-    canAddDeliverables: level === "none",
-    requiresUnlock: level === "hard",
+    canAddDeliverables: level === 'none',
+    requiresUnlock: level === 'hard',
   };
 }

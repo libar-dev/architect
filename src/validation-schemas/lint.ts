@@ -5,8 +5,8 @@
  * LintRule cannot be fully schematized (has function property) so
  * it remains as an interface in rules.ts.
  */
-import { z } from "zod";
-import { SEVERITY_TYPES, type SeverityType } from "../taxonomy/index.js";
+import { z } from 'zod';
+import { SEVERITY_TYPES, type SeverityType } from '../taxonomy/index.js';
 
 /**
  * Lint severity levels schema

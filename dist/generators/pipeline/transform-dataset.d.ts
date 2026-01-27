@@ -26,10 +26,10 @@
  * - **Immutable output**: Returns a new MasterDataset object
  * - **Workflow integration**: Uses workflow config for phase names
  */
-import type { ExtractedPattern, TagRegistry } from "../../validation-schemas/index.js";
-import type { LoadedWorkflow } from "../../config/workflow-loader.js";
-import type { StatusCounts } from "../../validation-schemas/master-dataset.js";
-import type { MasterDataset } from "../../validation-schemas/master-dataset.js";
+import type { ExtractedPattern, TagRegistry } from '../../validation-schemas/index.js';
+import type { LoadedWorkflow } from '../../config/workflow-loader.js';
+import type { StatusCounts } from '../../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 /**
  * Runtime MasterDataset with optional workflow
  *

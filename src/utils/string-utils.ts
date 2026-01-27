@@ -42,8 +42,8 @@
 export function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 }
 
 /**
@@ -78,17 +78,17 @@ export function toKebabCase(text: string): string {
   return (
     text
       // Insert hyphen between lowercase/digit and uppercase: camelCase → camel-Case
-      .replace(/([a-z\d])([A-Z])/g, "$1-$2")
+      .replace(/([a-z\d])([A-Z])/g, '$1-$2')
       // Insert hyphen between consecutive uppercase and uppercase+lowercase: HTTPServer → HTTP-Server
-      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
       // Insert hyphen between letter and digit: Auth2 → Auth-2
-      .replace(/([a-zA-Z])(\d)/g, "$1-$2")
+      .replace(/([a-zA-Z])(\d)/g, '$1-$2')
       // Convert to lowercase
       .toLowerCase()
       // Replace any non-alphanumeric characters with hyphens
-      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/[^a-z0-9]+/g, '-')
       // Remove leading/trailing hyphens
-      .replace(/^-+|-+$/g, "")
+      .replace(/^-+|-+$/g, '')
   );
 }
 
@@ -104,43 +104,43 @@ export function toKebabCase(text: string): string {
  */
 const KNOWN_ACRONYMS = [
   // Multi-word technical terms (longest first)
-  "JavaScript", // 10 chars
-  "TypeScript", // 10 chars
-  "WebSocket", // 9 chars
-  "GraphQL", // 7 chars
-  "Gherkin", // 7 chars
-  "RegExp", // 6 chars
-  "GitHub", // 6 chars
+  'JavaScript', // 10 chars
+  'TypeScript', // 10 chars
+  'WebSocket', // 9 chars
+  'GraphQL', // 7 chars
+  'Gherkin', // 7 chars
+  'RegExp', // 6 chars
+  'GitHub', // 6 chars
   // 5-char acronyms
-  "HTTPS",
-  "OAuth",
+  'HTTPS',
+  'OAuth',
   // 4-char acronyms
-  "JSON",
-  "HTML",
-  "HTTP",
-  "UUID",
-  "REST",
-  "CRUD",
+  'JSON',
+  'HTML',
+  'HTTP',
+  'UUID',
+  'REST',
+  'CRUD',
   // 3-char acronyms
-  "DoD", // Definition of Done
-  "PRD", // Product Requirements Document
-  "API",
-  "CLI",
-  "AST",
-  "DOM",
-  "URL",
-  "XML",
-  "CSS",
-  "SQL",
-  "JWT",
-  "NPM",
-  "ESM",
-  "CJS",
-  "SSO",
-  "MCP",
-  "LLM",
-  "RAG",
-  "ADR",
+  'DoD', // Definition of Done
+  'PRD', // Product Requirements Document
+  'API',
+  'CLI',
+  'AST',
+  'DOM',
+  'URL',
+  'XML',
+  'CSS',
+  'SQL',
+  'JWT',
+  'NPM',
+  'ESM',
+  'CJS',
+  'SSO',
+  'MCP',
+  'LLM',
+  'RAG',
+  'ADR',
 ];
 
 /**
@@ -178,26 +178,26 @@ export function camelCaseToTitleCase(text: string): string {
     if (result.includes(acronym)) {
       const placeholder = `__ACRONYM_${placeholders.length}__`;
       placeholders.push({ placeholder, acronym });
-      const escapedAcronym = acronym.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const escapedAcronym = acronym.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
       // Replace acronym with placeholder:
       // 1. When preceded by lowercase and followed by uppercase: add spaces both sides
       result = result.replace(
-        new RegExp("([a-z])" + escapedAcronym + "([A-Z])", "g"),
-        "$1 " + placeholder + " $2"
+        new RegExp('([a-z])' + escapedAcronym + '([A-Z])', 'g'),
+        '$1 ' + placeholder + ' $2'
       );
       // 2. When followed by uppercase only: add space after
-      result = result.replace(new RegExp(escapedAcronym + "([A-Z])", "g"), placeholder + " $1");
+      result = result.replace(new RegExp(escapedAcronym + '([A-Z])', 'g'), placeholder + ' $1');
       // 2b. When followed by digit: add space after (PDR006 → PDR 006)
-      result = result.replace(new RegExp(escapedAcronym + "(\\d)", "g"), placeholder + " $1");
+      result = result.replace(new RegExp(escapedAcronym + '(\\d)', 'g'), placeholder + ' $1');
       // 3. When preceded by lowercase only: add space before
       result = result.replace(
-        new RegExp("([a-z])" + escapedAcronym + "(?![A-Za-z])", "g"),
-        "$1 " + placeholder
+        new RegExp('([a-z])' + escapedAcronym + '(?![A-Za-z])', 'g'),
+        '$1 ' + placeholder
       );
       // 4. Standalone occurrences (start of string, or between non-letters)
       result = result.replace(
-        new RegExp("(?<![A-Za-z])" + escapedAcronym + "(?![A-Za-z])", "g"),
+        new RegExp('(?<![A-Za-z])' + escapedAcronym + '(?![A-Za-z])', 'g'),
         placeholder
       );
     }
@@ -205,12 +205,12 @@ export function camelCaseToTitleCase(text: string): string {
 
   // Step 2: Apply standard CamelCase splitting
   result = result
-    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2") // HTTPServer → HTTP Server
-    .replace(/([a-z\d])([A-Z])/g, "$1 $2") // camelCase → camel Case
-    .replace(/([A-Z]+)(\d)/g, "$1 $2") // V2 → V 2 (only when followed by digit)
-    .replace(/(\d)([A-Z])/g, "$1 $2") // 006T → 006 T (digit-to-uppercase)
-    .replace(/(\d)(__ACRONYM_\d+__)/g, "$1 $2") // 006__ACRONYM__ → 006 __ACRONYM__
-    .replace(/-/g, " ") // kebab-case → kebab case
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2') // HTTPServer → HTTP Server
+    .replace(/([a-z\d])([A-Z])/g, '$1 $2') // camelCase → camel Case
+    .replace(/([A-Z]+)(\d)/g, '$1 $2') // V2 → V 2 (only when followed by digit)
+    .replace(/(\d)([A-Z])/g, '$1 $2') // 006T → 006 T (digit-to-uppercase)
+    .replace(/(\d)(__ACRONYM_\d+__)/g, '$1 $2') // 006__ACRONYM__ → 006 __ACRONYM__
+    .replace(/-/g, ' ') // kebab-case → kebab case
     .trim();
 
   // Step 3: Restore acronyms from placeholders

@@ -17,14 +17,14 @@
  * Escape HTML entities to prevent injection in generated docs.
  */
 function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 /**
  * Escape pipe characters and newlines for markdown table cells.
  * Newlines are converted to <br> for proper rendering.
  */
 function escapeTableCell(cell) {
-    return cell.replace(/\|/g, "\\|").replace(/\n/g, "<br>");
+    return cell.replace(/\|/g, '\\|').replace(/\n/g, '<br>');
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Main Render Function
@@ -38,7 +38,7 @@ function escapeTableCell(cell) {
 export function renderToMarkdown(doc) {
     const lines = [];
     // Title (H1)
-    lines.push(`# ${doc.title}`, "");
+    lines.push(`# ${doc.title}`, '');
     // Frontmatter (purpose, detail level as plain text)
     if (doc.purpose || doc.detailLevel) {
         if (doc.purpose) {
@@ -47,14 +47,14 @@ export function renderToMarkdown(doc) {
         if (doc.detailLevel) {
             lines.push(`**Detail Level:** ${doc.detailLevel}`);
         }
-        lines.push("", "---", "");
+        lines.push('', '---', '');
     }
     // Sections
     for (const block of doc.sections) {
         lines.push(...renderBlock(block));
     }
     // Ensure single trailing newline
-    return lines.join("\n").trimEnd() + "\n";
+    return lines.join('\n').trimEnd() + '\n';
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Block Renderer
@@ -64,28 +64,28 @@ export function renderToMarkdown(doc) {
  */
 function renderBlock(block) {
     switch (block.type) {
-        case "heading": {
+        case 'heading': {
             // Clamp heading level to valid markdown range (1-6)
             const level = Math.max(1, Math.min(6, block.level));
-            return [`${"#".repeat(level)} ${block.text}`, ""];
+            return [`${'#'.repeat(level)} ${block.text}`, ''];
         }
-        case "paragraph":
-            return [block.text, ""];
-        case "separator":
-            return ["---", ""];
-        case "table":
+        case 'paragraph':
+            return [block.text, ''];
+        case 'separator':
+            return ['---', ''];
+        case 'table':
             return renderTable(block);
-        case "list":
+        case 'list':
             return renderList(block);
-        case "code":
-            return [`\`\`\`${block.language ?? ""}`, block.content, "\`\`\`", ""];
-        case "mermaid":
-            return ["\`\`\`mermaid", block.content, "\`\`\`", ""];
-        case "collapsible":
+        case 'code':
+            return [`\`\`\`${block.language ?? ''}`, block.content, '\`\`\`', ''];
+        case 'mermaid':
+            return ['\`\`\`mermaid', block.content, '\`\`\`', ''];
+        case 'collapsible':
             return renderCollapsible(block);
-        case "link-out":
+        case 'link-out':
             // URL-encode path for links with spaces or special characters
-            return [`[${block.text}](${encodeURI(block.path)})`, ""];
+            return [`[${block.text}](${encodeURI(block.path)})`, ''];
         default:
             // Type-safe exhaustive check
             const _exhaustive = block;
@@ -105,32 +105,32 @@ function renderTable(block) {
     const lines = [];
     // Header row - escape pipes and newlines in column names
     const escapedColumns = block.columns.map(escapeTableCell);
-    lines.push(`| ${escapedColumns.join(" | ")} |`);
+    lines.push(`| ${escapedColumns.join(' | ')} |`);
     // Separator row with alignment
     const separators = block.columns.map((_, i) => {
-        const align = block.alignment?.[i] ?? "left";
+        const align = block.alignment?.[i] ?? 'left';
         switch (align) {
-            case "center":
-                return ":---:";
-            case "right":
-                return "---:";
+            case 'center':
+                return ':---:';
+            case 'right':
+                return '---:';
             default:
-                return "---";
+                return '---';
         }
     });
-    lines.push(`| ${separators.join(" | ")} |`);
+    lines.push(`| ${separators.join(' | ')} |`);
     // Data rows
     for (const row of block.rows) {
         // Pad row to match columns if needed
         const paddedRow = [...row];
         while (paddedRow.length < block.columns.length) {
-            paddedRow.push("");
+            paddedRow.push('');
         }
         // Escape pipe characters and newlines in cell content
         const escapedRow = paddedRow.map(escapeTableCell);
-        lines.push(`| ${escapedRow.join(" | ")} |`);
+        lines.push(`| ${escapedRow.join(' | ')} |`);
     }
-    lines.push("");
+    lines.push('');
     return lines;
 }
 // ═══════════════════════════════════════════════════════════════════════════
@@ -145,10 +145,10 @@ function renderList(block) {
         const item = block.items[i];
         if (item === undefined)
             continue;
-        const prefix = block.ordered ? `${i + 1}.` : "-";
+        const prefix = block.ordered ? `${i + 1}.` : '-';
         lines.push(...renderListItem(item, prefix, 0));
     }
-    lines.push("");
+    lines.push('');
     return lines;
 }
 /**
@@ -156,19 +156,19 @@ function renderList(block) {
  */
 function renderListItem(item, prefix, indent) {
     const lines = [];
-    const indentStr = "  ".repeat(indent);
-    if (typeof item === "string") {
+    const indentStr = '  '.repeat(indent);
+    if (typeof item === 'string') {
         lines.push(`${indentStr}${prefix} ${item}`);
     }
     else {
         // Structured item with optional checkbox
-        const checkbox = item.checked !== undefined ? (item.checked ? "[x] " : "[ ] ") : "";
+        const checkbox = item.checked !== undefined ? (item.checked ? '[x] ' : '[ ] ') : '';
         lines.push(`${indentStr}${prefix} ${checkbox}${item.text}`);
         // Render children
         if (item.children) {
             for (let i = 0; i < item.children.length; i++) {
                 const child = item.children[i];
-                const childPrefix = /^\d/.exec(prefix) !== null ? `${i + 1}.` : "-";
+                const childPrefix = /^\d/.exec(prefix) !== null ? `${i + 1}.` : '-';
                 lines.push(...renderListItem(child, childPrefix, indent + 1));
             }
         }
@@ -183,16 +183,16 @@ function renderListItem(item, prefix, indent) {
  */
 function renderCollapsible(block) {
     const lines = [];
-    lines.push("<details>");
+    lines.push('<details>');
     // Escape HTML entities in summary to prevent injection
     lines.push(`<summary>${escapeHtml(block.summary)}</summary>`);
-    lines.push("");
+    lines.push('');
     // Render nested content
     for (const contentBlock of block.content) {
         lines.push(...renderBlock(contentBlock));
     }
-    lines.push("</details>");
-    lines.push("");
+    lines.push('</details>');
+    lines.push('');
     return lines;
 }
 /**

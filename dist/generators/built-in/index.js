@@ -19,5 +19,5 @@
  * - Import this module to register all default generators
  */
 // Import to register codec-based generators (RDM architecture)
-import "./codec-generators.js";
+import './codec-generators.js';
 //# sourceMappingURL=index.js.map

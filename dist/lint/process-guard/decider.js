@@ -24,12 +24,12 @@
  * 3. **Scope Creep** - Active specs cannot add new deliverables
  * 4. **Session Scope** - Modifications outside session scope warn
  */
-import { validateTransition, getValidTransitionsFrom } from "../../validation/fsm/index.js";
-import { isInSessionScope, isSessionExcluded } from "./derive-state.js";
+import { validateTransition, getValidTransitionsFrom } from '../../validation/fsm/index.js';
+import { isInSessionScope, isSessionExcluded } from './derive-state.js';
 /**
  * Default tag prefix for error messages when no registry is provided.
  */
-const DEFAULT_TAG_PREFIX = "@libar-docs-";
+const DEFAULT_TAG_PREFIX = '@libar-docs-';
 // =============================================================================
 // Decider - Main Entry Point
 // =============================================================================
@@ -64,33 +64,33 @@ export function validateChanges(input) {
     const warnings = [];
     // Emit start event
     const allFiles = [...changes.modifiedFiles, ...changes.addedFiles];
-    events.push({ type: "validation_started", fileCount: allFiles.length });
+    events.push({ type: 'validation_started', fileCount: allFiles.length });
     // Run each rule
     const rules = [
         {
-            rule: "completed-protection",
+            rule: 'completed-protection',
             fn: () => checkProtectionLevel(state, changes, options.registry),
         },
         {
-            rule: "invalid-status-transition",
+            rule: 'invalid-status-transition',
             fn: () => checkStatusTransitions(state, changes),
         },
-        { rule: "scope-creep", fn: () => checkScopeCreep(state, changes) },
+        { rule: 'scope-creep', fn: () => checkScopeCreep(state, changes) },
         {
-            rule: "session-scope",
+            rule: 'session-scope',
             fn: () => (options.ignoreSession ? [] : checkSessionScope(state, changes)),
         },
         {
-            rule: "session-excluded",
+            rule: 'session-excluded',
             fn: () => (options.ignoreSession ? [] : checkSessionExcluded(state, changes)),
         },
     ];
     for (const { rule, fn } of rules) {
         const ruleViolations = fn();
         const passed = ruleViolations.length === 0;
-        events.push({ type: "rule_checked", rule, passed });
+        events.push({ type: 'rule_checked', rule, passed });
         for (const v of ruleViolations) {
-            if (v.severity === "error") {
+            if (v.severity === 'error') {
                 violations.push(v);
             }
             else {
@@ -100,12 +100,12 @@ export function validateChanges(input) {
     }
     // In strict mode, promote warnings to violations
     const finalViolations = options.strict
-        ? [...violations, ...warnings.map((w) => ({ ...w, severity: "error" }))]
+        ? [...violations, ...warnings.map((w) => ({ ...w, severity: 'error' }))]
         : violations;
     const finalWarnings = options.strict ? [] : warnings;
     const valid = finalViolations.length === 0;
     events.push({
-        type: "validation_completed",
+        type: 'validation_completed',
         valid,
         violationCount: finalViolations.length,
     });
@@ -141,8 +141,8 @@ function checkProtectionLevel(state, changes, registry) {
         if (!fileState)
             continue;
         // Check hard protection (completed)
-        if (fileState.protection === "hard" && !fileState.hasUnlockReason) {
-            violations.push(createViolation("completed-protection", "error", `Cannot modify completed spec '${file}' without unlock reason`, file, `Add ${tagPrefix}unlock-reason:'your reason' to proceed`));
+        if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
+            violations.push(createViolation('completed-protection', 'error', `Cannot modify completed spec '${file}' without unlock reason`, file, `Add ${tagPrefix}unlock-reason:'your reason' to proceed`));
         }
     }
     return violations;
@@ -161,7 +161,7 @@ function checkStatusTransitions(state, changes) {
         const validationResult = validateTransition(transition.from, transition.to);
         if (!validationResult.valid) {
             const validTransitions = getValidTransitionsFrom(transition.from);
-            violations.push(createViolation("invalid-status-transition", "error", `Invalid status transition in '${file}': ${transition.from} → ${transition.to}`, file, `Valid transitions from '${transition.from}': ${validTransitions.join(", ")}`));
+            violations.push(createViolation('invalid-status-transition', 'error', `Invalid status transition in '${file}': ${transition.from} → ${transition.to}`, file, `Valid transitions from '${transition.from}': ${validTransitions.join(', ')}`));
         }
     }
     return violations;
@@ -181,12 +181,12 @@ function checkScopeCreep(state, changes) {
         if (!fileState)
             continue;
         // Only check active specs (scope-locked)
-        if (fileState.protection === "scope" && deliverableChange.added.length > 0) {
-            violations.push(createViolation("scope-creep", "error", `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(", ")}`, file, "Create new spec or revert to roadmap status first"));
+        if (fileState.protection === 'scope' && deliverableChange.added.length > 0) {
+            violations.push(createViolation('scope-creep', 'error', `Cannot add deliverables to active spec '${file}': ${deliverableChange.added.join(', ')}`, file, 'Create new spec or revert to roadmap status first'));
         }
         // Warn about removed deliverables
         if (deliverableChange.removed.length > 0) {
-            violations.push(createViolation("deliverable-removed", "warning", `Deliverable removed from '${file}': ${deliverableChange.removed.join(", ")}`, file, "Was this completed or descoped? Consider documenting the reason."));
+            violations.push(createViolation('deliverable-removed', 'warning', `Deliverable removed from '${file}': ${deliverableChange.removed.join(', ')}`, file, 'Was this completed or descoped? Consider documenting the reason.'));
         }
     }
     return violations;
@@ -206,7 +206,7 @@ function checkSessionScope(state, changes) {
     }
     for (const file of [...changes.modifiedFiles, ...changes.addedFiles]) {
         if (!isInSessionScope(state, file)) {
-            violations.push(createViolation("session-scope", "warning", `File '${file}' is not in session scope`, file, `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`));
+            violations.push(createViolation('session-scope', 'warning', `File '${file}' is not in session scope`, file, `Add to session '${state.activeSession.id}' scope or use --ignore-session flag`));
         }
     }
     return violations;
@@ -223,7 +223,7 @@ function checkSessionExcluded(state, changes) {
     }
     for (const file of [...changes.modifiedFiles, ...changes.addedFiles]) {
         if (isSessionExcluded(state, file)) {
-            violations.push(createViolation("session-excluded", "error", `File '${file}' is explicitly excluded from session '${state.activeSession.id}'`, file, "This file was explicitly excluded and cannot be modified in this session"));
+            violations.push(createViolation('session-excluded', 'error', `File '${file}' is explicitly excluded from session '${state.activeSession.id}'`, file, 'This file was explicitly excluded and cannot be modified in this session'));
         }
     }
     return violations;
@@ -277,15 +277,15 @@ export function summarizeResult(result) {
     const errorCount = result.violations.length;
     const warningCount = result.warnings.length;
     if (result.valid && warningCount === 0) {
-        return "Process guard check passed";
+        return 'Process guard check passed';
     }
     const parts = [];
     if (errorCount > 0) {
-        parts.push(`${errorCount} error${errorCount !== 1 ? "s" : ""}`);
+        parts.push(`${errorCount} error${errorCount !== 1 ? 's' : ''}`);
     }
     if (warningCount > 0) {
-        parts.push(`${warningCount} warning${warningCount !== 1 ? "s" : ""}`);
+        parts.push(`${warningCount} warning${warningCount !== 1 ? 's' : ''}`);
     }
-    return `Process guard check: ${parts.join(", ")}`;
+    return `Process guard check: ${parts.join(', ')}`;
 }
 //# sourceMappingURL=decider.js.map

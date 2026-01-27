@@ -22,7 +22,7 @@
  * - Use `DEFAULT_TAG_PREFIX` in error messages when no registry context exists
  */
 
-import { createRegexBuilders, type RegexBuilders } from "./regex-builders.js";
+import { createRegexBuilders, type RegexBuilders } from './regex-builders.js';
 
 /**
  * Default tag prefix for @libar-docs-* annotations.
@@ -37,7 +37,7 @@ import { createRegexBuilders, type RegexBuilders } from "./regex-builders.js";
  * const tagPrefix = registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
  * ```
  */
-export const DEFAULT_TAG_PREFIX = "@libar-docs-";
+export const DEFAULT_TAG_PREFIX = '@libar-docs-';
 
 /**
  * Default file opt-in tag (without suffix).
@@ -52,7 +52,7 @@ export const DEFAULT_TAG_PREFIX = "@libar-docs-";
  * /** @libar-docs This file is documented *\/
  * ```
  */
-export const DEFAULT_FILE_OPT_IN_TAG = "@libar-docs";
+export const DEFAULT_FILE_OPT_IN_TAG = '@libar-docs';
 
 /**
  * Pre-built regex builders using default prefix and opt-in tag.

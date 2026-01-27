@@ -26,7 +26,7 @@
  * - **Metadata**: Optional author, lastUpdated, and tags for organization
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 
 /**
  * Schema for artefact set metadata
@@ -57,7 +57,7 @@ export const ArtefactSetSchema = z
 
     /** Semantic version of the artefact set configuration */
     version: z.string().regex(/^\d+\.\d+\.\d+$/, {
-      message: "Version must be in semver format (e.g., 1.0.0)",
+      message: 'Version must be in semver format (e.g., 1.0.0)',
     }),
 
     /** Human-readable description of what this artefact set provides */
@@ -65,7 +65,7 @@ export const ArtefactSetSchema = z
 
     /** Array of generator names to run when this set is selected */
     generators: z.array(z.string()).min(1, {
-      message: "Artefact set must include at least one generator",
+      message: 'Artefact set must include at least one generator',
     }),
 
     /** Optional metadata for organization and tracking */

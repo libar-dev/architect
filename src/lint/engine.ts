@@ -19,20 +19,20 @@
  * - Use for formatting lint results (pretty or JSON output)
  */
 
-import type { DocDirective } from "../validation-schemas/doc-directive.js";
+import type { DocDirective } from '../validation-schemas/doc-directive.js';
 import {
   severityOrder,
   type LintContext,
   type LintRule,
   type LintViolation,
   type LintSeverity,
-} from "./rules.js";
+} from './rules.js';
 import {
   createJsonOutputCodec,
   LintOutputSchema,
   type LintOutput,
-} from "../validation-schemas/index.js";
-import type { Result } from "../types/result.js";
+} from '../validation-schemas/index.js';
+import type { Result } from '../types/result.js';
 
 /**
  * Codec for serializing lint output to JSON
@@ -140,13 +140,13 @@ export function lintFiles(
     // Count by severity
     for (const violation of fileViolations) {
       switch (violation.severity) {
-        case "error":
+        case 'error':
           errorCount++;
           break;
-        case "warning":
+        case 'warning':
           warningCount++;
           break;
-        case "info":
+        case 'info':
           infoCount++;
           break;
       }
@@ -214,7 +214,7 @@ export function formatPretty(summary: LintSummary, options: { quiet?: boolean } 
     const sorted = sortViolationsBySeverity(result.violations);
 
     // Filter based on quiet mode
-    const filtered = options.quiet === true ? sorted.filter((v) => v.severity === "error") : sorted;
+    const filtered = options.quiet === true ? sorted.filter((v) => v.severity === 'error') : sorted;
 
     if (filtered.length === 0) continue;
 
@@ -225,29 +225,29 @@ export function formatPretty(summary: LintSummary, options: { quiet?: boolean } 
       lines.push(`  ${v.line}:1  ${severityColor}  ${v.rule}  ${v.message}`);
     }
 
-    lines.push(""); // Blank line between files
+    lines.push(''); // Blank line between files
   }
 
   // Summary line
   const parts: string[] = [];
   if (summary.errorCount > 0) {
-    parts.push(`${summary.errorCount} error${summary.errorCount === 1 ? "" : "s"}`);
+    parts.push(`${summary.errorCount} error${summary.errorCount === 1 ? '' : 's'}`);
   }
   if (summary.warningCount > 0 && options.quiet !== true) {
-    parts.push(`${summary.warningCount} warning${summary.warningCount === 1 ? "" : "s"}`);
+    parts.push(`${summary.warningCount} warning${summary.warningCount === 1 ? '' : 's'}`);
   }
   if (summary.infoCount > 0 && options.quiet !== true) {
     parts.push(`${summary.infoCount} info`);
   }
 
   if (parts.length > 0) {
-    const icon = summary.errorCount > 0 ? "\u2717" : summary.warningCount > 0 ? "\u26a0" : "\u2713";
-    lines.push(`${icon} ${parts.join(", ")}`);
+    const icon = summary.errorCount > 0 ? '\u2717' : summary.warningCount > 0 ? '\u26a0' : '\u2713';
+    lines.push(`${icon} ${parts.join(', ')}`);
   } else {
     lines.push(`\u2713 No issues found (${summary.directivesChecked} directives checked)`);
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**
@@ -255,12 +255,12 @@ export function formatPretty(summary: LintSummary, options: { quiet?: boolean } 
  */
 function getSeverityPrefix(severity: LintSeverity): string {
   switch (severity) {
-    case "error":
-      return "error  ";
-    case "warning":
-      return "warning";
-    case "info":
-      return "info   ";
+    case 'error':
+      return 'error  ';
+    case 'warning':
+      return 'warning';
+    case 'info':
+      return 'info   ';
   }
 }
 

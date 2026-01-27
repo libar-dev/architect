@@ -27,7 +27,7 @@
  * export default createDeliveryProcess({ preset: "libar-generic" });
  * ```
  */
-import type { DeliveryProcessInstance } from "./types.js";
+import type { DeliveryProcessInstance } from './types.js';
 /**
  * Result of config file discovery
  */
@@ -45,7 +45,7 @@ export interface ConfigDiscoveryResult {
  * Error during config loading
  */
 export interface ConfigLoadError {
-    type: "config-load-error";
+    type: 'config-load-error';
     path: string;
     message: string;
     /** The underlying error that caused the failure (if any) */

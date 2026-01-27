@@ -24,16 +24,16 @@
  * const codeBlock = renderDocString(step.docString, "markdown");
  * ```
  */
-import type { ScenarioDataTable, ScenarioStep, ScenarioRef } from "../../validation-schemas/scenario-ref.js";
-import type { BusinessRule } from "../../validation-schemas/extracted-pattern.js";
-import { type SectionBlock } from "../schema.js";
+import type { ScenarioDataTable, ScenarioStep, ScenarioRef } from '../../validation-schemas/scenario-ref.js';
+import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import { type SectionBlock } from '../schema.js';
 export type { BusinessRule };
 /**
  * Warning information emitted during rich content rendering
  */
 export interface RichContentWarning {
     /** Warning code for programmatic handling */
-    code: "unclosed-docstring" | "invalid-content";
+    code: 'unclosed-docstring' | 'invalid-content';
     /** Human-readable warning message */
     message: string;
     /** Additional context about the warning */

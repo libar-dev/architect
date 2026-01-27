@@ -19,7 +19,7 @@
  * - When performing cross-validation between code and feature files
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 import {
   HIERARCHY_LEVELS,
   PROCESS_STATUS_VALUES,
@@ -27,7 +27,7 @@ import {
   type HierarchyLevel as TaxonomyHierarchyLevel,
   type ProcessStatusValue,
   type RiskLevel as TaxonomyRiskLevel,
-} from "../taxonomy/index.js";
+} from '../taxonomy/index.js';
 
 /**
  * Process status values from Gherkin @libar-process-status tag
@@ -82,7 +82,7 @@ export const ProcessMetadataSchema = z
     /** Process status */
     status: ProcessStatusSchema,
     /** Hierarchy level (default: "phase" for backward compatibility) */
-    level: HierarchyLevelSchema.default("phase"),
+    level: HierarchyLevelSchema.default('phase'),
     /** Parent pattern name for hierarchy (from @libar-process-parent tag) */
     parent: z.string().optional(),
     /** Quarter assignment (e.g., "Q1-2025") */

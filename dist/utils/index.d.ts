@@ -15,7 +15,7 @@
  * - Use when importing utility functions from the package
  * - Use for consistent text slugification or collection grouping
  */
-export { slugify, toKebabCase, camelCaseToTitleCase } from "./string-utils.js";
-export { groupBy } from "./collection-utils.js";
-export { generatePatternId } from "./id-utils.js";
+export { slugify, toKebabCase, camelCaseToTitleCase } from './string-utils.js';
+export { groupBy } from './collection-utils.js';
+export { generatePatternId } from './id-utils.js';
 //# sourceMappingURL=index.d.ts.map

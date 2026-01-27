@@ -1,7 +1,7 @@
-import * as fs from "fs/promises";
-import { Result as R, createFileParseError } from "../types/index.js";
-import { parseFileDirectives } from "./ast-parser.js";
-import { findFilesToScan, hasDocDirectives, hasFileOptIn } from "./pattern-scanner.js";
+import * as fs from 'fs/promises';
+import { Result as R, createFileParseError } from '../types/index.js';
+import { parseFileDirectives } from './ast-parser.js';
+import { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
 /**
  * Scans source files for @libar-docs-* directives and extracts them
  * with their associated code blocks and export information.
@@ -51,7 +51,7 @@ export async function scanPatterns(config, registry) {
     for (const filePath of files) {
         try {
             // Read file content once - passed to all functions (no double read!)
-            const content = await fs.readFile(filePath, "utf-8");
+            const content = await fs.readFile(filePath, 'utf-8');
             // Check for file-level opt-in (requires opt-in tag from registry)
             if (!hasFileOptIn(content, registry))
                 continue;
@@ -97,6 +97,6 @@ export async function scanPatterns(config, registry) {
         skippedDirectives,
     });
 }
-export { findFilesToScan, hasDocDirectives, hasFileOptIn } from "./pattern-scanner.js";
-export { parseFileDirectives } from "./ast-parser.js";
+export { findFilesToScan, hasDocDirectives, hasFileOptIn } from './pattern-scanner.js';
+export { parseFileDirectives } from './ast-parser.js';
 //# sourceMappingURL=index.js.map

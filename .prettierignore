@@ -1,0 +1,6 @@
+dist/
+node_modules/
+*.tsbuildinfo
+pnpm-lock.yaml
+docs-generated/
+catalogue/

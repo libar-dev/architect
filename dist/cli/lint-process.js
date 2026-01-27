@@ -18,82 +18,82 @@
  * - CI/CD to validate all changes against main branch
  * - Development to check specific files
  */
-import { printVersionAndExit } from "./version.js";
-import { handleCliError } from "./error-handler.js";
-import { deriveProcessState, detectStagedChanges, detectBranchChanges, detectFileChanges, validateChanges, hasChanges, hasErrors, hasWarnings, summarizeResult, } from "../lint/process-guard/index.js";
+import { printVersionAndExit } from './version.js';
+import { handleCliError } from './error-handler.js';
+import { deriveProcessState, detectStagedChanges, detectBranchChanges, detectFileChanges, validateChanges, hasChanges, hasErrors, hasWarnings, summarizeResult, } from '../lint/process-guard/index.js';
 /**
  * Parse command line arguments
  */
 export function parseArgs(argv = process.argv.slice(2)) {
     const config = {
-        mode: "staged",
+        mode: 'staged',
         files: [],
         strict: false,
         ignoreSession: false,
         showState: false,
         baseDir: process.cwd(),
-        format: "pretty",
+        format: 'pretty',
         help: false,
         version: false,
     };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
-        if (arg === "--help" || arg === "-h") {
+        if (arg === '--help' || arg === '-h') {
             config.help = true;
         }
-        else if (arg === "--staged") {
-            config.mode = "staged";
+        else if (arg === '--staged') {
+            config.mode = 'staged';
         }
-        else if (arg === "--all") {
-            config.mode = "all";
+        else if (arg === '--all') {
+            config.mode = 'all';
         }
-        else if (arg === "--files") {
-            config.mode = "files";
+        else if (arg === '--files') {
+            config.mode = 'files';
         }
-        else if (arg === "--file" || arg === "-f") {
+        else if (arg === '--file' || arg === '-f') {
             const nextArg = argv[++i];
             if (nextArg === undefined) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.files.push(nextArg);
-            config.mode = "files";
+            config.mode = 'files';
         }
-        else if (arg === "--strict") {
+        else if (arg === '--strict') {
             config.strict = true;
         }
-        else if (arg === "--ignore-session") {
+        else if (arg === '--ignore-session') {
             config.ignoreSession = true;
         }
-        else if (arg === "--show-state") {
+        else if (arg === '--show-state') {
             config.showState = true;
         }
-        else if (arg === "--base-dir" || arg === "-b") {
+        else if (arg === '--base-dir' || arg === '-b') {
             const nextArg = argv[++i];
             if (nextArg === undefined) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
             config.baseDir = nextArg;
         }
-        else if (arg === "--format") {
+        else if (arg === '--format') {
             const nextArg = argv[++i];
             if (nextArg === undefined) {
                 throw new Error(`Missing value for ${arg} flag`);
             }
-            if (nextArg !== "pretty" && nextArg !== "json") {
+            if (nextArg !== 'pretty' && nextArg !== 'json') {
                 throw new Error(`Invalid format: ${nextArg}. Use "pretty" or "json"`);
             }
             config.format = nextArg;
         }
-        else if (arg === "--version" || arg === "-v") {
+        else if (arg === '--version' || arg === '-v') {
             config.version = true;
         }
-        else if (arg?.startsWith("-") === true) {
+        else if (arg?.startsWith('-') === true) {
             console.warn(`Warning: Unknown flag '${arg}' ignored`);
         }
         else if (arg !== undefined) {
             // Positional argument treated as file
             config.files.push(arg);
-            config.mode = "files";
+            config.mode = 'files';
         }
     }
     return config;
@@ -156,9 +156,9 @@ function formatPretty(output) {
     const { result } = output;
     const lines = [];
     lines.push(summarizeResult(result));
-    lines.push("");
+    lines.push('');
     if (result.violations.length > 0) {
-        lines.push("Errors:");
+        lines.push('Errors:');
         for (const v of result.violations) {
             lines.push(`  [${v.rule}] ${v.file}`);
             lines.push(`    ${v.message}`);
@@ -166,10 +166,10 @@ function formatPretty(output) {
                 lines.push(`    Fix: ${v.suggestion}`);
             }
         }
-        lines.push("");
+        lines.push('');
     }
     if (result.warnings.length > 0) {
-        lines.push("Warnings:");
+        lines.push('Warnings:');
         for (const w of result.warnings) {
             lines.push(`  [${w.rule}] ${w.file}`);
             lines.push(`    ${w.message}`);
@@ -177,9 +177,9 @@ function formatPretty(output) {
                 lines.push(`    Fix: ${w.suggestion}`);
             }
         }
-        lines.push("");
+        lines.push('');
     }
-    return lines.join("\n");
+    return lines.join('\n');
 }
 /**
  * Format validation result for JSON output
@@ -199,7 +199,7 @@ function formatJson(output) {
 async function main() {
     const config = parseArgs();
     if (config.version) {
-        printVersionAndExit("lint-process");
+        printVersionAndExit('lint-process');
     }
     if (config.help) {
         printHelp();
@@ -215,11 +215,11 @@ async function main() {
         }
         const state = stateResult.value;
         if (config.showState) {
-            console.log("\nDerived Process State:");
+            console.log('\nDerived Process State:');
             console.log(`  Files: ${state.files.size}`);
-            console.log(`  Active Session: ${state.activeSession?.id ?? "none"}`);
-            console.log(`  Taxonomy Hash: ${state.taxonomyHash || "not found"}`);
-            console.log("");
+            console.log(`  Active Session: ${state.activeSession?.id ?? 'none'}`);
+            console.log(`  Taxonomy Hash: ${state.taxonomyHash || 'not found'}`);
+            console.log('');
             // Show file states
             for (const [path, fileState] of state.files) {
                 console.log(`  ${path}`);
@@ -228,20 +228,20 @@ async function main() {
                     console.log(`    Deliverables: ${fileState.deliverables.length}`);
                 }
             }
-            console.log("");
+            console.log('');
         }
         // Detect changes based on mode
         let changesResult;
         switch (config.mode) {
-            case "staged":
+            case 'staged':
                 changesResult = detectStagedChanges(config.baseDir);
                 break;
-            case "all":
+            case 'all':
                 changesResult = detectBranchChanges(config.baseDir);
                 break;
-            case "files":
+            case 'files':
                 if (config.files.length === 0) {
-                    console.error("Error: No files specified with --files mode");
+                    console.error('Error: No files specified with --files mode');
                     printHelp();
                     process.exit(1);
                 }
@@ -254,7 +254,7 @@ async function main() {
         const changes = changesResult.value;
         // Check if there are any changes
         if (!hasChanges(changes)) {
-            console.log("No changes detected.");
+            console.log('No changes detected.');
             process.exit(0);
         }
         console.log(`  Modified files: ${changes.modifiedFiles.length}`);
@@ -262,7 +262,7 @@ async function main() {
         console.log(`  Deleted files: ${changes.deletedFiles.length}`);
         console.log(`  Status transitions: ${changes.statusTransitions.size}`);
         console.log(`  Deliverable changes: ${changes.deliverableChanges.size}`);
-        console.log("");
+        console.log('');
         // Validate changes
         const output = validateChanges({
             state,
@@ -273,7 +273,7 @@ async function main() {
             },
         });
         // Format and output results
-        if (config.format === "json") {
+        if (config.format === 'json') {
             console.log(formatJson(output));
         }
         else {

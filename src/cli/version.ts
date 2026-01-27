@@ -15,9 +15,9 @@
  * - Call early in argument parsing before other operations
  */
 
-import { readFileSync } from "fs";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { readFileSync } from 'fs';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * Get the package version from package.json
@@ -29,15 +29,15 @@ export function getPackageVersion(): string {
     // Resolve path relative to this file: src/cli/version.ts -> package.json
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    const packagePath = join(__dirname, "..", "..", "package.json");
+    const packagePath = join(__dirname, '..', '..', 'package.json');
 
-    const packageJson = JSON.parse(readFileSync(packagePath, "utf-8")) as {
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8')) as {
       version?: string;
       name?: string;
     };
-    return packageJson.version ?? "unknown";
+    return packageJson.version ?? 'unknown';
   } catch {
-    return "unknown";
+    return 'unknown';
   }
 }
 
@@ -50,14 +50,14 @@ export function getPackageName(): string {
   try {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
-    const packagePath = join(__dirname, "..", "..", "package.json");
+    const packagePath = join(__dirname, '..', '..', 'package.json');
 
-    const packageJson = JSON.parse(readFileSync(packagePath, "utf-8")) as {
+    const packageJson = JSON.parse(readFileSync(packagePath, 'utf-8')) as {
       name?: string;
     };
-    return packageJson.name ?? "delivery-process";
+    return packageJson.name ?? 'delivery-process';
   } catch {
-    return "delivery-process";
+    return 'delivery-process';
   }
 }
 

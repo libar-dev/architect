@@ -17,8 +17,8 @@
  * - When switching between different tag prefixes
  * - When customizing the taxonomy for a specific project
  */
-import type { DeliveryProcessConfig, DeliveryProcessInstance } from "./types.js";
-import { type PresetName } from "./presets.js";
+import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
+import { type PresetName } from './presets.js';
 /**
  * Options for creating a delivery process instance
  */
@@ -30,7 +30,7 @@ export interface CreateDeliveryProcessOptions {
     /** Custom file opt-in tag (overrides preset) */
     fileOptInTag?: string;
     /** Custom categories (merged with or replaces preset) */
-    categories?: DeliveryProcessConfig["categories"];
+    categories?: DeliveryProcessConfig['categories'];
 }
 /**
  * Creates a configured delivery process instance.

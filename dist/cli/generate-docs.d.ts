@@ -30,5 +30,5 @@
  * - **Explicit Registration**: Generators must be registered before use
  * - **Artefact Sets**: Predefined generator groupings for common use cases
  */
-import "../generators/built-in/index.js";
+import '../generators/built-in/index.js';
 //# sourceMappingURL=generate-docs.d.ts.map

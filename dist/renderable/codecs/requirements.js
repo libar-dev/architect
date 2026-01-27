@@ -17,21 +17,21 @@
  * const doc = codec.decode(dataset);
  * ```
  */
-import { z } from "zod";
-import { MasterDatasetSchema, } from "../../validation-schemas/master-dataset.js";
-import { heading, paragraph, separator, table, list, collapsible, linkOut, document, } from "../schema.js";
-import { renderScenarioContent, renderBusinessRulesSection } from "./helpers.js";
-import { normalizeStatus } from "../../taxonomy/index.js";
-import { getStatusEmoji, getDisplayName, computeStatusCounts, completionPercentage, renderProgressBar, groupBy, sortByStatusAndName, formatBusinessValue, } from "../utils.js";
-import { toKebabCase } from "../../utils/index.js";
-import { DEFAULT_BASE_OPTIONS, mergeOptions, } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
+import { heading, paragraph, separator, table, list, collapsible, linkOut, document, } from '../schema.js';
+import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
+import { normalizeStatus } from '../../taxonomy/index.js';
+import { getStatusEmoji, getDisplayName, computeStatusCounts, completionPercentage, renderProgressBar, groupBy, sortByStatusAndName, formatBusinessValue, } from '../utils.js';
+import { toKebabCase } from '../../utils/index.js';
+import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers
 // ═══════════════════════════════════════════════════════════════════════════
 /**
  * Known repository prefixes that should be stripped from implementation paths.
  */
-const REPO_PREFIXES = ["libar-platform/", "monorepo/"];
+const REPO_PREFIXES = ['libar-platform/', 'monorepo/'];
 /**
  * Normalize implementation file path by stripping repository prefixes.
  *
@@ -51,14 +51,14 @@ function normalizeImplPath(filePath) {
  */
 export const DEFAULT_REQUIREMENTS_OPTIONS = {
     ...DEFAULT_BASE_OPTIONS,
-    groupBy: "product-area",
+    groupBy: 'product-area',
     filterStatus: [],
     includeScenarioSteps: true,
     includeBusinessValue: true,
     includeBusinessRules: true,
     includeStepDetails: true,
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Requirements Document Codec
 // ═══════════════════════════════════════════════════════════════════════════
@@ -85,7 +85,7 @@ export function createRequirementsCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("RequirementsDocumentCodec is decode-only. See zod-codecs.md");
+            throw new Error('RequirementsDocumentCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -111,19 +111,19 @@ function buildRequirementsDocument(dataset, options) {
         prdPatterns = prdPatterns.filter((p) => options.filterStatus.includes(normalizeStatus(p.status)));
     }
     if (prdPatterns.length === 0) {
-        sections.push(heading(2, "No Product Requirements"), paragraph("No patterns have product area, user role, or business value metadata."));
-        return document("Product Requirements", sections, {
-            purpose: "Product requirements documentation",
+        sections.push(heading(2, 'No Product Requirements'), paragraph('No patterns have product area, user role, or business value metadata.'));
+        return document('Product Requirements', sections, {
+            purpose: 'Product requirements documentation',
         });
     }
     // 1. Summary
     sections.push(...buildRequirementsSummary(prdPatterns));
     // 2. Features by primary grouping
-    if (options.groupBy === "user-role") {
+    if (options.groupBy === 'user-role') {
         sections.push(...buildByUserRole(prdPatterns));
         sections.push(...buildByProductArea(prdPatterns, options));
     }
-    else if (options.groupBy === "phase") {
+    else if (options.groupBy === 'phase') {
         sections.push(...buildByPhase(prdPatterns, options));
         sections.push(...buildByProductArea(prdPatterns, options));
     }
@@ -139,15 +139,15 @@ function buildRequirementsDocument(dataset, options) {
         ? buildRequirementsDetailFiles(prdPatterns, options, dataset)
         : {};
     const docOpts = {
-        purpose: "Product requirements and feature specifications",
+        purpose: 'Product requirements and feature specifications',
         detailLevel: options.generateDetailFiles
-            ? "Overview with links to detailed requirements"
-            : "Compact summary",
+            ? 'Overview with links to detailed requirements'
+            : 'Compact summary',
     };
     if (Object.keys(additionalFiles).length > 0) {
         docOpts.additionalFiles = additionalFiles;
     }
-    return document("Product Requirements", sections, docOpts);
+    return document('Product Requirements', sections, docOpts);
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Section Builders
@@ -164,15 +164,15 @@ function buildRequirementsSummary(patterns) {
     // Group by user role
     const byRole = groupBy(patterns.filter((p) => p.userRole !== undefined), (p) => p.userRole);
     return [
-        heading(2, "Summary"),
+        heading(2, 'Summary'),
         paragraph(`**Overall:** ${progressBar} (${progress}%)`),
-        table(["Metric", "Value"], [
-            ["Total Features", String(counts.total)],
-            ["Completed", String(counts.completed)],
-            ["Active", String(counts.active)],
-            ["Planned", String(counts.planned)],
-            ["Product Areas", String(byArea.size)],
-            ["User Roles", String(byRole.size)],
+        table(['Metric', 'Value'], [
+            ['Total Features', String(counts.total)],
+            ['Completed', String(counts.completed)],
+            ['Active', String(counts.active)],
+            ['Planned', String(counts.planned)],
+            ['Product Areas', String(byArea.size)],
+            ['User Roles', String(byRole.size)],
         ]),
         separator(),
     ];
@@ -183,11 +183,11 @@ function buildRequirementsSummary(patterns) {
  */
 function buildByProductArea(patterns, options) {
     const sections = [];
-    const byArea = groupBy(patterns.filter((p) => p.productArea), (p) => p.productArea ?? "");
+    const byArea = groupBy(patterns.filter((p) => p.productArea), (p) => p.productArea ?? '');
     if (byArea.size === 0) {
         return [];
     }
-    sections.push(heading(2, "By Product Area"));
+    sections.push(heading(2, 'By Product Area'));
     const sortedAreas = [...byArea.keys()].sort();
     for (const area of sortedAreas) {
         const areaPatterns = byArea.get(area) ?? [];
@@ -219,11 +219,11 @@ function buildByProductArea(patterns, options) {
  */
 function buildByUserRole(patterns) {
     const sections = [];
-    const byRole = groupBy(patterns.filter((p) => p.userRole), (p) => p.userRole ?? "");
+    const byRole = groupBy(patterns.filter((p) => p.userRole), (p) => p.userRole ?? '');
     if (byRole.size === 0) {
         return [];
     }
-    sections.push(heading(2, "By User Role"));
+    sections.push(heading(2, 'By User Role'));
     const sortedRoles = [...byRole.keys()].sort();
     for (const role of sortedRoles) {
         const rolePatterns = byRole.get(role) ?? [];
@@ -233,10 +233,10 @@ function buildByUserRole(patterns) {
         const rows = sortByStatusAndName([...rolePatterns]).map((p) => {
             const emoji = getStatusEmoji(p.status);
             const name = getDisplayName(p);
-            const area = p.productArea ?? "-";
+            const area = p.productArea ?? '-';
             return [`${emoji} ${name}`, area, normalizeStatus(p.status)];
         });
-        roleContent.push(table(["Feature", "Product Area", "Status"], rows));
+        roleContent.push(table(['Feature', 'Product Area', 'Status'], rows));
         sections.push(collapsible(`${role} (${counts.total} features, ${counts.completed} complete)`, roleContent));
     }
     sections.push(separator());
@@ -252,7 +252,7 @@ function buildByPhase(patterns, options) {
     if (byPhase.size === 0) {
         return [];
     }
-    sections.push(heading(2, "By Phase"));
+    sections.push(heading(2, 'By Phase'));
     const sortedPhases = [...byPhase.keys()].sort((a, b) => a - b);
     for (const phase of sortedPhases) {
         const phasePatterns = byPhase.get(phase) ?? [];
@@ -287,14 +287,14 @@ function buildAllFeaturesTable(patterns) {
     const rows = sorted.map((p) => {
         const emoji = getStatusEmoji(p.status);
         const name = getDisplayName(p);
-        const area = p.productArea ?? "-";
-        const role = p.userRole ?? "-";
+        const area = p.productArea ?? '-';
+        const role = p.userRole ?? '-';
         const status = normalizeStatus(p.status);
         return [`${emoji} ${name}`, area, role, status];
     });
     return [
-        heading(2, "All Features"),
-        table(["Feature", "Product Area", "User Role", "Status"], rows),
+        heading(2, 'All Features'),
+        table(['Feature', 'Product Area', 'User Role', 'Status'], rows),
         separator(),
     ];
 }
@@ -317,7 +317,7 @@ function buildAllFeaturesTable(patterns) {
  */
 export function requirementToSlug(patternName, phase) {
     const phaseNum = phase ?? 0;
-    const paddedPhase = String(phaseNum).padStart(2, "0");
+    const paddedPhase = String(phaseNum).padStart(2, '0');
     return `phase-${paddedPhase}-${toKebabCase(patternName)}`;
 }
 /**
@@ -341,31 +341,31 @@ function buildSingleRequirementDocument(pattern, options, dataset) {
     const emoji = getStatusEmoji(pattern.status);
     const name = getDisplayName(pattern);
     // Metadata
-    const metaRows = [["Status", normalizeStatus(pattern.status)]];
+    const metaRows = [['Status', normalizeStatus(pattern.status)]];
     if (pattern.productArea) {
-        metaRows.push(["Product Area", pattern.productArea]);
+        metaRows.push(['Product Area', pattern.productArea]);
     }
     if (pattern.userRole) {
-        metaRows.push(["User Role", pattern.userRole]);
+        metaRows.push(['User Role', pattern.userRole]);
     }
     if (options.includeBusinessValue && pattern.businessValue) {
-        metaRows.push(["Business Value", formatBusinessValue(pattern.businessValue)]);
+        metaRows.push(['Business Value', formatBusinessValue(pattern.businessValue)]);
     }
     if (pattern.phase !== undefined) {
-        metaRows.push(["Phase", String(pattern.phase)]);
+        metaRows.push(['Phase', String(pattern.phase)]);
     }
-    sections.push(heading(2, "Overview"), table(["Property", "Value"], metaRows));
+    sections.push(heading(2, 'Overview'), table(['Property', 'Value'], metaRows));
     // Description
     if (pattern.directive.description) {
-        sections.push(heading(2, "Description"), paragraph(pattern.directive.description));
+        sections.push(heading(2, 'Description'), paragraph(pattern.directive.description));
     }
     // Use cases
     if (pattern.useCases && pattern.useCases.length > 0) {
-        sections.push(heading(2, "Use Cases"), list([...pattern.useCases]));
+        sections.push(heading(2, 'Use Cases'), list([...pattern.useCases]));
     }
     // Scenarios as acceptance criteria with full steps, DataTables, and DocStrings
     if (options.includeScenarioSteps && pattern.scenarios && pattern.scenarios.length > 0) {
-        sections.push(heading(2, "Acceptance Criteria"));
+        sections.push(heading(2, 'Acceptance Criteria'));
         for (const scenario of pattern.scenarios) {
             sections.push(...renderScenarioContent(scenario));
         }
@@ -378,18 +378,18 @@ function buildSingleRequirementDocument(pattern, options, dataset) {
     // Deliverables
     if (pattern.deliverables && pattern.deliverables.length > 0) {
         const deliverableItems = pattern.deliverables.map((d) => {
-            const status = d.status ? ` (${d.status})` : "";
+            const status = d.status ? ` (${d.status})` : '';
             return `${d.name}${status}`;
         });
-        sections.push(heading(2, "Deliverables"), list(deliverableItems));
+        sections.push(heading(2, 'Deliverables'), list(deliverableItems));
     }
     // Implementations (files that implement this pattern via @libar-docs-implements)
     const patternKey = pattern.patternName ?? name;
     const rel = dataset.relationshipIndex?.[patternKey];
     if (rel?.implementedBy && rel.implementedBy.length > 0) {
-        sections.push(heading(2, "Implementations"));
-        sections.push(paragraph("Files that implement this pattern:"), list(rel.implementedBy.map((impl) => {
-            const fileName = impl.file.split("/").pop() ?? impl.file;
+        sections.push(heading(2, 'Implementations'));
+        sections.push(paragraph('Files that implement this pattern:'), list(rel.implementedBy.map((impl) => {
+            const fileName = impl.file.split('/').pop() ?? impl.file;
             // Normalize path to strip repo prefixes (e.g., "libar-platform/packages/..." -> "packages/...")
             const normalizedPath = normalizeImplPath(impl.file);
             // Link is relative from output/requirements/ directory, go up two levels to project root
@@ -398,7 +398,7 @@ function buildSingleRequirementDocument(pattern, options, dataset) {
         })));
     }
     // Back link
-    sections.push(separator(), linkOut("← Back to Product Requirements", "../PRODUCT-REQUIREMENTS.md"));
+    sections.push(separator(), linkOut('← Back to Product Requirements', '../PRODUCT-REQUIREMENTS.md'));
     return document(`${emoji} ${name}`, sections, {
         purpose: `Detailed requirements for the ${name} feature`,
     });

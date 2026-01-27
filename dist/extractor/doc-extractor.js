@@ -26,11 +26,11 @@
  * - **Name Inference**: Extracts from exports or JSDoc title when not explicit
  * - **Deterministic IDs**: MD5 hash of file path + line number ensures stable identifiers
  */
-import * as path from "path";
-import { Result } from "../types/index.js";
-import { asPatternId, asCategoryName, asSourceFilePath, createPatternValidationError, } from "../types/index.js";
-import { ExtractedPatternSchema, createDefaultTagRegistry, } from "../validation-schemas/index.js";
-import { generatePatternId } from "../utils/index.js";
+import * as path from 'path';
+import { Result } from '../types/index.js';
+import { asPatternId, asCategoryName, asSourceFilePath, createPatternValidationError, } from '../types/index.js';
+import { ExtractedPatternSchema, createDefaultTagRegistry, } from '../validation-schemas/index.js';
+import { generatePatternId } from '../utils/index.js';
 /**
  * Convert scanned files to extracted patterns
  *
@@ -155,8 +155,8 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
     // Validate against schema (schema-first enforcement)
     const validation = ExtractedPatternSchema.safeParse(pattern);
     if (!validation.success) {
-        const errorMessages = validation.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`);
-        const error = createPatternValidationError(asSourceFilePath(relativePath), name, "Pattern validation failed", errorMessages);
+        const errorMessages = validation.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`);
+        const error = createPatternValidationError(asSourceFilePath(relativePath), name, 'Pattern validation failed', errorMessages);
         return Result.err(error);
     }
     return Result.ok(validation.data);
@@ -216,11 +216,11 @@ export function inferPatternName(directive, exports, registry) {
         return directive.patternName;
     }
     // Priority 2: Try to extract name from first line of description
-    const lines = directive.description.split("\n");
+    const lines = directive.description.split('\n');
     const firstLine = lines[0];
-    if (firstLine?.trim() && !firstLine.trim().startsWith("@")) {
+    if (firstLine?.trim() && !firstLine.trim().startsWith('@')) {
         // Strip markdown header prefixes (##, ###, etc.)
-        const cleanedName = firstLine.trim().replace(/^#+\s*/, "");
+        const cleanedName = firstLine.trim().replace(/^#+\s*/, '');
         if (cleanedName) {
             return cleanedName;
         }
@@ -233,7 +233,7 @@ export function inferPatternName(directive, exports, registry) {
     // Last resort: generate from tags using registry prefix
     const tagPrefix = registry.tagPrefix;
     const firstTag = directive.tags[0];
-    const primaryTag = firstTag?.replace(tagPrefix, "") ?? "unknown";
+    const primaryTag = firstTag?.replace(tagPrefix, '') ?? 'unknown';
     return `${primaryTag}-pattern`;
 }
 /**
@@ -295,11 +295,11 @@ export function inferCategory(tags, registry) {
         else {
             // Check all possible contiguous subsequences for category matches
             // e.g., for "utils-validation" check: "utils-validation", "utils", "validation"
-            const parts = withoutPrefix.split("-");
+            const parts = withoutPrefix.split('-');
             // Try all contiguous subsequences from longest to shortest
             for (let len = parts.length; len > 0; len--) {
                 for (let start = 0; start <= parts.length - len; start++) {
-                    const candidate = parts.slice(start, start + len).join("-");
+                    const candidate = parts.slice(start, start + len).join('-');
                     if (priorityMap.has(candidate)) {
                         matches.push(candidate);
                     }
@@ -329,13 +329,13 @@ export function inferCategory(tags, registry) {
     const firstTag = tags[0];
     if (firstTag?.startsWith(prefix) === true) {
         const withoutPrefix = firstTag.substring(prefix.length);
-        const parts = withoutPrefix.split("-");
+        const parts = withoutPrefix.split('-');
         const firstPart = parts[0];
         if (firstPart) {
             return firstPart;
         }
     }
-    return "uncategorized";
+    return 'uncategorized';
 }
 /**
  * Check if directive has specific aggregation tag
@@ -385,9 +385,9 @@ export function hasAggregationTag(tags, aggregationTagName, registry) {
  */
 export function getAggregationTags(tags, registry) {
     return {
-        overview: hasAggregationTag(tags, "overview", registry),
-        decision: hasAggregationTag(tags, "decision", registry),
-        intro: hasAggregationTag(tags, "intro", registry),
+        overview: hasAggregationTag(tags, 'overview', registry),
+        decision: hasAggregationTag(tags, 'decision', registry),
+        intro: hasAggregationTag(tags, 'intro', registry),
     };
 }
 //# sourceMappingURL=doc-extractor.js.map

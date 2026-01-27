@@ -16,7 +16,7 @@
  * - When validating custom workflow configurations
  * - When creating new workflow definitions
  */
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * Status definition within a workflow
  *
@@ -81,7 +81,7 @@ export const WorkflowConfigSchema = z
     /** Workflow name (e.g., "6-phase-standard") */
     name: z.string().min(1),
     /** Semantic version for config compatibility */
-    version: z.string().regex(/^\d+\.\d+\.\d+$/, "Version must be semver format"),
+    version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format'),
     /** Human-readable description */
     description: z.string().optional(),
     /** Status definitions for this workflow */

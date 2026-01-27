@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 /**
  * A row in a Gherkin DataTable - maps column headers to cell values
  */

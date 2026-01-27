@@ -25,14 +25,14 @@
  * - **Naming Convention**: {name}.json (e.g., full-set.json, minimal-set.json)
  * - **Result Monad**: Returns Result<T, Error> for explicit error handling
  */
-import { type ArtefactSet } from "../validation-schemas/artefact-set.js";
-import type { Result } from "../types/index.js";
+import { type ArtefactSet } from '../validation-schemas/artefact-set.js';
+import type { Result } from '../types/index.js';
 /**
  * Error type for artefact set loading failures
  */
 export interface ArtefactSetLoadError {
     /** Error type identifier */
-    type: "artefact-set-load-error";
+    type: 'artefact-set-load-error';
     /** Name of the artefact set that failed to load */
     name: string;
     /** Path where the file was expected */

@@ -16,7 +16,7 @@
  * - Use when validating generator configuration files
  * - Use when composing documents from built-in sections
  */
-import { z } from "zod";
+import { z } from 'zod';
 declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
     type: z.ZodLiteral<"header">;
     title: z.ZodString;
@@ -82,8 +82,8 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
 }, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"timeline-summary">;
     groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-        phase: "phase";
         quarter: "quarter";
+        phase: "phase";
     }>>>;
 }, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"completed-phases">;
@@ -97,9 +97,9 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
         "progress-bar": "progress-bar";
     }>>>;
     groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-        phase: "phase";
         status: "status";
         location: "location";
+        phase: "phase";
         none: "none";
     }>>>;
     showStats: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -116,12 +116,12 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
     includeScenarioSteps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     includeBusinessValue: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     filterByLayer: z.ZodOptional<z.ZodEnum<{
+        unknown: "unknown";
         timeline: "timeline";
         domain: "domain";
         integration: "integration";
         e2e: "e2e";
         component: "component";
-        unknown: "unknown";
     }>>;
     progressiveDisclosure: z.ZodOptional<z.ZodObject<{
         enabled: z.ZodDefault<z.ZodBoolean>;
@@ -135,12 +135,12 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
         "bullet-points": "bullet-points";
     }>>>;
     filterByLayer: z.ZodOptional<z.ZodEnum<{
+        unknown: "unknown";
         timeline: "timeline";
         domain: "domain";
         integration: "integration";
         e2e: "e2e";
         component: "component";
-        unknown: "unknown";
     }>>;
 }, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"session-context">;
@@ -161,8 +161,8 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
     includeDiscoveredGaps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     outputDir: z.ZodOptional<z.ZodString>;
     sortBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-        phase: "phase";
         quarter: "quarter";
+        phase: "phase";
         priority: "priority";
         effort: "effort";
     }>>>;
@@ -201,8 +201,8 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
     showSourcePhase: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     includeLinks: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-        phase: "phase";
         category: "category";
+        phase: "phase";
     }>>>;
 }, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"changelog">;
@@ -223,8 +223,8 @@ declare const SectionConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
 }, z.core.$strip>, z.ZodObject<{
     type: z.ZodLiteral<"adr-list">;
     groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-        status: "status";
         category: "category";
+        status: "status";
     }>>>;
     includeContext: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     includeDecision: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -320,8 +320,8 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"timeline-summary">;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             quarter: "quarter";
+            phase: "phase";
         }>>>;
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"completed-phases">;
@@ -335,9 +335,9 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
             "progress-bar": "progress-bar";
         }>>>;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             status: "status";
             location: "location";
+            phase: "phase";
             none: "none";
         }>>>;
         showStats: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -354,12 +354,12 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
         includeScenarioSteps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         includeBusinessValue: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         filterByLayer: z.ZodOptional<z.ZodEnum<{
+            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
-            unknown: "unknown";
         }>>;
         progressiveDisclosure: z.ZodOptional<z.ZodObject<{
             enabled: z.ZodDefault<z.ZodBoolean>;
@@ -373,12 +373,12 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
             "bullet-points": "bullet-points";
         }>>>;
         filterByLayer: z.ZodOptional<z.ZodEnum<{
+            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
-            unknown: "unknown";
         }>>;
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"session-context">;
@@ -399,8 +399,8 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
         includeDiscoveredGaps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         outputDir: z.ZodOptional<z.ZodString>;
         sortBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             quarter: "quarter";
+            phase: "phase";
             priority: "priority";
             effort: "effort";
         }>>>;
@@ -439,8 +439,8 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
         showSourcePhase: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         includeLinks: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             category: "category";
+            phase: "phase";
         }>>>;
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"changelog">;
@@ -461,8 +461,8 @@ declare const BuiltInGeneratorConfigSchema: z.ZodObject<{
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"adr-list">;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            status: "status";
             category: "category";
+            status: "status";
         }>>>;
         includeContext: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         includeDecision: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -563,8 +563,8 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"timeline-summary">;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             quarter: "quarter";
+            phase: "phase";
         }>>>;
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"completed-phases">;
@@ -578,9 +578,9 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
             "progress-bar": "progress-bar";
         }>>>;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             status: "status";
             location: "location";
+            phase: "phase";
             none: "none";
         }>>>;
         showStats: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -597,12 +597,12 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
         includeScenarioSteps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         includeBusinessValue: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         filterByLayer: z.ZodOptional<z.ZodEnum<{
+            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
-            unknown: "unknown";
         }>>;
         progressiveDisclosure: z.ZodOptional<z.ZodObject<{
             enabled: z.ZodDefault<z.ZodBoolean>;
@@ -616,12 +616,12 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
             "bullet-points": "bullet-points";
         }>>>;
         filterByLayer: z.ZodOptional<z.ZodEnum<{
+            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
-            unknown: "unknown";
         }>>;
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"session-context">;
@@ -642,8 +642,8 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
         includeDiscoveredGaps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         outputDir: z.ZodOptional<z.ZodString>;
         sortBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             quarter: "quarter";
+            phase: "phase";
             priority: "priority";
             effort: "effort";
         }>>>;
@@ -682,8 +682,8 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
         showSourcePhase: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         includeLinks: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            phase: "phase";
             category: "category";
+            phase: "phase";
         }>>>;
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"changelog">;
@@ -704,8 +704,8 @@ declare const GeneratorConfigSchema: z.ZodUnion<readonly [z.ZodObject<{
     }, z.core.$strip>, z.ZodObject<{
         type: z.ZodLiteral<"adr-list">;
         groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-            status: "status";
             category: "category";
+            status: "status";
         }>>>;
         includeContext: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         includeDecision: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -809,8 +809,8 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
         }, z.core.$strip>, z.ZodObject<{
             type: z.ZodLiteral<"timeline-summary">;
             groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 quarter: "quarter";
+                phase: "phase";
             }>>>;
         }, z.core.$strip>, z.ZodObject<{
             type: z.ZodLiteral<"completed-phases">;
@@ -824,9 +824,9 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
                 "progress-bar": "progress-bar";
             }>>>;
             groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 status: "status";
                 location: "location";
+                phase: "phase";
                 none: "none";
             }>>>;
             showStats: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
@@ -843,12 +843,12 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
             includeScenarioSteps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             includeBusinessValue: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             filterByLayer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             progressiveDisclosure: z.ZodOptional<z.ZodObject<{
                 enabled: z.ZodDefault<z.ZodBoolean>;
@@ -862,12 +862,12 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
                 "bullet-points": "bullet-points";
             }>>>;
             filterByLayer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
         }, z.core.$strip>, z.ZodObject<{
             type: z.ZodLiteral<"session-context">;
@@ -888,8 +888,8 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
             includeDiscoveredGaps: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             outputDir: z.ZodOptional<z.ZodString>;
             sortBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 quarter: "quarter";
+                phase: "phase";
                 priority: "priority";
                 effort: "effort";
             }>>>;
@@ -928,8 +928,8 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
             showSourcePhase: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             includeLinks: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-                phase: "phase";
                 category: "category";
+                phase: "phase";
             }>>>;
         }, z.core.$strip>, z.ZodObject<{
             type: z.ZodLiteral<"changelog">;
@@ -950,8 +950,8 @@ export declare const GeneratorsConfigFileSchema: z.ZodObject<{
         }, z.core.$strip>, z.ZodObject<{
             type: z.ZodLiteral<"adr-list">;
             groupBy: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-                status: "status";
                 category: "category";
+                status: "status";
             }>>>;
             includeContext: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
             includeDecision: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;

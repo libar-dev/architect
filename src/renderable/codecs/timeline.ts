@@ -19,13 +19,13 @@
  * ```
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 import {
   MasterDatasetSchema,
   type MasterDataset,
   type PhaseGroup,
-} from "../../validation-schemas/master-dataset.js";
-import type { ExtractedPattern } from "../../validation-schemas/index.js";
+} from '../../validation-schemas/master-dataset.js';
+import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -37,8 +37,8 @@ import {
   collapsible,
   linkOut,
   document,
-} from "../schema.js";
-import { normalizeStatus } from "../../taxonomy/index.js";
+} from '../schema.js';
+import { normalizeStatus } from '../../taxonomy/index.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -48,14 +48,14 @@ import {
   sortByPhaseAndName,
   formatBusinessValue,
   groupBy,
-} from "../utils.js";
-import { toKebabCase } from "../../utils/index.js";
+} from '../utils.js';
+import { toKebabCase } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,
   DEFAULT_BASE_OPTIONS,
   mergeOptions,
-} from "./types/base.js";
+} from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Timeline Codec Options (co-located with codecs)
@@ -132,8 +132,8 @@ export const DEFAULT_CURRENT_WORK_OPTIONS: Required<CurrentWorkCodecOptions> = {
   includeDeliverables: true,
   includeProcess: true,
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
-import { renderAcceptanceCriteria, renderBusinessRulesSection } from "./helpers.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Roadmap Document Codec
@@ -165,7 +165,7 @@ export function createRoadmapCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("RoadmapDocumentCodec is decode-only. See zod-codecs.md");
+      throw new Error('RoadmapDocumentCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -201,7 +201,7 @@ export function createMilestonesCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("CompletedMilestonesCodec is decode-only. See zod-codecs.md");
+      throw new Error('CompletedMilestonesCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -240,7 +240,7 @@ export function createCurrentWorkCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("CurrentWorkCodec is decode-only. See zod-codecs.md");
+      throw new Error('CurrentWorkCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -290,17 +290,17 @@ function buildRoadmapDocument(
     detailLevel: string;
     additionalFiles?: Record<string, RenderableDocument>;
   } = {
-    purpose: "Track implementation progress by phase",
+    purpose: 'Track implementation progress by phase',
     detailLevel: options.generateDetailFiles
-      ? "Phase summaries with links to details"
-      : "Compact summary",
+      ? 'Phase summaries with links to details'
+      : 'Compact summary',
   };
 
   if (Object.keys(additionalFiles).length > 0) {
     docOpts.additionalFiles = additionalFiles;
   }
 
-  return document("Development Roadmap", sections, docOpts);
+  return document('Development Roadmap', sections, docOpts);
 }
 
 /**
@@ -317,16 +317,16 @@ function buildOverallProgress(dataset: MasterDataset): SectionBlock[] {
   ).length;
 
   return [
-    heading(2, "Overall Progress"),
+    heading(2, 'Overall Progress'),
     paragraph(`**Patterns:** ${progressBar} (${progress}%)`),
     paragraph(`**Phases:** ${completedPhases}/${phaseCount} complete`),
     table(
-      ["Metric", "Value"],
+      ['Metric', 'Value'],
       [
-        ["Total Patterns", String(counts.total)],
-        ["Completed", String(counts.completed)],
-        ["Active", String(counts.active)],
-        ["Planned", String(counts.planned)],
+        ['Total Patterns', String(counts.total)],
+        ['Completed', String(counts.completed)],
+        ['Active', String(counts.active)],
+        ['Planned', String(counts.planned)],
       ]
     ),
     separator(),
@@ -339,7 +339,7 @@ function buildOverallProgress(dataset: MasterDataset): SectionBlock[] {
 function buildPhaseBreakdown(dataset: MasterDataset): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
-  sections.push(heading(2, "Phases"));
+  sections.push(heading(2, 'Phases'));
 
   // Sort phases by number
   const sortedPhases = [...dataset.byPhase].sort((a, b) => a.phaseNumber - b.phaseNumber);
@@ -364,7 +364,7 @@ function buildPhaseSection(phase: PhaseGroup): SectionBlock[] {
   const isComplete = counts.total > 0 && counts.completed === counts.total;
 
   // Phase header with progress
-  const statusEmoji = isComplete ? "✅" : counts.active > 0 ? "🚧" : "📋";
+  const statusEmoji = isComplete ? '✅' : counts.active > 0 ? '🚧' : '📋';
   sections.push(heading(3, `${statusEmoji} ${displayName}`));
   sections.push(paragraph(`${progressBar} ${progress}% complete`));
 
@@ -375,10 +375,10 @@ function buildPhaseSection(phase: PhaseGroup): SectionBlock[] {
     const name = getDisplayName(p);
     const status = normalizeStatus(p.status);
     const summary = extractSummary(p.directive.description, p.patternName);
-    return [`${emoji} ${name}`, status, summary || "-"];
+    return [`${emoji} ${name}`, status, summary || '-'];
   });
 
-  sections.push(table(["Pattern", "Status", "Description"], rows), separator());
+  sections.push(table(['Pattern', 'Status', 'Description'], rows), separator());
 
   return sections;
 }
@@ -394,7 +394,7 @@ function buildQuarterlyTimeline(dataset: MasterDataset): SectionBlock[] {
     return [];
   }
 
-  sections.push(heading(2, "Quarterly Timeline"));
+  sections.push(heading(2, 'Quarterly Timeline'));
 
   // Current quarter detection
   const now = new Date();
@@ -402,14 +402,14 @@ function buildQuarterlyTimeline(dataset: MasterDataset): SectionBlock[] {
 
   const rows = quarters.map((quarter) => {
     const patterns = dataset.byQuarter[quarter] ?? [];
-    const completed = patterns.filter((p) => normalizeStatus(p.status) === "completed").length;
+    const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed').length;
     const isCurrent = quarter === currentQuarter;
-    const marker = isCurrent ? " ← Current" : "";
+    const marker = isCurrent ? ' ← Current' : '';
 
     return [quarter + marker, String(patterns.length), String(completed)];
   });
 
-  sections.push(table(["Quarter", "Total", "Completed"], rows), separator());
+  sections.push(table(['Quarter', 'Total', 'Completed'], rows), separator());
 
   return sections;
 }
@@ -432,14 +432,14 @@ function buildPhaseNavigationTable(
     return [];
   }
 
-  sections.push(heading(2, "Phase Navigation"));
+  sections.push(heading(2, 'Phase Navigation'));
 
   const rows = sortedPhases.map((phase) => {
     const { phaseNumber, phaseName, counts } = phase;
     const displayName = phaseName ?? `Phase ${phaseNumber}`;
     const progress = completionPercentage(counts);
     const isComplete = counts.total > 0 && counts.completed === counts.total;
-    const statusEmoji = isComplete ? "✅" : counts.active > 0 ? "🚧" : "📋";
+    const statusEmoji = isComplete ? '✅' : counts.active > 0 ? '🚧' : '📋';
     const slug = getPhaseSlug(phaseNumber, phaseName);
 
     // Link to detail file if generating detail files, otherwise just display name
@@ -450,7 +450,7 @@ function buildPhaseNavigationTable(
     return [nameCell, `${counts.completed}/${counts.total}`, `${progress}%`];
   });
 
-  sections.push(table(["Phase", "Progress", "Complete"], rows), separator());
+  sections.push(table(['Phase', 'Progress', 'Complete'], rows), separator());
 
   return sections;
 }
@@ -470,8 +470,8 @@ function buildPhaseNavigationTable(
  * @internal Exported for testing - not part of public API
  */
 export function getPhaseSlug(phaseNumber: number, phaseName: string | undefined): string {
-  const paddedPhase = String(phaseNumber).padStart(2, "0");
-  const namePart = phaseName ? toKebabCase(phaseName) : "unnamed";
+  const paddedPhase = String(phaseNumber).padStart(2, '0');
+  const namePart = phaseName ? toKebabCase(phaseName) : 'unnamed';
   return `phase-${paddedPhase}-${namePart}`;
 }
 
@@ -516,42 +516,42 @@ function buildPhaseDetailDocument(
   const progressBar = renderProgressBar(counts.completed, counts.total, 20);
 
   sections.push(
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     paragraph(`**Progress:** ${progressBar} (${progress}%)`),
     table(
-      ["Status", "Count"],
+      ['Status', 'Count'],
       [
-        ["✅ Completed", String(counts.completed)],
-        ["🚧 Active", String(counts.active)],
-        ["📋 Planned", String(counts.planned)],
-        ["**Total**", String(counts.total)],
+        ['✅ Completed', String(counts.completed)],
+        ['🚧 Active', String(counts.active)],
+        ['📋 Planned', String(counts.planned)],
+        ['**Total**', String(counts.total)],
       ]
     ),
     separator()
   );
 
   // Patterns by status
-  const completed = patterns.filter((p) => normalizeStatus(p.status) === "completed");
-  const active = patterns.filter((p) => normalizeStatus(p.status) === "active");
-  const planned = patterns.filter((p) => normalizeStatus(p.status) === "planned");
+  const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
+  const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+  const planned = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
 
   if (active.length > 0) {
-    sections.push(heading(2, "🚧 Active Patterns"));
+    sections.push(heading(2, '🚧 Active Patterns'));
     sections.push(...buildPatternDetailList(active));
   }
 
   if (planned.length > 0) {
-    sections.push(heading(2, "📋 Planned Patterns"));
+    sections.push(heading(2, '📋 Planned Patterns'));
     sections.push(...buildPatternDetailList(planned));
   }
 
   if (completed.length > 0) {
-    sections.push(heading(2, "✅ Completed Patterns"));
+    sections.push(heading(2, '✅ Completed Patterns'));
     sections.push(...buildPatternDetailList(completed));
   }
 
   // Back link
-  sections.push(linkOut("← Back to Roadmap", "../ROADMAP.md"));
+  sections.push(linkOut('← Back to Roadmap', '../ROADMAP.md'));
 
   return document(displayName, sections, {
     purpose: `Detailed patterns for ${displayName}`,
@@ -572,22 +572,22 @@ function buildPatternDetailList(patterns: ExtractedPattern[]): SectionBlock[] {
     sections.push(heading(3, `${emoji} ${name}`));
 
     // Metadata table
-    const metaRows: string[][] = [["Status", normalizeStatus(pattern.status)]];
+    const metaRows: string[][] = [['Status', normalizeStatus(pattern.status)]];
 
     if (pattern.effort) {
-      metaRows.push(["Effort", pattern.effort]);
+      metaRows.push(['Effort', pattern.effort]);
     }
 
     if (pattern.quarter) {
-      metaRows.push(["Quarter", pattern.quarter]);
+      metaRows.push(['Quarter', pattern.quarter]);
     }
 
     const businessValue = formatBusinessValue(pattern.businessValue);
     if (businessValue) {
-      metaRows.push(["Business Value", businessValue]);
+      metaRows.push(['Business Value', businessValue]);
     }
 
-    sections.push(table(["Property", "Value"], metaRows));
+    sections.push(table(['Property', 'Value'], metaRows));
 
     // Description
     if (pattern.directive.description) {
@@ -597,18 +597,18 @@ function buildPatternDetailList(patterns: ExtractedPattern[]): SectionBlock[] {
     // Dependencies
     if (pattern.dependsOn && pattern.dependsOn.length > 0) {
       sections.push(
-        heading(4, "Dependencies"),
+        heading(4, 'Dependencies'),
         list(pattern.dependsOn.map((d) => `Depends on: ${d}`))
       );
     }
 
     if (pattern.enables && pattern.enables.length > 0) {
-      sections.push(heading(4, "Enables"), list(pattern.enables.map((e) => `Enables: ${e}`)));
+      sections.push(heading(4, 'Enables'), list(pattern.enables.map((e) => `Enables: ${e}`)));
     }
 
     // Use cases
     if (pattern.useCases && pattern.useCases.length > 0) {
-      sections.push(heading(4, "Use Cases"), list([...pattern.useCases]));
+      sections.push(heading(4, 'Use Cases'), list([...pattern.useCases]));
     }
 
     // Acceptance Criteria (scenarios with steps, DataTables, DocStrings)
@@ -648,12 +648,12 @@ function buildCompletedMilestonesDocument(
 
   if (completedPatterns.length === 0) {
     sections.push(
-      heading(2, "No Completed Milestones"),
-      paragraph("No patterns have been completed yet.")
+      heading(2, 'No Completed Milestones'),
+      paragraph('No patterns have been completed yet.')
     );
 
-    return document("Completed Milestones", sections, {
-      purpose: "Historical record of completed work",
+    return document('Completed Milestones', sections, {
+      purpose: 'Historical record of completed work',
     });
   }
 
@@ -680,17 +680,17 @@ function buildCompletedMilestonesDocument(
     detailLevel: string;
     additionalFiles?: Record<string, RenderableDocument>;
   } = {
-    purpose: "Historical record of completed work",
+    purpose: 'Historical record of completed work',
     detailLevel: options.generateDetailFiles
-      ? "Quarterly summaries with links to details"
-      : "Compact summary",
+      ? 'Quarterly summaries with links to details'
+      : 'Compact summary',
   };
 
   if (Object.keys(additionalFiles).length > 0) {
     docOpts.additionalFiles = additionalFiles;
   }
 
-  return document("Completed Milestones", sections, docOpts);
+  return document('Completed Milestones', sections, docOpts);
 }
 
 /**
@@ -705,13 +705,13 @@ function buildCompletedSummary(
   ).length;
 
   return [
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     table(
-      ["Metric", "Value"],
+      ['Metric', 'Value'],
       [
-        ["Completed Patterns", String(completedPatterns.length)],
-        ["Completed Phases", String(completedPhases)],
-        ["Total Phases", String(dataset.phaseCount)],
+        ['Completed Patterns', String(completedPatterns.length)],
+        ['Completed Phases', String(completedPhases)],
+        ['Total Phases', String(dataset.phaseCount)],
       ]
     ),
     separator(),
@@ -733,7 +733,7 @@ function buildCompletedPhases(dataset: MasterDataset): SectionBlock[] {
     return [];
   }
 
-  sections.push(heading(2, "Completed Phases"));
+  sections.push(heading(2, 'Completed Phases'));
 
   for (const phase of completedPhases.sort((a, b) => a.phaseNumber - b.phaseNumber)) {
     const displayName = phase.phaseName ?? `Phase ${phase.phaseNumber}`;
@@ -744,10 +744,10 @@ function buildCompletedPhases(dataset: MasterDataset): SectionBlock[] {
     const rows = phase.patterns.map((p) => {
       const name = getDisplayName(p);
       const summary = extractSummary(p.directive.description, p.patternName);
-      return [name, summary || "-"];
+      return [name, summary || '-'];
     });
 
-    phaseContent.push(table(["Pattern", "Description"], rows));
+    phaseContent.push(table(['Pattern', 'Description'], rows));
 
     sections.push(collapsible(`✅ ${displayName} (${phase.counts.total} patterns)`, phaseContent));
   }
@@ -774,14 +774,14 @@ function buildQuarterlyNavigationTable(
   // Group completed patterns by quarter
   const byQuarter = groupBy(
     completedPatterns.filter((p) => p.quarter),
-    (p) => p.quarter ?? ""
+    (p) => p.quarter ?? ''
   );
 
   if (byQuarter.size === 0) {
     return [];
   }
 
-  sections.push(heading(2, "Quarterly Navigation"));
+  sections.push(heading(2, 'Quarterly Navigation'));
 
   const quarters = [...byQuarter.keys()].sort().reverse(); // Most recent first
 
@@ -794,7 +794,7 @@ function buildQuarterlyNavigationTable(
     return [quarterCell, String(patterns.length)];
   });
 
-  sections.push(table(["Quarter", "Completed"], rows), separator());
+  sections.push(table(['Quarter', 'Completed'], rows), separator());
 
   return sections;
 }
@@ -812,12 +812,12 @@ function buildRecentCompletions(patterns: ExtractedPattern[], limit = 10): Secti
     return [];
   }
 
-  sections.push(heading(2, "Recent Completions"));
+  sections.push(heading(2, 'Recent Completions'));
 
   const items = recent.map((p) => {
     const name = getDisplayName(p);
-    const phase = p.phase !== undefined ? ` (Phase ${p.phase})` : "";
-    const quarter = p.quarter ? ` - ${p.quarter}` : "";
+    const phase = p.phase !== undefined ? ` (Phase ${p.phase})` : '';
+    const quarter = p.quarter ? ` - ${p.quarter}` : '';
     return `✅ ${name}${phase}${quarter}`;
   });
 
@@ -849,7 +849,7 @@ function buildQuarterlyMilestoneFiles(
   // Group completed patterns by quarter
   const byQuarter = groupBy(
     completedPatterns.filter((p) => p.quarter),
-    (p) => p.quarter ?? ""
+    (p) => p.quarter ?? ''
   );
 
   for (const [quarter, patterns] of byQuarter.entries()) {
@@ -873,12 +873,12 @@ function buildQuarterDetailDocument(
 
   // Summary
   sections.push(
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     table(
-      ["Metric", "Value"],
+      ['Metric', 'Value'],
       [
-        ["Completed in Quarter", String(patterns.length)],
-        ["Quarter", quarter],
+        ['Completed in Quarter', String(patterns.length)],
+        ['Quarter', quarter],
       ]
     ),
     separator()
@@ -889,7 +889,7 @@ function buildQuarterDetailDocument(
   const sortedPhases = [...byPhase.keys()].sort((a, b) => a - b);
 
   if (sortedPhases.length > 0) {
-    sections.push(heading(2, "By Phase"));
+    sections.push(heading(2, 'By Phase'));
 
     for (const phaseNum of sortedPhases) {
       const phasePatterns = byPhase.get(phaseNum) ?? [];
@@ -902,10 +902,10 @@ function buildQuarterDetailDocument(
         const name = getDisplayName(p);
         const summary = extractSummary(p.directive.description, p.patternName);
         const businessValue = formatBusinessValue(p.businessValue);
-        return [name, summary || "-", businessValue || "-"];
+        return [name, summary || '-', businessValue || '-'];
       });
 
-      phaseContent.push(table(["Pattern", "Description", "Business Value"], rows));
+      phaseContent.push(table(['Pattern', 'Description', 'Business Value'], rows));
 
       sections.push(collapsible(`✅ ${displayName} (${phasePatterns.length})`, phaseContent));
     }
@@ -914,19 +914,19 @@ function buildQuarterDetailDocument(
   }
 
   // All patterns in quarter
-  sections.push(heading(2, "All Patterns"));
+  sections.push(heading(2, 'All Patterns'));
 
   const rows = sortByPhaseAndName([...patterns]).map((p) => {
     const name = getDisplayName(p);
-    const phase = p.phase !== undefined ? `Phase ${p.phase}` : "-";
+    const phase = p.phase !== undefined ? `Phase ${p.phase}` : '-';
     const summary = extractSummary(p.directive.description, p.patternName);
-    return [`✅ ${name}`, phase, summary || "-"];
+    return [`✅ ${name}`, phase, summary || '-'];
   });
 
-  sections.push(table(["Pattern", "Phase", "Description"], rows), separator());
+  sections.push(table(['Pattern', 'Phase', 'Description'], rows), separator());
 
   // Back link
-  sections.push(linkOut("← Back to Completed Milestones", "../COMPLETED-MILESTONES.md"));
+  sections.push(linkOut('← Back to Completed Milestones', '../COMPLETED-MILESTONES.md'));
 
   return document(`${quarter} Milestones`, sections, {
     purpose: `Completed patterns for ${quarter}`,
@@ -956,12 +956,12 @@ function buildCurrentWorkDocument(
 
   if (activePatterns.length === 0) {
     sections.push(
-      heading(2, "No Active Work"),
-      paragraph("No patterns are currently in progress.")
+      heading(2, 'No Active Work'),
+      paragraph('No patterns are currently in progress.')
     );
 
-    return document("Current Work", sections, {
-      purpose: "Active development work currently in progress",
+    return document('Current Work', sections, {
+      purpose: 'Active development work currently in progress',
     });
   }
 
@@ -984,17 +984,17 @@ function buildCurrentWorkDocument(
     detailLevel: string;
     additionalFiles?: Record<string, RenderableDocument>;
   } = {
-    purpose: "Active development work currently in progress",
+    purpose: 'Active development work currently in progress',
     detailLevel: options.generateDetailFiles
-      ? "Phase summaries with links to details"
-      : "Compact summary",
+      ? 'Phase summaries with links to details'
+      : 'Compact summary',
   };
 
   if (Object.keys(additionalFiles).length > 0) {
     docOpts.additionalFiles = additionalFiles;
   }
 
-  return document("Current Work", sections, docOpts);
+  return document('Current Work', sections, docOpts);
 }
 
 /**
@@ -1013,16 +1013,16 @@ function buildCurrentWorkSummary(
   const progressBar = renderProgressBar(counts.completed, counts.total, 20);
 
   return [
-    heading(2, "Summary"),
+    heading(2, 'Summary'),
     paragraph(`**Overall Progress:** ${progressBar} (${progress}%)`),
     table(
-      ["Metric", "Value"],
+      ['Metric', 'Value'],
       [
-        ["Total Patterns", String(counts.total)],
-        ["Completed", String(counts.completed)],
-        ["Active", String(counts.active)],
-        ["Planned", String(counts.planned)],
-        ["Active Phases", String(activePhasesCount)],
+        ['Total Patterns', String(counts.total)],
+        ['Completed', String(counts.completed)],
+        ['Active', String(counts.active)],
+        ['Planned', String(counts.planned)],
+        ['Active Phases', String(activePhasesCount)],
       ]
     ),
     separator(),
@@ -1047,14 +1047,14 @@ function buildActivePhases(
     return [];
   }
 
-  sections.push(heading(2, "Active Phases"));
+  sections.push(heading(2, 'Active Phases'));
 
   for (const phase of activePhasesData) {
     const { phaseNumber, phaseName, patterns, counts } = phase;
     const displayName = phaseName ?? `Phase ${phaseNumber}`;
 
     // Only show active patterns in this phase
-    const activeInPhase = patterns.filter((p) => normalizeStatus(p.status) === "active");
+    const activeInPhase = patterns.filter((p) => normalizeStatus(p.status) === 'active');
     const progress = completionPercentage(counts);
     const progressBar = renderProgressBar(counts.completed, counts.total, 15);
 
@@ -1062,17 +1062,17 @@ function buildActivePhases(
     // Build status breakdown with all non-zero categories
     const statusParts = [`${counts.completed} done`, `${activeInPhase.length} active`];
     if (counts.planned > 0) statusParts.push(`${counts.planned} planned`);
-    const statusText = statusParts.join(", ");
+    const statusText = statusParts.join(', ');
     sections.push(paragraph(`${progressBar} ${progress}% complete (${statusText})`));
 
     // Pattern table for active patterns in this phase
     const rows = sortByPhaseAndName([...activeInPhase]).map((p) => {
       const name = getDisplayName(p);
       const summary = extractSummary(p.directive.description, p.patternName);
-      return [`🚧 ${name}`, summary || "-"];
+      return [`🚧 ${name}`, summary || '-'];
     });
 
-    sections.push(table(["Pattern", "Description"], rows));
+    sections.push(table(['Pattern', 'Description'], rows));
 
     // Deliverables for active patterns (if configured)
     if (options.includeDeliverables) {
@@ -1080,10 +1080,10 @@ function buildActivePhases(
       if (allDeliverables.length > 0) {
         const deliverableItems = allDeliverables.map((d) => {
           const statusEmoji =
-            d.status === "complete" ? "✅" : d.status === "in-progress" ? "🚧" : "📋";
+            d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
           return `${statusEmoji} ${d.name}`;
         });
-        sections.push(heading(4, "Deliverables"), list(deliverableItems));
+        sections.push(heading(4, 'Deliverables'), list(deliverableItems));
       }
     }
 
@@ -1110,15 +1110,15 @@ function buildActivePatternsList(
 
   const rows = sorted.map((p) => {
     const name = getDisplayName(p);
-    const phase = p.phase !== undefined ? `Phase ${p.phase}` : "-";
-    const effort = p.effort ?? "-";
+    const phase = p.phase !== undefined ? `Phase ${p.phase}` : '-';
+    const effort = p.effort ?? '-';
     const summary = extractSummary(p.directive.description, p.patternName);
-    return [`🚧 ${name}`, phase, effort, summary || "-"];
+    return [`🚧 ${name}`, phase, effort, summary || '-'];
   });
 
   return [
-    heading(2, "All Active Patterns"),
-    table(["Pattern", "Phase", "Effort", "Description"], rows),
+    heading(2, 'All Active Patterns'),
+    table(['Pattern', 'Phase', 'Effort', 'Description'], rows),
     separator(),
   ];
 }
@@ -1162,25 +1162,25 @@ function buildCurrentPhaseDetailDocument(
   const progressBar = renderProgressBar(counts.completed, counts.total, 20);
 
   sections.push(
-    heading(2, "Progress"),
+    heading(2, 'Progress'),
     paragraph(`**Progress:** ${progressBar} (${progress}%)`),
     table(
-      ["Status", "Count"],
+      ['Status', 'Count'],
       [
-        ["✅ Completed", String(counts.completed)],
-        ["🚧 Active", String(counts.active)],
-        ["📋 Planned", String(counts.planned)],
-        ["**Total**", String(counts.total)],
+        ['✅ Completed', String(counts.completed)],
+        ['🚧 Active', String(counts.active)],
+        ['📋 Planned', String(counts.planned)],
+        ['**Total**', String(counts.total)],
       ]
     ),
     separator()
   );
 
   // Active patterns detail
-  const activePatterns = patterns.filter((p) => normalizeStatus(p.status) === "active");
+  const activePatterns = patterns.filter((p) => normalizeStatus(p.status) === 'active');
 
   if (activePatterns.length > 0) {
-    sections.push(heading(2, "🚧 Active Work"));
+    sections.push(heading(2, '🚧 Active Work'));
 
     for (const pattern of sortByPhaseAndName([...activePatterns])) {
       sections.push(...buildCurrentWorkPatternDetail(pattern, options));
@@ -1188,37 +1188,37 @@ function buildCurrentPhaseDetailDocument(
   }
 
   // Recently completed in this phase
-  const completedPatterns = patterns.filter((p) => normalizeStatus(p.status) === "completed");
+  const completedPatterns = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
   if (completedPatterns.length > 0) {
-    sections.push(heading(2, "✅ Recently Completed"));
+    sections.push(heading(2, '✅ Recently Completed'));
 
     const rows = sortByPhaseAndName([...completedPatterns]).map((p) => {
       const name = getDisplayName(p);
       const summary = extractSummary(p.directive.description, p.patternName);
-      return [`✅ ${name}`, summary || "-"];
+      return [`✅ ${name}`, summary || '-'];
     });
 
-    sections.push(table(["Pattern", "Description"], rows));
+    sections.push(table(['Pattern', 'Description'], rows));
     sections.push(separator());
   }
 
   // Upcoming in this phase
-  const plannedPatterns = patterns.filter((p) => normalizeStatus(p.status) === "planned");
+  const plannedPatterns = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
   if (plannedPatterns.length > 0) {
     const plannedContent: SectionBlock[] = [];
     const rows = sortByPhaseAndName([...plannedPatterns]).map((p) => {
       const name = getDisplayName(p);
-      const effort = p.effort ?? "-";
+      const effort = p.effort ?? '-';
       return [`📋 ${name}`, effort];
     });
-    plannedContent.push(table(["Pattern", "Effort"], rows));
+    plannedContent.push(table(['Pattern', 'Effort'], rows));
 
     sections.push(collapsible(`📋 Upcoming (${plannedPatterns.length})`, plannedContent));
     sections.push(separator());
   }
 
   // Back link
-  sections.push(linkOut("← Back to Current Work", "../CURRENT-WORK.md"));
+  sections.push(linkOut('← Back to Current Work', '../CURRENT-WORK.md'));
 
   return document(displayName, sections, {
     purpose: `Active work details for ${displayName}`,
@@ -1241,20 +1241,20 @@ function buildCurrentWorkPatternDetail(
   const metaRows: string[][] = [];
 
   if (pattern.effort) {
-    metaRows.push(["Effort", pattern.effort]);
+    metaRows.push(['Effort', pattern.effort]);
   }
 
   if (pattern.quarter) {
-    metaRows.push(["Quarter", pattern.quarter]);
+    metaRows.push(['Quarter', pattern.quarter]);
   }
 
   const businessValue = formatBusinessValue(pattern.businessValue);
   if (businessValue) {
-    metaRows.push(["Business Value", businessValue]);
+    metaRows.push(['Business Value', businessValue]);
   }
 
   if (metaRows.length > 0) {
-    sections.push(table(["Property", "Value"], metaRows));
+    sections.push(table(['Property', 'Value'], metaRows));
   }
 
   // Description
@@ -1265,25 +1265,25 @@ function buildCurrentWorkPatternDetail(
   // Deliverables (if configured)
   if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
     const deliverableItems = pattern.deliverables.map((d) => {
-      const statusEmoji = d.status === "complete" ? "✅" : d.status === "in-progress" ? "🚧" : "📋";
-      const statusText = d.status ? ` (${d.status})` : "";
+      const statusEmoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+      const statusText = d.status ? ` (${d.status})` : '';
       return `${statusEmoji} ${d.name}${statusText}`;
     });
 
-    sections.push(heading(4, "Deliverables"), list(deliverableItems));
+    sections.push(heading(4, 'Deliverables'), list(deliverableItems));
   }
 
   // Dependencies
   if (pattern.dependsOn && pattern.dependsOn.length > 0) {
     sections.push(
-      heading(4, "Dependencies"),
+      heading(4, 'Dependencies'),
       list(pattern.dependsOn.map((d) => `Depends on: ${d}`))
     );
   }
 
   // Use cases
   if (pattern.useCases && pattern.useCases.length > 0) {
-    sections.push(heading(4, "Use Cases"), list([...pattern.useCases]));
+    sections.push(heading(4, 'Use Cases'), list([...pattern.useCases]));
   }
 
   // Acceptance Criteria (scenarios with steps, DataTables, DocStrings)

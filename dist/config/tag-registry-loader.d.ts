@@ -17,7 +17,7 @@
  * - Use when validating custom tag registry files
  * - Use when auto-discovering tag-registry.json in standard locations
  */
-import { type TagRegistry } from "../validation-schemas/tag-registry.js";
+import { type TagRegistry } from '../validation-schemas/tag-registry.js';
 /**
  * Tag registry load error
  *
@@ -26,7 +26,7 @@ import { type TagRegistry } from "../validation-schemas/tag-registry.js";
  */
 export interface TagRegistryLoadError {
     /** Error type identifier */
-    type: "tag-registry-load-error";
+    type: 'tag-registry-load-error';
     /** Path to the registry file that failed to load */
     path: string;
     /** Human-readable error message */

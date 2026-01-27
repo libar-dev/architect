@@ -10,12 +10,12 @@
  * - unknown: Cannot determine layer from path
  */
 export const LAYER_TYPES = [
-  "timeline",
-  "domain",
-  "integration",
-  "e2e",
-  "component",
-  "unknown",
+  'timeline',
+  'domain',
+  'integration',
+  'e2e',
+  'component',
+  'unknown',
 ] as const;
 
 export type LayerType = (typeof LAYER_TYPES)[number];

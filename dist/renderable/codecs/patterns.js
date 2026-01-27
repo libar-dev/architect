@@ -22,13 +22,13 @@
  * const doc = PatternsDocumentCodec.decode(dataset);
  * ```
  */
-import { z } from "zod";
-import { MasterDatasetSchema, } from "../../validation-schemas/master-dataset.js";
-import { heading, paragraph, separator, table, list, mermaid, linkOut, document, } from "../schema.js";
-import { normalizeStatus } from "../../taxonomy/index.js";
-import { getStatusEmoji, getDisplayName, formatCategoryName, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, sortByStatusAndName, stripLeadingHeaders, } from "../utils.js";
-import { toKebabCase } from "../../utils/index.js";
-import { DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
+import { heading, paragraph, separator, table, list, mermaid, linkOut, document, } from '../schema.js';
+import { normalizeStatus } from '../../taxonomy/index.js';
+import { getStatusEmoji, getDisplayName, formatCategoryName, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, sortByStatusAndName, stripLeadingHeaders, } from '../utils.js';
+import { toKebabCase } from '../../utils/index.js';
+import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers
 // ═══════════════════════════════════════════════════════════════════════════
@@ -37,7 +37,7 @@ import { DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
  * These prefixes appear when the baseDir used for extraction is a parent
  * directory of the actual repo root.
  */
-const REPO_PREFIXES = ["libar-platform/", "monorepo/"];
+const REPO_PREFIXES = ['libar-platform/', 'monorepo/'];
 /**
  * Normalize implementation file path by stripping repository prefixes.
  *
@@ -74,8 +74,8 @@ export const DEFAULT_PATTERNS_OPTIONS = {
     includeUseCases: true,
     filterCategories: [],
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
-import { renderAcceptanceCriteria, renderBusinessRulesSection } from "./helpers.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import { renderAcceptanceCriteria, renderBusinessRulesSection } from './helpers.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Patterns Document Codec
 // ═══════════════════════════════════════════════════════════════════════════
@@ -102,7 +102,7 @@ export function createPatternsCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("PatternsDocumentCodec is decode-only. See zod-codecs.md");
+            throw new Error('PatternsDocumentCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -148,13 +148,13 @@ function buildPatternsDocument(dataset, options) {
         ? buildIndividualPatternFiles(filteredDataset)
         : {};
     const docOpts = {
-        purpose: "Quick reference for discovering and implementing patterns",
-        detailLevel: options.generateDetailFiles ? "Overview with links to details" : "Compact summary",
+        purpose: 'Quick reference for discovering and implementing patterns',
+        detailLevel: options.generateDetailFiles ? 'Overview with links to details' : 'Compact summary',
     };
     if (Object.keys(additionalFiles).length > 0) {
         docOpts.additionalFiles = additionalFiles;
     }
-    return document("Pattern Registry", sections, docOpts);
+    return document('Pattern Registry', sections, docOpts);
 }
 /**
  * Apply filters to dataset based on options
@@ -192,13 +192,13 @@ function buildProgressSummary(dataset) {
     const progress = completionPercentage(counts);
     const progressBar = renderProgressBar(counts.completed, counts.total, 20);
     return [
-        heading(2, "Progress"),
+        heading(2, 'Progress'),
         paragraph(`**Overall:** ${progressBar} (${progress}% complete)`),
-        table(["Status", "Count"], [
-            ["✅ Completed", String(counts.completed)],
-            ["🚧 Active", String(counts.active)],
-            ["📋 Planned", String(counts.planned)],
-            ["**Total**", String(counts.total)],
+        table(['Status', 'Count'], [
+            ['✅ Completed', String(counts.completed)],
+            ['🚧 Active', String(counts.active)],
+            ['📋 Planned', String(counts.planned)],
+            ['**Total**', String(counts.total)],
         ]),
         separator(),
     ];
@@ -219,7 +219,7 @@ function buildQuickNavigation(dataset) {
         const displayName = formatCategoryName(cat);
         return `[${displayName}](#${cat}) (${count})`;
     });
-    return [heading(2, "Categories"), list(items), separator()];
+    return [heading(2, 'Categories'), list(items), separator()];
 }
 /**
  * Build pattern table section
@@ -232,11 +232,11 @@ function buildPatternTable(dataset) {
         const displayName = getDisplayName(p);
         const category = formatCategoryName(p.category);
         const summary = extractSummary(p.directive.description, p.patternName);
-        return [`${emoji} ${displayName}`, category, status, summary || "-"];
+        return [`${emoji} ${displayName}`, category, status, summary || '-'];
     });
     return [
-        heading(2, "All Patterns"),
-        table(["Pattern", "Category", "Status", "Description"], rows),
+        heading(2, 'All Patterns'),
+        table(['Pattern', 'Category', 'Status', 'Description'], rows),
         separator(),
     ];
 }
@@ -283,7 +283,7 @@ function buildDependencyGraph(dataset) {
         return [];
     }
     // Build mermaid graph
-    const lines = ["graph TD"];
+    const lines = ['graph TD'];
     for (const name of patternNames) {
         const rel = relationships[name];
         if (!rel)
@@ -312,9 +312,9 @@ function buildDependencyGraph(dataset) {
         return [];
     }
     return [
-        heading(2, "Dependencies"),
-        paragraph("Pattern relationships and dependencies:"),
-        mermaid(lines.join("\n")),
+        heading(2, 'Dependencies'),
+        paragraph('Pattern relationships and dependencies:'),
+        mermaid(lines.join('\n')),
         separator(),
     ];
 }
@@ -322,7 +322,7 @@ function buildDependencyGraph(dataset) {
  * Sanitize pattern name for mermaid node ID
  */
 function sanitizeNodeId(name) {
-    return name.replace(/[^a-zA-Z0-9]/g, "_");
+    return name.replace(/[^a-zA-Z0-9]/g, '_');
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Individual Pattern Detail Files
@@ -367,33 +367,33 @@ function buildSinglePatternDocument(pattern, dataset) {
     const status = normalizeStatus(pattern.status);
     // Metadata table
     const metaRows = [
-        ["Status", status],
-        ["Category", formatCategoryName(pattern.category)],
+        ['Status', status],
+        ['Category', formatCategoryName(pattern.category)],
     ];
     if (pattern.phase !== undefined) {
-        metaRows.push(["Phase", String(pattern.phase)]);
+        metaRows.push(['Phase', String(pattern.phase)]);
     }
     if (pattern.quarter) {
-        metaRows.push(["Quarter", pattern.quarter]);
+        metaRows.push(['Quarter', pattern.quarter]);
     }
-    sections.push(heading(2, "Overview"), table(["Property", "Value"], metaRows));
+    sections.push(heading(2, 'Overview'), table(['Property', 'Value'], metaRows));
     // Description
     // Description - strip leading headers to avoid duplicate headings when
     // directive descriptions start with markdown headers like "## Topic"
     if (pattern.directive.description) {
         const cleanDescription = stripLeadingHeaders(pattern.directive.description);
         if (cleanDescription) {
-            sections.push(heading(2, "Description"), paragraph(cleanDescription));
+            sections.push(heading(2, 'Description'), paragraph(cleanDescription));
         }
     }
     // Use cases
     if (pattern.useCases && pattern.useCases.length > 0) {
-        sections.push(heading(2, "Use Cases"), list([...pattern.useCases]));
+        sections.push(heading(2, 'Use Cases'), list([...pattern.useCases]));
     }
     // Dependencies
     if ((pattern.dependsOn && pattern.dependsOn.length > 0) ||
         (pattern.enables && pattern.enables.length > 0)) {
-        sections.push(heading(2, "Dependencies"));
+        sections.push(heading(2, 'Dependencies'));
         if (pattern.dependsOn && pattern.dependsOn.length > 0) {
             sections.push(list(pattern.dependsOn.map((d) => `Depends on: ${d}`)));
         }
@@ -405,10 +405,10 @@ function buildSinglePatternDocument(pattern, dataset) {
     const patternKey = pattern.patternName ?? pattern.name;
     const rel = dataset.relationshipIndex?.[patternKey];
     if (rel?.implementedBy && rel.implementedBy.length > 0) {
-        sections.push(heading(2, "Implementations"));
-        sections.push(paragraph("Files that implement this pattern:"), list(rel.implementedBy.map((impl) => {
+        sections.push(heading(2, 'Implementations'));
+        sections.push(paragraph('Files that implement this pattern:'), list(rel.implementedBy.map((impl) => {
             // Extract file name from path for display (e.g., "outbox.ts" from "packages/.../outbox.ts")
-            const fileName = impl.file.split("/").pop() ?? impl.file;
+            const fileName = impl.file.split('/').pop() ?? impl.file;
             // Normalize path to strip repo prefixes (e.g., "libar-platform/packages/..." -> "packages/...")
             const normalizedPath = normalizeImplPath(impl.file);
             // ListItem accepts plain strings - build inline markdown link
@@ -419,8 +419,8 @@ function buildSinglePatternDocument(pattern, dataset) {
     }
     // Extensions (patterns that extend this pattern via @libar-docs-extends)
     if (rel?.extendedBy && rel.extendedBy.length > 0) {
-        sections.push(heading(2, "Extensions"));
-        sections.push(paragraph("Patterns that extend this one:"), list(rel.extendedBy.map((ext) => linkOut(`patterns/${patternToSlug(ext)}.md`, ext))));
+        sections.push(heading(2, 'Extensions'));
+        sections.push(paragraph('Patterns that extend this one:'), list(rel.extendedBy.map((ext) => linkOut(`patterns/${patternToSlug(ext)}.md`, ext))));
     }
     // Acceptance Criteria (scenarios with steps, DataTables, DocStrings)
     // Use H2 to match other top-level sections in detail documents
@@ -429,7 +429,7 @@ function buildSinglePatternDocument(pattern, dataset) {
     // Use H2 to match other top-level sections in detail documents
     sections.push(...renderBusinessRulesSection(pattern.rules, { baseHeadingLevel: 2 }));
     // Back link
-    sections.push(separator(), linkOut("← Back to Pattern Registry", "../PATTERNS.md"));
+    sections.push(separator(), linkOut('← Back to Pattern Registry', '../PATTERNS.md'));
     return document(`${emoji} ${displayName}`, sections, {
         purpose: `Detailed documentation for the ${displayName} pattern`,
     });

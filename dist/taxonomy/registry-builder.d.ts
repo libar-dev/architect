@@ -1,4 +1,4 @@
-import { type FormatType } from "./format-types.js";
+import { type FormatType } from './format-types.js';
 /**
  * TagRegistry interface (matches schema from validation-schemas/tag-registry.ts)
  */

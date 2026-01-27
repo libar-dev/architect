@@ -24,7 +24,7 @@
  * @returns Escaped string safe for regex
  */
 function escapeRegex(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 /**
  * Creates type-safe regex builders for a given tag prefix configuration.
@@ -55,9 +55,9 @@ export function createRegexBuilders(tagPrefix, fileOptInTag) {
     // This ensures @docs is not confused with @docs-pattern
     const fileOptInPattern = new RegExp(`\\/\\*\\*[\\s\\S]*?${escapedOptIn}(?!-)[\\s\\S]*?\\*\\/`);
     // Match directives: @docs-pattern, @docs-status, etc.
-    const directivePattern = new RegExp(`${escapedPrefix}[\\w-]+`, "g");
+    const directivePattern = new RegExp(`${escapedPrefix}[\\w-]+`, 'g');
     // For normalizing tags - remove @ and prefix
-    const prefixWithoutAt = tagPrefix.startsWith("@") ? tagPrefix.substring(1) : tagPrefix;
+    const prefixWithoutAt = tagPrefix.startsWith('@') ? tagPrefix.substring(1) : tagPrefix;
     return {
         fileOptInPattern,
         directivePattern,
@@ -70,7 +70,7 @@ export function createRegexBuilders(tagPrefix, fileOptInTag) {
             return directivePattern.test(content);
         },
         normalizeTag(tag) {
-            let normalized = tag.startsWith("@") ? tag.substring(1) : tag;
+            let normalized = tag.startsWith('@') ? tag.substring(1) : tag;
             if (normalized.startsWith(prefixWithoutAt)) {
                 normalized = normalized.substring(prefixWithoutAt.length);
             }

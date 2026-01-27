@@ -28,33 +28,33 @@
  * - **Result Monad**: Returns detailed errors for partial failures
  */
 
-import * as path from "path";
-import * as fs from "fs/promises";
-import type { TagRegistry, ExtractedPattern } from "../validation-schemas/index.js";
+import * as path from 'path';
+import * as fs from 'fs/promises';
+import type { TagRegistry, ExtractedPattern } from '../validation-schemas/index.js';
 import {
   createJsonOutputCodec,
   RegistryMetadataOutputSchema,
-} from "../validation-schemas/index.js";
-import { loadConfig, formatConfigError } from "../config/config-loader.js";
-import { scanPatterns } from "../scanner/index.js";
-import { extractPatterns } from "../extractor/doc-extractor.js";
-import { scanGherkinFiles } from "../scanner/gherkin-scanner.js";
+} from '../validation-schemas/index.js';
+import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { scanPatterns } from '../scanner/index.js';
+import { extractPatterns } from '../extractor/doc-extractor.js';
+import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
 import {
   extractPatternsFromGherkin,
   computeHierarchyChildren,
-} from "../extractor/gherkin-extractor.js";
-import { generatorRegistry } from "./registry.js";
-import type { GeneratorContext } from "./types.js";
-import type { Result } from "../types/index.js";
-import { Result as R } from "../types/index.js";
+} from '../extractor/gherkin-extractor.js';
+import { generatorRegistry } from './registry.js';
+import type { GeneratorContext } from './types.js';
+import type { Result } from '../types/index.js';
+import { Result as R } from '../types/index.js';
 import {
   loadDefaultWorkflow,
   loadWorkflowFromPath,
   type LoadedWorkflow,
-} from "../config/workflow-loader.js";
-import { transformToMasterDataset } from "./pipeline/index.js";
-import { detectBranchChanges, getAllChangedFiles } from "../lint/process-guard/detect-changes.js";
-import type { CodecOptions } from "../renderable/generate.js";
+} from '../config/workflow-loader.js';
+import { transformToMasterDataset } from './pipeline/index.js';
+import { detectBranchChanges, getAllChangedFiles } from '../lint/process-guard/detect-changes.js';
+import type { CodecOptions } from '../renderable/generate.js';
 
 /**
  * Codec for serializing registry metadata to JSON
@@ -164,7 +164,7 @@ export interface GeneratedFile {
  * Generation error
  */
 export interface GenerationError {
-  type: "scan" | "extraction" | "generator" | "file-write";
+  type: 'scan' | 'extraction' | 'generator' | 'file-write';
   message: string;
   generator?: string;
   filePath?: string;
@@ -184,7 +184,7 @@ export interface WarningDetail {
  * Generation warning
  */
 export interface GenerationWarning {
-  type: "scan" | "extraction" | "overwrite-skipped" | "config" | "cleanup";
+  type: 'scan' | 'extraction' | 'overwrite-skipped' | 'config' | 'cleanup';
   message: string;
   count?: number;
   filePath?: string;
@@ -250,7 +250,7 @@ export async function generateDocumentation(
   );
 
   if (!scanResult.ok) {
-    return R.err("Failed to scan source files");
+    return R.err('Failed to scan source files');
   }
 
   const { files: scannedFiles, errors: scanErrors, skippedDirectives } = scanResult.value;
@@ -258,7 +258,7 @@ export async function generateDocumentation(
   // Record scan warnings
   if (scanErrors.length > 0) {
     warnings.push({
-      type: "scan",
+      type: 'scan',
       message: `Failed to scan ${scanErrors.length} files (syntax errors)`,
       count: scanErrors.length,
     });
@@ -266,7 +266,7 @@ export async function generateDocumentation(
 
   if (skippedDirectives.length > 0) {
     warnings.push({
-      type: "scan",
+      type: 'scan',
       message: `Skipped ${skippedDirectives.length} invalid directives`,
       count: skippedDirectives.length,
     });
@@ -277,7 +277,7 @@ export async function generateDocumentation(
 
   if (extraction.errors.length > 0) {
     warnings.push({
-      type: "extraction",
+      type: 'extraction',
       message: `${extraction.errors.length} TypeScript patterns had errors`,
       count: extraction.errors.length,
     });
@@ -298,8 +298,8 @@ export async function generateDocumentation(
 
       if (gherkinErrors.length > 0) {
         warnings.push({
-          type: "scan",
-          message: `Failed to parse ${gherkinErrors.length} feature file${gherkinErrors.length === 1 ? "" : "s"}`,
+          type: 'scan',
+          message: `Failed to parse ${gherkinErrors.length} feature file${gherkinErrors.length === 1 ? '' : 's'}`,
           count: gherkinErrors.length,
           details: gherkinErrors.map((e) => ({
             file: e.file,
@@ -326,10 +326,10 @@ export async function generateDocumentation(
           // Include validation error details if available
           const details =
             error.validationErrors && error.validationErrors.length > 0
-              ? ` [${error.validationErrors.join("; ")}]`
-              : "";
+              ? ` [${error.validationErrors.join('; ')}]`
+              : '';
           warnings.push({
-            type: "extraction",
+            type: 'extraction',
             message: `${error.file}: ${error.patternName} - ${error.reason}${details}`,
           });
         }
@@ -365,7 +365,7 @@ export async function generateDocumentation(
     } catch (error) {
       // Default workflow load failure is not fatal - continue without workflow
       warnings.push({
-        type: "config",
+        type: 'config',
         message: `Could not load default workflow: ${error instanceof Error ? error.message : String(error)}`,
       });
     }
@@ -383,7 +383,7 @@ export async function generateDocumentation(
   // Step 9: Build codec options for PR-scoped generators
   // Only compute if PR Changes generator is requested
   let codecOptions: CodecOptions | undefined;
-  if (options.generators.some((g) => g.trim() === "pr-changes")) {
+  if (options.generators.some((g) => g.trim() === 'pr-changes')) {
     // Use explicit changedFiles if provided, otherwise detect from git
     let changedFiles = options.changedFiles;
 
@@ -393,28 +393,28 @@ export async function generateDocumentation(
         // Filter for relevant file types (source, tests, specs, features)
         changedFiles = getAllChangedFiles(detectionResult.value).filter(
           (f) =>
-            f.endsWith(".ts") ||
-            f.endsWith(".tsx") ||
-            f.endsWith(".feature") ||
-            f.endsWith(".feature.md")
+            f.endsWith('.ts') ||
+            f.endsWith('.tsx') ||
+            f.endsWith('.feature') ||
+            f.endsWith('.feature.md')
         );
       } else {
         warnings.push({
-          type: "config",
+          type: 'config',
           message: `Git diff detection failed: ${detectionResult.error.message}. PR Changes will show all patterns.`,
         });
       }
     }
 
     codecOptions = {
-      "pr-changes": {
+      'pr-changes': {
         changedFiles: changedFiles ?? [],
-        releaseFilter: options.releaseFilter ?? "",
+        releaseFilter: options.releaseFilter ?? '',
         includeDeliverables: true,
         includeReviewChecklist: true,
         includeDependencies: true,
         includeBusinessValue: true,
-        sortBy: "phase",
+        sortBy: 'phase',
       },
     };
   }
@@ -427,8 +427,8 @@ export async function generateDocumentation(
     const generator = generatorRegistry.get(trimmedName);
     if (!generator) {
       errors.push({
-        type: "generator",
-        message: `Unknown generator: "${trimmedName}". Available: ${generatorRegistry.available().join(", ")}`,
+        type: 'generator',
+        message: `Unknown generator: "${trimmedName}". Available: ${generatorRegistry.available().join(', ')}`,
         generator: trimmedName,
       });
       continue; // Skip this generator, try others
@@ -450,7 +450,7 @@ export async function generateDocumentation(
       output = await generator.generate(allPatterns, context);
     } catch (error) {
       errors.push({
-        type: "generator",
+        type: 'generator',
         message: `Generator "${trimmedName}" failed: ${error instanceof Error ? error.message : String(error)}`,
         generator: trimmedName,
       });
@@ -482,7 +482,7 @@ export async function generateDocumentation(
         });
 
         warnings.push({
-          type: "overwrite-skipped",
+          type: 'overwrite-skipped',
           message: `Skipped ${file.path} (exists, use overwrite: true to replace)`,
           filePath: file.path,
         });
@@ -492,7 +492,7 @@ export async function generateDocumentation(
       // Write file
       try {
         await fs.mkdir(dir, { recursive: true });
-        await fs.writeFile(fullPath, file.content, "utf-8");
+        await fs.writeFile(fullPath, file.content, 'utf-8');
 
         generatedFiles.push({
           path: file.path,
@@ -503,7 +503,7 @@ export async function generateDocumentation(
         });
       } catch (error) {
         errors.push({
-          type: "file-write",
+          type: 'file-write',
           message: `Failed to write ${file.path}: ${error instanceof Error ? error.message : String(error)}`,
           filePath: file.path,
           generator: trimmedName,
@@ -513,24 +513,24 @@ export async function generateDocumentation(
 
     // Write metadata (registry.json) if provided
     if (output.metadata) {
-      const metadataPath = path.join(options.outputDir, "registry.json");
+      const metadataPath = path.join(options.outputDir, 'registry.json');
 
       // Serialize using codec for type-safe validation
-      const serializeResult = RegistryMetadataCodec.serialize(output.metadata, "registry.json");
+      const serializeResult = RegistryMetadataCodec.serialize(output.metadata, 'registry.json');
 
       if (!serializeResult.ok) {
         errors.push({
-          type: "file-write",
+          type: 'file-write',
           message: `Failed to serialize registry.json: ${serializeResult.error.message}`,
-          filePath: "registry.json",
+          filePath: 'registry.json',
           generator: trimmedName,
         });
       } else {
         try {
-          await fs.writeFile(metadataPath, serializeResult.value, "utf-8");
+          await fs.writeFile(metadataPath, serializeResult.value, 'utf-8');
 
           generatedFiles.push({
-            path: "registry.json",
+            path: 'registry.json',
             fullPath: metadataPath,
             content: serializeResult.value,
             generator: trimmedName,
@@ -538,9 +538,9 @@ export async function generateDocumentation(
           });
         } catch (error) {
           errors.push({
-            type: "file-write",
+            type: 'file-write',
             message: `Failed to write registry.json: ${error instanceof Error ? error.message : String(error)}`,
-            filePath: "registry.json",
+            filePath: 'registry.json',
             generator: trimmedName,
           });
         }
@@ -555,15 +555,15 @@ export async function generateDocumentation(
           await fs.unlink(fullPath);
           // Track deletion as a warning for visibility
           warnings.push({
-            type: "cleanup",
+            type: 'cleanup',
             message: `Cleaned up orphaned file: ${fileToDelete}`,
             filePath: fileToDelete,
           });
         } catch (unlinkError) {
           // ENOENT is not an error - file was already deleted
-          if ((unlinkError as NodeJS.ErrnoException).code !== "ENOENT") {
+          if ((unlinkError as NodeJS.ErrnoException).code !== 'ENOENT') {
             warnings.push({
-              type: "cleanup",
+              type: 'cleanup',
               message: `Failed to clean up ${fileToDelete}: ${unlinkError instanceof Error ? unlinkError.message : String(unlinkError)}`,
               filePath: fileToDelete,
             });
@@ -583,17 +583,17 @@ export async function generateDocumentation(
   );
 
   // If any session files were written, clean up orphaned ones
-  if (writtenSessionFiles.size > 0 || options.generators.some((g) => g.includes("session"))) {
+  if (writtenSessionFiles.size > 0 || options.generators.some((g) => g.includes('session'))) {
     const cleanupResult = await cleanupOrphanedSessionFiles(
       options.outputDir,
-      "sessions/",
+      'sessions/',
       writtenSessionFiles
     );
 
     // Add cleanup results to warnings for visibility
     for (const deletedFile of cleanupResult.deleted) {
       warnings.push({
-        type: "scan",
+        type: 'scan',
         message: `Cleaned up orphaned session file: ${deletedFile}`,
         filePath: deletedFile,
       });
@@ -601,7 +601,7 @@ export async function generateDocumentation(
 
     for (const cleanupError of cleanupResult.errors) {
       warnings.push({
-        type: "scan",
+        type: 'scan',
         message: `Session cleanup warning: ${cleanupError}`,
       });
     }
@@ -642,7 +642,7 @@ function mergePatterns(
 
   if (conflicts.length > 0) {
     return R.err(
-      `Pattern conflicts detected: ${conflicts.join(", ")}. ` +
+      `Pattern conflicts detected: ${conflicts.join(', ')}. ` +
         `These patterns are defined in both TypeScript and Gherkin sources. ` +
         `Each pattern should only be defined in one source.`
     );
@@ -720,7 +720,7 @@ export async function cleanupOrphanedSessionFiles(
     }
   } catch (readdirError) {
     // Directory doesn't exist - nothing to clean (not an error)
-    if ((readdirError as NodeJS.ErrnoException).code !== "ENOENT") {
+    if ((readdirError as NodeJS.ErrnoException).code !== 'ENOENT') {
       errors.push(
         `Failed to read ${sessionsDir}: ${readdirError instanceof Error ? readdirError.message : String(readdirError)}`
       );

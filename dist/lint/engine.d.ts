@@ -18,9 +18,9 @@
  * - Use when building CI pipelines for documentation standards
  * - Use for formatting lint results (pretty or JSON output)
  */
-import type { DocDirective } from "../validation-schemas/doc-directive.js";
-import { type LintContext, type LintRule, type LintViolation } from "./rules.js";
-import type { Result } from "../types/result.js";
+import type { DocDirective } from '../validation-schemas/doc-directive.js';
+import { type LintContext, type LintRule, type LintViolation } from './rules.js';
+import type { Result } from '../types/result.js';
 /**
  * Lint results for a single file
  */

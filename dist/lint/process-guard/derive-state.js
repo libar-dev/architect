@@ -22,18 +22,18 @@
  * - When computing protection levels for files
  * - When determining session scope
  */
-import * as fs from "fs/promises";
-import * as path from "path";
-import * as crypto from "crypto";
-import { glob } from "glob";
-import { Result as R } from "../../types/index.js";
-import { scanGherkinFiles } from "../../scanner/gherkin-scanner.js";
-import { getProtectionLevel } from "../../validation/fsm/index.js";
-import { PROCESS_STATUS_VALUES, normalizeStatus, } from "../../taxonomy/index.js";
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import { glob } from 'glob';
+import { Result as R } from '../../types/index.js';
+import { scanGherkinFiles } from '../../scanner/gherkin-scanner.js';
+import { getProtectionLevel } from '../../validation/fsm/index.js';
+import { PROCESS_STATUS_VALUES, normalizeStatus, } from '../../taxonomy/index.js';
 /** Default spec patterns - generic defaults that work for package-level usage */
 const DEFAULT_SPEC_PATTERNS = [
-    "delivery-process/**/*.feature",
-    "specs/**/*.feature", // For consumers
+    'delivery-process/**/*.feature',
+    'specs/**/*.feature', // For consumers
 ];
 // =============================================================================
 // Core Functions
@@ -64,17 +64,17 @@ export async function deriveProcessState(config) {
     const specPatterns = config.specPatterns ?? DEFAULT_SPEC_PATTERNS;
     // taxonomyPath is now optional - TypeScript is the source of truth for taxonomy
     const taxonomyPath = config.taxonomyPath ?? null;
-    const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, "sessions");
+    const sessionsDir = config.sessionsDir ?? path.join(config.baseDir, 'sessions');
     // Derive file states
     const filesResult = await deriveFileStates(config.baseDir, specPatterns);
     if (!filesResult.ok) {
         return filesResult;
     }
     // Compute taxonomy hash (only if JSON path provided for backwards compatibility)
-    let taxonomyHash = "";
+    let taxonomyHash = '';
     if (taxonomyPath) {
         const hashResult = await computeTaxonomyHash(taxonomyPath);
-        taxonomyHash = hashResult.ok ? hashResult.value : "";
+        taxonomyHash = hashResult.ok ? hashResult.value : '';
     }
     // Find active session
     const sessionResult = await findActiveSession(sessionsDir, config.baseDir);
@@ -139,7 +139,7 @@ async function deriveFileStates(baseDir, patterns) {
 function extractStatusFromTags(tags) {
     for (const tag of tags) {
         // Handle @libar-docs-status:value format
-        if (tag.includes("status:")) {
+        if (tag.includes('status:')) {
             const match = /status:(\w+)/.exec(tag);
             if (match?.[1]) {
                 const status = match[1].toLowerCase();
@@ -150,14 +150,14 @@ function extractStatusFromTags(tags) {
         }
     }
     // Default to roadmap if no status found
-    return "roadmap";
+    return 'roadmap';
 }
 /**
  * Extract deliverable names from background data table.
  * Uses unknown type to handle exactOptionalPropertyTypes compatibility.
  */
 function extractDeliverablesFromBackground(background) {
-    if (background === null || background === undefined || typeof background !== "object")
+    if (background === null || background === undefined || typeof background !== 'object')
         return [];
     const bg = background;
     if (bg.steps === undefined)
@@ -168,7 +168,7 @@ function extractDeliverablesFromBackground(background) {
         if (rows) {
             for (const row of rows) {
                 // Look for "Deliverable" column
-                const deliverable = row["Deliverable"] ?? row["deliverable"];
+                const deliverable = row['Deliverable'] ?? row['deliverable'];
                 if (deliverable) {
                     deliverables.push(deliverable);
                 }
@@ -182,7 +182,7 @@ function extractDeliverablesFromBackground(background) {
  */
 function extractUnlockReason(tags) {
     for (const tag of tags) {
-        if (tag.includes("unlock-reason:")) {
+        if (tag.includes('unlock-reason:')) {
             const match = /unlock-reason:["']?([^"']+)["']?/.exec(tag);
             return {
                 hasUnlockReason: true,
@@ -197,8 +197,8 @@ function extractUnlockReason(tags) {
  */
 async function computeTaxonomyHash(taxonomyPath) {
     try {
-        const content = await fs.readFile(taxonomyPath, "utf-8");
-        const hash = crypto.createHash("sha256").update(content).digest("hex");
+        const content = await fs.readFile(taxonomyPath, 'utf-8');
+        const hash = crypto.createHash('sha256').update(content).digest('hex');
         return R.ok(hash.slice(0, 16)); // First 16 chars is enough
     }
     catch (error) {
@@ -219,13 +219,13 @@ async function findActiveSession(sessionsDir, baseDir) {
             return R.ok(undefined);
         }
         // Find session files
-        const sessionFiles = await glob("*.feature", {
+        const sessionFiles = await glob('*.feature', {
             cwd: sessionsDir,
             absolute: true,
         });
         for (const sessionFile of sessionFiles) {
             const session = await parseSessionFile(sessionFile, baseDir);
-            if (session?.status === "active") {
+            if (session?.status === 'active') {
                 return R.ok(session);
             }
         }
@@ -251,12 +251,12 @@ async function parseSessionFile(filePath, baseDir) {
         return undefined;
     const tags = file.feature.tags;
     // Extract session ID
-    const sessionId = extractTagValue(tags, "session-id");
+    const sessionId = extractTagValue(tags, 'session-id');
     if (!sessionId)
         return undefined;
     // Extract session status
-    const sessionStatusRaw = extractTagValue(tags, "session-status");
-    const sessionStatus = sessionStatusRaw === "active" || sessionStatusRaw === "closed" ? sessionStatusRaw : "draft";
+    const sessionStatusRaw = extractTagValue(tags, 'session-status');
+    const sessionStatus = sessionStatusRaw === 'active' || sessionStatusRaw === 'closed' ? sessionStatusRaw : 'draft';
     // Extract scoped specs (from background table or tags)
     const scopedSpecs = extractScopedSpecs(file.background);
     const excludedSpecs = extractExcludedSpecs(file.background);
@@ -286,7 +286,7 @@ function extractTagValue(tags, key) {
  * Uses unknown type to handle exactOptionalPropertyTypes compatibility.
  */
 function extractScopedSpecs(background) {
-    if (background === null || background === undefined || typeof background !== "object")
+    if (background === null || background === undefined || typeof background !== 'object')
         return [];
     const bg = background;
     if (bg.steps === undefined)
@@ -296,7 +296,7 @@ function extractScopedSpecs(background) {
         const rows = step.dataTable?.rows;
         if (rows) {
             for (const row of rows) {
-                const spec = row["spec"] ?? row["Spec"];
+                const spec = row['spec'] ?? row['Spec'];
                 if (spec) {
                     specs.push(spec);
                 }

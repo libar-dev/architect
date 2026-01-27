@@ -8,13 +8,13 @@
  * @libar-docs
  */
 
-import { loadFeature, describeFeature } from "@amiceli/vitest-cucumber";
-import { expect } from "vitest";
-import * as fs from "fs/promises";
-import * as os from "os";
-import * as path from "path";
-import { findFilesToScan } from "../../../src/scanner/pattern-scanner.js";
-import type { ScannerConfig } from "../../../src/types/index.js";
+import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
+import { expect } from 'vitest';
+import * as fs from 'fs/promises';
+import * as os from 'os';
+import * as path from 'path';
+import { findFilesToScan } from '../../../src/scanner/pattern-scanner.js';
+import type { ScannerConfig } from '../../../src/types/index.js';
 
 // =============================================================================
 // Types
@@ -39,7 +39,7 @@ function initState(): FileDiscoveryState {
     tempDir: null,
     config: {
       patterns: [],
-      baseDir: "",
+      baseDir: '',
     },
     foundFiles: [],
   };
@@ -49,7 +49,7 @@ function initState(): FileDiscoveryState {
 // Feature Definition
 // =============================================================================
 
-const feature = await loadFeature("tests/features/scanner/file-discovery.feature");
+const feature = await loadFeature('tests/features/scanner/file-discovery.feature');
 
 describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
@@ -68,9 +68,9 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   Background(({ Given }) => {
-    Given("a file discovery context with temp directory", async () => {
+    Given('a file discovery context with temp directory', async () => {
       state = initState();
-      state.tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "file-discovery-test-"));
+      state.tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'file-discovery-test-'));
       state.config.baseDir = state.tempDir;
     });
   });
@@ -80,7 +80,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const givenDirectoryStructure = async (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state?.tempDir) throw new Error("State not initialized");
+    if (!state?.tempDir) throw new Error('State not initialized');
 
     for (const row of table) {
       const filePath = path.join(state.tempDir, row.path);
@@ -90,12 +90,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   const givenScannerConfigWithPatterns = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     state.config.patterns = table.map((row) => row.pattern);
   };
 
   const givenExcludePatterns = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     state.config.exclude = table.map((row) => row.pattern);
   };
 
@@ -104,7 +104,7 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const whenFilesAreScanned = async () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     state.foundFiles = await findFilesToScan(state.config);
   };
 
@@ -113,32 +113,32 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenFileCountShouldBe = (_ctx: unknown, count: number) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.foundFiles).toHaveLength(count);
   };
 
   const thenFileEndingWithShouldBeFound = (_ctx: unknown, ending: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.foundFiles.some((f) => f.endsWith(ending))).toBe(true);
   };
 
   const thenNoFilesEndingWithShouldBeFound = (_ctx: unknown, ending: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.foundFiles.some((f) => f.endsWith(ending))).toBe(false);
   };
 
   const thenNoFilesContainingShouldBeFound = (_ctx: unknown, substring: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.foundFiles.some((f) => f.includes(substring))).toBe(false);
   };
 
   const thenFileContainingShouldBeFound = (_ctx: unknown, substring: string) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     expect(state.foundFiles.some((f) => f.includes(substring))).toBe(true);
   };
 
   const thenAllPathsShouldBeAbsolute = () => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     for (const file of state.foundFiles) {
       expect(path.isAbsolute(file)).toBe(true);
     }
@@ -149,21 +149,21 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
 
   const thenFilesEndingWithShouldBeFound = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     for (const row of table) {
       expect(state.foundFiles.some((f) => f.endsWith(row.ending))).toBe(true);
     }
   };
 
   const thenFilesEndingWithShouldNotBeFound = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     for (const row of table) {
       expect(state.foundFiles.some((f) => f.endsWith(row.ending))).toBe(false);
     }
   };
 
   const thenFilesContainingShouldBeFound = (_ctx: unknown, table: DataTableRow[]) => {
-    if (!state) throw new Error("State not initialized");
+    if (!state) throw new Error('State not initialized');
     for (const row of table) {
       expect(state.foundFiles.some((f) => f.includes(row.substring))).toBe(true);
     }
@@ -173,82 +173,82 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // Scenario Definitions
   // ---------------------------------------------------------------------------
 
-  Scenario("Find TypeScript files matching glob patterns", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("{int} files should be found", thenFileCountShouldBe);
-    And("files ending with should be found:", thenFilesEndingWithShouldBeFound);
+  Scenario('Find TypeScript files matching glob patterns', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('{int} files should be found', thenFileCountShouldBe);
+    And('files ending with should be found:', thenFilesEndingWithShouldBeFound);
   });
 
-  Scenario("Exclude node_modules by default", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("no files containing {string} should be found", thenNoFilesContainingShouldBeFound);
-    And("a file ending with {string} should be found", thenFileEndingWithShouldBeFound);
+  Scenario('Exclude node_modules by default', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
+    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
   });
 
-  Scenario("Exclude dist directory by default", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("no files containing {string} should be found", thenNoFilesContainingShouldBeFound);
-    And("a file ending with {string} should be found", thenFileEndingWithShouldBeFound);
+  Scenario('Exclude dist directory by default', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
+    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
   });
 
-  Scenario("Exclude test files by default", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("files ending with should NOT be found:", thenFilesEndingWithShouldNotBeFound);
-    And("a file ending with {string} should be found", thenFileEndingWithShouldBeFound);
+  Scenario('Exclude test files by default', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('files ending with should NOT be found:', thenFilesEndingWithShouldNotBeFound);
+    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
   });
 
-  Scenario("Exclude .d.ts declaration files", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("no files ending with {string} should be found", thenNoFilesEndingWithShouldBeFound);
-    And("a file ending with {string} should be found", thenFileEndingWithShouldBeFound);
+  Scenario('Exclude .d.ts declaration files', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('no files ending with {string} should be found', thenNoFilesEndingWithShouldBeFound);
+    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
   });
 
-  Scenario("Respect custom exclude patterns", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    And("exclude patterns:", givenExcludePatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("no files containing {string} should be found", thenNoFilesContainingShouldBeFound);
-    And("a file containing {string} should be found", thenFileContainingShouldBeFound);
+  Scenario('Respect custom exclude patterns', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    And('exclude patterns:', givenExcludePatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
+    And('a file containing {string} should be found', thenFileContainingShouldBeFound);
   });
 
-  Scenario("Return absolute paths", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("{int} file should be found", thenFileCountShouldBe);
-    And("all found paths should be absolute", thenAllPathsShouldBeAbsolute);
+  Scenario('Return absolute paths', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('{int} file should be found', thenFileCountShouldBe);
+    And('all found paths should be absolute', thenAllPathsShouldBeAbsolute);
   });
 
-  Scenario("Support multiple glob patterns", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("{int} files should be found", thenFileCountShouldBe);
-    And("files containing should be found:", thenFilesContainingShouldBeFound);
+  Scenario('Support multiple glob patterns', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('{int} files should be found', thenFileCountShouldBe);
+    And('files containing should be found:', thenFilesContainingShouldBeFound);
   });
 
-  Scenario("Return empty array when no files match", ({ Given, When, Then }) => {
-    Given("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("{int} files should be found", thenFileCountShouldBe);
+  Scenario('Return empty array when no files match', ({ Given, When, Then }) => {
+    Given('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('{int} files should be found', thenFileCountShouldBe);
   });
 
-  Scenario("Handle nested directory structures", ({ Given, When, Then, And }) => {
-    Given("a directory structure:", givenDirectoryStructure);
-    And("scanner config with patterns:", givenScannerConfigWithPatterns);
-    When("files are scanned", whenFilesAreScanned);
-    Then("{int} file should be found", thenFileCountShouldBe);
-    And("a file containing {string} should be found", thenFileContainingShouldBeFound);
+  Scenario('Handle nested directory structures', ({ Given, When, Then, And }) => {
+    Given('a directory structure:', givenDirectoryStructure);
+    And('scanner config with patterns:', givenScannerConfigWithPatterns);
+    When('files are scanned', whenFilesAreScanned);
+    Then('{int} file should be found', thenFileCountShouldBe);
+    And('a file containing {string} should be found', thenFileContainingShouldBeFound);
   });
 });

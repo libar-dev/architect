@@ -25,21 +25,21 @@
  * - Strict mode (`--strict`) for production readiness checks
  */
 
-import { printVersionAndExit } from "./version.js";
-import { handleCliError } from "./error-handler.js";
-import { scanPatterns } from "../scanner/index.js";
-import { scanGherkinFiles } from "../scanner/gherkin-scanner.js";
-import { extractPatterns } from "../extractor/doc-extractor.js";
-import { extractProcessMetadata, extractDeliverables } from "../extractor/dual-source-extractor.js";
-import { loadConfig, formatConfigError } from "../config/config-loader.js";
+import { printVersionAndExit } from './version.js';
+import { handleCliError } from './error-handler.js';
+import { scanPatterns } from '../scanner/index.js';
+import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
+import { extractPatterns } from '../extractor/doc-extractor.js';
+import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
+import { loadConfig, formatConfigError } from '../config/config-loader.js';
 import {
   ScannerConfigSchema,
   createJsonOutputCodec,
   ValidationSummaryOutputSchema,
-} from "../validation-schemas/index.js";
-import type { ExtractedPattern } from "../validation-schemas/index.js";
-import { normalizeStatus } from "../taxonomy/index.js";
-import type { Deliverable, ScannedGherkinFile } from "../validation-schemas/index.js";
+} from '../validation-schemas/index.js';
+import type { ExtractedPattern } from '../validation-schemas/index.js';
+import { normalizeStatus } from '../taxonomy/index.js';
+import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
 import {
   validateDoD,
   formatDoDSummary,
@@ -47,7 +47,7 @@ import {
   formatAntiPatternReport,
   toValidationIssues,
   DEFAULT_THRESHOLDS,
-} from "../validation/index.js";
+} from '../validation/index.js';
 
 /**
  * Codec for serializing validation summary to JSON
@@ -57,7 +57,7 @@ const ValidationSummaryCodec = createJsonOutputCodec(ValidationSummaryOutputSche
 /**
  * Validation issue severity
  */
-export type IssueSeverity = "error" | "warning" | "info";
+export type IssueSeverity = 'error' | 'warning' | 'info';
 
 /**
  * Validation issue
@@ -65,7 +65,7 @@ export type IssueSeverity = "error" | "warning" | "info";
 export interface ValidationIssue {
   severity: IssueSeverity;
   message: string;
-  source: "typescript" | "gherkin" | "cross-source";
+  source: 'typescript' | 'gherkin' | 'cross-source';
   pattern?: string;
   file?: string;
 }
@@ -110,7 +110,7 @@ export interface ValidateCLIConfig {
   /** Treat warnings as errors */
   strict: boolean;
   /** Output format */
-  format: "pretty" | "json";
+  format: 'pretty' | 'json';
   /** Path to tag registry JSON */
   tagRegistryPath: string | null;
   /** Show help */
@@ -141,7 +141,7 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
     exclude: [],
     baseDir: process.cwd(),
     strict: false,
-    format: "pretty",
+    format: 'pretty',
     tagRegistryPath: null,
     help: false,
     dod: false,
@@ -156,52 +156,52 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
 
-    if (arg === "--help" || arg === "-h") {
+    if (arg === '--help' || arg === '-h') {
       config.help = true;
-    } else if (arg === "--input" || arg === "-i") {
+    } else if (arg === '--input' || arg === '-i') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.input.push(nextArg);
-    } else if (arg === "--features" || arg === "-F") {
+    } else if (arg === '--features' || arg === '-F') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.features.push(nextArg);
-    } else if (arg === "--exclude" || arg === "-e") {
+    } else if (arg === '--exclude' || arg === '-e') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.exclude.push(nextArg);
-    } else if (arg === "--base-dir" || arg === "-b") {
+    } else if (arg === '--base-dir' || arg === '-b') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.baseDir = nextArg;
-    } else if (arg === "--strict") {
+    } else if (arg === '--strict') {
       config.strict = true;
-    } else if (arg === "--format" || arg === "-f") {
+    } else if (arg === '--format' || arg === '-f') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
-      if (nextArg !== "pretty" && nextArg !== "json") {
+      if (nextArg !== 'pretty' && nextArg !== 'json') {
         throw new Error(`Invalid format: ${nextArg}. Use "pretty" or "json"`);
       }
       config.format = nextArg;
-    } else if (arg === "--tag-registry" || arg === "-R") {
+    } else if (arg === '--tag-registry' || arg === '-R') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
       }
       config.tagRegistryPath = nextArg;
-    } else if (arg === "--dod") {
+    } else if (arg === '--dod') {
       config.dod = true;
-    } else if (arg === "--phase") {
+    } else if (arg === '--phase') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
@@ -211,9 +211,9 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid phase number: ${nextArg}. Must be a positive integer.`);
       }
       config.phases.push(phaseNum);
-    } else if (arg === "--anti-patterns") {
+    } else if (arg === '--anti-patterns') {
       config.antiPatterns = true;
-    } else if (arg === "--scenario-threshold") {
+    } else if (arg === '--scenario-threshold') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
@@ -223,7 +223,7 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid threshold: ${nextArg}. Must be a positive integer.`);
       }
       config.scenarioBloatThreshold = threshold;
-    } else if (arg === "--mega-feature-threshold") {
+    } else if (arg === '--mega-feature-threshold') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
@@ -233,7 +233,7 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid threshold: ${nextArg}. Must be a positive integer.`);
       }
       config.megaFeatureLineThreshold = threshold;
-    } else if (arg === "--magic-comment-threshold") {
+    } else if (arg === '--magic-comment-threshold') {
       const nextArg = argv[++i];
       if (!nextArg) {
         throw new Error(`Missing value for ${arg} flag`);
@@ -243,9 +243,9 @@ export function parseArgs(argv: string[] = process.argv.slice(2)): ValidateCLICo
         throw new Error(`Invalid threshold: ${nextArg}. Must be a positive integer.`);
       }
       config.magicCommentThreshold = threshold;
-    } else if (arg === "--version" || arg === "-v") {
+    } else if (arg === '--version' || arg === '-v') {
       config.version = true;
-    } else if (arg?.startsWith("-") === true) {
+    } else if (arg?.startsWith('-') === true) {
       console.warn(`Warning: Unknown flag '${arg}' ignored`);
     }
   }
@@ -397,9 +397,9 @@ export function validatePatterns(
       // Only report for roadmap patterns (those with phase numbers)
       if (tsPattern.phase !== undefined) {
         issues.push({
-          severity: "warning",
+          severity: 'warning',
           message: `Pattern "${tsPattern.patternName ?? tsPattern.name}" in TypeScript has no matching Gherkin feature`,
-          source: "cross-source",
+          source: 'cross-source',
           pattern: tsPattern.patternName ?? tsPattern.name,
           file: tsPattern.source.file,
         });
@@ -411,9 +411,9 @@ export function validatePatterns(
       if (tsPattern.phase !== undefined && gherkinMatch.phase !== undefined) {
         if (tsPattern.phase !== gherkinMatch.phase) {
           issues.push({
-            severity: "error",
+            severity: 'error',
             message: `Phase mismatch for "${tsPattern.patternName ?? tsPattern.name}": TypeScript=${tsPattern.phase}, Gherkin=${gherkinMatch.phase}`,
-            source: "cross-source",
+            source: 'cross-source',
             pattern: tsPattern.patternName ?? tsPattern.name,
           });
         }
@@ -430,9 +430,9 @@ export function validatePatterns(
             ? `Status mismatch for "${tsPattern.patternName ?? tsPattern.name}": TypeScript="${tsPattern.status}" (→${tsStatus}), Gherkin="${gherkinMatch.status}" (→${gherkinStatus})`
             : `Status mismatch for "${tsPattern.patternName ?? tsPattern.name}": TypeScript=${tsStatus}, Gherkin=${gherkinStatus}`;
           issues.push({
-            severity: "error",
+            severity: 'error',
             message,
-            source: "cross-source",
+            source: 'cross-source',
             pattern: tsPattern.patternName ?? tsPattern.name,
           });
         }
@@ -447,9 +447,9 @@ export function validatePatterns(
 
     if (!tsMatch) {
       issues.push({
-        severity: "info",
+        severity: 'info',
         message: `Pattern "${gherkinPattern.name}" in Gherkin has no matching TypeScript pattern`,
-        source: "cross-source",
+        source: 'cross-source',
         pattern: gherkinPattern.name,
         file: gherkinPattern.file,
       });
@@ -458,32 +458,32 @@ export function validatePatterns(
 
   // Check deliverables for completed patterns
   for (const gherkinPattern of gherkinPatterns) {
-    const status = normalizeStatus(gherkinPattern.status ?? "");
-    if (status === "completed") {
+    const status = normalizeStatus(gherkinPattern.status ?? '');
+    if (status === 'completed') {
       if (gherkinPattern.deliverables.length === 0) {
         issues.push({
-          severity: "warning",
+          severity: 'warning',
           message: `Completed pattern "${gherkinPattern.name}" has no deliverables defined`,
-          source: "gherkin",
+          source: 'gherkin',
           pattern: gherkinPattern.name,
           file: gherkinPattern.file,
         });
       } else {
         // Validate deliverable fields
         for (const d of gherkinPattern.deliverables) {
-          if (!d.name || d.name.trim() === "") {
+          if (!d.name || d.name.trim() === '') {
             issues.push({
-              severity: "warning",
+              severity: 'warning',
               message: `Deliverable in "${gherkinPattern.name}" missing name`,
-              source: "gherkin",
+              source: 'gherkin',
               pattern: gherkinPattern.name,
             });
           }
-          if (!d.status || d.status.trim() === "") {
+          if (!d.status || d.status.trim() === '') {
             issues.push({
-              severity: "warning",
+              severity: 'warning',
               message: `Deliverable "${d.name}" in "${gherkinPattern.name}" missing status`,
-              source: "gherkin",
+              source: 'gherkin',
               pattern: gherkinPattern.name,
             });
           }
@@ -500,9 +500,9 @@ export function validatePatterns(
     for (const dep of deps) {
       if (!allPatternNames.has(dep.toLowerCase())) {
         issues.push({
-          severity: "info",
+          severity: 'info',
           message: `Pattern "${pattern.patternName ?? pattern.name}" depends on "${dep}" which does not exist`,
-          source: "typescript",
+          source: 'typescript',
           pattern: pattern.patternName ?? pattern.name,
         });
       }
@@ -533,20 +533,20 @@ export function validatePatterns(
 function formatPretty(summary: ValidationSummary): string {
   const lines: string[] = [];
 
-  lines.push("Pattern Validation Summary");
-  lines.push("==========================");
-  lines.push("");
+  lines.push('Pattern Validation Summary');
+  lines.push('==========================');
+  lines.push('');
 
   // Stats
   lines.push(`TypeScript patterns: ${summary.stats.typescriptPatterns}`);
   lines.push(`Gherkin patterns:    ${summary.stats.gherkinPatterns}`);
   lines.push(`Matched:             ${summary.stats.matched}`);
-  lines.push("");
+  lines.push('');
 
   // Group issues by severity
-  const errors = summary.issues.filter((i) => i.severity === "error");
-  const warnings = summary.issues.filter((i) => i.severity === "warning");
-  const infos = summary.issues.filter((i) => i.severity === "info");
+  const errors = summary.issues.filter((i) => i.severity === 'error');
+  const warnings = summary.issues.filter((i) => i.severity === 'warning');
+  const infos = summary.issues.filter((i) => i.severity === 'info');
 
   if (errors.length > 0) {
     lines.push(`Errors (${errors.length}):`);
@@ -556,7 +556,7 @@ function formatPretty(summary: ValidationSummary): string {
         lines.push(`          at ${issue.file}`);
       }
     }
-    lines.push("");
+    lines.push('');
   }
 
   if (warnings.length > 0) {
@@ -567,7 +567,7 @@ function formatPretty(summary: ValidationSummary): string {
         lines.push(`          at ${issue.file}`);
       }
     }
-    lines.push("");
+    lines.push('');
   }
 
   if (infos.length > 0) {
@@ -578,19 +578,19 @@ function formatPretty(summary: ValidationSummary): string {
         lines.push(`          at ${issue.file}`);
       }
     }
-    lines.push("");
+    lines.push('');
   }
 
   // Summary line
   if (errors.length === 0 && warnings.length === 0) {
-    lines.push("All validations passed.");
+    lines.push('All validations passed.');
   } else {
     lines.push(
       `Found ${errors.length} error(s), ${warnings.length} warning(s), ${infos.length} info message(s).`
     );
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**
@@ -615,7 +615,7 @@ async function main(): Promise<void> {
   const config = parseArgs();
 
   if (config.version) {
-    printVersionAndExit("validate-patterns");
+    printVersionAndExit('validate-patterns');
   }
 
   if (config.help) {
@@ -624,13 +624,13 @@ async function main(): Promise<void> {
   }
 
   if (config.input.length === 0) {
-    console.error("Error: No TypeScript input patterns specified. Use --input <pattern>");
+    console.error('Error: No TypeScript input patterns specified. Use --input <pattern>');
     printHelp();
     process.exit(1);
   }
 
   if (config.features.length === 0) {
-    console.error("Error: No Gherkin feature patterns specified. Use --features <pattern>");
+    console.error('Error: No Gherkin feature patterns specified. Use --features <pattern>');
     printHelp();
     process.exit(1);
   }
@@ -645,15 +645,15 @@ async function main(): Promise<void> {
 
     const { instance: dpInstance, isDefault, path: configPath } = configResult.value;
     const registry = dpInstance.registry;
-    const configSource = !isDefault && configPath ? configPath : "(default DDD-ES-CQRS taxonomy)";
+    const configSource = !isDefault && configPath ? configPath : '(default DDD-ES-CQRS taxonomy)';
 
-    if (config.format === "pretty") {
-      console.log("Validating patterns...");
+    if (config.format === 'pretty') {
+      console.log('Validating patterns...');
       console.log(`  Config: ${configSource}`);
       console.log(`  Base directory: ${config.baseDir}`);
-      console.log(`  TypeScript patterns: ${config.input.join(", ")}`);
-      console.log(`  Gherkin patterns: ${config.features.join(", ")}`);
-      console.log("");
+      console.log(`  TypeScript patterns: ${config.input.join(', ')}`);
+      console.log(`  Gherkin patterns: ${config.features.join(', ')}`);
+      console.log('');
     }
 
     // Scan TypeScript files
@@ -665,7 +665,7 @@ async function main(): Promise<void> {
 
     const scanResult = await scanPatterns(scannerConfig, registry);
     if (!scanResult.ok) {
-      throw new Error("Unexpected scan failure");
+      throw new Error('Unexpected scan failure');
     }
 
     // Extract TypeScript patterns
@@ -678,7 +678,7 @@ async function main(): Promise<void> {
       baseDir: config.baseDir,
     });
     if (!gherkinScanResult.ok) {
-      throw new Error("Unexpected Gherkin scan failure");
+      throw new Error('Unexpected Gherkin scan failure');
     }
 
     // Extract Gherkin patterns
@@ -686,17 +686,17 @@ async function main(): Promise<void> {
 
     // Warn if no patterns found (common misconfiguration)
     if (tsPatterns.length === 0) {
-      console.warn("⚠️  Warning: No TypeScript patterns found. Check your --input patterns.");
+      console.warn('⚠️  Warning: No TypeScript patterns found. Check your --input patterns.');
     }
     if (gherkinPatterns.length === 0) {
-      console.warn("⚠️  Warning: No Gherkin patterns found. Check your --features patterns.");
+      console.warn('⚠️  Warning: No Gherkin patterns found. Check your --features patterns.');
     }
 
     // Run cross-source validation
     const summary = validatePatterns(tsPatterns, gherkinPatterns);
 
     // Output cross-source results
-    if (config.format === "pretty") {
+    if (config.format === 'pretty') {
       console.log(formatPretty(summary));
     }
 
@@ -705,7 +705,7 @@ async function main(): Promise<void> {
     if (config.dod) {
       const dodSummary = validateDoD(gherkinScanResult.value.files, config.phases);
 
-      if (config.format === "pretty") {
+      if (config.format === 'pretty') {
         console.log(formatDoDSummary(dodSummary));
       }
 
@@ -714,11 +714,11 @@ async function main(): Promise<void> {
         if (!result.isDoDMet) {
           dodHasErrors = true;
           for (const msg of result.messages) {
-            if (!msg.startsWith("DoD met")) {
+            if (!msg.startsWith('DoD met')) {
               summary.issues.push({
-                severity: "error",
+                severity: 'error',
                 message: `[DoD] Phase ${result.phase} (${result.patternName}): ${msg}`,
-                source: "gherkin",
+                source: 'gherkin',
                 pattern: result.patternName,
               });
             }
@@ -736,13 +736,11 @@ async function main(): Promise<void> {
         magicCommentThreshold: config.magicCommentThreshold,
       };
 
-      const violations = detectAntiPatterns(
-        scanResult.value.files,
-        gherkinScanResult.value.files,
-        { thresholds }
-      );
+      const violations = detectAntiPatterns(scanResult.value.files, gherkinScanResult.value.files, {
+        thresholds,
+      });
 
-      if (config.format === "pretty") {
+      if (config.format === 'pretty') {
         console.log(formatAntiPatternReport(violations));
       }
 
@@ -750,18 +748,18 @@ async function main(): Promise<void> {
       const antiPatternIssues = toValidationIssues(violations);
       summary.issues.push(...antiPatternIssues);
 
-      antiPatternHasErrors = violations.some((v) => v.severity === "error");
+      antiPatternHasErrors = violations.some((v) => v.severity === 'error');
     }
 
     // Output JSON if requested (all results combined)
-    if (config.format === "json") {
+    if (config.format === 'json') {
       console.log(formatJson(summary));
     }
 
     // Determine exit code based on all validation results
     const hasErrors =
-      summary.issues.some((i) => i.severity === "error") || dodHasErrors || antiPatternHasErrors;
-    const hasWarnings = summary.issues.some((i) => i.severity === "warning");
+      summary.issues.some((i) => i.severity === 'error') || dodHasErrors || antiPatternHasErrors;
+    const hasWarnings = summary.issues.some((i) => i.severity === 'warning');
 
     if (hasErrors) {
       process.exit(1);

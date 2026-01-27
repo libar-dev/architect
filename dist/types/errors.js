@@ -24,7 +24,7 @@ export function createFileSystemError(file, reason, originalError) {
     };
     // Use spread to conditionally include optional fields
     return {
-        type: "FILE_SYSTEM_ERROR",
+        type: 'FILE_SYSTEM_ERROR',
         message: reasonMessages[reason],
         file,
         reason,
@@ -51,10 +51,10 @@ export function createFileSystemError(file, reason, originalError) {
  * ```
  */
 export function createFileParseError(file, reason, location, originalError) {
-    const locationStr = location ? ` at line ${location.line}, column ${location.column}` : "";
+    const locationStr = location ? ` at line ${location.line}, column ${location.column}` : '';
     // Use spread to conditionally include optional fields
     return {
-        type: "FILE_PARSE_ERROR",
+        type: 'FILE_PARSE_ERROR',
         message: `Failed to parse ${file}${locationStr}: ${reason}`,
         file,
         reason,
@@ -84,7 +84,7 @@ export function createFileParseError(file, reason, location, originalError) {
 export function createDirectiveValidationError(file, line, reason, directive) {
     // Use spread to conditionally include optional fields
     return {
-        type: "DIRECTIVE_VALIDATION_ERROR",
+        type: 'DIRECTIVE_VALIDATION_ERROR',
         message: `Directive validation failed at ${file}:${line}: ${reason}`,
         file,
         line,
@@ -114,7 +114,7 @@ export function createDirectiveValidationError(file, line, reason, directive) {
 export function createPatternValidationError(file, patternName, reason, validationErrors) {
     // Use spread to conditionally include optional fields
     return {
-        type: "PATTERN_VALIDATION_ERROR",
+        type: 'PATTERN_VALIDATION_ERROR',
         message: `Pattern validation failed for "${patternName}" in ${file}: ${reason}`,
         file,
         patternName,
@@ -141,7 +141,7 @@ export function createPatternValidationError(file, patternName, reason, validati
  */
 export function createFeatureParseError(file, reason, originalError) {
     return {
-        type: "FEATURE_PARSE_ERROR",
+        type: 'FEATURE_PARSE_ERROR',
         message: `Failed to parse feature file ${file}: ${reason}`,
         file,
         reason,
@@ -167,7 +167,7 @@ export function createFeatureParseError(file, reason, originalError) {
  */
 export function createProcessMetadataValidationError(file, reason, validationErrors) {
     return {
-        type: "PROCESS_METADATA_VALIDATION_ERROR",
+        type: 'PROCESS_METADATA_VALIDATION_ERROR',
         message: `Process metadata validation failed in ${file}: ${reason}`,
         file,
         reason,
@@ -194,9 +194,9 @@ export function createProcessMetadataValidationError(file, reason, validationErr
  * ```
  */
 export function createDeliverableValidationError(file, reason, deliverableName, validationErrors) {
-    const nameStr = deliverableName ? ` "${deliverableName}"` : "";
+    const nameStr = deliverableName ? ` "${deliverableName}"` : '';
     return {
-        type: "DELIVERABLE_VALIDATION_ERROR",
+        type: 'DELIVERABLE_VALIDATION_ERROR',
         message: `Deliverable${nameStr} validation failed in ${file}: ${reason}`,
         file,
         reason,
@@ -225,7 +225,7 @@ export function createDeliverableValidationError(file, reason, deliverableName, 
  */
 export function createGherkinPatternValidationError(file, patternName, reason, validationErrors) {
     return {
-        type: "GHERKIN_PATTERN_VALIDATION_ERROR",
+        type: 'GHERKIN_PATTERN_VALIDATION_ERROR',
         message: `Gherkin pattern "${patternName}" validation failed in ${file}: ${reason}`,
         file,
         patternName,

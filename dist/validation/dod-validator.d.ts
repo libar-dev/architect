@@ -17,8 +17,8 @@
  * - CI pipeline checks to prevent premature "done" declarations
  * - Manual DoD checks during code review
  */
-import type { Deliverable, ScannedGherkinFile } from "../validation-schemas/index.js";
-import type { DoDValidationResult, DoDValidationSummary } from "./types.js";
+import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
+import type { DoDValidationResult, DoDValidationSummary } from './types.js';
 /**
  * Check if a deliverable status indicates completion
  *

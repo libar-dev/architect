@@ -37,16 +37,16 @@
  * const doc = codec.decode(dataset);
  * ```
  */
-import { z } from "zod";
-import { MasterDatasetSchema, } from "../../validation-schemas/master-dataset.js";
-import { heading, paragraph, separator, table, document, } from "../schema.js";
-import { DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+import { z } from 'zod';
+import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
+import { heading, paragraph, separator, table, document, } from '../schema.js';
+import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 /**
  * Default options for BusinessRulesCodec
  */
 export const DEFAULT_BUSINESS_RULES_OPTIONS = {
     ...DEFAULT_BASE_OPTIONS,
-    groupBy: "domain-then-phase",
+    groupBy: 'domain-then-phase',
     includeCodeExamples: false, // Only in detailed mode
     includeTables: true,
     includeRationale: true,
@@ -57,8 +57,8 @@ export const DEFAULT_BUSINESS_RULES_OPTIONS = {
     includeVerifiedBy: false, // Only in detailed mode
     maxDescriptionLength: 150,
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
-import { parseBusinessRuleAnnotations, extractFirstSentence, } from "./helpers.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import { parseBusinessRuleAnnotations, extractFirstSentence, } from './helpers.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Business Rules Document Codec
 // ═══════════════════════════════════════════════════════════════════════════
@@ -85,7 +85,7 @@ export function createBusinessRulesCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("BusinessRulesCodec is decode-only. See zod-codecs.md");
+            throw new Error('BusinessRulesCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -115,20 +115,20 @@ function buildBusinessRulesDocument(dataset, options) {
     // Calculate stats
     const stats = calculateStats(productAreaGroups);
     if (stats.totalRules === 0) {
-        sections.push(heading(2, "No Business Rules Found"), paragraph("No business rules were found in the feature files. " +
-            "Business rules are defined using the `Rule:` keyword in Gherkin feature files."));
-        return document("Business Rules", sections, {
-            purpose: "Domain constraints and invariants",
+        sections.push(heading(2, 'No Business Rules Found'), paragraph('No business rules were found in the feature files. ' +
+            'Business rules are defined using the `Rule:` keyword in Gherkin feature files.'));
+        return document('Business Rules', sections, {
+            purpose: 'Domain constraints and invariants',
         });
     }
     // 2. Build summary (single line with stats)
     sections.push(...buildSummarySection(stats));
     // 3. Build content sections (standard and detailed modes only)
-    if (options.detailLevel !== "summary") {
+    if (options.detailLevel !== 'summary') {
         sections.push(...buildProductAreaSections(productAreaGroups, options));
     }
-    return document("Business Rules", sections, {
-        purpose: "Domain constraints and invariants extracted from feature files",
+    return document('Business Rules', sections, {
+        purpose: 'Domain constraints and invariants extracted from feature files',
         detailLevel: options.detailLevel,
     });
 }
@@ -156,7 +156,7 @@ function collectRulesByProductArea(dataset, options) {
             continue;
         }
         // Determine product area (default to "Platform" if not specified)
-        const productArea = pattern.productArea ?? "Platform";
+        const productArea = pattern.productArea ?? 'Platform';
         const productAreaDisplay = formatProductAreaName(productArea);
         // Determine phase key (use release for DeliveryProcess items without phase)
         const phaseKey = getPhaseKey(pattern);
@@ -217,7 +217,7 @@ function getPhaseKey(pattern) {
         return release;
     }
     // Fallback
-    return "Uncategorized";
+    return 'Uncategorized';
 }
 /**
  * Extract a compact description from the feature
@@ -245,19 +245,19 @@ function extractFeatureDescription(pattern) {
             const nextHeaderMatch = nextHeaderPattern.exec(afterHeader);
             const content = nextHeaderMatch ? afterHeader.slice(0, nextHeaderMatch.index) : afterHeader;
             // Clean up and extract first sentence
-            const cleaned = content.trim().split("\n")[0]?.trim() ?? "";
+            const cleaned = content.trim().split('\n')[0]?.trim() ?? '';
             if (cleaned.length > 0) {
                 return extractFirstSentence(cleaned);
             }
         }
     }
     // Fallback: Try to get the first meaningful line
-    const lines = desc.split("\n").filter((line) => {
+    const lines = desc.split('\n').filter((line) => {
         const trimmed = line.trim();
         return (trimmed.length > 0 &&
-            !trimmed.startsWith("**") && // Skip any header
-            !trimmed.startsWith("|") && // Skip table rows
-            !trimmed.startsWith("-") && // Skip list items
+            !trimmed.startsWith('**') && // Skip any header
+            !trimmed.startsWith('|') && // Skip table rows
+            !trimmed.startsWith('-') && // Skip list items
             trimmed.length > 20 // Require substantial content
         );
     });
@@ -265,7 +265,7 @@ function extractFeatureDescription(pattern) {
     if (firstLine) {
         return extractFirstSentence(firstLine);
     }
-    return "";
+    return '';
 }
 function calculateStats(groups) {
     let totalRules = 0;
@@ -357,7 +357,7 @@ function extractPhaseNumber(phaseKey) {
  */
 function renderFeatureWithRules(feature, options) {
     const sections = [];
-    const isDetailed = options.detailLevel === "detailed";
+    const isDetailed = options.detailLevel === 'detailed';
     // Feature heading (H3)
     sections.push(heading(3, feature.featureName));
     // Feature description (plain text, rule title bold provides structure)
@@ -415,15 +415,15 @@ function renderRuleInline(ruleCtx, options, isDetailed) {
     if ((isDetailed || options.includeVerifiedBy) &&
         annotations.verifiedBy &&
         annotations.verifiedBy.length > 0) {
-        sections.push(paragraph(`**Verified by:** ${annotations.verifiedBy.join(", ")}`));
+        sections.push(paragraph(`**Verified by:** ${annotations.verifiedBy.join(', ')}`));
     }
     // API implementation references
     if (annotations.apiRefs && annotations.apiRefs.length > 0) {
-        const refList = annotations.apiRefs.map((ref) => `\`${ref}\``).join(", ");
+        const refList = annotations.apiRefs.map((ref) => `\`${ref}\``).join(', ');
         sections.push(paragraph(`**Implementation:** ${refList}`));
     }
     // Add spacing between rules
-    sections.push(paragraph(""));
+    sections.push(paragraph(''));
     return sections;
 }
 /**
@@ -431,12 +431,12 @@ function renderRuleInline(ruleCtx, options, isDetailed) {
  */
 function extractTables(content) {
     const sections = [];
-    const lines = content.split("\n");
+    const lines = content.split('\n');
     let inTable = false;
     let tableLines = [];
     for (const line of lines) {
         const trimmed = line.trim();
-        if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+        if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
             inTable = true;
             tableLines.push(trimmed);
         }
@@ -476,7 +476,7 @@ function parseMarkdownTable(lines) {
     if (!headerRow)
         return null;
     const headers = headerRow
-        .split("|")
+        .split('|')
         .map((cell) => cell.trim())
         .filter((cell) => cell.length > 0);
     if (headers.length === 0)
@@ -488,7 +488,7 @@ function parseMarkdownTable(lines) {
         if (!row)
             continue;
         const cells = row
-            .split("|")
+            .split('|')
             .map((cell) => cell.trim())
             .filter((cell) => cell.length > 0);
         if (cells.length > 0) {
@@ -506,14 +506,14 @@ function parseMarkdownTable(lines) {
 function formatProductAreaName(productArea) {
     // Handle common product areas
     switch (productArea.toLowerCase()) {
-        case "platform":
-            return "Platform";
-        case "deliveryprocess":
-            return "Delivery Process";
-        case "exampleapp":
-            return "Example App";
-        case "taxonomy":
-            return "Taxonomy";
+        case 'platform':
+            return 'Platform';
+        case 'deliveryprocess':
+            return 'Delivery Process';
+        case 'exampleapp':
+            return 'Example App';
+        case 'taxonomy':
+            return 'Taxonomy';
         default:
             // Title case for unknown product areas
             return productArea.charAt(0).toUpperCase() + productArea.slice(1);
@@ -526,7 +526,7 @@ function extractSourceName(filePath) {
     const pattern = /([^/]+)\.feature$/;
     const match = pattern.exec(filePath);
     if (match?.[1]) {
-        return match[1] + ".feature";
+        return match[1] + '.feature';
     }
     return filePath;
 }

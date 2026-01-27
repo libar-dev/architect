@@ -26,10 +26,10 @@
  */
 
 // Core types and protocols
-export type { DocumentGenerator, GeneratorContext, GeneratorOutput, OutputFile } from "./types.js";
+export type { DocumentGenerator, GeneratorContext, GeneratorOutput, OutputFile } from './types.js';
 
 // Generator registry (singleton + class for custom instances)
-export { GeneratorRegistry, generatorRegistry } from "./registry.js";
+export { GeneratorRegistry, generatorRegistry } from './registry.js';
 
 // Codec-based generators (RDM architecture)
 export {
@@ -37,7 +37,7 @@ export {
   createCodecGenerator,
   DOCUMENT_TYPES,
   type DocumentType,
-} from "./codec-based.js";
+} from './codec-based.js';
 
 // Orchestrator - programmatic API for documentation generation
 export {
@@ -47,14 +47,14 @@ export {
   type GeneratedFile,
   type GenerationError,
   type GenerationWarning,
-} from "./orchestrator.js";
+} from './orchestrator.js';
 
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
 export {
   transformToMasterDataset,
   type RawDataset,
   type RuntimeMasterDataset,
-} from "./pipeline/index.js";
+} from './pipeline/index.js';
 
 /**
  * NOTE: Built-in generators are NOT auto-registered.

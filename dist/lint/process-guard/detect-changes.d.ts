@@ -28,9 +28,9 @@
  * - When validating all changes against main branch
  * - When detecting scope creep (new deliverables)
  */
-import type { Result } from "../../types/index.js";
-import type { ChangeDetection, StatusTransition, DeliverableChange } from "./types.js";
-import type { WithTagRegistry } from "../../validation/types.js";
+import type { Result } from '../../types/index.js';
+import type { ChangeDetection, StatusTransition, DeliverableChange } from './types.js';
+import type { WithTagRegistry } from '../../validation/types.js';
 /**
  * Options for change detection functions.
  *

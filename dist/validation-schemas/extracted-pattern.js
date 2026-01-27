@@ -16,14 +16,14 @@
  * - Use when validating extracted patterns from the extractor
  * - Use when serializing/deserializing pattern data
  */
-import { z } from "zod";
-import { asPatternId, asCategoryName, asSourceFilePath } from "../types/branded.js";
-import { DocDirectiveSchema, PatternStatusSchema } from "./doc-directive.js";
-import { ExportInfoSchema } from "./export-info.js";
-import { ScenarioRefSchema } from "./scenario-ref.js";
-import { DeliverableSchema, HierarchyLevelSchema } from "./dual-source.js";
-import { slugify } from "../utils/string-utils.js";
-import { ADR_STATUS_VALUES } from "../taxonomy/index.js";
+import { z } from 'zod';
+import { asPatternId, asCategoryName, asSourceFilePath } from '../types/branded.js';
+import { DocDirectiveSchema, PatternStatusSchema } from './doc-directive.js';
+import { ExportInfoSchema } from './export-info.js';
+import { ScenarioRefSchema } from './scenario-ref.js';
+import { DeliverableSchema, HierarchyLevelSchema } from './dual-source.js';
+import { slugify } from '../utils/string-utils.js';
+import { ADR_STATUS_VALUES } from '../taxonomy/index.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Business Rule Schema (Shared Type)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -54,7 +54,7 @@ export const BusinessRuleSchema = z.object({
  */
 const PatternIdSchema = z
     .string()
-    .regex(/^pattern-[a-f0-9]{8}$/, "Pattern ID must match format: pattern-{8-char-hex}")
+    .regex(/^pattern-[a-f0-9]{8}$/, 'Pattern ID must match format: pattern-{8-char-hex}')
     .transform((id) => asPatternId(id));
 /**
  * Category name validation and normalization
@@ -62,10 +62,10 @@ const PatternIdSchema = z
  */
 const CategoryNameSchema = z
     .string()
-    .min(1, "Category name cannot be empty")
+    .min(1, 'Category name cannot be empty')
     .transform((name) => name.toLowerCase())
     .refine((name) => /^[a-z0-9-]+$/.test(name), {
-    message: "Category must contain only lowercase letters, numbers, and hyphens",
+    message: 'Category must contain only lowercase letters, numbers, and hyphens',
 })
     .transform((name) => asCategoryName(name));
 /**
@@ -74,9 +74,9 @@ const CategoryNameSchema = z
  */
 const SourceFilePathSchema = z
     .string()
-    .min(1, "File path cannot be empty")
-    .refine((path) => path.endsWith(".ts") || path.endsWith(".feature") || path.endsWith(".feature.md"), {
-    message: "Source file must be a TypeScript file (.ts) or Gherkin feature file (.feature or .feature.md)",
+    .min(1, 'File path cannot be empty')
+    .refine((path) => path.endsWith('.ts') || path.endsWith('.feature') || path.endsWith('.feature.md'), {
+    message: 'Source file must be a TypeScript file (.ts) or Gherkin feature file (.feature or .feature.md)',
 })
     .transform((path) => asSourceFilePath(path));
 /**
@@ -89,11 +89,11 @@ export const SourceInfoSchema = z
     /** Line range [startLine, endLine] */
     lines: z
         .tuple([
-        z.number().int().positive("Start line must be positive"),
-        z.number().int().positive("End line must be positive"),
+        z.number().int().positive('Start line must be positive'),
+        z.number().int().positive('End line must be positive'),
     ])
         .refine(([start, end]) => end >= start, {
-        message: "End line must be >= start line",
+        message: 'End line must be >= start line',
     })
         .readonly(),
 })
@@ -116,9 +116,9 @@ export const ExtractedPatternSchema = z
     /** Pattern name (inferred from description or code) */
     name: z
         .string()
-        .min(1, "Pattern name cannot be empty")
+        .min(1, 'Pattern name cannot be empty')
         .refine((name) => slugify(name).length > 0, {
-        message: "Pattern name must produce a non-empty slug (at least one alphanumeric character)",
+        message: 'Pattern name must produce a non-empty slug (at least one alphanumeric character)',
     }),
     /** Category inferred from tags (normalized to lowercase) */
     category: CategoryNameSchema,
@@ -131,7 +131,7 @@ export const ExtractedPatternSchema = z
     /** Exported symbols from this code block */
     exports: z.array(ExportInfoSchema).readonly().default([]),
     /** Timestamp of extraction (ISO 8601 format) */
-    extractedAt: z.iso.datetime({ error: "Must be valid ISO 8601 timestamp" }),
+    extractedAt: z.iso.datetime({ error: 'Must be valid ISO 8601 timestamp' }),
     /** Explicit pattern name from @libar-docs-pattern tag (overrides inferred name) */
     patternName: z.string().optional(),
     /** Implementation status from @libar-docs-status tag */

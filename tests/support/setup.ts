@@ -7,8 +7,8 @@
  * @libar-docs
  */
 
-import { beforeEach } from "vitest";
-import { resetPatternCounter } from "../fixtures/pattern-factories.js";
+import { beforeEach } from 'vitest';
+import { resetPatternCounter } from '../fixtures/pattern-factories.js';
 
 // =============================================================================
 // Global Test Setup
@@ -67,7 +67,7 @@ export async function sleep(ms: number): Promise<void> {
  * Create a deterministic timestamp for stable test output.
  */
 export function stableTimestamp(): string {
-  return "2025-01-01T00:00:00.000Z";
+  return '2025-01-01T00:00:00.000Z';
 }
 
 /**
@@ -80,7 +80,7 @@ export function createTestContext(): {
 } {
   return {
     timestamp: stableTimestamp(),
-    baseDir: "/test/base",
-    outputDir: "/test/output",
+    baseDir: '/test/base',
+    outputDir: '/test/output',
   };
 }

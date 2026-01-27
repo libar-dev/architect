@@ -27,7 +27,7 @@
 /**
  * Default tag prefix for error messages when no registry is provided.
  */
-const DEFAULT_TAG_PREFIX = "@libar-docs-";
+const DEFAULT_TAG_PREFIX = '@libar-docs-';
 /**
  * Valid FSM transitions matrix
  *
@@ -41,10 +41,10 @@ const DEFAULT_TAG_PREFIX = "@libar-docs-";
  * | deferred  | roadmap                    | Must go through roadmap      |
  */
 export const VALID_TRANSITIONS = {
-    roadmap: ["active", "deferred", "roadmap"], // Can start work, park, or stay in planning
-    active: ["completed", "roadmap"], // Can finish or regress if blocked
+    roadmap: ['active', 'deferred', 'roadmap'], // Can start work, park, or stay in planning
+    active: ['completed', 'roadmap'], // Can finish or regress if blocked
     completed: [], // Terminal state - no transitions allowed
-    deferred: ["roadmap"], // Must reactivate through roadmap first
+    deferred: ['roadmap'], // Must reactivate through roadmap first
 };
 /**
  * Check if a transition between two states is valid
@@ -99,15 +99,15 @@ export function getValidTransitionsFrom(status) {
 export function getTransitionErrorMessage(from, to, options) {
     const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
     // Handle terminal state
-    if (from === "completed") {
+    if (from === 'completed') {
         return `Cannot transition from 'completed' (terminal state). Use ${tagPrefix}unlock-reason to modify.`;
     }
     // Handle skipping active (roadmap → completed)
-    if (from === "roadmap" && to === "completed") {
+    if (from === 'roadmap' && to === 'completed') {
         return `Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first.`;
     }
     // Handle deferred shortcuts
-    if (from === "deferred" && (to === "active" || to === "completed")) {
+    if (from === 'deferred' && (to === 'active' || to === 'completed')) {
         return `Cannot transition from 'deferred' to '${to}'. Must reactivate to 'roadmap' first.`;
     }
     // Generic message
@@ -115,6 +115,6 @@ export function getTransitionErrorMessage(from, to, options) {
     if (validTargets.length === 0) {
         return `Cannot transition from '${from}' (terminal state).`;
     }
-    return `Invalid transition from '${from}' to '${to}'. Valid targets: ${validTargets.join(", ")}.`;
+    return `Invalid transition from '${from}' to '${to}'. Valid targets: ${validTargets.join(', ')}.`;
 }
 //# sourceMappingURL=transitions.js.map

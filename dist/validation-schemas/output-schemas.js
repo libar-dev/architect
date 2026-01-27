@@ -25,9 +25,9 @@
  * - **Output Schemas**: Define the shape of JSON output for external consumers
  * - **Codec Pattern**: Validate before serialize, not just after parse
  */
-import { z } from "zod";
-import { SEVERITY_TYPES } from "../taxonomy/index.js";
-import { LintSeveritySchema } from "./lint.js";
+import { z } from 'zod';
+import { SEVERITY_TYPES } from '../taxonomy/index.js';
+import { LintSeveritySchema } from './lint.js';
 // ============================================================================
 // Lint Engine Output (engine.ts formatJson)
 // ============================================================================
@@ -94,7 +94,7 @@ export const ValidationIssueSeveritySchema = z.enum(SEVERITY_TYPES);
 /**
  * Schema for validation issue source
  */
-export const ValidationIssueSourceSchema = z.enum(["typescript", "gherkin", "cross-source"]);
+export const ValidationIssueSourceSchema = z.enum(['typescript', 'gherkin', 'cross-source']);
 /**
  * Schema for individual validation issue in JSON output
  */

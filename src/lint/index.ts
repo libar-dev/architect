@@ -17,7 +17,7 @@
  */
 
 // Rule types and definitions
-export type { LintSeverity, LintViolation, LintRule, LintContext } from "./rules.js";
+export type { LintSeverity, LintViolation, LintRule, LintContext } from './rules.js';
 export {
   defaultRules,
   filterRulesBySeverity,
@@ -29,10 +29,10 @@ export {
   missingRelationships,
   patternConflictInImplements,
   missingRelationshipTarget,
-} from "./rules.js";
+} from './rules.js';
 
 // Engine types and functions
-export type { LintResult, LintSummary, DirectiveWithLocation } from "./engine.js";
+export type { LintResult, LintSummary, DirectiveWithLocation } from './engine.js';
 export {
   lintDirective,
   lintFiles,
@@ -40,7 +40,7 @@ export {
   sortViolationsBySeverity,
   formatPretty,
   formatJson,
-} from "./engine.js";
+} from './engine.js';
 
 // Process Guard (FSM validation, change detection, protection enforcement)
-export * from "./process-guard/index.js";
+export * from './process-guard/index.js';

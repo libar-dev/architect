@@ -17,7 +17,7 @@
  * - Progressive: collapsible, link-out
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Block Schemas
@@ -25,28 +25,28 @@ import { z } from "zod";
 
 /** Heading block - markdown headers */
 export const HeadingBlockSchema = z.object({
-  type: z.literal("heading"),
+  type: z.literal('heading'),
   level: z.number().int().min(1).max(6),
   text: z.string(),
 });
 
 /** Paragraph block - plain text content */
 export const ParagraphBlockSchema = z.object({
-  type: z.literal("paragraph"),
+  type: z.literal('paragraph'),
   text: z.string(),
 });
 
 /** Separator block - horizontal rule */
 export const SeparatorBlockSchema = z.object({
-  type: z.literal("separator"),
+  type: z.literal('separator'),
 });
 
 /** Table block - markdown tables */
 export const TableBlockSchema = z.object({
-  type: z.literal("table"),
+  type: z.literal('table'),
   columns: z.array(z.string()),
   rows: z.array(z.array(z.string())),
-  alignment: z.array(z.enum(["left", "center", "right"])).optional(),
+  alignment: z.array(z.enum(['left', 'center', 'right'])).optional(),
 });
 
 /** List item - can be string or structured with checkbox */
@@ -61,34 +61,34 @@ export const ListItemSchema = z.union([
 
 /** List block - ordered/unordered/checkbox lists */
 export const ListBlockSchema = z.object({
-  type: z.literal("list"),
+  type: z.literal('list'),
   ordered: z.boolean().default(false),
   items: z.array(ListItemSchema),
 });
 
 /** Code block - fenced code with language */
 export const CodeBlockSchema = z.object({
-  type: z.literal("code"),
+  type: z.literal('code'),
   language: z.string().optional(),
   content: z.string(),
 });
 
 /** Mermaid block - diagrams */
 export const MermaidBlockSchema = z.object({
-  type: z.literal("mermaid"),
+  type: z.literal('mermaid'),
   content: z.string(),
 });
 
 /** Collapsible block - details/summary for progressive disclosure */
 export const CollapsibleBlockSchema: z.ZodType = z.object({
-  type: z.literal("collapsible"),
+  type: z.literal('collapsible'),
   summary: z.string(),
   content: z.array(z.lazy(() => SectionBlockSchema)),
 });
 
 /** Link-out block - reference to external file */
 export const LinkOutBlockSchema = z.object({
-  type: z.literal("link-out"),
+  type: z.literal('link-out'),
   text: z.string(),
   path: z.string(),
 });
@@ -101,7 +101,7 @@ export const LinkOutBlockSchema = z.object({
  * All block types that can appear in a document section.
  * Uses discriminated union on `type` field for type-safe switching.
  */
-export const SectionBlockSchema = z.discriminatedUnion("type", [
+export const SectionBlockSchema = z.discriminatedUnion('type', [
   // Structural
   HeadingBlockSchema,
   ParagraphBlockSchema,
@@ -113,7 +113,7 @@ export const SectionBlockSchema = z.discriminatedUnion("type", [
   MermaidBlockSchema,
   // Progressive Disclosure
   CollapsibleBlockSchema as z.ZodObject<{
-    type: z.ZodLiteral<"collapsible">;
+    type: z.ZodLiteral<'collapsible'>;
     summary: z.ZodString;
     content: z.ZodArray<z.ZodType>;
   }>,
@@ -165,7 +165,7 @@ export type ListBlock = z.infer<typeof ListBlockSchema>;
 export type CodeBlock = z.infer<typeof CodeBlockSchema>;
 export type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
 export type CollapsibleBlock = {
-  type: "collapsible";
+  type: 'collapsible';
   summary: string;
   content: SectionBlock[];
 };
@@ -196,29 +196,29 @@ export type RenderableDocument = {
 
 /** Create a heading block */
 export const heading = (level: 1 | 2 | 3 | 4 | 5 | 6, text: string): HeadingBlock => ({
-  type: "heading",
+  type: 'heading',
   level,
   text,
 });
 
 /** Create a paragraph block */
 export const paragraph = (text: string): ParagraphBlock => ({
-  type: "paragraph",
+  type: 'paragraph',
   text,
 });
 
 /** Create a separator block */
 export const separator = (): SeparatorBlock => ({
-  type: "separator",
+  type: 'separator',
 });
 
 /** Create a table block */
 export const table = (
   columns: string[],
   rows: string[][],
-  alignment?: Array<"left" | "center" | "right">
+  alignment?: Array<'left' | 'center' | 'right'>
 ): TableBlock => ({
-  type: "table",
+  type: 'table',
   columns,
   rows,
   ...(alignment && { alignment }),
@@ -226,34 +226,34 @@ export const table = (
 
 /** Create a list block */
 export const list = (items: ListItem[], ordered = false): ListBlock => ({
-  type: "list",
+  type: 'list',
   ordered,
   items,
 });
 
 /** Create a code block */
 export const code = (content: string, language?: string): CodeBlock => ({
-  type: "code",
+  type: 'code',
   content,
   ...(language && { language }),
 });
 
 /** Create a mermaid diagram block */
 export const mermaid = (content: string): MermaidBlock => ({
-  type: "mermaid",
+  type: 'mermaid',
   content,
 });
 
 /** Create a collapsible block */
 export const collapsible = (summary: string, content: SectionBlock[]): CollapsibleBlock => ({
-  type: "collapsible",
+  type: 'collapsible',
   summary,
   content,
 });
 
 /** Create a link-out block */
 export const linkOut = (text: string, path: string): LinkOutBlock => ({
-  type: "link-out",
+  type: 'link-out',
   text,
   path,
 });

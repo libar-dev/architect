@@ -27,16 +27,16 @@
  * - Code review checklists for documentation quality
  */
 
-import { readFileSync } from "fs";
-import type { ScannedGherkinFile } from "../validation-schemas/feature.js";
-import type { TagRegistry } from "../validation-schemas/tag-registry.js";
-import type { ScannedFile } from "../scanner/index.js";
-import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from "./types.js";
-import { DEFAULT_THRESHOLDS } from "./types.js";
-import { DEFAULT_TAG_PREFIX } from "../config/defaults.js";
+import { readFileSync } from 'fs';
+import type { ScannedGherkinFile } from '../validation-schemas/feature.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
+import type { ScannedFile } from '../scanner/index.js';
+import type { AntiPatternViolation, AntiPatternThresholds, WithTagRegistry } from './types.js';
+import { DEFAULT_THRESHOLDS } from './types.js';
+import { DEFAULT_TAG_PREFIX } from '../config/defaults.js';
 
 // Re-export types for consumers that import from this module
-export type { AntiPatternViolation, AntiPatternThresholds } from "./types.js";
+export type { AntiPatternViolation, AntiPatternThresholds } from './types.js';
 
 /**
  * Tags that should NOT appear in feature files (belong in code only).
@@ -44,8 +44,8 @@ export type { AntiPatternViolation, AntiPatternThresholds } from "./types.js";
  * Gherkin parser strips @ prefix from tags.
  */
 const CODE_ONLY_TAGS = [
-  "libar-process-depends-on",
-  "libar-process-enables",
+  'libar-process-depends-on',
+  'libar-process-enables',
   // Note: ${tagPrefix}depends-on and ${tagPrefix}enables ARE correct in code
 ] as const;
 
@@ -54,12 +54,12 @@ const CODE_ONLY_TAGS = [
  * These are process metadata tags that track delivery workflow state.
  */
 const FEATURE_ONLY_TAG_SUFFIXES = [
-  "quarter",
-  "team",
-  "effort",
-  "workflow",
-  "completed",
-  "effort-actual",
+  'quarter',
+  'team',
+  'effort',
+  'workflow',
+  'completed',
+  'effort-actual',
 ] as const;
 
 /**
@@ -116,10 +116,10 @@ export function detectTagDuplication(
       for (const codeOnlyTag of CODE_ONLY_TAGS) {
         if (normalizedTag.startsWith(codeOnlyTag.toLowerCase())) {
           violations.push({
-            id: "tag-duplication",
+            id: 'tag-duplication',
             message: `Tag "${tag}" found in feature file. Dependency tags belong in code (${tagPrefix}depends-on), not features.`,
             file: feature.filePath,
-            severity: "error",
+            severity: 'error',
             fix: `Move dependency to TypeScript code using ${tagPrefix}depends-on annotation instead.`,
           });
         }
@@ -158,11 +158,11 @@ export function detectProcessInCode(
             // Extract the suffix part after the prefix
             const suffix = annotation.slice(tagPrefix.length);
             violations.push({
-              id: "process-in-code",
+              id: 'process-in-code',
               message: `Annotation "${tag}" found in TypeScript code. Process metadata belongs in feature files.`,
               file: file.filePath,
               line: directive.position.startLine,
-              severity: "error",
+              severity: 'error',
               fix: `Move to corresponding .feature file using @libar-process-${suffix} tag.`,
             });
           }
@@ -192,8 +192,8 @@ export function detectMagicComments(
 
   for (const feature of features) {
     try {
-      const content = readFileSync(feature.filePath, "utf-8");
-      const lines = content.split("\n");
+      const content = readFileSync(feature.filePath, 'utf-8');
+      const lines = content.split('\n');
       const magicComments: Array<{ line: number; text: string }> = [];
 
       for (let i = 0; i < lines.length; i++) {
@@ -210,10 +210,10 @@ export function detectMagicComments(
 
       if (magicComments.length > threshold) {
         violations.push({
-          id: "magic-comments",
+          id: 'magic-comments',
           message: `Feature file has ${magicComments.length} magic comments (threshold: ${threshold}). This creates tight coupling with generators.`,
           file: feature.filePath,
-          severity: "warning",
+          severity: 'warning',
           fix: `Reduce generator hints. Use standard Gherkin tags and structured data instead.`,
         });
       }
@@ -245,10 +245,10 @@ export function detectScenarioBloat(
     const scenarioCount = feature.scenarios.length;
     if (scenarioCount > threshold) {
       violations.push({
-        id: "scenario-bloat",
+        id: 'scenario-bloat',
         message: `Feature file has ${scenarioCount} scenarios (threshold: ${threshold}). Consider splitting by component or domain.`,
         file: feature.filePath,
-        severity: "warning",
+        severity: 'warning',
         fix: `Split into multiple .feature files organized by component, use case, or business capability.`,
       });
     }
@@ -275,15 +275,15 @@ export function detectMegaFeature(
 
   for (const feature of features) {
     try {
-      const content = readFileSync(feature.filePath, "utf-8");
-      const lineCount = content.split("\n").length;
+      const content = readFileSync(feature.filePath, 'utf-8');
+      const lineCount = content.split('\n').length;
 
       if (lineCount > threshold) {
         violations.push({
-          id: "mega-feature",
+          id: 'mega-feature',
           message: `Feature file has ${lineCount} lines (threshold: ${threshold}). Large files are hard to review and maintain.`,
           file: feature.filePath,
-          severity: "warning",
+          severity: 'warning',
           fix: `Split into multiple smaller .feature files organized by component or business domain.`,
         });
       }
@@ -351,49 +351,49 @@ export function detectAntiPatterns(
 export function formatAntiPatternReport(violations: AntiPatternViolation[]): string {
   const lines: string[] = [];
 
-  lines.push("");
-  lines.push("Anti-Pattern Detection Report");
-  lines.push("=============================");
-  lines.push("");
+  lines.push('');
+  lines.push('Anti-Pattern Detection Report');
+  lines.push('=============================');
+  lines.push('');
 
   if (violations.length === 0) {
-    lines.push("No anti-patterns detected.");
-    return lines.join("\n");
+    lines.push('No anti-patterns detected.');
+    return lines.join('\n');
   }
 
-  const errors = violations.filter((v) => v.severity === "error");
-  const warnings = violations.filter((v) => v.severity === "warning");
+  const errors = violations.filter((v) => v.severity === 'error');
+  const warnings = violations.filter((v) => v.severity === 'warning');
 
   lines.push(`Total: ${violations.length} (${errors.length} errors, ${warnings.length} warnings)`);
-  lines.push("");
+  lines.push('');
 
   if (errors.length > 0) {
-    lines.push("Errors (architectural violations):");
+    lines.push('Errors (architectural violations):');
     for (const v of errors) {
       lines.push(`  [ERROR] ${v.id}`);
       lines.push(`          ${v.message}`);
-      lines.push(`          at ${v.file}${v.line !== undefined ? `:${v.line}` : ""}`);
+      lines.push(`          at ${v.file}${v.line !== undefined ? `:${v.line}` : ''}`);
       if (v.fix) {
         lines.push(`          Fix: ${v.fix}`);
       }
-      lines.push("");
+      lines.push('');
     }
   }
 
   if (warnings.length > 0) {
-    lines.push("Warnings (hygiene issues):");
+    lines.push('Warnings (hygiene issues):');
     for (const v of warnings) {
       lines.push(`  [WARN]  ${v.id}`);
       lines.push(`          ${v.message}`);
-      lines.push(`          at ${v.file}${v.line !== undefined ? `:${v.line}` : ""}`);
+      lines.push(`          at ${v.file}${v.line !== undefined ? `:${v.line}` : ''}`);
       if (v.fix) {
         lines.push(`          Fix: ${v.fix}`);
       }
-      lines.push("");
+      lines.push('');
     }
   }
 
-  return lines.join("\n");
+  return lines.join('\n');
 }
 
 /**
@@ -402,16 +402,16 @@ export function formatAntiPatternReport(violations: AntiPatternViolation[]): str
  * For integration with the existing validate-patterns CLI.
  */
 export function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<{
-  severity: "error" | "warning" | "info";
+  severity: 'error' | 'warning' | 'info';
   message: string;
-  source: "typescript" | "gherkin" | "cross-source";
+  source: 'typescript' | 'gherkin' | 'cross-source';
   pattern?: string;
   file?: string;
 }> {
   return violations.map((v) => ({
     severity: v.severity,
     message: `[${v.id}] ${v.message}`,
-    source: v.id === "process-in-code" ? ("typescript" as const) : ("gherkin" as const),
+    source: v.id === 'process-in-code' ? ('typescript' as const) : ('gherkin' as const),
     file: v.file,
   }));
 }

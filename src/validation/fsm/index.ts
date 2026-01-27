@@ -59,7 +59,7 @@ export {
   // Re-exported from taxonomy for convenience
   PROCESS_STATUS_VALUES,
   type ProcessStatusValue,
-} from "./states.js";
+} from './states.js';
 
 // Transitions - Valid transition matrix and queries
 export {
@@ -68,7 +68,7 @@ export {
   getValidTransitionsFrom,
   getTransitionErrorMessage,
   type TransitionMessageOptions,
-} from "./transitions.js";
+} from './transitions.js';
 
 // Validator - Pure validation functions
 export {
@@ -82,4 +82,4 @@ export {
   validateCompletionMetadata,
   validatePatternStatus,
   getProtectionSummary,
-} from "./validator.js";
+} from './validator.js';

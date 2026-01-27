@@ -28,18 +28,18 @@
  * - **component**: System overview with bounded context subgraphs
  * - **layered**: Components organized by architectural layer
  */
-import { z } from "zod";
-import { MasterDatasetSchema, } from "../../validation-schemas/master-dataset.js";
-import { heading, paragraph, separator, table, mermaid, document, } from "../schema.js";
-import { getDisplayName, getStatusEmoji } from "../utils.js";
-import { DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { z } from 'zod';
+import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
+import { heading, paragraph, separator, table, mermaid, document, } from '../schema.js';
+import { getDisplayName, getStatusEmoji } from '../utils.js';
+import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 /**
  * Default options for ArchitectureDocumentCodec
  */
 export const DEFAULT_ARCHITECTURE_OPTIONS = {
     ...DEFAULT_BASE_OPTIONS,
-    diagramType: "component",
+    diagramType: 'component',
     includeInventory: true,
     includeLegend: true,
     filterContexts: [],
@@ -73,7 +73,7 @@ export function createArchitectureCodec(options) {
         },
         /** @throws Always - this codec is decode-only. See zod-codecs.md */
         encode: () => {
-            throw new Error("ArchitectureDocumentCodec is decode-only. See zod-codecs.md");
+            throw new Error('ArchitectureDocumentCodec is decode-only. See zod-codecs.md');
         },
     });
 }
@@ -101,11 +101,11 @@ function buildArchitectureDocument(dataset, options) {
     const archIndex = dataset.archIndex;
     // Check if we have any architecture metadata
     if (!archIndex || archIndex.all.length === 0) {
-        return document("Architecture", [
-            heading(2, "No Architecture Data"),
-            paragraph("No patterns with architecture annotations found. " +
-                "Add `@libar-docs-arch-role`, `@libar-docs-arch-context`, or " +
-                "`@libar-docs-arch-layer` tags to source files to generate architecture diagrams."),
+        return document('Architecture', [
+            heading(2, 'No Architecture Data'),
+            paragraph('No patterns with architecture annotations found. ' +
+                'Add `@libar-docs-arch-role`, `@libar-docs-arch-context`, or ' +
+                '`@libar-docs-arch-layer` tags to source files to generate architecture diagrams.'),
         ]);
     }
     // Apply context filter if specified
@@ -113,7 +113,7 @@ function buildArchitectureDocument(dataset, options) {
     // 1. Summary section
     sections.push(...buildSummarySection(filteredIndex));
     // 2. Main diagram based on type
-    if (options.diagramType === "component") {
+    if (options.diagramType === 'component') {
         sections.push(...buildComponentDiagram(filteredIndex, dataset));
     }
     else {
@@ -127,11 +127,11 @@ function buildArchitectureDocument(dataset, options) {
     if (options.includeInventory) {
         sections.push(...buildInventorySection(filteredIndex));
     }
-    return document("Architecture", sections, {
-        purpose: "Auto-generated architecture diagram from source annotations",
-        detailLevel: options.diagramType === "component"
-            ? "Component diagram with bounded context subgraphs"
-            : "Layered architecture diagram",
+    return document('Architecture', sections, {
+        purpose: 'Auto-generated architecture diagram from source annotations',
+        detailLevel: options.diagramType === 'component'
+            ? 'Component diagram with bounded context subgraphs'
+            : 'Layered architecture diagram',
     });
 }
 /**
@@ -184,13 +184,13 @@ function buildSummarySection(archIndex) {
     const roleCount = Object.keys(archIndex.byRole).length;
     const totalComponents = archIndex.all.length;
     return [
-        heading(2, "Overview"),
+        heading(2, 'Overview'),
         paragraph(`This diagram was auto-generated from ${totalComponents} annotated source files ` +
-            `across ${contextCount} bounded context${contextCount !== 1 ? "s" : ""}.`),
-        table(["Metric", "Count"], [
-            ["Total Components", String(totalComponents)],
-            ["Bounded Contexts", String(contextCount)],
-            ["Component Roles", String(roleCount)],
+            `across ${contextCount} bounded context${contextCount !== 1 ? 's' : ''}.`),
+        table(['Metric', 'Count'], [
+            ['Total Components', String(totalComponents)],
+            ['Bounded Contexts', String(contextCount)],
+            ['Component Roles', String(roleCount)],
         ]),
         separator(),
     ];
@@ -205,7 +205,7 @@ function buildSummarySection(archIndex) {
  * - extends → solid open arrow (-->>)
  */
 function buildComponentDiagram(archIndex, dataset) {
-    const lines = ["graph TB"];
+    const lines = ['graph TB'];
     const nodeIds = new Map(); // pattern name → node ID
     // First pass: collect all node IDs
     for (const pattern of archIndex.all) {
@@ -228,10 +228,10 @@ function buildComponentDiagram(archIndex, dataset) {
         for (const pattern of patterns) {
             const name = pattern.patternName ?? pattern.name;
             const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
-            const roleLabel = pattern.archRole ? `[${pattern.archRole}]` : "";
+            const roleLabel = pattern.archRole ? `[${pattern.archRole}]` : '';
             lines.push(`        ${nodeId}["${name}${roleLabel}"]`);
         }
-        lines.push("    end");
+        lines.push('    end');
     }
     // Generate shared infrastructure subgraph (patterns without context)
     if (sharedPatterns.length > 0) {
@@ -239,10 +239,10 @@ function buildComponentDiagram(archIndex, dataset) {
         for (const pattern of sharedPatterns) {
             const name = pattern.patternName ?? pattern.name;
             const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
-            const roleLabel = pattern.archRole ? `[${pattern.archRole}]` : "";
+            const roleLabel = pattern.archRole ? `[${pattern.archRole}]` : '';
             lines.push(`        ${nodeId}["${name}${roleLabel}"]`);
         }
-        lines.push("    end");
+        lines.push('    end');
     }
     // Second pass: add relationships from relationshipIndex
     const relationships = dataset.relationshipIndex ?? {};
@@ -284,9 +284,9 @@ function buildComponentDiagram(archIndex, dataset) {
         }
     }
     return [
-        heading(2, "System Overview"),
-        paragraph("Component architecture with bounded context isolation:"),
-        mermaid(lines.join("\n")),
+        heading(2, 'System Overview'),
+        paragraph('Component architecture with bounded context isolation:'),
+        mermaid(lines.join('\n')),
         separator(),
     ];
 }
@@ -294,7 +294,7 @@ function buildComponentDiagram(archIndex, dataset) {
  * Build layered architecture diagram organized by layer
  */
 function buildLayeredDiagram(archIndex, dataset) {
-    const lines = ["graph TB"];
+    const lines = ['graph TB'];
     const nodeIds = new Map();
     // Collect all node IDs first
     for (const pattern of archIndex.all) {
@@ -303,7 +303,7 @@ function buildLayeredDiagram(archIndex, dataset) {
         nodeIds.set(name, nodeId);
     }
     // Layer order (top to bottom in diagram)
-    const layerOrder = ["infrastructure", "application", "domain"];
+    const layerOrder = ['infrastructure', 'application', 'domain'];
     const byLayer = archIndex.byLayer;
     // Generate subgraphs for each layer
     for (const layer of layerOrder) {
@@ -315,10 +315,10 @@ function buildLayeredDiagram(archIndex, dataset) {
         for (const pattern of patterns) {
             const name = pattern.patternName ?? pattern.name;
             const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
-            const contextLabel = pattern.archContext ? ` (${pattern.archContext})` : "";
+            const contextLabel = pattern.archContext ? ` (${pattern.archContext})` : '';
             lines.push(`        ${nodeId}["${name}${contextLabel}"]`);
         }
-        lines.push("    end");
+        lines.push('    end');
     }
     // Patterns without layer
     const unlayered = archIndex.all.filter((p) => !p.archLayer);
@@ -329,7 +329,7 @@ function buildLayeredDiagram(archIndex, dataset) {
             const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
             lines.push(`        ${nodeId}["${name}"]`);
         }
-        lines.push("    end");
+        lines.push('    end');
     }
     // Add relationships
     const relationships = dataset.relationshipIndex ?? {};
@@ -355,9 +355,9 @@ function buildLayeredDiagram(archIndex, dataset) {
         }
     }
     return [
-        heading(2, "Layered Architecture"),
-        paragraph("Components organized by architectural layer:"),
-        mermaid(lines.join("\n")),
+        heading(2, 'Layered Architecture'),
+        paragraph('Components organized by architectural layer:'),
+        mermaid(lines.join('\n')),
         separator(),
     ];
 }
@@ -366,12 +366,12 @@ function buildLayeredDiagram(archIndex, dataset) {
  */
 function buildLegendSection() {
     return [
-        heading(2, "Legend"),
-        table(["Arrow Style", "Relationship", "Description"], [
-            ["`-->`", "uses", "Direct dependency (solid arrow)"],
-            ["`-.->` ", "depends-on", "Weak dependency (dashed arrow)"],
-            ["`..->` ", "implements", "Realization relationship (dotted arrow)"],
-            ["`-->>` ", "extends", "Generalization relationship (open arrow)"],
+        heading(2, 'Legend'),
+        table(['Arrow Style', 'Relationship', 'Description'], [
+            ['`-->`', 'uses', 'Direct dependency (solid arrow)'],
+            ['`-.->` ', 'depends-on', 'Weak dependency (dashed arrow)'],
+            ['`..->` ', 'implements', 'Realization relationship (dotted arrow)'],
+            ['`-->>` ', 'extends', 'Generalization relationship (open arrow)'],
         ]),
         separator(),
     ];
@@ -383,12 +383,12 @@ function buildInventorySection(archIndex) {
     const rows = [];
     // Sort patterns by context, then by role, then by name
     const sorted = [...archIndex.all].sort((a, b) => {
-        const ctxA = a.archContext ?? "zzz"; // No context sorts last
-        const ctxB = b.archContext ?? "zzz";
+        const ctxA = a.archContext ?? 'zzz'; // No context sorts last
+        const ctxB = b.archContext ?? 'zzz';
         if (ctxA !== ctxB)
             return ctxA.localeCompare(ctxB);
-        const roleA = a.archRole ?? "";
-        const roleB = b.archRole ?? "";
+        const roleA = a.archRole ?? '';
+        const roleB = b.archRole ?? '';
         if (roleA !== roleB)
             return roleA.localeCompare(roleB);
         const nameA = a.patternName ?? a.name;
@@ -398,16 +398,16 @@ function buildInventorySection(archIndex) {
     for (const pattern of sorted) {
         const name = getDisplayName(pattern);
         const emoji = getStatusEmoji(pattern.status);
-        const context = pattern.archContext ?? "-";
-        const role = pattern.archRole ?? "-";
-        const layer = pattern.archLayer ?? "-";
+        const context = pattern.archContext ?? '-';
+        const role = pattern.archRole ?? '-';
+        const layer = pattern.archLayer ?? '-';
         const source = pattern.source.file;
         rows.push([`${emoji} ${name}`, context, role, layer, source]);
     }
     return [
-        heading(2, "Component Inventory"),
-        paragraph("All components with architecture annotations:"),
-        table(["Component", "Context", "Role", "Layer", "Source File"], rows),
+        heading(2, 'Component Inventory'),
+        paragraph('All components with architecture annotations:'),
+        table(['Component', 'Context', 'Role', 'Layer', 'Source File'], rows),
     ];
 }
 // ═══════════════════════════════════════════════════════════════════════════
@@ -418,7 +418,7 @@ function buildInventorySection(archIndex) {
  * Mermaid requires alphanumeric + underscore only
  */
 function sanitizeNodeId(name) {
-    return name.replace(/[^a-zA-Z0-9]/g, "_");
+    return name.replace(/[^a-zA-Z0-9]/g, '_');
 }
 /**
  * Format context name for subgraph label

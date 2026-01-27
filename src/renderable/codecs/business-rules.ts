@@ -38,13 +38,13 @@
  * ```
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 import {
   MasterDatasetSchema,
   type MasterDataset,
-} from "../../validation-schemas/master-dataset.js";
-import type { ExtractedPattern } from "../../validation-schemas/index.js";
-import type { BusinessRule } from "../../validation-schemas/extracted-pattern.js";
+} from '../../validation-schemas/master-dataset.js';
+import type { ExtractedPattern } from '../../validation-schemas/index.js';
+import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -53,8 +53,8 @@ import {
   separator,
   table,
   document,
-} from "../schema.js";
-import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from "./types/base.js";
+} from '../schema.js';
+import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Business Rules Codec Options (co-located with codec)
@@ -70,7 +70,7 @@ import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from "./typ
  */
 export interface BusinessRulesCodecOptions extends BaseCodecOptions {
   /** Group rules by (default: "domain-then-phase") */
-  groupBy?: "domain" | "phase" | "domain-then-phase";
+  groupBy?: 'domain' | 'phase' | 'domain-then-phase';
 
   /** Include code examples from DocStrings (default: false, only in detailed mode) */
   includeCodeExamples?: boolean;
@@ -105,7 +105,7 @@ export interface BusinessRulesCodecOptions extends BaseCodecOptions {
  */
 export const DEFAULT_BUSINESS_RULES_OPTIONS: Required<BusinessRulesCodecOptions> = {
   ...DEFAULT_BASE_OPTIONS,
-  groupBy: "domain-then-phase",
+  groupBy: 'domain-then-phase',
   includeCodeExamples: false, // Only in detailed mode
   includeTables: true,
   includeRationale: true,
@@ -116,12 +116,12 @@ export const DEFAULT_BUSINESS_RULES_OPTIONS: Required<BusinessRulesCodecOptions>
   includeVerifiedBy: false, // Only in detailed mode
   maxDescriptionLength: 150,
 };
-import { RenderableDocumentOutputSchema } from "./shared-schema.js";
+import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import {
   parseBusinessRuleAnnotations,
   type BusinessRuleAnnotations,
   extractFirstSentence,
-} from "./helpers.js";
+} from './helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -185,7 +185,7 @@ export function createBusinessRulesCodec(
     },
     /** @throws Always - this codec is decode-only. See zod-codecs.md */
     encode: (): never => {
-      throw new Error("BusinessRulesCodec is decode-only. See zod-codecs.md");
+      throw new Error('BusinessRulesCodec is decode-only. See zod-codecs.md');
     },
   });
 }
@@ -225,14 +225,14 @@ function buildBusinessRulesDocument(
 
   if (stats.totalRules === 0) {
     sections.push(
-      heading(2, "No Business Rules Found"),
+      heading(2, 'No Business Rules Found'),
       paragraph(
-        "No business rules were found in the feature files. " +
-          "Business rules are defined using the `Rule:` keyword in Gherkin feature files."
+        'No business rules were found in the feature files. ' +
+          'Business rules are defined using the `Rule:` keyword in Gherkin feature files.'
       )
     );
-    return document("Business Rules", sections, {
-      purpose: "Domain constraints and invariants",
+    return document('Business Rules', sections, {
+      purpose: 'Domain constraints and invariants',
     });
   }
 
@@ -240,12 +240,12 @@ function buildBusinessRulesDocument(
   sections.push(...buildSummarySection(stats));
 
   // 3. Build content sections (standard and detailed modes only)
-  if (options.detailLevel !== "summary") {
+  if (options.detailLevel !== 'summary') {
     sections.push(...buildProductAreaSections(productAreaGroups, options));
   }
 
-  return document("Business Rules", sections, {
-    purpose: "Domain constraints and invariants extracted from feature files",
+  return document('Business Rules', sections, {
+    purpose: 'Domain constraints and invariants extracted from feature files',
     detailLevel: options.detailLevel,
   });
 }
@@ -284,7 +284,7 @@ function collectRulesByProductArea(
     }
 
     // Determine product area (default to "Platform" if not specified)
-    const productArea = pattern.productArea ?? "Platform";
+    const productArea = pattern.productArea ?? 'Platform';
     const productAreaDisplay = formatProductAreaName(productArea);
 
     // Determine phase key (use release for DeliveryProcess items without phase)
@@ -357,7 +357,7 @@ function getPhaseKey(pattern: ExtractedPattern): string {
   }
 
   // Fallback
-  return "Uncategorized";
+  return 'Uncategorized';
 }
 
 /**
@@ -389,7 +389,7 @@ function extractFeatureDescription(pattern: ExtractedPattern): string {
       const content = nextHeaderMatch ? afterHeader.slice(0, nextHeaderMatch.index) : afterHeader;
 
       // Clean up and extract first sentence
-      const cleaned = content.trim().split("\n")[0]?.trim() ?? "";
+      const cleaned = content.trim().split('\n')[0]?.trim() ?? '';
       if (cleaned.length > 0) {
         return extractFirstSentence(cleaned);
       }
@@ -397,13 +397,13 @@ function extractFeatureDescription(pattern: ExtractedPattern): string {
   }
 
   // Fallback: Try to get the first meaningful line
-  const lines = desc.split("\n").filter((line: string) => {
+  const lines = desc.split('\n').filter((line: string) => {
     const trimmed = line.trim();
     return (
       trimmed.length > 0 &&
-      !trimmed.startsWith("**") && // Skip any header
-      !trimmed.startsWith("|") && // Skip table rows
-      !trimmed.startsWith("-") && // Skip list items
+      !trimmed.startsWith('**') && // Skip any header
+      !trimmed.startsWith('|') && // Skip table rows
+      !trimmed.startsWith('-') && // Skip list items
       trimmed.length > 20 // Require substantial content
     );
   });
@@ -413,7 +413,7 @@ function extractFeatureDescription(pattern: ExtractedPattern): string {
     return extractFirstSentence(firstLine);
   }
 
-  return "";
+  return '';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -543,7 +543,7 @@ function renderFeatureWithRules(
   options: Required<BusinessRulesCodecOptions>
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
-  const isDetailed = options.detailLevel === "detailed";
+  const isDetailed = options.detailLevel === 'detailed';
 
   // Feature heading (H3)
   sections.push(heading(3, feature.featureName));
@@ -618,17 +618,17 @@ function renderRuleInline(
     annotations.verifiedBy &&
     annotations.verifiedBy.length > 0
   ) {
-    sections.push(paragraph(`**Verified by:** ${annotations.verifiedBy.join(", ")}`));
+    sections.push(paragraph(`**Verified by:** ${annotations.verifiedBy.join(', ')}`));
   }
 
   // API implementation references
   if (annotations.apiRefs && annotations.apiRefs.length > 0) {
-    const refList = annotations.apiRefs.map((ref) => `\`${ref}\``).join(", ");
+    const refList = annotations.apiRefs.map((ref) => `\`${ref}\``).join(', ');
     sections.push(paragraph(`**Implementation:** ${refList}`));
   }
 
   // Add spacing between rules
-  sections.push(paragraph(""));
+  sections.push(paragraph(''));
 
   return sections;
 }
@@ -638,7 +638,7 @@ function renderRuleInline(
  */
 function extractTables(content: string): SectionBlock[] {
   const sections: SectionBlock[] = [];
-  const lines = content.split("\n");
+  const lines = content.split('\n');
 
   let inTable = false;
   let tableLines: string[] = [];
@@ -646,7 +646,7 @@ function extractTables(content: string): SectionBlock[] {
   for (const line of lines) {
     const trimmed = line.trim();
 
-    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
       inTable = true;
       tableLines.push(trimmed);
     } else if (inTable) {
@@ -688,7 +688,7 @@ function parseMarkdownTable(lines: string[]): SectionBlock | null {
   if (!headerRow) return null;
 
   const headers = headerRow
-    .split("|")
+    .split('|')
     .map((cell) => cell.trim())
     .filter((cell) => cell.length > 0);
 
@@ -701,7 +701,7 @@ function parseMarkdownTable(lines: string[]): SectionBlock | null {
     if (!row) continue;
 
     const cells = row
-      .split("|")
+      .split('|')
       .map((cell) => cell.trim())
       .filter((cell) => cell.length > 0);
     if (cells.length > 0) {
@@ -722,14 +722,14 @@ function parseMarkdownTable(lines: string[]): SectionBlock | null {
 function formatProductAreaName(productArea: string): string {
   // Handle common product areas
   switch (productArea.toLowerCase()) {
-    case "platform":
-      return "Platform";
-    case "deliveryprocess":
-      return "Delivery Process";
-    case "exampleapp":
-      return "Example App";
-    case "taxonomy":
-      return "Taxonomy";
+    case 'platform':
+      return 'Platform';
+    case 'deliveryprocess':
+      return 'Delivery Process';
+    case 'exampleapp':
+      return 'Example App';
+    case 'taxonomy':
+      return 'Taxonomy';
     default:
       // Title case for unknown product areas
       return productArea.charAt(0).toUpperCase() + productArea.slice(1);
@@ -743,7 +743,7 @@ function extractSourceName(filePath: string): string {
   const pattern = /([^/]+)\.feature$/;
   const match = pattern.exec(filePath);
   if (match?.[1]) {
-    return match[1] + ".feature";
+    return match[1] + '.feature';
   }
   return filePath;
 }

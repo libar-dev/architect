@@ -29,7 +29,7 @@
  * - `component`: Tooling/infrastructure component tests
  * - `unknown`: Unclassified features (fallback)
  */
-export type FeatureLayer = "timeline" | "domain" | "integration" | "e2e" | "component" | "unknown";
+export type FeatureLayer = 'timeline' | 'domain' | 'integration' | 'e2e' | 'component' | 'unknown';
 
 /**
  * All valid feature layers as a readonly array
@@ -38,12 +38,12 @@ export type FeatureLayer = "timeline" | "domain" | "integration" | "e2e" | "comp
  * Useful for validation and schema definitions
  */
 export const FEATURE_LAYERS: readonly FeatureLayer[] = [
-  "timeline",
-  "domain",
-  "integration",
-  "e2e",
-  "component",
-  "unknown",
+  'timeline',
+  'domain',
+  'integration',
+  'e2e',
+  'component',
+  'unknown',
 ] as const;
 
 /**
@@ -74,44 +74,44 @@ export const FEATURE_LAYERS: readonly FeatureLayer[] = [
  */
 export function inferFeatureLayer(filePath: string): FeatureLayer {
   // Normalize path for cross-platform consistency
-  const normalizedPath = filePath.toLowerCase().replace(/\\/g, "/");
+  const normalizedPath = filePath.toLowerCase().replace(/\\/g, '/');
 
   // Timeline features (process documentation)
-  if (normalizedPath.includes("/timeline/")) {
-    return "timeline";
+  if (normalizedPath.includes('/timeline/')) {
+    return 'timeline';
   }
 
   // Decider features (pure domain logic)
-  if (normalizedPath.includes("/deciders/")) {
-    return "domain";
+  if (normalizedPath.includes('/deciders/')) {
+    return 'domain';
   }
 
   // Domain features (command handlers, but not integration tests)
   // Check for integration FIRST to avoid false positives
   const isIntegration =
-    normalizedPath.includes("/integration-features/") || normalizedPath.includes("/integration/");
+    normalizedPath.includes('/integration-features/') || normalizedPath.includes('/integration/');
 
   if (!isIntegration) {
-    if (normalizedPath.includes("/orders/") || normalizedPath.includes("/inventory/")) {
-      return "domain";
+    if (normalizedPath.includes('/orders/') || normalizedPath.includes('/inventory/')) {
+      return 'domain';
     }
   }
 
   // Integration features
   if (isIntegration) {
-    return "integration";
+    return 'integration';
   }
 
   // E2E features (browser-based tests)
-  if (normalizedPath.includes("/e2e/")) {
-    return "e2e";
+  if (normalizedPath.includes('/e2e/')) {
+    return 'e2e';
   }
 
   // Component features (tooling tests)
-  if (normalizedPath.includes("/scanner/") || normalizedPath.includes("/lint/")) {
-    return "component";
+  if (normalizedPath.includes('/scanner/') || normalizedPath.includes('/lint/')) {
+    return 'component';
   }
 
   // Unknown - fallback for unclassified features
-  return "unknown";
+  return 'unknown';
 }

@@ -13,13 +13,13 @@
  * needed by document codecs.
  */
 
-import type { ExtractedPattern, StatusCounts } from "../validation-schemas/index.js";
-import type { LoadedWorkflow } from "../validation-schemas/workflow-config.js";
-import { camelCaseToTitleCase, groupBy } from "../utils/index.js";
+import type { ExtractedPattern, StatusCounts } from '../validation-schemas/index.js';
+import type { LoadedWorkflow } from '../validation-schemas/workflow-config.js';
+import { camelCaseToTitleCase, groupBy } from '../utils/index.js';
 import {
   normalizeStatus as taxonomyNormalizeStatus,
   type NormalizedStatus as TaxonomyNormalizedStatus,
-} from "../taxonomy/index.js";
+} from '../taxonomy/index.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Status Utilities
@@ -31,13 +31,13 @@ import {
  * Intentionally maps both legacy and new values for display backward compat.
  */
 const STATUS_EMOJI: Record<string, string> = {
-  implemented: "\u2705", // ✅ (legacy)
-  completed: "\u2705", // ✅
-  partial: "\ud83d\udea7", // 🚧 (legacy)
-  active: "\ud83d\udea7", // 🚧
-  roadmap: "\ud83d\udccb", // 📋
-  planned: "\ud83d\udccb", // 📋 (normalized)
-  deferred: "\u23f8\ufe0f", // ⏸️
+  implemented: '\u2705', // ✅ (legacy)
+  completed: '\u2705', // ✅
+  partial: '\ud83d\udea7', // 🚧 (legacy)
+  active: '\ud83d\udea7', // 🚧
+  roadmap: '\ud83d\udccb', // 📋
+  planned: '\ud83d\udccb', // 📋 (normalized)
+  deferred: '\u23f8\ufe0f', // ⏸️
 };
 
 /**
@@ -48,21 +48,21 @@ const STATUS_EMOJI: Record<string, string> = {
  * @returns Emoji string
  */
 export function getStatusEmoji(status: string | undefined, workflow?: LoadedWorkflow): string {
-  if (!status) return "";
+  if (!status) return '';
 
   if (workflow) {
     const statusDef = workflow.statusMap.get(status.toLowerCase());
-    return statusDef?.emoji ?? "";
+    return statusDef?.emoji ?? '';
   }
 
-  return STATUS_EMOJI[status.toLowerCase()] ?? "";
+  return STATUS_EMOJI[status.toLowerCase()] ?? '';
 }
 
 /**
  * Get status display text (capitalized)
  */
 export function getStatusText(status: string | undefined): string {
-  if (!status) return "Planned";
+  if (!status) return 'Planned';
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
@@ -84,7 +84,7 @@ export function getDisplayName(pattern: ExtractedPattern): string {
 /**
  * Common acronyms that should be rendered in uppercase
  */
-const ACRONYMS = new Set(["ddd", "cqrs", "api", "cms", "es", "occ", "dcb", "bc"]);
+const ACRONYMS = new Set(['ddd', 'cqrs', 'api', 'cms', 'es', 'occ', 'dcb', 'bc']);
 
 /**
  * Format category name (capitalize words, handle acronyms)
@@ -94,7 +94,7 @@ const ACRONYMS = new Set(["ddd", "cqrs", "api", "cms", "es", "occ", "dcb", "bc"]
  */
 export function formatCategoryName(category: string): string {
   return category
-    .split("-")
+    .split('-')
     .map((word) => {
       const lower = word.toLowerCase();
       if (ACRONYMS.has(lower)) {
@@ -102,15 +102,15 @@ export function formatCategoryName(category: string): string {
       }
       return word.charAt(0).toUpperCase() + word.slice(1);
     })
-    .join(" ");
+    .join(' ');
 }
 
 /**
  * Format business value (replace hyphens with spaces)
  */
 export function formatBusinessValue(value: string | undefined): string {
-  if (!value) return "";
-  return value.replace(/-/g, " ");
+  if (!value) return '';
+  return value.replace(/-/g, ' ');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -139,12 +139,12 @@ export function formatBusinessValue(value: string | undefined): string {
 export function stripLeadingHeaders(text: string): string {
   if (!text) return text;
 
-  const lines = text.split("\n");
+  const lines = text.split('\n');
   let startIndex = 0;
 
   // Skip leading empty lines and markdown header lines (# to ######)
   while (startIndex < lines.length) {
-    const line = lines[startIndex]?.trim() ?? "";
+    const line = lines[startIndex]?.trim() ?? '';
     if (!line) {
       // Skip empty lines
       startIndex++;
@@ -159,35 +159,35 @@ export function stripLeadingHeaders(text: string): string {
     break;
   }
 
-  return lines.slice(startIndex).join("\n").trim();
+  return lines.slice(startIndex).join('\n').trim();
 }
 
 /** Maximum length for summary text */
 const SUMMARY_MAX_LENGTH = 120;
 /** Truncation suffix */
-const TRUNCATION_SUFFIX = "...";
+const TRUNCATION_SUFFIX = '...';
 
 /**
  * Strip markdown formatting from text
  */
 export function stripMarkdown(text: string): string {
   return text
-    .replace(/^#+\s*/, "") // Remove heading markers
-    .replace(/\*\*([^*]+)\*\*/g, "$1") // Bold
-    .replace(/\*([^*]+)\*/g, "$1") // Italic
-    .replace(/`([^`]+)`/g, "`$1`") // Keep inline code
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1"); // Links
+    .replace(/^#+\s*/, '') // Remove heading markers
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Bold
+    .replace(/\*([^*]+)\*/g, '$1') // Italic
+    .replace(/`([^`]+)`/g, '`$1`') // Keep inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1'); // Links
 }
 
 /**
  * Extract first paragraph from description
  */
 export function extractFirstParagraph(description: string, maxLength = 500): string {
-  if (!description) return "";
+  if (!description) return '';
 
-  const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, "");
+  const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, '');
   const paragraphs = withoutHeaders.split(/\n\s*\n/);
-  const firstParagraph = paragraphs[0]?.trim() ?? "";
+  const firstParagraph = paragraphs[0]?.trim() ?? '';
 
   if (firstParagraph.length > maxLength) {
     return firstParagraph.slice(0, maxLength - 3) + TRUNCATION_SUFFIX;
@@ -199,11 +199,11 @@ export function extractFirstParagraph(description: string, maxLength = 500): str
  * Extract first sentence from description
  */
 export function extractFirstSentence(description: string, maxLength = 120): string {
-  if (!description) return "";
+  if (!description) return '';
 
-  const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, "");
-  const lines = withoutHeaders.split("\n").filter((l) => l.trim());
-  const firstLine = lines[0]?.trim() ?? "";
+  const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, '');
+  const lines = withoutHeaders.split('\n').filter((l) => l.trim());
+  const firstLine = lines[0]?.trim() ?? '';
 
   // Find sentence-ending punctuation followed by space + capital or end of string
   const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
@@ -227,23 +227,23 @@ export function extractFirstSentence(description: string, maxLength = 120): stri
  * If no sentence ending is found within the limit, truncates at word boundary with "..."
  */
 export function extractSummary(description: string, patternName?: string): string {
-  if (!description) return "";
+  if (!description) return '';
 
-  const lines = description.split("\n");
+  const lines = description.split('\n');
   const nonEmptyLines: string[] = [];
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed && !trimmed.startsWith("#")) {
+    if (trimmed && !trimmed.startsWith('#')) {
       nonEmptyLines.push(trimmed);
     }
   }
 
-  if (nonEmptyLines.length === 0) return "";
+  if (nonEmptyLines.length === 0) return '';
 
   // Find starting index, skipping tautological first lines and section headers
   let startIndex = 0;
-  const firstCleaned = stripMarkdown(nonEmptyLines[0] ?? "");
+  const firstCleaned = stripMarkdown(nonEmptyLines[0] ?? '');
 
   // Skip tautological first line (just the pattern name)
   if (firstCleaned.toLowerCase().trim() === patternName?.toLowerCase().trim()) {
@@ -251,22 +251,22 @@ export function extractSummary(description: string, patternName?: string): strin
   }
 
   // Skip section header labels like "Problem:", "Solution:", "Context:"
-  const startText = stripMarkdown(nonEmptyLines[startIndex] ?? "");
+  const startText = stripMarkdown(nonEmptyLines[startIndex] ?? '');
   if (/^[A-Za-z]+:$/.test(startText) && startIndex < nonEmptyLines.length - 1) {
     startIndex++;
   }
 
   // Combine lines until we find a sentence ending or exceed max length
-  let summary = "";
+  let summary = '';
   const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
 
   for (let i = startIndex; i < nonEmptyLines.length && summary.length < SUMMARY_MAX_LENGTH; i++) {
-    const lineText = stripMarkdown(nonEmptyLines[i] ?? "");
+    const lineText = stripMarkdown(nonEmptyLines[i] ?? '');
     if (!lineText) continue;
 
     // Add space between combined lines
     if (summary.length > 0) {
-      summary += " ";
+      summary += ' ';
     }
     summary += lineText;
 
@@ -290,9 +290,8 @@ export function extractSummary(description: string, patternName?: string): strin
     } else {
       // No sentence boundary found - truncate at word boundary
       const truncateAt = SUMMARY_MAX_LENGTH - TRUNCATION_SUFFIX.length;
-      const lastSpace = withinLimit.lastIndexOf(" ", truncateAt);
-      summary =
-        withinLimit.slice(0, lastSpace > 0 ? lastSpace : truncateAt) + TRUNCATION_SUFFIX;
+      const lastSpace = withinLimit.lastIndexOf(' ', truncateAt);
+      summary = withinLimit.slice(0, lastSpace > 0 ? lastSpace : truncateAt) + TRUNCATION_SUFFIX;
     }
   } else if (summary.length > 0 && !/[.!?]$/.test(summary)) {
     // Text is under limit but doesn't end with sentence punctuation - add ellipsis
@@ -347,13 +346,13 @@ export function isFullyCompleted(counts: StatusCounts): boolean {
  * @returns Progress bar string like "[████░░░░] 4/8"
  */
 export function renderProgressBar(completed: number, total: number, width = 10): string {
-  if (total === 0) return `[${"░".repeat(width)}] 0/0`;
+  if (total === 0) return `[${'░'.repeat(width)}] 0/0`;
 
   const percent = completed / total;
   const filled = Math.round(percent * width);
   const empty = width - filled;
 
-  return `[${"█".repeat(filled)}${"░".repeat(empty)}] ${completed}/${total}`;
+  return `[${'█'.repeat(filled)}${'░'.repeat(empty)}] ${completed}/${total}`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
