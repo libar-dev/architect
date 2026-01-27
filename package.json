@@ -145,6 +145,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263",
     "@cucumber/gherkin": "^29.0.0",
     "@cucumber/messages": "^25.0.1",
     "@typescript-eslint/typescript-estree": "^8.18.0",
