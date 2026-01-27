@@ -63,7 +63,7 @@ Feature: Remaining Work Enhancement
       | 31    | Medium Task | 3d     | roadmap |
       | 32    | Long Task   | 1w     | roadmap |
     When generating remaining work with sortBy: effort
-    Then phases appear in effort order: Quick Task, Medium Task, Long Task
+    Then phases appear in effort order: "Quick Task, Medium Task, Long Task"
 
   Scenario: Effort parsing handles hours
     Given a phase with effort "2h"
@@ -110,7 +110,7 @@ Feature: Remaining Work Enhancement
       | 52    | Q4 Work | Q4-2025 | roadmap |
     And all phases have incomplete deliverables
     When generating remaining work with groupPlannedBy: quarter
-    Then quarters appear in order: Q4-2025, Q1-2026, Q2-2026
+    Then quarters appear in order: "Q4-2025, Q1-2026, Q2-2026"
 
   # ==========================================================================
   # Priority-Based Grouping
@@ -180,7 +180,7 @@ Feature: Remaining Work Enhancement
       | 80    | Phase A  | roadmap |
       | 90    | Phase B  | roadmap |
     When generating remaining work with default config
-    Then phases appear in phase number order: Phase A, Phase B, Phase C
+    Then phases appear in phase number order: "Phase A, Phase B, Phase C"
 
   Scenario: Default grouping is none (flat list)
     Given phases with different quarters:

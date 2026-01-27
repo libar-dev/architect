@@ -50,17 +50,21 @@ Feature: Remaining Work Summary Accuracy
       When remaining work document is generated
       Then summary shows Active count 2
       And summary shows Total Remaining count 3
-      And phase table shows "Phase 1" with Remaining: 1, Active: 1
+      And phase table shows phase 1 row with Remaining: 1, Active: 1
       And phase table shows "Backlog" with Remaining: 2, Active: 1
 
     Scenario: All patterns in backlog when none have phases
+      # When all patterns lack a phase, the codec does not generate a phase table
+      # (there are no phases to show). Backlog patterns appear in the summary
+      # and priority sections instead.
       Given a dataset with patterns:
         | id | patternName | status | phase |
         | p1 | PatternA | active | |
         | p2 | PatternB | planned | |
       When remaining work document is generated
-      Then phase table shows only "Backlog" row
-      And backlog row shows Remaining: 2, Active: 1
+      Then no phase table is generated
+      And summary shows Active count 1
+      And summary shows Total Remaining count 2
 
   # ===========================================================================
   # Rule 3: Patterns with undefined patternName handled correctly
