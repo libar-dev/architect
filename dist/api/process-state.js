@@ -3,6 +3,9 @@
  * @libar-docs-core
  * @libar-docs-pattern ProcessStateAPI
  * @libar-docs-status active
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context api
+ * @libar-docs-arch-layer application
  * @libar-docs-depends-on:MasterDataset
  * @libar-docs-depends-on:FSMValidator
  *

@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-extractor
  * @libar-docs-pattern Document Extractor
  * @libar-docs-status completed
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context extractor
+ * @libar-docs-arch-layer application
  * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
  * @libar-docs-used-by Orchestrator, Generators
  * @libar-docs-usecase "When converting scanned files to ExtractedPattern objects"

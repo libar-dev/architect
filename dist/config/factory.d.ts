@@ -29,17 +29,21 @@ export interface CreateDeliveryProcessOptions {
     tagPrefix?: string;
     /** Custom file opt-in tag (overrides preset) */
     fileOptInTag?: string;
-    /** Custom categories (merged with or replaces preset) */
+    /** Custom categories (replaces preset categories entirely) */
     categories?: DeliveryProcessConfig['categories'];
 }
 /**
  * Creates a configured delivery process instance.
  *
  * Configuration resolution order:
- * 1. Start with preset (or DDD-ES-CQRS default)
- * 2. Apply explicit overrides (tagPrefix, fileOptInTag, categories)
- * 3. Build registry by merging with base taxonomy
+ * 1. Start with preset (or libar-generic default)
+ * 2. Preset categories REPLACE base taxonomy categories (not merged)
+ * 3. Apply explicit overrides (tagPrefix, fileOptInTag, categories)
  * 4. Create regex builders from final configuration
+ *
+ * Note: Presets define complete category sets. The libar-generic preset
+ * has 3 categories (core, api, infra), while ddd-es-cqrs has 21.
+ * Categories from the preset replace base categories entirely.
  *
  * @param options - Configuration options
  * @returns Configured delivery process instance
@@ -62,7 +66,7 @@ export interface CreateDeliveryProcessOptions {
  *
  * @example
  * ```typescript
- * // Default (full DDD-ES-CQRS preset)
+ * // Default (libar-generic preset with 3 categories)
  * const dp = createDeliveryProcess();
  * ```
  */

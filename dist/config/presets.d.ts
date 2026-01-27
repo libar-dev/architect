@@ -70,22 +70,23 @@ export declare const GENERIC_PRESET: {
  * Generic preset with @libar-docs- prefix.
  *
  * Same minimal categories as GENERIC_PRESET but with @libar-docs- prefix.
- * This is the default preset when no configuration is specified.
+ * This is the universal default preset for both `createDeliveryProcess()` and
+ * `loadConfig()` fallback.
  *
  * Suitable for:
+ * - Most projects (default choice)
  * - Projects already using @libar-docs- tags
  * - Package-level configuration (simplified categories, same prefix)
  * - Gradual adoption without tag migration
  *
  * @example
  * ```typescript
- * import { createDeliveryProcess, LIBAR_GENERIC_PRESET } from '@libar-dev/delivery-process';
+ * import { createDeliveryProcess } from '@libar-dev/delivery-process';
  *
- * // These are equivalent:
- * const dp1 = createDeliveryProcess();
- * const dp2 = createDeliveryProcess({ preset: "libar-generic" });
+ * // Default preset (libar-generic):
+ * const dp = createDeliveryProcess();
  * // Uses @libar-docs-, @libar-docs-pattern, @libar-docs-status, etc.
- * // But only 3 category tags: @libar-docs-core, @libar-docs-api, @libar-docs-infra
+ * // With 3 category tags: @libar-docs-core, @libar-docs-api, @libar-docs-infra
  * ```
  */
 export declare const LIBAR_GENERIC_PRESET: {
