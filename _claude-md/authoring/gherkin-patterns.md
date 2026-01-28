@@ -3,6 +3,7 @@
 #### Roadmap Spec Structure
 
 ```gherkin
+@libar-docs
 @libar-docs-pattern:ProcessGuardLinter
 @libar-docs-status:roadmap
 @libar-docs-phase:99

@@ -568,6 +568,8 @@ Files must opt-in with a marker to be scanned:
 export class MyClass { ... }
 ```
 
+**Note:** Both TypeScript files and Gherkin feature files require the `@libar-docs` opt-in marker. For TypeScript, use a JSDoc comment `/** @libar-docs */`. For Gherkin, add the `@libar-docs` tag at the feature level.
+
 #### Key Tags
 
 | Tag                | Format | Description                                             |
@@ -762,6 +764,7 @@ Generated files are in `docs-generated/`:
 #### Roadmap Spec Structure
 
 ```gherkin
+@libar-docs
 @libar-docs-pattern:ProcessGuardLinter
 @libar-docs-status:roadmap
 @libar-docs-phase:99
