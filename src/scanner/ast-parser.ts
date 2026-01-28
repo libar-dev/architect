@@ -583,6 +583,8 @@ function parseDirective(
   const archRole = metadataResults.get('arch-role') as string | undefined;
   const archContext = metadataResults.get('arch-context') as string | undefined;
   const archLayer = metadataResults.get('arch-layer') as string | undefined;
+  // Shape extraction tags
+  const extractShapes = metadataResults.get('extract-shapes') as string[] | undefined;
 
   // Extract "### When to Use" section or "**When to use:**" inline format
   // Returns array of bullet points, stopping at section boundaries
@@ -664,6 +666,8 @@ function parseDirective(
     ...(archRole && { archRole }),
     ...(archContext && { archContext }),
     ...(archLayer && { archLayer }),
+    // Shape extraction fields
+    ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
   };
 
   // Validate against schema (schema-first enforcement)

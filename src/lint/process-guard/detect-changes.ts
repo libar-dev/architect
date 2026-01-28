@@ -30,7 +30,7 @@
  * - When detecting scope creep (new deliverables)
  */
 
-import { execSync, execFileSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as path from 'path';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
@@ -86,11 +86,11 @@ export function detectStagedChanges(
 
   try {
     // Get list of staged files with status
-    const nameStatus = execGit('diff --cached --name-status', baseDir);
+    const nameStatus = execGitSafe('diff', ['--cached', '--name-status'], baseDir);
     const { modified, added, deleted } = parseNameStatus(nameStatus);
 
     // Get full diff for content analysis
-    const diff = execGit('diff --cached', baseDir);
+    const diff = execGitSafe('diff', ['--cached'], baseDir);
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
@@ -215,21 +215,6 @@ export function detectFileChanges(
 // =============================================================================
 // Git Helpers
 // =============================================================================
-
-/**
- * Execute a git command and return output.
- *
- * @deprecated Use execGitSafe for user-controlled inputs to prevent command injection.
- * This function is kept for simple hardcoded commands like 'diff --cached'.
- */
-function execGit(command: string, cwd: string): string {
-  return execSync(`git ${command}`, {
-    cwd,
-    encoding: 'utf-8',
-    stdio: ['pipe', 'pipe', 'pipe'],
-    maxBuffer: GIT_MAX_BUFFER,
-  });
-}
 
 /**
  * Execute a git command safely using execFileSync to prevent command injection.

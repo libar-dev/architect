@@ -116,7 +116,9 @@ export function extractShapes(
       jsx: true,
     });
   } catch (error) {
-    warnings.push(`Failed to parse source code: ${error instanceof Error ? error.message : String(error)}`);
+    warnings.push(
+      `Failed to parse source code: ${error instanceof Error ? error.message : String(error)}`
+    );
     return { shapes, notFound: shapeNames, imported, reExported, warnings };
   }
 
@@ -129,12 +131,10 @@ export function extractShapes(
     // Check if it's a local declaration
     const declaration = declarations.get(shapeName);
     if (declaration) {
-      const shape = extractShape(
-        sourceCode,
-        declaration,
-        ast.comments ?? [],
-        { includeJsDoc, preserveFormatting }
-      );
+      const shape = extractShape(sourceCode, declaration, ast.comments ?? [], {
+        includeJsDoc,
+        preserveFormatting,
+      });
       if (shape) {
         shapes.push(shape);
       }
@@ -183,15 +183,13 @@ function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration> 
         }
       }
       // Handle export { Foo } without a source (local re-export)
-      if (node.specifiers && !node.source) {
+      if (!node.source) {
         for (const spec of node.specifiers) {
-          if (spec.type === 'ExportSpecifier') {
-            const localName = spec.local.name;
-            // This might reference a local declaration - mark it as exported
-            const existing = declarations.get(localName);
-            if (existing) {
-              existing.exported = true;
-            }
+          const localName = spec.local.name;
+          // This might reference a local declaration - mark it as exported
+          const existing = declarations.get(localName);
+          if (existing) {
+            existing.exported = true;
           }
         }
       }
@@ -285,7 +283,7 @@ function findImportsAndReExports(ast: TSESTree.Program): Map<string, ImportOrReE
   for (const node of ast.body) {
     // Import declarations
     if (node.type === 'ImportDeclaration') {
-      const sourceModule = node.source.value as string;
+      const sourceModule = node.source.value;
       const typeOnly = node.importKind === 'type';
 
       for (const spec of node.specifiers) {
@@ -309,21 +307,18 @@ function findImportsAndReExports(ast: TSESTree.Program): Map<string, ImportOrReE
 
     // Export declarations with source (re-exports)
     if (node.type === 'ExportNamedDeclaration' && node.source) {
-      const sourceModule = node.source.value as string;
+      const sourceModule = node.source.value;
       const typeOnly = node.exportKind === 'type';
 
       for (const spec of node.specifiers) {
-        if (spec.type === 'ExportSpecifier') {
-          const exportedName = spec.exported.type === 'Identifier'
-            ? spec.exported.name
-            : spec.exported.value;
-          result.set(exportedName, {
-            name: exportedName,
-            sourceModule,
-            isReExport: true,
-            typeOnly,
-          });
-        }
+        const exportedName =
+          spec.exported.type === 'Identifier' ? spec.exported.name : spec.exported.value;
+        result.set(exportedName, {
+          name: exportedName,
+          sourceModule,
+          isReExport: true,
+          typeOnly,
+        });
       }
     }
 
@@ -352,11 +347,8 @@ function extractShape(
 ): ExtractedShape | null {
   const { node, kind, name, exported } = declaration;
 
-  // Get the node's range for source extraction
-  const range = node.range;
-  if (!range) return null;
-
-  let sourceText = sourceCode.slice(range[0], range[1]);
+  // Get the node's range for source extraction (guaranteed by parse options: range: true)
+  let sourceText = sourceCode.slice(node.range[0], node.range[1]);
 
   // For functions, convert to signature only (remove body)
   if (kind === 'function') {
@@ -367,12 +359,10 @@ function extractShape(
   if (kind === 'const' && node.type === 'VariableDeclarator') {
     const declNode = node as TSESTree.VariableDeclarator;
     if (declNode.id.typeAnnotation) {
-      // Extract const with type annotation
+      // Extract const with type annotation (ranges guaranteed by parse options)
       const idRange = declNode.id.range;
       const typeRange = declNode.id.typeAnnotation.range;
-      if (idRange && typeRange) {
-        sourceText = `const ${sourceCode.slice(idRange[0], typeRange[1])};`;
-      }
+      sourceText = `const ${sourceCode.slice(idRange[0], typeRange[1])};`;
     }
   }
 
@@ -382,28 +372,22 @@ function extractShape(
     jsDoc = extractPrecedingJsDoc(sourceCode, node, comments);
   }
 
-  // Get line number
-  const lineNumber = node.loc?.start.line ?? 1;
+  // Get line number (guaranteed by parse options: loc: true)
+  const lineNumber = node.loc.start.line;
 
   // Extract type parameters for interfaces and types
   let typeParameters: string[] | undefined;
   if (node.type === 'TSInterfaceDeclaration' || node.type === 'TSTypeAliasDeclaration') {
-    const params = (node as TSESTree.TSInterfaceDeclaration | TSESTree.TSTypeAliasDeclaration).typeParameters;
+    const params = node.typeParameters;
     if (params?.params) {
-      typeParameters = params.params.map((p) => {
-        const paramRange = p.range;
-        return paramRange ? sourceCode.slice(paramRange[0], paramRange[1]) : p.name.name;
-      });
+      typeParameters = params.params.map((p) => sourceCode.slice(p.range[0], p.range[1]));
     }
   }
 
   // Extract extends for interfaces
   let extendsArr: string[] | undefined;
-  if (node.type === 'TSInterfaceDeclaration' && node.extends) {
-    extendsArr = node.extends.map((ext) => {
-      const extRange = ext.range;
-      return extRange ? sourceCode.slice(extRange[0], extRange[1]) : '';
-    }).filter(Boolean);
+  if (node.type === 'TSInterfaceDeclaration' && node.extends.length > 0) {
+    extendsArr = node.extends.map((ext) => sourceCode.slice(ext.range[0], ext.range[1]));
   }
 
   return {
@@ -426,8 +410,9 @@ function extractPrecedingJsDoc(
   node: TSESTree.Node,
   comments: TSESTree.Comment[]
 ): string | undefined {
-  const nodeStart = node.range?.[0] ?? 0;
-  const nodeLine = node.loc?.start.line ?? 1;
+  // Range and loc are guaranteed by parse options: { range: true, loc: true }
+  const nodeStart = node.range[0];
+  const nodeLine = node.loc.start.line;
 
   // Find the closest block comment that ends before this node
   // and is a JSDoc comment (starts with /**)
@@ -437,8 +422,8 @@ function extractPrecedingJsDoc(
     if (comment.type !== 'Block') continue;
     if (!comment.value.startsWith('*')) continue; // JSDoc starts with /**
 
-    const commentEnd = comment.range?.[1] ?? 0;
-    const commentEndLine = comment.loc?.end.line ?? 0;
+    const commentEnd = comment.range[1];
+    const commentEndLine = comment.loc.end.line;
 
     // Comment must end before node starts
     if (commentEnd > nodeStart) continue;
@@ -447,8 +432,8 @@ function extractPrecedingJsDoc(
     // (allowing for blank lines would be tricky)
     if (nodeLine - commentEndLine > 2) continue;
 
-    // This is a candidate
-    if (!closestJsDoc || (comment.range?.[1] ?? 0) > (closestJsDoc.range?.[1] ?? 0)) {
+    // This is a candidate - pick the one closest to the node
+    if (!closestJsDoc || comment.range[1] > closestJsDoc.range[1]) {
       closestJsDoc = comment;
     }
   }
@@ -456,10 +441,7 @@ function extractPrecedingJsDoc(
   if (!closestJsDoc) return undefined;
 
   // Return the full JSDoc including delimiters
-  const range = closestJsDoc.range;
-  if (!range) return undefined;
-
-  return sourceCode.slice(range[0], range[1]);
+  return sourceCode.slice(closestJsDoc.range[0], closestJsDoc.range[1]);
 }
 
 /**
@@ -513,7 +495,10 @@ export function processExtractShapesTag(
   sourceCode: string,
   extractShapesTag: string
 ): ExtractedShape[] {
-  const shapeNames = extractShapesTag.split(',').map((s) => s.trim()).filter(Boolean);
+  const shapeNames = extractShapesTag
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const result = extractShapes(sourceCode, shapeNames);
 
   // Log warnings for not-found shapes

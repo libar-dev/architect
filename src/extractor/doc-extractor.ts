@@ -30,8 +30,10 @@
  * - **Deterministic IDs**: MD5 hash of file path + line number ensures stable identifiers
  */
 
+import * as fs from 'fs';
 import * as path from 'path';
 import type { ScannedFile } from '../scanner/index.js';
+import { processExtractShapesTag } from './shape-extractor.js';
 import type {
   ExtractedPattern,
   DocDirective,
@@ -161,6 +163,22 @@ export function buildPattern(
   const name = inferPatternName(directive, exports, registry);
   const category = asCategoryName(inferCategory(directive.tags as readonly string[], registry));
 
+  // Extract shapes if @libar-docs-extract-shapes tag is present
+  // Read file lazily only when extraction is needed
+  let extractedShapes;
+  if (directive.extractShapes && directive.extractShapes.length > 0) {
+    try {
+      const sourceContent = fs.readFileSync(filePath, 'utf-8');
+      extractedShapes = processExtractShapesTag(sourceContent, directive.extractShapes.join(', '));
+    } catch (error) {
+      // File read error - log warning but continue without shapes
+      console.warn(
+        `[shape-extraction] Failed to read file for shape extraction: ${filePath}`,
+        error instanceof Error ? error.message : error
+      );
+    }
+  }
+
   // Build pattern object
   const pattern = {
     id,
@@ -204,6 +222,8 @@ export function buildPattern(
     ...(directive.archRole !== undefined && { archRole: directive.archRole }),
     ...(directive.archContext !== undefined && { archContext: directive.archContext }),
     ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
+    // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
+    ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
   };
 
   // Validate against schema (schema-first enforcement)
