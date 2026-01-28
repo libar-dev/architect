@@ -4,7 +4,7 @@
 @libar-docs-phase:99
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
-@libar-docs-executable-specs:delivery-process/tests/features/behavior/status-aware-eslint
+@libar-docs-executable-specs:tests/features/behavior/status-aware-eslint
 Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxation
 
   **Problem:**
@@ -249,13 +249,12 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
 
     **Current State (to be removed):**
     """javascript
-    // eslint.config.js lines 30-57
+    // eslint.config.js - directory-based exclusions pattern
     {
       files: [
-        "**/deps/libar-dev-packages/packages/platform/core/src/dcb/**",
-        "**/deps/libar-dev-packages/packages/platform/core/src/durability/**",
-        "**/deps/libar-dev-packages/packages/platform/core/src/ecst/**",
-        // ... 7 more patterns
+        "**/src/roadmap-stubs/**",
+        "**/src/api-stubs/**",
+        // ... patterns for roadmap/deferred files
       ],
       rules: {
         "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],
@@ -289,8 +288,8 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
     Scenario: Existing roadmap files still pass lint
       Given roadmap files that previously relied on directory exclusions:
         | File |
-        | deps/libar-dev-packages/packages/platform/core/src/dcb/execute-with-dcb.ts |
-        | deps/libar-dev-packages/packages/platform/core/src/durability/types.ts |
+        | src/roadmap-stubs/reservation-pattern.ts |
+        | src/api-stubs/durability-types.ts |
       When running "pnpm lint" after migration
       Then files pass lint (no unused-vars errors)
       And files have @libar-docs-status:roadmap annotations

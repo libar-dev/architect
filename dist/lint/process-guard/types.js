@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern ProcessGuardTypes
  * @libar-docs-status active
+ * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:FSMValidator
  *
  * ## ProcessGuardTypes - Type Definitions for Process Guard Linter
@@ -12,6 +13,12 @@
  * - Git diff change detection results
  * - Validation results (violations and warnings)
  * - Session scoping types
+ *
+ * ### When to Use
+ *
+ * - When importing types for process guard implementations
+ * - When implementing custom validation rules or decider functions
+ * - When working with process state or change detection results
  *
  * ### Design Principles
  *

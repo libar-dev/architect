@@ -1,4 +1,5 @@
 @opportunity-2
+@libar-docs
 @libar-docs-pattern:DoDValidation
 @libar-docs-status:roadmap
 @libar-docs-phase:100
@@ -22,15 +23,15 @@ Feature: DoD Validation CLI - Machine-Checkable Definition of Done
 
   Implements Convergence Opportunity 2: DoD as Machine-Checkable.
 
-  See: deps/libar-dev-packages/packages/tooling/delivery-process/docs/ideation-convergence/01-delivery-process-opportunities.md
+  See: docs/ideation-convergence/01-delivery-process-opportunities.md
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | validate:dod CLI command | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/ |
-      | Deliverable status parser | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/extractor/ |
-      | Acceptance criteria checker | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/validation/ |
-      | CI integration documentation | Pending | No | deps/libar-dev-packages/packages/tooling/delivery-process/README.md |
+      | validate:dod CLI command | Pending | Yes | src/cli/ |
+      | Deliverable status parser | Pending | Yes | src/extractor/ |
+      | Acceptance criteria checker | Pending | Yes | src/validation/ |
+      | CI integration documentation | Pending | No | README.md |
 
   @acceptance-criteria
   Scenario: Validate DoD for completed phase

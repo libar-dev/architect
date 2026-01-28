@@ -2,8 +2,8 @@
 
 Complete reference for documentation tags and CLI commands.
 
-> **Configurable Prefixes:** This document uses `@libar-docs-*` examples (DDD_ES_CQRS_PRESET default).
-> For other prefixes (e.g., `@docs-*` with GENERIC_PRESET), substitute the configured prefix.
+> **Configurable Prefixes:** This document uses `@libar-docs-*` examples (the default `libar-generic` preset).
+> For other prefixes (e.g., `@docs-*` with `generic` preset), substitute the configured prefix.
 > See [docs/CONFIGURATION.md](./docs/CONFIGURATION.md) for preset options and custom prefixes.
 
 > **Source of Truth:** All tags are defined in TypeScript at `src/taxonomy/`.
@@ -24,11 +24,12 @@ Complete reference for documentation tags and CLI commands.
 
 Files must have an opt-in marker to be scanned. The marker depends on your configuration.
 
-| Preset        | Opt-In Marker       | Tag Prefix       |
-| ------------- | ------------------- | ---------------- |
-| `generic`     | `@docs`             | `@docs-`         |
-| `ddd-es-cqrs` | `@libar-docs`       | `@libar-docs-`   |
-| Custom        | Your `fileOptInTag` | Your `tagPrefix` |
+| Preset                    | Opt-In Marker       | Tag Prefix       |
+| ------------------------- | ------------------- | ---------------- |
+| `libar-generic` (default) | `@libar-docs`       | `@libar-docs-`   |
+| `ddd-es-cqrs`             | `@libar-docs`       | `@libar-docs-`   |
+| `generic`                 | `@docs`             | `@docs-`         |
+| Custom                    | Your `fileOptInTag` | Your `tagPrefix` |
 
 **Basic usage:**
 
@@ -47,8 +48,8 @@ Without the opt-in marker, the file is skipped entirely.
 
 Assign patterns to categories. Multiple categories allowed per pattern.
 
-> **Complete list:** See `src/taxonomy/categories.ts` for all 21 DDD_ES_CQRS categories.
-> The GENERIC_PRESET includes only 3 categories (core, api, infra).
+> **Complete list:** See `src/taxonomy/categories.ts` for all 21 `ddd-es-cqrs` categories.
+> The `libar-generic` (default) and `generic` presets include only 3 categories (core, api, infra).
 
 | Tag                           | Domain               | Priority |
 | ----------------------------- | -------------------- | -------- |

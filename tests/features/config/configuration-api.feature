@@ -25,18 +25,25 @@ Feature: Configuration API for Open-Sourcing
   Rule: Factory creates configured instances with correct defaults
 
     @happy-path
-    Scenario: Create with no arguments uses DDD-ES-CQRS preset
+    Scenario: Create with no arguments uses libar-generic preset
       When I call createDeliveryProcess without arguments
       Then the registry tagPrefix should be "@libar-docs-"
       And the registry fileOptInTag should be "@libar-docs"
-      And the registry should have 21 categories
+      And the registry should have exactly 3 categories
 
     @happy-path
     Scenario: Create with generic preset
       When I call createDeliveryProcess with preset "generic"
       Then the registry tagPrefix should be "@docs-"
       And the registry fileOptInTag should be "@docs"
-      And the registry should have merged categories from base
+      And the registry should have exactly 3 categories
+
+    @happy-path
+    Scenario: Create with libar-generic preset
+      When I call createDeliveryProcess with preset "libar-generic"
+      Then the registry tagPrefix should be "@libar-docs-"
+      And the registry fileOptInTag should be "@libar-docs"
+      And the registry should have exactly 3 categories
 
     @happy-path
     Scenario: Create with ddd-es-cqrs preset explicitly
@@ -66,6 +73,28 @@ Feature: Configuration API for Open-Sourcing
       When I call createDeliveryProcess with tagPrefix "@proj-" and fileOptInTag "@proj"
       Then the registry tagPrefix should be "@proj-"
       And the registry fileOptInTag should be "@proj"
+
+  # ==========================================================================
+  # Preset Categories Replace Base Categories
+  # ==========================================================================
+
+  Rule: Preset categories replace base categories entirely
+
+    @happy-path
+    Scenario: Generic preset excludes DDD categories
+      When I call createDeliveryProcess with preset "generic"
+      Then the registry should NOT include category "ddd"
+      And the registry should NOT include category "event-sourcing"
+      And the registry should NOT include category "cqrs"
+      And the registry should NOT include category "saga"
+
+    @happy-path
+    Scenario: Libar-generic preset excludes DDD categories
+      When I call createDeliveryProcess with preset "libar-generic"
+      Then the registry should NOT include category "ddd"
+      And the registry should NOT include category "event-sourcing"
+      And the registry should NOT include category "cqrs"
+      And the registry should NOT include category "saga"
 
   # ==========================================================================
   # Regex Builders Integration

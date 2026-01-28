@@ -75,7 +75,7 @@ The package supports configurable tag prefixes via the Configuration API.
 ```typescript
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-const dp = createDeliveryProcess({ preset: 'generic' });
+const dp = createDeliveryProcess(); // Uses libar-generic (default)
 // Returns: { registry: TagRegistry, regexBuilders: RegexBuilders }
 ```
 
@@ -94,12 +94,12 @@ const dp = createDeliveryProcess({ preset: 'generic' });
 createDeliveryProcess(options)
          │
          ▼
-┌─────────────────────────────────────────┐
-│ 1. Select preset (or use default)       │
-│    - generic: @docs-                    │
-│    - libar-generic: @libar-docs-        │
-│    - ddd-es-cqrs: @libar-docs- (default)│
-└─────────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│ 1. Select preset (or use default)        │
+│    - libar-generic: @libar-docs- (default)│
+│    - generic: @docs-                     │
+│    - ddd-es-cqrs: @libar-docs-           │
+└──────────────────────────────────────────┘
          │
          ▼
 ┌────────────────────────────────────┐

@@ -1,4 +1,5 @@
 @opportunity-8
+@libar-docs
 @capstone
 @libar-docs-pattern:LivingRoadmapCLI
 @libar-docs-status:roadmap
@@ -29,12 +30,12 @@ Feature: Living Roadmap CLI - Interactive Queries Over Reality
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | roadmap:next CLI command | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/ |
-      | roadmap:blocked CLI command | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/ |
-      | roadmap:path-to CLI command | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/ |
-      | roadmap:status CLI command | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/cli/ |
-      | Dependency graph analyzer | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
-      | Critical path calculator | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
+      | roadmap:next CLI command | Pending | Yes | src/cli/ |
+      | roadmap:blocked CLI command | Pending | Yes | src/cli/ |
+      | roadmap:path-to CLI command | Pending | Yes | src/cli/ |
+      | roadmap:status CLI command | Pending | Yes | src/cli/ |
+      | Dependency graph analyzer | Pending | Yes | src/analyzers/ |
+      | Critical path calculator | Pending | Yes | src/analyzers/ |
 
   @acceptance-criteria
   Scenario: Query next actionable phase

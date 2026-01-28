@@ -3,12 +3,19 @@
  * @libar-docs-lint
  * @libar-docs-pattern ProcessGuardDecider
  * @libar-docs-status active
+ * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:FSMValidator,DeriveProcessState,DetectChanges
  *
  * ## ProcessGuardDecider - Pure Validation Logic
  *
  * Pure function that validates changes against process rules.
  * Follows the Decider pattern from platform-core: no I/O, no side effects.
+ *
+ * ### When to Use
+ *
+ * - When validating proposed changes against delivery process rules
+ * - When implementing custom validation rules for the process guard
+ * - When building pre-commit hooks that enforce FSM transitions
  *
  * ### Design Principles
  *

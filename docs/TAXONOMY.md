@@ -15,7 +15,7 @@ A **taxonomy** is a classification system. In `@libar-dev/delivery-process`, the
 | **Format Types** | How tag values are parsed (`flag`, `csv`, `enum`) |
 | **Hierarchy**    | Work item levels (`epic`, `phase`, `task`)        |
 
-The taxonomy is NOT a fixed schema. Presets (`generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
+The taxonomy is NOT a fixed schema. Presets (`libar-generic`, `generic`, `ddd-es-cqrs`) select different subsets, and you can define custom categories.
 
 ---
 
@@ -49,12 +49,13 @@ const registry = buildRegistry();
 
 ### Presets Select Taxonomy Subsets
 
-| Preset        | Categories | Tag Prefix     | Use Case             |
-| ------------- | ---------- | -------------- | -------------------- |
-| `generic`     | 3          | `@docs-`       | Simple projects      |
-| `ddd-es-cqrs` | 21         | `@libar-docs-` | DDD/ES architectures |
+| Preset                    | Categories | Tag Prefix     | Use Case                           |
+| ------------------------- | ---------- | -------------- | ---------------------------------- |
+| `libar-generic` (default) | 3          | `@libar-docs-` | Simple projects (this package)     |
+| `ddd-es-cqrs`             | 21         | `@libar-docs-` | DDD/Event Sourcing architectures   |
+| `generic`                 | 3          | `@docs-`       | Simple projects with @docs- prefix |
 
-The preset determines which categories are available. Both share the same status values and format types.
+The preset determines which categories are available. All presets share the same status values and format types.
 
 ---
 

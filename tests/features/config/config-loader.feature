@@ -14,7 +14,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
   **Solution:**
   - Walk up directories looking for `delivery-process.config.ts`
   - Stop at repo root (.git marker)
-  - Fall back to default DDD taxonomy if no config found
+  - Fall back to libar-generic preset (3 categories) if no config found
 
   Background:
     Given a config loader test context with temp directory
@@ -92,6 +92,7 @@ Feature: Config Loader - TypeScript Configuration Discovery
       Then config loading should succeed
       And loaded config should be the default
       And loaded registry tagPrefix should be "@libar-docs-"
+      And loaded registry should have exactly 3 categories
 
     @happy-path
     Scenario: Load valid config file

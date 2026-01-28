@@ -1,9 +1,11 @@
+@libar-docs
 @libar-docs-adr:004
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:testing
 @libar-docs-pattern:ADR004GherkinOnlyTesting
 @libar-docs-phase:43
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Process
 Feature: ADR-004 - Gherkin-Only Testing Policy

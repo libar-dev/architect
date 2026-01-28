@@ -9,6 +9,12 @@
  * Transforms MasterDataset into RenderableDocument for PR-scoped output.
  * Filters patterns by changed files and/or release version tags.
  *
+ * ### When to Use
+ *
+ * - When generating PR summaries filtered by changed files
+ * - When creating release-scoped documentation for PR reviews
+ * - When building CI/CD outputs focused on PR scope
+ *
  * ### Factory Pattern
  *
  * Use `createPrChangesCodec(options)` for custom options:

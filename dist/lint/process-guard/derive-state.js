@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern DeriveProcessState
  * @libar-docs-status active
+ * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:GherkinScanner,FSMValidator
  *
  * ## DeriveProcessState - Extract Process State from File Annotations
@@ -169,15 +170,27 @@ function extractDeliverablesFromBackground(background) {
 }
 /**
  * Extract unlock reason from tags.
+ *
+ * Validates that unlock reasons are meaningful:
+ * - Minimum 10 characters
+ * - Not a placeholder value (test, xxx, bypass, temp, todo, fixme)
+ *
+ * If the tag exists but the reason is invalid, hasUnlockReason is false
+ * so the completed-protection rule will catch it.
  */
 function extractUnlockReason(tags) {
+    const PLACEHOLDER_VALUES = /^(test|xxx|bypass|temp|todo|fixme)$/i;
+    const MIN_LENGTH = 10;
     for (const tag of tags) {
         if (tag.includes('unlock-reason:')) {
             const match = /unlock-reason:["']?([^"']+)["']?/.exec(tag);
-            return {
-                hasUnlockReason: true,
-                unlockReason: match?.[1],
-            };
+            const value = match?.[1]?.trim();
+            // Require meaningful reason (10+ chars, not a placeholder)
+            if (value && value.length >= MIN_LENGTH && !PLACEHOLDER_VALUES.test(value)) {
+                return { hasUnlockReason: true, unlockReason: value };
+            }
+            // Tag exists but reason is invalid - treat as no unlock reason
+            // This allows the completed-protection rule to catch it
         }
     }
     return { hasUnlockReason: false, unlockReason: undefined };
@@ -312,14 +325,21 @@ export function getFilesByProtection(state, protection) {
 }
 /**
  * Check if a file is in the active session scope.
+ *
+ * Uses smart matching based on spec format:
+ * - If spec contains path separator: Use path-aware matching
+ *   - `specs/auth.feature` matches exactly `specs/auth.feature`
+ *   - `specs/auth/` matches `specs/auth/login.feature`
+ * - If spec is just a name: Use substring matching
+ *   - `auth` matches `specs/auth.feature` or `tests/auth/test.ts`
  */
 export function isInSessionScope(state, relativePath) {
     if (!state.activeSession) {
         return true; // No session means all files are in scope
     }
-    // Check if file is in scoped specs
+    const normalizedPath = path.normalize(relativePath);
     for (const spec of state.activeSession.scopedSpecs) {
-        if (relativePath.includes(spec)) {
+        if (matchesSpec(normalizedPath, spec)) {
             return true;
         }
     }
@@ -327,16 +347,45 @@ export function isInSessionScope(state, relativePath) {
 }
 /**
  * Check if a file is explicitly excluded from session.
+ *
+ * Uses smart matching based on spec format:
+ * - If spec contains path separator: Use path-aware matching
+ *   - `specs/legacy.feature` matches exactly `specs/legacy.feature`
+ *   - `specs/legacy/` matches `specs/legacy/old.feature`
+ * - If spec is just a name: Use substring matching
+ *   - `legacy` matches `specs/phase-legacy.feature`
  */
 export function isSessionExcluded(state, relativePath) {
     if (!state.activeSession) {
         return false;
     }
+    const normalizedPath = path.normalize(relativePath);
     for (const spec of state.activeSession.excludedSpecs) {
-        if (relativePath.includes(spec)) {
+        if (matchesSpec(normalizedPath, spec)) {
             return true;
         }
     }
     return false;
+}
+/**
+ * Match a file path against a spec pattern.
+ *
+ * Two matching modes:
+ * 1. Path-aware: If spec contains path separator, use strict path matching
+ *    - Exact match or directory prefix match
+ * 2. Substring: If spec is just a name, match anywhere in the path
+ *
+ * @param normalizedPath - The normalized file path to check
+ * @param spec - The spec pattern to match against
+ * @returns true if the path matches the spec
+ */
+function matchesSpec(normalizedPath, spec) {
+    const normalizedSpec = path.normalize(spec);
+    // If spec contains a path separator, use path-aware matching
+    if (spec.includes('/') || spec.includes(path.sep)) {
+        return (normalizedPath === normalizedSpec || normalizedPath.startsWith(normalizedSpec + path.sep));
+    }
+    // Otherwise, use substring matching for simple names
+    return normalizedPath.includes(spec);
 }
 //# sourceMappingURL=derive-state.js.map

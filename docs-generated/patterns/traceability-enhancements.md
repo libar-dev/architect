@@ -28,7 +28,7 @@
 
   Implements Convergence Opportunity 4: Requirements ↔ Tests Traceability.
 
-  Existing: deps/libar-dev-packages/packages/tooling/delivery-process/docs-living/TRACEABILITY.md
+  Existing: docs-living/TRACEABILITY.md
 
 ## Acceptance Criteria
 

@@ -1,3 +1,4 @@
+@libar-docs
 @libar-docs-pattern:PhaseNumberingConventions
 @libar-docs-status:roadmap
 @libar-docs-phase:100

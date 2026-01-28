@@ -1,4 +1,5 @@
 @opportunity-3
+@libar-docs
 @libar-docs-pattern:EffortVarianceTracking
 @libar-docs-status:roadmap
 @libar-docs-phase:100
@@ -27,9 +28,9 @@ Feature: Effort Variance Tracking - Improve Estimates Over Time
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Effort variance section renderer | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/generators/sections/ |
-      | Workflow distribution analyzer | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
-      | effort-analysis generator config | Pending | No | deps/libar-dev-packages/packages/tooling/delivery-process/src/generators/built-in/ |
+      | Effort variance section renderer | Pending | Yes | src/generators/sections/ |
+      | Workflow distribution analyzer | Pending | Yes | src/analyzers/ |
+      | effort-analysis generator config | Pending | No | src/generators/built-in/ |
 
   @acceptance-criteria
   Scenario: Generate phase variance report

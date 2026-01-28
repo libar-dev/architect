@@ -216,7 +216,7 @@ async function main(): Promise<void> {
     if (!isDefault && configPath) {
       console.log(`  Config: ${configPath}`);
     } else {
-      console.log('  Config: (default DDD-ES-CQRS taxonomy)');
+      console.log('  Config: (default libar-generic preset)');
     }
 
     // Scan files for directives

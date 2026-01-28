@@ -9,6 +9,12 @@
  * Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
  * Extracts ADRs from patterns with `@libar-docs-adr` tags.
  *
+ * ### When to Use
+ *
+ * - When generating Architecture Decision Record documentation
+ * - When extracting ADRs from feature files with structured annotations
+ * - When building custom ADR reports with configurable content sections
+ *
  * ### Factory Pattern
  *
  * Use `createAdrCodec(options)` for custom options:

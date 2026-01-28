@@ -1,3 +1,4 @@
+@libar-docs-implements:CodecBehaviorTesting
 @behavior @timeline-codecs
 @libar-docs-pattern:TimelineCodecTesting
 @libar-docs-product-area:Codec

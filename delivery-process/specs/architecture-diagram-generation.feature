@@ -4,7 +4,7 @@
 @libar-docs-phase:23
 @libar-docs-effort:1w
 @libar-docs-product-area:DeliveryProcess
-@libar-docs-executable-specs:delivery-process/tests/features/behavior/architecture-diagrams
+@libar-docs-executable-specs:tests/features/behavior/architecture-diagrams
 Feature: Architecture Diagram Generation
 
   **Problem:** Architecture documentation requires manually maintaining mermaid diagrams
@@ -13,7 +13,7 @@ Feature: Architecture Diagram Generation
 
   **Solution:** Generate architecture diagrams automatically from source code annotations
   using dedicated `arch-*` tags for precise control. Three tags classify components:
-  - `@libar-docs-arch-role` - Component type (command-handler, projection, saga, etc.)
+  - `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
   - `@libar-docs-arch-context` - Bounded context for subgraph grouping
   - `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
 
@@ -38,7 +38,7 @@ Feature: Architecture Diagram Generation
       | ArchitectureCodec (component) | implemented | renderable/codecs/architecture.ts | Yes | unit |
       | ArchitectureCodec (layered) | implemented | renderable/codecs/architecture.ts | Yes | unit |
       | Architecture generator | planned | generators/built-in/architecture.ts | Yes | unit |
-      | Example app annotations | implemented | examples/order-management/convex/ | No | - |
+      | Example app annotations | planned | examples/sample-project/src/ | No | - |
       | Sequence diagram support | planned | renderable/codecs/architecture.ts | Yes | unit |
 
   # ============================================================================
@@ -54,6 +54,10 @@ Feature: Architecture Diagram Generation
     source files into diagram components. Standard tag infrastructure enables
     consistent extraction via the existing AST parser.
 
+    **Note:** The `arch-role` enum values are configurable via presets:
+    - `libar-generic` preset: generic roles (`service`, `repository`, `handler`, `infrastructure`)
+    - `ddd-es-cqrs` preset: DDD-specific roles (`command-handler`, `projection`, `saga`, etc.)
+
     **Verified by:** Tag registry contains arch-role, Tag registry contains arch-context,
     Tag registry contains arch-layer, arch-role has enum values, arch-layer has enum values
 
@@ -63,7 +67,7 @@ Feature: Architecture Diagram Generation
       When querying for tag "arch-role"
       Then the tag should exist
       And the tag format should be "enum"
-      And the tag should have values including "command-handler", "projection", "saga"
+      And the tag should have values including "service", "repository", "infrastructure"
 
     @acceptance-criteria @happy-path
     Scenario: Tag registry contains arch-context

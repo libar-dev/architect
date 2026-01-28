@@ -25,10 +25,10 @@ Feature: ProcessStateAPI Relationship Queries
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Implementation relationship queries | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/api/process-state.ts | Yes | unit |
-      | Inheritance hierarchy queries | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/api/process-state.ts | Yes | unit |
-      | ProcessStateAPI type extensions | planned | deps/libar-dev-packages/packages/tooling/delivery-process/src/api/types.ts | Yes | unit |
-      | Relationship query step definitions | planned | deps/libar-dev-packages/packages/tooling/delivery-process/tests/steps/api/process-state-api.steps.ts | Yes | unit |
+      | Implementation relationship queries | planned | src/api/process-state.ts | Yes | unit |
+      | Inheritance hierarchy queries | planned | src/api/process-state.ts | Yes | unit |
+      | ProcessStateAPI type extensions | planned | src/api/types.ts | Yes | unit |
+      | Relationship query step definitions | planned | tests/steps/api/process-state-api.steps.ts | Yes | unit |
 
   # ═══════════════════════════════════════════════════════════════════════════════
   # RULE 1: Implementation Relationship Queries
@@ -50,20 +50,20 @@ Feature: ProcessStateAPI Relationship Queries
 
     @acceptance-criteria @happy-path
     Scenario: Query implementations for a pattern
-      Given a pattern "EventStoreDurability" exists
+      Given a pattern "ProcessGuardLinter" exists
       And files implement this pattern:
         | File | Via Tag |
-        | deps/libar-dev-packages/packages/platform/store/src/outbox.ts | @libar-docs-implements:EventStoreDurability |
-        | deps/libar-dev-packages/packages/platform/store/src/append.ts | @libar-docs-implements:EventStoreDurability |
-      When querying getImplementations("EventStoreDurability")
+        | src/lint/process-guard/decider.ts | @libar-docs-implements:ProcessGuardLinter |
+        | src/lint/process-guard/derive-state.ts | @libar-docs-implements:ProcessGuardLinter |
+      When querying getImplementations("ProcessGuardLinter")
       Then the result should contain both file paths
       And the result should be sorted alphabetically
 
     @acceptance-criteria @happy-path
     Scenario: Query implemented patterns for a file
-      Given a file "outbox.ts" with tag "@libar-docs-implements:EventStoreDurability, IdempotentAppend"
-      When querying getImplementedPatterns("outbox.ts")
-      Then the result should contain ["EventStoreDurability", "IdempotentAppend"]
+      Given a file "decider.ts" with tag "@libar-docs-implements:ProcessGuardLinter, ProcessGuardDecider"
+      When querying getImplementedPatterns("decider.ts")
+      Then the result should contain ["ProcessGuardLinter", "ProcessGuardDecider"]
 
     @acceptance-criteria @validation
     Scenario: Query implementations for pattern with none

@@ -1,9 +1,11 @@
+@libar-docs
 @libar-docs-adr:001
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:process
 @libar-docs-pattern:ADR001ProblemSolutionDescriptions
 @libar-docs-phase:43
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Process
 Feature: ADR-001 - Problem/Solution Feature Description Structure

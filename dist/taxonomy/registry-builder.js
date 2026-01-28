@@ -1,7 +1,20 @@
 /**
- * Registry Builder
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern TagRegistryBuilder
+ * @libar-docs-status completed
+ * @libar-docs-implements TypeScriptTaxonomyImplementation
+ *
+ * ## Tag Registry Builder
  *
  * Constructs a complete TagRegistry from TypeScript constants.
+ * Provides the default tag definitions for the delivery-process annotation system.
+ *
+ * ### When to Use
+ *
+ * - When building custom tag registries with modified definitions
+ * - When accessing tag metadata (format, purpose, values)
+ * - When initializing the taxonomy for pattern extraction
  */
 import { CATEGORIES } from './categories.js';
 import { ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, GLOBAL_FORMAT_OPTIONS, PRIORITY_VALUES, WORKFLOW_VALUES, } from './generator-options.js';
@@ -261,7 +274,7 @@ export function buildRegistry() {
             {
                 tag: 'api-ref',
                 format: 'csv',
-                purpose: "File paths to implementation APIs (replaces 'See:' markdown text in Rules)",
+                purpose: "File paths to implementation APIs (replaces 'See:' Markdown text in Rules)",
                 example: '@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts',
             },
             // Architecture diagram generation tags

@@ -3,6 +3,7 @@
  * @libar-docs-validation
  * @libar-docs-pattern FSMStates
  * @libar-docs-status active
+ * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-depends-on:PDR005MvpWorkflow
  *
  * ## FSM States - Process Status States and Protection Levels

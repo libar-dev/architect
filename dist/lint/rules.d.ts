@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern LintRules
  * @libar-docs-status completed
+ * @libar-docs-implements PatternRelationshipModel
  * @libar-docs-used-by LintEngine
  *
  * ## LintRules - Annotation Quality Rules
@@ -100,9 +101,17 @@ export declare const missingRelationships: LintRule;
 /**
  * Rule: pattern-conflict-in-implements
  *
- * Files with an implements tag must not also define patterns.
- * The implements tag declares that a file realizes a pattern defined elsewhere.
- * Having both would create conflicting definitions.
+ * Validates that a file doesn't create a circular reference by defining
+ * a pattern that it also implements. Having both @libar-docs-pattern X
+ * AND @libar-docs-implements X on the same file is a conflict.
+ *
+ * However, a file CAN have both tags when they reference DIFFERENT patterns:
+ * - @libar-docs-pattern SubPattern (defines its own identity)
+ * - @libar-docs-implements ParentSpec (links to parent spec)
+ *
+ * This supports the sub-pattern hierarchy where implementation files can be
+ * named patterns that also implement a larger spec (e.g., MockPaymentActions
+ * implementing DurableEventsIntegration).
  */
 export declare const patternConflictInImplements: LintRule;
 /**

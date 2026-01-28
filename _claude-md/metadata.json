@@ -1,0 +1,177 @@
+{
+  "document": {
+    "title": "@libar-dev/delivery-process",
+    "version": "1.0",
+    "description": "Code-first documentation and delivery process toolkit"
+  },
+  "sections": [
+    {
+      "title": "Project Overview",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "core/project-overview.md",
+          "tags": ["core-mandatory"],
+          "description": "High-level project description"
+        }
+      ]
+    },
+    {
+      "title": "Common Commands",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "core/common-commands.md",
+          "tags": ["core-mandatory"],
+          "description": "Build, test, lint, and documentation commands"
+        }
+      ]
+    },
+    {
+      "title": "Architecture",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "core/architecture.md",
+          "tags": ["core-mandatory"],
+          "description": "Four-stage pipeline, design patterns, module structure, presets"
+        }
+      ]
+    },
+    {
+      "title": "Testing",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "testing/testing-policy.md",
+          "tags": ["core-mandatory"],
+          "description": "Gherkin-only testing policy and test safety rules"
+        },
+        {
+          "path": "testing/vitest-cucumber.md",
+          "tags": ["core-mandatory"],
+          "description": "vitest-cucumber patterns, rules, and quirks"
+        },
+        {
+          "path": "testing/test-implementation.md",
+          "tags": ["core-mandatory"],
+          "description": "Common test issues, debugging strategy, workflow checklist"
+        }
+      ]
+    },
+    {
+      "title": "Session Workflows",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "workflow/session-workflows.md",
+          "tags": ["core-mandatory"],
+          "description": "Session decision tree and session types"
+        },
+        {
+          "path": "workflow/session-details.md",
+          "tags": ["core-mandatory"],
+          "description": "Planning, Design, and Implementation session details"
+        },
+        {
+          "path": "workflow/fsm-handoff.md",
+          "tags": ["core-mandatory"],
+          "description": "FSM protection, error messages, escape hatches, and handoff documentation"
+        }
+      ]
+    },
+    {
+      "title": "Validation",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "validation/process-guard.md",
+          "tags": ["core-mandatory"],
+          "description": "Process Guard CLI, protection levels, exit codes"
+        },
+        {
+          "path": "validation/anti-patterns.md",
+          "tags": ["core-mandatory"],
+          "description": "Dual-source ownership rules and DoD validation"
+        }
+      ]
+    },
+    {
+      "title": "Annotation System",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "api/annotation-system.md",
+          "tags": ["core-mandatory"],
+          "description": "Opt-in markers, key tags, CLI commands"
+        },
+        {
+          "path": "api/tag-formats.md",
+          "tags": ["core-mandatory"],
+          "description": "Tag format types, status normalization, value constraints"
+        },
+        {
+          "path": "api/dual-source.md",
+          "tags": ["core-mandatory"],
+          "description": "Dual-source architecture, TypeScript vs Feature Files, merging rules"
+        },
+        {
+          "path": "api/relationships.md",
+          "tags": ["core-mandatory", "api", "relationships"],
+          "description": "Relationship taxonomy, tag ownership rules, workflow-relationship matrix"
+        }
+      ]
+    },
+    {
+      "title": "ProcessStateAPI",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "api/process-state-api.md",
+          "tags": ["core-mandatory"],
+          "description": "Programmatic API usage and generated documentation"
+        }
+      ]
+    },
+    {
+      "title": "Authoring",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "authoring/gherkin-patterns.md",
+          "tags": ["core-mandatory"],
+          "description": "Gherkin spec structure, tag conventions, Rule blocks"
+        },
+        {
+          "path": "authoring/feature-content.md",
+          "tags": ["core-mandatory"],
+          "description": "Feature file rich content, code-first principle, valid/forbidden content"
+        }
+      ]
+    },
+    {
+      "title": "Claude MD Management",
+      "tags": ["core-mandatory"],
+      "subsections": [
+        {
+          "path": "meta/management.md",
+          "tags": ["core-mandatory"],
+          "description": "Modular CLAUDE.md architecture, adding content, guidelines"
+        },
+        {
+          "path": "meta/deps-packages.md",
+          "tags": ["core-mandatory"],
+          "description": "External package sources via git subtrees"
+        }
+      ]
+    }
+  ],
+  "variations": [
+    {
+      "name": "default",
+      "path": "/",
+      "tags": ["core-mandatory"],
+      "description": "Complete CLAUDE.md for repo root"
+    }
+  ]
+}

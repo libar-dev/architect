@@ -1,3 +1,4 @@
+@libar-docs-implements:PrdImplementationSection
 Feature: PRD Implementation Section
 
   Tests the Implementations section rendering in pattern documents.

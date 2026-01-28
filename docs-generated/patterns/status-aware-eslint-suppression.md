@@ -170,8 +170,8 @@ export interface CMSState {
 
 | File |
 | --- |
-| deps/libar-dev-packages/packages/platform/core/src/dcb/execute-with-dcb.ts |
-| deps/libar-dev-packages/packages/platform/core/src/durability/types.ts |
+| src/roadmap-stubs/reservation-pattern.ts |
+| src/api-stubs/durability-types.ts |
 
 **Default configuration relaxes no-unused-vars**
 
@@ -292,13 +292,12 @@ _Verified by: CLI generates ESLint ignore file list, JSON output mode for progra
     **Current State (to be removed):**
 
 ```javascript
-// eslint.config.js lines 30-57
+// eslint.config.js - directory-based exclusions pattern
     {
       files: [
-        "**/deps/libar-dev-packages/packages/platform/core/src/dcb/**",
-        "**/deps/libar-dev-packages/packages/platform/core/src/durability/**",
-        "**/deps/libar-dev-packages/packages/platform/core/src/ecst/**",
-        // ... 7 more patterns
+        "**/src/roadmap-stubs/**",
+        "**/src/api-stubs/**",
+        // ... patterns for roadmap/deferred files
       ],
       rules: {
         "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],

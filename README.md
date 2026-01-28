@@ -327,21 +327,27 @@ graph TD
 ```typescript
 import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
-// Generic preset (default) — simple projects
+// Libar-generic preset (default) — this package uses it
 const dp = createDeliveryProcess();
-// Tag prefix: @docs-*
+// Tag prefix: @libar-docs-*
 // Categories: core, api, infra
 
 // DDD-ES-CQRS preset — complex domain architectures
 const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
 // Tag prefix: @libar-docs-*
 // Categories: 21 domain-specific categories
+
+// Generic preset — shorter tag names
+const dp = createDeliveryProcess({ preset: 'generic' });
+// Tag prefix: @docs-*
+// Categories: core, api, infra
 ```
 
-| Preset              | Tag Prefix      | Categories | Use Case                         |
-| ------------------- | --------------- | ---------- | -------------------------------- |
-| `generic` (default) | `@docs-*`       | 3          | Simple projects, getting started |
-| `ddd-es-cqrs`       | `@libar-docs-*` | 21         | Complex domain architectures     |
+| Preset                    | Tag Prefix      | Categories | Use Case                           |
+| ------------------------- | --------------- | ---------- | ---------------------------------- |
+| `libar-generic` (default) | `@libar-docs-*` | 3          | Simple projects (this package)     |
+| `ddd-es-cqrs`             | `@libar-docs-*` | 21         | DDD/Event Sourcing architectures   |
+| `generic`                 | `@docs-*`       | 3          | Simple projects with @docs- prefix |
 
 See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for custom presets.
 

@@ -21,9 +21,8 @@
 import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { buildRegistry } from '../taxonomy/registry-builder.js';
-import { mergeTagRegistries } from '../validation-schemas/tag-registry.js';
 import { createRegexBuilders } from './regex-builders.js';
-import { DDD_ES_CQRS_PRESET, PRESETS, type PresetName } from './presets.js';
+import { LIBAR_GENERIC_PRESET, PRESETS, type PresetName } from './presets.js';
 
 /**
  * Options for creating a delivery process instance
@@ -35,7 +34,7 @@ export interface CreateDeliveryProcessOptions {
   tagPrefix?: string;
   /** Custom file opt-in tag (overrides preset) */
   fileOptInTag?: string;
-  /** Custom categories (merged with or replaces preset) */
+  /** Custom categories (replaces preset categories entirely) */
   categories?: DeliveryProcessConfig['categories'];
 }
 
@@ -43,10 +42,14 @@ export interface CreateDeliveryProcessOptions {
  * Creates a configured delivery process instance.
  *
  * Configuration resolution order:
- * 1. Start with preset (or DDD-ES-CQRS default)
- * 2. Apply explicit overrides (tagPrefix, fileOptInTag, categories)
- * 3. Build registry by merging with base taxonomy
+ * 1. Start with preset (or libar-generic default)
+ * 2. Preset categories REPLACE base taxonomy categories (not merged)
+ * 3. Apply explicit overrides (tagPrefix, fileOptInTag, categories)
  * 4. Create regex builders from final configuration
+ *
+ * Note: Presets define complete category sets. The libar-generic preset
+ * has 3 categories (core, api, infra), while ddd-es-cqrs has 21.
+ * Categories from the preset replace base categories entirely.
  *
  * @param options - Configuration options
  * @returns Configured delivery process instance
@@ -69,15 +72,15 @@ export interface CreateDeliveryProcessOptions {
  *
  * @example
  * ```typescript
- * // Default (full DDD-ES-CQRS preset)
+ * // Default (libar-generic preset with 3 categories)
  * const dp = createDeliveryProcess();
  * ```
  */
 export function createDeliveryProcess(
   options: CreateDeliveryProcessOptions = {}
 ): DeliveryProcessInstance {
-  // Start with preset or default to DDD-ES-CQRS
-  const baseConfig = options.preset ? PRESETS[options.preset] : DDD_ES_CQRS_PRESET;
+  // Start with preset or default to libar-generic
+  const baseConfig = options.preset ? PRESETS[options.preset] : LIBAR_GENERIC_PRESET;
 
   // Apply overrides
   const tagPrefix = options.tagPrefix ?? baseConfig.tagPrefix;
@@ -87,8 +90,7 @@ export function createDeliveryProcess(
   // Build the base registry from taxonomy constants (readonly)
   const baseRegistry = buildRegistry();
 
-  // Convert readonly arrays to mutable for mergeTagRegistries compatibility
-  // This is necessary because buildRegistry() returns readonly arrays from `as const`
+  // Convert readonly arrays to mutable (buildRegistry returns readonly `as const` arrays)
   const mutableBaseRegistry: TagRegistry = {
     version: baseRegistry.version,
     categories: [...baseRegistry.categories].map((c) => ({
@@ -107,20 +109,23 @@ export function createDeliveryProcess(
     fileOptInTag: baseRegistry.fileOptInTag,
   };
 
-  // Create override with mutable category arrays
-  const registryOverride: Partial<TagRegistry> = {
+  // Create mutable categories from preset
+  const mutableCategories = [...categories].map((c) => ({
+    tag: c.tag,
+    domain: c.domain,
+    priority: c.priority,
+    description: c.description,
+    aliases: [...c.aliases],
+  }));
+
+  // Create registry with preset categories REPLACING base categories (not merging).
+  // This ensures libar-generic preset gets only 3 categories, not all 21 DDD categories.
+  const registry: TagRegistry = {
+    ...mutableBaseRegistry,
     tagPrefix,
     fileOptInTag,
-    categories: [...categories].map((c) => ({
-      tag: c.tag,
-      domain: c.domain,
-      priority: c.priority,
-      description: c.description,
-      aliases: [...c.aliases],
-    })),
+    categories: mutableCategories,
   };
-
-  const registry = mergeTagRegistries(mutableBaseRegistry, registryOverride);
 
   // Create regex builders
   const regexBuilders = createRegexBuilders(tagPrefix, fileOptInTag);

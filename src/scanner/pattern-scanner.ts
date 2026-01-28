@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-scanner
  * @libar-docs-pattern Pattern Scanner
  * @libar-docs-status completed
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context scanner
+ * @libar-docs-arch-layer infrastructure
  * @libar-docs-uses glob, AST Parser
  * @libar-docs-used-by Doc Extractor, Orchestrator
  * @libar-docs-usecase "When discovering TypeScript files for documentation extraction"

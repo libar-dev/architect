@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-infra
  * @libar-docs-pattern Documentation Generation Orchestrator
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer application
  * @libar-docs-uses Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor, Generator Registry, JSON Output Codec
  * @libar-docs-used-by CLI, Programmatic API
  * @libar-docs-usecase "When running full documentation generation pipeline"

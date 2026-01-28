@@ -6,7 +6,7 @@
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:ensure-cli-commands-work-correctly-with-all-argument-combinations
 @libar-docs-priority:high
-@libar-docs-executable-specs:delivery-process/tests/features/cli
+@libar-docs-executable-specs:tests/features/cli
 Feature: CLI Behavior Testing
 
   **Problem:**

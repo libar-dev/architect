@@ -3,6 +3,7 @@
  * @libar-docs-extractor
  * @libar-docs-pattern GherkinExtractor
  * @libar-docs-status completed
+ * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes, GherkinASTParser
  * @libar-docs-used-by DualSourceExtractor, Orchestrator
  *
@@ -147,6 +148,13 @@ export function extractPatternsFromGherkin(
 
     // Extract pattern metadata from feature tags
     const metadata = extractPatternTags(feature.tags);
+
+    // Skip if no @libar-docs opt-in marker (consistent with TypeScript requirement)
+    // The marker normalizes to 'libar-docs' after stripping the @ prefix
+    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === '@libar-docs');
+    if (!hasOptIn) {
+      continue;
+    }
 
     // Skip if no pattern tag (not a pattern definition)
     if (!metadata.pattern) {
@@ -472,6 +480,10 @@ export async function extractPatternsFromGherkinAsync(
     const { feature, scenarios, rules, filePath } = file;
     const relativePath = path.relative(baseDir, filePath);
     const metadata = extractPatternTags(feature.tags);
+
+    // Skip if no @libar-docs opt-in marker (consistent with TypeScript requirement)
+    const hasOptIn = feature.tags.some((tag) => tag === 'libar-docs' || tag === '@libar-docs');
+    if (!hasOptIn) continue;
 
     // Skip if no pattern or status tag
     if (!metadata.pattern || !metadata.status) continue;

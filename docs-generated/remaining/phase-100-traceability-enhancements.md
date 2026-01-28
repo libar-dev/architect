@@ -356,7 +356,7 @@ _Verified by: Dependency references non-existent pattern, All dependencies resol
 
   Implements Convergence Opportunity 2: DoD as Machine-Checkable.
 
-  See: deps/libar-dev-packages/packages/tooling/delivery-process/docs/ideation-convergence/01-delivery-process-opportunities.md
+  See: docs/ideation-convergence/01-delivery-process-opportunities.md
 
 #### Acceptance Criteria
 
@@ -767,7 +767,7 @@ _Verified by: Permission error during cleanup, Missing sessions directory_
 
   Implements Convergence Opportunity 4: Requirements ↔ Tests Traceability.
 
-  Existing: deps/libar-dev-packages/packages/tooling/delivery-process/docs-living/TRACEABILITY.md
+  Existing: docs-living/TRACEABILITY.md
 
 #### Acceptance Criteria
 

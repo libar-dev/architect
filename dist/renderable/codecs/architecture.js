@@ -10,6 +10,12 @@
  * Transforms MasterDataset into a RenderableDocument containing
  * architecture diagrams (Mermaid) generated from source annotations.
  *
+ * ### When to Use
+ *
+ * - When generating architecture diagrams from code annotations
+ * - When visualizing bounded contexts and component relationships
+ * - When creating layered architecture views (domain/application/infrastructure)
+ *
  * ### Factory Pattern
  *
  * Use `createArchitectureCodec(options)` to create a configured codec:
@@ -302,8 +308,8 @@ function buildLayeredDiagram(archIndex, dataset) {
         const nodeId = sanitizeNodeId(name);
         nodeIds.set(name, nodeId);
     }
-    // Layer order (top to bottom in diagram)
-    const layerOrder = ['infrastructure', 'application', 'domain'];
+    // Layer order (top to bottom in diagram: domain at top, infrastructure at bottom)
+    const layerOrder = ['domain', 'application', 'infrastructure'];
     const byLayer = archIndex.byLayer;
     // Generate subgraphs for each layer
     for (const layer of layerOrder) {

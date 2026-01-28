@@ -85,6 +85,12 @@ Feature: Error Handling Unification
     Then the extraction result errors array should contain the warning
     And console.warn should not have been called
 
+  @edge-case @extractor @opt-in-required
+  Scenario: Skip feature files without @libar-docs opt-in
+    Given a Gherkin feature file without @libar-docs opt-in marker
+    When patterns are extracted from Gherkin files
+    Then no patterns should be extracted
+
   # ==========================================================================
   # CLI Error Handler Integration
   # ==========================================================================

@@ -1,9 +1,11 @@
+@libar-docs
 @libar-docs-adr:005
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:architecture
 @libar-docs-pattern:ADR005ConfigurableTagPrefix
 @libar-docs-phase:44
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-product-area:DeliveryProcess
 Feature: ADR-005 - Configurable Tag Prefix
 

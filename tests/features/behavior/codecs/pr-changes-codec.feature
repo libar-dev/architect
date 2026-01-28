@@ -1,3 +1,4 @@
+@libar-docs-implements:CodecBehaviorTesting
 @behavior @pr-changes-codec
 @libar-docs-pattern:PrChangesCodecTesting
 @libar-docs-product-area:Codec

@@ -8,6 +8,12 @@
  * RDM (RenderableDocument Model) based document generation system.
  * Uses Zod 4 codecs to transform MasterDataset into RenderableDocuments.
  *
+ * ### When to Use
+ *
+ * - When importing generator types, registry, or orchestrator functions
+ * - When building custom generators or extending the generation pipeline
+ * - When programmatically generating documentation from code
+ *
  * ## Usage
  *
  * ```typescript

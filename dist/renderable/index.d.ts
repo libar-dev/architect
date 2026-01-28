@@ -1,10 +1,18 @@
 /**
  * @libar-docs
  * @libar-docs-core
+ * @libar-docs-pattern RenderableDocumentModel(RDM)
+ * @libar-docs-status completed
  *
  * ## Renderable Document Model (RDM)
  *
  * Unified document generation using codecs and a universal renderer.
+ *
+ * ### When to Use
+ *
+ * - When importing RDM types, schemas, or block builders
+ * - When using codecs for document transformation
+ * - When rendering RenderableDocuments to markdown
  *
  * Architecture:
  * ```

@@ -86,7 +86,7 @@ Options:
 
 Configuration:
   Uses delivery-process.config.ts for taxonomy configuration.
-  Falls back to default DDD-ES-CQRS taxonomy if no config file found.
+  Falls back to libar-generic preset (3 categories) if no config file found.
 
 Examples:
   # Generate using discovered config or default
@@ -121,7 +121,9 @@ async function main() {
         }
         const { instance: dpInstance, isDefault, path: configPath } = configResult.value;
         const tagRegistry = dpInstance.registry;
-        const sourcePath = !isDefault && configPath ? configPath : '(default DDD-ES-CQRS taxonomy)';
+        const sourcePath = !isDefault && configPath
+            ? path.relative(config.baseDir, configPath)
+            : '(default libar-generic preset)';
         console.log(`  Loaded: ${sourcePath}`);
         // Check if output file exists
         const outputPath = path.isAbsolute(config.output)

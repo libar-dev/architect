@@ -1,3 +1,4 @@
+@libar-docs-implements:ProcessGuardLinter
 @behavior @process-guard @libar-docs-pattern:ProcessGuard
 @libar-docs-product-area:Validation
 Feature: Process Guard Linter

@@ -1,3 +1,4 @@
+@libar-docs-implements:CodecBehaviorTesting
 @behavior @requirements-adr-codecs
 @libar-docs-pattern:RequirementsAdrCodecTesting
 @libar-docs-product-area:Codec

@@ -446,22 +446,22 @@ _Verified by: Help output shows all flags, Help shows examples_
 
 **Query implementations for a pattern**
 
-- Given a pattern "EventStoreDurability" exists
+- Given a pattern "ProcessGuardLinter" exists
 - And files implement this pattern:
-- When querying getImplementations("EventStoreDurability")
+- When querying getImplementations("ProcessGuardLinter")
 - Then the result should contain both file paths
 - And the result should be sorted alphabetically
 
 | File | Via Tag |
 | --- | --- |
-| deps/libar-dev-packages/packages/platform/store/src/outbox.ts | @libar-docs-implements:EventStoreDurability |
-| deps/libar-dev-packages/packages/platform/store/src/append.ts | @libar-docs-implements:EventStoreDurability |
+| src/lint/process-guard/decider.ts | @libar-docs-implements:ProcessGuardLinter |
+| src/lint/process-guard/derive-state.ts | @libar-docs-implements:ProcessGuardLinter |
 
 **Query implemented patterns for a file**
 
-- Given a file "outbox.ts" with tag "@libar-docs-implements:EventStoreDurability, IdempotentAppend"
-- When querying getImplementedPatterns("outbox.ts")
-- Then the result should contain ["EventStoreDurability", "IdempotentAppend"]
+- Given a file "decider.ts" with tag "@libar-docs-implements:ProcessGuardLinter, ProcessGuardDecider"
+- When querying getImplementedPatterns("decider.ts")
+- Then the result should contain ["ProcessGuardLinter", "ProcessGuardDecider"]
 
 **Query implementations for pattern with none**
 
@@ -772,8 +772,8 @@ export interface CMSState {
 
 | File |
 | --- |
-| deps/libar-dev-packages/packages/platform/core/src/dcb/execute-with-dcb.ts |
-| deps/libar-dev-packages/packages/platform/core/src/durability/types.ts |
+| src/roadmap-stubs/reservation-pattern.ts |
+| src/api-stubs/durability-types.ts |
 
 **Default configuration relaxes no-unused-vars**
 
@@ -894,13 +894,12 @@ _Verified by: CLI generates ESLint ignore file list, JSON output mode for progra
     **Current State (to be removed):**
 
 ```javascript
-// eslint.config.js lines 30-57
+// eslint.config.js - directory-based exclusions pattern
     {
       files: [
-        "**/deps/libar-dev-packages/packages/platform/core/src/dcb/**",
-        "**/deps/libar-dev-packages/packages/platform/core/src/durability/**",
-        "**/deps/libar-dev-packages/packages/platform/core/src/ecst/**",
-        // ... 7 more patterns
+        "**/src/roadmap-stubs/**",
+        "**/src/api-stubs/**",
+        // ... patterns for roadmap/deferred files
       ],
       rules: {
         "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],

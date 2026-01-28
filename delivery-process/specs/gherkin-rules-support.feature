@@ -1,6 +1,9 @@
+@libar-docs
 @libar-docs-pattern:GherkinRulesSupport
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-phase:100
+@libar-docs-release:v1.0.0
 @libar-docs-effort:4h
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:enable-human-readable-documentation-from-feature-files

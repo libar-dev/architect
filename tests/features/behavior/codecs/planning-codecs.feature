@@ -1,3 +1,4 @@
+@libar-docs-implements:CodecBehaviorTesting
 @behavior @planning-codecs
 @libar-docs-pattern:PlanningCodecTesting
 @libar-docs-product-area:Codec

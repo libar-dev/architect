@@ -1,7 +1,5 @@
 @libar-docs
-@libar-docs-pattern:ArchitectureDiagramGeneration
-@libar-docs-status:active
-@libar-docs-phase:23
+@libar-docs-implements:ArchitectureDiagramGeneration
 @libar-docs-product-area:DeliveryProcess
 @architecture
 Feature: Component Diagram Generation
@@ -70,7 +68,7 @@ Feature: Component Diagram Generation
         | OrderHandler | command-handler | orders      | OrderRepo | -         | -          |
         | OrderRepo    | repository      | orders      | -         | Database  | Repository |
         | Database     | infrastructure  | -           | -         | -         | -          |
-        | Repository   | interface       | -           | -         | -         | -          |
+        | Repository   | repository      | -           | -         | -         | -          |
       When the component diagram is generated
       Then the Mermaid output contains arrows:
         | arrow                       |

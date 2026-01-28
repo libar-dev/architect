@@ -1,4 +1,5 @@
 @opportunity-4
+@libar-docs
 @libar-docs-pattern:TraceabilityEnhancements
 @libar-docs-status:roadmap
 @libar-docs-phase:100
@@ -22,14 +23,14 @@ Feature: Traceability Enhancements - Requirements ↔ Tests Loop
 
   Implements Convergence Opportunity 4: Requirements ↔ Tests Traceability.
 
-  Existing: deps/libar-dev-packages/packages/tooling/delivery-process/docs-living/TRACEABILITY.md
+  Existing: docs-living/TRACEABILITY.md
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Coverage matrix section | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/generators/sections/ |
-      | Orphaned scenarios detector | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
-      | Pattern gap reporter | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
+      | Coverage matrix section | Pending | Yes | src/generators/sections/ |
+      | Orphaned scenarios detector | Pending | Yes | src/analyzers/ |
+      | Pattern gap reporter | Pending | Yes | src/analyzers/ |
 
   @acceptance-criteria
   Scenario: Show pattern coverage matrix

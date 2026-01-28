@@ -1,3 +1,4 @@
+@libar-docs-implements:CodecBehaviorTesting
 @behavior @session-codecs
 @libar-docs-pattern:SessionCodecTesting
 @libar-docs-product-area:Codec

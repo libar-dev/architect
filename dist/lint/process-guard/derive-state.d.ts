@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern DeriveProcessState
  * @libar-docs-status active
+ * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:GherkinScanner,FSMValidator
  *
  * ## DeriveProcessState - Extract Process State from File Annotations
@@ -69,10 +70,24 @@ export declare function getFileState(state: ProcessState, relativePath: string):
 export declare function getFilesByProtection(state: ProcessState, protection: ProtectionLevel): readonly FileState[];
 /**
  * Check if a file is in the active session scope.
+ *
+ * Uses smart matching based on spec format:
+ * - If spec contains path separator: Use path-aware matching
+ *   - `specs/auth.feature` matches exactly `specs/auth.feature`
+ *   - `specs/auth/` matches `specs/auth/login.feature`
+ * - If spec is just a name: Use substring matching
+ *   - `auth` matches `specs/auth.feature` or `tests/auth/test.ts`
  */
 export declare function isInSessionScope(state: ProcessState, relativePath: string): boolean;
 /**
  * Check if a file is explicitly excluded from session.
+ *
+ * Uses smart matching based on spec format:
+ * - If spec contains path separator: Use path-aware matching
+ *   - `specs/legacy.feature` matches exactly `specs/legacy.feature`
+ *   - `specs/legacy/` matches `specs/legacy/old.feature`
+ * - If spec is just a name: Use substring matching
+ *   - `legacy` matches `specs/phase-legacy.feature`
  */
 export declare function isSessionExcluded(state: ProcessState, relativePath: string): boolean;
 //# sourceMappingURL=derive-state.d.ts.map

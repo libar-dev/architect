@@ -1,3 +1,4 @@
+@libar-docs-implements:PhaseStateMachineValidation
 @behavior @fsm-validation
 @libar-docs-pattern:FSMValidator
 @libar-docs-product-area:Validation

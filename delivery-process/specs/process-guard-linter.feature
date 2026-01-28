@@ -1,6 +1,9 @@
+@libar-docs
 @libar-docs-pattern:ProcessGuardLinter
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Complete-deliverables-for-v1.0.0-release
 @libar-docs-phase:99
+@libar-docs-release:v1.0.0
 @libar-docs-effort:1d
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:prevent-accidental-scope-creep-and-locked-file-modifications
@@ -41,14 +44,14 @@ Feature: Process Guard Linter
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | State derivation from annotations | Pending | src/lint/process-guard/derive-state.ts |
-      | Git diff change detection | Pending | src/lint/process-guard/detect-changes.ts |
-      | Process Decider (pure validation) | Pending | src/lint/process-guard/decider.ts |
-      | Protection level rules | Pending | src/lint/process-guard/rules/ |
-      | Session scope validation | Pending | src/lint/process-guard/rules/session-scope.ts |
-      | Taxonomy stability validation | Pending | src/lint/process-guard/rules/taxonomy-stability.ts |
-      | CLI integration (lint-process.ts) | Pending | src/cli/lint-process.ts |
-      | Pre-commit hook integration | Pending | docs |
+      | State derivation from annotations | Complete | src/lint/process-guard/derive-state.ts |
+      | Git diff change detection | Complete | src/lint/process-guard/detect-changes.ts |
+      | Process Decider (pure validation) | Complete | src/lint/process-guard/decider.ts |
+      | Protection level rules | Complete | src/lint/process-guard/decider.ts |
+      | Session scope validation | Complete | src/lint/process-guard/decider.ts |
+      | Taxonomy stability validation | Complete | src/lint/process-guard/decider.ts |
+      | CLI integration (lint-process.ts) | Complete | src/cli/lint-process.ts |
+      | Pre-commit hook integration | Complete | .husky/pre-commit |
 
   # ============================================================================
   # PROTECTION LEVELS

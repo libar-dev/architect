@@ -7,13 +7,13 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 71/110 (65% complete)
+**Overall:** [█████████████░░░░░░░] 73/110 (66% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 71 |
+| ✅ Completed | 73 |
 | 🚧 Active | 13 |
-| 📋 Planned | 26 |
+| 📋 Planned | 24 |
 | **Total** | 110 |
 
 ---
@@ -63,6 +63,7 @@
 | ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and... |
 | ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts... |
 | ✅ Documentation Generator CLI | Core | completed | Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run. |
+| ✅ Document Codecs | Core | completed | Barrel export for all document codecs. |
 | ✅ Document Generator | Core | completed | Simplified document generation using codecs. |
 | ✅ DoD Validation Types | Validation | completed | Types and schemas for Definition of Done (DoD) validation and anti-pattern detection. |
 | ✅ DoD Validator | Validation | completed | Validates that completed phases meet Definition of Done criteria: 1. |
@@ -95,6 +96,7 @@
 | ✅ Public API | Core | completed | Main entry point for the @libar-dev/delivery-process package. |
 | ✅ Regex Builders | Core | completed | Type-safe regex factory functions for tag detection and normalization. |
 | ✅ Renderable Document | Core | completed | Universal intermediate format for all generated documentation. |
+| ✅ Renderable Document Model(RDM) | Core | completed | Unified document generation using codecs and a universal renderer. |
 | ✅ Renderable Utils | Core | completed | Utility functions for document codecs. |
 | ✅ Reporting Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for reporting outputs: - CHANGELOG-GENERATED.md (Keep a Changelog... |
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
@@ -135,7 +137,6 @@
 | 📋 Cli Behavior Testing | DDD | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
 | 📋 Codec Behavior Testing | DDD | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
-|  Document Codecs | Core | planned | Barrel export for all document codecs. |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
 | 📋 Generator Infrastructure Testing | DDD | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
@@ -146,7 +147,6 @@
 | 📋 Process State API Relationship Queries | DDD | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
-|  Renderable Document Model (RDM) | Core | planned | Unified document generation using codecs and a universal renderer. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
@@ -179,7 +179,7 @@
 
 ### Core
 
-39/45 complete (87%)
+41/45 complete (91%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -196,6 +196,7 @@
 - [✅ Document Extractor](patterns/document-extractor.md)
 - [✅ Documentation Generation Orchestrator](patterns/documentation-generation-orchestrator.md)
 - [✅ Documentation Generator CLI](patterns/documentation-generator-cli.md)
+- [✅ Document Codecs](patterns/document-codecs.md)
 - [✅ Document Generator](patterns/document-generator.md)
 - [✅ Master Dataset](patterns/master-dataset.md)
 - [✅ Output Schemas](patterns/output-schemas.md)
@@ -207,6 +208,7 @@
 - [✅ Public API](patterns/public-api.md)
 - [✅ Regex Builders](patterns/regex-builders.md)
 - [✅ Renderable Document](patterns/renderable-document.md)
+- [✅ Renderable Document Model(RDM)](patterns/renderable-document-model-rdm.md)
 - [✅ Renderable Utils](patterns/renderable-utils.md)
 - [✅ Reporting Codecs](patterns/reporting-codecs.md)
 - [✅ Requirements Codec](patterns/requirements-codec.md)
@@ -224,8 +226,6 @@
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
 - [📋 Business Rules Codec](patterns/business-rules-codec.md)
-- [ Document Codecs](patterns/document-codecs.md)
-- [ Renderable Document Model (RDM)](patterns/renderable-document-model-rdm.md)
 
 ---
 
@@ -417,6 +417,14 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    GherkinExtractor --> GherkinTypes
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> DocExtractor
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    Document_Extractor --> Tag_Registry
+    Document_Extractor --> Zod
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -430,14 +438,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    GherkinExtractor --> GherkinTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> DocExtractor
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    Document_Extractor --> Tag_Registry
-    Document_Extractor --> Zod
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -452,13 +452,13 @@ graph TD
     ConfigLoader --> ConfigurationTypes
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     PipelineModule --> TransformDataset
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
     StreamingGitDiff -.-> ProcessGuardLinter
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```

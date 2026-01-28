@@ -1,9 +1,11 @@
+@libar-docs
 @libar-docs-adr:003
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:architecture
 @libar-docs-pattern:ADR003EphemeralPersistentSeparation
 @libar-docs-phase:43
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Generators
 Feature: ADR-003 - Ephemeral vs Persistent Documentation Separation

@@ -1,4 +1,5 @@
 @opportunity-5
+@libar-docs
 @libar-docs-pattern:ArchitectureDelta
 @libar-docs-status:roadmap
 @libar-docs-phase:100
@@ -29,10 +30,10 @@ Feature: Architecture Delta Generation - ADRs as Release Notes
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Release boundary detector (git tags) | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
-      | Pattern diff analyzer | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/analyzers/ |
-      | Architecture delta section renderer | Pending | Yes | deps/libar-dev-packages/packages/tooling/delivery-process/src/generators/sections/ |
-      | arch-delta generator config | Pending | No | deps/libar-dev-packages/packages/tooling/delivery-process/src/generators/built-in/ |
+      | Release boundary detector (git tags) | Pending | Yes | src/analyzers/ |
+      | Pattern diff analyzer | Pending | Yes | src/analyzers/ |
+      | Architecture delta section renderer | Pending | Yes | src/generators/sections/ |
+      | arch-delta generator config | Pending | No | src/generators/built-in/ |
 
   @acceptance-criteria
   Scenario: Generate delta between releases

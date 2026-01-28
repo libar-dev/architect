@@ -3,7 +3,8 @@
  * @libar-docs-lint
  * @libar-docs-pattern DetectChanges
  * @libar-docs-status active
- * @libar-docs-depends-on:DeriveProcessState
+ * @libar-docs-implements ProcessGuardLinter
+ * @libar-docs-uses DeriveProcessState
  *
  * ## DetectChanges - Git Diff Change Detection
  *
@@ -29,14 +30,26 @@
  * - When detecting scope creep (new deliverables)
  */
 
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import * as path from 'path';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../../taxonomy/index.js';
-import type { ChangeDetection, StatusTransition, DeliverableChange } from './types.js';
+import type {
+  ChangeDetection,
+  StatusTransition,
+  DeliverableChange,
+  StatusTagLocation,
+} from './types.js';
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 import type { WithTagRegistry } from '../../validation/types.js';
+
+/**
+ * Maximum buffer size for git command output (50MB).
+ * Large enough to handle staging entire dist/ folders with source maps.
+ * Prevents ENOBUFS errors when diff output exceeds Node.js default (~1MB).
+ */
+const GIT_MAX_BUFFER = 50 * 1024 * 1024;
 
 /**
  * Options for change detection functions.
@@ -113,15 +126,18 @@ export function detectBranchChanges(
   const tagPrefix = options?.registry?.tagPrefix ?? DEFAULT_TAG_PREFIX;
 
   try {
-    // Get merge base
-    const mergeBase = execGit(`merge-base ${baseBranch} HEAD`, baseDir).trim();
+    // Validate branch name to prevent command injection
+    const safeBranch = sanitizeBranchName(baseBranch);
+
+    // Get merge base using safe execution (array args, no shell interpolation)
+    const mergeBase = execGitSafe('merge-base', [safeBranch, 'HEAD'], baseDir).trim();
 
     // Get list of changed files
-    const nameStatus = execGit(`diff --name-status ${mergeBase}`, baseDir);
+    const nameStatus = execGitSafe('diff', ['--name-status', mergeBase], baseDir);
     const { modified, added, deleted } = parseNameStatus(nameStatus);
 
     // Get full diff
-    const diff = execGit(`diff ${mergeBase}`, baseDir);
+    const diff = execGitSafe('diff', [mergeBase], baseDir);
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, [...modified, ...added], tagPrefix);
@@ -164,9 +180,9 @@ export function detectFileChanges(
       const fullPath = path.isAbsolute(file) ? file : path.join(baseDir, file);
       const relativePath = path.relative(baseDir, fullPath);
 
-      // Check if file is tracked
+      // Check if file is tracked (use -- to separate path from options)
       try {
-        execGit(`ls-files --error-unmatch ${relativePath}`, baseDir);
+        execGitSafe('ls-files', ['--error-unmatch', '--', relativePath], baseDir);
         modified.push(relativePath);
       } catch {
         // File not tracked, might be new
@@ -174,8 +190,9 @@ export function detectFileChanges(
       }
     }
 
-    // Get diff for modified files
-    const diff = modified.length > 0 ? execGit(`diff HEAD -- ${modified.join(' ')}`, baseDir) : '';
+    // Get diff for modified files (use -- to separate paths from options)
+    const diff =
+      modified.length > 0 ? execGitSafe('diff', ['HEAD', '--', ...modified], baseDir) : '';
 
     // Detect status transitions
     const statusTransitions = detectStatusTransitions(diff, modified, tagPrefix);
@@ -201,13 +218,60 @@ export function detectFileChanges(
 
 /**
  * Execute a git command and return output.
+ *
+ * @deprecated Use execGitSafe for user-controlled inputs to prevent command injection.
+ * This function is kept for simple hardcoded commands like 'diff --cached'.
  */
 function execGit(command: string, cwd: string): string {
   return execSync(`git ${command}`, {
     cwd,
     encoding: 'utf-8',
     stdio: ['pipe', 'pipe', 'pipe'],
+    maxBuffer: GIT_MAX_BUFFER,
   });
+}
+
+/**
+ * Execute a git command safely using execFileSync to prevent command injection.
+ *
+ * Uses array-based arguments instead of string interpolation to avoid shell
+ * metacharacter injection vulnerabilities.
+ *
+ * @param subcommand - Git subcommand (e.g., 'merge-base', 'diff', 'ls-files')
+ * @param args - Array of arguments (never interpolated into a shell command)
+ * @param cwd - Working directory
+ * @returns Command output as string
+ */
+function execGitSafe(subcommand: string, args: readonly string[], cwd: string): string {
+  return execFileSync('git', [subcommand, ...args], {
+    cwd,
+    encoding: 'utf-8',
+    stdio: ['pipe', 'pipe', 'pipe'],
+    maxBuffer: GIT_MAX_BUFFER,
+  });
+}
+
+/**
+ * Validate and sanitize a git branch name to prevent command injection.
+ *
+ * Allows only alphanumeric characters, dots, hyphens, underscores, and forward slashes.
+ * This matches the valid git branch name character set per git-check-ref-format.
+ *
+ * @param branch - Branch name to validate
+ * @returns The validated branch name (unchanged if valid)
+ * @throws Error if branch name contains invalid characters
+ */
+function sanitizeBranchName(branch: string): string {
+  // Git branch names: alphanumeric, dots, hyphens, underscores, forward slashes
+  // Excludes shell metacharacters: ; | & $ ` ( ) { } [ ] < > ! ~ ^ * ? " ' \
+  if (!/^[a-zA-Z0-9._\-/]+$/.test(branch)) {
+    throw new Error(`Invalid branch name: ${branch}`);
+  }
+  // Prevent path traversal attempts in branch names
+  if (branch.includes('..')) {
+    throw new Error(`Invalid branch name (contains ..): ${branch}`);
+  }
+  return branch;
 }
 
 /**
@@ -265,7 +329,36 @@ function escapeRegex(str: string): string {
 }
 
 /**
+ * Check if a file path is in a generated docs directory.
+ * These directories contain embedded status examples that look like transitions.
+ */
+function isGeneratedDocsPath(filePath: string): boolean {
+  const patterns = ['docs-living/', 'docs-generated/', 'docs/generated/'];
+  return patterns.some((p) => filePath.startsWith(p) || filePath.includes(`/${p}`));
+}
+
+/**
+ * State for tracking parsing context within a git diff file section.
+ */
+interface DiffFileParseState {
+  /** Current line number in the new file version (from hunk headers) */
+  newLineNumber: number;
+  /** Are we inside a docstring (between """ markers)? */
+  insideDocstring: boolean;
+  /** All status tags found with their locations (for debugging) */
+  foundTags: StatusTagLocation[];
+  /** The first valid (non-docstring) added status tag */
+  validAddedTag: StatusTagLocation | null;
+  /** The removed status tag (for modified files) */
+  removedTag: StatusTagLocation | null;
+}
+
+/**
  * Detect status transitions from diff content.
+ *
+ * This function is docstring-aware: it tracks `"""` boundaries and only
+ * captures status tags that appear OUTSIDE docstrings. For new files,
+ * the FIRST valid status tag is used (not the last).
  *
  * Looks for lines like:
  * -{tagPrefix}status:roadmap
@@ -283,84 +376,141 @@ function detectStatusTransitions(
   const transitions: Array<[string, StatusTransition]> = [];
   let currentFile = '';
 
-  // Build regex pattern with configurable prefix
+  // Build regex patterns
   const escapedPrefix = escapeRegex(tagPrefix);
   const statusPattern = new RegExp(`${escapedPrefix}status:(\\w+)`);
+  const hunkHeaderPattern = /^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/;
+
+  // Parse state per file
+  const fileStates = new Map<string, DiffFileParseState>();
 
   for (const line of diff.split('\n')) {
-    // Track current file
+    // Track current file from diff headers
     if (line.startsWith('diff --git')) {
       const match = /diff --git a\/(.+) b\/(.+)/.exec(line);
-      currentFile = match?.[2] ?? '';
+      const file = match?.[2] ?? '';
+      currentFile = file;
+
+      // Initialize state for relevant files
+      if (file && files.includes(file) && !isGeneratedDocsPath(file)) {
+        fileStates.set(file, {
+          newLineNumber: 0,
+          insideDocstring: false,
+          foundTags: [],
+          validAddedTag: null,
+          removedTag: null,
+        });
+      }
       continue;
     }
 
-    // Skip if not a relevant file
-    if (!currentFile || !files.includes(currentFile)) continue;
+    // Get current file state
+    const state = currentFile ? fileStates.get(currentFile) : undefined;
+    if (!state) continue;
 
-    // Skip generated docs directories - they contain embedded status examples
-    // that look like status transitions but are just content, not real tags
-    // Common patterns: docs-living/, docs-generated/, docs/generated/
-    const generatedDocsPatterns = ['docs-living/', 'docs-generated/', 'docs/generated/'];
-    if (
-      generatedDocsPatterns.some((p) => currentFile.startsWith(p) || currentFile.includes(`/${p}`))
-    )
+    // Track line numbers from hunk headers (@@ -old,count +new,count @@)
+    const hunkMatch = hunkHeaderPattern.exec(line);
+    if (hunkMatch?.[1]) {
+      // Hunk header gives starting line; we'll increment as we see lines
+      state.newLineNumber = parseInt(hunkMatch[1], 10) - 1;
+      // Reset docstring state at each hunk (conservative approach)
+      state.insideDocstring = false;
       continue;
+    }
 
-    // Look for status changes
+    // Track line numbers: increment for context and added lines, not for removed
+    if (!line.startsWith('-') || line.startsWith('---')) {
+      state.newLineNumber++;
+    }
+
+    // Track docstring boundaries (""" in Gherkin/Python)
+    // Check both added and context lines for docstring markers
+    const lineContent = line.startsWith('+') || line.startsWith('-') ? line.substring(1) : line;
+    if (/^\s*"""/.test(lineContent)) {
+      state.insideDocstring = !state.insideDocstring;
+    }
+
+    // Look for removed status tags (old value for modified files)
     if (line.startsWith('-') && !line.startsWith('---')) {
       const oldMatch = statusPattern.exec(line);
       if (oldMatch?.[1]) {
-        // Found a removed status, look for the added status
-        const fromStatus = oldMatch[1].toLowerCase();
-        // We'll find the 'to' status in subsequent lines
-        const existingTransition = transitions.find(([f]) => f === currentFile);
-        if (!existingTransition) {
-          // Temporarily store with 'from' only
-          transitions.push([
-            currentFile,
-            {
-              from: fromStatus as ProcessStatusValue,
-              to: fromStatus as ProcessStatusValue, // Will be updated
-            },
-          ]);
+        const location: StatusTagLocation = {
+          lineNumber: state.newLineNumber,
+          insideDocstring: state.insideDocstring,
+          rawLine: line,
+        };
+        state.foundTags.push(location);
+
+        // Capture removed tag if not inside docstring (first one wins)
+        if (!state.removedTag && !state.insideDocstring) {
+          state.removedTag = location;
         }
       }
     }
 
+    // Look for added status tags (new value)
     if (line.startsWith('+') && !line.startsWith('+++')) {
       const newMatch = statusPattern.exec(line);
       if (newMatch?.[1]) {
         const toStatus = newMatch[1].toLowerCase();
-        // Update the existing transition or create new
-        const existingIdx = transitions.findIndex(([f]) => f === currentFile);
-        if (existingIdx >= 0) {
-          const existing = transitions[existingIdx];
-          if (existing) {
-            transitions[existingIdx] = [
-              currentFile,
-              {
-                from: existing[1].from,
-                to: toStatus as ProcessStatusValue,
-              },
-            ];
+        if (PROCESS_STATUS_VALUES.includes(toStatus as ProcessStatusValue)) {
+          const location: StatusTagLocation = {
+            lineNumber: state.newLineNumber,
+            insideDocstring: state.insideDocstring,
+            rawLine: line,
+          };
+          state.foundTags.push(location);
+
+          // Capture FIRST valid added tag (not inside docstring)
+          if (!state.validAddedTag && !state.insideDocstring) {
+            state.validAddedTag = location;
           }
-        } else if (PROCESS_STATUS_VALUES.includes(toStatus as ProcessStatusValue)) {
-          // New file with status
-          transitions.push([
-            currentFile,
-            {
-              from: 'roadmap' as ProcessStatusValue, // Default for new files
-              to: toStatus as ProcessStatusValue,
-            },
-          ]);
         }
       }
     }
   }
 
-  // Filter out transitions where from === to (no actual change)
-  return transitions.filter(([, t]) => t.from !== t.to);
+  // Build transitions from parsed state
+  for (const [file, state] of fileStates) {
+    // Skip if no valid added tag found
+    if (!state.validAddedTag) continue;
+
+    // Extract status values
+    const toMatch = statusPattern.exec(state.validAddedTag.rawLine);
+    const toStatusRaw = toMatch?.[1]?.toLowerCase();
+    if (!toStatusRaw) continue;
+    const toStatus = toStatusRaw as ProcessStatusValue;
+
+    const isNewFile = state.removedTag === null;
+    let fromStatus: ProcessStatusValue;
+
+    if (state.removedTag === null) {
+      // New file defaults from 'roadmap'
+      fromStatus = 'roadmap';
+    } else {
+      // state.removedTag is guaranteed to exist here
+      const fromMatch = statusPattern.exec(state.removedTag.rawLine);
+      const fromStatusRaw = fromMatch?.[1]?.toLowerCase();
+      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : 'roadmap';
+    }
+
+    // Skip if no actual change
+    if (fromStatus === toStatus) continue;
+
+    // Build transition with debug metadata
+    const transition: StatusTransition = {
+      from: fromStatus,
+      to: toStatus,
+      isNewFile,
+      toLocation: state.validAddedTag,
+      // Include all detected tags if there were multiple (helps debug false positives)
+      ...(state.foundTags.length > 1 ? { allDetectedTags: state.foundTags } : {}),
+    };
+
+    transitions.push([file, transition]);
+  }
+
+  return transitions;
 }
 
 // =============================================================================

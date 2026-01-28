@@ -1,6 +1,9 @@
+@libar-docs
 @libar-docs-pattern:MvpWorkflowImplementation
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-phase:99
+@libar-docs-release:v1.0.0
 @libar-docs-effort:8h
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-business-value:align-package-with-pdr005-fsm

@@ -3,7 +3,8 @@
  * @libar-docs-lint
  * @libar-docs-pattern DetectChanges
  * @libar-docs-status active
- * @libar-docs-depends-on:DeriveProcessState
+ * @libar-docs-implements ProcessGuardLinter
+ * @libar-docs-uses DeriveProcessState
  *
  * ## DetectChanges - Git Diff Change Detection
  *
