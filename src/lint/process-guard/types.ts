@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern ProcessGuardTypes
  * @libar-docs-status active
+ * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:FSMValidator
  *
  * ## ProcessGuardTypes - Type Definitions for Process Guard Linter

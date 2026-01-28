@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern LintRules
  * @libar-docs-status completed
+ * @libar-docs-implements PatternRelationshipModel
  * @libar-docs-used-by LintEngine
  *
  * ## LintRules - Annotation Quality Rules
@@ -191,21 +192,35 @@ export const missingRelationships = {
 /**
  * Rule: pattern-conflict-in-implements
  *
- * Files with an implements tag must not also define patterns.
- * The implements tag declares that a file realizes a pattern defined elsewhere.
- * Having both would create conflicting definitions.
+ * Validates that a file doesn't create a circular reference by defining
+ * a pattern that it also implements. Having both @libar-docs-pattern X
+ * AND @libar-docs-implements X on the same file is a conflict.
+ *
+ * However, a file CAN have both tags when they reference DIFFERENT patterns:
+ * - @libar-docs-pattern SubPattern (defines its own identity)
+ * - @libar-docs-implements ParentSpec (links to parent spec)
+ *
+ * This supports the sub-pattern hierarchy where implementation files can be
+ * named patterns that also implement a larger spec (e.g., MockPaymentActions
+ * implementing DurableEventsIntegration).
  */
 export const patternConflictInImplements = {
     id: 'pattern-conflict-in-implements',
     severity: 'error',
-    description: 'Implementation files must not define patterns',
+    description: 'Pattern cannot implement itself (circular reference)',
     check: (directive, file, line, context) => {
         const hasImplements = (directive.implements?.length ?? 0) > 0;
-        const hasPattern = directive.patternName !== undefined;
-        if (hasImplements && hasPattern) {
-            const tagPrefix = getTagPrefix(context);
-            return violation('pattern-conflict-in-implements', 'error', `Files with ${tagPrefix}implements must not also define ${tagPrefix}pattern. ` +
-                'Implementation files realize patterns defined elsewhere.', file, line);
+        const patternName = directive.patternName;
+        if (hasImplements && patternName !== undefined) {
+            // Only error if pattern name matches any implements target (circular reference)
+            const patternNameLower = patternName.toLowerCase();
+            const implementsTargets = directive.implements?.map((i) => i.toLowerCase()) ?? [];
+            if (implementsTargets.includes(patternNameLower)) {
+                const tagPrefix = getTagPrefix(context);
+                return violation('pattern-conflict-in-implements', 'error', `Pattern '${patternName}' cannot implement itself. ` +
+                    `Remove either ${tagPrefix}pattern or ${tagPrefix}implements for this pattern.`, file, line);
+            }
+            // Different patterns: OK - this is a sub-pattern implementing a parent spec
         }
         return null;
     },

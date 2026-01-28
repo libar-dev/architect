@@ -161,11 +161,11 @@ describeFeature(feature, ({ Rule }) => {
   // RULE 1: Pattern Conflict Detection
   // ===========================================================================
 
-  Rule('Implements files must not define patterns', ({ RuleScenario }) => {
+  Rule('Pattern cannot implement itself (circular reference)', ({ RuleScenario }) => {
     RuleScenario('Pattern tag with implements tag causes error', ({ Given, When, Then, And }) => {
       Given('a TypeScript file with:', (_ctx: unknown, _docString: string) => {
         state = initState();
-        // Create directive with both patternName and implements (conflict)
+        // Create directive with same patternName and implements (circular reference)
         state.directive = createTestDirective({
           patternName: 'EventStoreDurability',
           implements: ['EventStoreDurability'],
@@ -193,12 +193,12 @@ describeFeature(feature, ({ Rule }) => {
         expect(violation?.severity).toBe('error');
       });
 
-      And('the message should mention "must not define patterns"', () => {
+      And('the message should mention "cannot implement itself"', () => {
         const violation = state!.violations.find(
           (v) => v.rule === 'pattern-conflict-in-implements'
         );
-        // The actual message says "must not also define @libar-docs-pattern"
-        expect(violation?.message.toLowerCase()).toContain('must not');
+        // The message says "Pattern 'X' cannot implement itself"
+        expect(violation?.message.toLowerCase()).toContain('cannot implement itself');
       });
     });
 

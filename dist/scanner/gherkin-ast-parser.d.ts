@@ -3,6 +3,7 @@
  * @libar-docs-scanner
  * @libar-docs-pattern GherkinASTParser
  * @libar-docs-status completed
+ * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes
  * @libar-docs-used-by GherkinScanner
  *

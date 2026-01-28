@@ -3,6 +3,7 @@
  * @libar-docs-validation
  * @libar-docs-pattern DocDirectiveSchema
  * @libar-docs-status completed
+ * @libar-docs-implements MvpWorkflowImplementation
  * @libar-docs-used-by DocExtractor, ExtractedPatternSchema
  *
  * ## DocDirectiveSchema - Parsed JSDoc Directive Validation

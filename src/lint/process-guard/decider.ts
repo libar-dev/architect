@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern ProcessGuardDecider
  * @libar-docs-status active
+ * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:FSMValidator,DeriveProcessState,DetectChanges
  *
  * ## ProcessGuardDecider - Pure Validation Logic

@@ -3,6 +3,7 @@
  * @libar-docs-extractor
  * @libar-docs-pattern GherkinExtractor
  * @libar-docs-status completed
+ * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes, GherkinASTParser
  * @libar-docs-used-by DualSourceExtractor, Orchestrator
  *

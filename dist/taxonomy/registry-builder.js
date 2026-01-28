@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
+ * @libar-docs-implements TypeScriptTaxonomyImplementation
  *
  * ## Tag Registry Builder
  *

@@ -9,10 +9,10 @@ Feature: Linter Rules for Relationship Validation
   # RULE 1: Pattern Conflict Detection
   # ===========================================================================
 
-  Rule: Implements files must not define patterns
+  Rule: Pattern cannot implement itself (circular reference)
 
-    Files with @libar-docs-implements provide implementation metadata for
-    a pattern defined elsewhere. They cannot also define the pattern.
+    A file cannot define a pattern that implements itself. This creates a
+    circular reference. Different patterns are allowed (sub-pattern hierarchy).
 
     @validation
     Scenario: Pattern tag with implements tag causes error
@@ -27,7 +27,7 @@ Feature: Linter Rules for Relationship Validation
       When the linter runs
       Then rule "pattern-conflict-in-implements" should trigger
       And the severity should be "error"
-      And the message should mention "must not define patterns"
+      And the message should mention "cannot implement itself"
 
     @validation
     Scenario: Implements without pattern tag is valid

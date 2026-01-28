@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern ProcessStateAPI
  * @libar-docs-status active
+ * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-arch-role service
  * @libar-docs-arch-context api
  * @libar-docs-arch-layer application

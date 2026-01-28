@@ -3,6 +3,7 @@
  * @libar-docs-validation
  * @libar-docs-pattern DualSourceSchemas
  * @libar-docs-status completed
+ * @libar-docs-implements MvpWorkflowImplementation
  * @libar-docs-used-by DocExtractor, FeatureParser, CrossValidator
  *
  * ## DualSourceSchemas - Dual-Source Extraction Type Validation

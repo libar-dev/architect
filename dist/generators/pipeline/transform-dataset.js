@@ -3,6 +3,7 @@
  * @libar-docs-generator @libar-docs-core
  * @libar-docs-pattern TransformDataset
  * @libar-docs-status completed
+ * @libar-docs-implements PatternRelationshipModel
  * @libar-docs-arch-role service
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer application
