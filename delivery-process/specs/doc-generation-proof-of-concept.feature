@@ -87,13 +87,33 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     superseded. The `Rule: Context` section of a decision IS the background/intro
     for any documentation about that topic.
 
+    **Extends Existing ADR Codec:**
+
+    The doc-from-decision generator extends the existing `AdrDocumentCodec` which
+    already parses Rule: prefixes via `partitionAdrRules()` (see adr.ts:627-663):
+
+    | Rule Prefix | ADR Section | Doc Section |
+    | `Context...` | context | ## Background / Introduction |
+    | `Decision...` | decision | ## How It Works |
+    | `Consequence...` | consequences | ## Trade-offs |
+    | Other rules | other (warning logged) | Custom sections |
+
     **Source Mapping Pattern:**
 
     Each documentation decision declares its target documents and source mapping:
 
-    | Target Document | Sources | Detail Level |
-    | docs/PROCESS-GUARD.md | This decision + behavior specs + code | detailed |
-    | _claude-md/validation/process-guard.md | This decision + behavior specs + code | compact |
+    | Target Document | Sources | Detail Level | Effect |
+    | docs/PROCESS-GUARD.md | This decision + behavior specs + code | detailed | All sections, full JSDoc |
+    | _claude-md/validation/process-guard.md | This decision + behavior specs + code | summary | Rules table, types only |
+
+    **Detail Level Mapping:**
+
+    Uses existing `DetailLevel` enum from `renderable/codecs/types/base.ts`:
+
+    | Level | Content Included | Typical Output |
+    | summary | Essential tables, types only | ~50 lines |
+    | standard | Tables, types, key descriptions | ~150 lines |
+    | detailed | Everything including JSDoc, examples | ~300 lines |
 
     **Extraction by Source Type:**
 
@@ -464,9 +484,32 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     Then warning is logged: "Source file not found: nonexistent.ts"
     And generation continues with available sources
 
+  @acceptance-criteria @validation
+  Scenario: Source file exists but extraction method fails
+    Given a source mapping references "src/types.ts" with extraction "@extract-shapes"
+    And the file exists but contains no matching shapes
+    When generating documentation
+    Then warning is logged: "No shapes extracted from src/types.ts"
+    And generation continues with empty shapes section
+
+  @acceptance-criteria @validation
+  Scenario: Source mapping validated at generation time
+    Given a decision with source mapping table
+    When running validation before generation
+    Then all referenced files are checked for existence
+    And extraction methods are validated against file content
+    And warnings are collected before generation starts
+
   @acceptance-criteria @integration
   Scenario: Full pipeline generates Process Guard docs
     When running the doc-from-decision generator
     Then "_claude-md/validation/process-guard.md" is created
     And "docs/PROCESS-GUARD.md" is created
     And no manual documentation files need updating
+
+  @acceptance-criteria @integration
+  Scenario: Generator registered in CODEC_MAP
+    Given the doc-from-decision generator is implemented
+    Then it is registered in the GeneratorRegistry
+    And can be invoked via generate-docs --generators doc-from-decision
+    And follows the existing CodecBasedGenerator pattern

@@ -480,3 +480,111 @@ Feature: TypeScript Shape Extraction for Documentation
       When extracting shapes
       Then warning: "Shape 'Request' is imported, not defined in this file"
       And suggestion: "Add extract-shapes to the source file"
+
+    @acceptance-criteria @validation
+    Scenario: Re-exported type produces same warning as import
+      Given a TypeScript file with:
+        """typescript
+        /**
+         * @libar-docs
+         * @libar-docs-extract-shapes Foo
+         */
+
+        // Re-export from another file
+        export { Foo } from './types.js';
+        export type { Bar } from './other.js';
+        """
+      When extracting shapes for "Foo"
+      Then warning: "Shape 'Foo' is re-exported, not defined in this file"
+      And the shape is NOT extracted
+      And suggestion: "Add @libar-docs-extract-shapes to ./types.js instead"
+
+  # ============================================================================
+  # RULE 9: Overloaded Functions
+  # ============================================================================
+
+  Rule: Overloaded function signatures are all extracted
+
+    **Invariant:** When a function has multiple overload signatures, all
+    signatures are extracted together as they represent the complete API.
+
+    @acceptance-criteria @happy-path
+    Scenario: Extract overloaded function signatures
+      Given a TypeScript file with:
+        """typescript
+        /**
+         * @libar-docs
+         * @libar-docs-extract-shapes validate
+         */
+
+        export function validate(input: string): boolean;
+        export function validate(input: number): boolean;
+        export function validate(input: string | number): boolean {
+          return typeof input === 'string' ? input.length > 0 : input > 0;
+        }
+        """
+      When extracting shapes
+      Then the extracted shape includes all overload signatures:
+        """typescript
+        function validate(input: string): boolean;
+        function validate(input: number): boolean;
+        """
+      And the implementation signature is NOT included
+
+    @acceptance-criteria @happy-path
+    Scenario: Extract method overloads in interface
+      Given a TypeScript file with:
+        """typescript
+        /**
+         * @libar-docs
+         * @libar-docs-extract-shapes Parser
+         */
+
+        export interface Parser {
+          parse(input: string): Result;
+          parse(input: Buffer): Result;
+        }
+        """
+      When extracting shapes
+      Then both method signatures are preserved in the interface
+
+  # ============================================================================
+  # RULE 10: Rendering Options
+  # ============================================================================
+
+  Rule: Shape rendering supports grouping options
+
+    **Invariant:** Codecs can render shapes grouped in a single code block
+    or as separate code blocks, depending on detail level.
+
+    @acceptance-criteria @happy-path
+    Scenario: Grouped rendering for compact output
+      Given extracted shapes "Input", "Output", "Options"
+      And rendering with groupInSingleBlock: true
+      When generating markdown
+      Then output is:
+        """markdown
+        ```typescript
+        interface Input { ... }
+
+        interface Output { ... }
+
+        interface Options { ... }
+        ```
+        """
+
+    @acceptance-criteria @happy-path
+    Scenario: Separate rendering for detailed output
+      Given extracted shapes "Input", "Output"
+      And rendering with groupInSingleBlock: false
+      When generating markdown
+      Then output is:
+        """markdown
+        ```typescript
+        interface Input { ... }
+        ```
+
+        ```typescript
+        interface Output { ... }
+        ```
+        """

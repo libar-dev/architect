@@ -64,6 +64,12 @@ export interface ExtractedShape {
 
   /** For interfaces: what it extends */
   extends?: string[];
+
+  /** For functions: overload signatures (excludes implementation signature) */
+  overloads?: string[];
+
+  /** Whether this is an exported shape */
+  exported: boolean;
 }
 
 /**
@@ -79,8 +85,26 @@ export interface ShapeExtractionResult {
   /** Shape names that exist but are imports (not defined in file) */
   imported: string[];
 
+  /** Shape names that are re-exported from other files */
+  reExported: ReExportedShape[];
+
   /** Any warnings generated during extraction */
   warnings: string[];
+}
+
+/**
+ * Information about a re-exported shape.
+ * Re-exports are treated like imports - not extracted, but with source info.
+ */
+export interface ReExportedShape {
+  /** The shape name that was re-exported */
+  name: string;
+
+  /** The source module path (e.g., './types.js') */
+  sourceModule: string;
+
+  /** Whether it's a type-only re-export */
+  typeOnly: boolean;
 }
 
 /**
@@ -135,12 +159,16 @@ export function extractShapes(
   // TODO: Implementation
   // 1. Parse sourceCode with typescript-estree
   // 2. Build map of all exported declarations
-  // 3. For each requested shapeName:
-  //    a. Find in declarations map
-  //    b. If not found, check if it's an import
-  //    c. Extract source text using location info
-  //    d. Extract preceding JSDoc if present
-  // 4. Return shapes in requested order
+  // 3. Build map of imports and re-exports
+  // 4. For each requested shapeName:
+  //    a. Find in declarations map → extract shape
+  //    b. If not found, check if it's an import → add to imported[]
+  //    c. If not found, check if it's a re-export → add to reExported[]
+  //    d. If truly not found → add to notFound[]
+  // 5. For functions, collect all overload signatures
+  // 6. Extract source text using location info
+  // 7. Extract preceding JSDoc if present
+  // 8. Return shapes in requested order
 
   throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
 }
@@ -200,6 +228,47 @@ function functionToSignature(_sourceText: string): string {
   throw new Error('Not implemented');
 }
 
+/**
+ * Find all imports and re-exports in the AST.
+ * @internal
+ *
+ * Distinguishes between:
+ * - `import { Foo } from './mod'` → imported
+ * - `export { Foo } from './mod'` → re-exported
+ * - `export type { Foo } from './mod'` → re-exported (typeOnly)
+ */
+function findImportsAndReExports(
+  _ast: unknown
+): {
+  imports: Map<string, string>; // name → sourceModule
+  reExports: Map<string, ReExportedShape>;
+} {
+  // Walk AST looking for:
+  // - ImportDeclaration → add to imports
+  // - ExportNamedDeclaration with source → add to reExports
+  // - ExportAllDeclaration → note but can't extract specific names
+
+  throw new Error('Not implemented');
+}
+
+/**
+ * Collect all overload signatures for a function.
+ * @internal
+ *
+ * TypeScript allows multiple function declarations with the same name
+ * followed by an implementation. We want only the declaration signatures.
+ */
+function collectOverloads(
+  _ast: unknown,
+  _functionName: string
+): string[] {
+  // Find all FunctionDeclaration nodes with matching name
+  // Filter: keep declarations (no body), exclude implementation (has body)
+  // Return array of signature source texts
+
+  throw new Error('Not implemented');
+}
+
 // =============================================================================
 // Integration with Extractor Pipeline
 // =============================================================================
@@ -226,10 +295,20 @@ export function processExtractShapesTag(
     console.warn(`[extract-shapes] Shape '${name}' not found in file`);
   }
 
+  // Log warnings for imported shapes
   for (const name of result.imported) {
     console.warn(
       `[extract-shapes] Shape '${name}' is imported, not defined in this file. ` +
         `Add @libar-docs-extract-shapes to the source file instead.`
+    );
+  }
+
+  // Log warnings for re-exported shapes with source module info
+  for (const reExport of result.reExported) {
+    const typeOnlyNote = reExport.typeOnly ? ' (type-only)' : '';
+    console.warn(
+      `[extract-shapes] Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. ` +
+        `Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`
     );
   }
 
