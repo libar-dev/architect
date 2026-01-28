@@ -13,11 +13,6 @@
 
 ## Description
 
-:DeriveProcessState
-
-
-## DetectChanges - Git Diff Change Detection
-
 Detects changes from git diff including:
 - Modified, added, deleted files
 - Status transitions (@libar-docs-status changes)

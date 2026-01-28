@@ -16,6 +16,12 @@
 Transforms MasterDataset into a RenderableDocument containing
 architecture diagrams (Mermaid) generated from source annotations.
 
+### When to Use
+
+- When generating architecture diagrams from code annotations
+- When visualizing bounded contexts and component relationships
+- When creating layered architecture views (domain/application/infrastructure)
+
 ### Factory Pattern
 
 Use `createArchitectureCodec(options)` to create a configured codec:

@@ -24,14 +24,14 @@ Component architecture with bounded context isolation:
 ```mermaid
 graph TB
     subgraph api["Api BC"]
-        ProcessStateAPI["ProcessStateAPI[infrastructure]"]
+        ProcessStateAPI["ProcessStateAPI"]
     end
     subgraph extractor["Extractor BC"]
-        Document_Extractor["Document Extractor[infrastructure]"]
+        Document_Extractor["Document Extractor"]
     end
     subgraph generator["Generator BC"]
-        Documentation_Generation_Orchestrator["Documentation Generation Orchestrator[infrastructure]"]
-        TransformDataset["TransformDataset[infrastructure]"]
+        Documentation_Generation_Orchestrator["Documentation Generation Orchestrator"]
+        TransformDataset["TransformDataset"]
     end
     subgraph scanner["Scanner BC"]
         Pattern_Scanner["Pattern Scanner[infrastructure]"]
@@ -60,9 +60,9 @@ All components with architecture annotations:
 
 | Component | Context | Role | Layer | Source File |
 | --- | --- | --- | --- | --- |
-| 🚧 Process State API | api | infrastructure | application | src/api/process-state.ts |
-| ✅ Document Extractor | extractor | infrastructure | application | src/extractor/doc-extractor.ts |
-| ✅ Documentation Generation Orchestrator | generator | infrastructure | application | src/generators/orchestrator.ts |
-| ✅ Transform Dataset | generator | infrastructure | application | src/generators/pipeline/transform-dataset.ts |
+| 🚧 Process State API | api | - | application | src/api/process-state.ts |
+| ✅ Document Extractor | extractor | - | application | src/extractor/doc-extractor.ts |
+| ✅ Documentation Generation Orchestrator | generator | - | application | src/generators/orchestrator.ts |
+| ✅ Transform Dataset | generator | - | application | src/generators/pipeline/transform-dataset.ts |
 | ✅ Pattern Scanner | scanner | infrastructure | infrastructure | src/scanner/pattern-scanner.ts |
 | ✅ TypeScript AST Parser | scanner | infrastructure | infrastructure | src/scanner/ast-parser.ts |

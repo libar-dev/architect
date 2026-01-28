@@ -37,6 +37,14 @@
   Confirmed vitest-cucumber supports Rules via `Rule()` + `RuleScenario()` syntax.
   No migration to alternative frameworks needed.
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`gherkin-extractor.ts`](../../src/extractor/gherkin-extractor.ts) - ## GherkinExtractor - Convert Feature Files to Pattern Documentation
+- [`gherkin-ast-parser.ts`](../../src/scanner/gherkin-ast-parser.ts) - ## GherkinASTParser - Parse Feature Files Using Cucumber Gherkin
+- [`gherkin-scanner.ts`](../../src/scanner/gherkin-scanner.ts) - ## GherkinScanner - Multi-Source Pattern Extraction from Feature Files
+
 ## Acceptance Criteria
 
 **Rules are captured by AST parser**

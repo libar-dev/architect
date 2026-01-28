@@ -16,6 +16,12 @@
 Transforms MasterDataset into a RenderableDocument for business rules output.
 Generates BUSINESS-RULES.md organized by product area, phase, and feature.
 
+### When to Use
+
+- When generating business rules documentation for stakeholders
+- When extracting domain constraints without implementation details
+- When creating compliance or audit documentation from feature specs
+
 ### Purpose
 
 Enable stakeholders to understand domain constraints without reading

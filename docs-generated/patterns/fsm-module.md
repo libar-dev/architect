@@ -30,6 +30,12 @@ roadmap ──→ active ──→ completed
 deferred ──→ roadmap
 ```
 
+### When to Use
+
+- When validating status transitions in pre-commit hooks
+- When checking protection levels for completed patterns
+- When implementing workflow enforcement in CI/CD
+
 ### Module Contents
 
 - **states.ts** - Status states and protection levels

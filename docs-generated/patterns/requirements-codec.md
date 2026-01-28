@@ -16,6 +16,12 @@
 Transforms MasterDataset into RenderableDocument for PRD/requirements output.
 Generates PRODUCT-REQUIREMENTS.md and detail files (requirements/*.md).
 
+### When to Use
+
+- When generating product requirements documentation
+- When creating stakeholder-facing PRD documents
+- When organizing requirements by user role or product area
+
 ### Factory Pattern
 
 Use `createRequirementsCodec(options)` for custom options:

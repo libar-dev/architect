@@ -13,13 +13,15 @@
 
 ## Description
 
-:FSMValidator
-
-
-## Process State API - Programmatic Query Interface
-
 TypeScript interface for querying delivery process state.
 Designed for Claude Code integration and programmatic access.
+
+### When to Use
+
+- When querying patterns by status, phase, or relationships
+- When validating FSM transitions before making changes
+- When building dashboards or reports on delivery progress
+- When Claude Code needs real-time delivery state (prefer over reading Markdown)
 
 ### Key Features
 

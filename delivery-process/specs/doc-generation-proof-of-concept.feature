@@ -1,0 +1,472 @@
+@libar-docs
+@libar-docs-adr:021
+@libar-docs-adr-status:proposed
+@libar-docs-adr-category:documentation
+@libar-docs-pattern:DocGenerationProofOfConcept
+@libar-docs-status:roadmap
+@libar-docs-phase:27
+@libar-docs-effort:2d
+@libar-docs-product-area:DeliveryProcess
+@libar-docs-depends-on:ShapeExtraction,ClaudeModuleGeneration
+@libar-docs-business-value:eliminates-manual-documentation-maintenance
+@libar-docs-priority:high
+Feature: ADR-021 - Documentation Generation from Annotated Sources
+
+  This decision establishes the pattern for generating technical documentation
+  from annotated source files. It serves as both the DECISION (why/how) and
+  the PROOF OF CONCEPT (demonstrating the pattern works).
+
+  # ============================================================================
+  # CONTEXT: Why We Need Generated Documentation
+  # ============================================================================
+
+  Rule: Context - Manual documentation maintenance does not scale
+
+    **The Problem:**
+
+    Common technical documentation is the hardest part to maintain in a repository.
+    The volume constantly grows, and AI coding sessions are drastically less effective
+    at updating documentation compared to code. Documentation drifts from source.
+
+    Current state in this package:
+    | Document | Lines | Maintenance Burden |
+    | docs/PROCESS-GUARD.md | ~300 | High - duplicates code behavior |
+    | docs/METHODOLOGY.md | ~400 | Medium - conceptual, changes less |
+    | _claude-md/validation/*.md | ~50 each | High - must match detailed docs |
+    | CLAUDE.md | ~800 | Very High - aggregates everything |
+
+    **Root Causes:**
+
+    1. **Duplication** - Same information exists in code comments, feature files,
+       and markdown docs. Changes require updating multiple places.
+
+    2. **No Single Source** - Documentation is authored separately from the code
+       it describes. There's no compilation step to catch drift.
+
+    3. **Detail Level Mismatch** - Compact docs for AI context and detailed docs
+       for humans are maintained separately despite sharing content.
+
+    **What We Have:**
+
+    The delivery-process package already has the required ingredients:
+    - Pattern extraction from TypeScript JSDoc and Gherkin tags
+    - Rich content support (DocStrings, tables, code blocks in features)
+    - Multi-source aggregation via tag taxonomy
+    - Progressive disclosure via codec detail levels
+    - Relationship tags for cross-references
+
+    **What's Missing:**
+
+    | Gap | Impact | Solution |
+    | Shape extraction from TypeScript | High | New @extract-shapes tag |
+    | Recipe for aggregation | Medium | Decision documents as recipes |
+    | Durable intro/context content | Medium | Decision Rule: Context sections |
+
+  # ============================================================================
+  # DECISION: How Documentation Generation Works
+  # ============================================================================
+
+  Rule: Decision - Decisions own recipes and durable content, code owns details
+
+    **The Pattern:**
+
+    Documentation is generated from three source types with different durability:
+
+    | Source Type | Durability | Content Ownership |
+    | Decision documents (ADR/PDR) | Permanent | Intro, context, rationale, recipes |
+    | Behavior specs (.feature) | Permanent | Rules, examples, acceptance criteria |
+    | Implementation code (.ts) | Compiled | API types, error messages, signatures |
+
+    **Why Decisions Own Intro Content:**
+
+    Tier 1 specs (roadmap features) become clutter after implementation - their
+    deliverables are done, status is completed, they pile up. Behavior specs stay
+    current because tests must pass. But neither is appropriate for intro content.
+
+    Decisions (ADR/PDR) are durable by design - they remain valid until explicitly
+    superseded. The `Rule: Context` section of a decision IS the background/intro
+    for any documentation about that topic.
+
+    **Source Mapping Pattern:**
+
+    Each documentation decision declares its target documents and source mapping:
+
+    | Target Document | Sources | Detail Level |
+    | docs/PROCESS-GUARD.md | This decision + behavior specs + code | detailed |
+    | _claude-md/validation/process-guard.md | This decision + behavior specs + code | compact |
+
+    **Extraction by Source Type:**
+
+    | Source | What's Extracted | How |
+    | Decision Rule: Context | Intro/background section | Rule description text |
+    | Decision Rule: Decision | How it works section | Rule description text |
+    | Decision Rule: Consequences | Trade-offs section | Rule description text |
+    | Decision DocStrings | Code examples (Husky, API) | Fenced code blocks |
+    | Behavior spec Rules | Validation rules, business rules | Rule names + descriptions |
+    | Behavior spec Scenario Outlines | Decision tables, lookup tables | Examples tables |
+    | TypeScript @extract-shapes | API types, interfaces | AST extraction |
+    | TypeScript JSDoc | Implementation notes | Markdown in comments |
+
+    **The Generator Command:**
+
+    """bash
+    # Generate all documentation from annotated sources
+    generate-docs \
+      --decisions 'delivery-process/decisions/**/*.feature' \
+      --features 'tests/features/**/*.feature' \
+      --typescript 'src/**/*.ts' \
+      --generators doc-from-decision \
+      --output docs
+    """
+
+  # ============================================================================
+  # PROOF OF CONCEPT: Process Guard Documentation
+  # ============================================================================
+
+  Rule: Proof of Concept - Process Guard docs generated from this pattern
+
+    **Target Documents:**
+
+    This proof of concept generates Process Guard documentation:
+
+    | Output | Purpose | Approximate Size |
+    | docs/PROCESS-GUARD.md | Detailed human reference | ~300 lines |
+    | _claude-md/validation/process-guard.md | Compact AI context | ~50 lines |
+
+    **Source Mapping for Process Guard:**
+
+    | Section | Source File | Extraction Method |
+    | Intro & Context | THIS DECISION (Rule: Context above) | Decision rule description |
+    | How It Works | THIS DECISION (Rule: Decision above) | Decision rule description |
+    | 7 Validation Rules | tests/features/validation/process-guard.feature | Rule blocks |
+    | Protection Levels | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
+    | Valid Transitions | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
+    | API Types | src/lint/process-guard/types.ts | @extract-shapes tag |
+    | Decider API | src/lint/process-guard/decider.ts | @extract-shapes tag |
+    | CLI Options | src/cli/lint-process.ts | JSDoc section |
+    | Error Messages | src/lint/process-guard/decider.ts | createViolation() patterns |
+    | Pre-commit Setup | THIS DECISION (DocString below) | Fenced code block |
+    | Programmatic API | THIS DECISION (DocString below) | Fenced code block |
+
+    **Pre-commit Hook Setup:**
+
+    """bash
+    # .husky/pre-commit
+    #!/usr/bin/env sh
+    . "$(dirname -- "$0")/_/husky.sh"
+
+    npx lint-process --staged
+    """
+
+    **Package.json Scripts:**
+
+    """json
+    {
+      "scripts": {
+        "lint:process": "lint-process --staged",
+        "lint:process:ci": "lint-process --all --strict"
+      }
+    }
+    """
+
+    **Programmatic API Example:**
+
+    """typescript
+    import {
+      deriveProcessState,
+      detectStagedChanges,
+      validateChanges,
+      hasErrors,
+      summarizeResult,
+    } from '@libar-dev/delivery-process/lint';
+
+    // 1. Derive state from annotations
+    const state = (await deriveProcessState({ baseDir: '.' })).value;
+
+    // 2. Detect changes
+    const changes = detectStagedChanges('.').value;
+
+    // 3. Validate
+    const { result } = validateChanges({
+      state,
+      changes,
+      options: { strict: false, ignoreSession: false },
+    });
+
+    // 4. Handle results
+    if (hasErrors(result)) {
+      console.log(summarizeResult(result));
+      process.exit(1);
+    }
+    """
+
+    **Escape Hatches:**
+
+    | Situation | Solution | Example |
+    | Fix bug in completed spec | Add unlock reason tag | `@libar-docs-unlock-reason:'Fix-typo'` |
+    | Modify outside session scope | Use ignore flag | `lint-process --staged --ignore-session` |
+    | CI treats warnings as errors | Use strict flag | `lint-process --all --strict` |
+    | Skip workflow (legacy import) | Multiple transitions | Set roadmap then completed in same commit |
+
+  # ============================================================================
+  # EXPECTED OUTPUT: Compact Module
+  # ============================================================================
+
+  Rule: Expected Output - Compact claude module structure
+
+    **File:** `_claude-md/validation/process-guard.md`
+
+    The compact module extracts only essential content for AI context:
+
+    """markdown
+    ### Process Guard
+
+    Pure validation for enforcing delivery process rules.
+
+    **Problem:** Completed specs modified without unlock, invalid transitions,
+    scope creep in active specs.
+
+    **Solution:** Decider-based validation with protection levels per FSM state.
+
+    #### API Types
+
+    ```typescript
+    interface DeciderInput {
+      state: ProcessState;
+      changes: ChangeDetection;
+      options: ValidationOptions;
+    }
+
+    interface ValidationResult {
+      valid: boolean;
+      violations: ProcessViolation[];
+      warnings: ProcessViolation[];
+    }
+    ```
+
+    #### 7 Validation Rules
+
+    | Rule | Severity | Description |
+    |------|----------|-------------|
+    | completed-protection | error | Completed specs require unlock-reason |
+    | invalid-status-transition | error | Must follow FSM path |
+    | scope-creep | error | Active specs cannot add deliverables |
+    | session-excluded | error | Cannot modify excluded files |
+    | missing-relationship-target | warning | Relationship target not found |
+    | session-scope | warning | File outside session scope |
+    | deliverable-removed | warning | Deliverable was removed |
+
+    #### Protection Levels
+
+    | Status | Protection | Restriction |
+    |--------|------------|-------------|
+    | completed | hard | Requires unlock-reason |
+    | active | scope | No new deliverables |
+    | roadmap | none | Fully editable |
+    | deferred | none | Fully editable |
+
+    #### CLI
+
+    ```bash
+    lint-process --staged              # Pre-commit (default)
+    lint-process --all --strict        # CI pipeline
+    lint-process --staged --ignore-session  # Override session
+    ```
+
+    **See:** [Full Documentation](docs/PROCESS-GUARD.md)
+    """
+
+  # ============================================================================
+  # CONSEQUENCES: Benefits and Trade-offs
+  # ============================================================================
+
+  Rule: Consequences - Durable sources with clear ownership boundaries
+
+    **Benefits:**
+
+    | Benefit | How |
+    | Single source of truth | Each content type owned by one source |
+    | Always-current docs | Generated from tested/compiled sources |
+    | Reduced maintenance | Change source once, docs regenerate |
+    | Progressive disclosure | Same sources → compact + detailed outputs |
+    | Clear ownership | Decisions own "why", code owns "what" |
+
+    **Trade-offs:**
+
+    | Trade-off | Mitigation |
+    | Decisions must be updated for fundamental changes | Appropriate - fundamentals ARE decisions |
+    | New @extract-shapes capability required | Spec created (shape-extraction.feature) |
+    | Initial annotation effort on existing code | One-time migration, then maintained |
+    | Generated docs in git history | Same as current manual approach |
+
+    **Ownership Boundaries:**
+
+    | Content Type | Owner | Update Trigger |
+    | Intro, rationale, context | Decision document | Fundamental change to approach |
+    | Rules, examples, edge cases | Behavior specs | Behavior change (tests fail) |
+    | API types, signatures | Code with @extract-shapes | Interface change (compile fail) |
+    | Error messages | Code patterns | Message text change |
+    | Code examples | Decision DocStrings | Example needs update |
+
+  Rule: Consequences - Design stubs live in specs, not src
+
+    **The Problem:**
+
+    Design stubs (pre-implementation API shapes) placed in `src/` cause issues:
+
+    | Issue | Impact |
+    | ESLint exceptions needed | Rules relaxed for "not-yet-real" code |
+    | Confusion | What's production vs. what's design? |
+    | Pollution | Stubs mixed with implemented code |
+    | Import accidents | Other code might import unimplemented stubs |
+    | Maintenance burden | Must track which files are stubs |
+
+    Example of the anti-pattern (from monorepo eslint.config.js):
+    """javascript
+    // TODO: Delivery process design artifacts: Relax unused-vars
+    {
+      files: [
+        "**/packages/platform-core/src/durability/durableAppend.ts",
+        "**/packages/platform-core/src/durability/intentCompletion.ts",
+        // ... more stubs in src/ ...
+      ],
+      rules: {
+        "@typescript-eslint/no-unused-vars": "off",
+      },
+    }
+    """
+
+    **The Solution:**
+
+    Design stubs live in `specs/examples/` or `specs/stubs/`:
+
+    | Location | Content | When Moved to src/ |
+    | specs/stubs/*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
+    | specs/examples/*.ts | Code examples for documentation | Never (stays as reference) |
+    | src/**/*.ts | Production code only | Already there |
+
+    **Design Stub Pattern:**
+
+    """typescript
+    // specs/stubs/shape-extractor.ts
+    /**
+     * @libar-docs
+     * @libar-docs-pattern ShapeExtractorStub
+     * @libar-docs-status roadmap
+     *
+     * ## Shape Extractor - Design Stub
+     *
+     * API design for extracting TypeScript types from source files.
+     */
+
+    export interface ExtractedShape {
+      name: string;
+      kind: 'interface' | 'type' | 'enum' | 'function';
+      sourceText: string;
+    }
+
+    export function extractShapes(
+      sourceCode: string,
+      shapeNames: string[]
+    ): Map<string, ExtractedShape> {
+      throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
+    }
+    """
+
+    **Benefits:**
+
+    | Benefit | How |
+    | No ESLint exceptions | Stubs aren't in src/, no relaxation needed |
+    | Clear separation | specs/ = design, src/ = production |
+    | Documentation source | Stubs with @extract-shapes generate API docs |
+    | Safe iteration | Can refine stub APIs without breaking anything |
+    | Implementation signal | Moving from specs/ to src/ = implementation started |
+
+    **Workflow:**
+
+    1. **Design session:** Create stub in `specs/stubs/pattern-name.ts`
+    2. **Iterate:** Refine API shapes, add JSDoc, test with docs generation
+    3. **Implementation session:** Move/copy to `src/`, implement real logic
+    4. **Stub becomes example:** Original stub stays as reference (optional)
+
+    **What This Enables:**
+
+    Once proven with Process Guard, the pattern applies to all documentation:
+
+    | Document | Decision Source |
+    | docs/METHODOLOGY.md | ADR for delivery process methodology |
+    | docs/TAXONOMY.md | PDR-006 TypeScript Taxonomy (exists) |
+    | docs/VALIDATION.md | ADR for validation approach |
+    | docs/SESSION-GUIDES.md | ADR for session workflows |
+    | _claude-md/**/*.md | Corresponding decisions with compact extraction |
+
+  # ============================================================================
+  # ACCEPTANCE CRITERIA
+  # ============================================================================
+
+  Background: Deliverables
+    Given the following deliverables:
+      | Deliverable | Status | Location |
+      | Decision extraction codec | planned | renderable/codecs/decision-doc.ts |
+      | Source mapping parser | planned | generators/source-mapper.ts |
+      | DocString extraction enhancement | planned | extractor/gherkin-extractor.ts |
+      | doc-from-decision generator | planned | generators/built-in/decision-doc-generator.ts |
+      | Design stub directory structure | planned | specs/stubs/, specs/examples/ |
+      | Process Guard annotations | planned | Multiple source files |
+      | Generated process-guard.md (compact) | planned | _claude-md/validation/ |
+      | Generated PROCESS-GUARD.md (detailed) | planned | docs/ |
+
+  @acceptance-criteria @happy-path
+  Scenario: Decision Rule descriptions become documentation sections
+    Given a decision with Rule blocks:
+      | Rule Name | Content |
+      | Context - Why we need X | Background explanation |
+      | Decision - How X works | Implementation approach |
+      | Consequences - Trade-offs | Benefits and costs |
+    When generating documentation from the decision
+    Then section "## Context" contains the background
+    And section "## How It Works" contains the approach
+    And section "## Trade-offs" contains benefits and costs
+
+  @acceptance-criteria @happy-path
+  Scenario: Decision DocStrings become code examples
+    Given a decision with DocStrings containing code:
+      | Language | Content |
+      | bash | Pre-commit hook script |
+      | typescript | API usage example |
+    When generating documentation
+    Then code blocks appear with correct language tags
+    And code content is preserved exactly
+
+  @acceptance-criteria @happy-path
+  Scenario: Source mapping aggregates multiple files
+    Given a decision with source mapping table
+    And the mapping references:
+      | Source | Extraction |
+      | behavior spec | Rule blocks |
+      | TypeScript file | @extract-shapes |
+    When generating documentation
+    Then content from all sources is aggregated
+    And sections appear in mapping order
+
+  @acceptance-criteria @happy-path
+  Scenario: Compact and detailed outputs from same sources
+    Given a decision with source mapping
+    When generating with detail level "compact"
+    Then output is ~50 lines with essential content only
+    When generating with detail level "detailed"
+    Then output is ~300 lines with full content
+
+  @acceptance-criteria @validation
+  Scenario: Missing source file produces warning
+    Given a source mapping references "nonexistent.ts"
+    When generating documentation
+    Then warning is logged: "Source file not found: nonexistent.ts"
+    And generation continues with available sources
+
+  @acceptance-criteria @integration
+  Scenario: Full pipeline generates Process Guard docs
+    When running the doc-from-decision generator
+    Then "_claude-md/validation/process-guard.md" is created
+    And "docs/PROCESS-GUARD.md" is created
+    And no manual documentation files need updating

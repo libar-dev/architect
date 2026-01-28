@@ -18,6 +18,12 @@ Zod 4 codecs. The simplification (using z.any() for recursive fields)
 avoids complex recursive type issues at the codec boundary while
 maintaining type safety in the rest of the system.
 
+### When to Use
+
+- When validating codec output in tests
+- When building custom codecs that need output validation
+- When working around Zod recursive schema type inference issues
+
 ### Why z.any() for sections?
 
 Zod's recursive schemas with z.lazy() cause type inference issues

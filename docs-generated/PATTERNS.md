@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 73/110 (66% complete)
+**Overall:** [█████████████░░░░░░░] 74/112 (66% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 73 |
+| ✅ Completed | 74 |
 | 🚧 Active | 13 |
-| 📋 Planned | 24 |
-| **Total** | 110 |
+| 📋 Planned | 25 |
+| **Total** | 112 |
 
 ---
 
@@ -22,8 +22,8 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (45)
-- [DDD](#ddd) (23)
+- [Core](#core) (46)
+- [DDD](#ddd) (24)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
 - [Infra](#infra) (1)
@@ -105,6 +105,7 @@
 | ✅ Shared Codec Schema | Core | completed | Provides a simplified RenderableDocument output schema for use with Zod 4 codecs. |
 | ✅ String Utilities | Core | completed | Provides shared utilities for string manipulation used across the delivery-process package, including slugification... |
 | ✅ Tag Registry Configuration | Core | completed | Defines the structure and validation for tag taxonomy configuration. |
+| ✅ Tag Registry Builder | Core | completed | Constructs a complete TagRegistry from TypeScript constants. |
 | ✅ Tag Taxonomy CLI | Cli | completed | Generates TAG_TAXONOMY.md from the TypeScript taxonomy module. |
 | ✅ Timeline Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)... |
 | ✅ Transform Dataset | Core | completed | Transforms raw extracted patterns into a MasterDataset with all pre-computed views. |
@@ -118,7 +119,7 @@
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
-| 🚧 Detect Changes | Lint | active | :DeriveProcessState Detects changes from git diff including: - Modified, added, deleted files - Status transitions... |
+| 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 FSM Module | Validation | active | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
 | 🚧 FSM States | Validation | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
@@ -127,7 +128,7 @@
 | 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
-| 🚧 Process State API | Core | active | :FSMValidator TypeScript interface for querying delivery process state. |
+| 🚧 Process State API | Core | active | TypeScript interface for querying delivery process state. |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
@@ -148,6 +149,7 @@
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
+| 📋 Shape Extraction | DDD | planned | Documentation comments duplicate type definitions that exist in the same file. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
@@ -179,7 +181,7 @@
 
 ### Core
 
-41/45 complete (91%)
+42/46 complete (91%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -217,6 +219,7 @@
 - [✅ Shared Codec Schema](patterns/shared-codec-schema.md)
 - [✅ String Utilities](patterns/string-utilities.md)
 - [✅ Tag Registry Configuration](patterns/tag-registry-configuration.md)
+- [✅ Tag Registry Builder](patterns/tag-registry-builder.md)
 - [✅ Timeline Codec](patterns/timeline-codec.md)
 - [✅ Transform Dataset](patterns/transform-dataset.md)
 - [✅ TypeScript AST Parser](patterns/type-script-ast-parser.md)
@@ -231,7 +234,7 @@
 
 ### DDD
 
-6/23 complete (26%)
+6/24 complete (25%)
 
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -252,6 +255,7 @@
 - [📋 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
+- [📋 Shape Extraction](patterns/shape-extraction.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
 - [📋 Step Definition Completion](patterns/step-definition-completion.md)
 - [📋 Streaming Git Diff](patterns/streaming-git-diff.md)
@@ -390,6 +394,8 @@ graph TD
     MasterDataset --> ExtractedPattern
     MasterDataset --> TagRegistry
     ExtractedPatternSchema --> DocDirectiveSchema
+    DualSourceSchemas ..-> MvpWorkflowImplementation
+    DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
     DoDValidator --> DoDValidationTypes
     DoDValidator --> GherkinTypes
@@ -398,14 +404,18 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
     GherkinScanner --> GherkinTypes
+    GherkinScanner ..-> GherkinRulesSupport
     GherkinASTParser --> GherkinTypes
+    GherkinASTParser ..-> GherkinRulesSupport
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
+    LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
@@ -419,12 +429,25 @@ graph TD
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
     GherkinExtractor --> GherkinTypes
     GherkinExtractor --> GherkinASTParser
+    GherkinExtractor ..-> GherkinRulesSupport
     DualSourceExtractor --> DocExtractor
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -438,28 +461,31 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
+    FSMValidator ..-> PhaseStateMachineValidation
+    FSMTransitions ..-> PhaseStateMachineValidation
+    FSMStates ..-> PhaseStateMachineValidation
+    PatternsCodec ..-> PatternRelationshipModel
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
+    ProcessGuardTypes ..-> ProcessGuardLinter
+    ProcessGuardModule ..-> ProcessGuardLinter
+    DetectChanges --> DeriveProcessState
+    DetectChanges ..-> ProcessGuardLinter
+    DeriveProcessState ..-> ProcessGuardLinter
+    ProcessGuardDecider ..-> ProcessGuardLinter
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
+    TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
     StreamingGitDiff -.-> ProcessGuardLinter
+    ShapeExtraction -.-> ClaudeModuleGeneration
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```
 

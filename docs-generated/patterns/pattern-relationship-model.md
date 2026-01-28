@@ -34,6 +34,14 @@
   | Agentic workflows | Claude can navigate from pattern to implementations and back |
   | UML-grade modeling | Professional relationship semantics enable rich tooling |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`transform-dataset.ts`](../../src/generators/pipeline/transform-dataset.ts) - ## TransformDataset - Single-Pass Pattern Transformation
+- [`rules.ts`](../../src/lint/rules.ts) - ## LintRules - Annotation Quality Rules
+- [`patterns.ts`](../../src/renderable/codecs/patterns.ts) - ## Patterns Document Codec
+
 ## Acceptance Criteria
 
 **Implements tag parsed from TypeScript**

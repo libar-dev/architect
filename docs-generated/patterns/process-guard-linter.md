@@ -45,6 +45,16 @@
   - `completed`: Hard-locked, requires explicit unlock to modify
   - `deferred`: Fully editable, no restrictions (parked work)
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`decider.ts`](../../src/lint/process-guard/decider.ts) - :FSMValidator,DeriveProcessState,DetectChanges
+- [`derive-state.ts`](../../src/lint/process-guard/derive-state.ts) - :GherkinScanner,FSMValidator
+- [`detect-changes.ts`](../../src/lint/process-guard/detect-changes.ts) - ## DetectChanges - Git Diff Change Detection
+- [`index.ts`](../../src/lint/process-guard/index.ts) - :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider
+- [`types.ts`](../../src/lint/process-guard/types.ts) - :FSMValidator
+
 ## Acceptance Criteria
 
 **Protection level from status**
