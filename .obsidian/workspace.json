@@ -185,6 +185,8 @@
   },
   "active": "7c97a34974168ce1",
   "lastOpenFiles": [
+    "src/extractor/shape-extractor.ts",
+    "src/validation-schemas/extracted-shape.ts",
     "delivery-process/specs/examples/extract-shapes-tag-definition.ts",
     "docs/INDEX.md",
     "docs/METHODOLOGY.md",

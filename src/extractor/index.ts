@@ -34,3 +34,10 @@ export {
   type GherkinExtractorConfig,
   type GherkinExtractionResult,
 } from './gherkin-extractor.js';
+
+// Shape Extraction (ADR-021: Documentation Generation)
+export {
+  extractShapes,
+  processExtractShapesTag,
+  renderShapesAsMarkdown,
+} from './shape-extractor.js';

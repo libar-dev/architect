@@ -23,6 +23,7 @@ import { DocDirectiveSchema, PatternStatusSchema } from './doc-directive.js';
 import { ExportInfoSchema } from './export-info.js';
 import { ScenarioRefSchema } from './scenario-ref.js';
 import { DeliverableSchema, HierarchyLevelSchema } from './dual-source.js';
+import { ExtractedShapeSchema } from './extracted-shape.js';
 import { slugify } from '../utils/string-utils.js';
 import { ADR_STATUS_VALUES } from '../taxonomy/index.js';
 
@@ -477,6 +478,23 @@ export const ExtractedPatternSchema = z
      * - infrastructure: External interfaces, persistence, messaging
      */
     archLayer: z.enum(['domain', 'application', 'infrastructure']).optional(),
+
+    // Shape extraction for documentation generation (ADR-021)
+
+    /**
+     * TypeScript shapes extracted via @libar-docs-extract-shapes tag
+     *
+     * Contains interfaces, type aliases, enums, and function signatures
+     * extracted from the source file for documentation generation.
+     * Shapes appear in the order specified in the tag.
+     *
+     * @example
+     * ```typescript
+     * // @libar-docs-extract-shapes DeciderInput, ValidationResult
+     * // Results in extractedShapes containing both shapes in that order
+     * ```
+     */
+    extractedShapes: z.array(ExtractedShapeSchema).readonly().optional(),
   })
   .strict();
 
