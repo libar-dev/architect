@@ -73,9 +73,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         }, z.core.$strict>;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -101,6 +101,7 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         archRole: z.ZodOptional<z.ZodString>;
         archContext: z.ZodOptional<z.ZodString>;
         archLayer: z.ZodOptional<z.ZodString>;
+        extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     }, z.core.$strict>;
     code: z.ZodString;
     source: z.ZodObject<{
@@ -132,9 +133,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     extractedAt: z.ZodISODateTime;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
-        completed: "completed";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
+        completed: "completed";
         deferred: "deferred";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
@@ -162,12 +163,12 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
-            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
+            unknown: "unknown";
         }>>;
         line: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strict>>>>;
@@ -199,8 +200,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     risk: z.ZodOptional<z.ZodString>;
     priority: z.ZodOptional<z.ZodString>;
     level: z.ZodOptional<z.ZodEnum<{
-        phase: "phase";
         epic: "epic";
+        phase: "phase";
         task: "task";
     }>>;
     parent: z.ZodOptional<z.ZodString>;
@@ -231,13 +232,13 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     }, z.core.$strip>>>>;
     archRole: z.ZodOptional<z.ZodEnum<{
         "bounded-context": "bounded-context";
-        "command-handler": "command-handler";
+        decider: "decider";
         projection: "projection";
         saga: "saga";
         "process-manager": "process-manager";
         infrastructure: "infrastructure";
+        "command-handler": "command-handler";
         repository: "repository";
-        decider: "decider";
         "read-model": "read-model";
         service: "service";
     }>>;
@@ -247,6 +248,23 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         infrastructure: "infrastructure";
         application: "application";
     }>>;
+    extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        kind: z.ZodEnum<{
+            function: "function";
+            enum: "enum";
+            type: "type";
+            const: "const";
+            interface: "interface";
+        }>;
+        sourceText: z.ZodString;
+        jsDoc: z.ZodOptional<z.ZodString>;
+        lineNumber: z.ZodNumber;
+        typeParameters: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        exported: z.ZodDefault<z.ZodBoolean>;
+    }, z.core.$strip>>>>;
 }, z.core.$strict>;
 /**
  * Type alias inferred from schema

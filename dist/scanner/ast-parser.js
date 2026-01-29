@@ -472,6 +472,8 @@ function parseDirective(commentText, loc, filePath, registry) {
     const archRole = metadataResults.get('arch-role');
     const archContext = metadataResults.get('arch-context');
     const archLayer = metadataResults.get('arch-layer');
+    // Shape extraction tags
+    const extractShapes = metadataResults.get('extract-shapes');
     // Extract "### When to Use" section or "**When to use:**" inline format
     // Returns array of bullet points, stopping at section boundaries
     // This is a special format that extracts from description, not a metadata tag
@@ -546,6 +548,8 @@ function parseDirective(commentText, loc, filePath, registry) {
         ...(archRole && { archRole }),
         ...(archContext && { archContext }),
         ...(archLayer && { archLayer }),
+        // Shape extraction fields
+        ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
     };
     // Validate against schema (schema-first enforcement)
     const validation = DocDirectiveSchema.safeParse(directive);

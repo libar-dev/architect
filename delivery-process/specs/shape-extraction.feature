@@ -1,10 +1,9 @@
 @libar-docs
 @libar-docs-pattern:ShapeExtraction
-@libar-docs-status:roadmap
+@libar-docs-status:completed
 @libar-docs-phase:26
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
-@libar-docs-depends-on:ClaudeModuleGeneration
 @libar-docs-enables:DocGenerationProofOfConcept
 @libar-docs-business-value:eliminates-type-duplication-in-documentation
 @libar-docs-priority:high
@@ -76,15 +75,15 @@ Feature: TypeScript Shape Extraction for Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | extract-shapes tag definition | planned | taxonomy/registry-builder.ts | Yes | unit |
-      | AST shape extractor | planned | extractor/shape-extractor.ts | Yes | unit |
-      | Interface extraction | planned | extractor/shape-extractor.ts | Yes | unit |
-      | Type alias extraction | planned | extractor/shape-extractor.ts | Yes | unit |
-      | Enum extraction | planned | extractor/shape-extractor.ts | Yes | unit |
-      | Function signature extraction | planned | extractor/shape-extractor.ts | Yes | unit |
-      | ExtractedPattern schema extension | planned | validation-schemas/extracted-pattern.ts | Yes | unit |
-      | Shape rendering in codecs | planned | renderable/codecs/*.ts | Yes | unit |
-      | Shape extraction integration test | planned | tests/features/extraction/shape-extraction.feature | Yes | behavior |
+      | extract-shapes tag definition | Done | taxonomy/registry-builder.ts | Yes | unit |
+      | AST shape extractor | Done | extractor/shape-extractor.ts | Yes | unit |
+      | Interface extraction | Done | extractor/shape-extractor.ts | Yes | unit |
+      | Type alias extraction | Done | extractor/shape-extractor.ts | Yes | unit |
+      | Enum extraction | Done | extractor/shape-extractor.ts | Yes | unit |
+      | Function signature extraction | Done | extractor/shape-extractor.ts | Yes | unit |
+      | ExtractedPattern schema extension | Done | validation-schemas/extracted-pattern.ts | Yes | unit |
+      | Shape rendering in codecs | Done | renderable/codecs/*.ts | Yes | unit |
+      | Shape extraction behavior test | Done | tests/features/extraction/shape-extraction.feature | Yes | behavior |
 
   # ============================================================================
   # RULE 1: Tag Definition

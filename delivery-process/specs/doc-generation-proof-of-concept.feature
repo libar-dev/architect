@@ -1,13 +1,13 @@
 @libar-docs
 @libar-docs-adr:021
-@libar-docs-adr-status:proposed
+@libar-docs-adr-status:accepted
 @libar-docs-adr-category:documentation
 @libar-docs-pattern:DocGenerationProofOfConcept
-@libar-docs-status:roadmap
+@libar-docs-status:completed
 @libar-docs-phase:27
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
-@libar-docs-depends-on:ShapeExtraction,ClaudeModuleGeneration
+@libar-docs-depends-on:ShapeExtraction
 @libar-docs-business-value:eliminates-manual-documentation-maintenance
 @libar-docs-priority:high
 Feature: ADR-021 - Documentation Generation from Annotated Sources
@@ -421,20 +421,60 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     | _claude-md/**/*.md | Corresponding decisions with compact extraction |
 
   # ============================================================================
+  # SOURCE MAPPING PARSING SEMANTICS
+  # ============================================================================
+
+  Rule: Decision - Source mapping table parsing and extraction method dispatch
+
+    **Invariant:** The source mapping table in a decision document defines how
+    documentation sections are assembled from multiple source files.
+
+    **Table Format:**
+
+    | Column | Purpose | Example |
+    | Section | Target section heading in generated doc | "Intro & Context", "API Types" |
+    | Source File | Path to source file or self-reference marker | "src/types.ts", "THIS DECISION" |
+    | Extraction Method | How to extract content from source | "@extract-shapes", "Rule blocks" |
+
+    **Self-Reference Markers:**
+
+    | Marker | Meaning |
+    | THIS DECISION | Extract from the current decision document |
+    | THIS DECISION (Rule: X) | Extract specific Rule: block from current document |
+    | THIS DECISION (DocString) | Extract fenced code blocks from current document |
+
+    **Extraction Method Dispatch:**
+
+    | Extraction Method | Source Type | Action |
+    | Decision rule description | Decision (.feature) | Extract Rule: block content (Invariant, Rationale) |
+    | @extract-shapes tag | TypeScript (.ts) | Invoke shape extractor for @libar-docs-extract-shapes |
+    | Rule blocks | Behavior spec (.feature) | Extract Rule: names and descriptions |
+    | Scenario Outline Examples | Behavior spec (.feature) | Extract Examples tables as markdown |
+    | JSDoc section | TypeScript (.ts) | Extract markdown from JSDoc comments |
+    | createViolation() patterns | TypeScript (.ts) | Extract error message literals |
+    | Fenced code block | Decision (.feature) | Extract DocString code blocks with language |
+
+    **Path Resolution:**
+
+    - Relative paths are resolved from project root
+    - `THIS DECISION` resolves to the current decision document
+    - Missing files produce warnings but generation continues
+
+  # ============================================================================
   # ACCEPTANCE CRITERIA
   # ============================================================================
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Decision extraction codec | planned | renderable/codecs/decision-doc.ts |
-      | Source mapping parser | planned | generators/source-mapper.ts |
-      | DocString extraction enhancement | planned | extractor/gherkin-extractor.ts |
-      | doc-from-decision generator | planned | generators/built-in/decision-doc-generator.ts |
-      | Design stub directory structure | planned | specs/stubs/, specs/examples/ |
-      | Process Guard annotations | planned | Multiple source files |
-      | Generated process-guard.md (compact) | planned | _claude-md/validation/ |
-      | Generated PROCESS-GUARD.md (detailed) | planned | docs/ |
+      | Decision extraction codec | Done | renderable/codecs/decision-doc.ts |
+      | Source mapping parser | Done | generators/source-mapper.ts |
+      | DocString extraction enhancement | Done | renderable/codecs/decision-doc.ts |
+      | doc-from-decision generator | Done | generators/built-in/decision-doc-generator.ts |
+      | Design stub directory structure | Deferred | specs/stubs/, specs/examples/ |
+      | Process Guard annotations | Done | src/lint/process-guard/types.ts, decider.ts |
+      | Generated process-guard.md (compact) | POC-Ready | _claude-md/validation/ |
+      | Generated PROCESS-GUARD.md (detailed) | POC-Ready | docs/ |
 
   @acceptance-criteria @happy-path
   Scenario: Decision Rule descriptions become documentation sections

@@ -65,8 +65,8 @@ export declare const MetadataTagDefinitionSchema: z.ZodObject<{
     tag: z.ZodString;
     format: z.ZodEnum<{
         number: "number";
-        enum: "enum";
         value: "value";
+        enum: "enum";
         "quoted-value": "quoted-value";
         csv: "csv";
         flag: "flag";
@@ -139,8 +139,8 @@ export declare const TagRegistrySchema: z.ZodObject<{
         tag: z.ZodString;
         format: z.ZodEnum<{
             number: "number";
-            enum: "enum";
             value: "value";
+            enum: "enum";
             "quoted-value": "quoted-value";
             csv: "csv";
             flag: "flag";
