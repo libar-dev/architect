@@ -18,6 +18,9 @@ Thumbs.db
 docs/test-decider/
 docs/test-progressive/
 
+# Generated CLAUDE.md layers
+.claude-layers/
+
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
 

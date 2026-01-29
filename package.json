@@ -101,7 +101,13 @@
     "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread",
     "claude-md:build": "modular-claude-md build",
     "claude-md:validate": "modular-claude-md validate",
-    "claude-md:info": "modular-claude-md info"
+    "claude-md:info": "modular-claude-md info",
+    "claude-md:additive": "modular-claude-md additive",
+    "claude-md:manifest": "modular-claude-md manifest",
+    "claude-md:all": "pnpm claude-md:build && pnpm claude-md:additive && pnpm claude-md:manifest",
+    "claude:api": "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir .claude-layers/api-reference",
+    "claude:meta": "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir .claude-layers/meta",
+    "claude:full": "CLAUDE_CODE_ADDITIONAL_DIRECTORIES_CLAUDE_MD=1 claude --add-dir .claude-layers/api-reference --add-dir .claude-layers/meta"
   },
   "keywords": [
     "source-first",
