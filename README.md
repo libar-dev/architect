@@ -63,16 +63,17 @@ This methodology was validated across **422 executable specifications** and a **
 
 ### The Discovery
 
-| Metric | Traditional Prompts | Structured Specs |
-|--------|---------------------|------------------|
-| Context usage during heavy editing | ~100% (fills up) | **50-65%** (stays low) |
-| After context compaction | Breaks continuity | **No impact** — results stay perfect |
-| Work completed per session | 1X baseline | **5X increase** |
-| Planning/decision overhead | High | **Near zero** |
+| Metric                             | Traditional Prompts | Structured Specs                     |
+| ---------------------------------- | ------------------- | ------------------------------------ |
+| Context usage during heavy editing | ~100% (fills up)    | **50-65%** (stays low)               |
+| After context compaction           | Breaks continuity   | **No impact** — results stay perfect |
+| Work completed per session         | 1X baseline         | **5X increase**                      |
+| Planning/decision overhead         | High                | **Near zero**                        |
 
 ### Why Structured Specs Work Better
 
 Traditional AI prompts are verbose and imprecise:
+
 ```
 "We need to implement a validation system that checks if status transitions
 are valid according to the FSM rules defined in our methodology document.
@@ -81,6 +82,7 @@ validate that transitions follow the allowed paths..."
 ```
 
 Structured specs are concise and typed:
+
 ```gherkin
 Rule: Status transitions must follow FSM
 
@@ -101,15 +103,16 @@ Rule: Status transitions must follow FSM
 
 The Process Guard validation system was implemented in 3 sessions using only structured specs as context:
 
-| Session | Context Used | Observation |
-|---------|--------------|-------------|
-| 1 | 100% → compressed | Speed **increased** after compression |
-| 2 | **65%** | First time context stayed low during heavy editing |
-| 3 | **55%** | Context actually **decreased** during work |
+| Session | Context Used      | Observation                                        |
+| ------- | ----------------- | -------------------------------------------------- |
+| 1       | 100% → compressed | Speed **increased** after compression              |
+| 2       | **65%**           | First time context stayed low during heavy editing |
+| 3       | **55%**           | Context actually **decreased** during work         |
 
 ### Implementation Sessions Become Mechanical
 
 With structured specs:
+
 - **No complicated planning** in implementation sessions
 - **No decision-making overhead** — decisions live in specs
 - **No prose explanations** — structured patterns are self-documenting
@@ -141,7 +144,7 @@ Each rule required tests, maintenance, exception lists, and `@architectural-dire
 
 ### After: AI Understands Structured Patterns
 
-With structured specs, the AI generates correct patterns *from the start*:
+With structured specs, the AI generates correct patterns _from the start_:
 
 ```gherkin
 Rule: Workflow functions must be deterministic
@@ -327,11 +330,11 @@ This causes confusion, accidental imports of unimplemented code, and maintenance
 
 ### The Solution: Design Artifacts in specs/
 
-| Location | Content | ESLint | When Moved |
-|----------|---------|--------|------------|
-| `specs/stubs/*.ts` | API shapes, interfaces, throw-not-implemented | Full rules | Implementation session |
-| `specs/examples/*.ts` | Code examples for documentation | Full rules | Never (stays as reference) |
-| `src/**/*.ts` | **Production code only** | Full rules | Already there |
+| Location              | Content                                       | ESLint     | When Moved                 |
+| --------------------- | --------------------------------------------- | ---------- | -------------------------- |
+| `specs/stubs/*.ts`    | API shapes, interfaces, throw-not-implemented | Full rules | Implementation session     |
+| `specs/examples/*.ts` | Code examples for documentation               | Full rules | Never (stays as reference) |
+| `src/**/*.ts`         | **Production code only**                      | Full rules | Already there              |
 
 **Design stub pattern:**
 
@@ -356,6 +359,7 @@ export function myFeature(config: MyConfig): Result {
 ```
 
 **Benefits:**
+
 - No ESLint exceptions needed
 - Clear separation: `specs/` = design, `src/` = production
 - Safe iteration on API shapes without breaking anything
@@ -497,16 +501,17 @@ graph TD
 
 Not all specs are equal. The package recognizes different durability levels:
 
-| Document Type | Durability | After Implementation | Content Ownership |
-|---------------|------------|---------------------|-------------------|
-| **Decision docs (ADR/PDR)** | Permanent | Remains valid until superseded | Intro, context, rationale |
-| **Behavior specs** | Permanent | Must pass tests | Rules, examples, edge cases |
-| **Tier 1 roadmap specs** | Temporary | Becomes clutter | Deliverables (until done) |
-| **Generated docs** | Derived | Regenerated from sources | — |
+| Document Type               | Durability | After Implementation           | Content Ownership           |
+| --------------------------- | ---------- | ------------------------------ | --------------------------- |
+| **Decision docs (ADR/PDR)** | Permanent  | Remains valid until superseded | Intro, context, rationale   |
+| **Behavior specs**          | Permanent  | Must pass tests                | Rules, examples, edge cases |
+| **Tier 1 roadmap specs**    | Temporary  | Becomes clutter                | Deliverables (until done)   |
+| **Generated docs**          | Derived    | Regenerated from sources       | —                           |
 
 ### Why This Matters
 
 **Decisions own "why"** — they're durable by design:
+
 ```gherkin
 Rule: Context - Why we need FSM validation
   # This content remains valid for years
@@ -516,6 +521,7 @@ Rule: Decision - How FSM validation works
 ```
 
 **Behavior specs own "what"** — they're tested:
+
 ```gherkin
 Scenario: Invalid transition fails
   Given status "roadmap"
@@ -524,6 +530,7 @@ Scenario: Invalid transition fails
 ```
 
 **Tier 1 specs own "when"** — they're temporary:
+
 ```gherkin
 Background: Deliverables
   | Deliverable | Status |
