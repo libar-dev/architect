@@ -179,6 +179,9 @@ export function createValidationRulesCodec(
   const opts = mergeOptions(DEFAULT_VALIDATION_RULES_OPTIONS, options);
 
   return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
+    // TODO: The _dataset parameter is unused because this codec builds from constants.
+    // Kept for interface consistency with other codecs that do use dataset.
+    // Future enhancement: derive validation rules from dataset if rules become dynamic.
     decode: (_dataset: MasterDataset): RenderableDocument => {
       return buildValidationRulesDocument(opts);
     },
@@ -219,16 +222,16 @@ function buildValidationRulesDocument(
   sections.push(...buildOverviewSection());
 
   // 2. Validation rules table (always included)
-  sections.push(...buildRulesTableSection());
+  sections.push(...buildRulesTableSection(options));
 
   // 3. FSM diagram (if enabled)
   if (options.includeFSMDiagram) {
-    sections.push(...buildFSMDiagramSection());
+    sections.push(...buildFSMDiagramSection(options));
   }
 
   // 4. Protection matrix (if enabled)
   if (options.includeProtectionMatrix) {
-    sections.push(...buildProtectionMatrixSection());
+    sections.push(...buildProtectionMatrixSection(options));
   }
 
   // 5. CLI usage (if enabled)
@@ -289,22 +292,29 @@ function buildOverviewSection(): SectionBlock[] {
 /**
  * Build validation rules table section
  */
-function buildRulesTableSection(): SectionBlock[] {
+function buildRulesTableSection(options: Required<ValidationRulesCodecOptions>): SectionBlock[] {
   const rows = RULE_DEFINITIONS.map((rule) => [`\`${rule.id}\``, rule.severity, rule.description]);
 
-  return [
+  const sections: SectionBlock[] = [
     heading(2, 'Validation Rules'),
     paragraph('Rules are checked in order. Errors block commit; warnings are informational.'),
     table(['Rule ID', 'Severity', 'Description'], rows),
-    linkOut('Full error catalog with fix instructions', 'validation/error-catalog.md'),
-    separator(),
   ];
+
+  if (options.generateDetailFiles) {
+    sections.push(
+      linkOut('Full error catalog with fix instructions', 'validation/error-catalog.md')
+    );
+  }
+  sections.push(separator());
+
+  return sections;
 }
 
 /**
  * Build FSM state diagram section from VALID_TRANSITIONS
  */
-function buildFSMDiagramSection(): SectionBlock[] {
+function buildFSMDiagramSection(options: Required<ValidationRulesCodecOptions>): SectionBlock[] {
   // Generate Mermaid diagram from VALID_TRANSITIONS constant
   const lines: string[] = ['stateDiagram-v2'];
   lines.push('    [*] --> roadmap: new pattern');
@@ -326,7 +336,7 @@ function buildFSMDiagramSection(): SectionBlock[] {
 
   lines.push('    completed --> [*]: terminal');
 
-  return [
+  const sections: SectionBlock[] = [
     heading(2, 'FSM State Diagram'),
     paragraph('Valid transitions per PDR-005 MVP Workflow:'),
     mermaid(lines.join('\n')),
@@ -336,15 +346,22 @@ function buildFSMDiagramSection(): SectionBlock[] {
         '- `active` -> `roadmap` (blocked/regressed)\n' +
         '- `roadmap` <-> `deferred` (parking)'
     ),
-    linkOut('Detailed transition matrix', 'validation/fsm-transitions.md'),
-    separator(),
   ];
+
+  if (options.generateDetailFiles) {
+    sections.push(linkOut('Detailed transition matrix', 'validation/fsm-transitions.md'));
+  }
+  sections.push(separator());
+
+  return sections;
 }
 
 /**
  * Build protection levels matrix section
  */
-function buildProtectionMatrixSection(): SectionBlock[] {
+function buildProtectionMatrixSection(
+  options: Required<ValidationRulesCodecOptions>
+): SectionBlock[] {
   const rows = (
     Object.entries(PROTECTION_LEVELS) as Array<[ProcessStatusValue, ProtectionLevel]>
   ).map(([status, level]) => {
@@ -353,13 +370,18 @@ function buildProtectionMatrixSection(): SectionBlock[] {
     return [`\`${status}\``, level, canAdd, needsUnlock];
   });
 
-  return [
+  const sections: SectionBlock[] = [
     heading(2, 'Protection Levels'),
     paragraph('Protection levels determine what modifications are allowed per status.'),
     table(['Status', 'Protection', 'Can Add Deliverables', 'Needs Unlock'], rows),
-    linkOut('Protection level details', 'validation/protection-levels.md'),
-    separator(),
   ];
+
+  if (options.generateDetailFiles) {
+    sections.push(linkOut('Protection level details', 'validation/protection-levels.md'));
+  }
+  sections.push(separator());
+
+  return sections;
 }
 
 /**

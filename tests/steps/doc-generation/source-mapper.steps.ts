@@ -16,6 +16,7 @@ import {
   type SourceMapperOptions,
   type AggregatedContent,
   type ExtractionWarning,
+  type ExtractedSection,
 } from '../../../src/generators/source-mapper.js';
 import {
   type SourceMappingEntry,

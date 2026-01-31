@@ -100,14 +100,14 @@ function buildTaxonomyDocument(dataset, options) {
     // 1. Overview section (always included)
     sections.push(...buildOverviewSection(tagRegistry));
     // 2. Categories section
-    sections.push(...buildCategoriesSection(tagRegistry));
+    sections.push(...buildCategoriesSection(tagRegistry, options));
     // 3. Metadata Tags section
     sections.push(...buildMetadataTagsSection(tagRegistry, options));
     // 4. Aggregation Tags section
     sections.push(...buildAggregationTagsSection(tagRegistry));
     // 5. Format Types section (if enabled)
     if (options.includeFormatTypes) {
-        sections.push(...buildFormatTypesSection());
+        sections.push(...buildFormatTypesSection(options));
     }
     // 6. Presets section (if enabled)
     if (options.includePresets) {
@@ -155,7 +155,7 @@ function buildOverviewSection(tagRegistry) {
 /**
  * Build categories reference section
  */
-function buildCategoriesSection(tagRegistry) {
+function buildCategoriesSection(tagRegistry, options) {
     // Sort categories by priority
     const sortedCategories = [...tagRegistry.categories].sort((a, b) => a.priority - b.priority);
     const rows = sortedCategories.map((cat) => [
@@ -170,7 +170,9 @@ function buildCategoriesSection(tagRegistry) {
         table(['Tag', 'Domain', 'Priority', 'Description'], rows),
     ];
     // Add link to detail file if generating detail files
-    sections.push(linkOut('Full category reference', 'taxonomy/categories.md'));
+    if (options.generateDetailFiles) {
+        sections.push(linkOut('Full category reference', 'taxonomy/categories.md'));
+    }
     sections.push(separator());
     return sections;
 }
@@ -194,8 +196,10 @@ function buildMetadataTagsSection(tagRegistry, options) {
         // Single table with all tags
         sections.push(...buildMetadataTagTable([...tagRegistry.metadataTags], tagRegistry.tagPrefix));
     }
-    // Add link to detail file
-    sections.push(linkOut('Full metadata tag reference', 'taxonomy/metadata-tags.md'));
+    // Add link to detail file if generating detail files
+    if (options.generateDetailFiles) {
+        sections.push(linkOut('Full metadata tag reference', 'taxonomy/metadata-tags.md'));
+    }
     sections.push(separator());
     return sections;
 }
@@ -295,7 +299,7 @@ function buildAggregationTagsSection(tagRegistry) {
 /**
  * Build format types reference section
  */
-function buildFormatTypesSection() {
+function buildFormatTypesSection(options) {
     const formatDescriptions = {
         value: { description: 'Simple string value', example: '@libar-docs-pattern MyPattern' },
         enum: {
@@ -314,13 +318,16 @@ function buildFormatTypesSection() {
         const info = formatDescriptions[format];
         return [`\`${format}\``, info.description, `\`${info.example}\``];
     });
-    return [
+    const sections = [
         heading(2, 'Format Types'),
         paragraph('How tag values are parsed and validated.'),
         table(['Format', 'Description', 'Example'], rows),
-        linkOut('Format type details', 'taxonomy/format-types.md'),
-        separator(),
     ];
+    if (options.generateDetailFiles) {
+        sections.push(linkOut('Format type details', 'taxonomy/format-types.md'));
+    }
+    sections.push(separator());
+    return sections;
 }
 /**
  * Build presets comparison section
