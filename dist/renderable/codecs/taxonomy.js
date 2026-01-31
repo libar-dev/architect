@@ -215,7 +215,22 @@ function buildMetadataTagTable(tags, tagPrefix) {
     return [table(['Tag', 'Format', 'Purpose', 'Required', 'Example'], rows)];
 }
 /**
- * Group metadata tags by domain/purpose
+ * Group metadata tags by domain/purpose.
+ *
+ * **Design Decision**: Tag domain categorization is intentionally hardcoded rather than
+ * derived from schema metadata. This provides:
+ *
+ * 1. **Stability**: Domain assignments don't change unexpectedly when new tags are added
+ * 2. **Documentation Focus**: Domains are presentation-oriented, not runtime concerns
+ * 3. **Explicit Curation**: Human judgment decides which domain best fits each tag
+ *
+ * When adding new tags to the taxonomy:
+ * - Core Tags: Essential identifiers (pattern, status, core, usecase)
+ * - Relationship Tags: Cross-reference links (uses, used-by, depends-on, etc.)
+ * - Timeline Tags: Planning/scheduling (phase, quarter, priority, etc.)
+ * - ADR Tags: Decision records (adr-* prefix)
+ * - Architecture Tags: System structure (arch-* prefix)
+ * - Other Tags: Anything that doesn't fit the above categories
  */
 function groupMetadataTagsByDomain(tags) {
     const coreTags = [];

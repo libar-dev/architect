@@ -55,15 +55,5 @@ export interface ProcessExtractShapesResult {
  * @returns Result with extracted shapes and any warnings
  */
 export declare function processExtractShapesTag(sourceCode: string, extractShapesTag: string): ProcessExtractShapesResult;
-/**
- * Render extracted shapes as markdown code blocks.
- *
- * @param shapes - Shapes to render
- * @param options - Rendering options
- * @returns Markdown string with fenced code blocks
- */
-export declare function renderShapesAsMarkdown(shapes: readonly ExtractedShape[], options?: {
-    groupInSingleBlock?: boolean;
-    includeJsDoc?: boolean;
-}): string;
+export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';
 //# sourceMappingURL=shape-extractor.d.ts.map

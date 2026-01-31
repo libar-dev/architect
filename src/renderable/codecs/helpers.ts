@@ -37,6 +37,7 @@ import type {
   ScenarioRef,
 } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
 import { normalizeLineEndings } from '../../utils/string-utils.js';
 
@@ -924,4 +925,52 @@ export function renderPatternRichContent(
   }
 
   return sections;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Shape Rendering
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Options for rendering extracted shapes as markdown.
+ */
+export interface RenderShapesOptions {
+  /** If true, combine all shapes into a single fenced code block (default: true) */
+  groupInSingleBlock?: boolean;
+  /** If true, include JSDoc comments with each shape (default: true) */
+  includeJsDoc?: boolean;
+}
+
+/**
+ * Render extracted TypeScript shapes as markdown code blocks.
+ *
+ * @param shapes - Shapes to render
+ * @param options - Rendering options
+ * @returns Markdown string with fenced code blocks
+ */
+export function renderShapesAsMarkdown(
+  shapes: readonly ExtractedShape[],
+  options: RenderShapesOptions = {}
+): string {
+  const { groupInSingleBlock = true, includeJsDoc = true } = options;
+
+  if (shapes.length === 0) {
+    return '';
+  }
+
+  const renderShape = (shape: ExtractedShape): string => {
+    const parts: string[] = [];
+    if (includeJsDoc && shape.jsDoc) {
+      parts.push(shape.jsDoc);
+    }
+    parts.push(shape.sourceText);
+    return parts.join('\n');
+  };
+
+  if (groupInSingleBlock) {
+    const content = shapes.map(renderShape).join('\n\n');
+    return '```typescript\n' + content + '\n```';
+  }
+
+  return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
 }

@@ -456,10 +456,18 @@ export class DecisionDocGeneratorImpl {
                 (rule.description.includes('| Source File |') || rule.description.includes('| Source |')));
             return hasSourceMappingInDesc || hasSourceMappingInRules;
         });
+        // Collect all warnings and errors for metadata instead of console output
+        const allWarnings = [];
+        const allErrors = [];
         if (decisionPatterns.length === 0) {
-            console.warn('[doc-from-decision] No decision documents with source mappings found. Ensure patterns have source mapping tables.');
+            allWarnings.push('No decision documents with source mappings found. Ensure patterns have source mapping tables.');
             return Promise.resolve({
                 files: [],
+                metadata: {
+                    warnings: allWarnings,
+                    errors: allErrors,
+                    patternsProcessed: 0,
+                },
             });
         }
         // Generate documentation for each decision pattern
@@ -472,16 +480,17 @@ export class DecisionDocGeneratorImpl {
                 claudeMdSection: section,
             });
             allFiles.push(...result.files);
-            // Log errors and warnings (but don't fail)
-            for (const error of result.errors) {
-                console.error(`[doc-from-decision] Error: ${error}`);
-            }
-            for (const warning of result.warnings) {
-                console.warn(`[doc-from-decision] ${warning}`);
-            }
+            // Collect errors and warnings (but don't fail)
+            allErrors.push(...result.errors);
+            allWarnings.push(...result.warnings);
         }
         return Promise.resolve({
             files: allFiles,
+            metadata: {
+                warnings: allWarnings,
+                errors: allErrors,
+                patternsProcessed: decisionPatterns.length,
+            },
         });
     }
 }

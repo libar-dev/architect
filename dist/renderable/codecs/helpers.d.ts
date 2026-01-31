@@ -32,6 +32,7 @@
  */
 import type { ScenarioDataTable, ScenarioStep, ScenarioRef } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock } from '../schema.js';
 export type { BusinessRule };
 /**
@@ -445,4 +446,21 @@ export declare function renderPatternRichContent(pattern: {
     scenarios?: readonly ScenarioRef[];
     rules?: readonly BusinessRule[];
 }, options?: RichContentOptions): SectionBlock[];
+/**
+ * Options for rendering extracted shapes as markdown.
+ */
+export interface RenderShapesOptions {
+    /** If true, combine all shapes into a single fenced code block (default: true) */
+    groupInSingleBlock?: boolean;
+    /** If true, include JSDoc comments with each shape (default: true) */
+    includeJsDoc?: boolean;
+}
+/**
+ * Render extracted TypeScript shapes as markdown code blocks.
+ *
+ * @param shapes - Shapes to render
+ * @param options - Rendering options
+ * @returns Markdown string with fenced code blocks
+ */
+export declare function renderShapesAsMarkdown(shapes: readonly ExtractedShape[], options?: RenderShapesOptions): string;
 //# sourceMappingURL=helpers.d.ts.map

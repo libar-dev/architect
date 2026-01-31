@@ -7,7 +7,8 @@
  * ## Decision Doc Codec
  *
  * Parses decision documents (ADR/PDR in .feature format) and extracts content
- * for documentation generation. Extends patterns from AdrDocumentCodec.
+ * for documentation generation. Provides parsing utilities for source mapping
+ * tables, self-reference markers, and rule block extraction.
  *
  * ### When to Use
  *
@@ -59,6 +60,20 @@ export interface ExtractedDocString {
     language: string;
     /** Content of the DocString */
     content: string;
+}
+/**
+ * Result of parsing a self-reference marker
+ *
+ * Identifies whether the reference points to:
+ * - The entire document (`document`)
+ * - A specific Rule: block (`rule` with name)
+ * - DocStrings in the document (`docstring`)
+ */
+export interface SelfReferenceResult {
+    /** Type of self-reference */
+    type: 'document' | 'rule' | 'docstring';
+    /** Name of the rule block (only for type: 'rule') */
+    name?: string;
 }
 /**
  * Parsed content from a decision document
@@ -215,10 +230,7 @@ export declare function isSelfReference(sourceFile: string): boolean;
  * // Returns: null
  * ```
  */
-export declare function parseSelfReference(sourceFile: string): {
-    type: 'document' | 'rule' | 'docstring';
-    name?: string;
-} | null;
+export declare function parseSelfReference(sourceFile: string): SelfReferenceResult | null;
 /**
  * Find a specific rule by name (flexible matching)
  *

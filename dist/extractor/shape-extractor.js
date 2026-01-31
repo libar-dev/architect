@@ -34,6 +34,11 @@ import { Result } from '../types/result.js';
  * Allows 1 blank line between JSDoc and declaration (comment end line + 1 blank + decl line = 3 gap)
  */
 const MAX_JSDOC_LINE_DISTANCE = 3;
+/**
+ * Maximum source code size in bytes (5MB).
+ * Prevents memory exhaustion from oversized input during AST parsing.
+ */
+const MAX_SOURCE_SIZE_BYTES = 5 * 1024 * 1024;
 // =============================================================================
 // Main Extraction Function
 // =============================================================================
@@ -46,6 +51,10 @@ const MAX_JSDOC_LINE_DISTANCE = 3;
  * @returns Result containing extraction result with shapes, warnings, and not-found list
  */
 export function extractShapes(sourceCode, shapeNames, options = {}) {
+    // Validate input size to prevent memory exhaustion
+    if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
+        return Result.err(new Error(`Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`));
+    }
     const { includeJsDoc = true, preserveFormatting = true } = options;
     const shapes = [];
     const notFound = [];
@@ -412,32 +421,9 @@ export function processExtractShapesTag(sourceCode, extractShapesTag) {
     return { shapes: [...result.shapes], warnings };
 }
 // =============================================================================
-// Rendering Helper
+// Re-export Rendering Helper (moved to codec layer)
 // =============================================================================
-/**
- * Render extracted shapes as markdown code blocks.
- *
- * @param shapes - Shapes to render
- * @param options - Rendering options
- * @returns Markdown string with fenced code blocks
- */
-export function renderShapesAsMarkdown(shapes, options = {}) {
-    const { groupInSingleBlock = true, includeJsDoc = true } = options;
-    if (shapes.length === 0) {
-        return '';
-    }
-    const renderShape = (shape) => {
-        const parts = [];
-        if (includeJsDoc && shape.jsDoc) {
-            parts.push(shape.jsDoc);
-        }
-        parts.push(shape.sourceText);
-        return parts.join('\n');
-    };
-    if (groupInSingleBlock) {
-        const content = shapes.map(renderShape).join('\n\n');
-        return '```typescript\n' + content + '\n```';
-    }
-    return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
-}
+// Re-export renderShapesAsMarkdown from the codec helpers where it belongs
+// This maintains backwards compatibility for existing imports
+export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';
 //# sourceMappingURL=shape-extractor.js.map

@@ -682,4 +682,30 @@ export function renderPatternRichContent(pattern, options) {
     }
     return sections;
 }
+/**
+ * Render extracted TypeScript shapes as markdown code blocks.
+ *
+ * @param shapes - Shapes to render
+ * @param options - Rendering options
+ * @returns Markdown string with fenced code blocks
+ */
+export function renderShapesAsMarkdown(shapes, options = {}) {
+    const { groupInSingleBlock = true, includeJsDoc = true } = options;
+    if (shapes.length === 0) {
+        return '';
+    }
+    const renderShape = (shape) => {
+        const parts = [];
+        if (includeJsDoc && shape.jsDoc) {
+            parts.push(shape.jsDoc);
+        }
+        parts.push(shape.sourceText);
+        return parts.join('\n');
+    };
+    if (groupInSingleBlock) {
+        const content = shapes.map(renderShape).join('\n\n');
+        return '```typescript\n' + content + '\n```';
+    }
+    return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
+}
 //# sourceMappingURL=helpers.js.map

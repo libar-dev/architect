@@ -46,6 +46,12 @@ import type {
  */
 const MAX_JSDOC_LINE_DISTANCE = 3;
 
+/**
+ * Maximum source code size in bytes (5MB).
+ * Prevents memory exhaustion from oversized input during AST parsing.
+ */
+const MAX_SOURCE_SIZE_BYTES = 5 * 1024 * 1024;
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -83,6 +89,15 @@ export function extractShapes(
   shapeNames: string[],
   options: ShapeExtractionOptionsInput = {}
 ): Result<ShapeExtractionResult> {
+  // Validate input size to prevent memory exhaustion
+  if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
+    return Result.err(
+      new Error(
+        `Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`
+      )
+    );
+  }
+
   const { includeJsDoc = true, preserveFormatting = true } = options;
 
   const shapes: ExtractedShape[] = [];
@@ -530,39 +545,9 @@ export function processExtractShapesTag(
 }
 
 // =============================================================================
-// Rendering Helper
+// Re-export Rendering Helper (moved to codec layer)
 // =============================================================================
 
-/**
- * Render extracted shapes as markdown code blocks.
- *
- * @param shapes - Shapes to render
- * @param options - Rendering options
- * @returns Markdown string with fenced code blocks
- */
-export function renderShapesAsMarkdown(
-  shapes: readonly ExtractedShape[],
-  options: { groupInSingleBlock?: boolean; includeJsDoc?: boolean } = {}
-): string {
-  const { groupInSingleBlock = true, includeJsDoc = true } = options;
-
-  if (shapes.length === 0) {
-    return '';
-  }
-
-  const renderShape = (shape: ExtractedShape): string => {
-    const parts: string[] = [];
-    if (includeJsDoc && shape.jsDoc) {
-      parts.push(shape.jsDoc);
-    }
-    parts.push(shape.sourceText);
-    return parts.join('\n');
-  };
-
-  if (groupInSingleBlock) {
-    const content = shapes.map(renderShape).join('\n\n');
-    return '```typescript\n' + content + '\n```';
-  }
-
-  return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
-}
+// Re-export renderShapesAsMarkdown from the codec helpers where it belongs
+// This maintains backwards compatibility for existing imports
+export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';

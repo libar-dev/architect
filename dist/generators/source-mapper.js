@@ -29,7 +29,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Result as R } from '../types/result.js';
 import { isSelfReference, parseSelfReference, normalizeExtractionMethod, findRuleByName, extractDocStrings, } from '../renderable/codecs/decision-doc.js';
-import { extractShapes, renderShapesAsMarkdown } from '../extractor/shape-extractor.js';
+import { extractShapes } from '../extractor/shape-extractor.js';
+import { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';
 import { parseFeatureFile } from '../scanner/gherkin-ast-parser.js';
 // =============================================================================
 // File Utilities
@@ -62,16 +63,16 @@ function fileExists(filePath) {
  * If already absolute, returns as-is.
  * Validates that resolved path stays within the base directory to prevent path traversal.
  *
- * @throws Error if the resolved path escapes the base directory
+ * @returns Result with the resolved absolute path, or error if path traversal is detected
  */
 function resolveAbsolutePath(filePath, baseDir) {
     const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(baseDir, filePath);
     const normalizedBase = path.resolve(baseDir);
     // Ensure resolved path is within base directory (prevent path traversal)
     if (!resolved.startsWith(normalizedBase + path.sep) && resolved !== normalizedBase) {
-        throw new Error(`Path traversal detected: ${filePath} escapes base directory`);
+        return R.err(new Error(`Path traversal detected: ${filePath} escapes base directory`));
     }
-    return resolved;
+    return R.ok(resolved);
 }
 // =============================================================================
 // Extraction Helpers
@@ -153,7 +154,11 @@ export function extractFromDecision(options, sourceMapping) {
  * Extract shapes from a TypeScript file using @extract-shapes
  */
 export function extractFromTypeScript(filePath, options, sourceMapping) {
-    const absolutePath = resolveAbsolutePath(filePath, options.baseDir);
+    const pathResult = resolveAbsolutePath(filePath, options.baseDir);
+    if (!pathResult.ok) {
+        return R.err(pathResult.error);
+    }
+    const absolutePath = pathResult.value;
     const fileResult = readFileSync(absolutePath);
     if (!fileResult.ok) {
         return R.err(fileResult.error);
@@ -238,7 +243,11 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
  * Extract Rule blocks or Scenario Outline Examples from a behavior spec
  */
 export function extractFromBehaviorSpec(filePath, options, sourceMapping) {
-    const absolutePath = resolveAbsolutePath(filePath, options.baseDir);
+    const pathResult = resolveAbsolutePath(filePath, options.baseDir);
+    if (!pathResult.ok) {
+        return R.err(pathResult.error);
+    }
+    const absolutePath = pathResult.value;
     const fileResult = readFileSync(absolutePath);
     if (!fileResult.ok) {
         return R.err(fileResult.error);
@@ -398,8 +407,16 @@ export function executeSourceMapping(sourceMappings, options) {
         let result;
         // Check file existence for non-self-reference sources
         if (!isSelfReference(mapping.sourceFile)) {
-            const absolutePath = resolveAbsolutePath(mapping.sourceFile, options.baseDir);
-            if (!fileExists(absolutePath)) {
+            const pathResult = resolveAbsolutePath(mapping.sourceFile, options.baseDir);
+            if (!pathResult.ok) {
+                warnings.push({
+                    severity: 'warning',
+                    message: pathResult.error.message,
+                    sourceMapping: mapping,
+                });
+                continue;
+            }
+            if (!fileExists(pathResult.value)) {
                 warnings.push({
                     severity: 'warning',
                     message: `Source file not found: ${mapping.sourceFile}`,
@@ -473,8 +490,16 @@ export function validateSourceMappings(sourceMappings, options) {
             continue;
         }
         // Check file exists
-        const absolutePath = resolveAbsolutePath(mapping.sourceFile, options.baseDir);
-        if (!fileExists(absolutePath)) {
+        const pathResult = resolveAbsolutePath(mapping.sourceFile, options.baseDir);
+        if (!pathResult.ok) {
+            warnings.push({
+                severity: 'warning',
+                message: pathResult.error.message,
+                sourceMapping: mapping,
+            });
+            continue;
+        }
+        if (!fileExists(pathResult.value)) {
             warnings.push({
                 severity: 'warning',
                 message: `Source file not found: ${mapping.sourceFile}`,

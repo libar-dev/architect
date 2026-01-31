@@ -436,29 +436,37 @@ function buildErrorCatalogDetailDocument() {
 function buildProtectionLevelsDetailDocument() {
     const sections = [];
     sections.push(heading(2, 'Protection Levels'), paragraph('Detailed explanation of protection levels per PDR-005 MVP Workflow.'));
-    const protectionDetails = [
-        {
-            level: 'none',
-            statuses: ['roadmap', 'deferred'],
+    // Derive statuses per protection level from PROTECTION_LEVELS (single source of truth)
+    const statusesByLevel = new Map();
+    for (const [status, level] of Object.entries(PROTECTION_LEVELS)) {
+        const existing = statusesByLevel.get(level) ?? [];
+        existing.push(status);
+        statusesByLevel.set(level, existing);
+    }
+    // Protection level descriptions (meaning, allowed, blocked are static documentation)
+    const protectionDescriptions = {
+        none: {
             meaning: 'Fully editable, no restrictions',
             allowed: 'All modifications including adding new deliverables',
             blocked: 'Nothing',
         },
-        {
-            level: 'scope',
-            statuses: ['active'],
+        scope: {
             meaning: 'Scope-locked, prevents adding new deliverables',
             allowed: 'Edit existing deliverables, change status',
             blocked: 'Adding new deliverables (scope creep)',
         },
-        {
-            level: 'hard',
-            statuses: ['completed'],
+        hard: {
             meaning: 'Hard-locked, requires explicit unlock to modify',
             allowed: 'Nothing (without unlock-reason tag)',
             blocked: 'All modifications',
         },
-    ];
+    };
+    // Combine derived statuses with static descriptions
+    const protectionDetails = ['none', 'scope', 'hard'].map((level) => ({
+        level,
+        statuses: statusesByLevel.get(level) ?? [],
+        ...protectionDescriptions[level],
+    }));
     // Summary table
     const summaryRows = protectionDetails.map((detail) => [
         `\`${detail.level}\``,

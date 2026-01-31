@@ -7,7 +7,8 @@
  * ## Decision Doc Codec
  *
  * Parses decision documents (ADR/PDR in .feature format) and extracts content
- * for documentation generation. Extends patterns from AdrDocumentCodec.
+ * for documentation generation. Provides parsing utilities for source mapping
+ * tables, self-reference markers, and rule block extraction.
  *
  * ### When to Use
  *
