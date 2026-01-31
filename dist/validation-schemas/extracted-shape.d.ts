@@ -21,10 +21,10 @@ import { z } from 'zod';
  */
 export declare const ShapeKindSchema: z.ZodEnum<{
     function: "function";
-    interface: "interface";
     type: "type";
     enum: "enum";
     const: "const";
+    interface: "interface";
 }>;
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
 /**
@@ -37,10 +37,10 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     name: z.ZodString;
     kind: z.ZodEnum<{
         function: "function";
-        interface: "interface";
         type: "type";
         enum: "enum";
         const: "const";
+        interface: "interface";
     }>;
     sourceText: z.ZodString;
     jsDoc: z.ZodOptional<z.ZodString>;
@@ -76,10 +76,10 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{
             function: "function";
-            interface: "interface";
             type: "type";
             enum: "enum";
             const: "const";
+            interface: "interface";
         }>;
         sourceText: z.ZodString;
         jsDoc: z.ZodOptional<z.ZodString>;

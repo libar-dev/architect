@@ -38,6 +38,7 @@ import type {
 } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
 import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
+import { normalizeLineEndings } from '../../utils/string-utils.js';
 
 // Re-export BusinessRule for convenience (consumers can import from codecs/index.ts)
 export type { BusinessRule };
@@ -344,7 +345,7 @@ export function parseDescriptionWithDocStrings(
   }
 
   // Normalize line endings (Windows CRLF → LF)
-  const normalized = description.replace(/\r\n/g, '\n');
+  const normalized = normalizeLineEndings(description);
 
   // Detect unclosed DocStrings (odd number of """)
   // Important: Exclude """ that appears inside backticks (inline code examples)
@@ -565,7 +566,7 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   }
 
   // Normalize line endings
-  const normalized = description.replace(/\r\n/g, '\n');
+  const normalized = normalizeLineEndings(description);
 
   const result: BusinessRuleAnnotations = {};
   const codeExamples: SectionBlock[] = [];

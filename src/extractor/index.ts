@@ -40,4 +40,5 @@ export {
   extractShapes,
   processExtractShapesTag,
   renderShapesAsMarkdown,
+  type ProcessExtractShapesResult,
 } from './shape-extractor.js';

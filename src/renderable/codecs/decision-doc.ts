@@ -38,6 +38,7 @@ import {
   type PartitionedRules,
 } from './helpers.js';
 import type { SectionBlock, CodeBlock } from '../schema.js';
+import { normalizeLineEndings } from '../../utils/string-utils.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
@@ -186,7 +187,7 @@ export function extractDocStrings(text: string): ExtractedDocString[] {
   }
 
   // Normalize line endings (Windows CRLF -> LF)
-  const normalized = text.replace(/\r\n/g, '\n');
+  const normalized = normalizeLineEndings(text);
 
   const docStrings: ExtractedDocString[] = [];
 
@@ -282,7 +283,7 @@ export function parseSourceMappingTable(text: string): SourceMappingEntry[] {
   }
 
   // Normalize line endings
-  const normalized = text.replace(/\r\n/g, '\n');
+  const normalized = normalizeLineEndings(text);
 
   // Find all markdown tables in the text
   const lines = normalized.split('\n');

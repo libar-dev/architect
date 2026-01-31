@@ -57,6 +57,13 @@ function fileExists(filePath) {
         return false;
     }
 }
+/**
+ * Resolve a file path to absolute using the base directory.
+ * If already absolute, returns as-is.
+ */
+function resolveAbsolutePath(filePath, baseDir) {
+    return path.isAbsolute(filePath) ? filePath : path.join(baseDir, filePath);
+}
 // =============================================================================
 // Extraction Helpers
 // =============================================================================
@@ -65,12 +72,7 @@ function fileExists(filePath) {
  * Helper to avoid duplicating array spread across multiple locations.
  */
 function collectAllRules(rules) {
-    return [
-        ...rules.context,
-        ...rules.decision,
-        ...rules.consequences,
-        ...rules.other,
-    ];
+    return [...rules.context, ...rules.decision, ...rules.consequences, ...rules.other];
 }
 /**
  * Extract content from THIS DECISION (the current decision document)
@@ -142,7 +144,7 @@ export function extractFromDecision(options, sourceMapping) {
  * Extract shapes from a TypeScript file using @extract-shapes
  */
 export function extractFromTypeScript(filePath, options, sourceMapping) {
-    const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(options.baseDir, filePath);
+    const absolutePath = resolveAbsolutePath(filePath, options.baseDir);
     const fileResult = readFileSync(absolutePath);
     if (!fileResult.ok) {
         return R.err(fileResult.error);
@@ -227,7 +229,7 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
  * Extract Rule blocks or Scenario Outline Examples from a behavior spec
  */
 export function extractFromBehaviorSpec(filePath, options, sourceMapping) {
-    const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(options.baseDir, filePath);
+    const absolutePath = resolveAbsolutePath(filePath, options.baseDir);
     const fileResult = readFileSync(absolutePath);
     if (!fileResult.ok) {
         return R.err(fileResult.error);
@@ -385,39 +387,29 @@ export function executeSourceMapping(sourceMappings, options) {
     const warnings = [];
     for (const mapping of sourceMappings) {
         let result;
+        // Check file existence for non-self-reference sources
+        if (!isSelfReference(mapping.sourceFile)) {
+            const absolutePath = resolveAbsolutePath(mapping.sourceFile, options.baseDir);
+            if (!fileExists(absolutePath)) {
+                warnings.push({
+                    severity: 'warning',
+                    message: `Source file not found: ${mapping.sourceFile}`,
+                    sourceMapping: mapping,
+                });
+                continue;
+            }
+        }
         // Dispatch based on source file type
         if (isSelfReference(mapping.sourceFile)) {
             // Extract from current decision document
             result = extractFromDecision(options, mapping);
         }
         else if (mapping.sourceFile.endsWith('.ts')) {
-            // TypeScript file - check if it exists first
-            const absolutePath = path.isAbsolute(mapping.sourceFile)
-                ? mapping.sourceFile
-                : path.join(options.baseDir, mapping.sourceFile);
-            if (!fileExists(absolutePath)) {
-                warnings.push({
-                    severity: 'warning',
-                    message: `Source file not found: ${mapping.sourceFile}`,
-                    sourceMapping: mapping,
-                });
-                continue;
-            }
+            // TypeScript file
             result = extractFromTypeScript(mapping.sourceFile, options, mapping);
         }
         else if (mapping.sourceFile.endsWith('.feature')) {
-            // Gherkin behavior spec - check if it exists first
-            const absolutePath = path.isAbsolute(mapping.sourceFile)
-                ? mapping.sourceFile
-                : path.join(options.baseDir, mapping.sourceFile);
-            if (!fileExists(absolutePath)) {
-                warnings.push({
-                    severity: 'warning',
-                    message: `Source file not found: ${mapping.sourceFile}`,
-                    sourceMapping: mapping,
-                });
-                continue;
-            }
+            // Gherkin behavior spec
             result = extractFromBehaviorSpec(mapping.sourceFile, options, mapping);
         }
         else {
@@ -472,9 +464,7 @@ export function validateSourceMappings(sourceMappings, options) {
             continue;
         }
         // Check file exists
-        const absolutePath = path.isAbsolute(mapping.sourceFile)
-            ? mapping.sourceFile
-            : path.join(options.baseDir, mapping.sourceFile);
+        const absolutePath = resolveAbsolutePath(mapping.sourceFile, options.baseDir);
         if (!fileExists(absolutePath)) {
             warnings.push({
                 severity: 'warning',

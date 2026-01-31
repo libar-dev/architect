@@ -31,6 +31,7 @@
  * ```
  */
 import { table, code, list, paragraph, heading } from '../schema.js';
+import { normalizeLineEndings } from '../../utils/string-utils.js';
 /**
  * Partition business rules by ADR-style name prefixes.
  *
@@ -223,7 +224,7 @@ export function parseDescriptionWithDocStrings(description, options) {
         return [];
     }
     // Normalize line endings (Windows CRLF → LF)
-    const normalized = description.replace(/\r\n/g, '\n');
+    const normalized = normalizeLineEndings(description);
     // Detect unclosed DocStrings (odd number of """)
     // Important: Exclude """ that appears inside backticks (inline code examples)
     // e.g., `"""typescript` should not be counted as a delimiter
@@ -390,7 +391,7 @@ export function parseBusinessRuleAnnotations(description) {
         return {};
     }
     // Normalize line endings
-    const normalized = description.replace(/\r\n/g, '\n');
+    const normalized = normalizeLineEndings(description);
     const result = {};
     const codeExamples = [];
     // Step 1: Extract code fences FIRST (before annotation parsing)

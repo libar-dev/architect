@@ -11,6 +11,7 @@ import { expect } from 'vitest';
 import { extractShapes, renderShapesAsMarkdown } from '../../../src/extractor/shape-extractor.js';
 import type { ShapeExtractionResult } from '../../../src/validation-schemas/extracted-shape.js';
 import { buildRegistry } from '../../../src/taxonomy/index.js';
+import type { Result } from '../../../src/types/result.js';
 
 /**
  * Helper to unwrap extractShapes result for tests.
@@ -34,6 +35,7 @@ interface TestState {
   sourceCode: string;
   shapeNames: string[];
   extractionResult: ShapeExtractionResult | null;
+  extractionRawResult: Result<ShapeExtractionResult> | null;
   renderedMarkdown: string | null;
   tagRegistry: ReturnType<typeof buildRegistry> | null;
 }
@@ -45,6 +47,7 @@ function resetState(): void {
     sourceCode: '',
     shapeNames: [],
     extractionResult: null,
+    extractionRawResult: null,
     renderedMarkdown: null,
     tagRegistry: null,
   };
@@ -522,6 +525,114 @@ describeFeature(feature, ({ Background, Rule }) => {
       Then('the markdown should have 2 code fences', () => {
         const fenceMatches = state.renderedMarkdown!.match(/```typescript/g) || [];
         expect(fenceMatches.length).toBe(2);
+      });
+    });
+  });
+
+  // ===========================================================================
+  // RULE 11: Const Declaration Extraction
+  // ===========================================================================
+
+  Rule('Const declarations are extracted from TypeScript AST', ({ RuleScenario }) => {
+    RuleScenario('Extract const with type annotation', ({ Given, When, Then, And }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "API_VERSION"', () => {
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['API_VERSION']);
+      });
+
+      Then('the shape should be extracted with kind "const"', () => {
+        expect(state.extractionResult!.shapes.length).toBe(1);
+        expect(state.extractionResult!.shapes[0].kind).toBe('const');
+      });
+
+      And('the shape source should contain "const API_VERSION: string"', () => {
+        expect(state.extractionResult!.shapes[0].sourceText).toContain('const API_VERSION: string');
+      });
+    });
+
+    RuleScenario('Extract const without type annotation', ({ Given, When, Then, And }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "MAX_RETRIES"', () => {
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['MAX_RETRIES']);
+      });
+
+      Then('the shape should be extracted with kind "const"', () => {
+        expect(state.extractionResult!.shapes.length).toBe(1);
+        expect(state.extractionResult!.shapes[0].kind).toBe('const');
+      });
+
+      And('the shape source should contain "MAX_RETRIES = 3"', () => {
+        expect(state.extractionResult!.shapes[0].sourceText).toContain('MAX_RETRIES = 3');
+      });
+    });
+  });
+
+  // ===========================================================================
+  // RULE 12: Parse Error Handling
+  // ===========================================================================
+
+  Rule('Invalid TypeScript produces error result', ({ RuleScenario }) => {
+    RuleScenario('Malformed TypeScript returns error', ({ Given, When, Then }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "Invalid" expecting failure', () => {
+        state.extractionRawResult = extractShapes(state.sourceCode, ['Invalid']);
+      });
+
+      Then('extraction should fail with parse error', () => {
+        expect(state.extractionRawResult!.ok).toBe(false);
+      });
+    });
+  });
+
+  // ===========================================================================
+  // RULE 13: Non-Exported Shape Extraction
+  // ===========================================================================
+
+  Rule('Non-exported shapes are extractable', ({ RuleScenario }) => {
+    RuleScenario('Extract non-exported interface', ({ Given, When, Then, And }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "InternalConfig"', () => {
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['InternalConfig']);
+      });
+
+      Then('the shape should be extracted with kind "interface"', () => {
+        expect(state.extractionResult!.shapes.length).toBe(1);
+        expect(state.extractionResult!.shapes[0].kind).toBe('interface');
+      });
+
+      And('the shape should have exported false', () => {
+        expect(state.extractionResult!.shapes[0].exported).toBe(false);
+      });
+    });
+
+    RuleScenario('Re-export marks internal shape as exported', ({ Given, When, Then, And }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "Config"', () => {
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Config']);
+      });
+
+      Then('the shape should be extracted with kind "interface"', () => {
+        expect(state.extractionResult!.shapes.length).toBe(1);
+        expect(state.extractionResult!.shapes[0].kind).toBe('interface');
+      });
+
+      And('the shape should have exported true', () => {
+        expect(state.extractionResult!.shapes[0].exported).toBe(true);
       });
     });
   });

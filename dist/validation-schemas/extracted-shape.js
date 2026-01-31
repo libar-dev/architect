@@ -22,13 +22,7 @@ import { z } from 'zod';
 /**
  * Kind of TypeScript construct that was extracted.
  */
-export const ShapeKindSchema = z.enum([
-    'interface',
-    'type',
-    'enum',
-    'function',
-    'const',
-]);
+export const ShapeKindSchema = z.enum(['interface', 'type', 'enum', 'function', 'const']);
 // =============================================================================
 // Extracted Shape Schema
 // =============================================================================

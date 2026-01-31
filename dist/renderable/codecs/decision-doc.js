@@ -31,6 +31,7 @@
  * - `THIS DECISION (DocString)` - Extract fenced code blocks
  */
 import { parseDescriptionWithDocStrings, partitionRulesByPrefix, } from './helpers.js';
+import { normalizeLineEndings } from '../../utils/string-utils.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Self-Reference Constants
 // ═══════════════════════════════════════════════════════════════════════════
@@ -105,7 +106,7 @@ export function extractDocStrings(text) {
         return [];
     }
     // Normalize line endings (Windows CRLF -> LF)
-    const normalized = text.replace(/\r\n/g, '\n');
+    const normalized = normalizeLineEndings(text);
     const docStrings = [];
     // Extract Gherkin DocStrings (""" format)
     const gherkinDocStringPattern = /"""(\w*)\n([\s\S]*?)"""/g;
@@ -188,7 +189,7 @@ export function parseSourceMappingTable(text) {
         return [];
     }
     // Normalize line endings
-    const normalized = text.replace(/\r\n/g, '\n');
+    const normalized = normalizeLineEndings(text);
     // Find all markdown tables in the text
     const lines = normalized.split('\n');
     const mappings = [];

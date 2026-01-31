@@ -278,6 +278,76 @@ Feature: TypeScript Shape Extraction
   # ============================================================================
 
   # ============================================================================
+  # RULE 11: Const Declaration Extraction
+  # ============================================================================
+
+  Rule: Const declarations are extracted from TypeScript AST
+
+    @acceptance-criteria @unit
+    Scenario: Extract const with type annotation
+      Given TypeScript source code:
+        """
+        export const API_VERSION: string = 'v1.0.0';
+        """
+      When extracting shape "API_VERSION"
+      Then the shape should be extracted with kind "const"
+      And the shape source should contain "const API_VERSION: string"
+
+    @acceptance-criteria @unit
+    Scenario: Extract const without type annotation
+      Given TypeScript source code:
+        """
+        export const MAX_RETRIES = 3;
+        """
+      When extracting shape "MAX_RETRIES"
+      Then the shape should be extracted with kind "const"
+      And the shape source should contain "MAX_RETRIES = 3"
+
+  # ============================================================================
+  # RULE 12: Parse Error Handling
+  # ============================================================================
+
+  Rule: Invalid TypeScript produces error result
+
+    @acceptance-criteria @validation
+    Scenario: Malformed TypeScript returns error
+      Given TypeScript source code:
+        """
+        export interface { broken syntax
+        """
+      When extracting shape "Invalid" expecting failure
+      Then extraction should fail with parse error
+
+  # ============================================================================
+  # RULE 13: Non-Exported Shape Extraction
+  # ============================================================================
+
+  Rule: Non-exported shapes are extractable
+
+    @acceptance-criteria @unit
+    Scenario: Extract non-exported interface
+      Given TypeScript source code:
+        """
+        interface InternalConfig {
+          secret: string;
+        }
+        """
+      When extracting shape "InternalConfig"
+      Then the shape should be extracted with kind "interface"
+      And the shape should have exported false
+
+    @acceptance-criteria @unit
+    Scenario: Re-export marks internal shape as exported
+      Given TypeScript source code:
+        """
+        interface Config { value: number; }
+        export { Config };
+        """
+      When extracting shape "Config"
+      Then the shape should be extracted with kind "interface"
+      And the shape should have exported true
+
+  # ============================================================================
   # RULE 10: Rendering Options
   # ============================================================================
 
