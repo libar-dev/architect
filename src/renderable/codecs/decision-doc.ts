@@ -484,10 +484,15 @@ export function parseSelfReference(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Find a specific rule by name (partial match)
+ * Find a specific rule by name (flexible matching)
+ *
+ * Matching strategy (in order):
+ * 1. Exact match on full name
+ * 2. Rule name contains search term
+ * 3. Both start with the same word (e.g., "Context above" matches "Context - ...")
  *
  * @param rules - Rules to search
- * @param ruleName - Name to search for (case-insensitive partial match)
+ * @param ruleName - Name to search for (case-insensitive)
  * @returns The matching rule or undefined
  */
 export function findRuleByName(
@@ -498,7 +503,7 @@ export function findRuleByName(
     return undefined;
   }
 
-  const nameLower = ruleName.toLowerCase();
+  const nameLower = ruleName.toLowerCase().trim();
 
   // First try exact match
   const exactMatch = rules.find((r) => r.name.toLowerCase() === nameLower);
@@ -507,7 +512,19 @@ export function findRuleByName(
   }
 
   // Then try partial match (rule name contains search term)
-  return rules.find((r) => r.name.toLowerCase().includes(nameLower));
+  const partialMatch = rules.find((r) => r.name.toLowerCase().includes(nameLower));
+  if (partialMatch) {
+    return partialMatch;
+  }
+
+  // Try prefix match - both start with the same word
+  // This handles cases like "Context above" matching "Context - Manual..."
+  const firstWord = nameLower.split(/[\s-]+/)[0];
+  if (firstWord && firstWord.length > 2) {
+    return rules.find((r) => r.name.toLowerCase().startsWith(firstWord));
+  }
+
+  return undefined;
 }
 
 /**

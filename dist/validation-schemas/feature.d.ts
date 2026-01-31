@@ -27,6 +27,21 @@ export declare const GherkinDocStringSchema: z.ZodObject<{
 }, z.core.$strict>;
 export type GherkinDocString = z.infer<typeof GherkinDocStringSchema>;
 /**
+ * Schema for an Examples table in a Scenario Outline
+ *
+ * Examples tables define parameter values for Scenario Outline iterations.
+ * Each Examples block can have its own name, tags, and data rows.
+ */
+export declare const GherkinExamplesSchema: z.ZodObject<{
+    name: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+    headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+    rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+    line: z.ZodNumber;
+}, z.core.$strict>;
+export type GherkinExamples = z.infer<typeof GherkinExamplesSchema>;
+/**
  * Schema for a step within a Background or Scenario
  *
  * Uses flexible string for keyword to handle any Cucumber parser output.
@@ -67,6 +82,9 @@ export declare const GherkinBackgroundSchema: z.ZodObject<{
 }, z.core.$strict>;
 /**
  * Schema for a single scenario within a Gherkin feature
+ *
+ * For Scenario Outlines, the examples field contains the Examples tables.
+ * Regular Scenarios have no examples (field is undefined or empty).
  */
 export declare const GherkinScenarioSchema: z.ZodObject<{
     name: z.ZodString;
@@ -84,6 +102,14 @@ export declare const GherkinScenarioSchema: z.ZodObject<{
             mediaType: z.ZodOptional<z.ZodString>;
         }, z.core.$strict>>;
     }, z.core.$strict>>>;
+    examples: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        description: z.ZodOptional<z.ZodString>;
+        tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+        headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+        rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+        line: z.ZodNumber;
+    }, z.core.$strict>>>>;
     line: z.ZodNumber;
 }, z.core.$strict>;
 /**
@@ -128,6 +154,14 @@ export declare const GherkinRuleSchema: z.ZodObject<{
                 mediaType: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>>;
         }, z.core.$strict>>>;
+        examples: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            description: z.ZodOptional<z.ZodString>;
+            tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+            line: z.ZodNumber;
+        }, z.core.$strict>>>>;
         line: z.ZodNumber;
     }, z.core.$strict>>>;
     line: z.ZodNumber;
@@ -191,6 +225,14 @@ export declare const ScannedGherkinFileSchema: z.ZodObject<{
                     mediaType: z.ZodOptional<z.ZodString>;
                 }, z.core.$strict>>;
             }, z.core.$strict>>>;
+            examples: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                description: z.ZodOptional<z.ZodString>;
+                tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+                line: z.ZodNumber;
+            }, z.core.$strict>>>>;
             line: z.ZodNumber;
         }, z.core.$strict>>>;
         line: z.ZodNumber;
@@ -211,6 +253,14 @@ export declare const ScannedGherkinFileSchema: z.ZodObject<{
                 mediaType: z.ZodOptional<z.ZodString>;
             }, z.core.$strict>>;
         }, z.core.$strict>>>;
+        examples: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            description: z.ZodOptional<z.ZodString>;
+            tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+            line: z.ZodNumber;
+        }, z.core.$strict>>>>;
         line: z.ZodNumber;
     }, z.core.$strict>>>;
 }, z.core.$strict>;
@@ -275,6 +325,14 @@ export declare const GherkinScanResultsSchema: z.ZodObject<{
                         mediaType: z.ZodOptional<z.ZodString>;
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>;
+                examples: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    description: z.ZodOptional<z.ZodString>;
+                    tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                    headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                    rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+                    line: z.ZodNumber;
+                }, z.core.$strict>>>>;
                 line: z.ZodNumber;
             }, z.core.$strict>>>;
             line: z.ZodNumber;
@@ -295,6 +353,14 @@ export declare const GherkinScanResultsSchema: z.ZodObject<{
                     mediaType: z.ZodOptional<z.ZodString>;
                 }, z.core.$strict>>;
             }, z.core.$strict>>>;
+            examples: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                description: z.ZodOptional<z.ZodString>;
+                tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+                line: z.ZodNumber;
+            }, z.core.$strict>>>>;
             line: z.ZodNumber;
         }, z.core.$strict>>>;
     }, z.core.$strict>>>;

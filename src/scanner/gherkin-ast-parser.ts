@@ -55,6 +55,7 @@ import {
   type GherkinDataTable,
   type GherkinDataTableRow,
   type GherkinRule,
+  type GherkinExamples,
 } from '../validation-schemas/feature.js';
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
@@ -188,6 +189,48 @@ function extractSteps(steps: readonly Messages.Step[]): GherkinStep[] {
 }
 
 /**
+ * Extract Examples tables from a Scenario Outline
+ *
+ * Converts Cucumber AST Examples tables to our simplified structure with
+ * headers and row objects. Each Examples block can have its own name and tags.
+ *
+ * @param examples - Cucumber AST Examples array from a Scenario Outline
+ * @param registry - Optional TagRegistry for tag normalization
+ * @returns Array of GherkinExamples with headers and rows
+ */
+function extractExamples(
+  examples: readonly Messages.Examples[],
+  registry?: TagRegistry
+): GherkinExamples[] {
+  return examples
+    .filter((ex) => ex.tableHeader) // Only process examples with valid headers
+    .map((ex) => {
+      // Extract headers from tableHeader
+      const headers = ex.tableHeader?.cells.map((c) => c.value) ?? [];
+
+      // Extract rows as header->value maps
+      const rows: GherkinDataTableRow[] = ex.tableBody.map((row) => {
+        const rowObj: Record<string, string> = {};
+        headers.forEach((h, i) => {
+          rowObj[h] = row.cells[i]?.value ?? '';
+        });
+        return rowObj;
+      });
+
+      const desc = ex.description.trim();
+
+      return {
+        name: ex.name,
+        ...(desc && { description: desc }),
+        tags: ex.tags.map((t) => normalizeTag(t.name, registry)),
+        headers,
+        rows,
+        line: ex.location.line,
+      };
+    });
+}
+
+/**
  * Parse a Gherkin feature file and extract structured data
  *
  * @param content - Feature file content
@@ -278,11 +321,13 @@ export function parseFeatureFile(
       // Handle Scenario (at feature level)
       else if (child.scenario) {
         const scenario = child.scenario;
+        const examples = extractExamples(scenario.examples);
         scenarios.push({
           name: scenario.name,
           description: scenario.description.trim(),
           tags: scenario.tags.map((tag) => normalizeTag(tag.name)),
           steps: extractSteps(scenario.steps),
+          ...(examples.length > 0 && { examples }),
           line: scenario.location.line,
         });
       }
@@ -298,12 +343,14 @@ export function parseFeatureFile(
           if (ruleChild.scenario) {
             const scenario = ruleChild.scenario;
             const scenarioTags = scenario.tags.map((tag) => normalizeTag(tag.name));
+            const examples = extractExamples(scenario.examples);
 
             const parsedScenario: GherkinScenario = {
               name: scenario.name,
               description: scenario.description.trim(),
               tags: scenarioTags,
               steps: extractSteps(scenario.steps),
+              ...(examples.length > 0 && { examples }),
               line: scenario.location.line,
             };
 

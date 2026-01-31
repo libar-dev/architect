@@ -32,6 +32,36 @@ import { renderToMarkdown } from '../../renderable/render.js';
 import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 // =============================================================================
+// Tag Helpers
+// =============================================================================
+/**
+ * Extract claude-md-section from pattern tags
+ *
+ * Looks for `@libar-docs-claude-md-section:VALUE` tag and extracts the value.
+ * Returns undefined if tag not found.
+ *
+ * @param pattern - Extracted pattern with directive tags
+ * @returns Section value (e.g., "validation") or undefined
+ *
+ * @example
+ * ```typescript
+ * // Pattern with @libar-docs-claude-md-section:validation tag
+ * const section = extractClaudeMdSection(pattern);
+ * // Returns: "validation"
+ * ```
+ */
+export function extractClaudeMdSection(pattern) {
+    const tags = pattern.directive.tags;
+    for (const tag of tags) {
+        // Match @libar-docs-claude-md-section:VALUE or @docs-claude-md-section:VALUE
+        const match = tag.match(/^@(?:libar-)?docs-claude-md-section[:\s]+(.+)$/i);
+        if (match?.[1]) {
+            return match[1].trim();
+        }
+    }
+    return undefined;
+}
+// =============================================================================
 // Output Path Resolution
 // =============================================================================
 /**
@@ -57,15 +87,11 @@ import { executeSourceMapping, } from '../source-mapper.js';
  */
 export function determineOutputPaths(patternName, options) {
     // Convert PatternName to kebab-case for module name
-    const moduleName = patternName
-        .replace(/([a-z])([A-Z])/g, '$1-$2')
-        .toLowerCase();
+    const moduleName = patternName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     // Use provided section or default to 'generated'
     const section = options?.section ?? 'generated';
     // Convert PatternName to UPPER-KEBAB-CASE for detailed path
-    const upperKebab = patternName
-        .replace(/([a-z])([A-Z])/g, '$1-$2')
-        .toUpperCase();
+    const upperKebab = patternName.replace(/([a-z])([A-Z])/g, '$1-$2').toUpperCase();
     return {
         compact: `_claude-md/${section}/${moduleName}.md`,
         detailed: `docs/${upperKebab}.md`,
@@ -431,10 +457,12 @@ export class DecisionDocGeneratorImpl {
         }
         // Generate documentation for each decision pattern
         for (const pattern of decisionPatterns) {
+            // Extract section from pattern tags or default to 'generated'
+            const section = extractClaudeMdSection(pattern) ?? 'generated';
             const result = generateFromDecisionMultiLevel(pattern, {
                 baseDir: context.baseDir,
                 detailLevel: 'detailed', // Generate both levels
-                claudeMdSection: 'generated',
+                claudeMdSection: section,
             });
             allFiles.push(...result.files);
             // Log errors and warnings (but don't fail)

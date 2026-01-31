@@ -282,12 +282,26 @@ export function extractFromTypeScript(
     // Extract JSDoc markdown from the file's main JSDoc block
     const jsDocMatch = /\/\*\*\s*\n([\s\S]*?)\*\//m.exec(sourceCode);
     if (jsDocMatch?.[1]) {
-      // Extract markdown content from JSDoc (after ## header)
-      const jsDocContent = jsDocMatch[1];
-      const markdownMatch = /##\s+.+?\n([\s\S]*?)(?=\n\s*\*\s*@|\n\s*\*\/|$)/m.exec(jsDocContent);
-      content =
-        markdownMatch?.[1]?.replace(/^\s*\*\s?/gm, '').trim() ??
-        jsDocContent.replace(/^\s*\*\s?/gm, '').trim();
+      // First, strip * prefix from all lines to get clean markdown
+      const cleanedContent = jsDocMatch[1].replace(/^\s*\*\s?/gm, '').trim();
+
+      // Extract markdown content after ## header (stop at @tags)
+      // Pattern: Find ## header, capture everything until @tag line or end
+      const markdownMatch = /##\s+.+?\n([\s\S]*?)(?=\n\s*@|\n*$)/m.exec(cleanedContent);
+
+      if (markdownMatch?.[1]) {
+        content = markdownMatch[1].trim();
+      } else {
+        // Fallback: use everything after first ## header if no @tags found
+        const headerStart = cleanedContent.indexOf('##');
+        if (headerStart !== -1) {
+          const afterHeader = cleanedContent.slice(headerStart);
+          const firstNewline = afterHeader.indexOf('\n');
+          if (firstNewline !== -1) {
+            content = afterHeader.slice(firstNewline + 1).trim();
+          }
+        }
+      }
     }
   } else if (method === 'CREATE_VIOLATION_PATTERNS') {
     // Extract error message patterns from createViolation() calls
@@ -350,8 +364,8 @@ export function extractFromBehaviorSpec(
       content = extractRuleBlocksContent(parsed.rules);
     }
   } else if (method === 'SCENARIO_OUTLINE_EXAMPLES') {
-    // Extract Examples tables from Scenario Outlines
-    content = extractScenarioOutlineExamples(parsed.scenarios);
+    // Extract Examples tables from Scenario Outlines, filtered by section name
+    content = extractScenarioOutlineExamples(parsed.scenarios, sourceMapping.section);
   }
 
   return R.ok({
@@ -381,16 +395,67 @@ function extractRuleBlocksContent(rules: readonly GherkinRule[]): string {
 }
 
 /**
- * Extract Examples tables from Scenario Outlines as markdown tables
+ * Check if scenario name matches section name using keyword overlap
+ *
+ * Uses case-insensitive keyword matching to find relevant scenarios.
+ * For example, "Protection Levels" matches "Protection level from status".
+ *
+ * @param sectionName - Section name from source mapping
+ * @param scenarioName - Scenario name from feature file
+ * @returns True if there's sufficient keyword overlap
  */
-function extractScenarioOutlineExamples(scenarios: readonly GherkinScenario[]): string {
+function scenarioMatchesSection(sectionName: string, scenarioName: string): boolean {
+  // Normalize: lowercase, extract significant words (3+ chars)
+  const normalizeWords = (text: string): Set<string> =>
+    new Set(
+      text
+        .toLowerCase()
+        .split(/[^a-z]+/)
+        .filter((word) => word.length >= 3)
+    );
+
+  const sectionWords = normalizeWords(sectionName);
+  const scenarioWords = normalizeWords(scenarioName);
+
+  // Count matching words
+  let matches = 0;
+  for (const word of sectionWords) {
+    if (scenarioWords.has(word)) {
+      matches++;
+    }
+  }
+
+  // Require at least 1 matching word (fuzzy match)
+  return matches >= 1;
+}
+
+/**
+ * Extract Examples tables from Scenario Outlines as markdown tables
+ *
+ * Uses the `examples` property on Scenario Outline nodes (not step DataTables).
+ * Filters scenarios by matching section name to scenario name using keyword overlap.
+ * This prevents duplicate content when multiple sections map to the same file.
+ *
+ * @param scenarios - All scenarios from the feature file
+ * @param sectionName - Section name from source mapping for filtering
+ * @returns Markdown tables from matching Scenario Outline Examples
+ */
+function extractScenarioOutlineExamples(
+  scenarios: readonly GherkinScenario[],
+  sectionName: string
+): string {
   const tables: string[] = [];
 
   for (const scenario of scenarios) {
-    // Check if scenario has steps with DataTables (common pattern for examples)
-    for (const step of scenario.steps) {
-      if (step.dataTable) {
-        const { headers, rows } = step.dataTable;
+    // Skip scenarios that don't match the section name
+    if (!scenarioMatchesSection(sectionName, scenario.name)) {
+      continue;
+    }
+
+    // Check if scenario has Examples tables (Scenario Outline)
+    if (scenario.examples && scenario.examples.length > 0) {
+      for (const example of scenario.examples) {
+        const { headers, rows } = example;
         if (headers.length > 0 && rows.length > 0) {
           // Build markdown table
           const headerLine = `| ${headers.join(' | ')} |`;

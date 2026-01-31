@@ -233,10 +233,15 @@ export declare function parseSelfReference(sourceFile: string): {
     name?: string;
 } | null;
 /**
- * Find a specific rule by name (partial match)
+ * Find a specific rule by name (flexible matching)
+ *
+ * Matching strategy (in order):
+ * 1. Exact match on full name
+ * 2. Rule name contains search term
+ * 3. Both start with the same word (e.g., "Context above" matches "Context - ...")
  *
  * @param rules - Rules to search
- * @param ruleName - Name to search for (case-insensitive partial match)
+ * @param ruleName - Name to search for (case-insensitive)
  * @returns The matching rule or undefined
  */
 export declare function findRuleByName(rules: readonly BusinessRule[] | undefined, ruleName: string): BusinessRule | undefined;

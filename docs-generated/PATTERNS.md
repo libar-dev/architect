@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 74/112 (66% complete)
+**Overall:** [██████████████░░░░░░] 81/118 (69% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 74 |
+| ✅ Completed | 81 |
 | 🚧 Active | 13 |
-| 📋 Planned | 25 |
-| **Total** | 112 |
+| 📋 Planned | 24 |
+| **Total** | 118 |
 
 ---
 
@@ -22,8 +22,8 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (46)
-- [DDD](#ddd) (24)
+- [Core](#core) (49)
+- [DDD](#ddd) (25)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
 - [Infra](#infra) (1)
@@ -34,6 +34,7 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
+- [Pattern](#pattern) (2)
 - [Scanner](#scanner) (2)
 - [Validation](#validation) (12)
 
@@ -58,8 +59,11 @@
 | ✅ Configuration Defaults | Core | completed | Centralized default constants for the delivery-process package. |
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
+| ✅ Decision Doc Codec | Core | completed | Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation. |
+| ✅ Decision Doc Generator | Core | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
 | ✅ Doc Directive Schema | Validation | completed | Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments. |
+| ✅ Doc Generation Proof Of Concept | DDD | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
 | ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and... |
 | ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts... |
 | ✅ Documentation Generator CLI | Core | completed | Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run. |
@@ -70,6 +74,7 @@
 | ✅ Dual Source Extractor | Extractor | completed | Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),... |
 | ✅ Dual Source Schemas | Validation | completed | Zod schemas for dual-source extraction types. |
 | ✅ Extracted Pattern Schema | Validation | completed | Zod schema for validating complete extracted patterns with code, metadata, relationships, and source information. |
+| ✅ Extracted Shape Schema | Pattern | completed | Zod schema for TypeScript type definitions extracted from source files via the @libar-docs-extract-shapes tag. |
 | ✅ Generator Registry | Generator | completed | Manages registration and lookup of document generators (both built-in and custom). |
 | ✅ Generator Types | Generator | completed | Minimal interface for pluggable generators that produce documentation from patterns. |
 | ✅ Gherkin AST Parser | Scanner | completed | Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,... |
@@ -102,7 +107,10 @@
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
 | ✅ Rich Content Helpers | Core | completed | Shared helper functions for rendering Gherkin rich content in document codecs. |
 | ✅ Session Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session... |
+| ✅ Shape Extraction | DDD | completed | Documentation comments duplicate type definitions that exist in the same file. |
+| ✅ Shape Extractor | Pattern | completed | Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for... |
 | ✅ Shared Codec Schema | Core | completed | Provides a simplified RenderableDocument output schema for use with Zod 4 codecs. |
+| ✅ Source Mapper | Core | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 | ✅ String Utilities | Core | completed | Provides shared utilities for string manipulation used across the delivery-process package, including slugification... |
 | ✅ Tag Registry Configuration | Core | completed | Defines the structure and validation for tag taxonomy configuration. |
 | ✅ Tag Registry Builder | Core | completed | Constructs a complete TagRegistry from TypeScript constants. |
@@ -149,7 +157,6 @@
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
-| 📋 Shape Extraction | DDD | planned | Documentation comments duplicate type definitions that exist in the same file. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
@@ -181,7 +188,7 @@
 
 ### Core
 
-42/46 complete (91%)
+45/49 complete (92%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -194,6 +201,8 @@
 - [✅ Configuration Defaults](patterns/configuration-defaults.md)
 - [✅ Configuration Presets](patterns/configuration-presets.md)
 - [✅ Configuration Types](patterns/configuration-types.md)
+- [✅ Decision Doc Codec](patterns/decision-doc-codec.md)
+- [✅ Decision Doc Generator](patterns/decision-doc-generator.md)
 - [✅ Delivery Process Factory](patterns/delivery-process-factory.md)
 - [✅ Document Extractor](patterns/document-extractor.md)
 - [✅ Documentation Generation Orchestrator](patterns/documentation-generation-orchestrator.md)
@@ -217,6 +226,7 @@
 - [✅ Rich Content Helpers](patterns/rich-content-helpers.md)
 - [✅ Session Codec](patterns/session-codec.md)
 - [✅ Shared Codec Schema](patterns/shared-codec-schema.md)
+- [✅ Source Mapper](patterns/source-mapper.md)
 - [✅ String Utilities](patterns/string-utilities.md)
 - [✅ Tag Registry Configuration](patterns/tag-registry-configuration.md)
 - [✅ Tag Registry Builder](patterns/tag-registry-builder.md)
@@ -234,13 +244,15 @@
 
 ### DDD
 
-6/24 complete (25%)
+8/25 complete (32%)
 
+- [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
 - [✅ Pattern Relationship Model](patterns/pattern-relationship-model.md)
 - [✅ Phase State Machine Validation](patterns/phase-state-machine-validation.md)
 - [✅ Process Guard Linter](patterns/process-guard-linter.md)
+- [✅ Shape Extraction](patterns/shape-extraction.md)
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
@@ -255,7 +267,6 @@
 - [📋 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
-- [📋 Shape Extraction](patterns/shape-extraction.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
 - [📋 Step Definition Completion](patterns/step-definition-completion.md)
 - [📋 Streaming Git Diff](patterns/streaming-git-diff.md)
@@ -354,6 +365,15 @@
 
 ---
 
+### Pattern
+
+2/2 complete (100%)
+
+- [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
+- [✅ Shape Extractor](patterns/shape-extractor.md)
+
+---
+
 ### Scanner
 
 2/2 complete (100%)
@@ -393,6 +413,7 @@ graph TD
     MasterDataset --> Zod
     MasterDataset --> ExtractedPattern
     MasterDataset --> TagRegistry
+    ExtractedShapeSchema ..-> ShapeExtraction
     ExtractedPatternSchema --> DocDirectiveSchema
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
@@ -404,7 +425,6 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -415,11 +435,15 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
     Documentation_Generation_Orchestrator --> Doc_Extractor
@@ -427,6 +451,8 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    ShapeExtractor --> typescript_estree
+    ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
     GherkinExtractor --> GherkinASTParser
     GherkinExtractor ..-> GherkinRulesSupport
@@ -484,8 +510,10 @@ graph TD
     PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     StreamingGitDiff -.-> ProcessGuardLinter
-    ShapeExtraction -.-> ClaudeModuleGeneration
+    DocGenerationProofOfConcept -.-> ShapeExtraction
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```
 

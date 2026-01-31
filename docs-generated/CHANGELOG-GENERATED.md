@@ -52,6 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Tag Registry Configuration**: Defines the structure and validation for tag taxonomy configuration.
 - **Output Schemas**: Zod schemas for JSON output formats used by CLI tools.
 - **Master Dataset**: Defines the schema for a pre-computed dataset that holds all extracted patterns along with derived views (by status,...
+- **Extracted Shape Schema**: Zod schema for TypeScript type definitions extracted from source files via the @libar-docs-extract-shapes tag.
 - **Extracted Pattern Schema**: Zod schema for validating complete extracted patterns with code, metadata, relationships, and source information.
 - **Dual Source Schemas**: Zod schemas for dual-source extraction types.
 - **Doc Directive Schema**: Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
@@ -77,6 +78,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
+- **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
+- **Source Mapper**: Aggregates content from multiple source files based on source mapping tables parsed from decision documents.
+- **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
+- **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
+- **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
+- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
 - **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
 - **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
 - **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
@@ -94,10 +101,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
 - **Configuration Defaults**: Centralized default constants for the delivery-process package.
 - **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
-- **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
-- **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
-- **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
-- **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
 - **Timeline Codec**: Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)...
 - **Shared Codec Schema**: Provides a simplified RenderableDocument output schema for use with Zod 4 codecs.
 - **Session Codec**: Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session...
@@ -108,18 +111,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Patterns Codec**: Transforms MasterDataset into a RenderableDocument for pattern registry output.
 - **Document Codecs**: Barrel export for all document codecs.
 - **Rich Content Helpers**: Shared helper functions for rendering Gherkin rich content in document codecs.
+- **Decision Doc Codec**: Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+- **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
+- **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
+- **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
 - **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
 - **Pipeline Module**: Barrel export for the unified transformation pipeline components.
-- **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
-- **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
 - **PDR 001 Self Documentation**
+- **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
 - **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
 - **ADR 004 Gherkin Only Testing**: The delivery-process package had dual test approaches creating inconsistency.
 - **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
 - **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
 - **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
+- **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
+- **Doc Generation Proof Of Concept**: This decision establishes the pattern for generating technical documentation from annotated source files.
 
 ---

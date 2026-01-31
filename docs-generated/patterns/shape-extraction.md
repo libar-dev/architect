@@ -1,4 +1,4 @@
-# 📋 Shape Extraction
+# ✅ Shape Extraction
 
 **Purpose:** Detailed documentation for the Shape Extraction pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | completed |
 | Category | DDD |
 | Phase | 26 |
 
@@ -79,9 +79,14 @@
 
 ## Dependencies
 
-- Depends on: ClaudeModuleGeneration
-
 - Enables: DocGenerationProofOfConcept
+
+## Implementations
+
+Files that implement this pattern:
+
+- [`shape-extractor.ts`](../../src/extractor/shape-extractor.ts) - ## Shape Extractor - TypeScript Type Extraction
+- [`extracted-shape.ts`](../../src/validation-schemas/extracted-shape.ts) - ## ExtractedShape Schema
 
 ## Acceptance Criteria
 
@@ -425,6 +430,102 @@ export interface MyHandler {
 - Then warning: "Shape 'Request' is imported, not defined in this file"
 - And suggestion: "Add extract-shapes to the source file"
 
+**Re-exported type produces same warning as import**
+
+- Given a TypeScript file with:
+- When extracting shapes for "Foo"
+- Then warning: "Shape 'Foo' is re-exported, not defined in this file"
+- And the shape is NOT extracted
+- And suggestion: "Add @libar-docs-extract-shapes to ./types.js instead"
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-extract-shapes Foo
+ */
+
+// Re-export from another file
+export { Foo } from './types.js';
+export type { Bar } from './other.js';
+```
+
+**Extract overloaded function signatures**
+
+- Given a TypeScript file with:
+- When extracting shapes
+- Then the extracted shape includes all overload signatures:
+- And the implementation signature is NOT included
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-extract-shapes validate
+ */
+
+export function validate(input: string): boolean;
+export function validate(input: number): boolean;
+export function validate(input: string | number): boolean {
+  return typeof input === 'string' ? input.length > 0 : input > 0;
+}
+```
+
+```typescript
+function validate(input: string): boolean;
+function validate(input: number): boolean;
+```
+
+**Extract method overloads in interface**
+
+- Given a TypeScript file with:
+- When extracting shapes
+- Then both method signatures are preserved in the interface
+
+```typescript
+/**
+ * @libar-docs
+ * @libar-docs-extract-shapes Parser
+ */
+
+export interface Parser {
+  parse(input: string): Result;
+  parse(input: Buffer): Result;
+}
+```
+
+**Grouped rendering for compact output**
+
+- Given extracted shapes "Input", "Output", "Options"
+- And rendering with groupInSingleBlock: true
+- When generating markdown
+- Then output is:
+
+```markdown
+```typescript
+interface Input { ... }
+
+interface Output { ... }
+
+interface Options { ... }
+```
+```
+
+**Separate rendering for detailed output**
+
+- Given extracted shapes "Input", "Output"
+- And rendering with groupInSingleBlock: false
+- When generating markdown
+- Then output is:
+
+```markdown
+```typescript
+interface Input { ... }
+```
+
+```typescript
+interface Output { ... }
+```
+```
+
 ## Business Rules
 
 **extract-shapes tag is defined in registry**
@@ -484,7 +585,21 @@ _Verified by: Shapes render in claude module, Shapes render in detailed docs_
     extractor does NOT resolve imports - it extracts the shape as-is.
     Consumers understand that referenced types are defined elsewhere.
 
-_Verified by: Shape with imported type reference, Shape extraction does not follow imports_
+_Verified by: Shape with imported type reference, Shape extraction does not follow imports, Re-exported type produces same warning as import_
+
+**Overloaded function signatures are all extracted**
+
+**Invariant:** When a function has multiple overload signatures, all
+    signatures are extracted together as they represent the complete API.
+
+_Verified by: Extract overloaded function signatures, Extract method overloads in interface_
+
+**Shape rendering supports grouping options**
+
+**Invariant:** Codecs can render shapes grouped in a single code block
+    or as separate code blocks, depending on detail level.
+
+_Verified by: Grouped rendering for compact output, Separate rendering for detailed output_
 
 ---
 

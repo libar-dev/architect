@@ -154,9 +154,9 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         // Build raw pattern object using explicit property assignment for performance
         // This avoids ~50 intermediate objects created by conditional spreads
         const directive = {
-            tags: feature.tags
-                .filter((tag) => !tag.includes(':'))
-                .map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
+            // Preserve ALL tags (including value tags like claude-md-section:validation)
+            // Tags are stored as @libar-docs-{tag} to match TypeScript directive format
+            tags: feature.tags.map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
             description: feature.description,
             examples: [],
             position: {
@@ -419,9 +419,8 @@ export async function extractPatternsFromGherkinAsync(scannedFiles, config) {
         }
         // Build pattern object (same as sync version but without behaviorFileVerified)
         const directive = {
-            tags: feature.tags
-                .filter((tag) => !tag.includes(':'))
-                .map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
+            // Preserve ALL tags (including value tags like claude-md-section:validation)
+            tags: feature.tags.map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
             description: feature.description,
             examples: [],
             position: { startLine: feature.line, endLine: feature.line },

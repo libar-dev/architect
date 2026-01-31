@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 74/112 (66%)
+**Patterns:** [██████████████░░░░░░] 81/118 (69%)
 
-**Phases:** 0/10 complete
+**Phases:** 2/11 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 112 |
-| Completed | 74 |
+| Total Patterns | 118 |
+| Completed | 81 |
 | Active | 13 |
-| Planned | 25 |
+| Planned | 24 |
 
 ---
 
@@ -27,7 +27,8 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
-| 📋 [ShapeExtraction](phases/phase-26-shape-extraction.md) | 0/1 | 0% |
+| ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
+| ✅ [SourceMapper](phases/phase-27-source-mapper.md) | 3/3 | 100% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -69,13 +70,26 @@
 
 ---
 
-### 📋 ShapeExtraction
+### ✅ ShapeExtractor
 
-[░░░░░░░░░░░░░░░] 0/1 0% complete
+[███████████████] 2/2 100% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 📋 Shape Extraction | planned | Documentation comments duplicate type definitions that exist in the same file. |
+| ✅ Shape Extraction | completed | Documentation comments duplicate type definitions that exist in the same file. |
+| ✅ Shape Extractor | completed | Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for... |
+
+---
+
+### ✅ SourceMapper
+
+[███████████████] 3/3 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
+| ✅ Doc Generation Proof Of Concept | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
+| ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 
 ---
 

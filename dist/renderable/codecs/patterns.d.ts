@@ -201,12 +201,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                timeline: "timeline";
+                unknown: "unknown";
                 domain: "domain";
+                timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -270,13 +270,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -292,8 +292,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 function: "function";
                 enum: "enum";
                 type: "type";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -318,8 +318,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                value: "value";
                 enum: "enum";
+                value: "value";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -445,12 +445,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -514,13 +514,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -536,8 +536,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -652,12 +652,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -721,13 +721,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -743,8 +743,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -859,12 +859,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -928,13 +928,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -950,8 +950,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1070,12 +1070,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1139,13 +1139,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -1161,8 +1161,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1284,12 +1284,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                timeline: "timeline";
+                unknown: "unknown";
                 domain: "domain";
+                timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1353,13 +1353,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1375,8 +1375,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 function: "function";
                 enum: "enum";
                 type: "type";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1491,12 +1491,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                timeline: "timeline";
+                unknown: "unknown";
                 domain: "domain";
+                timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1560,13 +1560,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1582,8 +1582,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 function: "function";
                 enum: "enum";
                 type: "type";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1699,12 +1699,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1768,13 +1768,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -1790,8 +1790,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1906,12 +1906,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -1975,13 +1975,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -1997,8 +1997,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2113,12 +2113,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2182,13 +2182,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2204,8 +2204,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2320,12 +2320,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2389,13 +2389,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2411,8 +2411,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2553,12 +2553,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2622,13 +2622,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2644,8 +2644,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2760,12 +2760,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2829,13 +2829,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2851,8 +2851,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2967,12 +2967,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3036,13 +3036,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3058,8 +3058,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3174,12 +3174,12 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    timeline: "timeline";
+                    unknown: "unknown";
                     domain: "domain";
+                    timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3243,13 +3243,13 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3265,8 +3265,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     enum: "enum";
                     type: "type";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;

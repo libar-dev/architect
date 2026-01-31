@@ -67,6 +67,23 @@ export interface DecisionDocGeneratorResult {
     errors: string[];
 }
 /**
+ * Extract claude-md-section from pattern tags
+ *
+ * Looks for `@libar-docs-claude-md-section:VALUE` tag and extracts the value.
+ * Returns undefined if tag not found.
+ *
+ * @param pattern - Extracted pattern with directive tags
+ * @returns Section value (e.g., "validation") or undefined
+ *
+ * @example
+ * ```typescript
+ * // Pattern with @libar-docs-claude-md-section:validation tag
+ * const section = extractClaudeMdSection(pattern);
+ * // Returns: "validation"
+ * ```
+ */
+export declare function extractClaudeMdSection(pattern: ExtractedPattern): string | undefined;
+/**
  * Determine output paths from decision metadata
  *
  * Uses pattern name and optional section to compute paths:

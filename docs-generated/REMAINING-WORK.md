@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [█████████████░░░░░░░] 74/112 (66%)
+**Overall Progress:** [██████████████░░░░░░] 81/118 (69%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 13 |
-| 📋 Planned | 25 |
-| **Total Remaining** | 38 |
+| 📋 Planned | 24 |
+| **Total Remaining** | 37 |
 
 ---
 
@@ -24,7 +24,6 @@
 | 📋 [TraceabilityGenerator](remaining/phase-18-traceability-generator.md) | 1 | 0 | 0% |
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
 | 📋 [ClaudeModuleGeneration](remaining/phase-25-claude-module-generation.md) | 1 | 0 | 0% |
-| 📋 [ShapeExtraction](remaining/phase-26-shape-extraction.md) | 1 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 5 | 0 | 44% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
@@ -41,7 +40,7 @@
 | --- | --- |
 | 🚧 In Progress | 13 |
 | ✅ Ready to Start | 23 |
-| ⚠️ Blocked | 2 |
+| ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
 

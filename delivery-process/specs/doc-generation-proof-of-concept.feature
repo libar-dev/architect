@@ -110,10 +110,10 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
     Uses existing `DetailLevel` enum from `renderable/codecs/types/base.ts`:
 
-    | Level | Content Included | Typical Output |
-    | summary | Essential tables, types only | ~50 lines |
-    | standard | Tables, types, key descriptions | ~150 lines |
-    | detailed | Everything including JSDoc, examples | ~300 lines |
+    | Level | Content Included | Rendering Style |
+    | summary | Essential tables, type names only | Compact - lists vs code blocks |
+    | standard | Tables, types, key descriptions | Balanced |
+    | detailed | Everything including JSDoc, examples | Full - code blocks with JSDoc |
 
     **Extraction by Source Type:**
 
@@ -130,53 +130,49 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     **The Generator Command:**
 
     """bash
-    # Generate all documentation from annotated sources
-    generate-docs \
-      --decisions 'delivery-process/decisions/**/*.feature' \
-      --features 'tests/features/**/*.feature' \
-      --typescript 'src/**/*.ts' \
-      --generators doc-from-decision \
-      --output docs
+    generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' --typescript 'src/**/*.ts' --generators doc-from-decision --output docs
     """
 
   # ============================================================================
   # PROOF OF CONCEPT: Process Guard Documentation
   # ============================================================================
 
-  Rule: Proof of Concept - Process Guard docs generated from this pattern
+  Rule: Proof of Concept - Self-documentation validates the pattern
 
-    **Target Documents:**
+    This POC demonstrates the doc-from-decision pattern by generating docs
+    about ITSELF. The DocGenerationProofOfConcept pattern produces:
 
-    This proof of concept generates Process Guard documentation:
+    | Output | Purpose | Detail Level |
+    | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md | Detailed reference | detailed |
+    | _claude-md/generated/doc-generation-proof-of-concept.md | AI context | summary |
 
-    | Output | Purpose | Approximate Size |
-    | docs/PROCESS-GUARD.md | Detailed human reference | ~300 lines |
-    | _claude-md/validation/process-guard.md | Compact AI context | ~50 lines |
+    **Process Guard docs are generated separately from `adr-006-process-guard.feature`.**
 
-    **Source Mapping for Process Guard:**
+    **Source Mapping for POC Self-Documentation:**
+
+    This source mapping demonstrates all extraction methods by extracting content
+    from this POC's own sources. The table serves as both documentation AND test data.
 
     | Section | Source File | Extraction Method |
     | Intro & Context | THIS DECISION (Rule: Context above) | Decision rule description |
     | How It Works | THIS DECISION (Rule: Decision above) | Decision rule description |
-    | 7 Validation Rules | tests/features/validation/process-guard.feature | Rule blocks |
+    | Validation Rules | tests/features/validation/process-guard.feature | Rule blocks |
     | Protection Levels | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
     | Valid Transitions | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
     | API Types | src/lint/process-guard/types.ts | @extract-shapes tag |
     | Decider API | src/lint/process-guard/decider.ts | @extract-shapes tag |
     | CLI Options | src/cli/lint-process.ts | JSDoc section |
     | Error Messages | src/lint/process-guard/decider.ts | createViolation() patterns |
-    | Pre-commit Setup | THIS DECISION (DocString below) | Fenced code block |
-    | Programmatic API | THIS DECISION (DocString below) | Fenced code block |
+    | Pre-commit Setup | THIS DECISION (DocString) | Fenced code block |
+    | Programmatic API | THIS DECISION (DocString) | Fenced code block |
 
     **Pre-commit Hook Setup:**
 
-    """bash
-    # .husky/pre-commit
-    #!/usr/bin/env sh
-    . "$(dirname -- "$0")/_/husky.sh"
+    File: `.husky/pre-commit`
 
+    ```bash
     npx lint-process --staged
-    """
+    ```
 
     **Package.json Scripts:**
 
@@ -236,65 +232,26 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
     **File:** `_claude-md/validation/process-guard.md`
 
-    The compact module extracts only essential content for AI context:
+    The compact module extracts only essential content for AI context.
+    Output size depends on source mapping entries - there is no artificial line limit.
 
-    """markdown
-    ### Process Guard
+    **Expected Sections:**
 
-    Pure validation for enforcing delivery process rules.
+    | Section | Content |
+    | Header + Intro | Pattern name, problem/solution summary |
+    | API Types | Core interface definitions (DeciderInput, ValidationResult) |
+    | 7 Validation Rules | Rule table with severity and description |
+    | Protection Levels | Status-to-protection mapping table |
+    | CLI | Essential command examples |
+    | Link | Reference to full documentation |
 
-    **Problem:** Completed specs modified without unlock, invalid transitions,
-    scope creep in active specs.
+    **Key Characteristics:**
 
-    **Solution:** Decider-based validation with protection levels per FSM state.
-
-    #### API Types
-
-    ```typescript
-    interface DeciderInput {
-      state: ProcessState;
-      changes: ChangeDetection;
-      options: ValidationOptions;
-    }
-
-    interface ValidationResult {
-      valid: boolean;
-      violations: ProcessViolation[];
-      warnings: ProcessViolation[];
-    }
-    ```
-
-    #### 7 Validation Rules
-
-    | Rule | Severity | Description |
-    |------|----------|-------------|
-    | completed-protection | error | Completed specs require unlock-reason |
-    | invalid-status-transition | error | Must follow FSM path |
-    | scope-creep | error | Active specs cannot add deliverables |
-    | session-excluded | error | Cannot modify excluded files |
-    | missing-relationship-target | warning | Relationship target not found |
-    | session-scope | warning | File outside session scope |
-    | deliverable-removed | warning | Deliverable was removed |
-
-    #### Protection Levels
-
-    | Status | Protection | Restriction |
-    |--------|------------|-------------|
-    | completed | hard | Requires unlock-reason |
-    | active | scope | No new deliverables |
-    | roadmap | none | Fully editable |
-    | deferred | none | Fully editable |
-
-    #### CLI
-
-    ```bash
-    lint-process --staged              # Pre-commit (default)
-    lint-process --all --strict        # CI pipeline
-    lint-process --staged --ignore-session  # Override session
-    ```
-
-    **See:** [Full Documentation](docs/PROCESS-GUARD.md)
-    """
+    - Summary detail level (essential tables only)
+    - No JSDoc comments or implementation details
+    - Tables for structured data (rules, protection levels)
+    - Inline code blocks for CLI examples
+    - Cross-reference to detailed documentation
 
   # ============================================================================
   # CONSEQUENCES: Benefits and Trade-offs
@@ -471,10 +428,11 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
       | Source mapping parser | Done | generators/source-mapper.ts |
       | DocString extraction enhancement | Done | renderable/codecs/decision-doc.ts |
       | doc-from-decision generator | Done | generators/built-in/decision-doc-generator.ts |
-      | Design stub directory structure | Deferred | specs/stubs/, specs/examples/ |
-      | Process Guard annotations | Done | src/lint/process-guard/types.ts, decider.ts |
-      | Generated process-guard.md (compact) | POC-Ready | _claude-md/validation/ |
-      | Generated PROCESS-GUARD.md (detailed) | POC-Ready | docs/ |
+      | Design stub directory structure | N/A | stubs transformed to implementations |
+      | Shape extraction annotations | Done | src/lint/process-guard/types.ts, decider.ts |
+      | POC self-documentation (compact) | Done | _claude-md/generated/doc-generation-proof-of-concept.md |
+      | POC self-documentation (detailed) | Done | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md |
+      | ProcessGuard ADR decision doc | Done | decisions/adr-006-process-guard.feature |
 
   @acceptance-criteria @happy-path
   Scenario: Decision Rule descriptions become documentation sections
@@ -512,10 +470,10 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
   @acceptance-criteria @happy-path
   Scenario: Compact and detailed outputs from same sources
     Given a decision with source mapping
-    When generating with detail level "compact"
-    Then output is ~50 lines with essential content only
+    When generating with detail level "summary"
+    Then output uses summary rendering (essential tables, type names only)
     When generating with detail level "detailed"
-    Then output is ~300 lines with full content
+    Then output includes full content with JSDoc and examples
 
   @acceptance-criteria @validation
   Scenario: Missing source file produces warning
@@ -541,11 +499,12 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     And warnings are collected before generation starts
 
   @acceptance-criteria @integration
-  Scenario: Full pipeline generates Process Guard docs
+  Scenario: Full pipeline generates documentation from decision documents
+    Given the ProcessGuard ADR exists at "decisions/adr-006-process-guard.feature"
     When running the doc-from-decision generator
-    Then "_claude-md/validation/process-guard.md" is created
-    And "docs/PROCESS-GUARD.md" is created
-    And no manual documentation files need updating
+    Then "_claude-md/validation/process-guard.md" is created from ProcessGuard ADR
+    And "docs/PROCESS-GUARD.md" is created from ProcessGuard ADR
+    And "_claude-md/generated/doc-generation-proof-of-concept.md" is created from this POC
 
   @acceptance-criteria @integration
   Scenario: Generator registered in CODEC_MAP

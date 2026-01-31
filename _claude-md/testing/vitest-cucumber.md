@@ -108,3 +108,48 @@ The library behaves differently than standard Cucumber.js.
 | Feature descriptions     | Starting a description line with `Given`, `When`, or `Then` breaks the parser                  | Ensure free-text descriptions do not start with reserved Gherkin keywords                               |
 | Multiple And same text   | Multiple `And` steps with identical text (different values) fail                               | Consolidate into single step with DataTable                                                             |
 | No regex step patterns   | `Then(/pattern/, ...)` throws `StepAbleStepExpressionError`                                    | Use only string patterns with `{string}`, `{int}` placeholders                                          |
+
+### Gherkin Parser: Hash Comments in Descriptions (CRITICAL)
+
+**Root Cause:** The @cucumber/gherkin parser interprets `#` at the start of a line as a Gherkin comment, even inside Feature/Rule descriptions. This terminates the description context and causes subsequent lines to fail parsing.
+
+**Symptom:** Parse error like:
+```
+expected: #EOF, #Comment, #BackgroundLine, #TagLine, #ScenarioLine, #RuleLine, #Empty
+got 'generate-docs --decisions ...'
+```
+
+**The Problem:**
+
+When you embed code examples in Rule descriptions using `"""` (which becomes literal text, NOT a DocString), any `#` comment inside will break parsing:
+
+```gherkin
+Rule: My Rule
+
+    """bash
+    # This comment breaks parsing!
+    generate-docs --output docs
+    """
+```
+
+The parser sees:
+1. `"""bash` → literal text in description
+2. `# This comment...` → Gherkin comment (TERMINATES description)
+3. `generate-docs...` → unexpected content (PARSE ERROR)
+
+**Why This Happens:**
+
+- `"""` in descriptions is NOT parsed as DocString delimiters (those only work as step arguments)
+- The content becomes plain description text
+- `#` at line start is ALWAYS a Gherkin comment in description context
+
+**Workarounds:**
+
+| Option | Example | When to Use |
+| ------ | ------- | ----------- |
+| Remove hash comments | `generate-docs --output docs` | Simple cases |
+| Use `//` instead | `// Generate docs` | When comment syntax doesn't matter |
+| Move to step DocString | `Given the script: """bash...` | When you need executable examples |
+| Manual parsing | Regex extraction bypassing Gherkin parser | When file must contain `#` |
+
+**Note:** The `parseDescriptionWithDocStrings()` helper extracts `"""` blocks from description text AFTER parsing succeeds. The issue is the Gherkin parser itself failing before that helper runs.
