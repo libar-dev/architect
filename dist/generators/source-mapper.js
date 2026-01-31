@@ -61,6 +61,18 @@ function fileExists(filePath) {
 // Extraction Helpers
 // =============================================================================
 /**
+ * Collect all rules from partitioned decision content into a single array.
+ * Helper to avoid duplicating array spread across multiple locations.
+ */
+function collectAllRules(rules) {
+    return [
+        ...rules.context,
+        ...rules.decision,
+        ...rules.consequences,
+        ...rules.other,
+    ];
+}
+/**
  * Extract content from THIS DECISION (the current decision document)
  */
 export function extractFromDecision(options, sourceMapping) {
@@ -77,12 +89,7 @@ export function extractFromDecision(options, sourceMapping) {
             const method = normalizeExtractionMethod(sourceMapping.extractionMethod);
             if (method === 'DECISION_RULE_DESCRIPTION') {
                 // Return all rule descriptions combined
-                const allRules = [
-                    ...decisionContent.rules.context,
-                    ...decisionContent.rules.decision,
-                    ...decisionContent.rules.consequences,
-                    ...decisionContent.rules.other,
-                ];
+                const allRules = collectAllRules(decisionContent.rules);
                 content = allRules.map((r) => r.description).join('\n\n');
             }
             else if (method === 'FENCED_CODE_BLOCK') {
@@ -105,13 +112,7 @@ export function extractFromDecision(options, sourceMapping) {
                 return R.err(new Error('Self-reference rule name is missing'));
             }
             // Search in all rule partitions
-            const allRules = [
-                ...decisionContent.rules.context,
-                ...decisionContent.rules.decision,
-                ...decisionContent.rules.consequences,
-                ...decisionContent.rules.other,
-            ];
-            const rule = findRuleByName(allRules, ruleName);
+            const rule = findRuleByName(collectAllRules(decisionContent.rules), ruleName);
             if (!rule) {
                 return R.err(new Error(`Rule not found: ${ruleName}`));
             }
@@ -158,9 +159,12 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
                 .split(',')
                 .map((s) => s.trim())
                 .filter(Boolean);
-            const result = extractShapes(sourceCode, shapeNames);
-            shapes = result.shapes;
-            content = renderShapesAsMarkdown(result.shapes, { includeJsDoc: true });
+            const extractResult = extractShapes(sourceCode, shapeNames);
+            if (!extractResult.ok) {
+                return R.err(extractResult.error);
+            }
+            shapes = [...extractResult.value.shapes]; // Convert readonly to mutable
+            content = renderShapesAsMarkdown(extractResult.value.shapes, { includeJsDoc: true });
         }
         else {
             // No @extract-shapes tag found - extract all exported types

@@ -176,8 +176,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -212,8 +212,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -264,9 +264,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
                 const: "const";
             }>;
             sourceText: z.ZodString;
@@ -420,8 +420,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -456,8 +456,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -508,9 +508,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -627,8 +627,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -663,8 +663,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -715,9 +715,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -834,8 +834,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -870,8 +870,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -922,9 +922,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -1045,8 +1045,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1081,8 +1081,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1133,9 +1133,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -1259,8 +1259,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1295,8 +1295,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1347,9 +1347,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
                 const: "const";
             }>;
             sourceText: z.ZodString;
@@ -1466,8 +1466,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
                 unknown: "unknown";
-                domain: "domain";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1502,8 +1502,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1554,9 +1554,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
                 const: "const";
             }>;
             sourceText: z.ZodString;
@@ -1674,8 +1674,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1710,8 +1710,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1762,9 +1762,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -1881,8 +1881,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1917,8 +1917,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -1969,9 +1969,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -2088,8 +2088,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2124,8 +2124,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2176,9 +2176,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -2295,8 +2295,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2331,8 +2331,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2383,9 +2383,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -2528,8 +2528,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2564,8 +2564,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2616,9 +2616,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -2735,8 +2735,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2771,8 +2771,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -2823,9 +2823,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -2942,8 +2942,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2978,8 +2978,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3030,9 +3030,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;
@@ -3149,8 +3149,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
                     unknown: "unknown";
-                    domain: "domain";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3185,8 +3185,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3237,9 +3237,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
                     const: "const";
                 }>;
                 sourceText: z.ZodString;

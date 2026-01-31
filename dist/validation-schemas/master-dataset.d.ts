@@ -141,12 +141,12 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -178,8 +178,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -210,13 +210,13 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -230,10 +230,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -348,12 +348,12 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -385,8 +385,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -417,13 +417,13 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -437,10 +437,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -555,12 +555,12 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -592,8 +592,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -624,13 +624,13 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -644,10 +644,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -781,12 +781,12 @@ export declare const PhaseGroupSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -818,8 +818,8 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -850,13 +850,13 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -870,10 +870,10 @@ export declare const PhaseGroupSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -999,12 +999,12 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1036,8 +1036,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1068,13 +1068,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1088,10 +1088,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1206,12 +1206,12 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1243,8 +1243,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1275,13 +1275,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1295,10 +1295,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1413,12 +1413,12 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1450,8 +1450,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1482,13 +1482,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1502,10 +1502,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1620,12 +1620,12 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1657,8 +1657,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1689,13 +1689,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1709,10 +1709,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1866,12 +1866,12 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -1903,8 +1903,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -1935,13 +1935,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1955,10 +1955,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2073,12 +2073,12 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -2110,8 +2110,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -2142,13 +2142,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2162,10 +2162,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2280,12 +2280,12 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -2317,8 +2317,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -2349,13 +2349,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2369,10 +2369,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2487,12 +2487,12 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -2524,8 +2524,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -2556,13 +2556,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2576,10 +2576,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2702,12 +2702,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -2739,8 +2739,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -2771,13 +2771,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2791,10 +2791,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2819,8 +2819,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                value: "value";
                 enum: "enum";
+                value: "value";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -2946,12 +2946,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -2983,8 +2983,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3015,13 +3015,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3035,10 +3035,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3153,12 +3153,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3190,8 +3190,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3222,13 +3222,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3242,10 +3242,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3360,12 +3360,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3397,8 +3397,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3429,13 +3429,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3449,10 +3449,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3571,12 +3571,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -3608,8 +3608,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -3640,13 +3640,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3660,10 +3660,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3785,12 +3785,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -3822,8 +3822,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -3854,13 +3854,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -3874,10 +3874,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3992,12 +3992,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                unknown: "unknown";
                 timeline: "timeline";
                 domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
-                unknown: "unknown";
             }>>;
             line: z.ZodOptional<z.ZodNumber>;
         }, z.core.$strict>>>>;
@@ -4029,8 +4029,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         risk: z.ZodOptional<z.ZodString>;
         priority: z.ZodOptional<z.ZodString>;
         level: z.ZodOptional<z.ZodEnum<{
-            epic: "epic";
             phase: "phase";
+            epic: "epic";
             task: "task";
         }>>;
         parent: z.ZodOptional<z.ZodString>;
@@ -4061,13 +4061,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -4081,10 +4081,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                enum: "enum";
-                type: "type";
-                const: "const";
                 interface: "interface";
+                type: "type";
+                enum: "enum";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -4200,12 +4200,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4237,8 +4237,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4269,13 +4269,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4289,10 +4289,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4407,12 +4407,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4444,8 +4444,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4476,13 +4476,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4496,10 +4496,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4614,12 +4614,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4651,8 +4651,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4683,13 +4683,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4703,10 +4703,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4821,12 +4821,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -4858,8 +4858,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -4890,13 +4890,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4910,10 +4910,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5054,12 +5054,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5091,8 +5091,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5123,13 +5123,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5143,10 +5143,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5261,12 +5261,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5298,8 +5298,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5330,13 +5330,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5350,10 +5350,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5468,12 +5468,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5505,8 +5505,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5537,13 +5537,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5557,10 +5557,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5675,12 +5675,12 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
                     timeline: "timeline";
                     domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
-                    unknown: "unknown";
                 }>>;
                 line: z.ZodOptional<z.ZodNumber>;
             }, z.core.$strict>>>>;
@@ -5712,8 +5712,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
             level: z.ZodOptional<z.ZodEnum<{
-                epic: "epic";
                 phase: "phase";
+                epic: "epic";
                 task: "task";
             }>>;
             parent: z.ZodOptional<z.ZodString>;
@@ -5744,13 +5744,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5764,10 +5764,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    enum: "enum";
-                    type: "type";
-                    const: "const";
                     interface: "interface";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;

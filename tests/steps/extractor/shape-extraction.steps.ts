@@ -9,22 +9,26 @@
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import { extractShapes, renderShapesAsMarkdown } from '../../../src/extractor/shape-extractor.js';
-import type { ExtractedShape } from '../../../src/validation-schemas/extracted-shape.js';
+import type { ShapeExtractionResult } from '../../../src/validation-schemas/extracted-shape.js';
 import { buildRegistry } from '../../../src/taxonomy/index.js';
+
+/**
+ * Helper to unwrap extractShapes result for tests.
+ * Throws if extraction failed (tests should provide valid source code).
+ */
+function unwrapExtraction(sourceCode: string, shapeNames: string[]): ShapeExtractionResult {
+  const result = extractShapes(sourceCode, shapeNames);
+  if (!result.ok) {
+    throw new Error(`Shape extraction failed: ${result.error.message}`);
+  }
+  return result.value;
+}
 
 const feature = await loadFeature('tests/features/extractor/shape-extraction.feature');
 
 // =============================================================================
 // Test State
 // =============================================================================
-
-interface ShapeExtractionResult {
-  shapes: ExtractedShape[];
-  notFound: string[];
-  imported: string[];
-  reExported: Array<{ name: string; sourceModule: string; typeOnly: boolean }>;
-  warnings: string[];
-}
 
 interface TestState {
   sourceCode: string;
@@ -86,7 +90,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "MyConfig"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['MyConfig']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['MyConfig']);
       });
 
       Then('the shape should be extracted with kind "interface"', () => {
@@ -105,7 +109,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "ConfigOptions"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['ConfigOptions']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['ConfigOptions']);
       });
 
       Then('the shape should be extracted with kind "interface"', () => {
@@ -126,7 +130,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Result"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Result']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Result']);
       });
 
       Then('the shape should be extracted with kind "interface"', () => {
@@ -145,7 +149,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "ExtendedConfig"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['ExtendedConfig']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['ExtendedConfig']);
       });
 
       Then('the shape should be extracted with kind "interface"', () => {
@@ -164,7 +168,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "NonExistent"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['NonExistent']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['NonExistent']);
       });
 
       Then('the extraction should have not-found entry for "NonExistent"', () => {
@@ -184,7 +188,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Status"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Status']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Status']);
       });
 
       Then('the shape should be extracted with kind "type"', () => {
@@ -205,7 +209,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Readonly"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Readonly']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Readonly']);
       });
 
       Then('the shape should be extracted with kind "type"', () => {
@@ -224,7 +228,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Unwrap"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Unwrap']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Unwrap']);
       });
 
       Then('the shape should be extracted with kind "type"', () => {
@@ -249,7 +253,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Severity"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Severity']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Severity']);
       });
 
       Then('the shape should be extracted with kind "enum"', () => {
@@ -268,7 +272,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Direction"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Direction']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Direction']);
       });
 
       Then('the shape should be extracted with kind "enum"', () => {
@@ -293,7 +297,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "validateChanges"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['validateChanges']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['validateChanges']);
       });
 
       Then('the shape should be extracted with kind "function"', () => {
@@ -316,7 +320,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "fetchData"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['fetchData']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['fetchData']);
       });
 
       Then('the shape should be extracted with kind "function"', () => {
@@ -341,7 +345,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shapes "Output, Input, Options"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Output', 'Input', 'Options']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Output', 'Input', 'Options']);
       });
 
       Then('3 shapes should be extracted', () => {
@@ -367,7 +371,11 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shapes "Status, Config, validate"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Status', 'Config', 'validate']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, [
+          'Status',
+          'Config',
+          'validate',
+        ]);
       });
 
       Then('3 shapes should be extracted', () => {
@@ -399,7 +407,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shapes "Input, Output"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Input', 'Output']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Input', 'Output']);
       });
 
       And('rendering shapes as markdown', () => {
@@ -431,7 +439,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Request"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Request']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Request']);
       });
 
       Then('the extraction should have imported entry for "Request"', () => {
@@ -445,7 +453,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shape "Foo"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Foo']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Foo']);
       });
 
       Then('the extraction should have re-exported entry for "Foo" from "./types.js"', () => {
@@ -473,7 +481,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shapes "Input, Output"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Input', 'Output']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Input', 'Output']);
       });
 
       And('rendering shapes with groupInSingleBlock true', () => {
@@ -502,7 +510,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('extracting shapes "Input, Output"', () => {
-        state.extractionResult = extractShapes(state.sourceCode, ['Input', 'Output']);
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Input', 'Output']);
       });
 
       And('rendering shapes with groupInSingleBlock false', () => {

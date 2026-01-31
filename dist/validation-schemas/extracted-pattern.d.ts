@@ -163,12 +163,12 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
+            unknown: "unknown";
             timeline: "timeline";
             domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
-            unknown: "unknown";
         }>>;
         line: z.ZodOptional<z.ZodNumber>;
     }, z.core.$strict>>>>;
@@ -200,8 +200,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     risk: z.ZodOptional<z.ZodString>;
     priority: z.ZodOptional<z.ZodString>;
     level: z.ZodOptional<z.ZodEnum<{
-        epic: "epic";
         phase: "phase";
+        epic: "epic";
         task: "task";
     }>>;
     parent: z.ZodOptional<z.ZodString>;
@@ -232,13 +232,13 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     }, z.core.$strip>>>>;
     archRole: z.ZodOptional<z.ZodEnum<{
         "bounded-context": "bounded-context";
-        decider: "decider";
+        "command-handler": "command-handler";
         projection: "projection";
         saga: "saga";
         "process-manager": "process-manager";
         infrastructure: "infrastructure";
-        "command-handler": "command-handler";
         repository: "repository";
+        decider: "decider";
         "read-model": "read-model";
         service: "service";
     }>>;
@@ -252,10 +252,10 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{
             function: "function";
-            enum: "enum";
-            type: "type";
-            const: "const";
             interface: "interface";
+            type: "type";
+            enum: "enum";
+            const: "const";
         }>;
         sourceText: z.ZodString;
         jsDoc: z.ZodOptional<z.ZodString>;

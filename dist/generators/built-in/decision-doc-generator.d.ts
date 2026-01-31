@@ -41,8 +41,6 @@ export interface DecisionDocGeneratorOptions {
     baseDir: string;
     /** Detail level for output generation */
     detailLevel?: DetailLevel;
-    /** Output directory override (defaults to standard paths) */
-    outputDir?: string;
     /** Claude MD section name (e.g., "validation" for _claude-md/validation/) */
     claudeMdSection?: string;
 }

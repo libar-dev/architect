@@ -31,6 +31,7 @@
  * - `THIS DECISION (DocString)` - Extract fenced code blocks
  */
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import { type PartitionedRules } from './helpers.js';
 import type { SectionBlock, CodeBlock } from '../schema.js';
 /**
  * Entry in a source mapping table
@@ -46,20 +47,10 @@ export interface SourceMappingEntry {
     extractionMethod: string;
 }
 /**
- * Partitioned rules from a decision document
- *
- * Rules are classified by their name prefix (case-insensitive):
- * - "Context..." -> context section
- * - "Decision..." -> decision section
- * - "Consequence..." -> consequences section
- * - Others -> other (custom sections)
+ * Partitioned rules from a decision document.
+ * Re-exported from helpers for convenience.
  */
-export interface PartitionedDecisionRules {
-    context: BusinessRule[];
-    decision: BusinessRule[];
-    consequences: BusinessRule[];
-    other: BusinessRule[];
-}
+export type PartitionedDecisionRules = PartitionedRules;
 /**
  * Extracted DocString with language tag
  */
@@ -106,19 +97,15 @@ export declare const SELF_REFERENCE_DOCSTRING_PATTERN: RegExp;
 /**
  * Partition decision rules by semantic prefix
  *
- * Rules are classified by their name prefix (case-insensitive):
- * - "Context..." -> context section
- * - "Decision..." -> decision section
- * - "Consequence..." -> consequences section
- * - Others -> other (not rendered in standard ADR format)
- *
- * This is a copy of the pattern from adr.ts for use in decision doc extraction.
+ * Wrapper around shared partitionRulesByPrefix that doesn't warn about "other" rules.
+ * Decision docs may have additional rules like "Proof of Concept" or "Expected Output"
+ * that are valid but don't fit the standard ADR sections.
  *
  * @param rules - Business rules from the extracted pattern
- * @param patternName - Pattern name for warning context (optional)
+ * @param _patternName - Pattern name for context (unused, kept for API compatibility)
  * @returns Partitioned rules by category
  */
-export declare function partitionDecisionRules(rules: readonly BusinessRule[] | undefined, patternName?: string): PartitionedDecisionRules;
+export declare function partitionDecisionRules(rules: readonly BusinessRule[] | undefined, _patternName?: string): PartitionedDecisionRules;
 /**
  * Extract DocStrings (fenced code blocks) from text content
  *

@@ -24,42 +24,26 @@
  * - **Includes JSDoc**: Type-level JSDoc comments are preserved
  * - **Order from tag**: Shapes appear in tag-specified order, not source order
  */
-import type { ExtractedShape, ReExportedShape } from '../validation-schemas/extracted-shape.js';
-/**
- * Options for shape extraction (simplified for internal use).
- */
-interface ShapeExtractionOptions {
-    /** Include JSDoc comments in extraction (default: true) */
-    includeJsDoc?: boolean;
-    /** For functions, include full signature or just name+params (default: 'signature') */
-    functionDetail?: 'signature' | 'name-only';
-    /** Preserve original formatting vs normalize (default: true) */
-    preserveFormatting?: boolean;
-}
-/**
- * Result of shape extraction from a file.
- */
-interface ShapeExtractionResult {
-    /** Successfully extracted shapes, in requested order */
-    shapes: ExtractedShape[];
-    /** Shape names that were requested but not found */
-    notFound: string[];
-    /** Shape names that exist but are imports (not defined in file) */
-    imported: string[];
-    /** Shape names that are re-exported from other files */
-    reExported: ReExportedShape[];
-    /** Any warnings generated during extraction */
-    warnings: string[];
-}
+import { Result } from '../types/result.js';
+import type { ExtractedShape, ShapeExtractionOptionsInput, ShapeExtractionResult } from '../validation-schemas/extracted-shape.js';
 /**
  * Extract named shapes from TypeScript source code.
  *
  * @param sourceCode - The TypeScript source code to parse
  * @param shapeNames - Names of shapes to extract (in desired output order)
  * @param options - Extraction options
- * @returns Extraction result with shapes, warnings, and not-found list
+ * @returns Result containing extraction result with shapes, warnings, and not-found list
  */
-export declare function extractShapes(sourceCode: string, shapeNames: string[], options?: ShapeExtractionOptions): ShapeExtractionResult;
+export declare function extractShapes(sourceCode: string, shapeNames: string[], options?: ShapeExtractionOptionsInput): Result<ShapeExtractionResult>;
+/**
+ * Result of processing extract-shapes tag.
+ */
+export interface ProcessExtractShapesResult {
+    /** Successfully extracted shapes in tag order */
+    shapes: ExtractedShape[];
+    /** Warnings generated during extraction */
+    warnings: string[];
+}
 /**
  * Process extract-shapes tag and return shapes for ExtractedPattern.
  *
@@ -68,9 +52,9 @@ export declare function extractShapes(sourceCode: string, shapeNames: string[], 
  *
  * @param sourceCode - File content
  * @param extractShapesTag - Comma-separated shape names from tag
- * @returns Array of extracted shapes in tag order
+ * @returns Result with extracted shapes and any warnings
  */
-export declare function processExtractShapesTag(sourceCode: string, extractShapesTag: string): ExtractedShape[];
+export declare function processExtractShapesTag(sourceCode: string, extractShapesTag: string): ProcessExtractShapesResult;
 /**
  * Render extracted shapes as markdown code blocks.
  *
@@ -78,9 +62,8 @@ export declare function processExtractShapesTag(sourceCode: string, extractShape
  * @param options - Rendering options
  * @returns Markdown string with fenced code blocks
  */
-export declare function renderShapesAsMarkdown(shapes: ExtractedShape[], options?: {
+export declare function renderShapesAsMarkdown(shapes: readonly ExtractedShape[], options?: {
     groupInSingleBlock?: boolean;
     includeJsDoc?: boolean;
 }): string;
-export {};
 //# sourceMappingURL=shape-extractor.d.ts.map

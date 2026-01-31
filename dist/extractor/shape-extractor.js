@@ -25,6 +25,7 @@
  * - **Order from tag**: Shapes appear in tag-specified order, not source order
  */
 import { parse } from '@typescript-eslint/typescript-estree';
+import { Result } from '../types/result.js';
 // =============================================================================
 // Main Extraction Function
 // =============================================================================
@@ -34,7 +35,7 @@ import { parse } from '@typescript-eslint/typescript-estree';
  * @param sourceCode - The TypeScript source code to parse
  * @param shapeNames - Names of shapes to extract (in desired output order)
  * @param options - Extraction options
- * @returns Extraction result with shapes, warnings, and not-found list
+ * @returns Result containing extraction result with shapes, warnings, and not-found list
  */
 export function extractShapes(sourceCode, shapeNames, options = {}) {
     const { includeJsDoc = true, preserveFormatting = true } = options;
@@ -54,8 +55,7 @@ export function extractShapes(sourceCode, shapeNames, options = {}) {
         });
     }
     catch (error) {
-        warnings.push(`Failed to parse source code: ${error instanceof Error ? error.message : String(error)}`);
-        return { shapes, notFound: shapeNames, imported, reExported, warnings };
+        return Result.err(error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`));
     }
     // Build maps of declarations and imports/re-exports
     const declarations = findDeclarations(ast);
@@ -69,9 +69,7 @@ export function extractShapes(sourceCode, shapeNames, options = {}) {
                 includeJsDoc,
                 preserveFormatting,
             });
-            if (shape) {
-                shapes.push(shape);
-            }
+            shapes.push(shape);
             continue;
         }
         // Check if it's an import or re-export
@@ -92,7 +90,7 @@ export function extractShapes(sourceCode, shapeNames, options = {}) {
         // Not found at all
         notFound.push(shapeName);
     }
-    return { shapes, notFound, imported, reExported, warnings };
+    return Result.ok({ shapes, notFound, imported, reExported, warnings });
 }
 // =============================================================================
 // AST Traversal Functions
@@ -320,9 +318,8 @@ function extractPrecedingJsDoc(sourceCode, node, comments) {
         // Comment must end before node starts
         if (commentEnd > nodeStart)
             continue;
-        // Comment must be on the line immediately before the node
-        // (allowing for blank lines would be tricky)
-        if (nodeLine - commentEndLine > 2)
+        // Comment must be close to the node (allow 1 blank line between JSDoc and declaration)
+        if (nodeLine - commentEndLine > 3)
             continue;
         // This is a candidate - pick the one closest to the node
         if (!closestJsDoc || comment.range[1] > closestJsDoc.range[1]) {
@@ -364,9 +361,6 @@ function functionToSignature(sourceText) {
     }
     return signature + ';';
 }
-// =============================================================================
-// Integration with Extractor Pipeline
-// =============================================================================
 /**
  * Process extract-shapes tag and return shapes for ExtractedPattern.
  *
@@ -375,30 +369,39 @@ function functionToSignature(sourceText) {
  *
  * @param sourceCode - File content
  * @param extractShapesTag - Comma-separated shape names from tag
- * @returns Array of extracted shapes in tag order
+ * @returns Result with extracted shapes and any warnings
  */
 export function processExtractShapesTag(sourceCode, extractShapesTag) {
     const shapeNames = extractShapesTag
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
-    const result = extractShapes(sourceCode, shapeNames);
-    // Log warnings for not-found shapes
-    for (const name of result.notFound) {
-        console.warn(`[extract-shapes] Shape '${name}' not found in file`);
+    const extractionResult = extractShapes(sourceCode, shapeNames);
+    // If extraction failed (parse error), return empty shapes with error as warning
+    if (!extractionResult.ok) {
+        return {
+            shapes: [],
+            warnings: [`[extract-shapes] ${extractionResult.error.message}`],
+        };
     }
-    // Log warnings for imported shapes
+    const result = extractionResult.value;
+    const warnings = [...result.warnings];
+    // Collect warnings for not-found shapes
+    for (const name of result.notFound) {
+        warnings.push(`[extract-shapes] Shape '${name}' not found in file`);
+    }
+    // Collect warnings for imported shapes
     for (const name of result.imported) {
-        console.warn(`[extract-shapes] Shape '${name}' is imported, not defined in this file. ` +
+        warnings.push(`[extract-shapes] Shape '${name}' is imported, not defined in this file. ` +
             `Add @libar-docs-extract-shapes to the source file instead.`);
     }
-    // Log warnings for re-exported shapes with source module info
+    // Collect warnings for re-exported shapes with source module info
     for (const reExport of result.reExported) {
         const typeOnlyNote = reExport.typeOnly ? ' (type-only)' : '';
-        console.warn(`[extract-shapes] Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. ` +
+        warnings.push(`[extract-shapes] Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. ` +
             `Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`);
     }
-    return result.shapes;
+    return { shapes: [...result.shapes], warnings };
 }
 // =============================================================================
 // Rendering Helper

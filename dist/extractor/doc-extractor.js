@@ -116,16 +116,21 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
     // Extract shapes if @libar-docs-extract-shapes tag is present
     // Read file lazily only when extraction is needed
     let extractedShapes;
+    const extractionWarnings = [];
     if (directive.extractShapes && directive.extractShapes.length > 0) {
         try {
             const sourceContent = fs.readFileSync(filePath, 'utf-8');
-            extractedShapes = processExtractShapesTag(sourceContent, directive.extractShapes.join(', '));
+            const shapeResult = processExtractShapesTag(sourceContent, directive.extractShapes.join(', '));
+            extractedShapes = shapeResult.shapes;
+            extractionWarnings.push(...shapeResult.warnings);
         }
         catch (error) {
-            // File read error - log warning but continue without shapes
-            console.warn(`[shape-extraction] Failed to read file for shape extraction: ${filePath}`, error instanceof Error ? error.message : error);
+            // File read error - collect warning but continue without shapes
+            extractionWarnings.push(`[shape-extraction] Failed to read file for shape extraction: ${filePath} - ${error instanceof Error ? error.message : String(error)}`);
         }
     }
+    // Note: extractionWarnings are collected but currently not surfaced
+    // Future enhancement: add warnings field to ExtractedPattern schema
     // Build pattern object
     const pattern = {
         id,

@@ -43,6 +43,104 @@ import { type SectionBlock, table, code, list, paragraph, heading } from '../sch
 export type { BusinessRule };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Rule Partitioning (Shared by ADR and Decision Doc codecs)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Result of partitioning business rules by ADR-style prefixes.
+ */
+export interface PartitionedRules {
+  /** Rules with names starting with "Context" */
+  context: BusinessRule[];
+  /** Rules with names starting with "Decision" */
+  decision: BusinessRule[];
+  /** Rules with names starting with "Consequence" */
+  consequences: BusinessRule[];
+  /** Rules that don't match any expected prefix */
+  other: BusinessRule[];
+}
+
+/**
+ * Options for partitioning business rules.
+ */
+export interface PartitionRulesOptions {
+  /**
+   * Warn about rules that don't match expected prefixes (default: false).
+   * When true, logs a warning to console for non-matching rules.
+   * ADR codec sets this to true; Decision Doc codec keeps false.
+   */
+  warnOnOther?: boolean;
+  /** Pattern name for warning context (optional) */
+  patternName?: string;
+}
+
+/**
+ * Partition business rules by ADR-style name prefixes.
+ *
+ * Rules are categorized based on their name prefix:
+ * - "Context..." → context section
+ * - "Decision..." → decision section
+ * - "Consequence..." → consequences section
+ * - Others → other (optionally logged as warning)
+ *
+ * This is a shared helper used by both ADR and Decision Doc codecs.
+ *
+ * @param rules - Business rules from the extracted pattern
+ * @param options - Partitioning options
+ * @returns Partitioned rules by category
+ *
+ * @example
+ * ```typescript
+ * // ADR codec (warn about unmatched rules)
+ * const partitioned = partitionRulesByPrefix(pattern.rules, {
+ *   warnOnOther: true,
+ *   patternName: pattern.name
+ * });
+ *
+ * // Decision doc codec (no warning)
+ * const partitioned = partitionRulesByPrefix(pattern.rules);
+ * ```
+ */
+export function partitionRulesByPrefix(
+  rules: readonly BusinessRule[] | undefined,
+  options: PartitionRulesOptions = {}
+): PartitionedRules {
+  if (!rules || rules.length === 0) {
+    return { context: [], decision: [], consequences: [], other: [] };
+  }
+
+  const { warnOnOther = false, patternName } = options;
+  const context: BusinessRule[] = [];
+  const decision: BusinessRule[] = [];
+  const consequences: BusinessRule[] = [];
+  const other: BusinessRule[] = [];
+
+  for (const rule of rules) {
+    const nameLower = rule.name.toLowerCase();
+    if (nameLower.startsWith('context')) {
+      context.push(rule);
+    } else if (nameLower.startsWith('decision')) {
+      decision.push(rule);
+    } else if (nameLower.startsWith('consequence')) {
+      consequences.push(rule);
+    } else {
+      other.push(rule);
+    }
+  }
+
+  // Optionally warn about rules that don't match expected ADR prefixes
+  if (warnOnOther && other.length > 0) {
+    const otherNames = other.map((r) => `"${r.name}"`).join(', ');
+    const patternContext = patternName ? ` in pattern "${patternName}"` : '';
+    console.warn(
+      `[codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`
+    );
+  }
+
+  return { context, decision, consequences, other };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Configuration Types
 // ═══════════════════════════════════════════════════════════════════════════
 

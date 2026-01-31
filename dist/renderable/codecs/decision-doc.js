@@ -30,7 +30,7 @@
  * - `THIS DECISION (Rule: X)` - Extract specific Rule: block
  * - `THIS DECISION (DocString)` - Extract fenced code blocks
  */
-import { parseDescriptionWithDocStrings } from './helpers.js';
+import { parseDescriptionWithDocStrings, partitionRulesByPrefix, } from './helpers.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Self-Reference Constants
 // ═══════════════════════════════════════════════════════════════════════════
@@ -49,54 +49,22 @@ export const SELF_REFERENCE_RULE_PATTERN = /^THIS DECISION \(Rule:\s*([^)]+)\)$/
  */
 export const SELF_REFERENCE_DOCSTRING_PATTERN = /^THIS DECISION \(DocString\)$/i;
 // ═══════════════════════════════════════════════════════════════════════════
-// Rule Partitioning (Reuses ADR codec pattern)
+// Rule Partitioning (Uses shared helper from helpers.ts)
 // ═══════════════════════════════════════════════════════════════════════════
 /**
  * Partition decision rules by semantic prefix
  *
- * Rules are classified by their name prefix (case-insensitive):
- * - "Context..." -> context section
- * - "Decision..." -> decision section
- * - "Consequence..." -> consequences section
- * - Others -> other (not rendered in standard ADR format)
- *
- * This is a copy of the pattern from adr.ts for use in decision doc extraction.
+ * Wrapper around shared partitionRulesByPrefix that doesn't warn about "other" rules.
+ * Decision docs may have additional rules like "Proof of Concept" or "Expected Output"
+ * that are valid but don't fit the standard ADR sections.
  *
  * @param rules - Business rules from the extracted pattern
- * @param patternName - Pattern name for warning context (optional)
+ * @param _patternName - Pattern name for context (unused, kept for API compatibility)
  * @returns Partitioned rules by category
  */
-export function partitionDecisionRules(rules, patternName) {
-    if (!rules || rules.length === 0) {
-        return { context: [], decision: [], consequences: [], other: [] };
-    }
-    const context = [];
-    const decision = [];
-    const consequences = [];
-    const other = [];
-    for (const rule of rules) {
-        const nameLower = rule.name.toLowerCase();
-        if (nameLower.startsWith('context')) {
-            context.push(rule);
-        }
-        else if (nameLower.startsWith('decision')) {
-            decision.push(rule);
-        }
-        else if (nameLower.startsWith('consequence')) {
-            consequences.push(rule);
-        }
-        else {
-            other.push(rule);
-        }
-    }
+export function partitionDecisionRules(rules, _patternName) {
     // Note: Unlike ADR codec, we don't warn about "other" rules
-    // Decision docs may have additional rules like "Proof of Concept" or "Expected Output"
-    // that are valid but don't fit the standard ADR sections
-    if (other.length > 0 && patternName) {
-        // Optional debug logging (can be enabled for debugging)
-        // console.debug(`[decision-doc-codec] Pattern "${patternName}" has ${other.length} non-standard rule(s)`);
-    }
-    return { context, decision, consequences, other };
+    return partitionRulesByPrefix(rules, { warnOnOther: false });
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // DocString Extraction

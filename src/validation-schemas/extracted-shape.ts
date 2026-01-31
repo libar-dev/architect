@@ -25,13 +25,7 @@ import { z } from 'zod';
 /**
  * Kind of TypeScript construct that was extracted.
  */
-export const ShapeKindSchema = z.enum([
-  'interface',
-  'type',
-  'enum',
-  'function',
-  'const',
-]);
+export const ShapeKindSchema = z.enum(['interface', 'type', 'enum', 'function', 'const']);
 
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
 
@@ -148,7 +142,11 @@ export const ShapeExtractionOptionsSchema = z.object({
   preserveFormatting: z.boolean().default(true),
 });
 
+/** Output type with all defaults applied */
 export type ShapeExtractionOptions = z.infer<typeof ShapeExtractionOptionsSchema>;
+
+/** Input type for function parameters (all fields optional with defaults) */
+export type ShapeExtractionOptionsInput = z.input<typeof ShapeExtractionOptionsSchema>;
 
 // =============================================================================
 // Type Guards

@@ -32,7 +32,11 @@
  */
 
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
-import { parseDescriptionWithDocStrings } from './helpers.js';
+import {
+  parseDescriptionWithDocStrings,
+  partitionRulesByPrefix,
+  type PartitionedRules,
+} from './helpers.js';
 import type { SectionBlock, CodeBlock } from '../schema.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -56,20 +60,10 @@ export interface SourceMappingEntry {
 }
 
 /**
- * Partitioned rules from a decision document
- *
- * Rules are classified by their name prefix (case-insensitive):
- * - "Context..." -> context section
- * - "Decision..." -> decision section
- * - "Consequence..." -> consequences section
- * - Others -> other (custom sections)
+ * Partitioned rules from a decision document.
+ * Re-exported from helpers for convenience.
  */
-export interface PartitionedDecisionRules {
-  context: BusinessRule[];
-  decision: BusinessRule[];
-  consequences: BusinessRule[];
-  other: BusinessRule[];
-}
+export type PartitionedDecisionRules = PartitionedRules;
 
 /**
  * Extracted DocString with language tag
@@ -129,59 +123,26 @@ export const SELF_REFERENCE_RULE_PATTERN = /^THIS DECISION \(Rule:\s*([^)]+)\)$/
 export const SELF_REFERENCE_DOCSTRING_PATTERN = /^THIS DECISION \(DocString\)$/i;
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Rule Partitioning (Reuses ADR codec pattern)
+// Rule Partitioning (Uses shared helper from helpers.ts)
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
  * Partition decision rules by semantic prefix
  *
- * Rules are classified by their name prefix (case-insensitive):
- * - "Context..." -> context section
- * - "Decision..." -> decision section
- * - "Consequence..." -> consequences section
- * - Others -> other (not rendered in standard ADR format)
- *
- * This is a copy of the pattern from adr.ts for use in decision doc extraction.
+ * Wrapper around shared partitionRulesByPrefix that doesn't warn about "other" rules.
+ * Decision docs may have additional rules like "Proof of Concept" or "Expected Output"
+ * that are valid but don't fit the standard ADR sections.
  *
  * @param rules - Business rules from the extracted pattern
- * @param patternName - Pattern name for warning context (optional)
+ * @param _patternName - Pattern name for context (unused, kept for API compatibility)
  * @returns Partitioned rules by category
  */
 export function partitionDecisionRules(
   rules: readonly BusinessRule[] | undefined,
-  patternName?: string
+  _patternName?: string
 ): PartitionedDecisionRules {
-  if (!rules || rules.length === 0) {
-    return { context: [], decision: [], consequences: [], other: [] };
-  }
-
-  const context: BusinessRule[] = [];
-  const decision: BusinessRule[] = [];
-  const consequences: BusinessRule[] = [];
-  const other: BusinessRule[] = [];
-
-  for (const rule of rules) {
-    const nameLower = rule.name.toLowerCase();
-    if (nameLower.startsWith('context')) {
-      context.push(rule);
-    } else if (nameLower.startsWith('decision')) {
-      decision.push(rule);
-    } else if (nameLower.startsWith('consequence')) {
-      consequences.push(rule);
-    } else {
-      other.push(rule);
-    }
-  }
-
   // Note: Unlike ADR codec, we don't warn about "other" rules
-  // Decision docs may have additional rules like "Proof of Concept" or "Expected Output"
-  // that are valid but don't fit the standard ADR sections
-  if (other.length > 0 && patternName) {
-    // Optional debug logging (can be enabled for debugging)
-    // console.debug(`[decision-doc-codec] Pattern "${patternName}" has ${other.length} non-standard rule(s)`);
-  }
-
-  return { context, decision, consequences, other };
+  return partitionRulesByPrefix(rules, { warnOnOther: false });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════

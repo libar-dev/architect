@@ -271,10 +271,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
+                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
-                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -515,10 +515,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -722,10 +722,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -929,10 +929,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1140,10 +1140,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1354,10 +1354,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
+                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
-                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1561,10 +1561,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
+                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
-                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1769,10 +1769,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1976,10 +1976,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2183,10 +2183,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2390,10 +2390,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2623,10 +2623,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2830,10 +2830,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3037,10 +3037,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3244,10 +3244,10 @@ export declare const ValidationRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
+                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
-                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
