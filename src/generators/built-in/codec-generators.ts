@@ -141,6 +141,12 @@ generatorRegistry.register(createCodecGenerator('architecture', 'architecture'))
  */
 generatorRegistry.register(createCodecGenerator('taxonomy', 'taxonomy'));
 
+/**
+ * Validation Rules Generator
+ * Generates VALIDATION-RULES.md + validation/*.md detail files
+ */
+generatorRegistry.register(createCodecGenerator('validation-rules', 'validation-rules'));
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Decision Document Generator (Pattern-Based, not Codec-Based)
 // ═══════════════════════════════════════════════════════════════════════════

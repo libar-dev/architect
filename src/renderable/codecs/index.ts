@@ -190,3 +190,11 @@ export {
   type TaxonomyCodecOptions,
   DEFAULT_TAXONOMY_OPTIONS,
 } from './taxonomy.js';
+
+// Validation Rules (includes ValidationRulesCodecOptions)
+export {
+  ValidationRulesCodec,
+  createValidationRulesCodec,
+  type ValidationRulesCodecOptions,
+  DEFAULT_VALIDATION_RULES_OPTIONS,
+} from './validation-rules.js';

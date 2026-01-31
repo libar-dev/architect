@@ -55,4 +55,6 @@ SELF_REFERENCE_MARKER, SELF_REFERENCE_RULE_PATTERN, SELF_REFERENCE_DOCSTRING_PAT
 partitionDecisionRules, extractDocStrings, extractDocStringsFromRules, parseSourceMappingTable, parseSourceMappingsFromRules, isSelfReference, parseSelfReference, findRuleByName, extractRuleContent, parseDecisionDocument, normalizeExtractionMethod, docStringsToCodeBlocks, } from './decision-doc.js';
 // Taxonomy (includes TaxonomyCodecOptions)
 export { TaxonomyDocumentCodec, createTaxonomyCodec, DEFAULT_TAXONOMY_OPTIONS, } from './taxonomy.js';
+// Validation Rules (includes ValidationRulesCodecOptions)
+export { ValidationRulesCodec, createValidationRulesCodec, DEFAULT_VALIDATION_RULES_OPTIONS, } from './validation-rules.js';
 //# sourceMappingURL=index.js.map
