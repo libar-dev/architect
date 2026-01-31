@@ -33,9 +33,7 @@ import {
 } from '../../../src/scanner/gherkin-ast-parser.js';
 import type { ExtractedPattern } from '../../../src/validation-schemas/index.js';
 
-const feature = await loadFeature(
-  'tests/features/doc-generation/poc-integration.feature'
-);
+const feature = await loadFeature('tests/features/doc-generation/poc-integration.feature');
 
 // =============================================================================
 // Test State
@@ -114,8 +112,8 @@ function parsePocDocument(): void {
   const businessRules = state.parsedFeature.rules?.map((r) => ({
     name: r.name,
     description: r.description || '',
-    scenarioCount: r.scenarios?.length || 0,
-    scenarioNames: r.scenarios?.map((s) => s.name) || [],
+    scenarioCount: r.scenarios.length,
+    scenarioNames: r.scenarios.map((s) => s.name),
   }));
 
   // Parse as decision document
@@ -148,8 +146,8 @@ function createPatternFromPoc(): ExtractedPattern {
   const rules = state.parsedFeature!.rules?.map((r) => ({
     name: r.name,
     description: r.description || '',
-    scenarioCount: r.scenarios?.length || 0,
-    scenarioNames: r.scenarios?.map((s) => s.name) || [],
+    scenarioCount: r.scenarios.length,
+    scenarioNames: r.scenarios.map((s) => s.name),
   }));
 
   return {
@@ -160,7 +158,7 @@ function createPatternFromPoc(): ExtractedPattern {
     directive: {
       patternName: 'DocGenerationProofOfConcept',
       status: 'completed',
-      description: state.parsedFeature!.description || '',
+      description: state.parsedFeature!.feature.description || '',
       tags: [],
       examples: [],
       position: { startLine: 1, endLine: 300 },
@@ -194,12 +192,9 @@ describeFeature(feature, ({ Background, Rule }) => {
 
   Rule('POC decision document is parsed correctly', ({ RuleScenario }) => {
     RuleScenario('Load actual POC decision document', ({ Given, When, Then }) => {
-      Given(
-        'the POC decision document at {string}',
-        (_ctx: unknown, relativePath: string) => {
-          state.pocPath = relativePath;
-        }
-      );
+      Given('the POC decision document at {string}', (_ctx: unknown, relativePath: string) => {
+        state.pocPath = relativePath;
+      });
 
       When('parsing the decision document', () => {
         parsePocDocument();
@@ -241,9 +236,7 @@ describeFeature(feature, ({ Background, Rule }) => {
         expect(tsFiles.length).toBeGreaterThanOrEqual(3);
 
         // Feature files
-        const featureFiles = state.sourceMappings.filter((m) =>
-          m.sourceFile.endsWith('.feature')
-        );
+        const featureFiles = state.sourceMappings.filter((m) => m.sourceFile.endsWith('.feature'));
         expect(featureFiles.length).toBeGreaterThanOrEqual(2);
       });
     });
@@ -266,7 +259,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           sourceFile,
           extractionMethod: 'Decision rule description',
         };
-        const result = executeSourceMapping([mapping], state.mapperOptions!);
+        const result = executeSourceMapping([mapping], state.mapperOptions);
         state.extractedSection = result.sections[0] ?? null;
       });
 
@@ -290,7 +283,7 @@ describeFeature(feature, ({ Background, Rule }) => {
           sourceFile,
           extractionMethod: 'Decision rule description',
         };
-        const result = executeSourceMapping([mapping], state.mapperOptions!);
+        const result = executeSourceMapping([mapping], state.mapperOptions);
         state.extractedSection = result.sections[0] ?? null;
       });
 
@@ -435,7 +428,9 @@ describeFeature(feature, ({ Background, Rule }) => {
       Then('extracted content should contain validation rule names', () => {
         expect(state.extractedSection).not.toBeNull();
         expect(state.extractedSection!.content).toContain('Completed files require unlock-reason');
-        expect(state.extractedSection!.content).toContain('Status transitions must follow PDR-005 FSM');
+        expect(state.extractedSection!.content).toContain(
+          'Status transitions must follow PDR-005 FSM'
+        );
       });
     });
 
@@ -518,10 +513,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
 
       When('executing all source mappings', () => {
-        state.aggregatedContent = executeSourceMapping(
-          state.sourceMappings,
-          state.mapperOptions!
-        );
+        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.mapperOptions!);
       });
 
       Then('aggregated content should be successful with sections', () => {
@@ -567,7 +559,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('compact output is generated from POC', () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern!, {
+        state.generationResult = generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'summary',
           claudeMdSection: 'validation',
@@ -617,7 +609,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('detailed output is generated from POC', () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern!, {
+        state.generationResult = generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'detailed',
         });
@@ -641,7 +633,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('compact output is generated from POC', () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern!, {
+        state.generationResult = generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'summary',
           claudeMdSection: 'validation',
@@ -666,7 +658,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('detailed output is generated from POC', () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern!, {
+        state.generationResult = generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'detailed',
         });

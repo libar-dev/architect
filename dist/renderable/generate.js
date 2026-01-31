@@ -19,9 +19,9 @@
  */
 import { renderDocumentWithFiles } from './render.js';
 // Default codec instances
-import { PatternsDocumentCodec, RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec, RequirementsDocumentCodec, SessionContextCodec, RemainingWorkCodec, PrChangesCodec, AdrDocumentCodec, PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec, ChangelogCodec, TraceabilityCodec, OverviewCodec, BusinessRulesCodec, ArchitectureDocumentCodec, } from './codecs/index.js';
+import { PatternsDocumentCodec, RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec, RequirementsDocumentCodec, SessionContextCodec, RemainingWorkCodec, PrChangesCodec, AdrDocumentCodec, PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec, ChangelogCodec, TraceabilityCodec, OverviewCodec, BusinessRulesCodec, ArchitectureDocumentCodec, TaxonomyDocumentCodec, } from './codecs/index.js';
 // Factory functions for creating codecs with options
-import { createPatternsCodec, createRoadmapCodec, createMilestonesCodec, createCurrentWorkCodec, createRequirementsCodec, createSessionContextCodec, createRemainingWorkCodec, createPrChangesCodec, createAdrCodec, createPlanningChecklistCodec, createSessionPlanCodec, createSessionFindingsCodec, createChangelogCodec, createTraceabilityCodec, createOverviewCodec, createBusinessRulesCodec, createArchitectureCodec, } from './codecs/index.js';
+import { createPatternsCodec, createRoadmapCodec, createMilestonesCodec, createCurrentWorkCodec, createRequirementsCodec, createSessionContextCodec, createRemainingWorkCodec, createPrChangesCodec, createAdrCodec, createPlanningChecklistCodec, createSessionPlanCodec, createSessionFindingsCodec, createChangelogCodec, createTraceabilityCodec, createOverviewCodec, createBusinessRulesCodec, createArchitectureCodec, createTaxonomyCodec, } from './codecs/index.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Document Types
 // ═══════════════════════════════════════════════════════════════════════════
@@ -97,6 +97,10 @@ export const DOCUMENT_TYPES = {
         outputPath: 'ARCHITECTURE.md',
         description: 'Architecture diagrams (component and layered views)',
     },
+    taxonomy: {
+        outputPath: 'TAXONOMY.md',
+        description: 'Tag taxonomy configuration reference',
+    },
 };
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec Map
@@ -122,6 +126,7 @@ const CODEC_MAP = {
     overview: OverviewCodec,
     'business-rules': BusinessRulesCodec,
     architecture: ArchitectureDocumentCodec,
+    taxonomy: TaxonomyDocumentCodec,
 };
 /**
  * Map document types to their factory functions.
@@ -145,6 +150,7 @@ const CODEC_FACTORY_MAP = {
     overview: createOverviewCodec,
     'business-rules': createBusinessRulesCodec,
     architecture: createArchitectureCodec,
+    taxonomy: createTaxonomyCodec,
 };
 // ═══════════════════════════════════════════════════════════════════════════
 // Generation Functions

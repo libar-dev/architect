@@ -135,6 +135,12 @@ generatorRegistry.register(createCodecGenerator('business-rules', 'business-rule
  */
 generatorRegistry.register(createCodecGenerator('architecture', 'architecture'));
 
+/**
+ * Taxonomy Reference Generator
+ * Generates TAXONOMY.md + taxonomy/*.md detail files
+ */
+generatorRegistry.register(createCodecGenerator('taxonomy', 'taxonomy'));
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Decision Document Generator (Pattern-Based, not Codec-Based)
 // ═══════════════════════════════════════════════════════════════════════════

@@ -182,3 +182,11 @@ export {
   normalizeExtractionMethod,
   docStringsToCodeBlocks,
 } from './decision-doc.js';
+
+// Taxonomy (includes TaxonomyCodecOptions)
+export {
+  TaxonomyDocumentCodec,
+  createTaxonomyCodec,
+  type TaxonomyCodecOptions,
+  DEFAULT_TAXONOMY_OPTIONS,
+} from './taxonomy.js';

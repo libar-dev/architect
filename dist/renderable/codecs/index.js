@@ -53,4 +53,6 @@ export {
 SELF_REFERENCE_MARKER, SELF_REFERENCE_RULE_PATTERN, SELF_REFERENCE_DOCSTRING_PATTERN, EXTRACTION_METHODS, 
 // Functions
 partitionDecisionRules, extractDocStrings, extractDocStringsFromRules, parseSourceMappingTable, parseSourceMappingsFromRules, isSelfReference, parseSelfReference, findRuleByName, extractRuleContent, parseDecisionDocument, normalizeExtractionMethod, docStringsToCodeBlocks, } from './decision-doc.js';
+// Taxonomy (includes TaxonomyCodecOptions)
+export { TaxonomyDocumentCodec, createTaxonomyCodec, DEFAULT_TAXONOMY_OPTIONS, } from './taxonomy.js';
 //# sourceMappingURL=index.js.map

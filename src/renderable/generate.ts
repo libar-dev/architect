@@ -41,6 +41,7 @@ import {
   OverviewCodec,
   BusinessRulesCodec,
   ArchitectureDocumentCodec,
+  TaxonomyDocumentCodec,
 } from './codecs/index.js';
 
 // Factory functions for creating codecs with options
@@ -62,6 +63,7 @@ import {
   createOverviewCodec,
   createBusinessRulesCodec,
   createArchitectureCodec,
+  createTaxonomyCodec,
 } from './codecs/index.js';
 
 // Codec options types
@@ -83,6 +85,7 @@ import type {
   OverviewCodecOptions,
   BusinessRulesCodecOptions,
   ArchitectureCodecOptions,
+  TaxonomyCodecOptions,
 } from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
@@ -164,6 +167,10 @@ export const DOCUMENT_TYPES = {
     outputPath: 'ARCHITECTURE.md',
     description: 'Architecture diagrams (component and layered views)',
   },
+  taxonomy: {
+    outputPath: 'TAXONOMY.md',
+    description: 'Tag taxonomy configuration reference',
+  },
 } as const;
 
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
@@ -207,6 +214,7 @@ export interface CodecOptions {
   overview?: OverviewCodecOptions;
   'business-rules'?: BusinessRulesCodecOptions;
   architecture?: ArchitectureCodecOptions;
+  taxonomy?: TaxonomyCodecOptions;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -234,6 +242,7 @@ const CODEC_MAP = {
   overview: OverviewCodec,
   'business-rules': BusinessRulesCodec,
   architecture: ArchitectureDocumentCodec,
+  taxonomy: TaxonomyDocumentCodec,
 } as const;
 
 /**
@@ -258,6 +267,7 @@ const CODEC_FACTORY_MAP = {
   overview: createOverviewCodec,
   'business-rules': createBusinessRulesCodec,
   architecture: createArchitectureCodec,
+  taxonomy: createTaxonomyCodec,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════

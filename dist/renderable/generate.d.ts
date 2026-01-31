@@ -19,7 +19,7 @@
  */
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { type OutputFile } from './render.js';
-import type { PatternsCodecOptions, RoadmapCodecOptions, CompletedMilestonesCodecOptions, CurrentWorkCodecOptions, RequirementsCodecOptions, SessionCodecOptions, RemainingWorkCodecOptions, PrChangesCodecOptions, AdrCodecOptions, PlanningChecklistCodecOptions, SessionPlanCodecOptions, SessionFindingsCodecOptions, ChangelogCodecOptions, TraceabilityCodecOptions, OverviewCodecOptions, BusinessRulesCodecOptions, ArchitectureCodecOptions } from './codecs/index.js';
+import type { PatternsCodecOptions, RoadmapCodecOptions, CompletedMilestonesCodecOptions, CurrentWorkCodecOptions, RequirementsCodecOptions, SessionCodecOptions, RemainingWorkCodecOptions, PrChangesCodecOptions, AdrCodecOptions, PlanningChecklistCodecOptions, SessionPlanCodecOptions, SessionFindingsCodecOptions, ChangelogCodecOptions, TraceabilityCodecOptions, OverviewCodecOptions, BusinessRulesCodecOptions, ArchitectureCodecOptions, TaxonomyCodecOptions } from './codecs/index.js';
 /**
  * Available document types and their output paths
  */
@@ -92,6 +92,10 @@ export declare const DOCUMENT_TYPES: {
         readonly outputPath: "ARCHITECTURE.md";
         readonly description: "Architecture diagrams (component and layered views)";
     };
+    readonly taxonomy: {
+        readonly outputPath: "TAXONOMY.md";
+        readonly description: "Tag taxonomy configuration reference";
+    };
 };
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
 /**
@@ -129,6 +133,7 @@ export interface CodecOptions {
     overview?: OverviewCodecOptions;
     'business-rules'?: BusinessRulesCodecOptions;
     architecture?: ArchitectureCodecOptions;
+    taxonomy?: TaxonomyCodecOptions;
 }
 /**
  * Generate a single document type

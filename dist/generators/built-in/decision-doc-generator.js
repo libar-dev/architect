@@ -54,7 +54,7 @@ export function extractClaudeMdSection(pattern) {
     const tags = pattern.directive.tags;
     for (const tag of tags) {
         // Match @libar-docs-claude-md-section:VALUE or @docs-claude-md-section:VALUE
-        const match = tag.match(/^@(?:libar-)?docs-claude-md-section[:\s]+(.+)$/i);
+        const match = /^@(?:libar-)?docs-claude-md-section[:\s]+(.+)$/i.exec(tag);
         if (match?.[1]) {
             return match[1].trim();
         }
