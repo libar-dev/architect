@@ -27,6 +27,14 @@
 import { parse } from '@typescript-eslint/typescript-estree';
 import { Result } from '../types/result.js';
 // =============================================================================
+// Constants
+// =============================================================================
+/**
+ * Maximum line gap between JSDoc comment end and declaration start.
+ * Allows 1 blank line between JSDoc and declaration (comment end line + 1 blank + decl line = 3 gap)
+ */
+const MAX_JSDOC_LINE_DISTANCE = 3;
+// =============================================================================
 // Main Extraction Function
 // =============================================================================
 /**
@@ -318,8 +326,8 @@ function extractPrecedingJsDoc(sourceCode, node, comments) {
         // Comment must end before node starts
         if (commentEnd > nodeStart)
             continue;
-        // Comment must be close to the node (allow 1 blank line between JSDoc and declaration)
-        if (nodeLine - commentEndLine > 3)
+        // Comment must be close to the node
+        if (nodeLine - commentEndLine > MAX_JSDOC_LINE_DISTANCE)
             continue;
         // This is a candidate - pick the one closest to the node
         if (!closestJsDoc || comment.range[1] > closestJsDoc.range[1]) {

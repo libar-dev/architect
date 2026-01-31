@@ -88,6 +88,25 @@ export function toKebabCase(text) {
         .replace(/^-+|-+$/g, ''));
 }
 /**
+ * Convert PascalCase or camelCase text to UPPER-KEBAB-CASE
+ *
+ * This is useful for generating constant-style identifiers or
+ * documentation file names that use uppercase conventions.
+ *
+ * @param text - Input text in PascalCase or camelCase
+ * @returns UPPER-KEBAB-CASE string
+ *
+ * @example
+ * ```typescript
+ * toUpperKebabCase('ProcessGuard');           // 'PROCESS-GUARD'
+ * toUpperKebabCase('DecisionDocCodec');       // 'DECISION-DOC-CODEC'
+ * toUpperKebabCase('OAuth2Flow');             // 'O-AUTH-2-FLOW'
+ * ```
+ */
+export function toUpperKebabCase(text) {
+    return toKebabCase(text).toUpperCase();
+}
+/**
  * Known acronyms that should not be split during case conversion.
  *
  * These terms are protected with placeholders before regex processing,

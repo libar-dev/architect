@@ -63,7 +63,7 @@ export function partitionRulesByPrefix(rules, options = {}) {
     if (!rules || rules.length === 0) {
         return { context: [], decision: [], consequences: [], other: [] };
     }
-    const { warnOnOther = false, patternName } = options;
+    const { warnOnOther = false, patternName, onWarning = console.warn } = options;
     const context = [];
     const decision = [];
     const consequences = [];
@@ -87,7 +87,7 @@ export function partitionRulesByPrefix(rules, options = {}) {
     if (warnOnOther && other.length > 0) {
         const otherNames = other.map((r) => `"${r.name}"`).join(', ');
         const patternContext = patternName ? ` in pattern "${patternName}"` : '';
-        console.warn(`[codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`);
+        onWarning(`[codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`);
     }
     return { context, decision, consequences, other };
 }

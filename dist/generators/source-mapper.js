@@ -60,9 +60,18 @@ function fileExists(filePath) {
 /**
  * Resolve a file path to absolute using the base directory.
  * If already absolute, returns as-is.
+ * Validates that resolved path stays within the base directory to prevent path traversal.
+ *
+ * @throws Error if the resolved path escapes the base directory
  */
 function resolveAbsolutePath(filePath, baseDir) {
-    return path.isAbsolute(filePath) ? filePath : path.join(baseDir, filePath);
+    const resolved = path.isAbsolute(filePath) ? filePath : path.resolve(baseDir, filePath);
+    const normalizedBase = path.resolve(baseDir);
+    // Ensure resolved path is within base directory (prevent path traversal)
+    if (!resolved.startsWith(normalizedBase + path.sep) && resolved !== normalizedBase) {
+        throw new Error(`Path traversal detected: ${filePath} escapes base directory`);
+    }
+    return resolved;
 }
 // =============================================================================
 // Extraction Helpers
@@ -236,7 +245,7 @@ export function extractFromBehaviorSpec(filePath, options, sourceMapping) {
     }
     const parseResult = parseFeatureFile(fileResult.value, absolutePath);
     if (!parseResult.ok) {
-        return R.err(new Error(parseResult.error.error.message));
+        return R.err(new Error(`Failed to parse ${absolutePath}: ${parseResult.error.error.message}`));
     }
     const parsed = parseResult.value;
     const method = normalizeExtractionMethod(sourceMapping.extractionMethod);

@@ -53,12 +53,17 @@ export interface PartitionedRules {
 export interface PartitionRulesOptions {
     /**
      * Warn about rules that don't match expected prefixes (default: false).
-     * When true, logs a warning to console for non-matching rules.
+     * When true, emits a warning for non-matching rules via onWarning callback.
      * ADR codec sets this to true; Decision Doc codec keeps false.
      */
     warnOnOther?: boolean;
     /** Pattern name for warning context (optional) */
     patternName?: string;
+    /**
+     * Callback for warnings (default: console.warn).
+     * Allows programmatic capture of warnings for testing or custom handling.
+     */
+    onWarning?: (message: string) => void;
 }
 /**
  * Partition business rules by ADR-style name prefixes.

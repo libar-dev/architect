@@ -67,12 +67,17 @@ export interface PartitionedRules {
 export interface PartitionRulesOptions {
   /**
    * Warn about rules that don't match expected prefixes (default: false).
-   * When true, logs a warning to console for non-matching rules.
+   * When true, emits a warning for non-matching rules via onWarning callback.
    * ADR codec sets this to true; Decision Doc codec keeps false.
    */
   warnOnOther?: boolean;
   /** Pattern name for warning context (optional) */
   patternName?: string;
+  /**
+   * Callback for warnings (default: console.warn).
+   * Allows programmatic capture of warnings for testing or custom handling.
+   */
+  onWarning?: (message: string) => void;
 }
 
 /**
@@ -110,7 +115,7 @@ export function partitionRulesByPrefix(
     return { context: [], decision: [], consequences: [], other: [] };
   }
 
-  const { warnOnOther = false, patternName } = options;
+  const { warnOnOther = false, patternName, onWarning = console.warn } = options;
   const context: BusinessRule[] = [];
   const decision: BusinessRule[] = [];
   const consequences: BusinessRule[] = [];
@@ -133,7 +138,7 @@ export function partitionRulesByPrefix(
   if (warnOnOther && other.length > 0) {
     const otherNames = other.map((r) => `"${r.name}"`).join(', ');
     const patternContext = patternName ? ` in pattern "${patternName}"` : '';
-    console.warn(
+    onWarning(
       `[codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`
     );
   }

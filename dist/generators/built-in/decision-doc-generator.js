@@ -31,6 +31,7 @@ import { heading, paragraph, code, list, separator, collapsible, document as cre
 import { renderToMarkdown } from '../../renderable/render.js';
 import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
 import { executeSourceMapping, } from '../source-mapper.js';
+import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
 // =============================================================================
 // Tag Helpers
 // =============================================================================
@@ -87,11 +88,11 @@ export function extractClaudeMdSection(pattern) {
  */
 export function determineOutputPaths(patternName, options) {
     // Convert PatternName to kebab-case for module name
-    const moduleName = patternName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    const moduleName = toKebabCase(patternName);
     // Use provided section or default to 'generated'
     const section = options?.section ?? 'generated';
     // Convert PatternName to UPPER-KEBAB-CASE for detailed path
-    const upperKebab = patternName.replace(/([a-z])([A-Z])/g, '$1-$2').toUpperCase();
+    const upperKebab = toUpperKebabCase(patternName);
     return {
         compact: `_claude-md/${section}/${moduleName}.md`,
         detailed: `docs/${upperKebab}.md`,
