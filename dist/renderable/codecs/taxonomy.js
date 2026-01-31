@@ -224,10 +224,30 @@ function groupMetadataTagsByDomain(tags) {
         if (['pattern', 'status', 'core', 'usecase'].includes(tag.tag)) {
             coreTags.push(tag);
         }
-        else if (['uses', 'used-by', 'depends-on', 'enables', 'implements', 'extends', 'see-also', 'api-ref'].includes(tag.tag)) {
+        else if ([
+            'uses',
+            'used-by',
+            'depends-on',
+            'enables',
+            'implements',
+            'extends',
+            'see-also',
+            'api-ref',
+        ].includes(tag.tag)) {
             relationshipTags.push(tag);
         }
-        else if (['phase', 'release', 'quarter', 'completed', 'effort', 'effort-actual', 'team', 'workflow', 'priority', 'risk'].includes(tag.tag)) {
+        else if ([
+            'phase',
+            'release',
+            'quarter',
+            'completed',
+            'effort',
+            'effort-actual',
+            'team',
+            'workflow',
+            'priority',
+            'risk',
+        ].includes(tag.tag)) {
             timelineTags.push(tag);
         }
         else if (tag.tag.startsWith('adr')) {
@@ -278,8 +298,14 @@ function buildAggregationTagsSection(tagRegistry) {
 function buildFormatTypesSection() {
     const formatDescriptions = {
         value: { description: 'Simple string value', example: '@libar-docs-pattern MyPattern' },
-        enum: { description: 'Constrained to predefined values', example: '@libar-docs-status roadmap' },
-        'quoted-value': { description: 'String in quotes (preserves spaces)', example: '@libar-docs-usecase "When X happens"' },
+        enum: {
+            description: 'Constrained to predefined values',
+            example: '@libar-docs-status roadmap',
+        },
+        'quoted-value': {
+            description: 'String in quotes (preserves spaces)',
+            example: '@libar-docs-usecase "When X happens"',
+        },
         csv: { description: 'Comma-separated values', example: '@libar-docs-uses A, B, C' },
         number: { description: 'Numeric value', example: '@libar-docs-phase 14' },
         flag: { description: 'Boolean presence (no value)', example: '@libar-docs-core' },
@@ -316,12 +342,7 @@ function buildPresetsSection() {
                 useCase = 'Full DDD/ES/CQRS taxonomy';
                 break;
         }
-        return [
-            `\`${name}\``,
-            `\`${preset.tagPrefix}\``,
-            String(categoryCount),
-            useCase,
-        ];
+        return [`\`${name}\``, `\`${preset.tagPrefix}\``, String(categoryCount), useCase];
     });
     return [
         heading(2, 'Presets'),
@@ -425,15 +446,7 @@ function buildMetadataTagsDetailDocument(tagRegistry) {
         const defaultVal = tag.default ?? '-';
         const repeatable = tag.repeatable ? 'Yes' : 'No';
         const required = tag.required ? 'Yes' : 'No';
-        return [
-            `\`${tag.tag}\``,
-            tag.format,
-            tag.purpose,
-            required,
-            repeatable,
-            values,
-            defaultVal,
-        ];
+        return [`\`${tag.tag}\``, tag.format, tag.purpose, required, repeatable, values, defaultVal];
     });
     sections.push(table(['Tag', 'Format', 'Purpose', 'Required', 'Repeatable', 'Values', 'Default'], rows));
     // Individual tag details

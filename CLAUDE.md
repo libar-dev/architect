@@ -523,17 +523,16 @@ For multi-session work, capture state at session boundaries:
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
 
-#### 7 Validation Rules
+#### 6 Validation Rules
 
-| Rule ID                       | Severity | Description                                         |
-| ----------------------------- | -------- | --------------------------------------------------- |
-| `completed-protection`        | error    | Completed specs require `@libar-docs-unlock-reason` |
-| `invalid-status-transition`   | error    | Must follow FSM path                                |
-| `scope-creep`                 | error    | Active specs cannot add new deliverables            |
-| `session-excluded`            | error    | Cannot modify explicitly excluded files             |
-| `missing-relationship-target` | warning  | Relationship target pattern not found               |
-| `session-scope`               | warning  | File outside session scope                          |
-| `deliverable-removed`         | warning  | Deliverable was removed                             |
+| Rule ID                     | Severity | Description                                         |
+| --------------------------- | -------- | --------------------------------------------------- |
+| `completed-protection`      | error    | Completed specs require `@libar-docs-unlock-reason` |
+| `invalid-status-transition` | error    | Must follow FSM path                                |
+| `scope-creep`               | error    | Active specs cannot add new deliverables            |
+| `session-excluded`          | error    | Cannot modify explicitly excluded files             |
+| `session-scope`             | warning  | File outside session scope                          |
+| `deliverable-removed`       | warning  | Deliverable was removed                             |
 
 #### Protection Levels
 

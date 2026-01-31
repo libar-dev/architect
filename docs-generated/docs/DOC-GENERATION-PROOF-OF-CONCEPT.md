@@ -226,22 +226,43 @@ generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' -
 
 ### Protection Levels
 
-| Tag | Format | Purpose |
+| status | protection | restriction |
 | --- | --- | --- |
-| unlock-reason | quoted-value | Required to modify protected files |
-| locked-by | value | Session ID that locked the file |
+| roadmap | none | Fully editable |
+| deferred | none | Fully editable |
+| active | scope | Errors on new deliverables |
+| completed | hard | Requires @libar-docs-unlock-reason |
+
+### Valid Transitions
+
+| from | to |
+| --- | --- |
+| roadmap | active |
+| roadmap | deferred |
+| active | completed |
+| active | roadmap |
+| deferred | roadmap |
+| roadmap | roadmap |
+
+| from | to |
+| --- | --- |
+| roadmap | completed |
+| deferred | active |
+| deferred | completed |
+| completed | active |
+| completed | roadmap |
+| completed | deferred |
 
 ### API Types
 
-*/**
+```typescript
+/**
  * Process guard rule identifiers.
  *
  * Note: `taxonomy-locked-tag` and `taxonomy-enum-in-use` were removed when
  * taxonomy moved from JSON to TypeScript. TypeScript changes require
  * recompilation, making runtime validation unnecessary.
- */*
-
-```typescript
+ */
 type ProcessGuardRule =
   | 'completed-protection'
   | 'scope-creep'
@@ -251,12 +272,11 @@ type ProcessGuardRule =
   | 'deliverable-removed';
 ```
 
-*/**
+```typescript
+/**
  * Input to the process guard decider.
  * Contains all information needed for validation.
- */*
-
-```typescript
+ */
 interface DeciderInput {
   readonly state: ProcessState;
   readonly changes: ChangeDetection;
@@ -264,11 +284,10 @@ interface DeciderInput {
 }
 ```
 
-*/**
- * Result of process guard validation.
- */*
-
 ```typescript
+/**
+ * Result of process guard validation.
+ */
 interface ValidationResult {
   /** Whether all checks passed (no errors) */
   readonly valid: boolean;
@@ -283,11 +302,10 @@ interface ValidationResult {
 }
 ```
 
-*/**
- * A validation violation from the process guard linter.
- */*
-
 ```typescript
+/**
+ * A validation violation from the process guard linter.
+ */
 interface ProcessViolation {
   /** Unique rule ID that triggered the violation */
   readonly rule: ProcessGuardRule;
@@ -302,11 +320,10 @@ interface ProcessViolation {
 }
 ```
 
-*/**
- * State for a single file derived from its @libar-docs-* annotations.
- */*
-
 ```typescript
+/**
+ * State for a single file derived from its @libar-docs-* annotations.
+ */
 interface FileState {
   /** Absolute file path */
   readonly path: string;
@@ -329,7 +346,8 @@ interface FileState {
 
 ### Decider API
 
-*/**
+```typescript
+/**
  * Validate changes against process rules.
  *
  * Pure function following the Decider pattern:
@@ -352,9 +370,7 @@ interface FileState {
  *   console.log('Violations:', output.result.violations);
  * }
  * ```
- */*
-
-```typescript
+ */
 function validateChanges(input: DeciderInput): DeciderOutput;
 ```
 
@@ -374,10 +390,6 @@ Validates git changes against delivery process rules.
 | session-excluded |
 
 ### Pre-commit Setup
-
-```bash
-generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' --typescript 'src/**/*.ts' --generators doc-from-decision --output docs
-```
 
 ```json
 {
@@ -462,92 +474,6 @@ npx lint-process --staged
 ```
 
 ### Programmatic API
-
-```bash
-generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' --typescript 'src/**/*.ts' --generators doc-from-decision --output docs
-```
-
-```json
-{
-      "scripts": {
-        "lint:process": "lint-process --staged",
-        "lint:process:ci": "lint-process --all --strict"
-      }
-    }
-```
-
-```typescript
-import {
-      deriveProcessState,
-      detectStagedChanges,
-      validateChanges,
-      hasErrors,
-      summarizeResult,
-    } from '@libar-dev/delivery-process/lint';
-
-    // 1. Derive state from annotations
-    const state = (await deriveProcessState({ baseDir: '.' })).value;
-
-    // 2. Detect changes
-    const changes = detectStagedChanges('.').value;
-
-    // 3. Validate
-    const { result } = validateChanges({
-      state,
-      changes,
-      options: { strict: false, ignoreSession: false },
-    });
-
-    // 4. Handle results
-    if (hasErrors(result)) {
-      console.log(summarizeResult(result));
-      process.exit(1);
-    }
-```
-
-```bash
-npx lint-process --staged
-```
-
-```javascript
-// TODO: Delivery process design artifacts: Relax unused-vars
-    {
-      files: [
-        "**/packages/platform-core/src/durability/durableAppend.ts",
-        "**/packages/platform-core/src/durability/intentCompletion.ts",
-        // ... more stubs in src/ ...
-      ],
-      rules: {
-        "@typescript-eslint/no-unused-vars": "off",
-      },
-    }
-```
-
-```typescript
-// specs/stubs/shape-extractor.ts
-    /**
-     * @libar-docs
-     * @libar-docs-pattern ShapeExtractorStub
-     * @libar-docs-status roadmap
-     *
-     * ## Shape Extractor - Design Stub
-     *
-     * API design for extracting TypeScript types from source files.
-     */
-
-    export interface ExtractedShape {
-      name: string;
-      kind: 'interface' | 'type' | 'enum' | 'function';
-      sourceText: string;
-    }
-
-    export function extractShapes(
-      sourceCode: string,
-      shapeNames: string[]
-    ): Map<string, ExtractedShape> {
-      throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
-    }
-```
 
 ## Consequences
 
@@ -782,12 +708,3 @@ This POC demonstrates the doc-from-decision pattern by generating docs
     - Tables for structured data (rules, protection levels)
     - Inline code blocks for CLI examples
     - Cross-reference to detailed documentation
-
----
-
-<details>
-<summary>Generation Warnings</summary>
-
-- info: No content extracted from delivery-process/specs/process-guard-linter.feature using Scenario Outline Examples
-
-</details>

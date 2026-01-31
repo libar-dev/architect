@@ -118,10 +118,32 @@
 
 ### Protection Levels
 
-| Tag | Format | Purpose |
+| status | protection | restriction |
 | --- | --- | --- |
-| unlock-reason | quoted-value | Required to modify protected files |
-| locked-by | value | Session ID that locked the file |
+| roadmap | none | Fully editable |
+| deferred | none | Fully editable |
+| active | scope | Errors on new deliverables |
+| completed | hard | Requires @libar-docs-unlock-reason |
+
+### Valid Transitions
+
+| from | to |
+| --- | --- |
+| roadmap | active |
+| roadmap | deferred |
+| active | completed |
+| active | roadmap |
+| deferred | roadmap |
+| roadmap | roadmap |
+
+| from | to |
+| --- | --- |
+| roadmap | completed |
+| deferred | active |
+| deferred | completed |
+| completed | active |
+| completed | roadmap |
+| completed | deferred |
 
 ### API Types
 

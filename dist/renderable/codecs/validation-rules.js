@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern ValidationRulesCodec
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  *
  * ## Validation Rules Document Codec
  *
@@ -200,11 +200,7 @@ function buildOverviewSection() {
  * Build validation rules table section
  */
 function buildRulesTableSection() {
-    const rows = RULE_DEFINITIONS.map((rule) => [
-        `\`${rule.id}\``,
-        rule.severity,
-        rule.description,
-    ]);
+    const rows = RULE_DEFINITIONS.map((rule) => [`\`${rule.id}\``, rule.severity, rule.description]);
     return [
         heading(2, 'Validation Rules'),
         paragraph('Rules are checked in order. Errors block commit; warnings are informational.'),

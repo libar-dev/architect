@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern ValidationRulesCodec
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  *
  * ## Validation Rules Document Codec
  *

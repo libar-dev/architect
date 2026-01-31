@@ -278,11 +278,27 @@ function extractRuleBlocksContent(rules) {
  * @returns True if there's sufficient keyword overlap
  */
 function scenarioMatchesSection(sectionName, scenarioName) {
-    // Normalize: lowercase, extract significant words (3+ chars)
+    // Basic stemming: remove common English suffixes
+    const stem = (word) => {
+        // Order matters: check longer suffixes first
+        if (word.endsWith('ies') && word.length > 4)
+            return word.slice(0, -3) + 'y';
+        if (word.endsWith('es') && word.length > 3)
+            return word.slice(0, -2);
+        if (word.endsWith('s') && word.length > 3)
+            return word.slice(0, -1);
+        if (word.endsWith('ing') && word.length > 5)
+            return word.slice(0, -3);
+        if (word.endsWith('ed') && word.length > 4)
+            return word.slice(0, -2);
+        return word;
+    };
+    // Normalize: lowercase, extract significant words (3+ chars), apply stemming
     const normalizeWords = (text) => new Set(text
         .toLowerCase()
         .split(/[^a-z]+/)
-        .filter((word) => word.length >= 3));
+        .filter((word) => word.length >= 3)
+        .map(stem));
     const sectionWords = normalizeWords(sectionName);
     const scenarioWords = normalizeWords(scenarioName);
     // Count matching words

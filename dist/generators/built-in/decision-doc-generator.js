@@ -156,6 +156,9 @@ export function generateCompactOutput(decisionContent, aggregatedContent) {
  */
 export function generateDetailedOutput(decisionContent, aggregatedContent) {
     const sections = [];
+    // Track rendered DocString content to prevent duplicates
+    // Key is content hash (language + content) to identify unique DocStrings
+    const renderedDocStrings = new Set();
     // Feature description
     if (decisionContent.description && decisionContent.description.trim().length > 0) {
         sections.push(paragraph(decisionContent.description));
@@ -193,16 +196,19 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
             if (extracted.shapes && extracted.shapes.length > 0) {
                 // Render full shape definitions with JSDoc
                 for (const shape of extracted.shapes) {
-                    if (shape.jsDoc) {
-                        sections.push(paragraph(`*${shape.jsDoc}*`));
-                    }
-                    sections.push(code(shape.sourceText, 'typescript'));
+                    // Include JSDoc as part of the code block (combined with source)
+                    const fullSource = shape.jsDoc ? `${shape.jsDoc}\n${shape.sourceText}` : shape.sourceText;
+                    sections.push(code(fullSource, 'typescript'));
                 }
             }
             else if (extracted.docStrings && extracted.docStrings.length > 0) {
-                // Render DocStrings as code blocks
+                // Render DocStrings as code blocks, skipping duplicates
                 for (const ds of extracted.docStrings) {
-                    sections.push(code(ds.content, ds.language));
+                    const contentKey = `${ds.language}:${ds.content}`;
+                    if (!renderedDocStrings.has(contentKey)) {
+                        renderedDocStrings.add(contentKey);
+                        sections.push(code(ds.content, ds.language));
+                    }
                 }
             }
             else {

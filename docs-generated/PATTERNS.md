@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 81/118 (69% complete)
+**Overall:** [██████████████░░░░░░] 81/120 (68% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 81 |
 | 🚧 Active | 13 |
-| 📋 Planned | 24 |
-| **Total** | 118 |
+| 📋 Planned | 26 |
+| **Total** | 120 |
 
 ---
 
@@ -22,7 +22,7 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (49)
+- [Core](#core) (51)
 - [DDD](#ddd) (25)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
@@ -114,7 +114,7 @@
 | ✅ String Utilities | Core | completed | Provides shared utilities for string manipulation used across the delivery-process package, including slugification... |
 | ✅ Tag Registry Configuration | Core | completed | Defines the structure and validation for tag taxonomy configuration. |
 | ✅ Tag Registry Builder | Core | completed | Constructs a complete TagRegistry from TypeScript constants. |
-| ✅ Tag Taxonomy CLI | Cli | completed | Generates TAG_TAXONOMY.md from the TypeScript taxonomy module. |
+| ✅ Taxonomy Codec | Core | completed | Transforms MasterDataset into a RenderableDocument for taxonomy reference output. |
 | ✅ Timeline Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)... |
 | ✅ Transform Dataset | Core | completed | Transforms raw extracted patterns into a MasterDataset with all pre-computed views. |
 | ✅ TypeScript AST Parser | Core | completed | Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with... |
@@ -160,21 +160,23 @@
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
+| ⏸️ Tag Taxonomy CLI | Cli | planned | by the codec-based TaxonomyCodec which: - Fits the MasterDataset pipeline architecture - Provides progressive... |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
+| 📋 Validation Rules Codec | Core | planned | Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference. |
 
 ---
 
 ### Cli
 
-5/6 complete (83%)
+4/6 complete (67%)
 
 - [✅ CLI Error Handler](patterns/cli-error-handler.md)
 - [✅ CLI Version Helper](patterns/cli-version-helper.md)
 - [✅ Lint Patterns CLI](patterns/lint-patterns-cli.md)
-- [✅ Tag Taxonomy CLI](patterns/tag-taxonomy-cli.md)
 - [✅ Validate Patterns CLI](patterns/validate-patterns-cli.md)
 - [🚧 Lint Process CLI](patterns/lint-process-cli.md)
+- [⏸️ Tag Taxonomy CLI](patterns/tag-taxonomy-cli.md)
 
 ---
 
@@ -188,7 +190,7 @@
 
 ### Core
 
-45/49 complete (92%)
+46/51 complete (90%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -230,6 +232,7 @@
 - [✅ String Utilities](patterns/string-utilities.md)
 - [✅ Tag Registry Configuration](patterns/tag-registry-configuration.md)
 - [✅ Tag Registry Builder](patterns/tag-registry-builder.md)
+- [✅ Taxonomy Codec](patterns/taxonomy-codec.md)
 - [✅ Timeline Codec](patterns/timeline-codec.md)
 - [✅ Transform Dataset](patterns/transform-dataset.md)
 - [✅ TypeScript AST Parser](patterns/type-script-ast-parser.md)
@@ -239,6 +242,7 @@
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
 - [📋 Business Rules Codec](patterns/business-rules-codec.md)
+- [📋 Validation Rules Codec](patterns/validation-rules-codec.md)
 
 ---
 
@@ -425,6 +429,7 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -435,7 +440,6 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine

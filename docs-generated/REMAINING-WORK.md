@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 81/118 (69%)
+**Overall Progress:** [██████████████░░░░░░] 81/120 (68%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 13 |
-| 📋 Planned | 24 |
-| **Total Remaining** | 37 |
+| 📋 Planned | 26 |
+| **Total Remaining** | 39 |
 
 ---
 
@@ -30,7 +30,7 @@
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 14 | 13 | 0% |
+| 🚧 Backlog (No Phase) | 16 | 13 | 0% |
 
 ---
 
@@ -39,7 +39,7 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 13 |
-| ✅ Ready to Start | 23 |
+| ✅ Ready to Start | 25 |
 | ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
@@ -69,6 +69,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Process State API CLI (Phase 99) - 2d
 - 📋 Process State API Relationship Queries (Phase 99) - 3d
 
-Showing 5 of 23 actionable items.
+Showing 5 of 25 actionable items.
 
 ---

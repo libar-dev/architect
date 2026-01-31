@@ -1,4 +1,4 @@
-# ✅ Tag Taxonomy CLI
+# ⏸️ Tag Taxonomy CLI
 
 **Purpose:** Detailed documentation for the Tag Taxonomy CLI pattern
 
@@ -8,10 +8,16 @@
 
 | Property | Value |
 | --- | --- |
-| Status | completed |
+| Status | planned |
 | Category | Cli |
 
 ## Description
+
+by the codec-based TaxonomyCodec which:
+- Fits the MasterDataset pipeline architecture
+- Provides progressive disclosure with detail files
+- Groups tags by domain (Core, Relationship, Timeline, ADR, Architecture)
+- Includes presets comparison and architecture diagrams
 
 Generates TAG_TAXONOMY.md from the TypeScript taxonomy module.
 Use to auto-generate comprehensive tag reference documentation.

@@ -37,8 +37,8 @@ graph TB
         Pattern_Scanner["Pattern Scanner[infrastructure]"]
         TypeScript_AST_Parser["TypeScript AST Parser[infrastructure]"]
     end
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     Document_Extractor --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
 ```
 
 ---
