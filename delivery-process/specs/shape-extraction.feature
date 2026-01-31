@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ShapeExtraction
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Fix-code-fence-formatting-per-PR-review
 @libar-docs-phase:26
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
@@ -21,7 +22,7 @@ Feature: TypeScript Shape Extraction for Documentation
   pattern in doc-generation-proof-of-concept.feature.
 
   Current pattern (duplication):
-  ```typescript
+  """typescript
   /**
    * @libar-docs
    *
@@ -41,7 +42,7 @@ Feature: TypeScript Shape Extraction for Documentation
     state: ProcessState;
     changes: ChangeDetection;
   }
-  ```
+  """
 
   **Solution:**
   New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
@@ -49,7 +50,7 @@ Feature: TypeScript Shape Extraction for Documentation
   generated documentation as fenced code blocks.
 
   Target pattern (single source):
-  ```typescript
+  """typescript
   /**
    * @libar-docs
    * @libar-docs-extract-shapes DeciderInput, ValidationResult
@@ -63,7 +64,7 @@ Feature: TypeScript Shape Extraction for Documentation
     state: ProcessState;
     changes: ChangeDetection;
   }
-  ```
+  """
 
   **Why It Matters:**
   | Benefit | How |

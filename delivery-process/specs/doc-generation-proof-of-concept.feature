@@ -4,6 +4,7 @@
 @libar-docs-adr-category:documentation
 @libar-docs-pattern:DocGenerationProofOfConcept
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Fix-code-fence-formatting-per-PR-review
 @libar-docs-phase:27
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
@@ -170,9 +171,9 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
     File: `.husky/pre-commit`
 
-    ```bash
+    """bash
     npx lint-process --staged
-    ```
+    """
 
     **Package.json Scripts:**
 
