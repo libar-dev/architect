@@ -332,7 +332,7 @@ export function extractFromTypeScript(
     // Extract error message patterns from createViolation() calls
     const violationPattern = /createViolation\s*\(\s*['"`]([^'"`]+)['"`]/g;
     const violations: string[] = [];
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = violationPattern.exec(sourceCode)) !== null) {
       if (match[1]) {
         violations.push(match[1]);

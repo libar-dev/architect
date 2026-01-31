@@ -365,13 +365,16 @@ function adrToSlug(pattern) {
  * Returns 0 for non-numeric ADR numbers to avoid NaN in sort comparisons.
  * Emits a warning when falling back to 0 for non-numeric values.
  * Examples: "001" → 1, "v1" → 0 (with warning), undefined → 0
+ *
+ * @param adr - The ADR number string to parse
+ * @param onWarning - Optional callback for warnings (default: console.warn)
  */
-function parseAdrNumber(adr) {
+function parseAdrNumber(adr, onWarning = console.warn) {
     if (!adr)
         return 0;
     const parsed = parseInt(adr, 10);
     if (Number.isNaN(parsed)) {
-        console.warn(`[adr-codec] Invalid ADR number "${adr}", defaulting to 0 for sorting`);
+        onWarning(`[adr-codec] Invalid ADR number "${adr}", defaulting to 0 for sorting`);
         return 0;
     }
     return parsed;
