@@ -177,8 +177,8 @@ export declare function generateFromDecision(pattern: ExtractedPattern, options:
 /**
  * Generate both compact and detailed outputs
  *
- * Convenience function that generates documentation at both detail levels
- * for maximum utility.
+ * Runs the pipeline once and generates documentation at both detail levels.
+ * More efficient than calling generateFromDecision twice.
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options

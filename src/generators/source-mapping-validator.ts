@@ -403,7 +403,6 @@ export function validateSourceMappingTable(
   options: ValidatorOptions
 ): ValidationResult {
   const errors: ValidationError[] = [];
-  const warnings: Warning[] = [];
 
   for (const mapping of mappings) {
     // 1. Validate file existence
@@ -430,16 +429,11 @@ export function validateSourceMappingTable(
     }
   }
 
-  // Capture warnings in the warning collector if provided
-  if (options.warningCollector) {
-    for (const warning of warnings) {
-      options.warningCollector.capture(warning);
-    }
-  }
-
+  // Note: Validation is pass/fail per row, no warnings are generated.
+  // The warnings array is kept in the interface for future extensibility.
   return {
     isValid: errors.length === 0,
     errors,
-    warnings,
+    warnings: [],
   };
 }

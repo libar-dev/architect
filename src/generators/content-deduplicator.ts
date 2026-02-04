@@ -4,7 +4,6 @@
  * @libar-docs-pattern ContentDeduplicator
  * @libar-docs-status roadmap
  * @libar-docs-phase 28
- * @libar-docs-depends-on SourceMapper,WarningCollector
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
  *
@@ -52,6 +51,9 @@ export interface ContentBlock {
 
   /** Number of lines in the body */
   lineCount: number;
+
+  /** Original index in the input array (for precise removal) */
+  originalIndex?: number;
 }
 
 /**
@@ -120,7 +122,11 @@ function normalizeForFingerprint(content: string): string {
 
 /**
  * Compute a content fingerprint using SHA-256.
- * Returns a 16-character hex string.
+ * Returns a 16-character hex string (64 bits).
+ *
+ * Note: 16 hex chars (64 bits) provides sufficient collision resistance for
+ * documentation deduplication. Birthday paradox collision probability is
+ * less than 0.001% for up to 10,000 sections, which exceeds expected usage.
  */
 export function computeFingerprint(content: string): string {
   const normalized = normalizeForFingerprint(content);
@@ -160,15 +166,19 @@ function countLines(content: string): number {
 }
 
 /**
- * Convert ExtractedSection to ContentBlock
+ * Convert ExtractedSection to ContentBlock with original index tracking
+ *
+ * @param section - The extracted section to convert
+ * @param index - Original index in the sections array (for precise removal)
  */
-function sectionToBlock(section: ExtractedSection): ContentBlock {
+function sectionToBlock(section: ExtractedSection, index: number): ContentBlock {
   return {
     header: section.section,
     body: section.content,
     source: section.sourceFile,
     fingerprint: computeFingerprint(section.content),
     lineCount: countLines(section.content),
+    originalIndex: index,
   };
 }
 
@@ -306,27 +316,26 @@ export function deduplicateSections(
     return { sections: [], mergedPairs: [], warnings: [] };
   }
 
-  // Convert to content blocks
-  const blocks = sections.map(sectionToBlock);
+  // Convert to content blocks with original indices for precise removal
+  const blocks = sections.map((section, index) => sectionToBlock(section, index));
 
   // Find duplicates by fingerprint
   const duplicates = findDuplicates(blocks);
 
-  // Track which sections to remove (by index)
+  // Track which sections to remove (by original index)
   const removeIndices = new Set<number>();
 
   // Process each duplicate group
   for (const [_fingerprint, duplicateBlocks] of duplicates) {
     const winner = chooseWinner(duplicateBlocks);
 
-    // Mark losers for removal
+    // Mark losers for removal using their original indices
     for (const block of duplicateBlocks) {
       if (block !== winner) {
-        // Find the section index for this block
-        const idx = sections.findIndex(
-          (s) => s.sourceFile === block.source && s.section === block.header
-        );
-        if (idx !== -1) {
+        // Use the tracked original index for precise removal
+        // This avoids mismatch when same file has duplicate headers
+        const idx = block.originalIndex;
+        if (idx !== undefined) {
           removeIndices.add(idx);
           mergedPairs.push({
             kept: winner,

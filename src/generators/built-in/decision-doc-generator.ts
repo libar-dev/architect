@@ -440,44 +440,47 @@ export function generateStandardOutput(
 }
 
 // =============================================================================
-// Main Generation Function
+// Pipeline Execution (Internal)
 // =============================================================================
 
 /**
- * Generate documentation from a decision document
+ * Result of pipeline execution
+ */
+interface PipelineResult {
+  /** Parsed decision document content */
+  decisionContent: DecisionDocContent;
+  /** Aggregated and deduplicated content from source mapping */
+  aggregatedContent: AggregatedContent;
+  /** Warning collector (if enabled) */
+  warningCollector: WarningCollector | undefined;
+  /** Pattern name for output path generation */
+  patternName: string;
+}
+
+/**
+ * Error result from pipeline execution
+ */
+interface PipelineError {
+  /** Validation or processing errors */
+  errors: string[];
+  /** Warnings collected before error */
+  warnings: string[];
+}
+
+/**
+ * Execute the generation pipeline: validation, extraction, deduplication
  *
- * Main entry point that orchestrates the full pipeline:
- * 1. Create WarningCollector for unified warning handling
- * 2. Parse decision document to extract content
- * 3. Validate source mappings (if enabled) - fails fast on validation errors
- * 4. Execute source mapping to aggregate content from referenced files
- * 5. Deduplicate sections (if enabled)
- * 6. Generate output at specified detail level(s)
- * 7. Return output files with all warnings
+ * Internal function that performs the expensive work once. Both single-level
+ * and multi-level generators use this to avoid duplicate work.
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options
- * @returns Generation result with files and warnings
- *
- * @example
- * ```typescript
- * const result = await generateFromDecision(processGuardPattern, {
- *   baseDir: process.cwd(),
- *   detailLevel: 'detailed',
- *   claudeMdSection: 'validation',
- * });
- *
- * for (const file of result.files) {
- *   fs.writeFileSync(file.path, file.content);
- * }
- * ```
+ * @returns Pipeline result or error
  */
-export function generateFromDecision(
+function executePipeline(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
-): DecisionDocGeneratorResult {
-  const files: OutputFile[] = [];
-
+): PipelineResult | PipelineError {
   // Default options - all robustness features enabled by default
   const enableValidation = options.enableValidation ?? true;
   const enableDeduplication = options.enableDeduplication ?? true;
@@ -517,6 +520,13 @@ export function generateFromDecision(
         validatorOptions
       );
 
+      // Capture validation warnings after successful validation (Issue #4 fix)
+      if (validationResult.isValid && warningCollector && validationResult.warnings.length > 0) {
+        for (const warning of validationResult.warnings) {
+          warningCollector.capture(warning);
+        }
+      }
+
       // If validation fails with errors, return early
       if (!validationResult.isValid) {
         const warnings = warningCollector
@@ -524,7 +534,6 @@ export function generateFromDecision(
           : [];
 
         return {
-          files: [],
           warnings,
           errors: validationResult.errors.map((e) => {
             // Include suggestions if available
@@ -562,7 +571,64 @@ export function generateFromDecision(
     }
   }
 
-  // Step 6: Generate output at requested detail level(s)
+  return { decisionContent, aggregatedContent, warningCollector, patternName };
+}
+
+/**
+ * Check if pipeline result is an error
+ */
+function isPipelineError(result: PipelineResult | PipelineError): result is PipelineError {
+  return 'errors' in result;
+}
+
+// =============================================================================
+// Main Generation Function
+// =============================================================================
+
+/**
+ * Generate documentation from a decision document
+ *
+ * Main entry point that orchestrates the full pipeline:
+ * 1. Create WarningCollector for unified warning handling
+ * 2. Parse decision document to extract content
+ * 3. Validate source mappings (if enabled) - fails fast on validation errors
+ * 4. Execute source mapping to aggregate content from referenced files
+ * 5. Deduplicate sections (if enabled)
+ * 6. Generate output at specified detail level(s)
+ * 7. Return output files with all warnings
+ *
+ * @param pattern - Extracted pattern with decision document content
+ * @param options - Generator options
+ * @returns Generation result with files and warnings
+ *
+ * @example
+ * ```typescript
+ * const result = await generateFromDecision(processGuardPattern, {
+ *   baseDir: process.cwd(),
+ *   detailLevel: 'detailed',
+ *   claudeMdSection: 'validation',
+ * });
+ *
+ * for (const file of result.files) {
+ *   fs.writeFileSync(file.path, file.content);
+ * }
+ * ```
+ */
+export function generateFromDecision(
+  pattern: ExtractedPattern,
+  options: DecisionDocGeneratorOptions
+): DecisionDocGeneratorResult {
+  // Execute the pipeline
+  const pipelineResult = executePipeline(pattern, options);
+
+  // If pipeline failed, return errors
+  if (isPipelineError(pipelineResult)) {
+    return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+  }
+
+  const { decisionContent, aggregatedContent, warningCollector, patternName } = pipelineResult;
+
+  // Generate output at requested detail level
   const sectionOption = options.claudeMdSection;
   const outputPaths = determineOutputPaths(
     patternName,
@@ -593,9 +659,9 @@ export function generateFromDecision(
 
   // Render to markdown
   const content = renderToMarkdown(doc);
-  files.push({ path: outputPath, content });
+  const files: OutputFile[] = [{ path: outputPath, content }];
 
-  // Step 7: Collect all warnings and return
+  // Collect all warnings and return
   const warnings = warningCollector
     ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
     : aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`);
@@ -606,8 +672,8 @@ export function generateFromDecision(
 /**
  * Generate both compact and detailed outputs
  *
- * Convenience function that generates documentation at both detail levels
- * for maximum utility.
+ * Runs the pipeline once and generates documentation at both detail levels.
+ * More efficient than calling generateFromDecision twice.
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options
@@ -617,31 +683,41 @@ export function generateFromDecisionMultiLevel(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
 ): DecisionDocGeneratorResult {
-  const warnings: string[] = [];
-  const errors: string[] = [];
-  const files: OutputFile[] = [];
+  // Execute the pipeline ONCE
+  const pipelineResult = executePipeline(pattern, options);
 
-  // Generate compact version
-  const compactResult = generateFromDecision(pattern, {
-    ...options,
-    detailLevel: 'summary',
-  });
-  files.push(...compactResult.files);
-  warnings.push(...compactResult.warnings);
-  errors.push(...compactResult.errors);
-
-  // Generate detailed version (only if compact succeeded)
-  if (compactResult.errors.length === 0) {
-    const detailedResult = generateFromDecision(pattern, {
-      ...options,
-      detailLevel: 'detailed',
-    });
-    files.push(...detailedResult.files);
-    warnings.push(...detailedResult.warnings);
-    errors.push(...detailedResult.errors);
+  // If pipeline failed, return errors
+  if (isPipelineError(pipelineResult)) {
+    return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
   }
 
-  return { files, warnings, errors };
+  const { decisionContent, aggregatedContent, warningCollector, patternName } = pipelineResult;
+
+  // Determine output paths
+  const sectionOption = options.claudeMdSection;
+  const outputPaths = determineOutputPaths(
+    patternName,
+    sectionOption ? { section: sectionOption } : undefined
+  );
+
+  // Generate BOTH outputs from the same processed data
+  const compactDoc = generateCompactOutput(decisionContent, aggregatedContent);
+  const detailedDoc = generateDetailedOutput(decisionContent, aggregatedContent);
+
+  const compactContent = renderToMarkdown(compactDoc);
+  const detailedContent = renderToMarkdown(detailedDoc);
+
+  const files: OutputFile[] = [
+    { path: outputPaths.compact, content: compactContent },
+    { path: outputPaths.detailed, content: detailedContent },
+  ];
+
+  // Collect all warnings
+  const warnings = warningCollector
+    ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
+    : aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`);
+
+  return { files, warnings, errors: [] };
 }
 
 // =============================================================================

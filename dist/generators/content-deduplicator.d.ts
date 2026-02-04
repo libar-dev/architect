@@ -4,7 +4,6 @@
  * @libar-docs-pattern ContentDeduplicator
  * @libar-docs-status roadmap
  * @libar-docs-phase 28
- * @libar-docs-depends-on SourceMapper,WarningCollector
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
  *
@@ -41,6 +40,8 @@ export interface ContentBlock {
     fingerprint?: string;
     /** Number of lines in the body */
     lineCount: number;
+    /** Original index in the input array (for precise removal) */
+    originalIndex?: number;
 }
 /**
  * A pair of content blocks that were merged
@@ -71,7 +72,11 @@ export interface DeduplicatorOptions {
 }
 /**
  * Compute a content fingerprint using SHA-256.
- * Returns a 16-character hex string.
+ * Returns a 16-character hex string (64 bits).
+ *
+ * Note: 16 hex chars (64 bits) provides sufficient collision resistance for
+ * documentation deduplication. Birthday paradox collision probability is
+ * less than 0.001% for up to 10,000 sections, which exceeds expected usage.
  */
 export declare function computeFingerprint(content: string): string;
 /**

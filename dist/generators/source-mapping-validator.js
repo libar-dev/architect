@@ -298,7 +298,6 @@ function findSimilarMethods(method) {
  */
 export function validateSourceMappingTable(mappings, options) {
     const errors = [];
-    const warnings = [];
     for (const mapping of mappings) {
         // 1. Validate file existence
         const fileResult = validateFileExists(mapping, options.baseDir);
@@ -321,16 +320,12 @@ export function validateSourceMappingTable(mappings, options) {
             }
         }
     }
-    // Capture warnings in the warning collector if provided
-    if (options.warningCollector) {
-        for (const warning of warnings) {
-            options.warningCollector.capture(warning);
-        }
-    }
+    // Note: Validation is pass/fail per row, no warnings are generated.
+    // The warnings array is kept in the interface for future extensibility.
     return {
         isValid: errors.length === 0,
         errors,
-        warnings,
+        warnings: [],
     };
 }
 //# sourceMappingURL=source-mapping-validator.js.map

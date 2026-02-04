@@ -138,6 +138,15 @@ Feature: Source Mapping Validator
       When validating method-file compatibility
       Then validation passes
 
+    @acceptance-criteria @validation
+    Scenario: Self-reference method on actual file produces error
+      Given a source mapping with:
+        | Section | Source File | Extraction Method |
+        | Context | src/types/result.ts | Decision rule description |
+      When validating method-file compatibility
+      Then validation fails
+      And error message contains "can only be used with THIS DECISION"
+
   # ============================================================================
   # RULE 4: Table Format Validation
   # ============================================================================
@@ -184,7 +193,7 @@ Feature: Source Mapping Validator
       Given a source mapping with:
         | Section | Source File | Extraction Method |
         | Types | src/missing.ts | @extract-shapes tag |
-        | Rules | src/types.ts | invalid-method |
+        | Rules | src/types/result.ts | invalid-method |
       When validating the full mapping
       Then validation fails with 2 errors
       And first error is about missing file

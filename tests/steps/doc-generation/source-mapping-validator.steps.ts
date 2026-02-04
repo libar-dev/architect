@@ -481,6 +481,41 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.compatibilityResult!.ok).toBe(true);
       });
     });
+
+    RuleScenario(
+      'Self-reference method on actual file produces error',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a source mapping with:',
+          (
+            _ctx: unknown,
+            table: Array<{ Section: string; 'Source File': string; 'Extraction Method': string }>
+          ) => {
+            const row = table[0];
+            state!.currentMapping = {
+              section: row.Section,
+              sourceFile: row['Source File'],
+              extractionMethod: row['Extraction Method'],
+            };
+          }
+        );
+
+        When('validating method-file compatibility', () => {
+          state!.compatibilityResult = validateMethodFileCompatibility(state!.currentMapping!);
+        });
+
+        Then('validation fails', () => {
+          expect(state!.compatibilityResult!.ok).toBe(false);
+        });
+
+        And('error message contains {string}', (_ctx: unknown, expectedSubstring: string) => {
+          expect(state!.compatibilityResult!.ok).toBe(false);
+          if (!state!.compatibilityResult!.ok) {
+            expect(state!.compatibilityResult!.error.message).toContain(expectedSubstring);
+          }
+        });
+      }
+    );
   });
 
   // ===========================================================================
@@ -587,20 +622,11 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           _ctx: unknown,
           table: Array<{ Section: string; 'Source File': string; 'Extraction Method': string }>
         ) => {
-          state!.mappings = table.map((row) => {
-            // Fix the spec's reference to src/types.ts (which doesn't exist)
-            // to use a real file so we get exactly 2 errors as expected
-            const sourceFile =
-              row['Source File'] === 'src/types.ts'
-                ? 'src/types/result.ts' // Use real file
-                : row['Source File'];
-
-            return {
-              section: row.Section,
-              sourceFile,
-              extractionMethod: row['Extraction Method'],
-            };
-          });
+          state!.mappings = table.map((row) => ({
+            section: row.Section,
+            sourceFile: row['Source File'],
+            extractionMethod: row['Extraction Method'],
+          }));
         }
       );
 

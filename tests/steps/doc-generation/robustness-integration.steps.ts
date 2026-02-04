@@ -545,10 +545,11 @@ export const EMPTY = {};
         expect(state!.result!.errors.length).toBe(0);
       });
 
-      And('result includes {int} warnings', (_ctx: unknown, _count: number) => {
-        // Warnings may be generated during the pipeline
-        // The exact count depends on what warnings are produced
+      And('result includes {int} warnings', (_ctx: unknown, expectedCount: number) => {
+        // Verify we have at least the expected number of warnings
+        // The pipeline may produce additional warnings from deduplication, empty sections, etc.
         expect(state!.result!.warnings).toBeDefined();
+        expect(state!.result!.warnings.length).toBeGreaterThanOrEqual(expectedCount);
       });
 
       And('warnings are grouped by stage', () => {
