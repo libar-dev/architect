@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern ContentDeduplicator
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  * @libar-docs-phase 28
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
@@ -68,7 +68,16 @@ export interface MergedPair {
 }
 
 /**
- * Result of deduplication processing
+ * Result of deduplication processing.
+ *
+ * Warnings are captured via two parallel paths:
+ * 1. Through the optional `warningCollector` passed in options (side-effect, preferred)
+ * 2. In the returned `warnings` array (for callers without a collector)
+ *
+ * When a `warningCollector` is provided, warnings flow to both paths. Callers should
+ * use ONE path for consuming warnings - either the collector OR the returned array.
+ * The decision-doc-generator uses the collector when available, falling back to the
+ * returned array when warning collection is disabled.
  */
 export interface DeduplicationResult {
   /** Deduplicated sections in original order */
@@ -77,7 +86,7 @@ export interface DeduplicationResult {
   /** Pairs of content that were merged */
   mergedPairs: MergedPair[];
 
-  /** Warnings produced during deduplication */
+  /** Warnings produced during deduplication (always populated regardless of collector) */
   warnings: Warning[];
 }
 
@@ -217,15 +226,14 @@ export function findDuplicates(blocks: ContentBlock[]): Map<string, ContentBlock
  * Choose which block to keep from a set of duplicates.
  * Higher priority source wins; if equal, richer content (more lines) wins.
  *
- * @param blocks - Non-empty array of content blocks
+ * Uses non-empty tuple type to guarantee at compile time that at least
+ * one block exists. Callers must ensure the array is non-empty before calling.
+ *
+ * @param blocks - Non-empty array of content blocks (at least one element)
  * @returns The winning block
- * @throws Error if blocks array is empty
  */
-function chooseWinner(blocks: ContentBlock[]): ContentBlock {
+function chooseWinner(blocks: [ContentBlock, ...ContentBlock[]]): ContentBlock {
   const [first, ...rest] = blocks;
-  if (!first) {
-    throw new Error('Cannot choose winner from empty blocks array');
-  }
 
   let winner: ContentBlock = first;
 
@@ -326,8 +334,9 @@ export function deduplicateSections(
   const removeIndices = new Set<number>();
 
   // Process each duplicate group
+  // Note: findDuplicates only returns groups with 2+ blocks, so this assertion is safe
   for (const [_fingerprint, duplicateBlocks] of duplicates) {
-    const winner = chooseWinner(duplicateBlocks);
+    const winner = chooseWinner(duplicateBlocks as [ContentBlock, ...ContentBlock[]]);
 
     // Mark losers for removal using their original indices
     for (const block of duplicateBlocks) {

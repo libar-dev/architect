@@ -1,9 +1,14 @@
 @libar-docs
+@libar-docs-pattern:SourceMappingValidator
 Feature: Source Mapping Validator
 
-  The source mapping validator performs pre-flight checks on source mapping
-  tables before extraction begins. It validates file existence, extraction
-  method validity, and format correctness to fail fast with clear errors.
+  **Context:** Source mappings reference files that may not exist, use invalid
+  extraction methods, or have incompatible method-file combinations. Without
+  pre-flight validation, extraction fails late with confusing errors.
+
+  **Approach:** Validate file existence, extraction method validity, and format
+  correctness before extraction begins. Collect all errors rather than stopping
+  at the first one, enabling users to fix all issues in a single iteration.
 
   Background: Validator setup
     Given the source mapping validator is initialized
@@ -15,8 +20,9 @@ Feature: Source Mapping Validator
 
   Rule: Source files must exist and be readable
 
-    Before extraction begins, all referenced source files are checked for
-    existence and readability. Missing or unreadable files produce errors.
+    **Invariant:** All source file paths in mappings must resolve to existing, readable files.
+    **Rationale:** Prevents extraction failures and provides clear error messages upfront.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     @acceptance-criteria @unit
     Scenario: Existing file passes validation
@@ -61,8 +67,9 @@ Feature: Source Mapping Validator
 
   Rule: Extraction methods must be valid and supported
 
-    Only recognized extraction methods are accepted. Invalid methods produce
-    errors with suggestions for valid alternatives.
+    **Invariant:** Extraction methods must match a known method from the supported set.
+    **Rationale:** Invalid methods cannot extract content; suggest valid alternatives.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     @acceptance-criteria @unit
     Scenario Outline: Valid extraction methods pass validation
@@ -108,8 +115,9 @@ Feature: Source Mapping Validator
 
   Rule: Extraction methods must be compatible with file types
 
-    Certain extraction methods only work with specific file types. The validator
-    ensures compatibility before extraction.
+    **Invariant:** Method-file combinations must be compatible (e.g., TypeScript methods for .ts files).
+    **Rationale:** Incompatible combinations fail at extraction; catch early with clear guidance.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     @acceptance-criteria @validation
     Scenario: TypeScript method on feature file produces error
@@ -153,8 +161,9 @@ Feature: Source Mapping Validator
 
   Rule: Source mapping tables must have required columns
 
-    Source mapping tables must include Section, Source File, and Extraction
-    Method columns. Missing columns produce validation errors.
+    **Invariant:** Tables must contain Section, Source File, and Extraction Method columns.
+    **Rationale:** Missing columns prevent extraction; alternative column names are mapped.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     @acceptance-criteria @validation
     Scenario: Missing Section column produces error
@@ -185,8 +194,9 @@ Feature: Source Mapping Validator
 
   Rule: All validation errors are collected and returned together
 
-    Validation checks all rows before returning, collecting all errors
-    rather than stopping at the first one.
+    **Invariant:** Validation collects all errors before returning, not just the first.
+    **Rationale:** Enables users to fix all issues in a single iteration.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     @acceptance-criteria @unit
     Scenario: Multiple errors are aggregated

@@ -527,15 +527,19 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       Then('output is valid JSON', () => {
-        expect(() => JSON.parse(state!.formattedOutput)).not.toThrow();
+        expect(() => JSON.parse(state!.formattedOutput) as unknown).not.toThrow();
       });
 
       And('includes fields: source, line, category, message', () => {
-        const parsed = JSON.parse(state!.formattedOutput) as Warning[];
-        expect(parsed[0]).toHaveProperty('source');
-        expect(parsed[0]).toHaveProperty('line');
-        expect(parsed[0]).toHaveProperty('category');
-        expect(parsed[0]).toHaveProperty('message');
+        const parsed: unknown = JSON.parse(state!.formattedOutput);
+        // Validate structure before accessing properties
+        expect(Array.isArray(parsed)).toBe(true);
+        expect((parsed as unknown[]).length).toBeGreaterThan(0);
+        const warnings = parsed as Warning[];
+        expect(warnings[0]).toHaveProperty('source');
+        expect(warnings[0]).toHaveProperty('line');
+        expect(warnings[0]).toHaveProperty('category');
+        expect(warnings[0]).toHaveProperty('message');
       });
     });
 

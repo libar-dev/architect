@@ -32,7 +32,7 @@ import { renderToMarkdown } from '../../renderable/render.js';
 import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
-import { createWarningCollector } from '../warning-collector.js';
+import { createWarningCollector, } from '../warning-collector.js';
 import { validateSourceMappingTable } from '../source-mapping-validator.js';
 import { deduplicateSections } from '../content-deduplicator.js';
 // =============================================================================
@@ -346,6 +346,8 @@ function executePipeline(pattern, options) {
         warnings: [],
         success: true,
     };
+    // Deduplication warnings when warningCollector is not used
+    const dedupWarnings = [];
     if (decisionContent.sourceMappings.length > 0) {
         // Step 3: PRE-FLIGHT VALIDATION (if enabled)
         if (enableValidation) {
@@ -392,9 +394,14 @@ function executePipeline(pattern, options) {
             const dedupOptions = warningCollector ? { warningCollector } : undefined;
             const dedupResult = deduplicateSections(aggregatedContent.sections, dedupOptions);
             aggregatedContent.sections = dedupResult.sections;
+            // Capture deduplication warnings when not using collector
+            // (When collector is present, warnings are captured via side-effect)
+            if (!warningCollector && dedupResult.warnings.length > 0) {
+                dedupWarnings.push(...dedupResult.warnings);
+            }
         }
     }
-    return { decisionContent, aggregatedContent, warningCollector, patternName };
+    return { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings };
 }
 /**
  * Check if pipeline result is an error
@@ -441,7 +448,7 @@ export function generateFromDecision(pattern, options) {
     if (isPipelineError(pipelineResult)) {
         return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
     }
-    const { decisionContent, aggregatedContent, warningCollector, patternName } = pipelineResult;
+    const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } = pipelineResult;
     // Generate output at requested detail level
     const sectionOption = options.claudeMdSection;
     const outputPaths = determineOutputPaths(patternName, sectionOption ? { section: sectionOption } : undefined);
@@ -468,9 +475,14 @@ export function generateFromDecision(pattern, options) {
     const content = renderToMarkdown(doc);
     const files = [{ path: outputPath, content }];
     // Collect all warnings and return
+    // When warningCollector is present, it captures all warnings via side-effects
+    // When not present, we need to merge extraction warnings with deduplication warnings
     const warnings = warningCollector
         ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
-        : aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`);
+        : [
+            ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
+            ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
+        ];
     return { files, warnings, errors: [] };
 }
 /**
@@ -490,7 +502,7 @@ export function generateFromDecisionMultiLevel(pattern, options) {
     if (isPipelineError(pipelineResult)) {
         return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
     }
-    const { decisionContent, aggregatedContent, warningCollector, patternName } = pipelineResult;
+    const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } = pipelineResult;
     // Determine output paths
     const sectionOption = options.claudeMdSection;
     const outputPaths = determineOutputPaths(patternName, sectionOption ? { section: sectionOption } : undefined);
@@ -504,9 +516,14 @@ export function generateFromDecisionMultiLevel(pattern, options) {
         { path: outputPaths.detailed, content: detailedContent },
     ];
     // Collect all warnings
+    // When warningCollector is present, it captures all warnings via side-effects
+    // When not present, we need to merge extraction warnings with deduplication warnings
     const warnings = warningCollector
         ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
-        : aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`);
+        : [
+            ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
+            ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
+        ];
     return { files, warnings, errors: [] };
 }
 // =============================================================================

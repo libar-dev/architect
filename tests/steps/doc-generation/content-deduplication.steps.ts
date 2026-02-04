@@ -222,13 +222,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           (_ctx: unknown, header: string, body: string) => {
             // Strip markdown header prefix (## ) from the header if present
             const cleanHeader = header.replace(/^#+\s*/, '');
+            // Normalize escaped newlines for consistency with other code paths
+            const cleanBody = parseContent(body);
             state!.contentBlockA = {
               header: cleanHeader,
-              body,
+              body: cleanBody,
               source: 'source-a',
-              lineCount: body.split('\n').length,
+              lineCount: cleanBody.split('\n').length,
             };
-            state!.sections.push(createSection(cleanHeader, 'source-a', body));
+            state!.sections.push(createSection(cleanHeader, 'source-a', cleanBody));
           }
         );
 
@@ -237,13 +239,15 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           (_ctx: unknown, header: string, body: string) => {
             // Strip markdown header prefix (## ) from the header if present
             const cleanHeader = header.replace(/^#+\s*/, '');
+            // Normalize escaped newlines for consistency with other code paths
+            const cleanBody = parseContent(body);
             state!.contentBlockB = {
               header: cleanHeader,
-              body,
+              body: cleanBody,
               source: 'source-b',
-              lineCount: body.split('\n').length,
+              lineCount: cleanBody.split('\n').length,
             };
-            state!.sections.push(createSection(cleanHeader, 'source-b', body));
+            state!.sections.push(createSection(cleanHeader, 'source-b', cleanBody));
           }
         );
 
@@ -477,12 +481,12 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state!.sections.length).toBe(3);
       });
 
-      Then('deduplication processes all extracted content', () => {
+      And('deduplication processes all extracted content', () => {
         // We should have merged the duplicates
         expect(state!.dedupResult!.mergedPairs.length).toBe(1);
       });
 
-      Then('RenderableDocument contains deduplicated sections', () => {
+      And('RenderableDocument contains deduplicated sections', () => {
         // Final output should have 2 sections (Section 1 and Section 2, not Section 3)
         expect(state!.dedupResult!.sections.length).toBe(2);
         const sectionNames = state!.dedupResult!.sections.map((s) => s.section);

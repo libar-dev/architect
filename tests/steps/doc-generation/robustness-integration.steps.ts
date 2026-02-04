@@ -395,18 +395,17 @@ export const LEVELS = {};
         });
       });
 
-      Then(
-        'output contains exactly one {string} section',
-        (_ctx: unknown, _sectionName: string) => {
-          // The deduplication merges content with identical fingerprints.
-          // The two sources have the same "Protection Levels" name but may have different content.
-          // When content is identical, only one should remain.
-          // When content differs, they may be renamed (e.g., "Protection Levels (from types)")
-          expect(state!.result!.errors.length).toBe(0);
-          expect(state!.result!.files.length).toBeGreaterThan(0);
-          // Deduplication was attempted - verify generation succeeded
-        }
-      );
+      Then('output contains exactly one {string} section', (_ctx: unknown, sectionName: string) => {
+        // The deduplication merges content with identical fingerprints.
+        // Verify generation succeeded without errors
+        expect(state!.result!.errors.length).toBe(0);
+        expect(state!.result!.files.length).toBeGreaterThan(0);
+
+        // Verify the section name appears in output (deduplication preserved content)
+        // Note: The exact header format depends on generator detail level
+        const content = state!.result!.files[0].content;
+        expect(content).toContain(sectionName);
+      });
 
       And('source attribution shows primary source', () => {
         // Deduplication keeps the higher-priority source (TypeScript)
@@ -492,16 +491,19 @@ export const LEVELS = {};
 
   Rule('Warnings from all stages are collected and reported', ({ RuleScenario }) => {
     RuleScenario('Warnings are collected across pipeline stages', ({ Given, And, When, Then }) => {
-      Given('validation produces warning {string}', () => {
+      Given('validation produces warning {string}', (_ctx: unknown, _warning: string) => {
         // This is setup - we create a pattern that will produce warnings
+        // The warning text is descriptive for the feature file; actual setup is in When step
       });
 
-      And('extraction produces warning {string}', () => {
+      And('extraction produces warning {string}', (_ctx: unknown, _warning: string) => {
         // Extraction warnings are generated when content extraction produces warnings
+        // The warning text is descriptive for the feature file; actual setup is in When step
       });
 
-      And('deduplication produces warning {string}', () => {
+      And('deduplication produces warning {string}', (_ctx: unknown, _warning: string) => {
         // Deduplication warnings are generated when content is merged
+        // The warning text is descriptive for the feature file; actual setup is in When step
       });
 
       When('generating documentation', () => {
@@ -545,7 +547,7 @@ export const EMPTY = {};
         expect(state!.result!.errors.length).toBe(0);
       });
 
-      And('result includes {int} warnings', (_ctx: unknown, expectedCount: number) => {
+      And('result includes {int} warning', (_ctx: unknown, expectedCount: number) => {
         // Verify we have at least the expected number of warnings
         // The pipeline may produce additional warnings from deduplication, empty sections, etc.
         expect(state!.result!.warnings).toBeDefined();
@@ -627,10 +629,10 @@ export interface TestType {
         });
       });
 
-      And('the file was renamed to {string}', () => {
+      And('the file was renamed to {string}', (_ctx: unknown, newFileName: string) => {
         // Create the new file (but not the old one)
         createTypeScriptFile(
-          'src/new-name.ts',
+          newFileName,
           `/**
  * @libar-docs
  * @libar-docs-extract-shapes TestType

@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern ContentDeduplicator
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  * @libar-docs-phase 28
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
@@ -53,14 +53,23 @@ export interface MergedPair {
     removed: ContentBlock;
 }
 /**
- * Result of deduplication processing
+ * Result of deduplication processing.
+ *
+ * Warnings are captured via two parallel paths:
+ * 1. Through the optional `warningCollector` passed in options (side-effect, preferred)
+ * 2. In the returned `warnings` array (for callers without a collector)
+ *
+ * When a `warningCollector` is provided, warnings flow to both paths. Callers should
+ * use ONE path for consuming warnings - either the collector OR the returned array.
+ * The decision-doc-generator uses the collector when available, falling back to the
+ * returned array when warning collection is disabled.
  */
 export interface DeduplicationResult {
     /** Deduplicated sections in original order */
     sections: ExtractedSection[];
     /** Pairs of content that were merged */
     mergedPairs: MergedPair[];
-    /** Warnings produced during deduplication */
+    /** Warnings produced during deduplication (always populated regardless of collector) */
     warnings: Warning[];
 }
 /**

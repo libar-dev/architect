@@ -119,5 +119,5 @@ Feature: Content Deduplication
       And some files contain duplicate content
       When executing the full source mapping pipeline
       Then extraction happens first
-      Then deduplication processes all extracted content
-      Then RenderableDocument contains deduplicated sections
+      And deduplication processes all extracted content
+      And RenderableDocument contains deduplicated sections

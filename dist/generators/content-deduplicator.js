@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern ContentDeduplicator
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  * @libar-docs-phase 28
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
@@ -140,15 +140,14 @@ export function findDuplicates(blocks) {
  * Choose which block to keep from a set of duplicates.
  * Higher priority source wins; if equal, richer content (more lines) wins.
  *
- * @param blocks - Non-empty array of content blocks
+ * Uses non-empty tuple type to guarantee at compile time that at least
+ * one block exists. Callers must ensure the array is non-empty before calling.
+ *
+ * @param blocks - Non-empty array of content blocks (at least one element)
  * @returns The winning block
- * @throws Error if blocks array is empty
  */
 function chooseWinner(blocks) {
     const [first, ...rest] = blocks;
-    if (!first) {
-        throw new Error('Cannot choose winner from empty blocks array');
-    }
     let winner = first;
     for (const block of rest) {
         const winnerPriority = getSourcePriority(winner.source);
@@ -231,6 +230,7 @@ export function deduplicateSections(sections, options) {
     // Track which sections to remove (by original index)
     const removeIndices = new Set();
     // Process each duplicate group
+    // Note: findDuplicates only returns groups with 2+ blocks, so this assertion is safe
     for (const [_fingerprint, duplicateBlocks] of duplicates) {
         const winner = chooseWinner(duplicateBlocks);
         // Mark losers for removal using their original indices

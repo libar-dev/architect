@@ -88,7 +88,7 @@ Feature: Robustness Integration
       And deduplication produces warning "Content merged from 2 sources"
       When generating documentation
       Then generation succeeds
-      And result includes 1 warnings
+      And result includes 1 warning
       And warnings are grouped by stage
 
     @acceptance-criteria @integration
