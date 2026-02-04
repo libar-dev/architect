@@ -701,32 +701,36 @@ export interface TestType {
       });
     });
 
-    RuleScenario('Missing source files do not prevent generation', ({ Given, When, Then }) => {
-      Given('a decision document referencing missing files', () => {
-        state.pattern = createTestPattern({
-          directive: {
-            patternName: 'MissingFiles',
-            status: 'active',
-            description: `Description
+    RuleScenario(
+      'Missing source files are reported as validation errors',
+      ({ Given, When, Then }) => {
+        Given('a decision document referencing missing files', () => {
+          state.pattern = createTestPattern({
+            directive: {
+              patternName: 'MissingFiles',
+              status: 'active',
+              description: `Description
 
 | Section | Source File | Extraction Method |
 | Types | nonexistent.ts | @extract-shapes tag |`,
-          },
+            },
+          });
         });
-      });
 
-      When('generating from decision', () => {
-        state.generationResult = generateFromDecision(state.pattern!, {
-          baseDir: state.baseDir,
-          detailLevel: 'detailed',
+        When('generating from decision', () => {
+          state.generationResult = generateFromDecision(state.pattern!, {
+            baseDir: state.baseDir,
+            detailLevel: 'detailed',
+          });
         });
-      });
 
-      Then('generation should complete successfully', () => {
-        expect(state.generationResult).not.toBeNull();
-        // Should produce at least one file
-        expect(state.generationResult!.files.length).toBeGreaterThan(0);
-      });
-    });
+        Then('validation errors are reported for missing files', () => {
+          expect(state.generationResult).not.toBeNull();
+          // Validation should fail with errors about missing files
+          expect(state.generationResult!.errors.length).toBeGreaterThan(0);
+          expect(state.generationResult!.errors[0]).toContain('nonexistent.ts');
+        });
+      }
+    );
   });
 });

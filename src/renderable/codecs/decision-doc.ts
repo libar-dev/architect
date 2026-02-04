@@ -562,8 +562,12 @@ export function parseDecisionDocument(
   // DocStrings from all rules
   docStrings.push(...extractDocStringsFromRules(rules));
 
-  // Parse source mappings from all rules
-  const sourceMappings = parseSourceMappingsFromRules(rules);
+  // Parse source mappings from description AND rules
+  // The description may contain a source mapping table (e.g., in decision documents)
+  const sourceMappings: SourceMappingEntry[] = [
+    ...parseSourceMappingTable(description),
+    ...parseSourceMappingsFromRules(rules),
+  ];
 
   return {
     patternName,
