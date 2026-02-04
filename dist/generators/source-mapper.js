@@ -48,13 +48,17 @@ function readFileSync(filePath) {
     }
 }
 /**
- * Check if file exists
+ * Check if file exists.
+ * Logs filesystem errors (EACCES, EPERM, etc.) to prevent silent failures.
  */
 function fileExists(filePath) {
     try {
         return fs.existsSync(filePath);
     }
-    catch {
+    catch (error) {
+        // Log actual error for debugging - filesystem errors (EACCES, EPERM, ELOOP, etc.)
+        // should not be silently swallowed as they indicate real problems
+        console.warn(`[FILE_CHECK_ERROR] ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
         return false;
     }
 }
@@ -210,6 +214,11 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
                         content = afterHeader.slice(firstNewline + 1).trim();
                     }
                 }
+            }
+            // Warn if JSDoc block was found but extraction produced empty content
+            if (!content) {
+                console.warn(`[JSDOC_EXTRACTION_EMPTY] ${filePath}: JSDoc block found but no markdown content extracted. ` +
+                    `Expected ## header followed by content. JSDoc starts with: "${cleanedContent.slice(0, 50)}..."`);
             }
         }
     }

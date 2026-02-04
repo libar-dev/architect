@@ -376,3 +376,15 @@ Feature: TypeScript Shape Extraction
       When extracting shapes "Input, Output"
       And rendering shapes with groupInSingleBlock false
       Then the markdown should have 2 code fences
+
+  # ============================================================================
+  # RULE 11: Input Validation
+  # ============================================================================
+
+  Rule: Large source files are rejected to prevent memory exhaustion
+
+    @acceptance-criteria @unit @security
+    Scenario: Source code exceeding 5MB limit returns error
+      Given TypeScript source code larger than 5MB
+      When attempting to extract shapes
+      Then the extraction should fail with error containing "exceeds maximum allowed"

@@ -636,4 +636,31 @@ describeFeature(feature, ({ Background, Rule }) => {
       });
     });
   });
+
+  // ===========================================================================
+  // RULE 11: Input Validation
+  // ===========================================================================
+
+  Rule('Large source files are rejected to prevent memory exhaustion', ({ RuleScenario }) => {
+    RuleScenario('Source code exceeding 5MB limit returns error', ({ Given, When, Then }) => {
+      Given('TypeScript source code larger than 5MB', () => {
+        // Create a string just over 5MB (5 * 1024 * 1024 + 1 bytes)
+        // Use a valid TypeScript structure to ensure this tests size, not parsing
+        const padding = 'x'.repeat(5 * 1024 * 1024 + 1);
+        state.sourceCode = `// ${padding}\nexport interface Test { value: string; }`;
+      });
+
+      When('attempting to extract shapes', () => {
+        state.extractionRawResult = extractShapes(state.sourceCode, ['Test']);
+      });
+
+      Then('the extraction should fail with error containing "exceeds maximum allowed"', () => {
+        expect(state.extractionRawResult).not.toBeNull();
+        expect(state.extractionRawResult!.ok).toBe(false);
+        if (!state.extractionRawResult!.ok) {
+          expect(state.extractionRawResult!.error.message).toContain('exceeds maximum allowed');
+        }
+      });
+    });
+  });
 });
