@@ -49,16 +49,23 @@ function readFileSync(filePath) {
 }
 /**
  * Check if file exists.
- * Logs filesystem errors (EACCES, EPERM, etc.) to prevent silent failures.
+ * Captures filesystem errors (EACCES, EPERM, etc.) via warning collector to prevent silent failures.
  */
-function fileExists(filePath) {
+function fileExists(filePath, warningCollector) {
     try {
         return fs.existsSync(filePath);
     }
     catch (error) {
-        // Log actual error for debugging - filesystem errors (EACCES, EPERM, ELOOP, etc.)
+        // Capture actual error for debugging - filesystem errors (EACCES, EPERM, ELOOP, etc.)
         // should not be silently swallowed as they indicate real problems
-        console.warn(`[FILE_CHECK_ERROR] ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
+        if (warningCollector) {
+            warningCollector.capture({
+                source: filePath,
+                category: 'file-access',
+                subcategory: 'check-error',
+                message: error instanceof Error ? error.message : String(error),
+            });
+        }
         return false;
     }
 }
@@ -216,9 +223,13 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
                 }
             }
             // Warn if JSDoc block was found but extraction produced empty content
-            if (!content) {
-                console.warn(`[JSDOC_EXTRACTION_EMPTY] ${filePath}: JSDoc block found but no markdown content extracted. ` +
-                    `Expected ## header followed by content. JSDoc starts with: "${cleanedContent.slice(0, 50)}..."`);
+            if (!content && options.warningCollector) {
+                options.warningCollector.capture({
+                    source: filePath,
+                    category: 'extraction',
+                    subcategory: 'jsdoc-empty',
+                    message: `JSDoc block found but no markdown content extracted. Expected ## header followed by content. JSDoc starts with: "${cleanedContent.slice(0, 50)}..."`,
+                });
             }
         }
     }
@@ -425,7 +436,7 @@ export function executeSourceMapping(sourceMappings, options) {
                 });
                 continue;
             }
-            if (!fileExists(pathResult.value)) {
+            if (!fileExists(pathResult.value, options.warningCollector)) {
                 warnings.push({
                     severity: 'warning',
                     message: `Source file not found: ${mapping.sourceFile}`,
