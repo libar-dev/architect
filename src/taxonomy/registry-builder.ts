@@ -329,6 +329,13 @@ export function buildRegistry(): TagRegistry {
         purpose: "File paths to implementation APIs (replaces 'See:' Markdown text in Rules)",
         example: '@libar-docs-api-ref @libar-dev/platform-core/src/durability/outbox.ts',
       },
+      // Shape extraction for documentation generation (ADR-021)
+      {
+        tag: 'extract-shapes',
+        format: 'csv',
+        purpose: 'TypeScript type names to extract from this file for documentation',
+        example: '@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation',
+      },
       // Architecture diagram generation tags
       {
         tag: 'arch-role',

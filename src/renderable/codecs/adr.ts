@@ -41,7 +41,8 @@ import {
   MasterDatasetSchema,
   type MasterDataset,
 } from '../../validation-schemas/master-dataset.js';
-import type { ExtractedPattern, BusinessRule } from '../../validation-schemas/index.js';
+import type { ExtractedPattern } from '../../validation-schemas/index.js';
+import { partitionRulesByPrefix, type PartitionedRules } from './helpers.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -366,7 +367,10 @@ function buildAdrEntry(
 
   // ADR Content sections from Gherkin Rule: keywords
   // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
-  const partitioned = partitionAdrRules(pattern.rules, name);
+  const partitioned = partitionRulesByPrefix(pattern.rules, {
+    warnOnOther: true,
+    patternName: name,
+  });
   sections.push(...renderPartitionedAdrSections(partitioned, options, 5));
 
   return sections;
@@ -515,12 +519,18 @@ function adrToSlug(pattern: ExtractedPattern): string {
  * Returns 0 for non-numeric ADR numbers to avoid NaN in sort comparisons.
  * Emits a warning when falling back to 0 for non-numeric values.
  * Examples: "001" → 1, "v1" → 0 (with warning), undefined → 0
+ *
+ * @param adr - The ADR number string to parse
+ * @param onWarning - Optional callback for warnings (default: console.warn)
  */
-function parseAdrNumber(adr: string | undefined): number {
+function parseAdrNumber(
+  adr: string | undefined,
+  onWarning: (message: string) => void = console.warn
+): number {
   if (!adr) return 0;
   const parsed = parseInt(adr, 10);
   if (Number.isNaN(parsed)) {
-    console.warn(`[adr-codec] Invalid ADR number "${adr}", defaulting to 0 for sorting`);
+    onWarning(`[adr-codec] Invalid ADR number "${adr}", defaulting to 0 for sorting`);
     return 0;
   }
   return parsed;
@@ -580,7 +590,10 @@ function buildSingleAdrDocument(
 
   // ADR Content sections from Gherkin Rule: keywords
   // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
-  const partitioned = partitionAdrRules(pattern.rules, name);
+  const partitioned = partitionRulesByPrefix(pattern.rules, {
+    warnOnOther: true,
+    patternName: name,
+  });
   sections.push(...renderPartitionedAdrSections(partitioned, options, 2));
 
   // Back link
@@ -596,73 +609,6 @@ function buildSingleAdrDocument(
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Partitioned ADR rules by semantic category
- *
- * ADR content is derived from Gherkin Rule: keywords with semantic prefixes:
- * - "Context - ..." rules describe the problem background
- * - "Decision - ..." rules describe the chosen solution
- * - "Consequences - ..." rules describe outcomes
- * - Other rules are not rendered in standard ADR sections
- */
-interface PartitionedAdrRules {
-  context: BusinessRule[];
-  decision: BusinessRule[];
-  consequences: BusinessRule[];
-  other: BusinessRule[];
-}
-
-/**
- * Partition ADR rules by semantic prefix
- *
- * Rules are classified by their name prefix (case-insensitive):
- * - "Context..." → context section
- * - "Decision..." → decision section
- * - "Consequence..." → consequences section
- * - Others → other (logged as warning, not rendered in standard ADR format)
- *
- * @param rules - Business rules from the extracted pattern
- * @param patternName - Pattern name for warning context (optional)
- * @returns Partitioned rules by category
- */
-function partitionAdrRules(
-  rules: readonly BusinessRule[] | undefined,
-  patternName?: string
-): PartitionedAdrRules {
-  if (!rules || rules.length === 0) {
-    return { context: [], decision: [], consequences: [], other: [] };
-  }
-
-  const context: BusinessRule[] = [];
-  const decision: BusinessRule[] = [];
-  const consequences: BusinessRule[] = [];
-  const other: BusinessRule[] = [];
-
-  for (const rule of rules) {
-    const nameLower = rule.name.toLowerCase();
-    if (nameLower.startsWith('context')) {
-      context.push(rule);
-    } else if (nameLower.startsWith('decision')) {
-      decision.push(rule);
-    } else if (nameLower.startsWith('consequence')) {
-      consequences.push(rule);
-    } else {
-      other.push(rule);
-    }
-  }
-
-  // Warn about rules that don't match expected ADR prefixes
-  if (other.length > 0) {
-    const otherNames = other.map((r) => `"${r.name}"`).join(', ');
-    const patternContext = patternName ? ` in pattern "${patternName}"` : '';
-    console.warn(
-      `[adr-codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`
-    );
-  }
-
-  return { context, decision, consequences, other };
-}
-
-/**
  * Render partitioned ADR sections (Context, Decision, Consequences)
  *
  * Shared helper to ensure consistent rendering between buildAdrEntry and buildSingleAdrDocument.
@@ -673,7 +619,7 @@ function partitionAdrRules(
  * @returns Array of SectionBlocks
  */
 function renderPartitionedAdrSections(
-  partitioned: PartitionedAdrRules,
+  partitioned: PartitionedRules,
   options: Required<AdrCodecOptions>,
   headingLevel: 2 | 5
 ): SectionBlock[] {

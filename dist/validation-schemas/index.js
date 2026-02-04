@@ -4,6 +4,8 @@ export { PositionSchema, DocDirectiveSchema, isDocDirective, DefaultPatternStatu
 export { ExportInfoSchema, isExportInfo } from './export-info.js';
 // ExtractedPattern schemas and types
 export { SourceInfoSchema, ExtractedPatternSchema, BusinessRuleSchema, isExtractedPattern, } from './extracted-pattern.js';
+// ExtractedShape schemas and types (ADR-021: Shape Extraction)
+export { ShapeKindSchema, ExtractedShapeSchema, ReExportedShapeSchema, ShapeExtractionResultSchema, ShapeExtractionOptionsSchema, isExtractedShape, isShapeExtractionResult, } from './extracted-shape.js';
 // ScenarioRef schemas and types
 export { ScenarioRefSchema } from './scenario-ref.js';
 // Config schemas and types

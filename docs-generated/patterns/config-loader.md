@@ -16,6 +16,12 @@
 Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 Supports package-level and repo-level configuration inheritance.
 
+### When to Use
+
+- When CLI tools need to load project configuration automatically
+- When implementing custom tooling that respects project config
+- When testing configuration loading in different directory structures
+
 ### Discovery Strategy
 
 1. Look for `delivery-process.config.ts` in current directory

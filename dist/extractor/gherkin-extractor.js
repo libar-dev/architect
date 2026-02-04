@@ -37,6 +37,25 @@ import { inferFeatureLayer } from './layer-inference.js';
 import { extractDeliverables } from './dual-source-extractor.js';
 import { createGherkinPatternValidationError, } from '../types/errors.js';
 import { generatePatternId } from '../utils/index.js';
+// =============================================================================
+// Constants
+// =============================================================================
+/**
+ * Semantic tags for scenario categorization.
+ *
+ * These tags identify the nature of a scenario (e.g., happy-path, validation)
+ * and are extracted from scenario tags during pattern extraction.
+ */
+export const SEMANTIC_SCENARIO_TAGS = [
+    'happy-path',
+    'validation',
+    'business-failure',
+    'business-rule',
+    'compensation',
+    'idempotency',
+    'expiration',
+    'workflow-state',
+];
 /**
  * Assign a property to an object only if the value is defined (not undefined/null).
  *
@@ -154,9 +173,9 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         // Build raw pattern object using explicit property assignment for performance
         // This avoids ~50 intermediate objects created by conditional spreads
         const directive = {
-            tags: feature.tags
-                .filter((tag) => !tag.includes(':'))
-                .map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
+            // Preserve ALL tags (including value tags like claude-md-section:validation)
+            // Tags are stored as @libar-docs-{tag} to match TypeScript directive format
+            tags: feature.tags.map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
             description: feature.description,
             examples: [],
             position: {
@@ -242,16 +261,7 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
                     featureName: feature.name,
                     featureDescription: feature.description,
                     scenarioName: scenario.name,
-                    semanticTags: scenario.tags.filter((tag) => [
-                        'happy-path',
-                        'validation',
-                        'business-failure',
-                        'business-rule',
-                        'compensation',
-                        'idempotency',
-                        'expiration',
-                        'workflow-state',
-                    ].includes(tag)),
+                    semanticTags: scenario.tags.filter((tag) => SEMANTIC_SCENARIO_TAGS.includes(tag)),
                     tags: scenario.tags,
                     layer: inferFeatureLayer(filePath),
                     line: scenario.line,
@@ -419,9 +429,8 @@ export async function extractPatternsFromGherkinAsync(scannedFiles, config) {
         }
         // Build pattern object (same as sync version but without behaviorFileVerified)
         const directive = {
-            tags: feature.tags
-                .filter((tag) => !tag.includes(':'))
-                .map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
+            // Preserve ALL tags (including value tags like claude-md-section:validation)
+            tags: feature.tags.map((tag) => asDirectiveTag(`@libar-docs-${tag}`)),
             description: feature.description,
             examples: [],
             position: { startLine: feature.line, endLine: feature.line },
@@ -494,16 +503,7 @@ export async function extractPatternsFromGherkinAsync(scannedFiles, config) {
                     featureName: feature.name,
                     featureDescription: feature.description,
                     scenarioName: scenario.name,
-                    semanticTags: scenario.tags.filter((tag) => [
-                        'happy-path',
-                        'validation',
-                        'business-failure',
-                        'business-rule',
-                        'compensation',
-                        'idempotency',
-                        'expiration',
-                        'workflow-state',
-                    ].includes(tag)),
+                    semanticTags: scenario.tags.filter((tag) => SEMANTIC_SCENARIO_TAGS.includes(tag)),
                     tags: scenario.tags,
                     layer: inferFeatureLayer(filePath),
                     line: scenario.line,

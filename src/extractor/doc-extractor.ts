@@ -30,8 +30,10 @@
  * - **Deterministic IDs**: MD5 hash of file path + line number ensures stable identifiers
  */
 
+import * as fs from 'fs';
 import * as path from 'path';
 import type { ScannedFile } from '../scanner/index.js';
+import { processExtractShapesTag } from './shape-extractor.js';
 import type {
   ExtractedPattern,
   DocDirective,
@@ -161,6 +163,29 @@ export function buildPattern(
   const name = inferPatternName(directive, exports, registry);
   const category = asCategoryName(inferCategory(directive.tags as readonly string[], registry));
 
+  // Extract shapes if @libar-docs-extract-shapes tag is present
+  // Read file lazily only when extraction is needed
+  let extractedShapes;
+  const extractionWarnings: string[] = [];
+  if (directive.extractShapes && directive.extractShapes.length > 0) {
+    try {
+      const sourceContent = fs.readFileSync(filePath, 'utf-8');
+      const shapeResult = processExtractShapesTag(
+        sourceContent,
+        directive.extractShapes.join(', ')
+      );
+      extractedShapes = shapeResult.shapes;
+      extractionWarnings.push(...shapeResult.warnings);
+    } catch (error) {
+      // File read error - collect warning but continue without shapes
+      extractionWarnings.push(
+        `[shape-extraction] Failed to read file for shape extraction: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+  // Note: extractionWarnings are collected but currently not surfaced
+  // Future enhancement: add warnings field to ExtractedPattern schema
+
   // Build pattern object
   const pattern = {
     id,
@@ -204,6 +229,8 @@ export function buildPattern(
     ...(directive.archRole !== undefined && { archRole: directive.archRole }),
     ...(directive.archContext !== undefined && { archContext: directive.archContext }),
     ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
+    // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
+    ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
   };
 
   // Validate against schema (schema-first enforcement)

@@ -25,6 +25,15 @@
   - Provides clear error messages for invalid transitions
   - Integrates with generators and linters
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`process-state.ts`](../../src/api/process-state.ts) - ## Process State API - Programmatic Query Interface
+- [`states.ts`](../../src/validation/fsm/states.ts) - :PDR005MvpWorkflow
+- [`transitions.ts`](../../src/validation/fsm/transitions.ts) - :PDR005MvpWorkflow
+- [`validator.ts`](../../src/validation/fsm/validator.ts) - :PDR005MvpWorkflow
+
 ## Acceptance Criteria
 
 **Only valid status values are accepted**

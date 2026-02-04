@@ -55,9 +55,9 @@ export declare function createDirectiveTagSchema(tagPrefix: string): z.ZodPipe<z
  * @see src/taxonomy/status-values.ts
  */
 export declare const DefaultPatternStatusSchema: z.ZodEnum<{
-    completed: "completed";
-    active: "active";
     roadmap: "roadmap";
+    active: "active";
+    completed: "completed";
     deferred: "deferred";
 }>;
 /**
@@ -70,9 +70,9 @@ export declare const DefaultPatternStatusSchema: z.ZodEnum<{
  * @see src/taxonomy/normalized-status.ts
  */
 export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
-    completed: "completed";
-    active: "active";
     roadmap: "roadmap";
+    active: "active";
+    completed: "completed";
     deferred: "deferred";
 }>;
 /**
@@ -82,9 +82,9 @@ export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
  * Legacy values are normalized to display values via normalizeStatus().
  */
 export declare const PatternStatusSchema: z.ZodEnum<{
-    completed: "completed";
-    active: "active";
     roadmap: "roadmap";
+    active: "active";
+    completed: "completed";
     deferred: "deferred";
 }>;
 export type PatternStatus = AcceptedStatusValue;
@@ -131,9 +131,9 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     }, z.core.$strict>;
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
-        completed: "completed";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
+        completed: "completed";
         deferred: "deferred";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
@@ -159,6 +159,7 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     archRole: z.ZodOptional<z.ZodString>;
     archContext: z.ZodOptional<z.ZodString>;
     archLayer: z.ZodOptional<z.ZodString>;
+    extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
 }, z.core.$strict>;
 /**
  * Type alias inferred from schema

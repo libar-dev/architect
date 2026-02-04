@@ -24,6 +24,12 @@ Defines types for the process guard linter including:
 - Validation results (violations and warnings)
 - Session scoping types
 
+### When to Use
+
+- When importing types for process guard implementations
+- When implementing custom validation rules or decider functions
+- When working with process state or change detection results
+
 ### Design Principles
 
 - Types enable pure Decider pattern (no I/O in validation)

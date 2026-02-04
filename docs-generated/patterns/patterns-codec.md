@@ -16,6 +16,12 @@
 Transforms MasterDataset into a RenderableDocument for pattern registry output.
 Generates PATTERNS.md and category detail files (patterns/*.md).
 
+### When to Use
+
+- When generating the pattern registry documentation (PATTERNS.md)
+- When creating category-specific pattern detail files
+- When building pattern overview reports with status tracking
+
 ### Factory Pattern
 
 Use `createPatternsCodec(options)` to create a configured codec:

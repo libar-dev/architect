@@ -5,6 +5,7 @@
  * @libar-docs-status active
  * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:FSMValidator
+ * @libar-docs-extract-shapes ProcessGuardRule, DeciderInput, ValidationResult, ProcessViolation, FileState
  *
  * ## ProcessGuardTypes - Type Definitions for Process Guard Linter
  *

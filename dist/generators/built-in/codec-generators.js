@@ -26,6 +26,7 @@
  */
 import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
+import { createDecisionDocGenerator } from './decision-doc-generator.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec-Based Generators (RDM Architecture)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -114,4 +115,23 @@ generatorRegistry.register(createCodecGenerator('business-rules', 'business-rule
  * Generates ARCHITECTURE.md (component and layered architecture diagrams)
  */
 generatorRegistry.register(createCodecGenerator('architecture', 'architecture'));
+/**
+ * Taxonomy Reference Generator
+ * Generates TAXONOMY.md + taxonomy/*.md detail files
+ */
+generatorRegistry.register(createCodecGenerator('taxonomy', 'taxonomy'));
+/**
+ * Validation Rules Generator
+ * Generates VALIDATION-RULES.md + validation/*.md detail files
+ */
+generatorRegistry.register(createCodecGenerator('validation-rules', 'validation-rules'));
+// ═══════════════════════════════════════════════════════════════════════════
+// Decision Document Generator (Pattern-Based, not Codec-Based)
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Decision Document Generator
+ * Generates documentation from ADR/PDR decision documents with source mappings.
+ * Produces both compact (_claude-md/) and detailed (docs/) outputs.
+ */
+generatorRegistry.register(createDecisionDocGenerator());
 //# sourceMappingURL=codec-generators.js.map

@@ -41,6 +41,8 @@ import {
   OverviewCodec,
   BusinessRulesCodec,
   ArchitectureDocumentCodec,
+  TaxonomyDocumentCodec,
+  ValidationRulesCodec,
 } from './codecs/index.js';
 
 // Factory functions for creating codecs with options
@@ -62,6 +64,8 @@ import {
   createOverviewCodec,
   createBusinessRulesCodec,
   createArchitectureCodec,
+  createTaxonomyCodec,
+  createValidationRulesCodec,
 } from './codecs/index.js';
 
 // Codec options types
@@ -83,6 +87,8 @@ import type {
   OverviewCodecOptions,
   BusinessRulesCodecOptions,
   ArchitectureCodecOptions,
+  TaxonomyCodecOptions,
+  ValidationRulesCodecOptions,
 } from './codecs/index.js';
 
 // Shared codec types for type-safe factory invocation
@@ -164,6 +170,14 @@ export const DOCUMENT_TYPES = {
     outputPath: 'ARCHITECTURE.md',
     description: 'Architecture diagrams (component and layered views)',
   },
+  taxonomy: {
+    outputPath: 'TAXONOMY.md',
+    description: 'Tag taxonomy configuration reference',
+  },
+  'validation-rules': {
+    outputPath: 'VALIDATION-RULES.md',
+    description: 'Process Guard validation rules reference',
+  },
 } as const;
 
 export type DocumentType = keyof typeof DOCUMENT_TYPES;
@@ -207,6 +221,8 @@ export interface CodecOptions {
   overview?: OverviewCodecOptions;
   'business-rules'?: BusinessRulesCodecOptions;
   architecture?: ArchitectureCodecOptions;
+  taxonomy?: TaxonomyCodecOptions;
+  'validation-rules'?: ValidationRulesCodecOptions;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -234,6 +250,8 @@ const CODEC_MAP = {
   overview: OverviewCodec,
   'business-rules': BusinessRulesCodec,
   architecture: ArchitectureDocumentCodec,
+  taxonomy: TaxonomyDocumentCodec,
+  'validation-rules': ValidationRulesCodec,
 } as const;
 
 /**
@@ -258,6 +276,8 @@ const CODEC_FACTORY_MAP = {
   overview: createOverviewCodec,
   'business-rules': createBusinessRulesCodec,
   architecture: createArchitectureCodec,
+  taxonomy: createTaxonomyCodec,
+  'validation-rules': createValidationRulesCodec,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════

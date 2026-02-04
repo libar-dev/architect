@@ -7,160 +7,160 @@
   "sections": [
     {
       "title": "Project Overview",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "core/project-overview.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "High-level project description"
         }
       ]
     },
     {
       "title": "Common Commands",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "core/common-commands.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Build, test, lint, and documentation commands"
         }
       ]
     },
     {
       "title": "Architecture",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "core/architecture.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Four-stage pipeline, design patterns, module structure, presets"
         }
       ]
     },
     {
       "title": "Testing",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "testing/testing-policy.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Gherkin-only testing policy and test safety rules"
         },
         {
           "path": "testing/vitest-cucumber.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "vitest-cucumber patterns, rules, and quirks"
         },
         {
           "path": "testing/test-implementation.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Common test issues, debugging strategy, workflow checklist"
         }
       ]
     },
     {
       "title": "Session Workflows",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "workflow/session-workflows.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Session decision tree and session types"
         },
         {
           "path": "workflow/session-details.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Planning, Design, and Implementation session details"
         },
         {
           "path": "workflow/fsm-handoff.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "FSM protection, error messages, escape hatches, and handoff documentation"
         }
       ]
     },
     {
       "title": "Validation",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "validation/process-guard.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Process Guard CLI, protection levels, exit codes"
         },
         {
           "path": "validation/anti-patterns.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Dual-source ownership rules and DoD validation"
         }
       ]
     },
     {
       "title": "Annotation System",
-      "tags": ["core-mandatory"],
+      "tags": ["api-reference"],
       "subsections": [
         {
           "path": "api/annotation-system.md",
-          "tags": ["core-mandatory"],
+          "tags": ["api-reference"],
           "description": "Opt-in markers, key tags, CLI commands"
         },
         {
           "path": "api/tag-formats.md",
-          "tags": ["core-mandatory"],
+          "tags": ["api-reference"],
           "description": "Tag format types, status normalization, value constraints"
         },
         {
           "path": "api/dual-source.md",
-          "tags": ["core-mandatory"],
+          "tags": ["api-reference"],
           "description": "Dual-source architecture, TypeScript vs Feature Files, merging rules"
         },
         {
           "path": "api/relationships.md",
-          "tags": ["core-mandatory", "api", "relationships"],
+          "tags": ["api-reference"],
           "description": "Relationship taxonomy, tag ownership rules, workflow-relationship matrix"
         }
       ]
     },
     {
       "title": "ProcessStateAPI",
-      "tags": ["core-mandatory"],
+      "tags": ["api-reference"],
       "subsections": [
         {
           "path": "api/process-state-api.md",
-          "tags": ["core-mandatory"],
+          "tags": ["api-reference"],
           "description": "Programmatic API usage and generated documentation"
         }
       ]
     },
     {
       "title": "Authoring",
-      "tags": ["core-mandatory"],
+      "tags": ["core"],
       "subsections": [
         {
           "path": "authoring/gherkin-patterns.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Gherkin spec structure, tag conventions, Rule blocks"
         },
         {
           "path": "authoring/feature-content.md",
-          "tags": ["core-mandatory"],
+          "tags": ["core"],
           "description": "Feature file rich content, code-first principle, valid/forbidden content"
         }
       ]
     },
     {
       "title": "Claude MD Management",
-      "tags": ["core-mandatory"],
+      "tags": ["meta"],
       "subsections": [
         {
           "path": "meta/management.md",
-          "tags": ["core-mandatory"],
+          "tags": ["meta"],
           "description": "Modular CLAUDE.md architecture, adding content, guidelines"
         },
         {
           "path": "meta/deps-packages.md",
-          "tags": ["core-mandatory"],
+          "tags": ["meta"],
           "description": "External package sources via git subtrees"
         }
       ]
@@ -170,8 +170,22 @@
     {
       "name": "default",
       "path": "/",
-      "tags": ["core-mandatory"],
-      "description": "Complete CLAUDE.md for repo root"
+      "tags": ["core"],
+      "description": "Core context with testing, workflow, validation, and authoring"
+    }
+  ],
+  "additive_variations": [
+    {
+      "name": "api-reference",
+      "output_dir": ".claude-layers/api-reference",
+      "tags": ["api-reference"],
+      "description": "Annotation system, tag formats, and API reference"
+    },
+    {
+      "name": "meta",
+      "output_dir": ".claude-layers/meta",
+      "tags": ["meta"],
+      "description": "CLAUDE.md management and deps-packages exploration"
     }
   ]
 }

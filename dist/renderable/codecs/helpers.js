@@ -31,6 +31,66 @@
  * ```
  */
 import { table, code, list, paragraph, heading } from '../schema.js';
+import { normalizeLineEndings } from '../../utils/string-utils.js';
+/**
+ * Partition business rules by ADR-style name prefixes.
+ *
+ * Rules are categorized based on their name prefix:
+ * - "Context..." → context section
+ * - "Decision..." → decision section
+ * - "Consequence..." → consequences section
+ * - Others → other (optionally logged as warning)
+ *
+ * This is a shared helper used by both ADR and Decision Doc codecs.
+ *
+ * @param rules - Business rules from the extracted pattern
+ * @param options - Partitioning options
+ * @returns Partitioned rules by category
+ *
+ * @example
+ * ```typescript
+ * // ADR codec (warn about unmatched rules)
+ * const partitioned = partitionRulesByPrefix(pattern.rules, {
+ *   warnOnOther: true,
+ *   patternName: pattern.name
+ * });
+ *
+ * // Decision doc codec (no warning)
+ * const partitioned = partitionRulesByPrefix(pattern.rules);
+ * ```
+ */
+export function partitionRulesByPrefix(rules, options = {}) {
+    if (!rules || rules.length === 0) {
+        return { context: [], decision: [], consequences: [], other: [] };
+    }
+    const { warnOnOther = false, patternName, onWarning = console.warn } = options;
+    const context = [];
+    const decision = [];
+    const consequences = [];
+    const other = [];
+    for (const rule of rules) {
+        const nameLower = rule.name.toLowerCase();
+        if (nameLower.startsWith('context')) {
+            context.push(rule);
+        }
+        else if (nameLower.startsWith('decision')) {
+            decision.push(rule);
+        }
+        else if (nameLower.startsWith('consequence')) {
+            consequences.push(rule);
+        }
+        else {
+            other.push(rule);
+        }
+    }
+    // Optionally warn about rules that don't match expected ADR prefixes
+    if (warnOnOther && other.length > 0) {
+        const otherNames = other.map((r) => `"${r.name}"`).join(', ');
+        const patternContext = patternName ? ` in pattern "${patternName}"` : '';
+        onWarning(`[codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`);
+    }
+    return { context, decision, consequences, other };
+}
 /**
  * Default rich content options
  *
@@ -164,7 +224,7 @@ export function parseDescriptionWithDocStrings(description, options) {
         return [];
     }
     // Normalize line endings (Windows CRLF → LF)
-    const normalized = description.replace(/\r\n/g, '\n');
+    const normalized = normalizeLineEndings(description);
     // Detect unclosed DocStrings (odd number of """)
     // Important: Exclude """ that appears inside backticks (inline code examples)
     // e.g., `"""typescript` should not be counted as a delimiter
@@ -331,7 +391,7 @@ export function parseBusinessRuleAnnotations(description) {
         return {};
     }
     // Normalize line endings
-    const normalized = description.replace(/\r\n/g, '\n');
+    const normalized = normalizeLineEndings(description);
     const result = {};
     const codeExamples = [];
     // Step 1: Extract code fences FIRST (before annotation parsing)
@@ -621,5 +681,31 @@ export function renderPatternRichContent(pattern, options) {
         sections.push(...renderBusinessRulesSection(pattern.rules, opts));
     }
     return sections;
+}
+/**
+ * Render extracted TypeScript shapes as markdown code blocks.
+ *
+ * @param shapes - Shapes to render
+ * @param options - Rendering options
+ * @returns Markdown string with fenced code blocks
+ */
+export function renderShapesAsMarkdown(shapes, options = {}) {
+    const { groupInSingleBlock = true, includeJsDoc = true } = options;
+    if (shapes.length === 0) {
+        return '';
+    }
+    const renderShape = (shape) => {
+        const parts = [];
+        if (includeJsDoc && shape.jsDoc) {
+            parts.push(shape.jsDoc);
+        }
+        parts.push(shape.sourceText);
+        return parts.join('\n');
+    };
+    if (groupInSingleBlock) {
+        const content = shapes.map(renderShape).join('\n\n');
+        return '```typescript\n' + content + '\n```';
+    }
+    return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
 }
 //# sourceMappingURL=helpers.js.map

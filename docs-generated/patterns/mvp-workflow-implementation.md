@@ -25,6 +25,13 @@
   2. Update validation schemas to import from taxonomy module
   3. Update generators to use normalizeStatus() for display bucket mapping
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`doc-directive.ts`](../../src/validation-schemas/doc-directive.ts) - ## DocDirectiveSchema - Parsed JSDoc Directive Validation
+- [`dual-source.ts`](../../src/validation-schemas/dual-source.ts) - ## DualSourceSchemas - Dual-Source Extraction Type Validation
+
 ## Acceptance Criteria
 
 **Scanner extracts new status values**

@@ -5,4 +5,6 @@ export { extractProcessMetadata, extractDeliverables, combineSources, validateDu
 export { inferFeatureLayer, FEATURE_LAYERS } from './layer-inference.js';
 // Gherkin Extraction (Feature File → Pattern)
 export { extractPatternsFromGherkin, extractPatternsFromGherkinAsync, computeHierarchyChildren, } from './gherkin-extractor.js';
+// Shape Extraction (ADR-021: Documentation Generation)
+export { extractShapes, processExtractShapesTag, renderShapesAsMarkdown, } from './shape-extractor.js';
 //# sourceMappingURL=index.js.map

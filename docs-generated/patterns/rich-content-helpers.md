@@ -17,6 +17,12 @@ Shared helper functions for rendering Gherkin rich content in document codecs.
 Provides granular and composite helpers for DataTables, DocStrings, steps,
 scenarios, and business rules.
 
+### When to Use
+
+- When building custom codecs that need to render Gherkin content
+- When transforming DataTables, DocStrings, or scenarios into markdown
+- When implementing acceptance criteria or business rules sections
+
 ### Usage Pattern
 
 ```typescript

@@ -155,3 +155,46 @@ export {
   type ArchitectureDiagramType,
   DEFAULT_ARCHITECTURE_OPTIONS,
 } from './architecture.js';
+
+// Decision Doc (for documentation generation from ADR/PDR)
+export {
+  // Types
+  type SourceMappingEntry,
+  type PartitionedDecisionRules,
+  type ExtractedDocString,
+  type DecisionDocContent,
+  // Constants
+  SELF_REFERENCE_MARKER,
+  SELF_REFERENCE_RULE_PATTERN,
+  SELF_REFERENCE_DOCSTRING_PATTERN,
+  EXTRACTION_METHODS,
+  // Functions
+  partitionDecisionRules,
+  extractDocStrings,
+  extractDocStringsFromRules,
+  parseSourceMappingTable,
+  parseSourceMappingsFromRules,
+  isSelfReference,
+  parseSelfReference,
+  findRuleByName,
+  extractRuleContent,
+  parseDecisionDocument,
+  normalizeExtractionMethod,
+  docStringsToCodeBlocks,
+} from './decision-doc.js';
+
+// Taxonomy (includes TaxonomyCodecOptions)
+export {
+  TaxonomyDocumentCodec,
+  createTaxonomyCodec,
+  type TaxonomyCodecOptions,
+  DEFAULT_TAXONOMY_OPTIONS,
+} from './taxonomy.js';
+
+// Validation Rules (includes ValidationRulesCodecOptions)
+export {
+  ValidationRulesCodec,
+  createValidationRulesCodec,
+  type ValidationRulesCodecOptions,
+  DEFAULT_VALIDATION_RULES_OPTIONS,
+} from './validation-rules.js';

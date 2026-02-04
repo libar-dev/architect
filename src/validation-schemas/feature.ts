@@ -46,6 +46,31 @@ export const GherkinDocStringSchema = z
 export type GherkinDocString = z.infer<typeof GherkinDocStringSchema>;
 
 /**
+ * Schema for an Examples table in a Scenario Outline
+ *
+ * Examples tables define parameter values for Scenario Outline iterations.
+ * Each Examples block can have its own name, tags, and data rows.
+ */
+export const GherkinExamplesSchema = z
+  .object({
+    /** Examples table name (often empty string) */
+    name: z.string(),
+    /** Examples table description */
+    description: z.string().optional(),
+    /** Tags applied to this Examples table */
+    tags: z.array(z.string()).readonly(),
+    /** Column headers from the first row */
+    headers: z.array(z.string()).readonly(),
+    /** Data rows (excluding header row), each row maps column name to value */
+    rows: z.array(z.record(z.string(), z.string())).readonly(),
+    /** Line number where Examples table starts */
+    line: z.number().int().positive(),
+  })
+  .strict();
+
+export type GherkinExamples = z.infer<typeof GherkinExamplesSchema>;
+
+/**
  * Schema for a step within a Background or Scenario
  *
  * Uses flexible string for keyword to handle any Cucumber parser output.
@@ -83,6 +108,9 @@ export const GherkinBackgroundSchema = z
 
 /**
  * Schema for a single scenario within a Gherkin feature
+ *
+ * For Scenario Outlines, the examples field contains the Examples tables.
+ * Regular Scenarios have no examples (field is undefined or empty).
  */
 export const GherkinScenarioSchema = z
   .object({
@@ -94,6 +122,8 @@ export const GherkinScenarioSchema = z
     tags: z.array(z.string()).readonly(),
     /** Scenario steps with full DataTable/DocString support */
     steps: z.array(GherkinStepSchema).readonly(),
+    /** Examples tables for Scenario Outline (undefined/empty for regular Scenario) */
+    examples: z.array(GherkinExamplesSchema).readonly().optional(),
     /** Line number where scenario starts */
     line: z.number().int().positive(),
   })

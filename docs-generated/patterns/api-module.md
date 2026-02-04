@@ -16,6 +16,12 @@
 Central export for the Process State API, providing a TypeScript
 interface for querying delivery process state.
 
+### When to Use
+
+- When building tools that need programmatic access to delivery process state
+- When integrating with Claude Code for real-time process queries
+- When building CI/CD pipelines that validate delivery workflow
+
 ### Usage
 
 ```typescript

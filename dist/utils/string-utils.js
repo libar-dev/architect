@@ -88,6 +88,25 @@ export function toKebabCase(text) {
         .replace(/^-+|-+$/g, ''));
 }
 /**
+ * Convert PascalCase or camelCase text to UPPER-KEBAB-CASE
+ *
+ * This is useful for generating constant-style identifiers or
+ * documentation file names that use uppercase conventions.
+ *
+ * @param text - Input text in PascalCase or camelCase
+ * @returns UPPER-KEBAB-CASE string
+ *
+ * @example
+ * ```typescript
+ * toUpperKebabCase('ProcessGuard');           // 'PROCESS-GUARD'
+ * toUpperKebabCase('DecisionDocCodec');       // 'DECISION-DOC-CODEC'
+ * toUpperKebabCase('OAuth2Flow');             // 'O-AUTH-2-FLOW'
+ * ```
+ */
+export function toUpperKebabCase(text) {
+    return toKebabCase(text).toUpperCase();
+}
+/**
  * Known acronyms that should not be split during case conversion.
  *
  * These terms are protected with placeholders before regex processing,
@@ -199,5 +218,23 @@ export function camelCaseToTitleCase(text) {
         result = result.split(placeholder).join(acronym);
     }
     return result;
+}
+/**
+ * Normalize line endings from Windows CRLF to Unix LF.
+ *
+ * Used when processing text that may have been created on Windows systems
+ * or transferred through systems that preserve Windows line endings.
+ *
+ * @param text - Text that may contain CRLF line endings
+ * @returns Text with all CRLF sequences replaced by LF
+ *
+ * @example
+ * ```typescript
+ * normalizeLineEndings('line1\r\nline2\r\n'); // 'line1\nline2\n'
+ * normalizeLineEndings('already\nunix\n');    // 'already\nunix\n'
+ * ```
+ */
+export function normalizeLineEndings(text) {
+    return text.replace(/\r\n/g, '\n');
 }
 //# sourceMappingURL=string-utils.js.map

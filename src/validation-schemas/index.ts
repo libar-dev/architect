@@ -26,6 +26,22 @@ export {
   type BusinessRule,
 } from './extracted-pattern.js';
 
+// ExtractedShape schemas and types (ADR-021: Shape Extraction)
+export {
+  ShapeKindSchema,
+  ExtractedShapeSchema,
+  ReExportedShapeSchema,
+  ShapeExtractionResultSchema,
+  ShapeExtractionOptionsSchema,
+  isExtractedShape,
+  isShapeExtractionResult,
+  type ShapeKind,
+  type ExtractedShape,
+  type ReExportedShape,
+  type ShapeExtractionResult,
+  type ShapeExtractionOptions,
+} from './extracted-shape.js';
+
 // ScenarioRef schemas and types
 export { ScenarioRefSchema, type ScenarioRef } from './scenario-ref.js';
 

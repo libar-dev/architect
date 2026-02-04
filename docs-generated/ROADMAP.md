@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 73/110 (66%)
+**Patterns:** [██████████████░░░░░░] 81/120 (68%)
 
-**Phases:** 0/9 complete
+**Phases:** 2/11 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 110 |
-| Completed | 73 |
+| Total Patterns | 120 |
+| Completed | 81 |
 | Active | 13 |
-| Planned | 24 |
+| Planned | 26 |
 
 ---
 
@@ -27,6 +27,8 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
+| ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
+| ✅ [SourceMapper](phases/phase-27-source-mapper.md) | 3/3 | 100% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -65,6 +67,29 @@
 | Pattern | Status | Description |
 | --- | --- | --- |
 | 📋 Claude Module Generation | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
+
+---
+
+### ✅ ShapeExtractor
+
+[███████████████] 2/2 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Shape Extraction | completed | Documentation comments duplicate type definitions that exist in the same file. |
+| ✅ Shape Extractor | completed | Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for... |
+
+---
+
+### ✅ SourceMapper
+
+[███████████████] 3/3 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
+| ✅ Doc Generation Proof Of Concept | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
+| ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 
 ---
 

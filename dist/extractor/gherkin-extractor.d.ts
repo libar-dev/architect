@@ -30,6 +30,13 @@ import { type ExtractedPattern } from '../validation-schemas/extracted-pattern.j
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { type GherkinPatternValidationError } from '../types/errors.js';
 /**
+ * Semantic tags for scenario categorization.
+ *
+ * These tags identify the nature of a scenario (e.g., happy-path, validation)
+ * and are extracted from scenario tags during pattern extraction.
+ */
+export declare const SEMANTIC_SCENARIO_TAGS: readonly ["happy-path", "validation", "business-failure", "business-rule", "compensation", "idempotency", "expiration", "workflow-state"];
+/**
  * Configuration for Gherkin extractor
  */
 export interface GherkinExtractorConfig {

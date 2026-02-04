@@ -248,6 +248,11 @@ export const DocDirectiveSchema = z
 
     /** Architectural layer (from @libar-docs-arch-layer tag) */
     archLayer: z.string().optional(),
+
+    // Shape extraction fields
+
+    /** Shape names to extract from this file (from @libar-docs-extract-shapes tag) */
+    extractShapes: z.array(z.string()).readonly().optional(),
   })
   .strict();
 

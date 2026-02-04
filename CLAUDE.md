@@ -21,6 +21,75 @@ Code-first documentation and delivery process toolkit. Extracts patterns from Ty
 
 ---
 
+### Development Philosophy
+
+**This package was extracted from a large monorepo** where it accelerates development by eliminating manually maintained documentation. It is published and consumed by that monorepo.
+
+#### Why This Matters for Implementation Sessions
+
+| Aspect    | Wrong Mental Model                    | Correct Mental Model                              |
+| --------- | ------------------------------------- | ------------------------------------------------- |
+| Scope     | "Build feature for small output here" | "Build capability for hundreds of files there"    |
+| ROI       | "Over-engineered for this repo"       | "Multi-day investment saves weeks of maintenance" |
+| Testing   | "Simple feature, basic tests"         | "Mission-critical infra, comprehensive tests"     |
+| Shortcuts | "Good enough for this repo"           | "Must work across many annotated sources"         |
+
+#### Reference Implementation Pattern
+
+This package uses itself as the primary test case:
+
+- `_claude-md/validation/process-guard.md` → compact AI context
+- `docs/PROCESS-GUARD.md` → detailed human reference
+
+Both generated from the SAME annotated sources. When the POC succeeds here, the pattern applies to the entire monorepo.
+
+#### Session Planning Principle
+
+Features are planned for **reusability across the monorepo**, not for minimal output in this package.
+
+---
+
+### Target Monorepo
+
+**Location:** `~/dev-projects/convex-event-sourcing/libar-platform`
+
+The package is actively used as a dev dependency. The monorepo contains:
+
+| Component                 | Purpose                                                                    |
+| ------------------------- | -------------------------------------------------------------------------- |
+| `packages/platform-*`     | 6 platform packages with annotated TypeScript sources                      |
+| `delivery-process/specs/` | Tier 1 roadmap specifications                                              |
+| `docs-living/`            | Generated documentation output (patterns, phases, requirements, decisions) |
+
+**Manual docs being replaced:** `~/dev-projects/convex-event-sourcing/docs/` contains 150+ manually maintained files including architecture decisions, pattern theory, roadmap phases, and project management docs—all candidates for code-first generation.
+
+#### What Gets Generated
+
+| Output Type                  | Purpose                                    |
+| ---------------------------- | ------------------------------------------ |
+| `PATTERNS.md` + detail pages | Pattern registry from annotated TypeScript |
+| `ROADMAP.md` + phase files   | Roadmap from Tier 1 feature specs          |
+| `REMAINING-WORK.md`          | Outstanding work summary                   |
+| `CURRENT-WORK.md`            | Active work tracking                       |
+| `DECISIONS.md` + ADRs        | Architecture decision records              |
+| `BUSINESS-RULES.md`          | Business rules from Gherkin                |
+
+---
+
+### Why No Shortcuts
+
+Every shortcut in this package ripples across:
+
+- Multiple platform packages with annotated sources
+- Many Gherkin feature specifications
+- All generated documentation files
+
+**Test rigor matches mission-critical status.** A bug in the codec system means many files generate incorrectly. A gap in the extractor means patterns are missed across source files.
+
+The validation in this repo is a **proof of concept**. When it succeeds here, the same validation applies to the entire monorepo's delivery workflow.
+
+---
+
 ## Common Commands
 
 ### Common Commands
@@ -454,17 +523,16 @@ For multi-session work, capture state at session boundaries:
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
 
-#### 7 Validation Rules
+#### 6 Validation Rules
 
-| Rule ID                       | Severity | Description                                         |
-| ----------------------------- | -------- | --------------------------------------------------- |
-| `completed-protection`        | error    | Completed specs require `@libar-docs-unlock-reason` |
-| `invalid-status-transition`   | error    | Must follow FSM path                                |
-| `scope-creep`                 | error    | Active specs cannot add new deliverables            |
-| `session-excluded`            | error    | Cannot modify explicitly excluded files             |
-| `missing-relationship-target` | warning  | Relationship target pattern not found               |
-| `session-scope`               | warning  | File outside session scope                          |
-| `deliverable-removed`         | warning  | Deliverable was removed                             |
+| Rule ID                     | Severity | Description                                         |
+| --------------------------- | -------- | --------------------------------------------------- |
+| `completed-protection`      | error    | Completed specs require `@libar-docs-unlock-reason` |
+| `invalid-status-transition` | error    | Must follow FSM path                                |
+| `scope-creep`               | error    | Active specs cannot add new deliverables            |
+| `session-excluded`          | error    | Cannot modify explicitly excluded files             |
+| `session-scope`             | warning  | File outside session scope                          |
+| `deliverable-removed`       | warning  | Deliverable was removed                             |
 
 #### Protection Levels
 
@@ -545,215 +613,6 @@ npx validate-patterns \
   --anti-patterns \
   --dod
 ```
-
----
-
-## Annotation System
-
-### Annotation System
-
-Files must opt-in with a marker to be scanned:
-
-```typescript
-/** @libar-docs */
-
-/**
- * @libar-docs-pattern PatternName
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-uses OtherPattern
- *
- * ## Description in markdown
- */
-export class MyClass { ... }
-```
-
-**Note:** Both TypeScript files and Gherkin feature files require the `@libar-docs` opt-in marker. For TypeScript, use a JSDoc comment `/** @libar-docs */`. For Gherkin, add the `@libar-docs` tag at the feature level.
-
-#### Key Tags
-
-| Tag                | Format | Description                                             |
-| ------------------ | ------ | ------------------------------------------------------- |
-| `pattern`          | value  | Pattern identifier (required for named patterns)        |
-| `status`           | enum   | FSM state: `roadmap`, `active`, `completed`, `deferred` |
-| `phase`            | number | Roadmap phase number                                    |
-| `release`          | value  | Version tag: `v0.1.0` or `vNEXT`                        |
-| `uses`             | csv    | Runtime dependencies (TypeScript only)                  |
-| `used-by`          | csv    | Reverse dependencies                                    |
-| `depends-on`       | csv    | Planning dependencies (Gherkin only)                    |
-| `quarter`          | value  | Timeline: `Q1-2025` (Gherkin only)                      |
-| `implements`       | csv    | Links behavior tests to tier 1 specs                    |
-| `extends`          | value  | Pattern inheritance                                     |
-| `executable-specs` | value  | Location of behavior tests                              |
-| `arch-role`        | value  | Architecture diagram: component role                    |
-| `arch-context`     | value  | Architecture diagram: bounded context                   |
-| `arch-layer`       | value  | Architecture diagram: layer assignment                  |
-
-**Category tags** are flags (no value): `@libar-docs-core`, `@libar-docs-api`, `@libar-docs-infra`, `@libar-docs-domain`, etc.
-
-#### CLI Commands
-
-| Command                 | Purpose                                                    |
-| ----------------------- | ---------------------------------------------------------- |
-| `generate-docs`         | Generate documentation from annotated sources              |
-| `lint-patterns`         | Validate annotation quality (missing tags, invalid status) |
-| `lint-process`          | FSM validation for delivery process                        |
-| `validate-patterns`     | Cross-source validation with DoD checks                    |
-| `generate-tag-taxonomy` | Generate tag reference from TypeScript                     |
-
-### Tag Format Types
-
-Tags have different value formats for parsing:
-
-| Format         | Example                    | Description                    |
-| -------------- | -------------------------- | ------------------------------ |
-| `flag`         | `@docs-core`               | Boolean presence (no value)    |
-| `value`        | `@docs-pattern MyPattern`  | Simple string value            |
-| `enum`         | `@docs-status completed`   | Constrained to predefined list |
-| `csv`          | `@docs-uses A, B, C`       | Comma-separated values         |
-| `number`       | `@docs-phase 15`           | Numeric value                  |
-| `quoted-value` | `@docs-brief:'Multi word'` | Preserves spaces in value      |
-
-#### Status Normalization
-
-All codecs normalize status to three canonical display values:
-
-| Input Status                        | Normalized To |
-| ----------------------------------- | ------------- |
-| `completed`                         | `completed`   |
-| `active`                            | `active`      |
-| `roadmap`, `deferred`, or undefined | `planned`     |
-
-#### Tag Value Constraints
-
-**Tag values cannot contain spaces.** Use hyphens instead:
-
-| Invalid                        | Valid                          |
-| ------------------------------ | ------------------------------ |
-| `@unlock-reason:Fix for issue` | `@unlock-reason:Fix-for-issue` |
-| `@pattern:My Pattern`          | `@pattern:MyPattern`           |
-
-### Dual-Source Architecture
-
-Patterns can be defined in TypeScript, Feature files, or both. Each source owns specific metadata.
-
-#### When to Use TypeScript vs Feature Files
-
-| Use Case                  | Source       | Why                                       |
-| ------------------------- | ------------ | ----------------------------------------- |
-| Retroactive documentation | TypeScript   | Code existed before delivery process      |
-| Rich relationships        | TypeScript   | `@libar-docs-uses`, `@libar-docs-used-by` |
-| Phase/release tracking    | Feature file | Milestone planning                        |
-| Acceptance criteria       | Feature file | BDD scenarios                             |
-| New patterns              | Both         | Feature for roadmap, TypeScript for graph |
-
-#### Category Flags (libar-generic preset)
-
-| Flag                | Domain         |
-| ------------------- | -------------- |
-| `@libar-docs-core`  | Core patterns  |
-| `@libar-docs-api`   | Public APIs    |
-| `@libar-docs-infra` | Infrastructure |
-
-**Note:** The `@libar-docs` opt-in marker is NOT a category—add explicit category tags for proper categorization.
-
-#### Dual-Source Merging
-
-When pattern exists in both TypeScript AND feature file:
-
-| Aspect            | Resolution                      |
-| ----------------- | ------------------------------- |
-| Pattern name      | Must match exactly              |
-| Categories        | Unioned from both sources       |
-| `uses`, `used-by` | Unioned from both sources       |
-| Phase/release     | Feature file takes precedence   |
-| Description       | TypeScript markdown description |
-
-**Warning:** If TypeScript file is missing `@libar-docs-status`, the pattern data is **ignored** and not merged with feature file.
-
-## Relationship Taxonomy
-
-| Tag          | UML Analog     | Direction     | Format | Source     | Arrow  |
-| ------------ | -------------- | ------------- | ------ | ---------- | ------ |
-| `implements` | Realization    | CODE→SPEC     | csv    | TypeScript | `..->` |
-| `extends`    | Generalization | CHILD→PARENT  | value  | Any        | `-->>` |
-| `uses`       | Dependency     | OUT           | csv    | TypeScript | `-->`  |
-| `used-by`    | Dependency     | IN            | csv    | TypeScript | `-->`  |
-| `depends-on` | Ordering       | SEQUENCE      | csv    | Gherkin    | `-.->` |
-| `enables`    | Ordering       | SEQUENCE      | csv    | Gherkin    | `-.->` |
-| `see-also`   | Association    | BIDIRECTIONAL | csv    | Any        | `---`  |
-| `api-ref`    | Reference      | DOC→API       | value  | Any        | N/A    |
-
-### Tag Ownership Rules
-
-| Tag                | TypeScript | Gherkin | Why                   |
-| ------------------ | ---------- | ------- | --------------------- |
-| `uses`             | ✅         | ❌      | Runtime dependencies  |
-| `used-by`          | ✅         | ❌      | Reverse of uses       |
-| `depends-on`       | ❌         | ✅      | Planning dependencies |
-| `enables`          | ❌         | ✅      | What this unblocks    |
-| `implements`       | ✅         | ❌      | Behavior test links   |
-| `executable-specs` | ❌         | ✅      | Spec file location    |
-
-### Workflow-Relationship Matrix
-
-| Workflow           | Required Tags     | Recommended Tags         |
-| ------------------ | ----------------- | ------------------------ |
-| **Planning**       | `status`, `phase` | `depends-on`, `enables`  |
-| **Design**         | `status`, `uses`  | `arch-*` tags, `extends` |
-| **Implementation** | `implements`      | `uses`, `used-by`        |
-
----
-
-## ProcessStateAPI
-
-For Claude Code sessions, use ProcessStateAPI instead of reading generated documentation:
-
-```typescript
-import {
-  generators,
-  api as apiModule,
-  createDefaultTagRegistry,
-} from '@libar-dev/delivery-process';
-
-// Build dataset from extracted patterns
-const tagRegistry = createDefaultTagRegistry();
-const dataset = generators.transformToMasterDataset({
-  patterns: extractedPatterns, // From scanPatterns + extractPatterns
-  tagRegistry,
-});
-const api = apiModule.createProcessStateAPI(dataset);
-
-// Common queries
-api.getCurrentWork(); // Active patterns
-api.getRoadmapItems(); // Available to start
-api.getPatternsByPhase(19); // All Phase 19 patterns
-api.isValidTransition('roadmap', 'active'); // Can we start?
-api.getPattern('BddTestingInfrastructure'); // Full pattern details
-api.getPhaseProgress(19); // Phase completion metrics
-```
-
-**Benefits over generated docs:**
-
-- Low context cost — typed queries vs. reading markdown
-- Real-time accuracy — direct from source, not snapshot
-- Instant queries — no regeneration required
-
-### Using Generated Documentation as Context
-
-When adding features, consult generated documentation for current state:
-
-```bash
-pnpm docs:patterns    # Creates PATTERNS.md with all patterns
-pnpm docs:all         # Creates roadmap, remaining work, changelog
-```
-
-Generated files are in `docs-generated/`:
-
-- `PATTERNS.md` - Pattern registry with completion status
-- `ROADMAP.md` - Development roadmap by phase
-- `REMAINING-WORK.md` - Incomplete work summary
-- `CURRENT-WORK.md` - Active work summary
 
 ---
 
@@ -868,86 +727,5 @@ Code stubs are annotated TypeScript files with `throw new Error("not yet impleme
 | -------------------------------- | ------------------------------- |
 | `@unlock-reason:Fix for issue`   | `@unlock-reason:Fix-for-issue`  |
 | `@libar-docs-pattern:My Pattern` | `@libar-docs-pattern:MyPattern` |
-
----
-
-## Claude MD Management
-
-### Modular CLAUDE.md Architecture
-
-The package uses a **modular CLAUDE.md system** via `@libar-dev/modular-claude-md`.
-
-**Philosophy:** Optimized instructions are the 20% of context that delivers 80% of value. Different work contexts need different information.
-
-#### Directory Structure
-
-| Directory                  | Purpose                                   |
-| -------------------------- | ----------------------------------------- |
-| `_claude-md/core/`         | Project overview, commands, architecture  |
-| `_claude-md/testing/`      | Gherkin policy, vitest-cucumber rules     |
-| `_claude-md/workflow/`     | Session workflows, FSM, handoff           |
-| `_claude-md/validation/`   | Process Guard, anti-patterns              |
-| `_claude-md/api/`          | Annotations, tag formats, ProcessStateAPI |
-| `_claude-md/authoring/`    | Gherkin patterns, feature file content    |
-| `_claude-md/meta/`         | Claude MD management, deps-packages       |
-| `_claude-md/metadata.json` | Central configuration                     |
-
-#### Adding New Content
-
-1. **Create module file** in appropriate directory:
-   - Use tables over paragraphs where possible
-   - Focus on actionable rules and patterns
-   - Keep it essential and compact
-
-2. **Update metadata.json** with module path and tags
-
-3. **Validate and build:**
-
-   ```bash
-   pnpm claude-md:validate  # Check configuration
-   pnpm claude-md:build     # Regenerate CLAUDE.md
-   pnpm claude-md:info      # Review structure
-   ```
-
-4. **Commit both** module and generated CLAUDE.md files
-
-#### Content Guidelines
-
-| Guideline      | Rationale                                            |
-| -------------- | ---------------------------------------------------- |
-| Essential only | Only include what Claude needs to know               |
-| Actionable     | Rules, patterns, decisions - not prose               |
-| Compact        | Tables over paragraphs where possible                |
-| Tagged         | Use tags to control which variations include content |
-
-### External Package Sources (deps-packages/)
-
-> **Claude Code Context Only**: This directory contains git subtrees of external packages for **source code exploration during Claude Code sessions**. These are NOT the actual dependencies—those come from npm via `package.json`.
-
-**Purpose:** Enable Claude Code to read implementations, understand APIs, and reference source code without leaving the repo.
-
-**Current Packages:**
-
-| Package           | Namespace                    | Purpose                     |
-| ----------------- | ---------------------------- | --------------------------- |
-| modular-claude-md | @libar-dev/modular-claude-md | CLAUDE.md generation system |
-
-**Rules:**
-
-| Rule         | Enforcement                                   |
-| ------------ | --------------------------------------------- |
-| Read freely  | Use Glob/Grep/Read to explore implementations |
-| Don't modify | `Edit(deps-packages/**)` denied               |
-| Don't push   | `git subtree push` blocked by settings        |
-
-**Updating packages:**
-
-```bash
-# Update to a specific tag
-git subtree pull --prefix=deps-packages/<name> <remote> <tag> --squash
-
-# Example:
-git subtree pull --prefix=deps-packages/modular-claude-md modular-claude-md v1.0.0 --squash
-```
 
 ---

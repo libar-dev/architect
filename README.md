@@ -57,6 +57,132 @@ api.getPatternDependencies('DualSourceExtractor');
 
 ---
 
+## Proven: Structured Specs Beat Human Prompts
+
+This methodology was validated across **422 executable specifications** and a **8.8M line monorepo**. The results challenged assumptions about AI context management.
+
+### The Discovery
+
+| Metric                             | Traditional Prompts | Structured Specs                     |
+| ---------------------------------- | ------------------- | ------------------------------------ |
+| Context usage during heavy editing | ~100% (fills up)    | **50-65%** (stays low)               |
+| After context compaction           | Breaks continuity   | **No impact** — results stay perfect |
+| Work completed per session         | 1X baseline         | **5X increase**                      |
+| Planning/decision overhead         | High                | **Near zero**                        |
+
+### Why Structured Specs Work Better
+
+Traditional AI prompts are verbose and imprecise:
+
+```
+"We need to implement a validation system that checks if status transitions
+are valid according to the FSM rules defined in our methodology document.
+It should handle the four states (roadmap, active, completed, deferred) and
+validate that transitions follow the allowed paths..."
+```
+
+Structured specs are concise and typed:
+
+```gherkin
+Rule: Status transitions must follow FSM
+
+  Scenario Outline: Valid transitions pass
+    Given a file with status "<from>"
+    When status changes to "<to>"
+    Then validation passes
+
+    Examples:
+      | from    | to        |
+      | roadmap | active    |
+      | active  | completed |
+```
+
+**The AI understands structure better than prose.** Gherkin files compress into context more efficiently than explanatory paragraphs.
+
+### Real Results: 3-Session MVP
+
+The Process Guard validation system was implemented in 3 sessions using only structured specs as context:
+
+| Session | Context Used      | Observation                                        |
+| ------- | ----------------- | -------------------------------------------------- |
+| 1       | 100% → compressed | Speed **increased** after compression              |
+| 2       | **65%**           | First time context stayed low during heavy editing |
+| 3       | **55%**           | Context actually **decreased** during work         |
+
+### Implementation Sessions Become Mechanical
+
+With structured specs:
+
+- **No complicated planning** in implementation sessions
+- **No decision-making overhead** — decisions live in specs
+- **No prose explanations** — structured patterns are self-documenting
+- **Context compaction doesn't break anything** — specs survive compression
+
+> "Providing the specs and the implementation workflow doc is all that is needed."
+
+This transforms implementation sessions from creative problem-solving to **mechanical spec-to-test transformation** — dramatically more reliable and 5X more productive.
+
+### Before: Fighting AI-Generated Code with ESLint
+
+Before structured specs, AI assistants generated patterns that violated architectural constraints. The "solution" was **106 custom ESLint rules**:
+
+```
+eslint-rules/
+├── prevent-unsafe-patterns.ts      # 800+ lines catching AI mistakes
+├── enforce-parallel-queries.ts     # AI forgot async patterns
+├── no-action-wrapper-queries.ts    # AI mixed action/query contexts
+├── require-query-bounds.ts         # AI forgot pagination
+├── workflow-determinism/           # 13 rules for workflow safety
+│   ├── no-date-now.ts
+│   ├── no-math-random.ts
+│   ├── no-process-env.ts
+│   └── ... (10 more)
+└── ... (90+ more rules)
+```
+
+Each rule required tests, maintenance, exception lists, and `@architectural-directive` comments scattered through code. **Constant whack-a-mole.**
+
+### After: AI Understands Structured Patterns
+
+With structured specs, the AI generates correct patterns _from the start_:
+
+```gherkin
+Rule: Workflow functions must be deterministic
+
+  Scenario Outline: Non-deterministic calls are forbidden
+    Given a workflow function
+    When it calls "<forbidden>"
+    Then compilation fails
+
+    Examples:
+      | forbidden       |
+      | Date.now()      |
+      | Math.random()   |
+      | process.env     |
+```
+
+**Result:** 106 ESLint rules → 0. The AI reads the spec and generates deterministic code. No enforcement needed.
+
+### Scale Validation
+
+The methodology was proven on a complex monorepo:
+
+```
+Monorepo totals:
+├── 8.8M lines of code
+├── 43,949 files
+├── 378 Gherkin feature files
+├── 12,770 TypeScript files
+└── Built in 3-4 weeks with this approach
+
+delivery-process package:
+├── 1.6M lines
+├── 120 feature files
+└── 422 executable specifications
+```
+
+---
+
 ## How It Works
 
 This package documents itself using its own annotation system. Here's a real example from the codebase:
@@ -184,6 +310,63 @@ See [INSTRUCTIONS.md](INSTRUCTIONS.md) for full CLI reference.
 
 ---
 
+## Design-First Development
+
+The package enforces a clear separation between **design artifacts** and **production code**.
+
+### The Problem with Design Stubs in src/
+
+Many projects mix design artifacts with production code:
+
+```javascript
+// eslint.config.js — Don't do this
+{
+  files: ["**/src/durability/intentCompletion.ts"],
+  rules: { "@typescript-eslint/no-unused-vars": "off" }  // ESLint exceptions for "not-yet-real" code
+}
+```
+
+This causes confusion, accidental imports of unimplemented code, and maintenance burden.
+
+### The Solution: Design Artifacts in specs/
+
+| Location              | Content                                       | ESLint     | When Moved                 |
+| --------------------- | --------------------------------------------- | ---------- | -------------------------- |
+| `specs/stubs/*.ts`    | API shapes, interfaces, throw-not-implemented | Full rules | Implementation session     |
+| `specs/examples/*.ts` | Code examples for documentation               | Full rules | Never (stays as reference) |
+| `src/**/*.ts`         | **Production code only**                      | Full rules | Already there              |
+
+**Design stub pattern:**
+
+```typescript
+// specs/stubs/my-feature.ts
+/**
+ * @libar-docs
+ * @libar-docs-pattern MyFeature
+ * @libar-docs-status roadmap
+ *
+ * ## My Feature - Design Stub
+ *
+ * API design for the upcoming feature.
+ */
+export interface MyConfig {
+  timeout: number;
+}
+
+export function myFeature(config: MyConfig): Result {
+  throw new Error('MyFeature not yet implemented - roadmap pattern');
+}
+```
+
+**Benefits:**
+
+- No ESLint exceptions needed
+- Clear separation: `specs/` = design, `src/` = production
+- Safe iteration on API shapes without breaking anything
+- Moving to `src/` signals implementation started
+
+---
+
 ## FSM-Enforced Workflow
 
 Status transitions are **validated programmatically**, not just documented:
@@ -293,19 +476,68 @@ graph TD
 
 ## How It Compares
 
-| Tool                 | Living Docs | FSM Enforcement | AI API | Code-First |
-| -------------------- | ----------- | --------------- | ------ | ---------- |
-| **This package**     | ✓           | ✓               | ✓      | ✓          |
-| Backstage            | ✓           | ✗               | ✗      | ✗ (YAML)   |
-| Notion/Confluence    | ✗           | ✗               | ✗      | ✗          |
-| Docusaurus/VitePress | ✗           | ✗               | ✗      | Partial    |
-| Gherkin Living Doc   | ✓           | ✗               | ✗      | ✓          |
+| Tool                 | Living Docs | FSM Enforcement | AI API | Code-First | Context Efficient |
+| -------------------- | ----------- | --------------- | ------ | ---------- | ----------------- |
+| **This package**     | ✓           | ✓               | ✓      | ✓          | ✓ (50-65%)        |
+| Backstage            | ✓           | ✗               | ✗      | ✗ (YAML)   | ✗                 |
+| Notion/Confluence    | ✗           | ✗               | ✗      | ✗          | ✗                 |
+| Docusaurus/VitePress | ✗           | ✗               | ✗      | Partial    | ✗                 |
+| Gherkin Living Doc   | ✓           | ✗               | ✗      | ✓          | Partial           |
+| Human prompts to AI  | ✗           | ✗               | ✗      | ✗          | ✗ (100%)          |
 
 **Key differentiators:**
 
 - **FSM enforcement** — Not just docs; validated state machine transitions
 - **Dual-source** — TypeScript relationships + Gherkin planning = complete picture
 - **AI-native** — ProcessStateAPI provides typed queries, not string parsing
+- **Context efficient** — Structured specs use 50-65% context vs 100% for prose prompts
+- **Compaction resilient** — Specs survive context compression; prose doesn't
+
+**Note on AI models:** This methodology was validated primarily with Claude Opus 4.5. The structured spec approach appears to leverage advanced pattern-recognition capabilities particularly well.
+
+---
+
+## Document Durability Model
+
+Not all specs are equal. The package recognizes different durability levels:
+
+| Document Type               | Durability | After Implementation           | Content Ownership           |
+| --------------------------- | ---------- | ------------------------------ | --------------------------- |
+| **Decision docs (ADR/PDR)** | Permanent  | Remains valid until superseded | Intro, context, rationale   |
+| **Behavior specs**          | Permanent  | Must pass tests                | Rules, examples, edge cases |
+| **Tier 1 roadmap specs**    | Temporary  | Becomes clutter                | Deliverables (until done)   |
+| **Generated docs**          | Derived    | Regenerated from sources       | —                           |
+
+### Why This Matters
+
+**Decisions own "why"** — they're durable by design:
+
+```gherkin
+Rule: Context - Why we need FSM validation
+  # This content remains valid for years
+
+Rule: Decision - How FSM validation works
+  # Implementation details that rarely change
+```
+
+**Behavior specs own "what"** — they're tested:
+
+```gherkin
+Scenario: Invalid transition fails
+  Given status "roadmap"
+  When changing to "completed"
+  Then validation fails  # If this breaks, tests fail
+```
+
+**Tier 1 specs own "when"** — they're temporary:
+
+```gherkin
+Background: Deliverables
+  | Deliverable | Status |
+  | FSM types   | Done   |  # Tracking until completion
+```
+
+This hierarchy enables **documentation generation from durable sources** — decisions and behavior specs stay current; tier 1 specs can be archived.
 
 ---
 

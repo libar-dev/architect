@@ -21,6 +21,12 @@ As a delivery-process developer
   **Note (D12):** Implementation uses TypeScript as the single source of truth,
   with consumers importing directly rather than generating intermediate JSON files.
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`registry-builder.ts`](../../src/taxonomy/registry-builder.ts) - ## Tag Registry Builder
+
 ## Acceptance Criteria
 
 **Define status values as TypeScript constant**

@@ -37,10 +37,115 @@ import type {
   ScenarioRef,
 } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
+import { normalizeLineEndings } from '../../utils/string-utils.js';
 
 // Re-export BusinessRule for convenience (consumers can import from codecs/index.ts)
 export type { BusinessRule };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Rule Partitioning (Shared by ADR and Decision Doc codecs)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Result of partitioning business rules by ADR-style prefixes.
+ */
+export interface PartitionedRules {
+  /** Rules with names starting with "Context" */
+  context: BusinessRule[];
+  /** Rules with names starting with "Decision" */
+  decision: BusinessRule[];
+  /** Rules with names starting with "Consequence" */
+  consequences: BusinessRule[];
+  /** Rules that don't match any expected prefix */
+  other: BusinessRule[];
+}
+
+/**
+ * Options for partitioning business rules.
+ */
+export interface PartitionRulesOptions {
+  /**
+   * Warn about rules that don't match expected prefixes (default: false).
+   * When true, emits a warning for non-matching rules via onWarning callback.
+   * ADR codec sets this to true; Decision Doc codec keeps false.
+   */
+  warnOnOther?: boolean;
+  /** Pattern name for warning context (optional) */
+  patternName?: string;
+  /**
+   * Callback for warnings (default: console.warn).
+   * Allows programmatic capture of warnings for testing or custom handling.
+   */
+  onWarning?: (message: string) => void;
+}
+
+/**
+ * Partition business rules by ADR-style name prefixes.
+ *
+ * Rules are categorized based on their name prefix:
+ * - "Context..." → context section
+ * - "Decision..." → decision section
+ * - "Consequence..." → consequences section
+ * - Others → other (optionally logged as warning)
+ *
+ * This is a shared helper used by both ADR and Decision Doc codecs.
+ *
+ * @param rules - Business rules from the extracted pattern
+ * @param options - Partitioning options
+ * @returns Partitioned rules by category
+ *
+ * @example
+ * ```typescript
+ * // ADR codec (warn about unmatched rules)
+ * const partitioned = partitionRulesByPrefix(pattern.rules, {
+ *   warnOnOther: true,
+ *   patternName: pattern.name
+ * });
+ *
+ * // Decision doc codec (no warning)
+ * const partitioned = partitionRulesByPrefix(pattern.rules);
+ * ```
+ */
+export function partitionRulesByPrefix(
+  rules: readonly BusinessRule[] | undefined,
+  options: PartitionRulesOptions = {}
+): PartitionedRules {
+  if (!rules || rules.length === 0) {
+    return { context: [], decision: [], consequences: [], other: [] };
+  }
+
+  const { warnOnOther = false, patternName, onWarning = console.warn } = options;
+  const context: BusinessRule[] = [];
+  const decision: BusinessRule[] = [];
+  const consequences: BusinessRule[] = [];
+  const other: BusinessRule[] = [];
+
+  for (const rule of rules) {
+    const nameLower = rule.name.toLowerCase();
+    if (nameLower.startsWith('context')) {
+      context.push(rule);
+    } else if (nameLower.startsWith('decision')) {
+      decision.push(rule);
+    } else if (nameLower.startsWith('consequence')) {
+      consequences.push(rule);
+    } else {
+      other.push(rule);
+    }
+  }
+
+  // Optionally warn about rules that don't match expected ADR prefixes
+  if (warnOnOther && other.length > 0) {
+    const otherNames = other.map((r) => `"${r.name}"`).join(', ');
+    const patternContext = patternName ? ` in pattern "${patternName}"` : '';
+    onWarning(
+      `[codec] ${other.length} rule(s)${patternContext} not matching ADR prefixes (Context/Decision/Consequence): ${otherNames}. These rules will not be rendered in standard ADR sections.`
+    );
+  }
+
+  return { context, decision, consequences, other };
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Configuration Types
@@ -246,7 +351,7 @@ export function parseDescriptionWithDocStrings(
   }
 
   // Normalize line endings (Windows CRLF → LF)
-  const normalized = description.replace(/\r\n/g, '\n');
+  const normalized = normalizeLineEndings(description);
 
   // Detect unclosed DocStrings (odd number of """)
   // Important: Exclude """ that appears inside backticks (inline code examples)
@@ -467,7 +572,7 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   }
 
   // Normalize line endings
-  const normalized = description.replace(/\r\n/g, '\n');
+  const normalized = normalizeLineEndings(description);
 
   const result: BusinessRuleAnnotations = {};
   const codeExamples: SectionBlock[] = [];
@@ -820,4 +925,52 @@ export function renderPatternRichContent(
   }
 
   return sections;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Shape Rendering
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Options for rendering extracted shapes as markdown.
+ */
+export interface RenderShapesOptions {
+  /** If true, combine all shapes into a single fenced code block (default: true) */
+  groupInSingleBlock?: boolean;
+  /** If true, include JSDoc comments with each shape (default: true) */
+  includeJsDoc?: boolean;
+}
+
+/**
+ * Render extracted TypeScript shapes as markdown code blocks.
+ *
+ * @param shapes - Shapes to render
+ * @param options - Rendering options
+ * @returns Markdown string with fenced code blocks
+ */
+export function renderShapesAsMarkdown(
+  shapes: readonly ExtractedShape[],
+  options: RenderShapesOptions = {}
+): string {
+  const { groupInSingleBlock = true, includeJsDoc = true } = options;
+
+  if (shapes.length === 0) {
+    return '';
+  }
+
+  const renderShape = (shape: ExtractedShape): string => {
+    const parts: string[] = [];
+    if (includeJsDoc && shape.jsDoc) {
+      parts.push(shape.jsDoc);
+    }
+    parts.push(shape.sourceText);
+    return parts.join('\n');
+  };
+
+  if (groupInSingleBlock) {
+    const content = shapes.map(renderShape).join('\n\n');
+    return '```typescript\n' + content + '\n```';
+  }
+
+  return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
 }

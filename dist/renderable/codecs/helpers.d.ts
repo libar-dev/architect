@@ -32,8 +32,68 @@
  */
 import type { ScenarioDataTable, ScenarioStep, ScenarioRef } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock } from '../schema.js';
 export type { BusinessRule };
+/**
+ * Result of partitioning business rules by ADR-style prefixes.
+ */
+export interface PartitionedRules {
+    /** Rules with names starting with "Context" */
+    context: BusinessRule[];
+    /** Rules with names starting with "Decision" */
+    decision: BusinessRule[];
+    /** Rules with names starting with "Consequence" */
+    consequences: BusinessRule[];
+    /** Rules that don't match any expected prefix */
+    other: BusinessRule[];
+}
+/**
+ * Options for partitioning business rules.
+ */
+export interface PartitionRulesOptions {
+    /**
+     * Warn about rules that don't match expected prefixes (default: false).
+     * When true, emits a warning for non-matching rules via onWarning callback.
+     * ADR codec sets this to true; Decision Doc codec keeps false.
+     */
+    warnOnOther?: boolean;
+    /** Pattern name for warning context (optional) */
+    patternName?: string;
+    /**
+     * Callback for warnings (default: console.warn).
+     * Allows programmatic capture of warnings for testing or custom handling.
+     */
+    onWarning?: (message: string) => void;
+}
+/**
+ * Partition business rules by ADR-style name prefixes.
+ *
+ * Rules are categorized based on their name prefix:
+ * - "Context..." → context section
+ * - "Decision..." → decision section
+ * - "Consequence..." → consequences section
+ * - Others → other (optionally logged as warning)
+ *
+ * This is a shared helper used by both ADR and Decision Doc codecs.
+ *
+ * @param rules - Business rules from the extracted pattern
+ * @param options - Partitioning options
+ * @returns Partitioned rules by category
+ *
+ * @example
+ * ```typescript
+ * // ADR codec (warn about unmatched rules)
+ * const partitioned = partitionRulesByPrefix(pattern.rules, {
+ *   warnOnOther: true,
+ *   patternName: pattern.name
+ * });
+ *
+ * // Decision doc codec (no warning)
+ * const partitioned = partitionRulesByPrefix(pattern.rules);
+ * ```
+ */
+export declare function partitionRulesByPrefix(rules: readonly BusinessRule[] | undefined, options?: PartitionRulesOptions): PartitionedRules;
 /**
  * Warning information emitted during rich content rendering
  */
@@ -386,4 +446,21 @@ export declare function renderPatternRichContent(pattern: {
     scenarios?: readonly ScenarioRef[];
     rules?: readonly BusinessRule[];
 }, options?: RichContentOptions): SectionBlock[];
+/**
+ * Options for rendering extracted shapes as markdown.
+ */
+export interface RenderShapesOptions {
+    /** If true, combine all shapes into a single fenced code block (default: true) */
+    groupInSingleBlock?: boolean;
+    /** If true, include JSDoc comments with each shape (default: true) */
+    includeJsDoc?: boolean;
+}
+/**
+ * Render extracted TypeScript shapes as markdown code blocks.
+ *
+ * @param shapes - Shapes to render
+ * @param options - Rendering options
+ * @returns Markdown string with fenced code blocks
+ */
+export declare function renderShapesAsMarkdown(shapes: readonly ExtractedShape[], options?: RenderShapesOptions): string;
 //# sourceMappingURL=helpers.d.ts.map

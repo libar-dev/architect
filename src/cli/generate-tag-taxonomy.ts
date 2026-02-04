@@ -4,10 +4,17 @@
  * @libar-docs
  * @libar-docs-cli
  * @libar-docs-pattern TagTaxonomyCLI
- * @libar-docs-status completed
+ * @libar-docs-status deferred
  * @libar-docs-uses ConfigLoader, TagTaxonomyGenerator
  *
  * ## TagTaxonomyCLI - Tag Registry Documentation Generator
+ *
+ * @deprecated Use `pnpm docs:taxonomy` instead. This standalone CLI is replaced
+ * by the codec-based TaxonomyCodec which:
+ * - Fits the MasterDataset pipeline architecture
+ * - Provides progressive disclosure with detail files
+ * - Groups tags by domain (Core, Relationship, Timeline, ADR, Architecture)
+ * - Includes presets comparison and architecture diagrams
  *
  * Generates TAG_TAXONOMY.md from the TypeScript taxonomy module.
  * Use to auto-generate comprehensive tag reference documentation.
@@ -127,6 +134,12 @@ async function main(): Promise<void> {
     printHelp();
     process.exit(0);
   }
+
+  // Deprecation warning
+  console.warn('\n⚠️  DEPRECATED: generate-tag-taxonomy is deprecated.');
+  console.warn('   Use `pnpm docs:taxonomy` instead for codec-based generation.');
+  console.warn('   The new approach provides progressive disclosure, domain grouping,');
+  console.warn('   and fits the MasterDataset pipeline architecture.\n');
 
   try {
     console.log('Loading configuration...');

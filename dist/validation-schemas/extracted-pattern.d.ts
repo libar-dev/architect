@@ -101,6 +101,7 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         archRole: z.ZodOptional<z.ZodString>;
         archContext: z.ZodOptional<z.ZodString>;
         archLayer: z.ZodOptional<z.ZodString>;
+        extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     }, z.core.$strict>;
     code: z.ZodString;
     source: z.ZodObject<{
@@ -247,6 +248,23 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         infrastructure: "infrastructure";
         application: "application";
     }>>;
+    extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        kind: z.ZodEnum<{
+            function: "function";
+            type: "type";
+            enum: "enum";
+            const: "const";
+            interface: "interface";
+        }>;
+        sourceText: z.ZodString;
+        jsDoc: z.ZodOptional<z.ZodString>;
+        lineNumber: z.ZodNumber;
+        typeParameters: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        exported: z.ZodDefault<z.ZodBoolean>;
+    }, z.core.$strip>>>>;
 }, z.core.$strict>;
 /**
  * Type alias inferred from schema
