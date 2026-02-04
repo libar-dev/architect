@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:UniversalDocGeneratorRobustness
-@libar-docs-status:active
+@libar-docs-status:completed
+@libar-docs-unlock-reason:All-deliverables-implemented-and-tested
 @libar-docs-phase:28
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
