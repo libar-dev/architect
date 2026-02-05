@@ -216,3 +216,4 @@ Feature: Source Mapping Validator
       Then validation result includes both errors and warnings
       And validation fails if any errors exist
       And validation passes if only warnings exist
+

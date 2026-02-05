@@ -401,16 +401,28 @@ export const LEVELS = {};
         expect(state!.result!.errors.length).toBe(0);
         expect(state!.result!.files.length).toBeGreaterThan(0);
 
-        // Verify the section name appears in output (deduplication preserved content)
-        // Note: The exact header format depends on generator detail level
+        // Verify the section content is present in output
         const content = state!.result!.files[0].content;
         expect(content).toContain(sectionName);
+
+        // Count occurrences of the section as heading (any level)
+        // Note: Different extraction methods may produce different formatting,
+        // leading to different fingerprints. True deduplication only works when
+        // content has identical fingerprints. This assertion verifies content exists
+        // and catches obvious regression (> 2 occurrences would indicate a bug).
+        const headingRegex = new RegExp(`^#{1,6}\\s+${sectionName}`, 'gm');
+        const headingMatches = content.match(headingRegex) ?? [];
+        // Allow 1-2 occurrences (different extraction methods may not merge)
+        // but fail if more than 2 (indicates a regression)
+        expect(headingMatches.length).toBeLessThanOrEqual(2);
       });
 
       And('source attribution shows primary source', () => {
         // Deduplication keeps the higher-priority source (TypeScript)
-        // We verify the generation succeeded
         expect(state!.result!.errors.length).toBe(0);
+        // Verify that TypeScript (higher priority source) content was retained
+        const content = state!.result!.files[0].content;
+        expect(content).toContain('src/types.ts');
       });
     });
 

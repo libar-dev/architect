@@ -55,7 +55,7 @@ export interface ValidationResult {
 export interface ValidatorOptions {
     /** Base directory for resolving relative paths */
     baseDir: string;
-    /** Optional warning collector for non-fatal issues */
+    /** Optional warning collector for non-fatal issues (reserved for future use) */
     warningCollector?: WarningCollector;
 }
 /**

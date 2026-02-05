@@ -1,9 +1,13 @@
 @libar-docs
+@libar-docs-pattern:RobustnessIntegration
 Feature: Robustness Integration
 
-  Integration tests for the robustness improvements to the document generation
-  pipeline. These tests verify that validation, deduplication, and warning
-  collection work together correctly.
+  **Context:** Document generation pipeline needs validation, deduplication, and
+  warning collection to work together correctly for production use.
+
+  **Approach:** Integration tests verify the full pipeline with all robustness
+  features enabled, ensuring validation runs first, deduplication merges content,
+  and warnings are collected across stages.
 
   Background: Pipeline setup
     Given the decision doc generator is initialized
@@ -16,6 +20,10 @@ Feature: Robustness Integration
   # ============================================================================
 
   Rule: Validation runs before extraction in the pipeline
+
+    **Invariant:** Validation must complete and pass before extraction begins.
+    **Rationale:** Prevents wasted extraction work and provides clear fail-fast behavior.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     The validation layer must run first and halt the pipeline if errors
     are found, preventing wasted extraction work.
@@ -51,6 +59,10 @@ Feature: Robustness Integration
 
   Rule: Deduplication runs after extraction before assembly
 
+    **Invariant:** Deduplication processes all extracted content before document assembly.
+    **Rationale:** All sources must be extracted to identify cross-source duplicates.
+    **Verified by:** @acceptance-criteria scenarios below.
+
     Content from all sources is extracted first, then deduplicated,
     then assembled into the final document.
 
@@ -77,6 +89,10 @@ Feature: Robustness Integration
   # ============================================================================
 
   Rule: Warnings from all stages are collected and reported
+
+    **Invariant:** Warnings from all pipeline stages are aggregated in the result.
+    **Rationale:** Users need visibility into non-fatal issues without blocking generation.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     Non-fatal issues from validation, extraction, and deduplication are
     collected and included in the result.
@@ -105,6 +121,10 @@ Feature: Robustness Integration
   # ============================================================================
 
   Rule: Pipeline provides actionable error messages
+
+    **Invariant:** Error messages include context and fix suggestions.
+    **Rationale:** Users should fix issues in one iteration without guessing.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     Errors include enough context for users to understand and fix the issue.
 
@@ -137,6 +157,10 @@ Feature: Robustness Integration
   # ============================================================================
 
   Rule: Existing decision documents continue to work
+
+    **Invariant:** Valid existing decision documents generate without new errors.
+    **Rationale:** Robustness improvements must be backward compatible.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     The robustness improvements must not break existing valid decision
     documents that worked with the PoC.
