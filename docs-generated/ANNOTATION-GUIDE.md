@@ -6,9 +6,9 @@
 
 | Metric | Before | After |
 |--------|--------|-------|
-| Files with `@extract-shapes` | 18 | **35** |
-| Total generated doc lines | ~3,000 | **7,397** |
-| Docs with TypeScript extraction | 3 | **7** |
+| Files with `@extract-shapes` | 18 | **36** |
+| Total generated doc lines | ~3,000 | **7,500+** |
+| Docs with TypeScript extraction | 3 | **8** |
 
 **Documents Now Auto-Generated:**
 - ARCHITECTURE-REFERENCE.md (714 lines) - TypeScript schemas extracted
@@ -16,8 +16,9 @@
 - INSTRUCTIONS-REFERENCE.md (974 lines) - All 5 CLI configs extracted
 - VALIDATION-REFERENCE.md (912 lines) - All validation types extracted
 - TAXONOMY-REFERENCE.md (622 lines) - All taxonomy types extracted
-- PROCESS-GUARD-REFERENCE.md (438 lines) - Decider types extracted
+- PROCESS-GUARD-REFERENCE.md (449 lines) - FSM + Decider types extracted, NO DUPLICATES
 - DOC-GENERATION-PROOF-OF-CONCEPT.md (710 lines) - Pattern demonstration
+- SESSION-GUIDES-REFERENCE.md - FSM states types extracted
 
 **Documents Remaining Manual (Conceptual Content):**
 - METHODOLOGY-REFERENCE.md (372 lines)
@@ -94,6 +95,95 @@ export type MasterDataset = z.infer<typeof MasterDatasetSchema>;
 **Generator behavior:**
 - Self-references: Content rendered inline (parsed from feature file)
 - External files: Content extracted via `@extract-shapes` annotation
+
+### Pattern 4: Section Names Must Match Rule Names (CRITICAL)
+
+**Problem:** Duplicate sections appear when Source Mapping section names don't match Rule: block names.
+
+**Root Cause:** The generator's fuzzy matching algorithm checks if Source Mapping section names match Rule: block names to avoid rendering the same content twice. When names don't match, both get rendered.
+
+**Example of the problem:**
+```gherkin
+# Source Mapping has:
+| CLI Examples | THIS DECISION (Rule: CLI Usage) | Fenced code block |
+
+# But Rule: block is named:
+Rule: CLI Usage
+```
+
+The fuzzy matcher checks:
+- "cli examples" contains "cli usage"? NO
+- "cli usage" contains "cli examples"? NO
+- Word overlap: {"cli", "examples"} vs {"cli", "usage"} → only 1 word matches (need 2)
+
+**Result:** Content appears TWICE in generated output.
+
+**Solution:** Section names MUST match Rule: block names exactly:
+```gherkin
+# CORRECT - Section name matches Rule: name
+| CLI Usage | THIS DECISION (Rule: CLI Usage) | Rule block content |
+| Programmatic API | THIS DECISION (Rule: Programmatic API) | Rule block content |
+
+# WRONG - Section name differs from Rule: name
+| CLI Examples | THIS DECISION (Rule: CLI Usage) | Fenced code block |
+| API Example | THIS DECISION (Rule: Programmatic API) | Fenced code block |
+```
+
+### Pattern 5: Content Ownership Boundaries
+
+**Principle:** Each content type has one owner. Do NOT duplicate content across sources.
+
+| Content Type | Owner | Extract From | Examples |
+|--------------|-------|--------------|----------|
+| Type definitions | TypeScript code | `@extract-shapes` | interfaces, types, consts |
+| Const values (FSM states) | TypeScript code | `@extract-shapes` | `PROTECTION_LEVELS`, `VALID_TRANSITIONS` |
+| Human-readable tables | Feature file | Self-reference Rule: block | Escape Hatches, Rule Descriptions |
+| Mermaid diagrams | Feature file | Self-reference DocString | FSM diagrams, architecture flows |
+| Code examples | Feature file | Self-reference DocString | CLI usage, API examples |
+| Conceptual context | Feature file | Self-reference Rule: block | "Why" explanations |
+
+**Anti-pattern:** Don't have BOTH a hardcoded table in Rule: block AND TypeScript extraction for the same data:
+```gherkin
+# WRONG - duplicates FSM data in two places
+Rule: Protection Levels
+  | Status | Level | ... |  # Hardcoded table
+  | roadmap | none | ... |
+
+# Source Mapping also extracts from TypeScript:
+| Protection Levels | src/validation/fsm/states.ts | @extract-shapes tag |
+```
+
+**Correct approach:** Extract from TypeScript (single source of truth):
+```gherkin
+# Source Mapping extracts from TypeScript only
+| FSM Protection Levels | src/validation/fsm/states.ts | @extract-shapes tag |
+
+# NO hardcoded Rule: block table for same data
+```
+
+### Pattern 6: All Rule: Blocks Must Be in Source Mapping
+
+**Problem:** Rule: blocks that aren't in Source Mapping get rendered as standalone "Other rules" sections, causing duplicates when their content overlaps with Source Mapping entries.
+
+**Solution:** Every Rule: block should have a corresponding Source Mapping entry:
+
+```gherkin
+**Source Mapping:**
+
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| FSM Diagram | THIS DECISION (Rule: FSM Diagram) | Fenced code block (Mermaid) |
+| Escape Hatches | THIS DECISION (Rule: Escape Hatches) | Rule block table |
+| Rule Descriptions | THIS DECISION (Rule: Rule Descriptions) | Rule block table |
+| CLI Usage | THIS DECISION (Rule: CLI Usage) | Rule block content |
+| Programmatic API | THIS DECISION (Rule: Programmatic API) | Rule block content |
+| Architecture | THIS DECISION (Rule: Architecture) | Rule block content |
+```
+
+This ensures:
+1. All Rule: content is extracted exactly once via Source Mapping
+2. The fuzzy matching correctly skips rendering the same content as "Other rules"
+3. No duplicate sections in generated output
 
 ---
 
@@ -288,6 +378,29 @@ Files fixed:
 
 **Generated:** 912 lines
 
+### Process Guard Documentation ✅ (Exemplar for duplicate prevention)
+
+Feature: `specs/docs/process-guard-reference.feature`
+
+**Key fixes applied:**
+1. Added `@libar-docs-extract-shapes` to `src/validation/fsm/states.ts`:
+   - `PROTECTION_LEVELS, ProtectionLevel, getProtectionLevel, isTerminalState, isFullyEditable, isScopeLocked`
+
+2. Updated Source Mapping to extract from TypeScript instead of hardcoded Rule: blocks:
+   - Protection Levels → `src/validation/fsm/states.ts`
+   - Valid Transitions → `src/validation/fsm/transitions.ts`
+
+3. Fixed Section names to match Rule: names exactly:
+   - `CLI Usage` → `THIS DECISION (Rule: CLI Usage)` (not "CLI Examples")
+   - `Programmatic API` → `THIS DECISION (Rule: Programmatic API)` (not "API Example")
+
+4. Added all Rule: blocks to Source Mapping table to prevent "Other rules" duplication
+
+**Before:** 521 lines with duplicate sections
+**After:** 449 lines with NO duplicates
+
+**Compact output:** 134 lines with actual content (was "No structured content")
+
 ---
 
 ## Agent Deployment Template
@@ -298,32 +411,73 @@ You are fixing auto-generated documentation for the delivery-process package.
 **Feature file:** specs/docs/[NAME]-reference.feature
 
 **Your task:**
-1. Read the feature file's Source Mapping table
-2. For each row with "extract-shapes tag" extraction method:
-   - Read the referenced TypeScript file
-   - Check if it has @libar-docs-extract-shapes annotation
-   - If missing, add it with key exported types
-   - **IMPORTANT:** For Zod files, extract SCHEMA CONSTANTS (e.g., `MasterDatasetSchema`)
-     NOT type aliases (e.g., `MasterDataset`) - schema constants show full structure
-3. Run: npx tsx scripts/generate-docs-auto.ts [filter]
-4. Verify the generated output:
-   - Contains TypeScript code blocks with actual interfaces/schemas
-   - No duplicate sections (same content appearing twice)
-   - Zod schemas show `z.object({...})` structure, NOT `z.infer<typeof ...>`
+
+### Step 1: Analyze Source Mapping Table
+Read the feature file's Source Mapping table and categorize each row:
+- TypeScript extraction (`@extract-shapes tag`) → Check for missing annotations
+- Self-references (`THIS DECISION`) → Verify section names match Rule: names
+
+### Step 2: Fix TypeScript Extraction
+For each row with "extract-shapes tag" extraction method:
+1. Read the referenced TypeScript file
+2. Check if it has `@libar-docs-extract-shapes` annotation
+3. If missing, add it with key exported types
+4. **IMPORTANT:** For Zod files, extract SCHEMA CONSTANTS (e.g., `MasterDatasetSchema`)
+   NOT type aliases (e.g., `MasterDataset`) - schema constants show full structure
+
+### Step 3: Fix Self-References (CRITICAL for duplicates)
+For each row with `THIS DECISION (Rule: X)` reference:
+1. Verify the Source Mapping section name MATCHES the Rule: block name
+2. If they differ, update the Source Mapping section name to match exactly
+
+Example fix:
+```gherkin
+# BEFORE (causes duplicates):
+| CLI Examples | THIS DECISION (Rule: CLI Usage) |
+
+# AFTER (no duplicates):
+| CLI Usage | THIS DECISION (Rule: CLI Usage) |
+```
+
+### Step 4: Ensure All Rules Are Mapped
+Every Rule: block in the feature file should have a Source Mapping entry:
+- Missing Rule: → Add to Source Mapping table
+- This prevents "Other rules" section duplication
+
+### Step 5: Verify Generation
+Run: `npx tsx scripts/generate-docs-auto.ts [filter]`
+
+Check output for:
+- TypeScript code blocks with actual interfaces/schemas
+- NO duplicate sections (search for repeated headings)
+- Zod schemas show `z.object({...})` structure
+- Compact version (`_claude-md/`) has content, not "No structured content"
 
 **Success criteria:**
 - All referenced TypeScript files have @libar-docs-extract-shapes
-- Generation completes without "No shapes extracted" warnings
-- Generated docs contain TypeScript code blocks with full type definitions
-- No duplicate content between "Implementation Details" and standalone sections
+- Source Mapping section names match Rule: block names exactly
+- Every Rule: block has a Source Mapping entry
+- Generated docs contain NO duplicate sections
+- Compact output has essential content (~50-150 lines)
 
 **Common issues and fixes:**
 | Issue | Cause | Fix |
 |-------|-------|-----|
 | `z.infer<typeof X>` shown | Extracted type alias | Extract schema const (`XSchema`) instead |
-| Duplicate sections | Rule block + Source Mapping overlap | Already fixed in generator |
+| Duplicate sections | Section name ≠ Rule: name | Make Source Mapping section name match Rule: name |
 | Missing shapes | No annotation | Add `@libar-docs-extract-shapes` to file |
 | Empty sections | Wrong shape names | Check `grep "^export"` output for correct names |
+| "Other rules" section | Rule: not in Source Mapping | Add entry to Source Mapping table |
+| Compact shows "No content" | Rule: content not tables | Include tables in Rule: blocks |
+
+**Content ownership rules:**
+| Content Type | Extract From |
+|--------------|--------------|
+| Type definitions, const values | TypeScript `@extract-shapes` |
+| Human-readable tables | Self-reference Rule: block |
+| Mermaid diagrams | Self-reference DocString |
+| Workflow examples | Self-reference DocString |
+| Conceptual context | Self-reference Rule: block |
 ```
 
 ---

@@ -32,7 +32,7 @@
 
     **Example Reference:** See specs/process-guard-linter.feature for a complete example.
 
-### Rule Blocks for Constraints
+### Rule Blocks for Business Constraints
 
 **Context:** Use the Rule keyword to group related scenarios under a business constraint.
     Rules provide semantic grouping - generators extract them for business rules documentation.
@@ -58,7 +58,7 @@
     - Tag scenarios within Rules (at-happy-path, at-edge-case, etc.)
     - Rule blocks are optional - use when defining business invariants
 
-### Scenario Outline Variations
+### Scenario Outline for Variations
 
 **Context:** Use Scenario Outline with Examples table when the same pattern applies
     with different inputs. This avoids duplicating nearly-identical scenarios.
@@ -81,7 +81,7 @@
 
     **Example Reference:** See tests/features/validation/fsm-transitions.feature
 
-### DataTable Usage
+### DataTable and DocString Usage
 
 **Context:** DataTables and DocStrings serve different purposes. Choose
     the right one based on your data structure.
@@ -231,3 +231,16 @@
 | at-happy-path | Primary success scenario | Every feature with scenarios |
 | at-edge-case | Boundary conditions | Validation features |
 | at-acceptance-criteria | Required for DoD | Roadmap specs |
+
+### Related Documentation
+
+**Context:** Gherkin patterns connect to other documentation.
+
+    **Decision:** Related docs by topic:
+
+| Document | Content |
+| --- | --- |
+| INSTRUCTIONS.md | Complete tag reference and CLI |
+| CONFIGURATION.md | Preset and tag prefix configuration |
+| SESSION-GUIDES.md | Session workflows using these patterns |
+| METHODOLOGY.md | Core thesis and two-tier architecture |

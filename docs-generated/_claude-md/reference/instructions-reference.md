@@ -280,6 +280,16 @@
      */
     """
 
+### Shape Extraction
+
+**Context:** Extract TypeScript types for documentation generation (ADR-021).
+
+| Tag | Format | Purpose | Example |
+| --- | --- | --- | --- |
+| extract-shapes | csv | TypeScript type names to extract | at-libar-docs-extract-shapes DeciderInput, Result |
+
+    **Usage:** Add to files containing types that should appear in generated docs.
+
 ### generate-docs CLI
 
 - `CLIConfig` - interface

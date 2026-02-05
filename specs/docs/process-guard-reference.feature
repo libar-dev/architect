@@ -27,15 +27,17 @@ Feature: Process Guard Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| Protection Levels | THIS DECISION (Rule: Protection Levels) | Rule block table |
-| Valid Transitions | THIS DECISION (Rule: Valid Transitions) | Rule block table |
-| FSM Diagram | THIS DECISION (Rule: Valid Transitions DocString) | Fenced code block (Mermaid) |
-| Validation Rules | src/lint/process-guard/types.ts | @extract-shapes tag |
+| FSM Protection Levels | src/validation/fsm/states.ts | @extract-shapes tag |
+| FSM Valid Transitions | src/validation/fsm/transitions.ts | @extract-shapes tag |
+| FSM Diagram | THIS DECISION (Rule: FSM Diagram) | Fenced code block (Mermaid) |
+| Validation Rules Types | src/lint/process-guard/types.ts | @extract-shapes tag |
 | Decider Function | src/lint/process-guard/decider.ts | @extract-shapes tag |
 | CLI Config | src/cli/lint-process.ts | @extract-shapes tag |
-| FSM Transitions | src/validation/fsm/transitions.ts | @extract-shapes tag |
-| CLI Examples | THIS DECISION (Rule: CLI Usage DocString) | Fenced code block |
-| API Example | THIS DECISION (Rule: Programmatic API DocString) | Fenced code block |
+| Escape Hatches | THIS DECISION (Rule: Escape Hatches) | Rule block table |
+| Rule Descriptions | THIS DECISION (Rule: Rule Descriptions) | Rule block table |
+| CLI Usage | THIS DECISION (Rule: CLI Usage) | Rule block content |
+| Programmatic API | THIS DECISION (Rule: Programmatic API) | Rule block content |
+| Architecture | THIS DECISION (Rule: Architecture) | Rule block content |
 
   Background: Deliverables
     Given the following deliverables:
@@ -44,31 +46,10 @@ Feature: Process Guard Reference - Auto-Generated Documentation
       | Generated detailed docs | Pending | docs-generated/docs/PROCESSGUARDREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/validation/processguardreference.md |
 
-  Rule: Protection Levels
+  Rule: FSM Diagram
 
-    **Context:** Different FSM states have different protection levels.
-
-    **Decision:** Protection levels are derived from status:
-
-| Status | Level | Allowed | Blocked |
-| --- | --- | --- | --- |
-| roadmap | none | Full editing | - |
-| deferred | none | Full editing | - |
-| active | scope | Edit existing deliverables | Adding new deliverables |
-| completed | hard | Nothing | Any change without unlock-reason |
-
-  Rule: Valid Transitions
-
-    **Context:** Status transitions must follow the FSM to maintain process integrity.
-
-| From | To | Notes |
-| --- | --- | --- |
-| roadmap | active, deferred | Start work or postpone |
-| active | completed, roadmap | Finish or regress if blocked |
-| deferred | roadmap | Resume planning |
-| completed | (none) | Terminal - use unlock to modify |
-
-    **FSM Diagram:**
+    The FSM enforces valid state transitions. Protection levels and transitions
+    are defined in TypeScript (extracted via @extract-shapes).
 
     """mermaid
     stateDiagram-v2
@@ -96,11 +77,11 @@ Feature: Process Guard Reference - Auto-Generated Documentation
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
 
-  Rule: Validation Rules
+  Rule: Rule Descriptions
 
-    Process Guard validates these rules:
+    Process Guard validates 6 rules (types extracted from TypeScript):
 
-| Rule | Severity | Description |
+| Rule | Severity | Human Description |
 | --- | --- | --- |
 | completed-protection | error | Cannot modify completed specs without unlock-reason |
 | invalid-status-transition | error | Status transition must follow FSM |

@@ -35,10 +35,35 @@
 | FSM Transitions | src/validation/fsm/transitions.ts | at-extract-shapes tag |
 | Handoff Documentation | THIS DECISION (Rule: Handoff Documentation) | Rule block content |
 | Discovery Tags | THIS DECISION (Rule: Discovery Tags) | Rule block table |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
 ---
 
 ## Implementation Details
+
+### Session Decision Tree
+
+**Context:** Developers need to choose the correct session type based on their current situation.
+
+    **Decision Tree (ASCII):**
+
+```text
+Starting from pattern brief?
+    |-- Yes --> Need code stubs now? --> Yes --> Planning + Design
+    |                                --> No  --> Planning
+    |-- No  --> Ready to code? --> Yes --> Complex decisions? --> Yes --> Design first
+                                                               --> No  --> Implementation
+                               --> No  --> Planning
+```
+
+**Decision:** Session types map to inputs, outputs, and FSM changes:
+
+| Session | Input | Output | FSM Change |
+| --- | --- | --- | --- |
+| Planning | Pattern brief | Roadmap spec (.feature) | Creates roadmap |
+| Design | Complex requirement | Design doc + code stubs | None |
+| Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
+| Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
 
 ### Planning Session
 
@@ -71,6 +96,57 @@
 | Transition to active | Active requires implementation readiness |
 | Ask Ready to implement? | Planning session ends at roadmap spec |
 | Write full implementations | Stubs only if Planning + Design |
+
+### Design Session
+
+**Goal:** Make architectural decisions. Create code stubs with interfaces. Do NOT implement.
+
+    **When Required:**
+
+| Use Design Session | Skip Design Session |
+| --- | --- |
+| Multiple valid approaches | Single obvious path |
+| New patterns/capabilities | Bug fix |
+| Cross-context coordination | Clear requirements |
+
+    **Checklist:**
+
+    1. Create design doc at plans/designs/draft/DESIGN-name.md
+
+    2. Document options (at least 2-3 approaches with pros/cons)
+
+    3. Get approval (user must approve recommended approach)
+
+    4. Create code stubs with interfaces (throw new Error pattern)
+
+    5. Move to approved after user approval (designs/draft to designs/approved)
+
+    **Code Stub Pattern:**
+
+```typescript
+/**
+     * at-prefix
+     * at-prefix-status roadmap
+     * at-prefix-uses Workpool, EventStore
+     *
+     * MyPattern - Description
+     */
+    export interface MyResult {
+      id: string;
+    }
+
+    export function myFunction(args: MyArgs): Promise<MyResult> {
+      throw new Error('MyPattern not yet implemented - roadmap pattern');
+    }
+```
+
+**Do NOT:**
+
+| Forbidden Action | Rationale |
+| --- | --- |
+| Create implementation plans | Design focuses on architecture |
+| Transition spec to active | Requires implementation session |
+| Write full implementations | Stubs only |
 
 ### Implementation Session
 
@@ -158,6 +234,87 @@
     - pnpm lint passes
     - pnpm typecheck passes
 
+### FSM Protection
+
+```typescript
+/**
+ * Protection level mapping per PDR-005
+ *
+ * | State     | Protection | Meaning                          |
+ * |-----------|------------|----------------------------------|
+ * | roadmap   | none       | Planning phase, fully editable   |
+ * | active    | scope      | In progress, no new deliverables |
+ * | completed | hard       | Done, requires unlock to modify  |
+ * | deferred  | none       | Parked, fully editable           |
+ */
+const PROTECTION_LEVELS: Readonly<Record<ProcessStatusValue, ProtectionLevel>>;
+```
+
+```typescript
+/**
+ * Protection level types for FSM states
+ *
+ * - `none`: Fully editable, no restrictions
+ * - `scope`: Scope-locked, prevents adding new deliverables
+ * - `hard`: Hard-locked, requires explicit unlock-reason annotation
+ */
+type ProtectionLevel = 'none' | 'scope' | 'hard';
+```
+
+```typescript
+/**
+ * Get the protection level for a status
+ *
+ * @param status - Process status value
+ * @returns Protection level for the status
+ *
+ * @example
+ * ```typescript
+ * getProtectionLevel("active"); // → "scope"
+ * getProtectionLevel("completed"); // → "hard"
+ * ```
+ */
+function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel;
+```
+
+```typescript
+/**
+ * Check if a status is a terminal state (cannot transition out)
+ *
+ * Terminal states require explicit unlock to modify.
+ *
+ * @param status - Process status value
+ * @returns true if the status is terminal
+ *
+ * @example
+ * ```typescript
+ * isTerminalState("completed"); // → true
+ * isTerminalState("active"); // → false
+ * ```
+ */
+function isTerminalState(status: ProcessStatusValue): boolean;
+```
+
+```typescript
+/**
+ * Check if a status is fully editable (no protection)
+ *
+ * @param status - Process status value
+ * @returns true if the status has no protection
+ */
+function isFullyEditable(status: ProcessStatusValue): boolean;
+```
+
+```typescript
+/**
+ * Check if a status is scope-locked
+ *
+ * @param status - Process status value
+ * @returns true if the status prevents scope changes
+ */
+function isScopeLocked(status: ProcessStatusValue): boolean;
+```
+
 ### FSM Transitions
 
 ```typescript
@@ -237,233 +394,7 @@ function getTransitionErrorMessage(
 ): string;
 ```
 
-## Session Decision Tree
-
-**Context:** Developers need to choose the correct session type based on their current situation.
-
-    **Decision Tree (ASCII):**
-
-```text
-Starting from pattern brief?
-    |-- Yes --> Need code stubs now? --> Yes --> Planning + Design
-    |                                --> No  --> Planning
-    |-- No  --> Ready to code? --> Yes --> Complex decisions? --> Yes --> Design first
-                                                               --> No  --> Implementation
-                               --> No  --> Planning
-```
-
-**Decision:** Session types map to inputs, outputs, and FSM changes:
-
-| Session | Input | Output | FSM Change |
-| --- | --- | --- | --- |
-| Planning | Pattern brief | Roadmap spec (.feature) | Creates roadmap |
-| Design | Complex requirement | Design doc + code stubs | None |
-| Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
-| Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
-
-## Planning Session
-
-**Goal:** Create a roadmap spec. Do NOT write implementation code.
-
-    **Checklist:**
-
-    1. Extract metadata from pattern brief
-       - Phase number to at-prefix-phase
-       - Dependencies to at-prefix-depends-on
-       - Status to at-prefix-status:roadmap (always roadmap)
-
-    2. Create spec file at specs/product-area/pattern.feature
-
-    3. Structure the feature with at-prefix tags
-
-    4. Add deliverables table in Background section
-
-    5. Convert tables to Rule blocks (each business constraint becomes a Rule)
-
-    6. Add scenarios per Rule (minimum: 1 happy-path + 1 validation)
-
-    7. Set executable specs location with at-prefix-executable-specs tag
-
-    **Do NOT:**
-
-| Forbidden Action | Rationale |
-| --- | --- |
-| Create .ts implementation files | Planning only creates specs |
-| Transition to active | Active requires implementation readiness |
-| Ask Ready to implement? | Planning session ends at roadmap spec |
-| Write full implementations | Stubs only if Planning + Design |
-
-## Design Session
-
-**Goal:** Make architectural decisions. Create code stubs with interfaces. Do NOT implement.
-
-    **When Required:**
-
-| Use Design Session | Skip Design Session |
-| --- | --- |
-| Multiple valid approaches | Single obvious path |
-| New patterns/capabilities | Bug fix |
-| Cross-context coordination | Clear requirements |
-
-    **Checklist:**
-
-    1. Create design doc at plans/designs/draft/DESIGN-name.md
-
-    2. Document options (at least 2-3 approaches with pros/cons)
-
-    3. Get approval (user must approve recommended approach)
-
-    4. Create code stubs with interfaces (throw new Error pattern)
-
-    5. Move to approved after user approval (designs/draft to designs/approved)
-
-    **Code Stub Pattern:**
-
-```typescript
-/**
-     * at-prefix
-     * at-prefix-status roadmap
-     * at-prefix-uses Workpool, EventStore
-     *
-     * MyPattern - Description
-     */
-    export interface MyResult {
-      id: string;
-    }
-
-    export function myFunction(args: MyArgs): Promise<MyResult> {
-      throw new Error('MyPattern not yet implemented - roadmap pattern');
-    }
-```
-
-**Do NOT:**
-
-| Forbidden Action | Rationale |
-| --- | --- |
-| Create implementation plans | Design focuses on architecture |
-| Transition spec to active | Requires implementation session |
-| Write full implementations | Stubs only |
-
-## Implementation Session
-
-**Goal:** Write code. The roadmap spec is the source of truth.
-
-    **Pre-flight Requirements:**
-
-| Requirement | Why |
-| --- | --- |
-| Roadmap spec exists with at-prefix-status:roadmap | Cannot implement without spec |
-| Design doc approved (if needed) | Complex decisions need approval |
-| Implementation plan exists (for multi-session work) | Prevents scope drift |
-
-    **Execution Checklist (CRITICAL - Order Matters):**
-
-    1. Transition to active FIRST (before any code)
-       - Change at-prefix-status:roadmap to at-prefix-status:active
-       - Protection: active = scope-locked (no new deliverables)
-
-    2. Create executable spec stubs (if at-prefix-executable-specs present)
-       - Use at-prefix-implements:PatternName tag
-
-    3. For each deliverable:
-       - Read acceptance criteria from spec
-       - Implement code (replace throw new Error)
-       - Preserve at-prefix-* annotations in JSDoc
-       - Write tests
-       - Update deliverable status to completed
-
-    4. Transition to completed (only when ALL done)
-       - Change at-prefix-status:active to at-prefix-status:completed
-       - Protection: completed = hard-locked (requires at-prefix-unlock-reason)
-
-    5. Regenerate docs with: pnpm docs:all
-
-    **Do NOT:**
-
-| Forbidden Action | Rationale |
-| --- | --- |
-| Add new deliverables to active spec | Scope-locked state prevents this |
-| Mark completed with incomplete work | Hard-locked state cannot be undone |
-| Skip FSM transitions | Process Guard will reject |
-| Edit generated docs directly | Regenerate from source |
-
-## Planning + Design Session
-
-**Goal:** Create spec AND code stubs in one session. For immediate implementation handoff.
-
-    **When to Use:**
-
-| Use Planning + Design | Use Planning Only |
-| --- | --- |
-| Need stubs for implementation | Only enhancing spec |
-| Preparing for immediate handoff | Still exploring requirements |
-| Want complete two-tier architecture | Do not need Tier 2 yet |
-
-    **Checklist:**
-
-    1. Complete Planning checklist (see Planning Session rule)
-
-    2. Add at-prefix-executable-specs tag pointing to Tier 2 location
-
-    3. Create code stubs (see Design Session code stub pattern)
-
-    4. Create Tier 2 directory: package/tests/features/behavior/pattern-name/
-
-    5. Create Tier 2 feature stubs with at-prefix-implements:PatternName
-
-    6. Create step definitions stub at tests/planning-stubs/pattern.steps.ts
-
-    **Handoff Complete When:**
-
-    Tier 1:
-    - All at-prefix-* tags present
-    - at-prefix-executable-specs points to Tier 2
-    - Deliverables table complete
-    - Status is roadmap
-
-    Tier 2:
-    - Directory created with .feature files
-    - Each file has at-prefix-implements
-    - Step definitions stub compiles
-
-    Validation:
-    - pnpm lint passes
-    - pnpm typecheck passes
-
-## FSM Protection
-
-**Context:** The FSM (Finite State Machine) protects work integrity through state-based restrictions.
-
-    **Decision:** Four states with different protection levels:
-
-| State | Protection | Can Add Deliverables | Needs Unlock |
-| --- | --- | --- | --- |
-| roadmap | None | Yes | No |
-| active | Scope-locked | No | No |
-| completed | Hard-locked | No | Yes |
-| deferred | None | Yes | No |
-
-    **Valid FSM Transitions:**
-
-```text
-roadmap --> active --> completed (terminal)
-        |          |
-        |          v
-        |       roadmap (blocked/regressed)
-        v
-    deferred --> roadmap
-```
-
-**Transition Details:**
-
-| From | To | Notes |
-| --- | --- | --- |
-| roadmap | active, deferred | Start work or postpone |
-| active | completed, roadmap | Finish or regress if blocked |
-| deferred | roadmap | Resume planning |
-| completed | (none) | Terminal - use unlock to modify |
-
-## Handoff Documentation
+### Handoff Documentation
 
 **Context:** Multi-session work requires state capture at session boundaries.
 
@@ -498,7 +429,7 @@ Session State
 | Files Modified | Track changes for review |
 | Next Session | Clear starting point |
 
-## Discovery Tags
+### Discovery Tags
 
 **Context:** Learnings discovered during sessions should be captured inline.
 
@@ -520,7 +451,7 @@ at-prefix-discovered-gap: Missing-edge-case-for-empty-input
 
 **Note:** Discovery tags use hyphens instead of spaces (tag values cannot contain spaces).
 
-## Related Documentation
+### Related Documentation
 
 **Context:** Session guides connect to other documentation.
 
@@ -532,12 +463,3 @@ at-prefix-discovered-gap: Missing-edge-case-for-empty-input
 | GHERKIN-PATTERNS.md | DataTables, DocStrings, Rule blocks |
 | CONFIGURATION.md | Tag prefixes, presets |
 | INSTRUCTIONS.md | CLI commands, full tag reference |
-
----
-
-<details>
-<summary>Generation Warnings</summary>
-
-- warning: No @libar-docs-extract-shapes tag found in src/validation/fsm/states.ts
-
-</details>

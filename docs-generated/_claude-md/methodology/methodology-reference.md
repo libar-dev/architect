@@ -134,7 +134,7 @@
     }
     """
 
-### Planning Stubs
+### Planning Stubs Architecture
 
 **Context:** Step definitions created during Planning sessions need a separate location
     excluded from test execution.
@@ -157,3 +157,17 @@
 | Completed | steps/ | Fully executable |
 
     This avoids .skip() (forbidden by test safety policy) while preserving planning artifacts.
+
+### Related Documentation
+
+**Context:** This methodology document connects to other documentation.
+
+    **Decision:** Related documents:
+
+| Document | Purpose |
+| --- | --- |
+| README.md | Quick start, FSM diagram, ProcessStateAPI usage |
+| PROCESS-GUARD.md | FSM validation rules, protection levels, CLI |
+| CONFIGURATION.md | Tag prefixes, presets, customization |
+| GHERKIN-PATTERNS.md | Writing effective specs |
+| INSTRUCTIONS.md | Complete tag reference |

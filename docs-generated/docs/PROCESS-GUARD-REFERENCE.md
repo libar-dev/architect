@@ -25,34 +25,202 @@
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| Protection Levels | THIS DECISION (Rule: Protection Levels) | Rule block table |
-| Valid Transitions | THIS DECISION (Rule: Valid Transitions) | Rule block table |
-| FSM Diagram | THIS DECISION (Rule: Valid Transitions DocString) | Fenced code block (Mermaid) |
-| Validation Rules | src/lint/process-guard/types.ts | @extract-shapes tag |
+| FSM Protection Levels | src/validation/fsm/states.ts | @extract-shapes tag |
+| FSM Valid Transitions | src/validation/fsm/transitions.ts | @extract-shapes tag |
+| FSM Diagram | THIS DECISION (Rule: FSM Diagram) | Fenced code block (Mermaid) |
+| Validation Rules Types | src/lint/process-guard/types.ts | @extract-shapes tag |
 | Decider Function | src/lint/process-guard/decider.ts | @extract-shapes tag |
 | CLI Config | src/cli/lint-process.ts | @extract-shapes tag |
-| FSM Transitions | src/validation/fsm/transitions.ts | @extract-shapes tag |
-| CLI Examples | THIS DECISION (Rule: CLI Usage DocString) | Fenced code block |
-| API Example | THIS DECISION (Rule: Programmatic API DocString) | Fenced code block |
+| Escape Hatches | THIS DECISION (Rule: Escape Hatches) | Rule block table |
+| Rule Descriptions | THIS DECISION (Rule: Rule Descriptions) | Rule block table |
+| CLI Usage | THIS DECISION (Rule: CLI Usage) | Rule block content |
+| Programmatic API | THIS DECISION (Rule: Programmatic API) | Rule block content |
+| Architecture | THIS DECISION (Rule: Architecture) | Rule block content |
 
 ---
 
 ## Implementation Details
 
-### Protection Levels
+### FSM Protection Levels
 
-**Context:** Different FSM states have different protection levels.
+```typescript
+/**
+ * Protection level mapping per PDR-005
+ *
+ * | State     | Protection | Meaning                          |
+ * |-----------|------------|----------------------------------|
+ * | roadmap   | none       | Planning phase, fully editable   |
+ * | active    | scope      | In progress, no new deliverables |
+ * | completed | hard       | Done, requires unlock to modify  |
+ * | deferred  | none       | Parked, fully editable           |
+ */
+const PROTECTION_LEVELS: Readonly<Record<ProcessStatusValue, ProtectionLevel>>;
+```
 
-    **Decision:** Protection levels are derived from status:
+```typescript
+/**
+ * Protection level types for FSM states
+ *
+ * - `none`: Fully editable, no restrictions
+ * - `scope`: Scope-locked, prevents adding new deliverables
+ * - `hard`: Hard-locked, requires explicit unlock-reason annotation
+ */
+type ProtectionLevel = 'none' | 'scope' | 'hard';
+```
 
-| Status | Level | Allowed | Blocked |
-| --- | --- | --- | --- |
-| roadmap | none | Full editing | - |
-| deferred | none | Full editing | - |
-| active | scope | Edit existing deliverables | Adding new deliverables |
-| completed | hard | Nothing | Any change without unlock-reason |
+```typescript
+/**
+ * Get the protection level for a status
+ *
+ * @param status - Process status value
+ * @returns Protection level for the status
+ *
+ * @example
+ * ```typescript
+ * getProtectionLevel("active"); // → "scope"
+ * getProtectionLevel("completed"); // → "hard"
+ * ```
+ */
+function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel;
+```
 
-### Validation Rules
+```typescript
+/**
+ * Check if a status is a terminal state (cannot transition out)
+ *
+ * Terminal states require explicit unlock to modify.
+ *
+ * @param status - Process status value
+ * @returns true if the status is terminal
+ *
+ * @example
+ * ```typescript
+ * isTerminalState("completed"); // → true
+ * isTerminalState("active"); // → false
+ * ```
+ */
+function isTerminalState(status: ProcessStatusValue): boolean;
+```
+
+```typescript
+/**
+ * Check if a status is fully editable (no protection)
+ *
+ * @param status - Process status value
+ * @returns true if the status has no protection
+ */
+function isFullyEditable(status: ProcessStatusValue): boolean;
+```
+
+```typescript
+/**
+ * Check if a status is scope-locked
+ *
+ * @param status - Process status value
+ * @returns true if the status prevents scope changes
+ */
+function isScopeLocked(status: ProcessStatusValue): boolean;
+```
+
+### FSM Valid Transitions
+
+```typescript
+/**
+ * Valid FSM transitions matrix
+ *
+ * Maps each state to the list of states it can transition to.
+ *
+ * | From      | Valid Targets              | Notes                        |
+ * |-----------|----------------------------|------------------------------|
+ * | roadmap   | active, deferred, roadmap  | Can start, park, or stay     |
+ * | active    | completed, roadmap         | Can finish or regress        |
+ * | completed | (none)                     | Terminal state               |
+ * | deferred  | roadmap                    | Must go through roadmap      |
+ */
+const VALID_TRANSITIONS: Readonly<
+  Record<ProcessStatusValue, readonly ProcessStatusValue[]>
+>;
+```
+
+```typescript
+/**
+ * Check if a transition between two states is valid
+ *
+ * @param from - Current status
+ * @param to - Target status
+ * @returns true if the transition is allowed
+ *
+ * @example
+ * ```typescript
+ * isValidTransition("roadmap", "active"); // → true
+ * isValidTransition("roadmap", "completed"); // → false (must go through active)
+ * isValidTransition("completed", "active"); // → false (terminal state)
+ * ```
+ */
+function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean;
+```
+
+```typescript
+/**
+ * Get all valid transitions from a given state
+ *
+ * @param status - Current status
+ * @returns Array of valid target states (empty for terminal states)
+ *
+ * @example
+ * ```typescript
+ * getValidTransitionsFrom("roadmap"); // → ["active", "deferred", "roadmap"]
+ * getValidTransitionsFrom("completed"); // → []
+ * ```
+ */
+function getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[];
+```
+
+```typescript
+/**
+ * Get a human-readable description of why a transition is invalid
+ *
+ * @param from - Current status
+ * @param to - Attempted target status
+ * @param options - Optional message options with registry for prefix
+ * @returns Error message describing the violation
+ *
+ * @example
+ * ```typescript
+ * getTransitionErrorMessage("roadmap", "completed");
+ * // → "Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first."
+ *
+ * getTransitionErrorMessage("completed", "active");
+ * // → "Cannot transition from 'completed' (terminal state). Use unlock-reason tag to modify."
+ * ```
+ */
+function getTransitionErrorMessage(
+  from: ProcessStatusValue,
+  to: ProcessStatusValue,
+  options?: TransitionMessageOptions
+): string;
+```
+
+### FSM Diagram
+
+The FSM enforces valid state transitions. Protection levels and transitions
+    are defined in TypeScript (extracted via @extract-shapes).
+
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress (blocked)
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Terminal state
+        note right of active : Scope-locked
+```
+
+### Validation Rules Types
 
 ```typescript
 /**
@@ -201,126 +369,7 @@ interface ProcessGuardCLIConfig {
 }
 ```
 
-### FSM Transitions
-
-```typescript
-/**
- * Valid FSM transitions matrix
- *
- * Maps each state to the list of states it can transition to.
- *
- * | From      | Valid Targets              | Notes                        |
- * |-----------|----------------------------|------------------------------|
- * | roadmap   | active, deferred, roadmap  | Can start, park, or stay     |
- * | active    | completed, roadmap         | Can finish or regress        |
- * | completed | (none)                     | Terminal state               |
- * | deferred  | roadmap                    | Must go through roadmap      |
- */
-const VALID_TRANSITIONS: Readonly<
-  Record<ProcessStatusValue, readonly ProcessStatusValue[]>
->;
-```
-
-```typescript
-/**
- * Check if a transition between two states is valid
- *
- * @param from - Current status
- * @param to - Target status
- * @returns true if the transition is allowed
- *
- * @example
- * ```typescript
- * isValidTransition("roadmap", "active"); // → true
- * isValidTransition("roadmap", "completed"); // → false (must go through active)
- * isValidTransition("completed", "active"); // → false (terminal state)
- * ```
- */
-function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean;
-```
-
-```typescript
-/**
- * Get all valid transitions from a given state
- *
- * @param status - Current status
- * @returns Array of valid target states (empty for terminal states)
- *
- * @example
- * ```typescript
- * getValidTransitionsFrom("roadmap"); // → ["active", "deferred", "roadmap"]
- * getValidTransitionsFrom("completed"); // → []
- * ```
- */
-function getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[];
-```
-
-```typescript
-/**
- * Get a human-readable description of why a transition is invalid
- *
- * @param from - Current status
- * @param to - Attempted target status
- * @param options - Optional message options with registry for prefix
- * @returns Error message describing the violation
- *
- * @example
- * ```typescript
- * getTransitionErrorMessage("roadmap", "completed");
- * // → "Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first."
- *
- * getTransitionErrorMessage("completed", "active");
- * // → "Cannot transition from 'completed' (terminal state). Use unlock-reason tag to modify."
- * ```
- */
-function getTransitionErrorMessage(
-  from: ProcessStatusValue,
-  to: ProcessStatusValue,
-  options?: TransitionMessageOptions
-): string;
-```
-
-## Protection Levels
-
-**Context:** Different FSM states have different protection levels.
-
-    **Decision:** Protection levels are derived from status:
-
-| Status | Level | Allowed | Blocked |
-| --- | --- | --- | --- |
-| roadmap | none | Full editing | - |
-| deferred | none | Full editing | - |
-| active | scope | Edit existing deliverables | Adding new deliverables |
-| completed | hard | Nothing | Any change without unlock-reason |
-
-## Valid Transitions
-
-**Context:** Status transitions must follow the FSM to maintain process integrity.
-
-| From | To | Notes |
-| --- | --- | --- |
-| roadmap | active, deferred | Start work or postpone |
-| active | completed, roadmap | Finish or regress if blocked |
-| deferred | roadmap | Resume planning |
-| completed | (none) | Terminal - use unlock to modify |
-
-    **FSM Diagram:**
-
-```mermaid
-stateDiagram-v2
-        [*] --> roadmap
-        roadmap --> active : Start work
-        roadmap --> deferred : Postpone
-        active --> completed : Finish
-        active --> roadmap : Regress (blocked)
-        deferred --> roadmap : Resume
-        completed --> [*]
-
-        note right of completed : Terminal state
-        note right of active : Scope-locked
-```
-
-## Escape Hatches
+### Escape Hatches
 
 **Context:** Sometimes process rules need to be bypassed for legitimate reasons.
 
@@ -332,11 +381,11 @@ stateDiagram-v2
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
 
-## Validation Rules
+### Rule Descriptions
 
-Process Guard validates these rules:
+Process Guard validates 6 rules (types extracted from TypeScript):
 
-| Rule | Severity | Description |
+| Rule | Severity | Human Description |
 | --- | --- | --- |
 | completed-protection | error | Cannot modify completed specs without unlock-reason |
 | invalid-status-transition | error | Status transition must follow FSM |
@@ -345,7 +394,7 @@ Process Guard validates these rules:
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 
-## CLI Usage
+### CLI Usage
 
 Process Guard is invoked via the lint-process CLI command.
 
@@ -368,7 +417,7 @@ lint-process --staged
     lint-process --staged --ignore-session
 ```
 
-## Programmatic API
+### Programmatic API
 
 Process Guard can be used programmatically for custom integrations.
 
@@ -413,7 +462,7 @@ import {
 | Results | hasWarnings(result) | Check for warnings |
 | Results | summarizeResult(result) | Human-readable summary |
 
-## Architecture
+### Architecture
 
 Process Guard uses the Decider pattern for testable validation.
 

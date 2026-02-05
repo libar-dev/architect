@@ -38,7 +38,7 @@
 | Understand the taxonomy | TAXONOMY.md |
 | Publish to npm | PUBLISHING.md |
 
-### Reading Order New Users
+### Reading Order for New Users
 
 **Context:** Recommended path for developers new to the package.
 
@@ -48,7 +48,7 @@
 | 2 | CONFIGURATION.md | Presets, tag prefixes, config files |
 | 3 | METHODOLOGY.md | Core thesis, dual-source architecture |
 
-### Reading Order Developers
+### Reading Order for Developers
 
 **Context:** Recommended path for developers implementing features.
 
@@ -59,7 +59,7 @@
 | 6 | GHERKIN-PATTERNS.md | Writing effective Gherkin specs |
 | 7 | INSTRUCTIONS.md | Complete tag and CLI reference |
 
-### Reading Order Team Leads
+### Reading Order for Team Leads
 
 **Context:** Recommended path for team leads and CI/CD setup.
 
@@ -82,7 +82,7 @@
     **Rationale:** Gherkin owns timeline/planning metadata (when/priority).
     TypeScript owns runtime metadata (dependencies/categories).
 
-### Delivery FSM
+### Delivery Workflow FSM
 
 **Context:** Status transitions follow a finite state machine for process integrity.
 

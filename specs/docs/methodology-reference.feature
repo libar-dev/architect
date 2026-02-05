@@ -33,9 +33,11 @@ Feature: Methodology Reference - Auto-Generated Documentation
 | Four-Stage Workflow | THIS DECISION (Rule: Four-Stage Workflow) | Rule block table |
 | Skip Conditions | THIS DECISION (Rule: Skip Conditions) | Rule block table |
 | Annotation Ownership | THIS DECISION (Rule: Annotation Ownership) | Rule block tables |
+| Example Annotation Split | THIS DECISION (Rule: Example Annotation Split) | Rule block code examples |
 | Two-Tier Spec Architecture | THIS DECISION (Rule: Two-Tier Spec Architecture) | Rule block table |
 | Code Stub Levels | THIS DECISION (Rule: Code Stub Levels) | Rule block table |
-| Planning Stubs | THIS DECISION (Rule: Planning Stubs Architecture) | Rule block table |
+| Planning Stubs Architecture | THIS DECISION (Rule: Planning Stubs Architecture) | Rule block table |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
     Given the following deliverables:

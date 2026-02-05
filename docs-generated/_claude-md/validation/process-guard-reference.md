@@ -7,47 +7,23 @@
 
 ## Overview
 
-### Protection Levels
+### FSM Protection Levels
 
-**Context:** Different FSM states have different protection levels.
+- `PROTECTION_LEVELS` - const
+- `ProtectionLevel` - type
+- `getProtectionLevel` - function
+- `isTerminalState` - function
+- `isFullyEditable` - function
+- `isScopeLocked` - function
 
-    **Decision:** Protection levels are derived from status:
+### FSM Valid Transitions
 
-| Status | Level | Allowed | Blocked |
-| --- | --- | --- | --- |
-| roadmap | none | Full editing | - |
-| deferred | none | Full editing | - |
-| active | scope | Edit existing deliverables | Adding new deliverables |
-| completed | hard | Nothing | Any change without unlock-reason |
+- `VALID_TRANSITIONS` - const
+- `isValidTransition` - function
+- `getValidTransitionsFrom` - function
+- `getTransitionErrorMessage` - function
 
-### Valid Transitions
-
-**Context:** Status transitions must follow the FSM to maintain process integrity.
-
-| From | To | Notes |
-| --- | --- | --- |
-| roadmap | active, deferred | Start work or postpone |
-| active | completed, roadmap | Finish or regress if blocked |
-| deferred | roadmap | Resume planning |
-| completed | (none) | Terminal - use unlock to modify |
-
-    **FSM Diagram:**
-
-    """mermaid
-    stateDiagram-v2
-        [*] --> roadmap
-        roadmap --> active : Start work
-        roadmap --> deferred : Postpone
-        active --> completed : Finish
-        active --> roadmap : Regress (blocked)
-        deferred --> roadmap : Resume
-        completed --> [*]
-
-        note right of completed : Terminal state
-        note right of active : Scope-locked
-    """
-
-### Validation Rules
+### Validation Rules Types
 
 - `ProcessGuardRule` - type
 - `DeciderInput` - interface
@@ -63,14 +39,32 @@
 
 - `ProcessGuardCLIConfig` - interface
 
-### FSM Transitions
+### Escape Hatches
 
-- `VALID_TRANSITIONS` - const
-- `isValidTransition` - function
-- `getValidTransitionsFrom` - function
-- `getTransitionErrorMessage` - function
+**Context:** Sometimes process rules need to be bypassed for legitimate reasons.
 
-### CLI Examples
+    **Decision:** These escape hatches are available:
+
+| Situation | Solution | Example |
+| --- | --- | --- |
+| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
+| CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
+
+### Rule Descriptions
+
+Process Guard validates 6 rules (types extracted from TypeScript):
+
+| Rule | Severity | Human Description |
+| --- | --- | --- |
+| completed-protection | error | Cannot modify completed specs without unlock-reason |
+| invalid-status-transition | error | Status transition must follow FSM |
+| scope-creep | error | Cannot add deliverables to active specs |
+| session-excluded | error | Cannot modify files excluded from session |
+| session-scope | warning | File not in active session scope |
+| deliverable-removed | warning | Deliverable was removed (informational) |
+
+### CLI Usage
 
 Process Guard is invoked via the lint-process CLI command.
 
@@ -93,7 +87,7 @@ Process Guard is invoked via the lint-process CLI command.
     lint-process --staged --ignore-session
     """
 
-### API Example
+### Programmatic API
 
 Process Guard can be used programmatically for custom integrations.
 

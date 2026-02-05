@@ -38,7 +38,8 @@
 | Layer Types | src/taxonomy/layer-types.ts | @extract-shapes tag |
 | TagRegistry | src/taxonomy/registry-builder.ts | @extract-shapes tag |
 | Presets | THIS DECISION (Rule: Presets) | Rule block table |
-| Architecture | THIS DECISION (Rule: Architecture DocString) | Fenced code block |
+| Architecture | THIS DECISION (Rule: Architecture) | Fenced code block |
+| Tag Generation | THIS DECISION (Rule: Tag Generation) | Rule block content |
 
 ---
 
@@ -216,6 +217,45 @@ type AcceptedStatusValue = (typeof ACCEPTED_STATUS_VALUES)[number];
  * Default status for new items
  */
 const DEFAULT_STATUS: ProcessStatusValue;
+```
+
+### Status FSM
+
+**Context:** Status values control the FSM workflow for pattern lifecycle.
+
+    **Decision:** Four canonical status values are defined (per PDR-005):
+
+| Status | Protection | Description |
+| --- | --- | --- |
+| roadmap | none | Planned work, fully editable |
+| active | scope-locked | In progress, cannot add deliverables |
+| completed | hard-locked | Done, requires unlock-reason to modify |
+| deferred | none | On hold, fully editable |
+
+    **Transitions:**
+
+| From | To | Action |
+| --- | --- | --- |
+| roadmap | active | Start work |
+| roadmap | deferred | Postpone |
+| active | completed | Finish work |
+| active | roadmap | Regress (blocked) |
+| deferred | roadmap | Resume planning |
+
+    **FSM Diagram:**
+
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Hard-locked
+        note right of active : Scope-locked
 ```
 
 ### Normalized Status
@@ -450,132 +490,7 @@ function buildRegistry(): TagRegistry;
     **Behavior:** The preset determines which categories are available.
     All presets share the same status values and format types.
 
-## Concept
-
-**Context:** A taxonomy is a classification system for organizing knowledge.
-
-    **Definition:** In delivery-process, the taxonomy defines the vocabulary for
-    pattern annotations. It determines what tags exist, their valid values, and
-    how they are parsed from source code.
-
-    **Components:**
-
-| Component | Purpose | Source File |
-| --- | --- | --- |
-| Categories | Domain classifications (e.g., core, api, ddd) | categories.ts |
-| Status Values | FSM states (roadmap, active, completed, deferred) | status-values.ts |
-| Format Types | How tag values are parsed (flag, csv, enum) | format-types.ts |
-| Hierarchy Levels | Work item levels (epic, phase, task) | hierarchy-levels.ts |
-| Risk Levels | Risk assessment (low, medium, high) | risk-levels.ts |
-| Layer Types | Feature layer (timeline, domain, integration) | layer-types.ts |
-
-    **Key Principle:** The taxonomy is NOT a fixed schema. Presets select
-    different subsets, and you can define custom categories.
-
-## Format Types
-
-**Context:** Tags have different value formats that determine parsing.
-
-    **Decision:** Six format types are supported:
-
-| Format | Example | Parsing |
-| --- | --- | --- |
-| flag | @docs-core | Boolean presence (no value) |
-| value | @docs-pattern MyPattern | Simple string |
-| enum | @docs-status completed | Constrained to predefined list |
-| csv | @docs-uses A, B, C | Comma-separated values |
-| number | @docs-phase 15 | Numeric value |
-| quoted-value | @docs-brief:'Multi word' | Preserves spaces |
-
-    **Implementation:** The format type is specified in the tag definition
-    within the TagRegistry. The extractor uses the format to parse values.
-
-## Status Values
-
-**Context:** Status values control the FSM workflow for pattern lifecycle.
-
-    **Decision:** Four canonical status values are defined (per PDR-005):
-
-| Status | Protection | Description |
-| --- | --- | --- |
-| roadmap | none | Planned work, fully editable |
-| active | scope-locked | In progress, cannot add deliverables |
-| completed | hard-locked | Done, requires unlock-reason to modify |
-| deferred | none | On hold, fully editable |
-
-    **Transitions:**
-
-| From | To | Action |
-| --- | --- | --- |
-| roadmap | active | Start work |
-| roadmap | deferred | Postpone |
-| active | completed | Finish work |
-| active | roadmap | Regress (blocked) |
-| deferred | roadmap | Resume planning |
-
-    **FSM Diagram:**
-
-```mermaid
-stateDiagram-v2
-        [*] --> roadmap
-        roadmap --> active : Start work
-        roadmap --> deferred : Postpone
-        active --> completed : Finish
-        active --> roadmap : Regress
-        deferred --> roadmap : Resume
-        completed --> [*]
-
-        note right of completed : Hard-locked
-        note right of active : Scope-locked
-```
-
-## Normalized Status
-
-**Context:** Display requires mapping 4 FSM states to 3 presentation buckets.
-
-    **Decision:** Raw status values normalize to display status:
-
-| Raw Status | Normalized | Bucket |
-| --- | --- | --- |
-| completed | completed | Work is done |
-| active | active | Work in progress |
-| roadmap | planned | Future work |
-| deferred | planned | Future work (paused) |
-
-    **Rationale:** This separation follows DDD principles - the domain model
-    (raw FSM states) is distinct from the view model (normalized display).
-
-## Presets
-
-**Context:** Different projects need different taxonomy subsets.
-
-    **Decision:** Three presets are available:
-
-| Preset | Categories | Tag Prefix | Use Case |
-| --- | --- | --- | --- |
-| libar-generic (default) | 3 | @libar-docs- | Simple projects (this package) |
-| ddd-es-cqrs | 21 | @libar-docs- | DDD/Event Sourcing architectures |
-| generic | 3 | @docs- | Simple projects with @docs- prefix |
-
-    **Behavior:** The preset determines which categories are available.
-    All presets share the same status values and format types.
-
-## Hierarchy Levels
-
-**Context:** Work items need hierarchical breakdown for planning.
-
-    **Decision:** Three hierarchy levels are defined:
-
-| Level | Duration | Description |
-| --- | --- | --- |
-| epic | Multi-quarter | Strategic initiatives |
-| phase | 2-5 days | Standard work units |
-| task | 1-4 hours | Session-level work |
-
-    **Usage:** The level tag organizes work for roadmap generation.
-    Phases can have a parent epic; tasks can have a parent phase.
-
-## Architecture
+### Architecture
 
 **Context:** The taxonomy module structure supports the type-safe annotation system.
 
@@ -608,7 +523,7 @@ import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
     // registry.metadataTags    -> MetadataTagDefinitionForRegistry[]
 ```
 
-## Tag Generation
+### Tag Generation
 
 **Context:** Developers need a reference of all available tags.
 

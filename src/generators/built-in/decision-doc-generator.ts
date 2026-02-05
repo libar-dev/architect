@@ -321,12 +321,25 @@ export function generateDetailedOutput(
           sections.push(code(fullSource, 'typescript'));
         }
       } else if (extracted.docStrings && extracted.docStrings.length > 0) {
-        // Render DocStrings as code blocks, skipping duplicates
-        for (const ds of extracted.docStrings) {
-          const contentKey = `${ds.language}:${ds.content}`;
-          if (!renderedDocStrings.has(contentKey)) {
-            renderedDocStrings.add(contentKey);
-            sections.push(code(ds.content, ds.language));
+        // Check if content has meaningful text beyond just DocStrings
+        // Rule block extractions include context text, tables, AND DocStrings
+        // We should render full content to preserve all text, not just DocStrings
+        const contentWithoutDocStrings = extracted.content
+          .replace(/"""[\w]*\n[\s\S]*?"""/g, '') // Remove Gherkin DocStrings
+          .replace(/```[\w]*\n[\s\S]*?```/g, '') // Remove markdown code blocks
+          .trim();
+
+        if (contentWithoutDocStrings.length > 0) {
+          // Content has text beyond DocStrings - render full content with inline DocStrings
+          sections.push(...parseDescriptionWithDocStrings(extracted.content));
+        } else {
+          // Content is ONLY DocStrings - render them as code blocks, skipping duplicates
+          for (const ds of extracted.docStrings) {
+            const contentKey = `${ds.language}:${ds.content}`;
+            if (!renderedDocStrings.has(contentKey)) {
+              renderedDocStrings.add(contentKey);
+              sections.push(code(ds.content, ds.language));
+            }
           }
         }
       } else {

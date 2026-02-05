@@ -28,11 +28,11 @@ Feature: Index Reference - Auto-Generated Documentation
 | --- | --- | --- |
 | Package Metadata | THIS DECISION (Rule: Package Metadata) | Rule block table |
 | Quick Navigation | THIS DECISION (Rule: Quick Navigation) | Rule block table |
-| Reading Order New Users | THIS DECISION (Rule: Reading Order for New Users) | Rule block table |
-| Reading Order Developers | THIS DECISION (Rule: Reading Order for Developers) | Rule block table |
-| Reading Order Team Leads | THIS DECISION (Rule: Reading Order for Team Leads) | Rule block table |
+| Reading Order for New Users | THIS DECISION (Rule: Reading Order for New Users) | Rule block table |
+| Reading Order for Developers | THIS DECISION (Rule: Reading Order for Developers) | Rule block table |
+| Reading Order for Team Leads | THIS DECISION (Rule: Reading Order for Team Leads) | Rule block table |
 | Dual-Source Architecture | THIS DECISION (Rule: Dual-Source Architecture) | Rule block table |
-| Delivery FSM | THIS DECISION (Rule: Delivery Workflow FSM) | Fenced code block |
+| Delivery Workflow FSM | THIS DECISION (Rule: Delivery Workflow FSM) | Fenced code block |
 | ProcessStateAPI | THIS DECISION (Rule: ProcessStateAPI) | Fenced code block |
 | Document Roles | THIS DECISION (Rule: Document Roles) | Rule block table |
 

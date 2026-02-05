@@ -196,7 +196,7 @@
 | standard | Default with all sections |
 | detailed | Maximum detail, all optional sections |
 
-### Codec Mapping
+### Codec to Generator Mapping
 
 **Context:** Each codec is exposed via a CLI generator flag.
 
@@ -219,3 +219,74 @@
 | ChangelogCodec | changelog | -g changelog |
 | TraceabilityCodec | traceability | -g traceability |
 | OverviewCodec | overview-rdm | -g overview-rdm |
+
+### Status Normalization
+
+**Context:** Source annotations use various status values that must be normalized.
+
+    **Decision:** All status values are normalized to three canonical states:
+
+| Input Status | Normalized To |
+| --- | --- |
+| completed, implemented | completed |
+| active, partial, in-progress | active |
+| roadmap, planned, deferred, undefined | planned |
+
+### Result Monad Pattern
+
+**Context:** The package uses explicit error handling instead of exceptions.
+
+    **Decision:** All operations return Result T,E for type-safe error handling:
+
+    """typescript
+    type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+
+    // Usage
+    const result = await scanPatterns(options);
+    if (result.ok) {
+      const { files } = result.value;
+    } else {
+      console.error(result.error);
+    }
+    """
+
+    **Benefits:**
+    - No exception swallowing
+    - Partial success scenarios supported
+    - Type-safe error handling at boundaries
+
+### Orchestrator Pipeline
+
+**Context:** The orchestrator coordinates the complete documentation generation pipeline.
+
+    **Decision:** The orchestrator executes these steps:
+
+| Step | Operation | Key Function |
+| --- | --- | --- |
+| 1 | Load configuration | loadConfig() |
+| 2 | Scan TypeScript sources | scanPatterns() |
+| 3 | Extract TypeScript patterns | extractPatterns() |
+| 4 | Scan Gherkin sources | scanGherkinFiles() |
+| 5 | Extract Gherkin patterns | extractPatternsFromGherkin() |
+| 6 | Merge patterns | mergePatterns() |
+| 7 | Compute hierarchy | computeHierarchyChildren() |
+| 8 | Transform to MasterDataset | transformToMasterDataset() |
+| 9 | Run codecs | Codec.decode() for each generator |
+| 10 | Write output files | fs.writeFile() |
+
+    **Orchestrator Flow Diagram:**
+
+    """mermaid
+    flowchart TB
+        A[loadConfig] --> B[scanPatterns]
+        B --> C[extractPatterns]
+        D[scanGherkinFiles] --> E[extractPatternsFromGherkin]
+        C --> F[mergePatterns]
+        E --> F
+        F --> G[computeHierarchyChildren]
+        G --> H[transformToMasterDataset]
+        H --> I[For each generator]
+        I --> J[Codec.decode]
+        J --> K[renderDocumentWithFiles]
+        K --> L[fs.writeFile]
+    """

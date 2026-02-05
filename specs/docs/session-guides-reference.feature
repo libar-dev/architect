@@ -36,6 +36,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 | FSM Transitions | src/validation/fsm/transitions.ts | at-extract-shapes tag |
 | Handoff Documentation | THIS DECISION (Rule: Handoff Documentation) | Rule block content |
 | Discovery Tags | THIS DECISION (Rule: Discovery Tags) | Rule block table |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
     Given the following deliverables:

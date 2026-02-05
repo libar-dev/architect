@@ -35,15 +35,20 @@
 | Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
 | DoD Validation | THIS DECISION (Rule: DoD Validation) | Rule block table |
 | DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
+| validate-patterns Flags | THIS DECISION (Rule: validate-patterns Flags) | Rule block table |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
-| Programmatic API | THIS DECISION (Rule: Programmatic API DocString) | Fenced code block |
+| Programmatic API | THIS DECISION (Rule: Programmatic API) | Fenced code block |
 
 ---
 
 ## Implementation Details
 
 ### Command Decision Tree
+
+**Context:** Developers need to quickly determine which validation command to run.
+
+    **Decision Tree:**
 
 ```text
 Need to check annotation quality?
@@ -73,10 +78,27 @@ Need to check annotation quality?
 
 ### lint-patterns Rules (from this decision (rule: lint-patterns rules))
 
+**Context:** lint-patterns validates annotation quality in TypeScript files.
+
+    **Usage:**
+
 ```bash
 npx lint-patterns -i "src/**/*.ts"
     npx lint-patterns -i "src/**/*.ts" --strict
 ```
+
+**Validation Rules:**
+
+| Rule | Severity | What It Checks |
+| --- | --- | --- |
+| missing-pattern-name | error | Must have pattern tag |
+| invalid-status | error | Status must be valid FSM value |
+| tautological-description | error | Description cannot just repeat name |
+| pattern-conflict-in-implements | error | Pattern cannot implement itself |
+| missing-relationship-target | warning | Relationship targets must exist |
+| missing-status | warning | Should have status tag |
+| missing-when-to-use | warning | Should have When to Use section |
+| missing-relationships | info | Consider adding uses/used-by |
 
 ### lint-patterns Rules (from rules)
 
@@ -608,6 +630,17 @@ interface WithTagRegistry {
 
 ### DoD Validation (from this decision (rule: dod validation))
 
+**Context:** Definition of Done validation ensures completed patterns meet quality criteria.
+
+    **Criteria for completed status:**
+
+| Criterion | What It Checks |
+| --- | --- |
+| All deliverables complete | Status must be: complete, done, finished, yes, or checkmarks |
+| Acceptance criteria present | At least one scenario with @acceptance-criteria tag |
+
+    **Completion Patterns Recognized:**
+
 ```text
 Text patterns: complete, completed, done, finished, yes
     Symbol patterns: check mark, heavy check mark, white check mark, ballot box with check
@@ -716,7 +749,33 @@ function validateDoD(
 function formatDoDSummary(summary: DoDValidationSummary): string;
 ```
 
+### validate-patterns Flags
+
+**Context:** validate-patterns combines multiple validation checks.
+
+    **Usage:**
+
+```bash
+npx validate-patterns \
+      -i "src/**/*.ts" \
+      -F "specs/**/*.feature" \
+      --dod \
+      --anti-patterns
+```
+
+**Available Flags:**
+
+| Flag | What It Validates |
+| --- | --- |
+| --dod | Completed patterns have all deliverables done |
+| --anti-patterns | Dual-source ownership rules not violated |
+| --cross-source | Feature/TypeScript metadata consistency |
+
 ### CI/CD Integration
+
+**Context:** Validation commands integrate into CI/CD pipelines.
+
+    **Recommended package.json Scripts:**
 
 ```json
 {
@@ -729,9 +788,13 @@ function formatDoDSummary(summary: DoDValidationSummary): string;
     }
 ```
 
+**Pre-commit Hook:**
+
 ```bash
 npx lint-process --staged
 ```
+
+**GitHub Actions:**
 
 ```yaml
 - name: Lint annotations
@@ -752,6 +815,10 @@ npx lint-process --staged
 
 ### Programmatic API
 
+**Context:** All validation tools expose programmatic APIs for custom integrations.
+
+    **Import Paths:**
+
 ```typescript
 // Pattern linting
     import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
@@ -762,6 +829,8 @@ npx lint-process --staged
     // Anti-patterns and DoD
     import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
 ```
+
+**Anti-Pattern Detection Example:**
 
 ```typescript
 import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery-process/validation';
@@ -783,6 +852,8 @@ import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery
     }
 ```
 
+**DoD Validation Example:**
+
 ```typescript
 import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
     import { scanGherkin } from '@libar-dev/delivery-process/scanner';
@@ -796,25 +867,3 @@ import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/valid
       process.exit(1);
     }
 ```
-
-## validate-patterns Flags
-
-**Context:** validate-patterns combines multiple validation checks.
-
-    **Usage:**
-
-```bash
-npx validate-patterns \
-      -i "src/**/*.ts" \
-      -F "specs/**/*.feature" \
-      --dod \
-      --anti-patterns
-```
-
-**Available Flags:**
-
-| Flag | What It Validates |
-| --- | --- |
-| --dod | Completed patterns have all deliverables done |
-| --anti-patterns | Dual-source ownership rules not violated |
-| --cross-source | Feature/TypeScript metadata consistency |

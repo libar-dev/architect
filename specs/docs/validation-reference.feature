@@ -37,9 +37,10 @@ Feature: Validation Reference - Auto-Generated Documentation
 | Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
 | DoD Validation | THIS DECISION (Rule: DoD Validation) | Rule block table |
 | DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
+| validate-patterns Flags | THIS DECISION (Rule: validate-patterns Flags) | Rule block table |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
-| Programmatic API | THIS DECISION (Rule: Programmatic API DocString) | Fenced code block |
+| Programmatic API | THIS DECISION (Rule: Programmatic API) | Fenced code block |
 
   Background: Deliverables
     Given the following deliverables:

@@ -200,6 +200,15 @@
     - pnpm lint passes
     - pnpm typecheck passes
 
+### FSM Protection
+
+- `PROTECTION_LEVELS` - const
+- `ProtectionLevel` - type
+- `getProtectionLevel` - function
+- `isTerminalState` - function
+- `isFullyEditable` - function
+- `isScopeLocked` - function
+
 ### FSM Transitions
 
 - `VALID_TRANSITIONS` - const
@@ -263,3 +272,16 @@
     """
 
     **Note:** Discovery tags use hyphens instead of spaces (tag values cannot contain spaces).
+
+### Related Documentation
+
+**Context:** Session guides connect to other documentation.
+
+    **Decision:** Related docs by topic:
+
+| Document | Content |
+| --- | --- |
+| METHODOLOGY.md | Core thesis, FSM states, two-tier architecture |
+| GHERKIN-PATTERNS.md | DataTables, DocStrings, Rule blocks |
+| CONFIGURATION.md | Tag prefixes, presets |
+| INSTRUCTIONS.md | CLI commands, full tag reference |

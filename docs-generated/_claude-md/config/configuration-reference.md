@@ -7,7 +7,7 @@
 
 ## Overview
 
-### Quick Reference
+### Preset Quick Reference
 
 **Context:** Three presets are available with different tag prefixes and category counts.
 
@@ -21,7 +21,7 @@
 
     **Note:** The tag prefix begins with the at-symbol followed by the shown prefix.
 
-### Category Behavior
+### Preset Category Behavior
 
 **Context:** Presets define complete category sets that replace base taxonomy.
 
@@ -37,7 +37,7 @@
     If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.),
     use the ddd-es-cqrs preset explicitly.
 
-### Default Preset
+### Default Preset Selection
 
 **Context:** All entry points use consistent defaults.
 
@@ -51,6 +51,73 @@
 
     **Rationale:** Simple defaults for most users.
     Use preset ddd-es-cqrs explicitly if you need the full 21-category DDD taxonomy.
+
+### Libar Generic Preset
+
+**Context:** Default preset with libar-docs- prefix and 3 categories.
+
+| Property | Value |
+| --- | --- |
+| Tag Prefix | at-libar-docs- |
+| File Opt-In | at-libar-docs |
+| Categories | 3 (core, api, infra) |
+
+    **Usage Example:**
+
+    """typescript
+    /**
+     * at-libar-docs
+     * at-libar-docs-pattern PatternScanner
+     * at-libar-docs-status completed
+     * at-libar-docs-core
+     * at-libar-docs-uses FileDiscovery, ASTParser
+     */
+    export function scanPatterns(config: ScanConfig): Promise<ScanResult> {
+      // Implementation
+    }
+    """
+
+### Generic Preset
+
+**Context:** Same 3 categories as libar-generic but with shorter docs- prefix.
+
+| Property | Value |
+| --- | --- |
+| Tag Prefix | at-docs- |
+| File Opt-In | at-docs |
+| Categories | 3 (core, api, infra) |
+
+    **Usage Example:**
+
+    """typescript
+    /**
+     * at-docs
+     * at-docs-pattern PatternScanner
+     * at-docs-status completed
+     * at-docs-core
+     * at-docs-uses FileDiscovery, ASTParser
+     */
+    export function scanPatterns(config: ScanConfig): Promise<ScanResult> {
+      // Implementation
+    }
+    """
+
+### DDD ES CQRS Preset
+
+**Context:** Full taxonomy for domain-driven architectures with 21 categories.
+
+| Property | Value |
+| --- | --- |
+| Tag Prefix | at-libar-docs- |
+| File Opt-In | at-libar-docs |
+| Categories | 21 (domain, ddd, bounded-context, event-sourcing, decider, cqrs, etc.) |
+
+    **When to Use:**
+
+    - DDD architectures
+    - Event sourcing projects
+    - CQRS implementations
+    - Full roadmap/phase tracking
 
 ### Presets
 
@@ -71,7 +138,7 @@
 - `DeliveryProcessInstance` - interface
 - `RegexBuilders` - interface
 
-### Discovery Order
+### Hierarchical Configuration
 
 **Context:** CLI tools discover config files automatically via directory traversal.
 
@@ -98,6 +165,33 @@
 - `findConfigFile` - function
 - `loadConfig` - function
 - `formatConfigError` - function
+
+### RegexBuilders API
+
+**Context:** DeliveryProcessInstance includes utilities for tag detection.
+
+    **API Methods:**
+
+| Method | Description |
+| --- | --- |
+| hasFileOptIn(content) | true if content contains file opt-in marker |
+| hasDocDirectives(content) | true if content contains doc directives |
+| normalizeTag(tag) | Strips prefix: at-libar-docs-pattern becomes pattern |
+
+    **Usage Example:**
+
+    """typescript
+    const dp = createDeliveryProcess(); // Uses libar-generic (default)
+
+    // Check if file should be scanned
+    dp.regexBuilders.hasFileOptIn(fileContent);  // true if contains /** at-libar-docs */
+
+    // Check for any documentation directives
+    dp.regexBuilders.hasDocDirectives(fileContent);  // true if contains at-libar-docs-*
+
+    // Normalize tag for lookup
+    dp.regexBuilders.normalizeTag('at-libar-docs-pattern');  // "pattern"
+    """
 
 ### RegexBuilders
 

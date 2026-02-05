@@ -40,7 +40,8 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 | Layer Types | src/taxonomy/layer-types.ts | @extract-shapes tag |
 | TagRegistry | src/taxonomy/registry-builder.ts | @extract-shapes tag |
 | Presets | THIS DECISION (Rule: Presets) | Rule block table |
-| Architecture | THIS DECISION (Rule: Architecture DocString) | Fenced code block |
+| Architecture | THIS DECISION (Rule: Architecture) | Fenced code block |
+| Tag Generation | THIS DECISION (Rule: Tag Generation) | Rule block content |
 
   Background: Deliverables
     Given the following deliverables:

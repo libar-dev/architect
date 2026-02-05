@@ -38,6 +38,7 @@
 | Traceability Tags | THIS DECISION (Rule: Traceability Tags) | Rule block table |
 | Architecture Tags | THIS DECISION (Rule: Architecture Diagram Tags) | Rule block table |
 | Aggregation Tags | THIS DECISION (Rule: Aggregation Tags) | Rule block table |
+| Shape Extraction | THIS DECISION (Rule: Shape Extraction Tag) | Rule block table |
 | generate-docs CLI | src/cli/generate-docs.ts | extract-shapes tag |
 | lint-patterns CLI | src/cli/lint-patterns.ts | extract-shapes tag |
 | lint-process CLI | src/cli/lint-process.ts | extract-shapes tag |
@@ -51,6 +52,18 @@
 
 ### File-Level Opt-In
 
+**Context:** Files must explicitly opt-in to be scanned for annotations.
+
+    **Decision:** Add the opt-in marker as the first annotation in a JSDoc comment.
+
+| Preset | Opt-In Marker | Example |
+| --- | --- | --- |
+| libar-generic | at-libar-docs | JSDoc comment with at-libar-docs |
+| generic | at-docs | JSDoc comment with at-docs |
+| ddd-es-cqrs | at-libar-docs | JSDoc comment with at-libar-docs |
+
+    **Usage Example:**
+
 ```typescript
 /**
      * at-libar-docs
@@ -63,6 +76,9 @@
       // Implementation
     }
 ```
+
+**Important:** Only files with the opt-in marker are scanned. Files without
+    the marker are ignored by the scanner even if they contain other annotations.
 
 ### Category Tags
 
@@ -111,6 +127,38 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
 ```
 
 ### Category Reference
+
+**Context:** Category tags classify patterns by domain area.
+
+    **Full Category Table (ddd-es-cqrs preset - 21 categories):**
+
+| Tag | Domain | Priority | Description |
+| --- | --- | --- | --- |
+| domain | Strategic DDD | 1 | Bounded contexts, aggregates, strategic design |
+| ddd | Domain-Driven Design | 2 | DDD tactical patterns |
+| bounded-context | Bounded Context | 3 | BC contracts and definitions |
+| event-sourcing | Event Sourcing | 4 | Event store, aggregates, replay |
+| decider | Decider | 5 | Decider pattern |
+| fsm | FSM | 5 | Finite state machine patterns |
+| cqrs | CQRS | 5 | Command/query separation |
+| projection | Projection | 6 | Read models, checkpoints |
+| saga | Saga | 7 | Cross-context coordination, process managers |
+| command | Command | 8 | Command handlers, orchestration |
+| arch | Architecture | 9 | Architecture patterns, decisions |
+| infra | Infrastructure | 10 | Infrastructure, composition root |
+| validation | Validation | 11 | Input validation, schemas |
+| testing | Testing | 12 | Test patterns, BDD |
+| performance | Performance | 13 | Optimization, caching |
+| security | Security | 14 | Auth, authorization |
+| core | Core | 15 | Core utilities |
+| api | API | 16 | Public APIs |
+| generator | Generator | 17 | Code generators |
+| middleware | Middleware | 18 | Middleware patterns |
+| correlation | Correlation | 19 | Correlation tracking |
+
+    **Simple Presets (generic, libar-generic):** Only core, api, infra categories.
+
+    **Usage:** Add category tag as a flag (no value needed).
 
 ```typescript
 /**
@@ -333,6 +381,16 @@ function buildRegistry(): TagRegistry;
 
 ### Aggregation Tags
 
+**Context:** Aggregation tags control document output organization.
+
+| Tag | Target Document | Purpose |
+| --- | --- | --- |
+| overview | OVERVIEW.md | Architecture overview patterns |
+| decision | DECISIONS.md | ADR-style decisions (auto-numbered) |
+| intro | (template) | Package introduction placeholder |
+
+    **Usage Example:**
+
 ```typescript
 /**
      * at-libar-docs
@@ -340,6 +398,16 @@ function buildRegistry(): TagRegistry;
      * at-libar-docs-overview
      */
 ```
+
+### Shape Extraction
+
+**Context:** Extract TypeScript types for documentation generation (ADR-021).
+
+| Tag | Format | Purpose | Example |
+| --- | --- | --- | --- |
+| extract-shapes | csv | TypeScript type names to extract | at-libar-docs-extract-shapes DeciderInput, Result |
+
+    **Usage:** Add to files containing types that should appear in generated docs.
 
 ### generate-docs CLI
 
@@ -546,13 +614,3 @@ interface CLIConfig {
 | Problem/Solution | Problem and Solution | Pain point to fix |
 | Value-First | Business Value and How It Works | TDD-style specs |
 | Context/Approach | Context and Approach | Technical patterns |
-
-## Shape Extraction Tag
-
-**Context:** Extract TypeScript types for documentation generation (ADR-021).
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| extract-shapes | csv | TypeScript type names to extract | at-libar-docs-extract-shapes DeciderInput, Result |
-
-    **Usage:** Add to files containing types that should appear in generated docs.

@@ -35,7 +35,10 @@
 | Transform Function | src/generators/pipeline/transform-dataset.ts | extract-shapes tag |
 | Available Codecs | THIS DECISION (Rule: Available Codecs) | Rule block table |
 | Progressive Disclosure | THIS DECISION (Rule: Progressive Disclosure) | Rule block table |
-| Codec Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block table |
+| Codec to Generator Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block table |
+| Status Normalization | THIS DECISION (Rule: Status Normalization) | Rule block table |
+| Result Monad Pattern | THIS DECISION (Rule: Result Monad Pattern) | Rule block content |
+| Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block table + Mermaid |
 
 ---
 
@@ -56,6 +59,19 @@
 | Result Monad | Explicit error handling via Result T,E instead of exceptions |
 
 ### Four-Stage Pipeline
+
+**Context:** The documentation generation pipeline consists of four stages.
+
+    **Decision:** The four stages are:
+
+| Stage | Purpose | Key Files | Input | Output |
+| --- | --- | --- | --- | --- |
+| Scanner | File discovery and AST parsing | pattern-scanner.ts, gherkin-scanner.ts | Source files | ScannedFile[] |
+| Extractor | Pattern extraction from AST | doc-extractor.ts, gherkin-extractor.ts | ScannedFile[] | ExtractedPattern[] |
+| Transformer | Single-pass view computation | transform-dataset.ts | ExtractedPattern[] | MasterDataset |
+| Codec | Document generation | codecs/*.ts, render.ts | MasterDataset | Markdown files |
+
+    **Pipeline Diagram:**
 
 ```mermaid
 graph LR
@@ -361,6 +377,10 @@ type CollapsibleBlock = {
 
 ### Codec Factory Pattern
 
+**Context:** Every codec provides both a default instance and a factory function.
+
+    **Decision:** The two-export pattern enables both simple and customized usage:
+
 ```typescript
 // Default codec with standard options
     import { PatternsDocumentCodec } from './codecs';
@@ -371,6 +391,15 @@ type CollapsibleBlock = {
     const codec = createPatternsCodec({ generateDetailFiles: false });
     const doc = codec.decode(dataset);
 ```
+
+**Common Options:**
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| generateDetailFiles | boolean | true | Create progressive disclosure files |
+| detailLevel | summary, standard, detailed | standard | Output verbosity |
+| limits.recentItems | number | 10 | Max recent items in summaries |
+| limits.collapseThreshold | number | 5 | Items before collapsing |
 
 ### Generator Types
 
@@ -613,7 +642,7 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | standard | Default with all sections |
 | detailed | Maximum detail, all optional sections |
 
-### Codec Mapping
+### Codec to Generator Mapping
 
 **Context:** Each codec is exposed via a CLI generator flag.
 
@@ -637,7 +666,7 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | TraceabilityCodec | traceability | -g traceability |
 | OverviewCodec | overview-rdm | -g overview-rdm |
 
-## Status Normalization
+### Status Normalization
 
 **Context:** Source annotations use various status values that must be normalized.
 
@@ -649,7 +678,7 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | active, partial, in-progress | active |
 | roadmap, planned, deferred, undefined | planned |
 
-## Result Monad Pattern
+### Result Monad Pattern
 
 **Context:** The package uses explicit error handling instead of exceptions.
 
@@ -672,7 +701,7 @@ type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
     - Partial success scenarios supported
     - Type-safe error handling at boundaries
 
-## Orchestrator Pipeline
+### Orchestrator Pipeline
 
 **Context:** The orchestrator coordinates the complete documentation generation pipeline.
 

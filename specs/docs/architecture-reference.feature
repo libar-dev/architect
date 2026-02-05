@@ -37,7 +37,10 @@ Feature: Architecture Reference - Auto-Generated Documentation
 | Transform Function | src/generators/pipeline/transform-dataset.ts | extract-shapes tag |
 | Available Codecs | THIS DECISION (Rule: Available Codecs) | Rule block table |
 | Progressive Disclosure | THIS DECISION (Rule: Progressive Disclosure) | Rule block table |
-| Codec Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block table |
+| Codec to Generator Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block table |
+| Status Normalization | THIS DECISION (Rule: Status Normalization) | Rule block table |
+| Result Monad Pattern | THIS DECISION (Rule: Result Monad Pattern) | Rule block content |
+| Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block table + Mermaid |
 
   Background: Deliverables
     Given the following deliverables:

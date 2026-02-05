@@ -39,6 +39,7 @@ Feature: Instructions Reference - Auto-Generated Documentation
 | Traceability Tags | THIS DECISION (Rule: Traceability Tags) | Rule block table |
 | Architecture Tags | THIS DECISION (Rule: Architecture Diagram Tags) | Rule block table |
 | Aggregation Tags | THIS DECISION (Rule: Aggregation Tags) | Rule block table |
+| Shape Extraction | THIS DECISION (Rule: Shape Extraction Tag) | Rule block table |
 | generate-docs CLI | src/cli/generate-docs.ts | extract-shapes tag |
 | lint-patterns CLI | src/cli/lint-patterns.ts | extract-shapes tag |
 | lint-process CLI | src/cli/lint-process.ts | extract-shapes tag |

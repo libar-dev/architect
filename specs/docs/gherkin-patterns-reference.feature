@@ -29,15 +29,16 @@ Feature: Gherkin Patterns Reference - Auto-Generated Documentation
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Roadmap Spec Structure | THIS DECISION (Rule: Roadmap Spec Structure) | Rule block content |
-| Rule Blocks for Constraints | THIS DECISION (Rule: Rule Blocks for Business Constraints) | Rule block content |
-| Scenario Outline Variations | THIS DECISION (Rule: Scenario Outline for Variations) | Rule block content |
+| Rule Blocks for Business Constraints | THIS DECISION (Rule: Rule Blocks for Business Constraints) | Rule block content |
+| Scenario Outline for Variations | THIS DECISION (Rule: Scenario Outline for Variations) | Rule block content |
 | Executable Test Feature | THIS DECISION (Rule: Executable Test Feature) | Rule block content |
-| DataTable Usage | THIS DECISION (Rule: DataTable and DocString Usage) | Rule block content |
+| DataTable and DocString Usage | THIS DECISION (Rule: DataTable and DocString Usage) | Rule block content |
 | Tag Conventions | THIS DECISION (Rule: Tag Conventions) | Rule block table |
 | Feature Description Patterns | THIS DECISION (Rule: Feature Description Patterns) | Rule block table |
 | Valid Rich Content | THIS DECISION (Rule: Valid Rich Content) | Rule block table |
 | Syntax Notes | THIS DECISION (Rule: Syntax Notes) | Rule block content |
 | Quick Reference | THIS DECISION (Rule: Quick Reference) | Rule block table |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
     Given the following deliverables:

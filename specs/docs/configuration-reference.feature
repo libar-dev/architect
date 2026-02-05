@@ -27,16 +27,22 @@ Feature: Configuration Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| Quick Reference | THIS DECISION (Rule: Preset Quick Reference) | Rule block table |
-| Category Behavior | THIS DECISION (Rule: Preset Category Behavior) | Rule block table |
-| Default Preset | THIS DECISION (Rule: Default Preset Selection) | Rule block table |
+| Preset Quick Reference | THIS DECISION (Rule: Preset Quick Reference) | Rule block table |
+| Preset Category Behavior | THIS DECISION (Rule: Preset Category Behavior) | Rule block table |
+| Default Preset Selection | THIS DECISION (Rule: Default Preset Selection) | Rule block table |
+| Libar Generic Preset | THIS DECISION (Rule: Libar Generic Preset) | Rule block table |
+| Generic Preset | THIS DECISION (Rule: Generic Preset) | Rule block table |
+| DDD ES CQRS Preset | THIS DECISION (Rule: DDD ES CQRS Preset) | Rule block table |
 | Presets | src/config/presets.ts | extract-shapes tag |
 | Factory Options | src/config/factory.ts | extract-shapes tag |
 | Types | src/config/types.ts | extract-shapes tag |
-| Discovery Order | THIS DECISION (Rule: Hierarchical Configuration) | Rule block table |
+| Hierarchical Configuration | THIS DECISION (Rule: Hierarchical Configuration) | Rule block table |
+| Config File Format | THIS DECISION (Rule: Config File Format) | DocString examples |
 | Config Loader | src/config/config-loader.ts | extract-shapes tag |
+| RegexBuilders API | THIS DECISION (Rule: RegexBuilders API) | Rule block table |
 | RegexBuilders | src/config/regex-builders.ts | extract-shapes tag |
-| Custom Config | THIS DECISION (Rule: Custom Configuration) | DocString examples |
+| Custom Configuration | THIS DECISION (Rule: Custom Configuration) | DocString examples |
+| Programmatic Config Loading | THIS DECISION (Rule: Programmatic Config Loading) | DocString examples |
 
   Background: Deliverables
     Given the following deliverables:
