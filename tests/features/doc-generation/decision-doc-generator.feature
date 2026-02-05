@@ -163,7 +163,7 @@ Feature: Decision Document Generator
       Then aggregated content should be included
 
     @acceptance-criteria @integration
-    Scenario: Missing source files do not prevent generation
+    Scenario: Missing source files are reported as validation errors
       Given a decision document referencing missing files
       When generating from decision
-      Then generation should complete successfully
+      Then validation errors are reported for missing files

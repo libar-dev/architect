@@ -28,6 +28,7 @@
 import type { Result } from '../types/result.js';
 import { type SourceMappingEntry, type DecisionDocContent, type ExtractedDocString } from '../renderable/codecs/decision-doc.js';
 import type { ExtractedShape } from '../validation-schemas/extracted-shape.js';
+import type { WarningCollector } from './warning-collector.js';
 /**
  * Options for source mapping execution
  */
@@ -40,6 +41,8 @@ export interface SourceMapperOptions {
     decisionContent: DecisionDocContent;
     /** Detail level affects what content is included */
     detailLevel?: 'summary' | 'standard' | 'detailed';
+    /** Optional warning collector for structured warning handling */
+    warningCollector?: WarningCollector;
 }
 /**
  * Warning produced during extraction

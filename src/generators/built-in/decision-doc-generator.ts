@@ -52,6 +52,13 @@ import {
   type AggregatedContent,
 } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
+import {
+  createWarningCollector,
+  type Warning,
+  type WarningCollector,
+} from '../warning-collector.js';
+import { validateSourceMappingTable, type ValidationResult } from '../source-mapping-validator.js';
+import { deduplicateSections, type DeduplicationResult } from '../content-deduplicator.js';
 
 // =============================================================================
 // Types
@@ -69,6 +76,15 @@ export interface DecisionDocGeneratorOptions {
 
   /** Claude MD section name (e.g., "validation" for _claude-md/validation/) */
   claudeMdSection?: string;
+
+  /** Enable pre-flight validation of source mappings (default: true) */
+  enableValidation?: boolean;
+
+  /** Enable content deduplication after extraction (default: true) */
+  enableDeduplication?: boolean;
+
+  /** Enable warning collection across pipeline stages (default: true) */
+  enableWarningCollection?: boolean;
 }
 
 /**
@@ -428,6 +444,168 @@ export function generateStandardOutput(
 }
 
 // =============================================================================
+// Pipeline Execution (Internal)
+// =============================================================================
+
+/**
+ * Result of pipeline execution
+ */
+interface PipelineResult {
+  /** Parsed decision document content */
+  decisionContent: DecisionDocContent;
+  /** Aggregated and deduplicated content from source mapping */
+  aggregatedContent: AggregatedContent;
+  /** Warning collector (if enabled) */
+  warningCollector: WarningCollector | undefined;
+  /** Pattern name for output path generation */
+  patternName: string;
+  /** Deduplication warnings captured when no warningCollector is present */
+  dedupWarnings: Warning[];
+}
+
+/**
+ * Error result from pipeline execution
+ */
+interface PipelineError {
+  /** Validation or processing errors */
+  errors: string[];
+  /** Warnings collected before error */
+  warnings: string[];
+}
+
+/**
+ * Execute the generation pipeline: validation, extraction, deduplication
+ *
+ * Internal function that performs the expensive work once. Both single-level
+ * and multi-level generators use this to avoid duplicate work.
+ *
+ * @param pattern - Extracted pattern with decision document content
+ * @param options - Generator options
+ * @returns Pipeline result or error
+ */
+function executePipeline(
+  pattern: ExtractedPattern,
+  options: DecisionDocGeneratorOptions
+): PipelineResult | PipelineError {
+  // Default options - all robustness features enabled by default
+  const enableValidation = options.enableValidation ?? true;
+  const enableDeduplication = options.enableDeduplication ?? true;
+  const enableWarningCollection = options.enableWarningCollection ?? true;
+
+  // Step 1: Create WarningCollector for unified warning handling
+  const warningCollector: WarningCollector | undefined = enableWarningCollection
+    ? createWarningCollector()
+    : undefined;
+
+  // Pattern name can come from directive.patternName or pattern.patternName or pattern.name
+  // directive.patternName and pattern.patternName are optional, pattern.name is required
+  // Use helper function to catch both null/undefined AND empty strings
+  const getPatternName = (): string => {
+    if (pattern.directive.patternName?.trim()) {
+      return pattern.directive.patternName;
+    }
+    if (pattern.patternName?.trim()) {
+      return pattern.patternName;
+    }
+    return pattern.name;
+  };
+  const patternName = getPatternName();
+
+  const description = pattern.directive.description;
+  const rules = pattern.rules ?? [];
+
+  // Step 2: Parse decision document
+  const decisionContent = parseDecisionDocument(patternName, description, rules);
+
+  // Step 3 & 4: Validate and execute source mapping (if mappings exist)
+  let aggregatedContent: AggregatedContent = {
+    sections: [],
+    warnings: [],
+    success: true,
+  };
+
+  // Deduplication warnings when warningCollector is not used
+  const dedupWarnings: Warning[] = [];
+
+  if (decisionContent.sourceMappings.length > 0) {
+    // Step 3: PRE-FLIGHT VALIDATION (if enabled)
+    if (enableValidation) {
+      const validatorOptions = warningCollector
+        ? { baseDir: options.baseDir, warningCollector }
+        : { baseDir: options.baseDir };
+
+      const validationResult: ValidationResult = validateSourceMappingTable(
+        decisionContent.sourceMappings,
+        validatorOptions
+      );
+
+      // Capture validation warnings after successful validation (Issue #4 fix)
+      if (validationResult.isValid && warningCollector && validationResult.warnings.length > 0) {
+        for (const warning of validationResult.warnings) {
+          warningCollector.capture(warning);
+        }
+      }
+
+      // If validation fails with errors, return early
+      if (!validationResult.isValid) {
+        const warnings = warningCollector
+          ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
+          : [];
+
+        return {
+          warnings,
+          errors: validationResult.errors.map((e) => {
+            // Include suggestions if available
+            if (e.suggestions && e.suggestions.length > 0) {
+              return `${e.message}. Did you mean: ${e.suggestions.join(', ')}?`;
+            }
+            return e.message;
+          }),
+        };
+      }
+    }
+
+    // Step 4: EXECUTE SOURCE MAPPING (with warning collector)
+    const baseMapperOptions = {
+      baseDir: options.baseDir,
+      decisionDocPath: pattern.source.file,
+      decisionContent,
+      detailLevel: options.detailLevel ?? 'standard',
+    };
+
+    const mapperOptions: SourceMapperOptions = warningCollector
+      ? { ...baseMapperOptions, warningCollector }
+      : baseMapperOptions;
+
+    aggregatedContent = executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
+
+    // Step 5: DEDUPLICATE SECTIONS (if enabled)
+    if (enableDeduplication && aggregatedContent.sections.length > 0) {
+      const dedupOptions = warningCollector ? { warningCollector } : undefined;
+      const dedupResult: DeduplicationResult = deduplicateSections(
+        aggregatedContent.sections,
+        dedupOptions
+      );
+      aggregatedContent.sections = dedupResult.sections;
+      // Capture deduplication warnings when not using collector
+      // (When collector is present, warnings are captured via side-effect)
+      if (!warningCollector && dedupResult.warnings.length > 0) {
+        dedupWarnings.push(...dedupResult.warnings);
+      }
+    }
+  }
+
+  return { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings };
+}
+
+/**
+ * Check if pipeline result is an error
+ */
+function isPipelineError(result: PipelineResult | PipelineError): result is PipelineError {
+  return 'errors' in result;
+}
+
+// =============================================================================
 // Main Generation Function
 // =============================================================================
 
@@ -435,10 +613,13 @@ export function generateStandardOutput(
  * Generate documentation from a decision document
  *
  * Main entry point that orchestrates the full pipeline:
- * 1. Parse decision document to extract content
- * 2. Execute source mapping to aggregate content from referenced files
- * 3. Generate output at specified detail level(s)
- * 4. Return output files for writing
+ * 1. Create WarningCollector for unified warning handling
+ * 2. Parse decision document to extract content
+ * 3. Validate source mappings (if enabled) - fails fast on validation errors
+ * 4. Execute source mapping to aggregate content from referenced files
+ * 5. Deduplicate sections (if enabled)
+ * 6. Generate output at specified detail level(s)
+ * 7. Return output files with all warnings
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options
@@ -461,44 +642,18 @@ export function generateFromDecision(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
 ): DecisionDocGeneratorResult {
-  const warnings: string[] = [];
-  const errors: string[] = [];
-  const files: OutputFile[] = [];
+  // Execute the pipeline
+  const pipelineResult = executePipeline(pattern, options);
 
-  // Pattern name can come from directive.patternName or pattern.patternName or pattern.name
-  // directive.patternName and pattern.patternName are optional, pattern.name is required
-  const patternName = pattern.directive.patternName ?? pattern.patternName ?? pattern.name;
-
-  const description = pattern.directive.description;
-  const rules = pattern.rules ?? [];
-
-  // Step 1: Parse decision document
-  const decisionContent = parseDecisionDocument(patternName, description, rules);
-
-  // Step 2: Execute source mapping (if mappings exist)
-  let aggregatedContent: AggregatedContent = {
-    sections: [],
-    warnings: [],
-    success: true,
-  };
-
-  if (decisionContent.sourceMappings.length > 0) {
-    const mapperOptions: SourceMapperOptions = {
-      baseDir: options.baseDir,
-      decisionDocPath: pattern.source.file,
-      decisionContent,
-      detailLevel: options.detailLevel ?? 'standard',
-    };
-
-    aggregatedContent = executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
-
-    // Collect warnings
-    for (const w of aggregatedContent.warnings) {
-      warnings.push(`${w.severity}: ${w.message}`);
-    }
+  // If pipeline failed, return errors
+  if (isPipelineError(pipelineResult)) {
+    return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
   }
 
-  // Step 3: Generate output at requested detail level(s)
+  const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } =
+    pipelineResult;
+
+  // Generate output at requested detail level
   const sectionOption = options.claudeMdSection;
   const outputPaths = determineOutputPaths(
     patternName,
@@ -529,16 +684,26 @@ export function generateFromDecision(
 
   // Render to markdown
   const content = renderToMarkdown(doc);
-  files.push({ path: outputPath, content });
+  const files: OutputFile[] = [{ path: outputPath, content }];
 
-  return { files, warnings, errors };
+  // Collect all warnings and return
+  // When warningCollector is present, it captures all warnings via side-effects
+  // When not present, we need to merge extraction warnings with deduplication warnings
+  const warnings = warningCollector
+    ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
+    : [
+        ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
+        ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
+      ];
+
+  return { files, warnings, errors: [] };
 }
 
 /**
  * Generate both compact and detailed outputs
  *
- * Convenience function that generates documentation at both detail levels
- * for maximum utility.
+ * Runs the pipeline once and generates documentation at both detail levels.
+ * More efficient than calling generateFromDecision twice.
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options
@@ -548,31 +713,47 @@ export function generateFromDecisionMultiLevel(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
 ): DecisionDocGeneratorResult {
-  const warnings: string[] = [];
-  const errors: string[] = [];
-  const files: OutputFile[] = [];
+  // Execute the pipeline ONCE
+  const pipelineResult = executePipeline(pattern, options);
 
-  // Generate compact version
-  const compactResult = generateFromDecision(pattern, {
-    ...options,
-    detailLevel: 'summary',
-  });
-  files.push(...compactResult.files);
-  warnings.push(...compactResult.warnings);
-  errors.push(...compactResult.errors);
-
-  // Generate detailed version (only if compact succeeded)
-  if (compactResult.errors.length === 0) {
-    const detailedResult = generateFromDecision(pattern, {
-      ...options,
-      detailLevel: 'detailed',
-    });
-    files.push(...detailedResult.files);
-    warnings.push(...detailedResult.warnings);
-    errors.push(...detailedResult.errors);
+  // If pipeline failed, return errors
+  if (isPipelineError(pipelineResult)) {
+    return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
   }
 
-  return { files, warnings, errors };
+  const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } =
+    pipelineResult;
+
+  // Determine output paths
+  const sectionOption = options.claudeMdSection;
+  const outputPaths = determineOutputPaths(
+    patternName,
+    sectionOption ? { section: sectionOption } : undefined
+  );
+
+  // Generate BOTH outputs from the same processed data
+  const compactDoc = generateCompactOutput(decisionContent, aggregatedContent);
+  const detailedDoc = generateDetailedOutput(decisionContent, aggregatedContent);
+
+  const compactContent = renderToMarkdown(compactDoc);
+  const detailedContent = renderToMarkdown(detailedDoc);
+
+  const files: OutputFile[] = [
+    { path: outputPaths.compact, content: compactContent },
+    { path: outputPaths.detailed, content: detailedContent },
+  ];
+
+  // Collect all warnings
+  // When warningCollector is present, it captures all warnings via side-effects
+  // When not present, we need to merge extraction warnings with deduplication warnings
+  const warnings = warningCollector
+    ? warningCollector.getAll().map((w) => `${w.category}: ${w.message}`)
+    : [
+        ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
+        ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
+      ];
+
+  return { files, warnings, errors: [] };
 }
 
 // =============================================================================

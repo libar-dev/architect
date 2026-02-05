@@ -43,6 +43,12 @@ export interface DecisionDocGeneratorOptions {
     detailLevel?: DetailLevel;
     /** Claude MD section name (e.g., "validation" for _claude-md/validation/) */
     claudeMdSection?: string;
+    /** Enable pre-flight validation of source mappings (default: true) */
+    enableValidation?: boolean;
+    /** Enable content deduplication after extraction (default: true) */
+    enableDeduplication?: boolean;
+    /** Enable warning collection across pipeline stages (default: true) */
+    enableWarningCollection?: boolean;
 }
 /**
  * Output paths for generated documentation
@@ -142,10 +148,13 @@ export declare function generateStandardOutput(decisionContent: DecisionDocConte
  * Generate documentation from a decision document
  *
  * Main entry point that orchestrates the full pipeline:
- * 1. Parse decision document to extract content
- * 2. Execute source mapping to aggregate content from referenced files
- * 3. Generate output at specified detail level(s)
- * 4. Return output files for writing
+ * 1. Create WarningCollector for unified warning handling
+ * 2. Parse decision document to extract content
+ * 3. Validate source mappings (if enabled) - fails fast on validation errors
+ * 4. Execute source mapping to aggregate content from referenced files
+ * 5. Deduplicate sections (if enabled)
+ * 6. Generate output at specified detail level(s)
+ * 7. Return output files with all warnings
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options
@@ -168,8 +177,8 @@ export declare function generateFromDecision(pattern: ExtractedPattern, options:
 /**
  * Generate both compact and detailed outputs
  *
- * Convenience function that generates documentation at both detail levels
- * for maximum utility.
+ * Runs the pipeline once and generates documentation at both detail levels.
+ * More efficient than calling generateFromDecision twice.
  *
  * @param pattern - Extracted pattern with decision document content
  * @param options - Generator options
