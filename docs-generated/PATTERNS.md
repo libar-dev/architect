@@ -66,7 +66,7 @@
 | ✅ Decision Doc Generator | Core | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
 | ✅ Doc Directive Schema | Validation | completed | Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments. |
-| ✅ Doc Generation Proof Of Concept | DDD | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
+| ✅ Doc Generation Proof Of Concept | DDD | completed | Status: SUPERSEDED - This POC has been implemented. |
 | ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and... |
 | ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts... |
 | ✅ Documentation Generator CLI | Core | completed | Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run. |
@@ -485,6 +485,19 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -511,19 +524,6 @@ graph TD
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
     ProcessStateAPI ..-> PhaseStateMachineValidation
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> ConfigLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation

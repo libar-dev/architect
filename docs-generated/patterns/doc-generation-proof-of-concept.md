@@ -14,7 +14,11 @@
 
 ## Description
 
-This decision establishes the pattern for generating technical documentation
+**Status: SUPERSEDED** - This POC has been implemented. See:
+  - `delivery-process/recipes/` - 11 documentation recipes implementing this pattern
+  - `docs-generated/ANNOTATION-GUIDE.md` - Comprehensive guide for fixing generated docs
+
+  This decision establishes the pattern for generating technical documentation
   from annotated source files. It serves as both the DECISION (why/how) and
   the PROOF OF CONCEPT (demonstrating the pattern works).
 

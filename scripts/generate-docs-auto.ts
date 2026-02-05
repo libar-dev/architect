@@ -12,7 +12,7 @@
  *   npx tsx scripts/generate-docs-auto.ts [feature-pattern]
  *
  * Examples:
- *   npx tsx scripts/generate-docs-auto.ts                    # All feature files in specs/docs/
+ *   npx tsx scripts/generate-docs-auto.ts                    # All feature files in delivery-process/recipes/
  *   npx tsx scripts/generate-docs-auto.ts process-guard      # Only process-guard-reference.feature
  */
 
@@ -53,8 +53,8 @@ const CONFIG = {
     'src/extractor/doc-extractor.ts',
   ],
 
-  // Feature file patterns for decision documents
-  featureFiles: 'specs/docs/*.feature',
+  // Feature file patterns for documentation recipes
+  featureFiles: 'delivery-process/recipes/*.feature',
 
   // Output directory (separate from manually maintained docs)
   outputDir: 'docs-generated',
@@ -83,7 +83,7 @@ function main(): void {
   const inputFlags = CONFIG.typescriptSources.map((src) => `-i '${src}'`).join(' ');
 
   const featurePattern = filterPattern
-    ? `specs/docs/*${filterPattern}*.feature`
+    ? `delivery-process/recipes/*${filterPattern}*.feature`
     : CONFIG.featureFiles;
 
   const cmd = [

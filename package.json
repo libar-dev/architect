@@ -86,7 +86,7 @@
     "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
     "docs:architecture": "tsx src/cli/generate-docs.ts -g architecture -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' -o docs-generated -f",
     "docs:decisions": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
-    "docs:technical": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' --features 'specs/docs/*.feature' -o docs-generated -f",
+    "docs:technical": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' --features 'delivery-process/recipes/*.feature' -o docs-generated -f",
     "docs:taxonomy": "tsx src/cli/generate-docs.ts -g taxonomy -i 'src/**/*.ts' -o docs-generated -f",
     "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules -i 'src/**/*.ts' -o docs-generated -f",
     "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:technical && pnpm docs:taxonomy && pnpm docs:validation",

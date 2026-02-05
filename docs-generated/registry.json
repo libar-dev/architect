@@ -1,7 +1,8 @@
 {
   "warnings": [],
   "errors": [
-    "File not found: src/types.ts"
+    "File not found: src/types.ts",
+    "File not found: src/validation/dod-validator.ts, src/validation/types.ts"
   ],
-  "patternsProcessed": 2
+  "patternsProcessed": 12
 }

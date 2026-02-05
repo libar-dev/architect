@@ -89,7 +89,7 @@
 | Pattern | Status | Description |
 | --- | --- | --- |
 | ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
-| ✅ Doc Generation Proof Of Concept | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
+| ✅ Doc Generation Proof Of Concept | completed | Status: SUPERSEDED - This POC has been implemented. |
 | ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 
 ---
