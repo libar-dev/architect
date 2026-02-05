@@ -5,6 +5,7 @@
  * @libar-docs-pattern ValidatePatternsCLI
  * @libar-docs-status completed
  * @libar-docs-uses PatternScanner, GherkinScanner, DocExtractor, DualSourceExtractor, CodecUtils
+ * @libar-docs-extract-shapes ValidateCLIConfig, ValidationIssue, ValidationSummary
  *
  * ## ValidatePatternsCLI - Cross-Source Pattern Validator
  *

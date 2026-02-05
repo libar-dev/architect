@@ -74,8 +74,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
             completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -134,8 +134,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
         completed: "completed";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
         deferred: "deferred";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;
@@ -163,9 +163,9 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
+            domain: "domain";
             unknown: "unknown";
             timeline: "timeline";
-            domain: "domain";
             integration: "integration";
             e2e: "e2e";
             component: "component";
@@ -232,13 +232,13 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
     }, z.core.$strip>>>>;
     archRole: z.ZodOptional<z.ZodEnum<{
         "bounded-context": "bounded-context";
-        "command-handler": "command-handler";
+        decider: "decider";
         projection: "projection";
         saga: "saga";
         "process-manager": "process-manager";
         infrastructure: "infrastructure";
+        "command-handler": "command-handler";
         repository: "repository";
-        decider: "decider";
         "read-model": "read-model";
         service: "service";
     }>>;
@@ -252,8 +252,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{
             function: "function";
-            type: "type";
             enum: "enum";
+            type: "type";
             const: "const";
             interface: "interface";
         }>;
@@ -264,6 +264,10 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         exported: z.ZodDefault<z.ZodBoolean>;
+        propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            jsDoc: z.ZodString;
+        }, z.core.$strip>>>>;
     }, z.core.$strip>>>>;
 }, z.core.$strict>;
 /**

@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 81/120 (68%)
+**Patterns:** [██████████████░░░░░░] 93/131 (71%)
 
-**Phases:** 2/11 complete
+**Phases:** 3/12 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 120 |
-| Completed | 81 |
+| Total Patterns | 131 |
+| Completed | 93 |
 | Active | 13 |
-| Planned | 26 |
+| Planned | 25 |
 
 ---
 
@@ -29,6 +29,7 @@
 | 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | ✅ [SourceMapper](phases/phase-27-source-mapper.md) | 3/3 | 100% |
+| ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -90,6 +91,19 @@
 | ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Doc Generation Proof Of Concept | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
 | ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
+
+---
+
+### ✅ WarningCollector
+
+[███████████████] 4/4 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ Content Deduplicator | completed | Identifies and merges duplicate sections extracted from multiple sources. |
+| ✅ Source Mapping Validator | completed | Performs pre-flight checks on source mapping tables before extraction begins. |
+| ✅ Universal Doc Generator Robustness | completed | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
+| ✅ Warning Collector | completed | Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation. |
 
 ---
 

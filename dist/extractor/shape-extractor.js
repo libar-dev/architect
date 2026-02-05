@@ -304,6 +304,27 @@ function extractShape(sourceCode, declaration, comments, options) {
     if (node.type === 'TSInterfaceDeclaration' && node.extends.length > 0) {
         extendsArr = node.extends.map((ext) => sourceCode.slice(ext.range[0], ext.range[1]));
     }
+    // Extract property-level JSDoc for interfaces
+    let propertyDocs;
+    if (options.includeJsDoc && node.type === 'TSInterfaceDeclaration') {
+        const docs = [];
+        for (const member of node.body.body) {
+            if (member.type === 'TSPropertySignature' && member.key.type === 'Identifier') {
+                const propName = member.key.name;
+                const propJsDoc = extractPrecedingJsDoc(sourceCode, member, comments);
+                if (propJsDoc) {
+                    // Extract just the text content from JSDoc, removing delimiters
+                    const cleanedJsDoc = extractJsDocText(propJsDoc);
+                    if (cleanedJsDoc) {
+                        docs.push({ name: propName, jsDoc: cleanedJsDoc });
+                    }
+                }
+            }
+        }
+        if (docs.length > 0) {
+            propertyDocs = docs;
+        }
+    }
     return {
         name,
         kind,
@@ -313,6 +334,7 @@ function extractShape(sourceCode, declaration, comments, options) {
         typeParameters,
         extends: extendsArr,
         exported,
+        propertyDocs,
     };
 }
 /**
@@ -347,6 +369,36 @@ function extractPrecedingJsDoc(sourceCode, node, comments) {
         return undefined;
     // Return the full JSDoc including delimiters
     return sourceCode.slice(closestJsDoc.range[0], closestJsDoc.range[1]);
+}
+/**
+ * Extract clean text content from a JSDoc comment.
+ *
+ * Removes the JSDoc delimiters (/** and *\/) and leading asterisks from each line.
+ * Returns the first meaningful line as the description.
+ */
+function extractJsDocText(jsDoc) {
+    // Remove /** prefix and */ suffix
+    let text = jsDoc.trim();
+    if (text.startsWith('/**')) {
+        text = text.slice(3);
+    }
+    if (text.endsWith('*/')) {
+        text = text.slice(0, -2);
+    }
+    // Split into lines and clean each line
+    const lines = text
+        .split('\n')
+        .map((line) => {
+        // Remove leading whitespace and asterisk
+        let cleaned = line.trim();
+        if (cleaned.startsWith('*')) {
+            cleaned = cleaned.slice(1).trim();
+        }
+        return cleaned;
+    })
+        .filter((line) => line.length > 0 && !line.startsWith('@')); // Skip empty and tag lines
+    // Return first non-empty line as the description
+    return lines.length > 0 ? lines[0] : undefined;
 }
 /**
  * Convert function declaration to signature-only form.

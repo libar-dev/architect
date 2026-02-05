@@ -90,10 +90,15 @@
  * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
  */
 interface CategoryDefinition {
+  /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */
   readonly tag: string;
+  /** Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") */
   readonly domain: string;
+  /** Display order priority - lower values appear first in sorted output */
   readonly priority: number;
+  /** Brief description of the category's purpose and typical patterns */
   readonly description: string;
+  /** Alternative tag names that map to this category (e.g., "es" for "event-sourcing") */
   readonly aliases: readonly string[];
 }
 ```
@@ -126,25 +131,40 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
  * TagRegistry interface (matches schema from validation-schemas/tag-registry.ts)
  */
 interface TagRegistry {
+  /** Schema version for forward/backward compatibility checking */
   version: string;
+  /** Category definitions for classifying patterns by domain (e.g., core, api, ddd) */
   categories: readonly CategoryDefinitionForRegistry[];
+  /** Metadata tag definitions with format, purpose, and validation rules */
   metadataTags: readonly MetadataTagDefinitionForRegistry[];
+  /** Aggregation tag definitions for document-level grouping */
   aggregationTags: readonly AggregationTagDefinitionForRegistry[];
+  /** Available format options for documentation output */
   formatOptions: readonly string[];
+  /** Prefix for all tags (e.g., "@libar-docs-") */
   tagPrefix: string;
+  /** File-level opt-in marker tag (e.g., "@libar-docs") */
   fileOptInTag: string;
 }
 ```
 
 ```typescript
 interface MetadataTagDefinitionForRegistry {
+  /** Tag name without prefix (e.g., "pattern", "status", "phase") */
   tag: string;
+  /** Value format type determining parsing rules (flag, value, enum, csv, number, quoted-value) */
   format: FormatType;
+  /** Human-readable description of the tag's purpose and usage */
   purpose: string;
+  /** Whether this tag must be present for valid patterns */
   required?: boolean;
+  /** Whether this tag can appear multiple times on a single pattern */
   repeatable?: boolean;
+  /** Valid values for enum-type tags (undefined for non-enum formats) */
   values?: readonly string[];
+  /** Default value applied when tag is not specified */
   default?: string;
+  /** Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") */
   example?: string;
 }
 ```
@@ -275,20 +295,33 @@ METADATA_TAGS_BY_GROUP = {
 
 ```typescript
 interface CLIConfig {
+  /** Glob patterns for TypeScript input files (-i, --input). Repeatable. */
   input: string[];
+  /** Glob patterns to exclude from scanning (-e, --exclude). Repeatable. */
   exclude: string[];
+  /** Output directory for generated documentation (-o, --output). Default: docs/architecture */
   output: string;
+  /** Base directory for path resolution (-b, --base-dir). Default: cwd */
   baseDir: string;
+  /** Generators to run (-g, --generators). Repeatable. Default: patterns */
   generators: string[];
+  /** Overwrite existing files (-f, --overwrite). Default: false */
   overwrite: boolean;
+  /** Glob patterns for Gherkin feature files (--features). Repeatable. */
   features: string[];
+  /** Workflow config JSON file path (-w, --workflow). */
   workflowPath: string | null;
+  /** List available generators and exit (--list-generators). */
   listGenerators: boolean;
+  /** Show help message (-h, --help). */
   help: boolean;
+  /** Show version number (-v, --version). */
   version: boolean;
-  // PR Changes options
+  /** Base branch for git diff (--git-diff-base). For PR Changes generator. */
   gitDiffBase: string | null;
+  /** Explicit list of changed files (--changed-files). For PR Changes generator. */
   changedFiles: string[];
+  /** Filter patterns by release version (--release-filter). */
   releaseFilter: string | null;
 }
 ```
@@ -423,10 +456,15 @@ interface ValidationSummary {
  * CLI configuration
  */
 interface CLIConfig {
+  /** Output path for TAG_TAXONOMY.md (-o, --output). Default: docs/architecture/TAG_TAXONOMY.md */
   output: string;
+  /** Base directory for path resolution (-b, --base-dir). Default: cwd */
   baseDir: string;
+  /** Overwrite existing file (-f, --overwrite). Default: false */
   overwrite: boolean;
+  /** Show help message (-h, --help). */
   help: boolean;
+  /** Show version number (-v, --version). */
   version: boolean;
 }
 ```

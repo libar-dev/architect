@@ -1,5 +1,6 @@
 /**
  * @libar-docs
+ * @libar-docs-extract-shapes PROTECTION_LEVELS, ProtectionLevel, getProtectionLevel, isTerminalState, isFullyEditable, isScopeLocked
  * @libar-docs-validation
  * @libar-docs-pattern FSMStates
  * @libar-docs-status active

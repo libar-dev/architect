@@ -1,8 +1,9 @@
 {
   "warnings": [],
   "errors": [
+    "File not found: src/types.ts",
     "Unknown extraction method: Mermaid diagram. Did you mean: @extract-shapes tag, Rule blocks?",
     "Unknown extraction method: JSON extraction (name, version, description, engines.node, license). Did you mean: Decision rule description?"
   ],
-  "patternsProcessed": 11
+  "patternsProcessed": 12
 }

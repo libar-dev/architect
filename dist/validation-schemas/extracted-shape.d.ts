@@ -21,12 +21,23 @@ import { z } from 'zod';
  */
 export declare const ShapeKindSchema: z.ZodEnum<{
     function: "function";
-    type: "type";
     enum: "enum";
+    type: "type";
     const: "const";
     interface: "interface";
 }>;
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
+/**
+ * JSDoc documentation for an interface property.
+ *
+ * Used to capture property-level documentation from interfaces,
+ * enabling generation of description tables alongside code blocks.
+ */
+export declare const PropertyDocSchema: z.ZodObject<{
+    name: z.ZodString;
+    jsDoc: z.ZodString;
+}, z.core.$strip>;
+export type PropertyDoc = z.infer<typeof PropertyDocSchema>;
 /**
  * A single extracted shape from TypeScript source.
  *
@@ -37,8 +48,8 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     name: z.ZodString;
     kind: z.ZodEnum<{
         function: "function";
-        type: "type";
         enum: "enum";
+        type: "type";
         const: "const";
         interface: "interface";
     }>;
@@ -49,6 +60,10 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     exported: z.ZodDefault<z.ZodBoolean>;
+    propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        jsDoc: z.ZodString;
+    }, z.core.$strip>>>>;
 }, z.core.$strip>;
 /**
  * Type alias inferred from schema.
@@ -76,8 +91,8 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{
             function: "function";
-            type: "type";
             enum: "enum";
+            type: "type";
             const: "const";
             interface: "interface";
         }>;
@@ -88,6 +103,10 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         exported: z.ZodDefault<z.ZodBoolean>;
+        propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            jsDoc: z.ZodString;
+        }, z.core.$strip>>>>;
     }, z.core.$strip>>>;
     notFound: z.ZodReadonly<z.ZodArray<z.ZodString>>;
     imported: z.ZodReadonly<z.ZodArray<z.ZodString>>;

@@ -39,7 +39,7 @@ const DEFAULT_TAG_PREFIX = '@libar-docs-';
  * Options for transition functions that generate messages
  */
 export interface TransitionMessageOptions {
-  /** Tag registry for prefix-aware error messages (optional) */
+  /** Tag registry providing prefix for error message formatting */
   readonly registry?: TagRegistry;
 }
 

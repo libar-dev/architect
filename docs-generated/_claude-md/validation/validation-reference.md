@@ -71,25 +71,9 @@
 
 ### validate-patterns Flags
 
-**Context:** validate-patterns combines multiple validation checks.
-
-    **Usage:**
-
-    """bash
-    npx validate-patterns \
-      -i "src/**/*.ts" \
-      -F "specs/**/*.feature" \
-      --dod \
-      --anti-patterns
-    """
-
-    **Available Flags:**
-
-| Flag | What It Validates |
-| --- | --- |
-| --dod | Completed patterns have all deliverables done |
-| --anti-patterns | Dual-source ownership rules not violated |
-| --cross-source | Feature/TypeScript metadata consistency |
+- `ValidateCLIConfig` - interface
+- `ValidationIssue` - interface
+- `ValidationSummary` - interface
 
 ### Exit Codes
 

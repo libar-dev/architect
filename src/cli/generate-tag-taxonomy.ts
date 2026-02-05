@@ -37,10 +37,15 @@ import { printVersionAndExit } from './version.js';
  * CLI configuration
  */
 interface CLIConfig {
+  /** Output path for TAG_TAXONOMY.md (-o, --output). Default: docs/architecture/TAG_TAXONOMY.md */
   output: string;
+  /** Base directory for path resolution (-b, --base-dir). Default: cwd */
   baseDir: string;
+  /** Overwrite existing file (-f, --overwrite). Default: false */
   overwrite: boolean;
+  /** Show help message (-h, --help). */
   help: boolean;
+  /** Show version number (-v, --version). */
   version: boolean;
 }
 

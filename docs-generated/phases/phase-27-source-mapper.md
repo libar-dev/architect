@@ -300,11 +300,11 @@ This POC demonstrates the doc-from-decision pattern by generating docs
 
     File: `.husky/pre-commit`
 
-    ```bash
-    npx lint-process --staged
-    ```
+```bash
+npx lint-process --staged
+```
 
-    **Package.json Scripts:**
+**Package.json Scripts:**
 
 ```json
 {

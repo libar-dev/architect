@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *

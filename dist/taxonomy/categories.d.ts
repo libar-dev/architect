@@ -12,10 +12,15 @@
  * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
  */
 export interface CategoryDefinition {
+    /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */
     readonly tag: string;
+    /** Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") */
     readonly domain: string;
+    /** Display order priority - lower values appear first in sorted output */
     readonly priority: number;
+    /** Brief description of the category's purpose and typical patterns */
     readonly description: string;
+    /** Alternative tag names that map to this category (e.g., "es" for "event-sourcing") */
     readonly aliases: readonly string[];
 }
 /**

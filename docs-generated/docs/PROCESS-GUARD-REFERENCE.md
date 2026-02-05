@@ -397,15 +397,7 @@ Process Guard validates 6 rules (types extracted from TypeScript):
 ### CLI Usage
 
 Process Guard is invoked via the lint-process CLI command.
-
-| Flag | Description | Use Case |
-| --- | --- | --- |
-| --staged | Validate staged changes (default) | Pre-commit hooks |
-| --all | Validate all changes vs main | CI/CD pipelines |
-| --strict | Treat warnings as errors | CI enforcement |
-| --ignore-session | Skip session scope rules | Emergency changes |
-| --show-state | Show derived process state | Debugging |
-| --format json | Machine-readable output | CI integration |
+    Configuration interface (`ProcessGuardCLIConfig`) is extracted from `src/cli/lint-process.ts`.
 
     **CLI Examples:**
 

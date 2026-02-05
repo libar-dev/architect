@@ -631,6 +631,59 @@ Check output for:
 
 ---
 
+### Pattern 9: Property-Level JSDoc for CLI Config Interfaces
+
+**Problem:** Extracted TypeScript interfaces show structure but lack descriptions for each property, making them less useful than hand-written tables.
+
+**Solution:** Add JSDoc comments to every property in config interfaces. The shape extractor preserves these comments in the extracted source text.
+
+**Example:**
+```typescript
+// BEFORE - properties lack descriptions
+interface CLIConfig {
+  input: string[];
+  exclude: string[];
+  output: string;
+}
+
+// AFTER - JSDoc describes each property
+interface CLIConfig {
+  /** Glob patterns for TypeScript input files (-i, --input). Repeatable. */
+  input: string[];
+  /** Glob patterns to exclude from scanning (-e, --exclude). Repeatable. */
+  exclude: string[];
+  /** Output directory for generated documentation (-o, --output). Default: docs/architecture */
+  output: string;
+}
+```
+
+**Result:** The generated documentation shows the full interface with inline JSDoc comments, providing the same information as hand-written flag tables but extracted directly from source code.
+
+### Pattern 10: CLI Documentation Ownership
+
+**Problem:** CLI documentation exists in both feature files (hardcoded tables) and TypeScript files (config interfaces), creating duplication.
+
+**Solution:** Apply strict content ownership:
+
+| Content Type | Owner | Extraction Method |
+|--------------|-------|-------------------|
+| Interface structure | TypeScript | `@extract-shapes` |
+| Property descriptions | TypeScript JSDoc | `@extract-shapes` (visible in extracted source) |
+| Usage examples | Feature file DocStrings | Self-reference |
+| Business rules (lint/validation rules) | Feature file tables | Supplementary content |
+| Context paragraphs | Feature file Rule: blocks | Self-reference |
+
+**What to Remove from Feature Files:**
+- CLI flag tables that duplicate TypeScript interface properties
+- Replace with: "Configuration interface (`CLIConfig`) extracted from `src/cli/[name].ts`."
+
+**What to KEEP in Feature Files:**
+- Supplementary tables (Lint Rules, Validation Rules, Escape Hatches)
+- Usage examples in DocStrings
+- Context paragraphs explaining when/why to use the CLI
+
+---
+
 ## Inherently Manual Docs (No Changes Needed)
 
 These docs describe concepts/practices, not code:

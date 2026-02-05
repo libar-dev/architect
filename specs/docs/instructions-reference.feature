@@ -163,24 +163,8 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
     **Context:** Unified documentation generation CLI.
 
-    **Usage:** generate-docs [options]
-
-| Flag | Description | Default |
-| --- | --- | --- |
-| -i, --input pattern | Glob patterns for TypeScript files | (required) |
-| -e, --exclude pattern | Glob patterns to exclude | (none) |
-| -o, --output dir | Output directory | docs/architecture |
-| -b, --base-dir dir | Base directory for paths | cwd |
-| -g, --generators names | Generators to run | patterns |
-| -w, --workflow file | Workflow config JSON file | 6-phase-standard |
-| -f, --overwrite | Overwrite existing files | false |
-| --features pattern | Glob pattern for .feature files | (none) |
-| --list-generators | List available generators and exit | (flag) |
-| --git-diff-base branch | Base branch for git diff | (none) |
-| --changed-files file | Explicit file list | (none) |
-| --release-filter version | Filter by release version | (none) |
-| -h, --help | Show help message | (flag) |
-| -v, --version | Show version number | (flag) |
+    Configuration interface (`CLIConfig`) extracted from `src/cli/generate-docs.ts`.
+    Property descriptions appear in generated output with each flag.
 
     **Examples:**
 
@@ -195,21 +179,10 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
     **Context:** Pattern annotation quality checker.
 
-    **Usage:** lint-patterns [options]
+    Configuration interface (`LintCLIConfig`) extracted from `src/cli/lint-patterns.ts`.
+    Property descriptions appear in generated output with each flag.
 
-| Flag | Description | Default |
-| --- | --- | --- |
-| -i, --input pattern | Glob pattern for TypeScript files | (required) |
-| -e, --exclude pattern | Glob pattern to exclude | (none) |
-| -b, --base-dir dir | Base directory for paths | cwd |
-| --strict | Treat warnings as errors | false |
-| -f, --format type | Output format (pretty or json) | pretty |
-| -q, --quiet | Only show errors | false |
-| --min-severity level | Minimum severity (error, warning, info) | info |
-| -h, --help | Show help message | (flag) |
-| -v, --version | Show version number | (flag) |
-
-    **Lint Rules:**
+    **Lint Rules (supplementary):**
 
 | Severity | Rule | Description |
 | --- | --- | --- |
@@ -225,23 +198,10 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
     **Context:** Process Guard linter for delivery workflow validation.
 
-    **Usage:** lint-process [options] [files...]
+    Configuration interface (`ProcessGuardCLIConfig`) extracted from `src/cli/lint-process.ts`.
+    Property descriptions appear in generated output with each flag.
 
-| Flag | Description | Default |
-| --- | --- | --- |
-| --staged | Validate staged changes | (default mode) |
-| --all | Validate all changes vs main branch | (mode) |
-| --files | Validate specific files | (mode) |
-| -f, --file path | File to validate (repeatable) | (none) |
-| -b, --base-dir dir | Base directory for paths | cwd |
-| --strict | Treat warnings as errors | false |
-| --ignore-session | Ignore session scope rules | false |
-| --show-state | Show derived process state | false |
-| --format type | Output format (pretty or json) | pretty |
-| -h, --help | Show help message | (flag) |
-| -v, --version | Show version number | (flag) |
-
-    **Validation Rules:**
+    **Validation Rules (supplementary):**
 
 | Severity | Rule | Description |
 | --- | --- | --- |
@@ -258,26 +218,10 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
     **Context:** Cross-source pattern validator for TypeScript vs Gherkin.
 
-    **Usage:** validate-patterns [options]
+    Configuration interface (`ValidateCLIConfig`) extracted from `src/cli/validate-patterns.ts`.
+    Property descriptions appear in generated output with each flag.
 
-| Flag | Description | Default |
-| --- | --- | --- |
-| -i, --input pattern | Glob pattern for TypeScript files | (required) |
-| -F, --features pattern | Glob pattern for Gherkin files | (required) |
-| -e, --exclude pattern | Glob pattern to exclude | (none) |
-| -b, --base-dir dir | Base directory for paths | cwd |
-| --strict | Treat warnings as errors (exit 2) | false |
-| -f, --format type | Output format (pretty or json) | pretty |
-| --dod | Enable Definition of Done validation | false |
-| --phase N | Validate specific phase (repeatable) | (all completed) |
-| --anti-patterns | Enable anti-pattern detection | false |
-| --scenario-threshold N | Max scenarios per feature | 20 |
-| --mega-feature-threshold N | Max lines per feature | 500 |
-| --magic-comment-threshold N | Max magic comments | 5 |
-| -h, --help | Show help message | (flag) |
-| -v, --version | Show version number | (flag) |
-
-    **Validation Checks:**
+    **Validation Checks (supplementary):**
 
 | Severity | Rule | Description |
 | --- | --- | --- |
@@ -293,15 +237,8 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
     **Context:** Tag registry documentation generator (deprecated).
 
-    **Usage:** generate-tag-taxonomy [options]
-
-| Flag | Description | Default |
-| --- | --- | --- |
-| -o, --output path | Output path for TAG_TAXONOMY.md | docs/architecture/TAG_TAXONOMY.md |
-| -b, --base-dir dir | Base directory for paths | cwd |
-| -f, --overwrite | Overwrite existing file | false |
-| -h, --help | Show help message | (flag) |
-| -v, --version | Show version number | (flag) |
+    Configuration interface (`CLIConfig`) extracted from `src/cli/generate-tag-taxonomy.ts`.
+    Property descriptions appear in generated output with each flag.
 
     **Note:** This CLI is deprecated. Use pnpm docs:taxonomy instead for
     codec-based generation with progressive disclosure and domain grouping.

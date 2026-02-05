@@ -5,7 +5,7 @@
  * @libar-docs-status completed
  * @libar-docs-implements PatternRelationshipModel
  * @libar-docs-used-by LintEngine
- * @libar-docs-extract-shapes LintRule, LintContext, defaultRules
+ * @libar-docs-extract-shapes LintRule, LintContext, defaultRules, severityOrder, filterRulesBySeverity, missingPatternName, missingStatus, invalidStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget
  *
  * ## LintRules - Annotation Quality Rules
  *

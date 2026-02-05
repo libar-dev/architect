@@ -34,7 +34,7 @@ Feature: Validation Reference - Auto-Generated Documentation
 | Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
 | Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
 | DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
-| validate-patterns Flags | THIS DECISION (Rule: validate-patterns Flags) | Rule block table |
+| validate-patterns Flags | src/cli/validate-patterns.ts | @extract-shapes tag |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
 | Programmatic API | THIS DECISION (Rule: Programmatic API) | Fenced code block |
@@ -120,6 +120,9 @@ Feature: Validation Reference - Auto-Generated Documentation
 
     **Context:** validate-patterns combines multiple validation checks.
 
+    CLI configuration interface (`ValidateCLIConfig`) with all flags and options
+    is extracted from `src/cli/validate-patterns.ts` via `@extract-shapes`.
+
     **Usage:**
 
     """bash
@@ -129,14 +132,6 @@ Feature: Validation Reference - Auto-Generated Documentation
       --dod \
       --anti-patterns
     """
-
-    **Available Flags:**
-
-| Flag | What It Validates |
-| --- | --- |
-| --dod | Completed patterns have all deliverables done |
-| --anti-patterns | Dual-source ownership rules not violated |
-| --cross-source | Feature/TypeScript metadata consistency |
 
   Rule: CI/CD Integration
 

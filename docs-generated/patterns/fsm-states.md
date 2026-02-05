@@ -9,7 +9,7 @@
 | Property | Value |
 | --- | --- |
 | Status | active |
-| Category | Validation |
+| Category | Extract |
 
 ## Description
 

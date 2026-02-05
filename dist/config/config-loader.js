@@ -5,7 +5,7 @@
  * @libar-docs-status completed
  * @libar-docs-uses DeliveryProcessFactory, ConfigurationTypes
  * @libar-docs-used-by CLI
- * @libar-docs-extract-shapes ConfigDiscoveryResult, loadConfig, findConfigFile
+ * @libar-docs-extract-shapes ConfigDiscoveryResult, ConfigLoadError, ConfigLoadResult, findConfigFile, loadConfig, formatConfigError
  *
  * ## Config Loader - TypeScript Configuration File Discovery
  *

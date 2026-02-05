@@ -24,6 +24,21 @@ import { z } from 'zod';
  */
 export const ShapeKindSchema = z.enum(['interface', 'type', 'enum', 'function', 'const']);
 // =============================================================================
+// Property Documentation Schema
+// =============================================================================
+/**
+ * JSDoc documentation for an interface property.
+ *
+ * Used to capture property-level documentation from interfaces,
+ * enabling generation of description tables alongside code blocks.
+ */
+export const PropertyDocSchema = z.object({
+    /** Property name */
+    name: z.string(),
+    /** JSDoc comment text (without delimiters) */
+    jsDoc: z.string(),
+});
+// =============================================================================
 // Extracted Shape Schema
 // =============================================================================
 /**
@@ -51,6 +66,8 @@ export const ExtractedShapeSchema = z.object({
     overloads: z.array(z.string()).readonly().optional(),
     /** Whether this is an exported shape */
     exported: z.boolean().default(true),
+    /** For interfaces: JSDoc documentation for each property */
+    propertyDocs: z.array(PropertyDocSchema).readonly().optional(),
 });
 // =============================================================================
 // Re-exported Shape Schema

@@ -32,7 +32,7 @@
 | Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
 | Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
 | DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
-| validate-patterns Flags | THIS DECISION (Rule: validate-patterns Flags) | Rule block table |
+| validate-patterns Flags | src/cli/validate-patterns.ts | @extract-shapes tag |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
 | Programmatic API | THIS DECISION (Rule: Programmatic API) | Fenced code block |
@@ -683,25 +683,70 @@ function formatDoDSummary(summary: DoDValidationSummary): string;
 
 ### validate-patterns Flags
 
-**Context:** validate-patterns combines multiple validation checks.
-
-    **Usage:**
-
-```bash
-npx validate-patterns \
-      -i "src/**/*.ts" \
-      -F "specs/**/*.feature" \
-      --dod \
-      --anti-patterns
+```typescript
+/**
+ * CLI configuration
+ */
+interface ValidateCLIConfig {
+  /** Glob patterns for TypeScript input files */
+  input: string[];
+  /** Glob patterns for Gherkin feature files */
+  features: string[];
+  /** Glob patterns to exclude */
+  exclude: string[];
+  /** Base directory for path resolution */
+  baseDir: string;
+  /** Treat warnings as errors */
+  strict: boolean;
+  /** Output format */
+  format: 'pretty' | 'json';
+  /** Show help */
+  help: boolean;
+  /** Enable DoD validation mode */
+  dod: boolean;
+  /** Specific phases to validate (empty = all completed phases) */
+  phases: number[];
+  /** Enable anti-pattern detection */
+  antiPatterns: boolean;
+  /** Override scenario bloat threshold */
+  scenarioBloatThreshold: number;
+  /** Override mega-feature line threshold */
+  megaFeatureLineThreshold: number;
+  /** Override magic comment threshold */
+  magicCommentThreshold: number;
+  /** Show version */
+  version: boolean;
+}
 ```
 
-**Available Flags:**
+```typescript
+/**
+ * Validation issue
+ */
+interface ValidationIssue {
+  severity: IssueSeverity;
+  message: string;
+  source: 'typescript' | 'gherkin' | 'cross-source';
+  pattern?: string;
+  file?: string;
+}
+```
 
-| Flag | What It Validates |
-| --- | --- |
-| --dod | Completed patterns have all deliverables done |
-| --anti-patterns | Dual-source ownership rules not violated |
-| --cross-source | Feature/TypeScript metadata consistency |
+```typescript
+/**
+ * Validation summary
+ */
+interface ValidationSummary {
+  issues: ValidationIssue[];
+  stats: {
+    typescriptPatterns: number;
+    gherkinPatterns: number;
+    matched: number;
+    missingInGherkin: number;
+    missingInTypeScript: number;
+  };
+}
+```
 
 ### CI/CD Integration
 
