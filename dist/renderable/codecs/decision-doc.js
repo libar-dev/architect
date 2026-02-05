@@ -278,9 +278,11 @@ export function parseSourceMappingsFromRules(rules) {
  * Check if a source file reference is a self-reference
  *
  * @param sourceFile - The source file path to check
- * @returns True if the reference is to the current decision document
+ * @returns True if the reference is to the current decision document, false for null/undefined
  */
 export function isSelfReference(sourceFile) {
+    if (!sourceFile)
+        return false;
     return (sourceFile === SELF_REFERENCE_MARKER ||
         SELF_REFERENCE_RULE_PATTERN.test(sourceFile) ||
         SELF_REFERENCE_DOCSTRING_PATTERN.test(sourceFile));

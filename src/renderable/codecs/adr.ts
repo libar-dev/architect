@@ -42,7 +42,11 @@ import {
   type MasterDataset,
 } from '../../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
-import { partitionRulesByPrefix, type PartitionedRules } from './helpers.js';
+import {
+  partitionRulesByPrefix,
+  parseDescriptionWithDocStrings,
+  type PartitionedRules,
+} from './helpers.js';
 import {
   type RenderableDocument,
   type SectionBlock,
@@ -630,7 +634,7 @@ function renderPartitionedAdrSections(
     sections.push(heading(headingLevel, 'Context'));
     for (const rule of partitioned.context) {
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -640,7 +644,7 @@ function renderPartitionedAdrSections(
     sections.push(heading(headingLevel, 'Decision'));
     for (const rule of partitioned.decision) {
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -650,7 +654,7 @@ function renderPartitionedAdrSections(
     sections.push(heading(headingLevel, 'Consequences'));
     for (const rule of partitioned.consequences) {
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }

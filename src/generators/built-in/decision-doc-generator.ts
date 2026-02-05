@@ -45,7 +45,9 @@ import { renderToMarkdown } from '../../renderable/render.js';
 import {
   parseDecisionDocument,
   type DecisionDocContent,
+  isSelfReference,
 } from '../../renderable/codecs/decision-doc.js';
+import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
 import {
   executeSourceMapping,
   type SourceMapperOptions,
@@ -277,7 +279,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.context) {
       sections.push(heading(3, rule.name.replace(/^Context\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -288,20 +290,40 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.decision) {
       sections.push(heading(3, rule.name.replace(/^Decision\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
 
   // Aggregated content sections
-  if (aggregatedContent.sections.length > 0) {
+  // Filter to only include sections that aren't already rendered in Rules
+  const nonDuplicateSections = aggregatedContent.sections.filter((extracted) => {
+    // Skip empty content
+    if (!extracted.content || extracted.content.trim().length === 0) {
+      return false;
+    }
+    // Skip self-reference sections with DocStrings - these are already rendered in Rule sections
+    // (Context, Decision, Consequences). Only shapes from external TypeScript files should appear here.
+    if (
+      isSelfReference(extracted.sourceFile) &&
+      extracted.docStrings &&
+      extracted.docStrings.length > 0
+    ) {
+      // Debug logging to aid troubleshooting when content appears to be missing
+      if (process.env['DEBUG']) {
+        console.debug(
+          `[decision-doc] Filtering self-reference DocString section "${extracted.section}" to prevent duplicate content`
+        );
+      }
+      return false;
+    }
+    return true;
+  });
+
+  if (nonDuplicateSections.length > 0) {
     sections.push(heading(2, 'Implementation Details'));
 
-    for (const extracted of aggregatedContent.sections) {
-      if (!extracted.content || extracted.content.trim().length === 0) {
-        continue;
-      }
-
+    for (const extracted of nonDuplicateSections) {
       sections.push(heading(3, extracted.section));
 
       // Handle different content types
@@ -322,8 +344,8 @@ export function generateDetailedOutput(
           }
         }
       } else {
-        // Plain content
-        sections.push(paragraph(extracted.content));
+        // Plain content - convert DocStrings to code fences
+        sections.push(...parseDescriptionWithDocStrings(extracted.content));
       }
     }
   }
@@ -334,7 +356,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.consequences) {
       sections.push(heading(3, rule.name.replace(/^Consequence[s]?\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -344,7 +366,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.other) {
       sections.push(heading(2, rule.name));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
