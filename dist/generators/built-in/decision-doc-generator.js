@@ -29,7 +29,7 @@
  */
 import { heading, paragraph, code, list, separator, collapsible, document as createDocument, } from '../../renderable/schema.js';
 import { renderToMarkdown } from '../../renderable/render.js';
-import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
+import { parseDecisionDocument, isSelfReference, } from '../../renderable/codecs/decision-doc.js';
 import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
@@ -190,12 +190,24 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         }
     }
     // Aggregated content sections
-    if (aggregatedContent.sections.length > 0) {
+    // Filter to only include sections that aren't already rendered in Rules
+    const nonDuplicateSections = aggregatedContent.sections.filter((extracted) => {
+        // Skip empty content
+        if (!extracted.content || extracted.content.trim().length === 0) {
+            return false;
+        }
+        // Skip self-reference sections with DocStrings - these are already rendered in Rule sections
+        // (Context, Decision, Consequences). Only shapes from external TypeScript files should appear here.
+        if (isSelfReference(extracted.sourceFile) &&
+            extracted.docStrings &&
+            extracted.docStrings.length > 0) {
+            return false;
+        }
+        return true;
+    });
+    if (nonDuplicateSections.length > 0) {
         sections.push(heading(2, 'Implementation Details'));
-        for (const extracted of aggregatedContent.sections) {
-            if (!extracted.content || extracted.content.trim().length === 0) {
-                continue;
-            }
+        for (const extracted of nonDuplicateSections) {
             sections.push(heading(3, extracted.section));
             // Handle different content types
             if (extracted.shapes && extracted.shapes.length > 0) {
