@@ -27,12 +27,12 @@ Feature: Process Guard Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| FSM Protection Levels | src/validation/fsm/states.ts | @extract-shapes tag |
-| FSM Valid Transitions | src/validation/fsm/transitions.ts | @extract-shapes tag |
+| FSM Protection Levels | src/validation/fsm/states.ts | extract-shapes tag |
+| FSM Valid Transitions | src/validation/fsm/transitions.ts | extract-shapes tag |
 | FSM Diagram | THIS DECISION (Rule: FSM Diagram) | Fenced code block (Mermaid) |
-| Validation Rules Types | src/lint/process-guard/types.ts | @extract-shapes tag |
-| Decider Function | src/lint/process-guard/decider.ts | @extract-shapes tag |
-| CLI Config | src/cli/lint-process.ts | @extract-shapes tag |
+| Validation Rules Types | src/lint/process-guard/types.ts | extract-shapes tag |
+| Decider Function | src/lint/process-guard/decider.ts | extract-shapes tag |
+| CLI Config | src/cli/lint-process.ts | extract-shapes tag |
 | Escape Hatches | THIS DECISION (Rule: Escape Hatches) | Rule block table |
 | Rule Descriptions | THIS DECISION (Rule: Rule Descriptions) | Rule block table |
 | CLI Usage | THIS DECISION (Rule: CLI Usage) | Rule block content |
@@ -42,7 +42,7 @@ Feature: Process Guard Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Process Guard reference feature file | Complete | specs/docs/process-guard-reference.feature |
+      | Process Guard reference feature file | Complete | delivery-process/recipes/process-guard-reference.feature |
       | Generated detailed docs | Pending | docs-generated/docs/PROCESSGUARDREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/validation/processguardreference.md |
 

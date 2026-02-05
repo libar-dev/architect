@@ -34,8 +34,8 @@ import { type HierarchyLevel as TaxonomyHierarchyLevel, type ProcessStatusValue,
  */
 export declare const ProcessStatusSchema: z.ZodEnum<{
     completed: "completed";
-    roadmap: "roadmap";
     active: "active";
+    roadmap: "roadmap";
     deferred: "deferred";
 }>;
 export type ProcessStatus = ProcessStatusValue;
@@ -80,8 +80,8 @@ export declare const ProcessMetadataSchema: z.ZodObject<{
     phase: z.ZodNumber;
     status: z.ZodEnum<{
         completed: "completed";
-        roadmap: "roadmap";
         active: "active";
+        roadmap: "roadmap";
         deferred: "deferred";
     }>;
     level: z.ZodDefault<z.ZodEnum<{

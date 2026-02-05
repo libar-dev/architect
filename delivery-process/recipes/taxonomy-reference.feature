@@ -29,16 +29,16 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Concept | THIS DECISION (Rule: Concept) | Rule block content |
-| Format Types | src/taxonomy/format-types.ts | @extract-shapes tag |
-| Categories | src/taxonomy/categories.ts | @extract-shapes tag |
-| Status Values | src/taxonomy/status-values.ts | @extract-shapes tag |
+| Format Types | src/taxonomy/format-types.ts | extract-shapes tag |
+| Categories | src/taxonomy/categories.ts | extract-shapes tag |
+| Status Values | src/taxonomy/status-values.ts | extract-shapes tag |
 | Status Values | THIS DECISION (Rule: Status Values) | Rule block + Mermaid diagram |
-| Normalized Status | src/taxonomy/normalized-status.ts | @extract-shapes tag |
+| Normalized Status | src/taxonomy/normalized-status.ts | extract-shapes tag |
 | Normalized Status | THIS DECISION (Rule: Normalized Status) | Rule block content |
-| Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | @extract-shapes tag |
-| Risk Levels | src/taxonomy/risk-levels.ts | @extract-shapes tag |
-| Layer Types | src/taxonomy/layer-types.ts | @extract-shapes tag |
-| TagRegistry | src/taxonomy/registry-builder.ts | @extract-shapes tag |
+| Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | extract-shapes tag |
+| Risk Levels | src/taxonomy/risk-levels.ts | extract-shapes tag |
+| Layer Types | src/taxonomy/layer-types.ts | extract-shapes tag |
+| TagRegistry | src/taxonomy/registry-builder.ts | extract-shapes tag |
 | Presets | THIS DECISION (Rule: Presets) | Rule block table |
 | Architecture | THIS DECISION (Rule: Architecture) | Fenced code block |
 | Tag Generation | THIS DECISION (Rule: Tag Generation) | Rule block content |
@@ -46,7 +46,7 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Taxonomy reference feature file | Complete | specs/docs/taxonomy-reference.feature |
+      | Taxonomy reference feature file | Complete | delivery-process/recipes/taxonomy-reference.feature |
       | Source annotations added | Complete | src/taxonomy/*.ts |
       | Generated detailed docs | Pending | docs-generated/docs/TAXONOMYREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/taxonomy/taxonomyreference.md |

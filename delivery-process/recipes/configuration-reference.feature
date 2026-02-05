@@ -47,7 +47,7 @@ Feature: Configuration Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Configuration reference feature file | Complete | specs/docs/configuration-reference.feature |
+      | Configuration reference feature file | Complete | delivery-process/recipes/configuration-reference.feature |
       | Generated detailed docs | Pending | docs-generated/docs/CONFIGURATIONREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/config/configurationreference.md |
 
@@ -103,7 +103,7 @@ Feature: Configuration Reference - Auto-Generated Documentation
 
     """typescript
     // delivery-process.config.ts
-    import { createDeliveryProcess } from 'at-libar-dev/delivery-process';
+    import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
     // Default preset
     export default createDeliveryProcess();
@@ -169,7 +169,7 @@ Feature: Configuration Reference - Auto-Generated Documentation
     **Usage Example:**
 
     """typescript
-    import { loadConfig, formatConfigError } from 'at-libar-dev/delivery-process/config';
+    import { loadConfig, formatConfigError } from '@libar-dev/delivery-process/config';
 
     const result = await loadConfig(process.cwd());
 

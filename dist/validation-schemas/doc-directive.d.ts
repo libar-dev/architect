@@ -56,8 +56,8 @@ export declare function createDirectiveTagSchema(tagPrefix: string): z.ZodPipe<z
  */
 export declare const DefaultPatternStatusSchema: z.ZodEnum<{
     completed: "completed";
-    roadmap: "roadmap";
     active: "active";
+    roadmap: "roadmap";
     deferred: "deferred";
 }>;
 /**
@@ -71,8 +71,8 @@ export declare const DefaultPatternStatusSchema: z.ZodEnum<{
  */
 export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
     completed: "completed";
-    roadmap: "roadmap";
     active: "active";
+    roadmap: "roadmap";
     deferred: "deferred";
 }>;
 /**
@@ -83,8 +83,8 @@ export declare const AcceptedPatternStatusSchema: z.ZodEnum<{
  */
 export declare const PatternStatusSchema: z.ZodEnum<{
     completed: "completed";
-    roadmap: "roadmap";
     active: "active";
+    roadmap: "roadmap";
     deferred: "deferred";
 }>;
 export type PatternStatus = AcceptedStatusValue;
@@ -132,8 +132,8 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     patternName: z.ZodOptional<z.ZodString>;
     status: z.ZodOptional<z.ZodEnum<{
         completed: "completed";
-        roadmap: "roadmap";
         active: "active";
+        roadmap: "roadmap";
         deferred: "deferred";
     }>>;
     isCore: z.ZodOptional<z.ZodBoolean>;

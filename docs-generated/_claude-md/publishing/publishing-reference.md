@@ -15,8 +15,8 @@
 
 | Tag | Purpose | Install Command |
 | --- | --- | --- |
-| latest | Stable releases (production-ready) | npm i at-libar-dev/delivery-process |
-| pre | Pre-releases (testing, 1.0.0-pre.N) | npm i at-libar-dev/delivery-process at-pre |
+| latest | Stable releases (production-ready) | npm i @libar-dev/delivery-process |
+| pre | Pre-releases (testing, 1.0.0-pre.N) | npm i @libar-dev/delivery-process at-pre |
 
     **Version Format:**
 
@@ -155,7 +155,7 @@
     **Check npm Registry:**
 
     """bash
-    npm view at-libar-dev/delivery-process
+    npm view @libar-dev/delivery-process
     """
 
     **Test Installation:**
@@ -163,7 +163,7 @@
     """bash
     mkdir /tmp/test-install && cd /tmp/test-install
     npm init -y
-    npm install at-libar-dev/delivery-process at-pre
+    npm install @libar-dev/delivery-process at-pre
     """
 
     **Verification Checklist:**
@@ -208,5 +208,5 @@
 
     """bash
     npm cache clean --force
-    npm view at-libar-dev/delivery-process
+    npm view @libar-dev/delivery-process
     """

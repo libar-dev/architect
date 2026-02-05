@@ -27,16 +27,16 @@
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Concept | THIS DECISION (Rule: Concept) | Rule block content |
-| Format Types | src/taxonomy/format-types.ts | @extract-shapes tag |
-| Categories | src/taxonomy/categories.ts | @extract-shapes tag |
-| Status Values | src/taxonomy/status-values.ts | @extract-shapes tag |
+| Format Types | src/taxonomy/format-types.ts | extract-shapes tag |
+| Categories | src/taxonomy/categories.ts | extract-shapes tag |
+| Status Values | src/taxonomy/status-values.ts | extract-shapes tag |
 | Status Values | THIS DECISION (Rule: Status Values) | Rule block + Mermaid diagram |
-| Normalized Status | src/taxonomy/normalized-status.ts | @extract-shapes tag |
+| Normalized Status | src/taxonomy/normalized-status.ts | extract-shapes tag |
 | Normalized Status | THIS DECISION (Rule: Normalized Status) | Rule block content |
-| Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | @extract-shapes tag |
-| Risk Levels | src/taxonomy/risk-levels.ts | @extract-shapes tag |
-| Layer Types | src/taxonomy/layer-types.ts | @extract-shapes tag |
-| TagRegistry | src/taxonomy/registry-builder.ts | @extract-shapes tag |
+| Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | extract-shapes tag |
+| Risk Levels | src/taxonomy/risk-levels.ts | extract-shapes tag |
+| Layer Types | src/taxonomy/layer-types.ts | extract-shapes tag |
+| TagRegistry | src/taxonomy/registry-builder.ts | extract-shapes tag |
 | Presets | THIS DECISION (Rule: Presets) | Rule block table |
 | Architecture | THIS DECISION (Rule: Architecture) | Fenced code block |
 | Tag Generation | THIS DECISION (Rule: Tag Generation) | Rule block content |
@@ -171,9 +171,12 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
  *
  * FSM transitions:
  * - roadmap to active (start work)
+ * - roadmap to deferred (pause before start)
+ * - deferred to roadmap (resume planning)
  * - active to completed (finish work)
  * - active to deferred (pause work)
  * - deferred to active (resume work)
+ * - active cannot regress to roadmap
  */
 PROCESS_STATUS_VALUES = [
   'roadmap', // Planned work, fully editable

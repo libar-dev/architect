@@ -11,9 +11,12 @@
  *
  * FSM transitions:
  * - roadmap to active (start work)
+ * - roadmap to deferred (pause before start)
+ * - deferred to roadmap (resume planning)
  * - active to completed (finish work)
  * - active to deferred (pause work)
  * - deferred to active (resume work)
+ * - active cannot regress to roadmap
  */
 export const PROCESS_STATUS_VALUES = [
     'roadmap', // Planned work, fully editable

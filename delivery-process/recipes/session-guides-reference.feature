@@ -40,7 +40,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Session guides reference feature file | Complete | specs/docs/session-guides-reference.feature |
+      | Session guides reference feature file | Complete | delivery-process/recipes/session-guides-reference.feature |
       | Generated detailed docs | Pending | docs-generated/docs/SESSIONGUIDESREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/sessions/sessionguidesreference.md |
 

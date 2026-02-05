@@ -40,7 +40,7 @@ Feature: Publishing Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Publishing reference feature file | Complete | specs/docs/publishing-reference.feature |
+      | Publishing reference feature file | Complete | delivery-process/recipes/publishing-reference.feature |
       | Generated detailed docs | Pending | docs-generated/docs/PUBLISHINGREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/publishing/publishingreference.md |
 
@@ -68,8 +68,8 @@ Feature: Publishing Reference - Auto-Generated Documentation
 
 | Tag | Purpose | Install Command |
 | --- | --- | --- |
-| latest | Stable releases (production-ready) | npm i at-libar-dev/delivery-process |
-| pre | Pre-releases (testing, 1.0.0-pre.N) | npm i at-libar-dev/delivery-process at-pre |
+| latest | Stable releases (production-ready) | npm i @libar-dev/delivery-process |
+| pre | Pre-releases (testing, 1.0.0-pre.N) | npm i @libar-dev/delivery-process at-pre |
 
     **Version Format:**
 
@@ -247,7 +247,7 @@ Feature: Publishing Reference - Auto-Generated Documentation
     **Check npm Registry:**
 
     """bash
-    npm view at-libar-dev/delivery-process
+    npm view @libar-dev/delivery-process
     """
 
     **Test Installation:**
@@ -255,7 +255,7 @@ Feature: Publishing Reference - Auto-Generated Documentation
     """bash
     mkdir /tmp/test-install && cd /tmp/test-install
     npm init -y
-    npm install at-libar-dev/delivery-process at-pre
+    npm install @libar-dev/delivery-process at-pre
     """
 
     **Verification Checklist:**
@@ -300,7 +300,7 @@ Feature: Publishing Reference - Auto-Generated Documentation
 
     """bash
     npm cache clean --force
-    npm view at-libar-dev/delivery-process
+    npm view @libar-dev/delivery-process
     """
 
   @acceptance-criteria

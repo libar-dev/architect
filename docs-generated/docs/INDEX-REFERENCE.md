@@ -149,7 +149,7 @@ stateDiagram-v2
     **Usage Example:**
 
 ```typescript
-import { createProcessStateAPI } from 'at-libar-dev/delivery-process';
+import { createProcessStateAPI } from '@libar-dev/delivery-process';
 
     const api = createProcessStateAPI(dataset);
 

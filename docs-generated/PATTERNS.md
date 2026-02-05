@@ -145,7 +145,7 @@
 | 🚧 FSM States | Extract | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
-| 🚧 Lint Process CLI | Cli | active | :ProcessGuardModule Validates git changes against delivery process rules. |
+| 🚧 Lint Process CLI | Cli | active | Validates git changes against delivery process rules. |
 | 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
@@ -442,13 +442,6 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
-    UtilsModule --> StringUtilities
-    UtilsModule --> CollectionUtilities
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> GherkinTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
-    AntiPatternDetector --> GherkinTypes
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -459,6 +452,13 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> GherkinTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    AntiPatternDetector --> GherkinTypes
+    UtilsModule --> StringUtilities
+    UtilsModule --> CollectionUtilities
     TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
@@ -496,22 +496,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> ConfigLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -524,6 +508,23 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation

@@ -43,7 +43,7 @@ Feature: Instructions Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Instructions reference feature file | Complete | specs/docs/instructions-reference.feature |
+      | Instructions reference feature file | Complete | delivery-process/recipes/instructions-reference.feature |
       | Source annotations added | Complete | src/taxonomy/*.ts, src/cli/*.ts |
       | Generated detailed docs | Pending | docs-generated/docs/INSTRUCTIONSREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/reference/instructionsreference.md |

@@ -64,8 +64,8 @@
 
 | Tag | Purpose | Install Command |
 | --- | --- | --- |
-| latest | Stable releases (production-ready) | npm i at-libar-dev/delivery-process |
-| pre | Pre-releases (testing, 1.0.0-pre.N) | npm i at-libar-dev/delivery-process at-pre |
+| latest | Stable releases (production-ready) | npm i @libar-dev/delivery-process |
+| pre | Pre-releases (testing, 1.0.0-pre.N) | npm i @libar-dev/delivery-process at-pre |
 
     **Version Format:**
 
@@ -243,7 +243,7 @@ npm publish --dry-run --tag pre --access public
     **Check npm Registry:**
 
 ```bash
-npm view at-libar-dev/delivery-process
+npm view @libar-dev/delivery-process
 ```
 
 **Test Installation:**
@@ -251,7 +251,7 @@ npm view at-libar-dev/delivery-process
 ```bash
 mkdir /tmp/test-install && cd /tmp/test-install
     npm init -y
-    npm install at-libar-dev/delivery-process at-pre
+    npm install @libar-dev/delivery-process at-pre
 ```
 
 **Verification Checklist:**
@@ -296,5 +296,5 @@ npm login
 
 ```bash
 npm cache clean --force
-    npm view at-libar-dev/delivery-process
+    npm view @libar-dev/delivery-process
 ```

@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Lint Process CLI**: :ProcessGuardModule Validates git changes against delivery process rules.
+- **Lint Process CLI**: Validates git changes against delivery process rules.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
 - **Process State API**: TypeScript interface for querying delivery process state.
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
@@ -85,11 +85,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
-- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
-- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
-- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
-- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
-- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -98,6 +93,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
 - **Content Deduplicator**: Identifies and merges duplicate sections extracted from multiple sources.
 - **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
+- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
+- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
+- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
+- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
+- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
+- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
+- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
+- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
+- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
+- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
 - **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
 - **Configuration Types**: Type definitions for the delivery process configuration system.
 - **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
@@ -105,11 +110,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
 - **Configuration Defaults**: Centralized default constants for the delivery-process package.
 - **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
-- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
-- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
-- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
-- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
-- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
 - **Validation Rules Codec**: Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference.
 - **Timeline Codec**: Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)...
 - **Taxonomy Codec**: Transforms MasterDataset into a RenderableDocument for taxonomy reference output.

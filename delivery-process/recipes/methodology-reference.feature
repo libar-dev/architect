@@ -42,7 +42,7 @@ Feature: Methodology Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Methodology reference feature file | Complete | specs/docs/methodology-reference.feature |
+      | Methodology reference feature file | Complete | delivery-process/recipes/methodology-reference.feature |
       | Generated detailed docs | Pending | docs-generated/docs/METHODOLOGY-REFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/methodology/methodology-reference.md |
 

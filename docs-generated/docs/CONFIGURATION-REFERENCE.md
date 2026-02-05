@@ -384,7 +384,7 @@ interface RegexBuilders {
 
 ```typescript
 // delivery-process.config.ts
-    import { createDeliveryProcess } from 'at-libar-dev/delivery-process';
+    import { createDeliveryProcess } from '@libar-dev/delivery-process';
 
     // Default preset
     export default createDeliveryProcess();
@@ -598,7 +598,7 @@ const dp = createDeliveryProcess({
     **Usage Example:**
 
 ```typescript
-import { loadConfig, formatConfigError } from 'at-libar-dev/delivery-process/config';
+import { loadConfig, formatConfigError } from '@libar-dev/delivery-process/config';
 
     const result = await loadConfig(process.cwd());
 

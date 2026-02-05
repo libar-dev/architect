@@ -39,7 +39,7 @@ Feature: Index Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Index reference feature file | Complete | specs/docs/index-reference.feature |
+      | Index reference feature file | Complete | delivery-process/recipes/index-reference.feature |
       | Generated detailed docs | Pending | docs-generated/docs/INDEXREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/index/indexreference.md |
 
@@ -153,7 +153,7 @@ Feature: Index Reference - Auto-Generated Documentation
     **Usage Example:**
 
     """typescript
-    import { createProcessStateAPI } from 'at-libar-dev/delivery-process';
+    import { createProcessStateAPI } from '@libar-dev/delivery-process';
 
     const api = createProcessStateAPI(dataset);
 

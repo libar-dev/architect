@@ -13,11 +13,6 @@
 
 ## Description
 
-:ProcessGuardModule
-
-
-## LintProcessCLI - Process Guard Linter CLI
-
 Validates git changes against delivery process rules.
 Enforces protection levels, status transitions, and session scope.
 
