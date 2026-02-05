@@ -157,7 +157,8 @@ export function createWarningCollector(): WarningCollector {
     },
 
     getAll(): readonly Warning[] {
-      return warnings;
+      // Return a copy to prevent external mutation of internal state
+      return [...warnings];
     },
 
     filterByCategory(category: WarningCategory): readonly Warning[] {

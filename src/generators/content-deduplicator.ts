@@ -334,8 +334,9 @@ export function deduplicateSections(
   const removeIndices = new Set<number>();
 
   // Process each duplicate group
-  // Note: findDuplicates only returns groups with 2+ blocks, so this assertion is safe
   for (const [_fingerprint, duplicateBlocks] of duplicates) {
+    // SAFETY: findDuplicates() only returns groups with 2+ blocks (see filter at line 216),
+    // so the type assertion to non-empty tuple is guaranteed to be correct at runtime.
     const winner = chooseWinner(duplicateBlocks as [ContentBlock, ...ContentBlock[]]);
 
     // Mark losers for removal using their original indices

@@ -499,7 +499,17 @@ function executePipeline(
 
   // Pattern name can come from directive.patternName or pattern.patternName or pattern.name
   // directive.patternName and pattern.patternName are optional, pattern.name is required
-  const patternName = pattern.directive.patternName ?? pattern.patternName ?? pattern.name;
+  // Use helper function to catch both null/undefined AND empty strings
+  const getPatternName = (): string => {
+    if (pattern.directive.patternName?.trim()) {
+      return pattern.directive.patternName;
+    }
+    if (pattern.patternName?.trim()) {
+      return pattern.patternName;
+    }
+    return pattern.name;
+  };
+  const patternName = getPatternName();
 
   const description = pattern.directive.description;
   const rules = pattern.rules ?? [];

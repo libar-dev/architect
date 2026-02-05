@@ -56,7 +56,8 @@ export function createWarningCollector() {
             warnings.push(warning);
         },
         getAll() {
-            return warnings;
+            // Return a copy to prevent external mutation of internal state
+            return [...warnings];
         },
         filterByCategory(category) {
             return warnings.filter((w) => w.category === category);

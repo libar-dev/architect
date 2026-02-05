@@ -160,9 +160,11 @@ export function validateFileExists(
         row: mapping,
       });
     }
-  } catch {
+  } catch (error: unknown) {
+    // Capture the actual error for better debugging (permission denied, etc.)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return Result.err({
-      message: `Unable to read file: ${mapping.sourceFile}`,
+      message: `Unable to read file: ${mapping.sourceFile} (${errorMessage})`,
       row: mapping,
     });
   }
@@ -208,15 +210,18 @@ function normalizeMethodString(method: string): string {
  * @returns Result with normalized method on success, ValidationError on failure
  */
 export function validateExtractionMethod(method: string): Result<string, ValidationError> {
+  // Trim whitespace before validation to handle leading/trailing spaces
+  const trimmedMethod = method.trim();
+
   // Check for empty method
-  if (!method || method.trim() === '') {
+  if (trimmedMethod.length === 0) {
     return Result.err({
       message: 'Extraction method is required',
     });
   }
 
   // First, try using the built-in normalization
-  const normalizedKey = normalizeExtractionMethod(method);
+  const normalizedKey = normalizeExtractionMethod(trimmedMethod);
 
   if (normalizedKey !== 'unknown') {
     // Return the canonical form of the method
@@ -224,7 +229,7 @@ export function validateExtractionMethod(method: string): Result<string, Validat
   }
 
   // Try our extended aliases
-  const normalizedString = normalizeMethodString(method);
+  const normalizedString = normalizeMethodString(trimmedMethod);
   const aliasKey = METHOD_ALIASES[normalizedString];
 
   if (aliasKey) {
@@ -232,10 +237,10 @@ export function validateExtractionMethod(method: string): Result<string, Validat
   }
 
   // Check if it's close to a known method for suggestions
-  const suggestions = findSimilarMethods(method);
+  const suggestions = findSimilarMethods(trimmedMethod);
 
   return Result.err({
-    message: `Unknown extraction method: ${method}`,
+    message: `Unknown extraction method: ${trimmedMethod}`,
     suggestions,
   });
 }
