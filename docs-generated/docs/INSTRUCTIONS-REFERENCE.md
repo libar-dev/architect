@@ -26,8 +26,8 @@
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | File-Level Opt-In | THIS DECISION (Rule: File-Level Opt-In) | Rule block content |
-| Categories | src/taxonomy/categories.ts | extract-shapes tag |
-| Metadata Tags (Grouped) | src/taxonomy/registry-builder.ts | extract-shapes tag |
+| Category Tags | src/taxonomy/categories.ts | extract-shapes tag |
+| Metadata Tags | src/taxonomy/registry-builder.ts | extract-shapes tag |
 | Format Types | THIS DECISION (Rule: Format Types) | Rule block table |
 | Source Ownership | THIS DECISION (Rule: Source Ownership) | Rule block table |
 | Hierarchy Duration | THIS DECISION (Rule: Hierarchy Duration) | Rule block table |
@@ -73,7 +73,7 @@
 **Important:** Only files with the opt-in marker are scanned. Files without
     the marker are ignored by the scanner even if they contain other annotations.
 
-### Categories
+### Category Tags
 
 ```typescript
 /**
@@ -124,7 +124,7 @@ type CategoryTag = (typeof CATEGORIES)[number]['tag'];
 CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
 ```
 
-### Metadata Tags (Grouped)
+### Metadata Tags
 
 ```typescript
 /**
@@ -514,23 +514,3 @@ interface CLIConfig {
 | Problem/Solution | Problem and Solution | Pain point to fix |
 | Value-First | Business Value and How It Works | TDD-style specs |
 | Context/Approach | Context and Approach | Technical patterns |
-
-## Category Tags
-
-**Context:** Category tags classify patterns by domain area.
-
-    The full category list (21 categories in ddd-es-cqrs preset) is extracted from
-    `src/taxonomy/categories.ts`. Each category has: tag, domain, priority, description.
-
-    **Simple Presets (generic, libar-generic):** Only core, api, infra categories.
-
-    **Usage:** Add category tag as a flag (no value needed).
-
-```typescript
-/**
-     * at-libar-docs
-     * at-libar-docs-pattern DeciderPattern
-     * at-libar-docs-decider
-     * at-libar-docs-event-sourcing
-     */
-```

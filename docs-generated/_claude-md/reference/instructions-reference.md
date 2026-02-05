@@ -37,14 +37,14 @@
     **Important:** Only files with the opt-in marker are scanned. Files without
     the marker are ignored by the scanner even if they contain other annotations.
 
-### Categories
+### Category Tags
 
 - `CategoryDefinition` - interface
 - `CATEGORIES` - const
 - `CategoryTag` - type
 - `CATEGORY_TAGS` - const
 
-### Metadata Tags (Grouped)
+### Metadata Tags
 
 - `TagRegistry` - interface
 - `MetadataTagDefinitionForRegistry` - interface

@@ -459,7 +459,6 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -470,6 +469,7 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
@@ -485,6 +485,17 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    ShapeExtractor --> typescript_estree
+    ShapeExtractor ..-> ShapeExtraction
+    GherkinExtractor --> GherkinTypes
+    GherkinExtractor --> GherkinASTParser
+    GherkinExtractor ..-> GherkinRulesSupport
+    DualSourceExtractor --> DocExtractor
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    Document_Extractor --> Tag_Registry
+    Document_Extractor --> Zod
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -497,17 +508,9 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ShapeExtractor --> typescript_estree
-    ShapeExtractor ..-> ShapeExtraction
-    GherkinExtractor --> GherkinTypes
-    GherkinExtractor --> GherkinASTParser
-    GherkinExtractor ..-> GherkinRulesSupport
-    DualSourceExtractor --> DocExtractor
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    Document_Extractor --> Tag_Registry
-    Document_Extractor --> Zod
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -521,9 +524,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -536,16 +536,16 @@ graph TD
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction

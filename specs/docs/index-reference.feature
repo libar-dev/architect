@@ -26,7 +26,7 @@ Feature: Index Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| Package Metadata | package.json | JSON extraction (name, version, description, engines.node, license) |
+| Package Metadata | THIS DECISION (Rule: Package Metadata) | Rule block table |
 | Quick Navigation | THIS DECISION (Rule: Quick Navigation) | Rule block table |
 | Reading Order for New Users | THIS DECISION (Rule: Reading Order for New Users) | Rule block table |
 | Reading Order for Developers | THIS DECISION (Rule: Reading Order for Developers) | Rule block table |
@@ -47,7 +47,13 @@ Feature: Index Reference - Auto-Generated Documentation
 
     **Context:** Essential package information for orientation.
 
-    **Extracted from:** `package.json` fields: `name`, `version`, `description`, `engines.node`, `license`
+| Field | Value |
+| --- | --- |
+| Package | @libar-dev/delivery-process |
+| Version | 0.1.0-pre.0 |
+| Purpose | Turn TypeScript annotations and Gherkin specs into living docs, architecture graphs, and AI-queryable delivery state |
+| Node.js | >=18.0.0 |
+| License | MIT |
 
   Rule: Quick Navigation
 

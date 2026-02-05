@@ -26,19 +26,19 @@
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Design Principles | THIS DECISION (Rule: Design Principles) | Rule block table |
-| Four-Stage Pipeline | THIS DECISION (Rule: Four-Stage Pipeline) | Rule block content + Mermaid |
-| MasterDataset Schema | src/validation-schemas/master-dataset.ts | extract-shapes tag |
-| RenderableDocument | src/renderable/schema.ts | extract-shapes tag |
+| Four-Stage Pipeline | THIS DECISION (Rule: Four-Stage Pipeline) | Rule block content |
+| MasterDataset Schema | THIS DECISION (Rule: MasterDataset Schema) | Rule block content |
+| RenderableDocument Schema | THIS DECISION (Rule: RenderableDocument Schema) | Rule block content |
 | Block Vocabulary | THIS DECISION (Rule: Block Vocabulary) | Rule block table |
 | Codec Factory Pattern | THIS DECISION (Rule: Codec Factory Pattern) | Rule block content |
 | Generator Types | src/generators/types.ts | extract-shapes tag |
 | Transform Function | src/generators/pipeline/transform-dataset.ts | extract-shapes tag |
-| Available Codecs | src/renderable/generate.ts | extract-shapes tag + Rule: Available Codecs |
+| Available Codecs | THIS DECISION (Rule: Available Codecs) | Rule block content |
 | Progressive Disclosure | THIS DECISION (Rule: Progressive Disclosure) | Rule block table |
-| Codec to Generator Mapping | src/renderable/generate.ts | extract-shapes tag + Rule: Codec to Generator Mapping |
-| Status Normalization | src/taxonomy/normalized-status.ts | extract-shapes tag + Rule: Status Normalization |
+| Codec to Generator Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block content |
+| Status Normalization | THIS DECISION (Rule: Status Normalization) | Rule block content |
 | Result Monad Pattern | THIS DECISION (Rule: Result Monad Pattern) | Rule block content |
-| Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block table + Mermaid |
+| Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block content |
 
 ---
 
@@ -84,270 +84,36 @@ graph LR
 
 ### MasterDataset Schema
 
-```typescript
-/**
- * Master Dataset - Unified view of all extracted patterns
- *
- * Contains raw patterns plus pre-computed views and statistics.
- * This is the primary data structure passed to generators and sections.
- */
-MasterDatasetSchema = z.object({
-  // ─────────────────────────────────────────────────────────────────────────
-  // Raw Data
-  // ─────────────────────────────────────────────────────────────────────────
+**Context:** MasterDataset is the central data structure with all pre-computed views.
 
-  /** All extracted patterns (both TypeScript and Gherkin) */
-  patterns: z.array(ExtractedPatternSchema),
+    **Decision:** The schema contains:
 
-  /** Tag registry for category lookups */
-  tagRegistry: TagRegistrySchema,
+    - patterns: All extracted patterns (both TypeScript and Gherkin)
+    - tagRegistry: Tag registry for category lookups
+    - byStatus: Patterns grouped by normalized status (completed, active, planned)
+    - byPhase: Patterns grouped by phase number with pre-computed counts
+    - byQuarter: Patterns grouped by quarter (e.g., "Q4-2024")
+    - byCategory: Patterns grouped by category
+    - bySource: Patterns grouped by source type (typescript, gherkin, roadmap, prd)
+    - counts: Overall status counts (completed, active, planned, total)
+    - relationshipIndex: Optional dependency graph (uses, usedBy, dependsOn, enables)
+    - archIndex: Optional architecture index for diagram generation
 
-  // Note: workflow is not in the Zod schema because LoadedWorkflow contains Maps
-  // (statusMap, phaseMap) which are not JSON-serializable. When workflow access
-  // is needed, get it from SectionContext/GeneratorContext instead.
+    See src/validation-schemas/master-dataset.ts for the complete Zod schema.
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Pre-computed Views
-  // ─────────────────────────────────────────────────────────────────────────
+### RenderableDocument Schema
 
-  /** Patterns grouped by normalized status */
-  byStatus: StatusGroupsSchema,
+**Context:** RenderableDocument is the universal intermediate format.
 
-  /** Patterns grouped by phase number (sorted ascending) */
-  byPhase: z.array(PhaseGroupSchema),
+    **Decision:** All document codecs output this format. The renderer converts it to markdown.
 
-  /** Patterns grouped by quarter (e.g., "Q4-2024") */
-  byQuarter: z.record(z.string(), z.array(ExtractedPatternSchema)),
+    - title: Document title (becomes H1)
+    - purpose: Optional description (rendered as blockquote)
+    - detailLevel: Optional detail level indicator
+    - sections: Array of SectionBlock (the document content)
+    - additionalFiles: Record of path to RenderableDocument for progressive disclosure
 
-  /** Patterns grouped by category */
-  byCategory: z.record(z.string(), z.array(ExtractedPatternSchema)),
-
-  /** Patterns grouped by source type */
-  bySource: SourceViewsSchema,
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Aggregate Statistics
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /** Overall status counts */
-  counts: StatusCountsSchema,
-
-  /** Number of distinct phases */
-  phaseCount: z.number().int().nonnegative(),
-
-  /** Number of distinct categories */
-  categoryCount: z.number().int().nonnegative(),
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Relationship Data (optional)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /** Optional relationship index for dependency graph */
-  relationshipIndex: z.record(z.string(), RelationshipEntrySchema).optional(),
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Architecture Data (optional)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /** Optional architecture index for diagram generation */
-  archIndex: ArchIndexSchema.optional(),
-})
-```
-
-```typescript
-/**
- * Status-based grouping of patterns
- *
- * Patterns are normalized to three canonical states:
- * - completed: implemented, completed
- * - active: active, partial, in-progress
- * - planned: roadmap, planned, undefined
- */
-StatusGroupsSchema = z.object({
-  /** Patterns with status 'completed' or 'implemented' */
-  completed: z.array(ExtractedPatternSchema),
-
-  /** Patterns with status 'active', 'partial', or 'in-progress' */
-  active: z.array(ExtractedPatternSchema),
-
-  /** Patterns with status 'roadmap', 'planned', or undefined */
-  planned: z.array(ExtractedPatternSchema),
-})
-```
-
-```typescript
-/**
- * Status counts for aggregate statistics
- */
-StatusCountsSchema = z.object({
-  /** Number of completed patterns */
-  completed: z.number().int().nonnegative(),
-
-  /** Number of active patterns */
-  active: z.number().int().nonnegative(),
-
-  /** Number of planned patterns */
-  planned: z.number().int().nonnegative(),
-
-  /** Total number of patterns */
-  total: z.number().int().nonnegative(),
-})
-```
-
-```typescript
-/**
- * Phase grouping with patterns and counts
- *
- * Groups patterns by their phase number, with pre-computed
- * status counts for each phase.
- */
-PhaseGroupSchema = z.object({
-  /** Phase number (e.g., 1, 2, 3, 14, 39) */
-  phaseNumber: z.number().int(),
-
-  /** Optional phase name from workflow config */
-  phaseName: z.string().optional(),
-
-  /** Patterns in this phase */
-  patterns: z.array(ExtractedPatternSchema),
-
-  /** Pre-computed status counts for this phase */
-  counts: StatusCountsSchema,
-})
-```
-
-```typescript
-/**
- * Source-based views for different data origins
- */
-SourceViewsSchema = z.object({
-  /** Patterns from TypeScript files (.ts) */
-  typescript: z.array(ExtractedPatternSchema),
-
-  /** Patterns from Gherkin feature files (.feature) */
-  gherkin: z.array(ExtractedPatternSchema),
-
-  /** Patterns with phase metadata (roadmap items) */
-  roadmap: z.array(ExtractedPatternSchema),
-
-  /** Patterns with PRD metadata (productArea, userRole, businessValue) */
-  prd: z.array(ExtractedPatternSchema),
-})
-```
-
-```typescript
-/**
- * Relationship index for dependency tracking
- *
- * Maps pattern names to their relationship metadata.
- */
-RelationshipEntrySchema = z.object({
-  /** Patterns this pattern uses (from @libar-docs-uses) */
-  uses: z.array(z.string()),
-
-  /** Patterns that use this pattern (from @libar-docs-used-by) */
-  usedBy: z.array(z.string()),
-
-  /** Patterns this pattern depends on (from @libar-docs-depends-on) */
-  dependsOn: z.array(z.string()),
-
-  /** Patterns this pattern enables (from @libar-docs-enables) */
-  enables: z.array(z.string()),
-
-  // UML-inspired relationship fields (PatternRelationshipModel)
-  /** Patterns this item implements (realization relationship) */
-  implementsPatterns: z.array(z.string()),
-
-  /** Files/patterns that implement this pattern (computed inverse with file paths) */
-  implementedBy: z.array(ImplementationRefSchema),
-
-  /** Pattern this extends (generalization relationship) */
-  extendsPattern: z.string().optional(),
-
-  /** Patterns that extend this pattern (computed inverse) */
-  extendedBy: z.array(z.string()),
-
-  /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
-  seeAlso: z.array(z.string()),
-
-  /** File paths to implementation APIs (from @libar-docs-api-ref tag) */
-  apiRef: z.array(z.string()),
-})
-```
-
-```typescript
-/**
- * Architecture index for diagram generation
- *
- * Groups patterns by architectural metadata for rendering component diagrams.
- */
-ArchIndexSchema = z.object({
-  /** Patterns grouped by arch-role (bounded-context, projection, saga, etc.) */
-  byRole: z.record(z.string(), z.array(ExtractedPatternSchema)),
-
-  /** Patterns grouped by arch-context (orders, inventory, etc.) */
-  byContext: z.record(z.string(), z.array(ExtractedPatternSchema)),
-
-  /** Patterns grouped by arch-layer (domain, application, infrastructure) */
-  byLayer: z.record(z.string(), z.array(ExtractedPatternSchema)),
-
-  /** Patterns with any architecture metadata (for diagram generation) */
-  all: z.array(ExtractedPatternSchema),
-})
-```
-
-### RenderableDocument
-
-```typescript
-type RenderableDocument = {
-  title: string;
-  purpose?: string;
-  detailLevel?: string;
-  sections: SectionBlock[];
-  additionalFiles?: Record<string, RenderableDocument>;
-};
-```
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
-
-```typescript
-type HeadingBlock = z.infer<typeof HeadingBlockSchema>;
-```
-
-```typescript
-type TableBlock = z.infer<typeof TableBlockSchema>;
-```
-
-```typescript
-type ListBlock = z.infer<typeof ListBlockSchema>;
-```
-
-```typescript
-type CodeBlock = z.infer<typeof CodeBlockSchema>;
-```
-
-```typescript
-type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
-```
-
-```typescript
-type CollapsibleBlock = {
-  type: 'collapsible';
-  summary: string;
-  content: SectionBlock[];
-};
-```
+    See src/renderable/schema.ts for block builders and type definitions.
 
 ### Block Vocabulary
 
@@ -576,6 +342,14 @@ interface RawDataset {
 function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 ```
 
+### Available Codecs
+
+**Context:** The package provides multiple specialized codecs for different documentation needs.
+
+    **Decision:** Codecs are grouped by purpose. Pattern-focused codecs generate pattern registries, requirements, and ADRs. Timeline-focused codecs generate roadmaps, milestones, current work, and changelogs. Session-focused codecs generate session context, remaining work, PR changes, and traceability views. Planning codecs generate checklists, session plans, and findings.
+
+    See src/renderable/generate.ts for the complete DOCUMENT_TYPES registry with all codecs, output paths, and descriptions.
+
 ### Progressive Disclosure
 
 **Context:** Large documents are split into main index plus detail files.
@@ -602,67 +376,21 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | standard | Default with all sections |
 | detailed | Maximum detail, all optional sections |
 
+### Codec to Generator Mapping
+
+**Context:** Each codec is exposed via a CLI generator flag.
+
+    **Decision:** The CODEC_MAP and CODEC_FACTORY_MAP in src/renderable/generate.ts define the mapping from generator names to codec instances and factory functions. Generator names match the CLI -g flag values (e.g., -g patterns, -g roadmap).
+
+    See src/renderable/generate.ts for DOCUMENT_TYPES (output paths), CODEC_MAP (default instances), and CODEC_FACTORY_MAP (factory functions for custom options).
+
 ### Status Normalization
 
-```typescript
-/**
- * Normalized status values for display
- *
- * Maps raw FSM states to three presentation buckets:
- * - completed: Work is done
- * - active: Work in progress
- * - planned: Future work (includes roadmap and deferred)
- */
-NORMALIZED_STATUS_VALUES = ['completed', 'active', 'planned'] as const
-```
+**Context:** Source annotations use various status values that must be normalized.
 
-```typescript
-/**
- * Normalized status values for display
- *
- * Maps raw FSM states to three presentation buckets:
- * - completed: Work is done
- * - active: Work in progress
- * - planned: Future work (includes roadmap and deferred)
- */
-type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];
-```
+    **Decision:** All status values are normalized to three canonical display states: completed, active, and planned. The STATUS_NORMALIZATION_MAP in src/taxonomy/normalized-status.ts defines the mapping from raw FSM states to display buckets.
 
-```typescript
-/**
- * Maps raw status values → normalized display status
- *
- * Includes both:
- * Canonical taxonomy values (per PDR-005 FSM)
- */
-const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>>;
-```
-
-```typescript
-/**
- * Normalize any status string to a display bucket
- *
- * Maps status values to three canonical display states:
- * - "completed": completed
- * - "active": active
- * - "planned": roadmap, deferred, planned, or any unknown value
- *
- * Per PDR-005: deferred items are treated as planned (not actively worked on)
- *
- * @param status - Raw status from pattern (case-insensitive)
- * @returns "completed" | "active" | "planned"
- *
- * @example
- * ```typescript
- * normalizeStatus("completed")   // → "completed"
- * normalizeStatus("active")      // → "active"
- * normalizeStatus("roadmap")     // → "planned"
- * normalizeStatus("deferred")    // → "planned"
- * normalizeStatus(undefined)     // → "planned"
- * ```
- */
-function normalizeStatus(status: string | undefined): NormalizedStatus;
-```
+    See src/taxonomy/normalized-status.ts for NORMALIZED_STATUS_VALUES, STATUS_NORMALIZATION_MAP, and the normalizeStatus function.
 
 ### Result Monad Pattern
 
@@ -722,14 +450,3 @@ flowchart TB
         J --> K[renderDocumentWithFiles]
         K --> L[fs.writeFile]
 ```
-
----
-
-<details>
-<summary>Generation Warnings</summary>
-
-- warning: No @libar-docs-extract-shapes tag found in src/renderable/generate.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/renderable/generate.ts
-
-</details>

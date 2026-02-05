@@ -34,24 +34,6 @@
 - `FORMAT_TYPES` - const
 - `FormatType` - type
 
-### Format Types Table
-
-**Context:** Tags have different value formats that determine parsing.
-
-    **Decision:** Six format types are supported:
-
-| Format | Example | Parsing |
-| --- | --- | --- |
-| flag | @docs-core | Boolean presence (no value) |
-| value | @docs-pattern MyPattern | Simple string |
-| enum | @docs-status completed | Constrained to predefined list |
-| csv | @docs-uses A, B, C | Comma-separated values |
-| number | @docs-phase 15 | Numeric value |
-| quoted-value | @docs-brief:'Multi word' | Preserves spaces |
-
-    **Implementation:** The format type is specified in the tag definition
-    within the TagRegistry. The extractor uses the format to parse values.
-
 ### Categories
 
 - `CategoryDefinition` - interface
@@ -59,7 +41,7 @@
 - `CategoryTag` - type
 - `CATEGORY_TAGS` - const
 
-### Status Values
+### Status Values (from status-values)
 
 - `PROCESS_STATUS_VALUES` - const
 - `ProcessStatusValue` - type
@@ -67,46 +49,7 @@
 - `AcceptedStatusValue` - type
 - `DEFAULT_STATUS` - const
 
-### Status FSM
-
-**Context:** Status values control the FSM workflow for pattern lifecycle.
-
-    **Decision:** Four canonical status values are defined (per PDR-005):
-
-| Status | Protection | Description |
-| --- | --- | --- |
-| roadmap | none | Planned work, fully editable |
-| active | scope-locked | In progress, cannot add deliverables |
-| completed | hard-locked | Done, requires unlock-reason to modify |
-| deferred | none | On hold, fully editable |
-
-    **Transitions:**
-
-| From | To | Action |
-| --- | --- | --- |
-| roadmap | active | Start work |
-| roadmap | deferred | Postpone |
-| active | completed | Finish work |
-| active | roadmap | Regress (blocked) |
-| deferred | roadmap | Resume planning |
-
-    **FSM Diagram:**
-
-    """mermaid
-    stateDiagram-v2
-        [*] --> roadmap
-        roadmap --> active : Start work
-        roadmap --> deferred : Postpone
-        active --> completed : Finish
-        active --> roadmap : Regress
-        deferred --> roadmap : Resume
-        completed --> [*]
-
-        note right of completed : Hard-locked
-        note right of active : Scope-locked
-    """
-
-### Normalized Status
+### Normalized Status (from normalized-status)
 
 - `NORMALIZED_STATUS_VALUES` - const
 - `NormalizedStatus` - type
@@ -135,6 +78,7 @@
 - `MetadataTagDefinitionForRegistry` - interface
 - `TagDefinition` - type
 - `buildRegistry` - function
+- `METADATA_TAGS_BY_GROUP` - const
 
 ### Presets
 

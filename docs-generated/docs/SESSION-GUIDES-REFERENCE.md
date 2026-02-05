@@ -31,8 +31,7 @@
 | Design Session | THIS DECISION (Rule: Design Session) | Rule block lists |
 | Implementation Session | THIS DECISION (Rule: Implementation Session) | Rule block lists |
 | Planning + Design Session | THIS DECISION (Rule: Planning + Design Session) | Rule block lists |
-| FSM Protection | src/validation/fsm/states.ts | at-extract-shapes tag |
-| FSM Transitions | src/validation/fsm/transitions.ts | at-extract-shapes tag |
+| FSM Protection | THIS DECISION (Rule: FSM Protection) | Rule block content |
 | Handoff Documentation | THIS DECISION (Rule: Handoff Documentation) | Rule block content |
 | Discovery Tags | THIS DECISION (Rule: Discovery Tags) | Rule block table |
 | Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
@@ -236,162 +235,21 @@ Starting from pattern brief?
 
 ### FSM Protection
 
-```typescript
-/**
- * Protection level mapping per PDR-005
- *
- * | State     | Protection | Meaning                          |
- * |-----------|------------|----------------------------------|
- * | roadmap   | none       | Planning phase, fully editable   |
- * | active    | scope      | In progress, no new deliverables |
- * | completed | hard       | Done, requires unlock to modify  |
- * | deferred  | none       | Parked, fully editable           |
- */
-const PROTECTION_LEVELS: Readonly<Record<ProcessStatusValue, ProtectionLevel>>;
-```
+**Context:** The FSM (Finite State Machine) protects work integrity through state-based restrictions.
 
-```typescript
-/**
- * Protection level types for FSM states
- *
- * - `none`: Fully editable, no restrictions
- * - `scope`: Scope-locked, prevents adding new deliverables
- * - `hard`: Hard-locked, requires explicit unlock-reason annotation
- */
-type ProtectionLevel = 'none' | 'scope' | 'hard';
-```
+    **Decision:** Protection levels and valid transitions are defined in TypeScript source:
+    - Protection levels: See `PROTECTION_LEVELS` in `src/validation/fsm/states.ts`
+    - Valid transitions: See `VALID_TRANSITIONS` in `src/validation/fsm/transitions.ts`
 
-```typescript
-/**
- * Get the protection level for a status
- *
- * @param status - Process status value
- * @returns Protection level for the status
- *
- * @example
- * ```typescript
- * getProtectionLevel("active"); // → "scope"
- * getProtectionLevel("completed"); // → "hard"
- * ```
- */
-function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel;
-```
+    **Valid FSM Transitions (Visual):**
 
-```typescript
-/**
- * Check if a status is a terminal state (cannot transition out)
- *
- * Terminal states require explicit unlock to modify.
- *
- * @param status - Process status value
- * @returns true if the status is terminal
- *
- * @example
- * ```typescript
- * isTerminalState("completed"); // → true
- * isTerminalState("active"); // → false
- * ```
- */
-function isTerminalState(status: ProcessStatusValue): boolean;
-```
-
-```typescript
-/**
- * Check if a status is fully editable (no protection)
- *
- * @param status - Process status value
- * @returns true if the status has no protection
- */
-function isFullyEditable(status: ProcessStatusValue): boolean;
-```
-
-```typescript
-/**
- * Check if a status is scope-locked
- *
- * @param status - Process status value
- * @returns true if the status prevents scope changes
- */
-function isScopeLocked(status: ProcessStatusValue): boolean;
-```
-
-### FSM Transitions
-
-```typescript
-/**
- * Valid FSM transitions matrix
- *
- * Maps each state to the list of states it can transition to.
- *
- * | From      | Valid Targets              | Notes                        |
- * |-----------|----------------------------|------------------------------|
- * | roadmap   | active, deferred, roadmap  | Can start, park, or stay     |
- * | active    | completed, roadmap         | Can finish or regress        |
- * | completed | (none)                     | Terminal state               |
- * | deferred  | roadmap                    | Must go through roadmap      |
- */
-const VALID_TRANSITIONS: Readonly<
-  Record<ProcessStatusValue, readonly ProcessStatusValue[]>
->;
-```
-
-```typescript
-/**
- * Check if a transition between two states is valid
- *
- * @param from - Current status
- * @param to - Target status
- * @returns true if the transition is allowed
- *
- * @example
- * ```typescript
- * isValidTransition("roadmap", "active"); // → true
- * isValidTransition("roadmap", "completed"); // → false (must go through active)
- * isValidTransition("completed", "active"); // → false (terminal state)
- * ```
- */
-function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean;
-```
-
-```typescript
-/**
- * Get all valid transitions from a given state
- *
- * @param status - Current status
- * @returns Array of valid target states (empty for terminal states)
- *
- * @example
- * ```typescript
- * getValidTransitionsFrom("roadmap"); // → ["active", "deferred", "roadmap"]
- * getValidTransitionsFrom("completed"); // → []
- * ```
- */
-function getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[];
-```
-
-```typescript
-/**
- * Get a human-readable description of why a transition is invalid
- *
- * @param from - Current status
- * @param to - Attempted target status
- * @param options - Optional message options with registry for prefix
- * @returns Error message describing the violation
- *
- * @example
- * ```typescript
- * getTransitionErrorMessage("roadmap", "completed");
- * // → "Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first."
- *
- * getTransitionErrorMessage("completed", "active");
- * // → "Cannot transition from 'completed' (terminal state). Use unlock-reason tag to modify."
- * ```
- */
-function getTransitionErrorMessage(
-  from: ProcessStatusValue,
-  to: ProcessStatusValue,
-  options?: TransitionMessageOptions
-): string;
+```text
+roadmap --> active --> completed (terminal)
+        |          |
+        |          v
+        |       roadmap (blocked/regressed)
+        v
+    deferred --> roadmap
 ```
 
 ### Handoff Documentation

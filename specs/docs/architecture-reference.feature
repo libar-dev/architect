@@ -28,19 +28,19 @@ Feature: Architecture Reference - Auto-Generated Documentation
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Design Principles | THIS DECISION (Rule: Design Principles) | Rule block table |
-| Four-Stage Pipeline | THIS DECISION (Rule: Four-Stage Pipeline) | Rule block content + Mermaid |
-| MasterDataset Schema | src/validation-schemas/master-dataset.ts | extract-shapes tag |
-| RenderableDocument | src/renderable/schema.ts | extract-shapes tag |
+| Four-Stage Pipeline | THIS DECISION (Rule: Four-Stage Pipeline) | Rule block content |
+| MasterDataset Schema | THIS DECISION (Rule: MasterDataset Schema) | Rule block content |
+| RenderableDocument Schema | THIS DECISION (Rule: RenderableDocument Schema) | Rule block content |
 | Block Vocabulary | THIS DECISION (Rule: Block Vocabulary) | Rule block table |
 | Codec Factory Pattern | THIS DECISION (Rule: Codec Factory Pattern) | Rule block content |
 | Generator Types | src/generators/types.ts | extract-shapes tag |
 | Transform Function | src/generators/pipeline/transform-dataset.ts | extract-shapes tag |
-| Available Codecs | src/renderable/generate.ts | extract-shapes tag + Rule: Available Codecs |
+| Available Codecs | THIS DECISION (Rule: Available Codecs) | Rule block content |
 | Progressive Disclosure | THIS DECISION (Rule: Progressive Disclosure) | Rule block table |
-| Codec to Generator Mapping | src/renderable/generate.ts | extract-shapes tag + Rule: Codec to Generator Mapping |
-| Status Normalization | src/taxonomy/normalized-status.ts | extract-shapes tag + Rule: Status Normalization |
+| Codec to Generator Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block content |
+| Status Normalization | THIS DECISION (Rule: Status Normalization) | Rule block content |
 | Result Monad Pattern | THIS DECISION (Rule: Result Monad Pattern) | Rule block content |
-| Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block table + Mermaid |
+| Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block content |
 
   Background: Deliverables
     Given the following deliverables:

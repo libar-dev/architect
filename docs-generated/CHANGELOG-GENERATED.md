@@ -14,10 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Lint Process CLI**: :ProcessGuardModule Validates git changes against delivery process rules.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
 - **Process State API**: TypeScript interface for querying delivery process state.
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
+- **Lint Process CLI**: :ProcessGuardModule Validates git changes against delivery process rules.
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -65,6 +65,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Utils Module**: Common helper functions used across the delivery-process package.
 - **Pattern Id Generator**: Generates unique, deterministic pattern IDs based on file path and line number.
 - **Collection Utilities**: Provides shared utilities for working with arrays and collections, such as grouping items by a key function.
+- **Pattern Scanner**: Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in.
+- **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
+- **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
+- **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with...
 - **Status Values**: THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM).
 - **Risk Levels**: Three-tier risk classification for roadmap planning.
 - **Tag Registry Builder**: Constructs a complete TagRegistry from TypeScript constants.
@@ -73,10 +77,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hierarchy Levels**: Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units...
 - **Format Types**: Defines how tag values are parsed and validated.
 - **Category Definitions**: Categories are used to classify patterns and organize documentation.
-- **Pattern Scanner**: Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in.
-- **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
-- **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
-- **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with...
 - **Renderable Utils**: Utility functions for document codecs.
 - **Renderable Document**: Universal intermediate format for all generated documentation.
 - **Universal Renderer**: Converts RenderableDocument to Markdown.
@@ -85,6 +85,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
+- **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
+- **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
+- **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
+- **Source Mapper**: Aggregates content from multiple source files based on source mapping tables parsed from decision documents.
+- **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
+- **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
+- **Content Deduplicator**: Identifies and merges duplicate sections extracted from multiple sources.
+- **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
 - **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
 - **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
 - **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
@@ -102,14 +110,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
 - **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
 - **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
-- **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
-- **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
-- **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
-- **Source Mapper**: Aggregates content from multiple source files based on source mapping tables parsed from decision documents.
-- **Generator Registry**: Manages registration and lookup of document generators (both built-in and custom).
-- **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
-- **Content Deduplicator**: Identifies and merges duplicate sections extracted from multiple sources.
-- **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
 - **Validation Rules Codec**: Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference.
 - **Timeline Codec**: Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)...
 - **Taxonomy Codec**: Transforms MasterDataset into a RenderableDocument for taxonomy reference output.

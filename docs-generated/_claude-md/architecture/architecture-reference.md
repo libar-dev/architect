@@ -45,27 +45,6 @@
         CODEC[CODEC<br/>RenderableDocument<br/>to Markdown]
     """
 
-### MasterDataset Schema
-
-- `MasterDatasetSchema` - const
-- `StatusGroupsSchema` - const
-- `StatusCountsSchema` - const
-- `PhaseGroupSchema` - const
-- `SourceViewsSchema` - const
-- `RelationshipEntrySchema` - const
-- `ArchIndexSchema` - const
-
-### RenderableDocument
-
-- `RenderableDocument` - type
-- `SectionBlock` - type
-- `HeadingBlock` - type
-- `TableBlock` - type
-- `ListBlock` - type
-- `CodeBlock` - type
-- `MermaidBlock` - type
-- `CollapsibleBlock` - type
-
 ### Block Vocabulary
 
 **Context:** RenderableDocument uses a fixed vocabulary of 9 section block types.
@@ -155,13 +134,6 @@
 | summary | Minimal output, key metrics only |
 | standard | Default with all sections |
 | detailed | Maximum detail, all optional sections |
-
-### Status Normalization
-
-- `NORMALIZED_STATUS_VALUES` - const
-- `NormalizedStatus` - type
-- `STATUS_NORMALIZATION_MAP` - const
-- `normalizeStatus` - function
 
 ### Result Monad Pattern
 

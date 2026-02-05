@@ -27,8 +27,8 @@ Feature: Instructions Reference - Auto-Generated Documentation
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | File-Level Opt-In | THIS DECISION (Rule: File-Level Opt-In) | Rule block content |
-| Categories | src/taxonomy/categories.ts | extract-shapes tag |
-| Metadata Tags (Grouped) | src/taxonomy/registry-builder.ts | extract-shapes tag |
+| Category Tags | src/taxonomy/categories.ts | extract-shapes tag |
+| Metadata Tags | src/taxonomy/registry-builder.ts | extract-shapes tag |
 | Format Types | THIS DECISION (Rule: Format Types) | Rule block table |
 | Source Ownership | THIS DECISION (Rule: Source Ownership) | Rule block table |
 | Hierarchy Duration | THIS DECISION (Rule: Hierarchy Duration) | Rule block table |

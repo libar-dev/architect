@@ -32,8 +32,9 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 | Format Types | src/taxonomy/format-types.ts | @extract-shapes tag |
 | Categories | src/taxonomy/categories.ts | @extract-shapes tag |
 | Status Values | src/taxonomy/status-values.ts | @extract-shapes tag |
-| Status FSM | THIS DECISION (Rule: Status Values) | Mermaid diagram |
+| Status Values | THIS DECISION (Rule: Status Values) | Rule block + Mermaid diagram |
 | Normalized Status | src/taxonomy/normalized-status.ts | @extract-shapes tag |
+| Normalized Status | THIS DECISION (Rule: Normalized Status) | Rule block content |
 | Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | @extract-shapes tag |
 | Risk Levels | src/taxonomy/risk-levels.ts | @extract-shapes tag |
 | Layer Types | src/taxonomy/layer-types.ts | @extract-shapes tag |

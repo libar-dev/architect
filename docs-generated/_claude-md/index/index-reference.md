@@ -13,11 +13,10 @@
 
 | Field | Value |
 | --- | --- |
-| Package | at-libar-dev/delivery-process |
+| Package | @libar-dev/delivery-process |
 | Version | 0.1.0-pre.0 |
-| Purpose | Source-first delivery process - code is the single source of truth |
-| Key Features | Living docs, FSM enforcement, AI-native ProcessStateAPI |
-| Node.js | greater-than-or-equal 18.0.0 |
+| Purpose | Turn TypeScript annotations and Gherkin specs into living docs, architecture graphs, and AI-queryable delivery state |
+| Node.js | >=18.0.0 |
 | License | MIT |
 
 ### Quick Navigation

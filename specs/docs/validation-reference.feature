@@ -32,8 +32,7 @@ Feature: Validation Reference - Auto-Generated Documentation
 | Command Summary | THIS DECISION (Rule: Command Summary) | Rule block table |
 | lint-patterns Rules | src/lint/rules.ts | @extract-shapes tag |
 | Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
-| Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
-| DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
+| DoD Validation | src/validation/dod-validator.ts, src/validation/types.ts | @extract-shapes tag |
 | validate-patterns Flags | src/cli/validate-patterns.ts | @extract-shapes tag |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |

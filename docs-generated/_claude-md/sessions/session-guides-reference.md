@@ -202,19 +202,22 @@
 
 ### FSM Protection
 
-- `PROTECTION_LEVELS` - const
-- `ProtectionLevel` - type
-- `getProtectionLevel` - function
-- `isTerminalState` - function
-- `isFullyEditable` - function
-- `isScopeLocked` - function
+**Context:** The FSM (Finite State Machine) protects work integrity through state-based restrictions.
 
-### FSM Transitions
+    **Decision:** Protection levels and valid transitions are defined in TypeScript source:
+    - Protection levels: See `PROTECTION_LEVELS` in `src/validation/fsm/states.ts`
+    - Valid transitions: See `VALID_TRANSITIONS` in `src/validation/fsm/transitions.ts`
 
-- `VALID_TRANSITIONS` - const
-- `isValidTransition` - function
-- `getValidTransitionsFrom` - function
-- `getTransitionErrorMessage` - function
+    **Valid FSM Transitions (Visual):**
+
+    """
+    roadmap --> active --> completed (terminal)
+        |          |
+        |          v
+        |       roadmap (blocked/regressed)
+        v
+    deferred --> roadmap
+    """
 
 ### Handoff Documentation
 

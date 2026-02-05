@@ -8,6 +8,7 @@
 @libar-docs-completed:2026-01-29
 @libar-docs-product-area:Validation
 @libar-docs-claude-md-section:validation
+@libar-docs-unlock-reason:Fix-Source-Mapping-self-references-for-doc-generation
 Feature: ADR-006 - Process Guard Validation System
 
   **Context:**
@@ -46,9 +47,9 @@ Feature: ADR-006 - Process Guard Validation System
   **Source Mapping:**
 
   | Section | Source File | Extraction Method |
-  | Context | THIS DECISION (Rule: Context above) | Decision rule description |
-  | How It Works | THIS DECISION (Rule: Decision above) | Decision rule description |
-  | Trade-offs | THIS DECISION (Rule: Consequences above) | Decision rule description |
+  | Context | THIS DECISION (Rule: Context - Why Process Guard Exists) | Decision rule description |
+  | How It Works | THIS DECISION (Rule: Decision - How Process Guard Works) | Decision rule description |
+  | Trade-offs | THIS DECISION (Rule: Consequences - Trade-offs of This Approach) | Decision rule description |
   | Validation Rules | tests/features/validation/process-guard.feature | Rule blocks |
   | Protection Levels | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
   | Valid Transitions | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |

@@ -28,11 +28,11 @@
 | --- | --- | --- |
 | Concept | THIS DECISION (Rule: Concept) | Rule block content |
 | Format Types | src/taxonomy/format-types.ts | @extract-shapes tag |
-| Format Types Table | THIS DECISION (Rule: Format Types) | Rule block table |
 | Categories | src/taxonomy/categories.ts | @extract-shapes tag |
 | Status Values | src/taxonomy/status-values.ts | @extract-shapes tag |
-| Status FSM | THIS DECISION (Rule: Status Values) | Rule block table |
+| Status Values | THIS DECISION (Rule: Status Values) | Rule block + Mermaid diagram |
 | Normalized Status | src/taxonomy/normalized-status.ts | @extract-shapes tag |
+| Normalized Status | THIS DECISION (Rule: Normalized Status) | Rule block content |
 | Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | @extract-shapes tag |
 | Risk Levels | src/taxonomy/risk-levels.ts | @extract-shapes tag |
 | Layer Types | src/taxonomy/layer-types.ts | @extract-shapes tag |
@@ -96,24 +96,6 @@ FORMAT_TYPES = [
 type FormatType = (typeof FORMAT_TYPES)[number];
 ```
 
-### Format Types Table
-
-**Context:** Tags have different value formats that determine parsing.
-
-    **Decision:** Six format types are supported:
-
-| Format | Example | Parsing |
-| --- | --- | --- |
-| flag | @docs-core | Boolean presence (no value) |
-| value | @docs-pattern MyPattern | Simple string |
-| enum | @docs-status completed | Constrained to predefined list |
-| csv | @docs-uses A, B, C | Comma-separated values |
-| number | @docs-phase 15 | Numeric value |
-| quoted-value | @docs-brief:'Multi word' | Preserves spaces |
-
-    **Implementation:** The format type is specified in the tag definition
-    within the TagRegistry. The extractor uses the format to parse values.
-
 ### Categories
 
 ```typescript
@@ -131,10 +113,15 @@ type FormatType = (typeof FORMAT_TYPES)[number];
  * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
  */
 interface CategoryDefinition {
+  /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */
   readonly tag: string;
+  /** Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") */
   readonly domain: string;
+  /** Display order priority - lower values appear first in sorted output */
   readonly priority: number;
+  /** Brief description of the category's purpose and typical patterns */
   readonly description: string;
+  /** Alternative tag names that map to this category (e.g., "es" for "event-sourcing") */
   readonly aliases: readonly string[];
 }
 ```
@@ -160,7 +147,7 @@ type CategoryTag = (typeof CATEGORIES)[number]['tag'];
 CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
 ```
 
-### Status Values
+### Status Values (from status-values)
 
 ```typescript
 /**
@@ -219,28 +206,13 @@ type AcceptedStatusValue = (typeof ACCEPTED_STATUS_VALUES)[number];
 const DEFAULT_STATUS: ProcessStatusValue;
 ```
 
-### Status FSM
+### Status Values (from this decision (rule: status values))
 
 **Context:** Status values control the FSM workflow for pattern lifecycle.
 
-    **Decision:** Four canonical status values are defined (per PDR-005):
-
-| Status | Protection | Description |
-| --- | --- | --- |
-| roadmap | none | Planned work, fully editable |
-| active | scope-locked | In progress, cannot add deliverables |
-| completed | hard-locked | Done, requires unlock-reason to modify |
-| deferred | none | On hold, fully editable |
-
-    **Transitions:**
-
-| From | To | Action |
-| --- | --- | --- |
-| roadmap | active | Start work |
-| roadmap | deferred | Postpone |
-| active | completed | Finish work |
-| active | roadmap | Regress (blocked) |
-| deferred | roadmap | Resume planning |
+    **Decision:** Four canonical status values are defined (per PDR-005).
+    See `src/taxonomy/status-values.ts` for the `PROCESS_STATUS_VALUES` array
+    with inline documentation on FSM transitions and protection levels.
 
     **FSM Diagram:**
 
@@ -258,7 +230,7 @@ stateDiagram-v2
         note right of active : Scope-locked
 ```
 
-### Normalized Status
+### Normalized Status (from normalized-status)
 
 ```typescript
 /**
@@ -319,6 +291,17 @@ const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>>;
  */
 function normalizeStatus(status: string | undefined): NormalizedStatus;
 ```
+
+### Normalized Status (from this decision (rule: normalized status))
+
+**Context:** Display requires mapping 4 FSM states to 3 presentation buckets.
+
+    **Decision:** Raw status values normalize to display status.
+    See `src/taxonomy/normalized-status.ts` for the `STATUS_NORMALIZATION_MAP`
+    and `normalizeStatus()` function with complete mapping logic.
+
+    **Rationale:** This separation follows DDD principles - the domain model
+    (raw FSM states) is distinct from the view model (normalized display).
 
 ### Hierarchy Levels
 
@@ -438,25 +421,40 @@ type LayerType = (typeof LAYER_TYPES)[number];
  * TagRegistry interface (matches schema from validation-schemas/tag-registry.ts)
  */
 interface TagRegistry {
+  /** Schema version for forward/backward compatibility checking */
   version: string;
+  /** Category definitions for classifying patterns by domain (e.g., core, api, ddd) */
   categories: readonly CategoryDefinitionForRegistry[];
+  /** Metadata tag definitions with format, purpose, and validation rules */
   metadataTags: readonly MetadataTagDefinitionForRegistry[];
+  /** Aggregation tag definitions for document-level grouping */
   aggregationTags: readonly AggregationTagDefinitionForRegistry[];
+  /** Available format options for documentation output */
   formatOptions: readonly string[];
+  /** Prefix for all tags (e.g., "@libar-docs-") */
   tagPrefix: string;
+  /** File-level opt-in marker tag (e.g., "@libar-docs") */
   fileOptInTag: string;
 }
 ```
 
 ```typescript
 interface MetadataTagDefinitionForRegistry {
+  /** Tag name without prefix (e.g., "pattern", "status", "phase") */
   tag: string;
+  /** Value format type determining parsing rules (flag, value, enum, csv, number, quoted-value) */
   format: FormatType;
+  /** Human-readable description of the tag's purpose and usage */
   purpose: string;
+  /** Whether this tag must be present for valid patterns */
   required?: boolean;
+  /** Whether this tag can appear multiple times on a single pattern */
   repeatable?: boolean;
+  /** Valid values for enum-type tags (undefined for non-enum formats) */
   values?: readonly string[];
+  /** Default value applied when tag is not specified */
   default?: string;
+  /** Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") */
   example?: string;
 }
 ```
@@ -473,6 +471,63 @@ type TagDefinition = MetadataTagDefinitionForRegistry;
  * All consumers should use this function instead of loading JSON.
  */
 function buildRegistry(): TagRegistry;
+```
+
+```typescript
+/**
+ * Metadata tags organized by functional group.
+ * Used for documentation generation to create organized sections.
+ *
+ * Groups:
+ * - core: Essential pattern identification (pattern, status, core, usecase, brief)
+ * - relationship: Pattern dependencies and connections
+ * - process: Timeline and assignment tracking
+ * - prd: Product requirements documentation
+ * - adr: Architecture decision records
+ * - hierarchy: Epic/phase/task breakdown
+ * - traceability: Two-tier spec architecture links
+ * - architecture: Diagram generation tags
+ * - extraction: Documentation extraction control
+ */
+METADATA_TAGS_BY_GROUP = {
+  core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
+  relationship: [
+    'uses',
+    'used-by',
+    'implements',
+    'extends',
+    'depends-on',
+    'enables',
+    'see-also',
+    'api-ref',
+  ] as const,
+  process: [
+    'phase',
+    'release',
+    'quarter',
+    'completed',
+    'effort',
+    'effort-actual',
+    'team',
+    'workflow',
+    'risk',
+    'priority',
+  ] as const,
+  prd: ['product-area', 'user-role', 'business-value', 'constraint'] as const,
+  adr: [
+    'adr',
+    'adr-status',
+    'adr-category',
+    'adr-supersedes',
+    'adr-superseded-by',
+    'adr-theme',
+    'adr-layer',
+  ] as const,
+  hierarchy: ['level', 'parent'] as const,
+  traceability: ['executable-specs', 'roadmap-spec'] as const,
+  architecture: ['arch-role', 'arch-context', 'arch-layer'] as const,
+  extraction: ['extract-shapes'] as const,
+} as const
 ```
 
 ### Presets

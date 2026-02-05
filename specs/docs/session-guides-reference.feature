@@ -32,8 +32,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 | Design Session | THIS DECISION (Rule: Design Session) | Rule block lists |
 | Implementation Session | THIS DECISION (Rule: Implementation Session) | Rule block lists |
 | Planning + Design Session | THIS DECISION (Rule: Planning + Design Session) | Rule block lists |
-| FSM Protection | src/validation/fsm/states.ts | at-extract-shapes tag |
-| FSM Transitions | src/validation/fsm/transitions.ts | at-extract-shapes tag |
+| FSM Protection | THIS DECISION (Rule: FSM Protection) | Rule block content |
 | Handoff Documentation | THIS DECISION (Rule: Handoff Documentation) | Rule block content |
 | Discovery Tags | THIS DECISION (Rule: Discovery Tags) | Rule block table |
 | Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |

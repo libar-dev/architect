@@ -684,6 +684,91 @@ interface CLIConfig {
 
 ---
 
+### Pattern 11: ADR vs Documentation Recipe
+
+**Problem:** Two document types both use Source Mapping tables but serve different purposes.
+
+**Document Types:**
+
+| Type | Purpose | Location | Script |
+|------|---------|----------|--------|
+| ADR/PDR | Record decisions (WHY) | `delivery-process/decisions/` | `docs:decisions` |
+| Recipe | Configure generation (HOW) | `specs/docs/` | `docs:technical` |
+
+**When to Use Each:**
+
+- **ADR:** When documenting WHY a decision was made (Context/Decision/Consequences structure)
+- **Recipe:** When ONLY configuring doc generation (Source Mapping + minimal Rule: blocks)
+
+**Anti-pattern:** Having BOTH an ADR AND a Recipe that duplicate content. Choose one:
+- If the ADR has good Context/Decision/Consequences → use ADR, add Source Mapping
+- If you only need to aggregate TypeScript extractions → use Recipe
+
+---
+
+## Directory Structure
+
+| Directory | Purpose | Package.json Script |
+|-----------|---------|---------------------|
+| `specs/docs/` | Doc generation recipes with Source Mapping | `docs:technical` |
+| `delivery-process/decisions/` | ADR/PDR decision documents | `docs:decisions` |
+| `delivery-process/specs/` | Tier 1 roadmap specifications | `docs:patterns`, `docs:roadmap` |
+
+**Note:** `specs/docs/` is at project root (not inside `delivery-process/`) because these are recipes FOR generating documentation, not part of the delivery process itself.
+
+---
+
+## Agent Deployment for Fixing Generated Docs
+
+### Pre-Flight Checklist
+
+Before fixing a document:
+
+1. [ ] Identify the feature file (recipe in `specs/docs/` or ADR in `delivery-process/decisions/`)
+2. [ ] Check Source Mapping table exists
+3. [ ] Verify Source Mapping section names match Rule: block names **EXACTLY**
+4. [ ] Verify all TypeScript files have `@libar-docs-extract-shapes`
+
+### Debugging Empty Output
+
+When generated docs are empty or have "No structured content":
+
+1. **Check self-reference matching:**
+   - Source Mapping: `THIS DECISION (Rule: X)`
+   - Must match: `Rule: X` block name exactly (case-sensitive)
+   - Example: `Rule: Context above` does NOT match `Rule: Context - Why X Exists`
+
+2. **Check external file paths:**
+   - Paths relative to project root
+   - Files must exist
+   - TypeScript files need `@libar-docs-extract-shapes`
+
+3. **Run with output inspection:**
+   ```bash
+   npx tsx scripts/generate-docs-auto.ts [pattern] 2>&1 | head -100
+   ```
+
+### Success Criteria
+
+| Document Type | Expected Lines | Key Content |
+|---------------|----------------|-------------|
+| TypeScript-heavy (PROCESS-GUARD-REFERENCE) | 400-500 | Code blocks with actual types |
+| Conceptual (METHODOLOGY-REFERENCE) | 300-400 | Prose in Rule: blocks |
+| Compact (_claude-md/) | 50-150 | Tables only, no code blocks |
+
+### Systematic Fix Process
+
+For each document to fix:
+
+1. **Read the feature file** (recipe or ADR)
+2. **Check Source Mapping table:**
+   - Do section names match Rule: block names exactly?
+   - Do external TypeScript files have `@libar-docs-extract-shapes`?
+3. **Fix mismatches** following Pattern 4 (Section Names Must Match)
+4. **Regenerate and verify** line count meets expectations
+
+---
+
 ## Inherently Manual Docs (No Changes Needed)
 
 These docs describe concepts/practices, not code:
