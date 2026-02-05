@@ -30,7 +30,7 @@
 import { heading, paragraph, code, list, separator, collapsible, document as createDocument, } from '../../renderable/schema.js';
 import { renderToMarkdown } from '../../renderable/render.js';
 import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
-import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
+import { parseDescriptionWithDocStrings, renderPropertyDocsTable, } from '../../renderable/codecs/helpers.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
 import { createWarningCollector, } from '../warning-collector.js';
@@ -211,6 +211,11 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
                     // Include JSDoc as part of the code block (combined with source)
                     const fullSource = shape.jsDoc ? `${shape.jsDoc}\n${shape.sourceText}` : shape.sourceText;
                     sections.push(code(fullSource, 'typescript'));
+                    // Add property description table for interfaces with documented properties
+                    const propertyTable = renderPropertyDocsTable(shape.propertyDocs);
+                    if (propertyTable) {
+                        sections.push(paragraph(propertyTable));
+                    }
                 }
             }
             else if (extracted.docStrings && extracted.docStrings.length > 0) {

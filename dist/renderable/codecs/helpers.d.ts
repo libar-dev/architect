@@ -32,7 +32,7 @@
  */
 import type { ScenarioDataTable, ScenarioStep, ScenarioRef } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
-import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
+import type { ExtractedShape, PropertyDoc } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock } from '../schema.js';
 export type { BusinessRule };
 /**
@@ -463,4 +463,22 @@ export interface RenderShapesOptions {
  * @returns Markdown string with fenced code blocks
  */
 export declare function renderShapesAsMarkdown(shapes: readonly ExtractedShape[], options?: RenderShapesOptions): string;
+/**
+ * Render property documentation as a markdown table.
+ *
+ * Generates a two-column table with property names and their JSDoc descriptions.
+ * Returns empty string if no property docs exist.
+ *
+ * @param propertyDocs - Property documentation array from ExtractedShape
+ * @returns Markdown table string, or empty string if no docs
+ *
+ * @example
+ * ```typescript
+ * const table = renderPropertyDocsTable(shape.propertyDocs);
+ * if (table) {
+ *   sections.push(md(table));
+ * }
+ * ```
+ */
+export declare function renderPropertyDocsTable(propertyDocs: readonly PropertyDoc[] | undefined): string;
 //# sourceMappingURL=helpers.d.ts.map

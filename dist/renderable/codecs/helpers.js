@@ -708,4 +708,33 @@ export function renderShapesAsMarkdown(shapes, options = {}) {
     }
     return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
 }
+/**
+ * Render property documentation as a markdown table.
+ *
+ * Generates a two-column table with property names and their JSDoc descriptions.
+ * Returns empty string if no property docs exist.
+ *
+ * @param propertyDocs - Property documentation array from ExtractedShape
+ * @returns Markdown table string, or empty string if no docs
+ *
+ * @example
+ * ```typescript
+ * const table = renderPropertyDocsTable(shape.propertyDocs);
+ * if (table) {
+ *   sections.push(md(table));
+ * }
+ * ```
+ */
+export function renderPropertyDocsTable(propertyDocs) {
+    if (!propertyDocs || propertyDocs.length === 0) {
+        return '';
+    }
+    const lines = ['| Property | Description |', '| --- | --- |'];
+    for (const prop of propertyDocs) {
+        // Escape pipe characters in description to prevent table breakage
+        const escapedDesc = prop.jsDoc.replace(/\|/g, '\\|');
+        lines.push(`| \`${prop.name}\` | ${escapedDesc} |`);
+    }
+    return lines.join('\n');
+}
 //# sourceMappingURL=helpers.js.map
