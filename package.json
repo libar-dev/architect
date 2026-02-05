@@ -203,5 +203,10 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@libar-dev/modular-claude-md"
+    ]
   }
 }
