@@ -37,7 +37,7 @@
  */
 import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
-import { partitionRulesByPrefix } from './helpers.js';
+import { partitionRulesByPrefix, parseDescriptionWithDocStrings, } from './helpers.js';
 import { heading, paragraph, separator, table, collapsible, linkOut, document, } from '../schema.js';
 import { getDisplayName } from '../utils.js';
 import { groupBy } from '../../utils/index.js';
@@ -448,7 +448,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
         sections.push(heading(headingLevel, 'Context'));
         for (const rule of partitioned.context) {
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }
@@ -457,7 +457,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
         sections.push(heading(headingLevel, 'Decision'));
         for (const rule of partitioned.decision) {
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }
@@ -466,7 +466,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
         sections.push(heading(headingLevel, 'Consequences'));
         for (const rule of partitioned.consequences) {
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }

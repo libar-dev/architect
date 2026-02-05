@@ -30,6 +30,7 @@
 import { heading, paragraph, code, list, separator, collapsible, document as createDocument, } from '../../renderable/schema.js';
 import { renderToMarkdown } from '../../renderable/render.js';
 import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
+import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
 import { createWarningCollector, } from '../warning-collector.js';
@@ -174,7 +175,7 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         for (const rule of decisionContent.rules.context) {
             sections.push(heading(3, rule.name.replace(/^Context\s*[-:]\s*/i, '')));
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }
@@ -184,7 +185,7 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         for (const rule of decisionContent.rules.decision) {
             sections.push(heading(3, rule.name.replace(/^Decision\s*[-:]\s*/i, '')));
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }
@@ -216,8 +217,8 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
                 }
             }
             else {
-                // Plain content
-                sections.push(paragraph(extracted.content));
+                // Plain content - convert DocStrings to code fences
+                sections.push(...parseDescriptionWithDocStrings(extracted.content));
             }
         }
     }
@@ -227,7 +228,7 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         for (const rule of decisionContent.rules.consequences) {
             sections.push(heading(3, rule.name.replace(/^Consequence[s]?\s*[-:]\s*/i, '')));
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }
@@ -236,7 +237,7 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         for (const rule of decisionContent.rules.other) {
             sections.push(heading(2, rule.name));
             if (rule.description) {
-                sections.push(paragraph(rule.description));
+                sections.push(...parseDescriptionWithDocStrings(rule.description));
             }
         }
     }

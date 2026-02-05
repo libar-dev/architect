@@ -46,6 +46,7 @@ import {
   parseDecisionDocument,
   type DecisionDocContent,
 } from '../../renderable/codecs/decision-doc.js';
+import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
 import {
   executeSourceMapping,
   type SourceMapperOptions,
@@ -277,7 +278,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.context) {
       sections.push(heading(3, rule.name.replace(/^Context\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -288,7 +289,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.decision) {
       sections.push(heading(3, rule.name.replace(/^Decision\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -322,8 +323,8 @@ export function generateDetailedOutput(
           }
         }
       } else {
-        // Plain content
-        sections.push(paragraph(extracted.content));
+        // Plain content - convert DocStrings to code fences
+        sections.push(...parseDescriptionWithDocStrings(extracted.content));
       }
     }
   }
@@ -334,7 +335,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.consequences) {
       sections.push(heading(3, rule.name.replace(/^Consequence[s]?\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
@@ -344,7 +345,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.other) {
       sections.push(heading(2, rule.name));
       if (rule.description) {
-        sections.push(paragraph(rule.description));
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
       }
     }
   }
