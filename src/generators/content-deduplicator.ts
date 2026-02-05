@@ -4,6 +4,8 @@
  * @libar-docs-pattern ContentDeduplicator
  * @libar-docs-status completed
  * @libar-docs-phase 28
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer infrastructure
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
  *

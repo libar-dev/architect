@@ -27,6 +27,7 @@ Feature: Index Reference - Auto-Generated Documentation
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Package Metadata | THIS DECISION (Rule: Package Metadata) | Rule block table |
+| Quick Start Paths | THIS DECISION (Rule: Quick Start Paths) | Rule block table |
 | Quick Navigation | THIS DECISION (Rule: Quick Navigation) | Rule block table |
 | Reading Order for New Users | THIS DECISION (Rule: Reading Order for New Users) | Rule block table |
 | Reading Order for Developers | THIS DECISION (Rule: Reading Order for Developers) | Rule block table |
@@ -54,6 +55,19 @@ Feature: Index Reference - Auto-Generated Documentation
 | Purpose | Turn TypeScript annotations and Gherkin specs into living docs, architecture graphs, and AI-queryable delivery state |
 | Node.js | >=18.0.0 |
 | License | MIT |
+
+  Rule: Quick Start Paths
+
+    **Context:** Common tasks with recommended documentation paths.
+
+| Task | Start Here | Then Read |
+| --- | --- | --- |
+| Set up pre-commit hooks | PROCESS-GUARD.md | CONFIGURATION.md |
+| Add annotations to TypeScript | INSTRUCTIONS.md | GHERKIN-PATTERNS.md |
+| Run AI-assisted implementation | SESSION-GUIDES.md | PROCESS-GUARD.md |
+| Generate documentation | CONFIGURATION.md | ARCHITECTURE.md |
+| Validate before PR | VALIDATION.md | PROCESS-GUARD.md |
+| Understand the system | METHODOLOGY.md | ARCHITECTURE.md |
 
   Rule: Quick Navigation
 

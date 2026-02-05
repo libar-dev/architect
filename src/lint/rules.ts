@@ -3,6 +3,8 @@
  * @libar-docs-lint
  * @libar-docs-pattern LintRules
  * @libar-docs-status completed
+ * @libar-docs-arch-context lint
+ * @libar-docs-arch-layer application
  * @libar-docs-implements PatternRelationshipModel
  * @libar-docs-used-by LintEngine
  * @libar-docs-extract-shapes LintRule, LintContext, defaultRules, severityOrder, filterRulesBySeverity, missingPatternName, missingStatus, invalidStatus, missingWhenToUse, tautologicalDescription, missingRelationships, patternConflictInImplements, missingRelationshipTarget

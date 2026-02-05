@@ -3,6 +3,8 @@
  * @libar-docs-core
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
+ * @libar-docs-arch-context taxonomy
+ * @libar-docs-arch-layer domain
  * @libar-docs-implements TypeScriptTaxonomyImplementation
  * @libar-docs-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry, METADATA_TAGS_BY_GROUP
  *

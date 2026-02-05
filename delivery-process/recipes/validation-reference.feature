@@ -37,6 +37,7 @@ Feature: Validation Reference - Auto-Generated Documentation
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
 | Programmatic API | THIS DECISION (Rule: Programmatic API) | Fenced code block |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
     Given the following deliverables:
@@ -228,6 +229,17 @@ Feature: Validation Reference - Auto-Generated Documentation
       process.exit(1);
     }
     """
+
+  Rule: Related Documentation
+
+    **Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| PROCESS-GUARD-REFERENCE.md | Sibling | FSM workflow enforcement, pre-commit hooks |
+| CONFIGURATION-REFERENCE.md | Reference | Tag prefixes, presets |
+| TAXONOMY-REFERENCE.md | Reference | Valid status values, tag formats |
+| INSTRUCTIONS-REFERENCE.md | Reference | Complete annotation reference |
 
   @acceptance-criteria
   Scenario: Reference generates Validation documentation

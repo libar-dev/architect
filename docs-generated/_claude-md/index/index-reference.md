@@ -19,6 +19,19 @@
 | Node.js | >=18.0.0 |
 | License | MIT |
 
+### Quick Start Paths
+
+**Context:** Common tasks with recommended documentation paths.
+
+| Task | Start Here | Then Read |
+| --- | --- | --- |
+| Set up pre-commit hooks | PROCESS-GUARD.md | CONFIGURATION.md |
+| Add annotations to TypeScript | INSTRUCTIONS.md | GHERKIN-PATTERNS.md |
+| Run AI-assisted implementation | SESSION-GUIDES.md | PROCESS-GUARD.md |
+| Generate documentation | CONFIGURATION.md | ARCHITECTURE.md |
+| Validate before PR | VALIDATION.md | PROCESS-GUARD.md |
+| Understand the system | METHODOLOGY.md | ARCHITECTURE.md |
+
 ### Quick Navigation
 
 **Context:** Direct links to documentation by task.

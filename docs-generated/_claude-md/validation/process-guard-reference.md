@@ -108,3 +108,14 @@ Process Guard can be used programmatically for custom integrations.
 | Results | hasErrors(result) | Check for blocking errors |
 | Results | hasWarnings(result) | Check for warnings |
 | Results | summarizeResult(result) | Human-readable summary |
+
+### Related Documentation
+
+**Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| VALIDATION-REFERENCE.md | Sibling | DoD validation, anti-pattern detection |
+| SESSION-GUIDES-REFERENCE.md | Prerequisite | Planning/Implementation workflows that Process Guard enforces |
+| CONFIGURATION-REFERENCE.md | Reference | Presets and tag configuration |
+| METHODOLOGY-REFERENCE.md | Background | Code-first documentation philosophy |

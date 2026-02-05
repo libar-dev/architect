@@ -36,6 +36,7 @@
 | CLI Usage | THIS DECISION (Rule: CLI Usage) | Rule block content |
 | Programmatic API | THIS DECISION (Rule: Programmatic API) | Rule block content |
 | Architecture | THIS DECISION (Rule: Architecture) | Rule block content |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
 ---
 
@@ -516,3 +517,14 @@ flowchart LR
 ```
 
 **Principle:** State is derived from file annotations - there is no separate state file to maintain.
+
+### Related Documentation
+
+**Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| VALIDATION-REFERENCE.md | Sibling | DoD validation, anti-pattern detection |
+| SESSION-GUIDES-REFERENCE.md | Prerequisite | Planning/Implementation workflows that Process Guard enforces |
+| CONFIGURATION-REFERENCE.md | Reference | Presets and tag configuration |
+| METHODOLOGY-REFERENCE.md | Background | Code-first documentation philosophy |

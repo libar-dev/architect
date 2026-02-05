@@ -3,6 +3,8 @@
  * @libar-docs-core
  * @libar-docs-pattern PatternsCodec
  * @libar-docs-status completed
+ * @libar-docs-arch-context renderer
+ * @libar-docs-arch-layer application
  * @libar-docs-implements PatternRelationshipModel
  *
  * ## Patterns Document Codec

@@ -3,6 +3,8 @@
  * @libar-docs-core
  * @libar-docs-pattern DecisionDocCodec
  * @libar-docs-status completed
+ * @libar-docs-arch-context renderer
+ * @libar-docs-arch-layer application
  *
  * ## Decision Doc Codec
  *
