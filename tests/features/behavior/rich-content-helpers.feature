@@ -117,3 +117,35 @@ Feature: Rich Content Rendering Helpers
       When rendering the business rule
       Then the description is parsed for DocStrings
       And code blocks are rendered from embedded DocStrings
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DocString Dedentation
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  Rule: DocString content is dedented when parsed
+
+    Scenario: Code block preserves internal relative indentation
+      Given a description with DocString containing nested code
+      When parsing for DocStrings
+      Then the code block has correct nested indentation
+
+    Scenario: Empty lines in code block are preserved
+      Given a description with DocString containing empty lines:
+        """
+        line1
+
+        line2
+        """
+      When parsing for DocStrings
+      Then the code block contains 3 lines
+      And line 2 of the code block is empty
+
+    Scenario: Trailing whitespace is trimmed from each line
+      Given a description with DocString where lines have trailing spaces
+      When parsing for DocStrings
+      Then no line in the code block ends with whitespace
+
+    Scenario: Code with mixed indentation is preserved
+      Given a description with DocString containing mixed indent code
+      When parsing for DocStrings
+      Then the code block preserves the indentation structure

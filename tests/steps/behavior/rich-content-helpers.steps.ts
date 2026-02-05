@@ -511,4 +511,140 @@ describeFeature(feature, ({ Rule, AfterEachScenario }) => {
       });
     });
   });
+
+  // ===========================================================================
+  // Rule: DocString content is dedented when parsed
+  // ===========================================================================
+
+  Rule('DocString content is dedented when parsed', ({ RuleScenario }) => {
+    RuleScenario('Code block preserves internal relative indentation', ({ Given, When, Then }) => {
+      Given('a description with DocString containing nested code', () => {
+        state = initState();
+        // Realistic DocString with nested indentation (like actual code)
+        // The dedent function trims trailing whitespace from each line
+        state.description = [
+          'Some intro.',
+          '',
+          '"""typescript',
+          'function foo() {',
+          '  return 42;', // 2-space relative indent
+          '}',
+          '"""',
+          '',
+          'More text.',
+        ].join('\n');
+      });
+
+      When('parsing for DocStrings', () => {
+        state!.result = parseDescriptionWithDocStrings(state!.description);
+      });
+
+      Then('the code block has correct nested indentation', () => {
+        const codeBlock = state!.result.find((b) => b.type === 'code');
+        expect(codeBlock).toBeDefined();
+        // Type assertion safe: find() with type check guarantees CodeBlock
+        const content = (codeBlock as { type: 'code'; content: string }).content;
+        const lines = content.split('\n');
+        // First line: no indent
+        expect(lines[0]).toBe('function foo() {');
+        // Second line: 2-space indent preserved
+        expect(lines[1]).toBe('  return 42;');
+        // Third line: no indent
+        expect(lines[2]).toBe('}');
+      });
+    });
+
+    RuleScenario('Empty lines in code block are preserved', ({ Given, When, Then, And }) => {
+      Given(
+        'a description with DocString containing empty lines:',
+        (_ctx: unknown, docString: string) => {
+          state = initState();
+          // Create description with the DocString containing empty lines
+          state.description = `Intro.\n\n"""text\n${docString}\n"""\n\nOutro.`;
+        }
+      );
+
+      When('parsing for DocStrings', () => {
+        state!.result = parseDescriptionWithDocStrings(state!.description);
+      });
+
+      Then('the code block contains {int} lines', (_ctx: unknown, lineCount: number) => {
+        const codeBlock = state!.result.find((b) => b.type === 'code');
+        expect(codeBlock).toBeDefined();
+        // Type assertion safe: find() with type check guarantees CodeBlock
+        const content = (codeBlock as { type: 'code'; content: string }).content;
+        const lines = content.split('\n');
+        expect(lines.length).toBe(lineCount);
+      });
+
+      And('line {int} of the code block is empty', (_ctx: unknown, lineNum: number) => {
+        const codeBlock = state!.result.find((b) => b.type === 'code');
+        expect(codeBlock).toBeDefined();
+        // Type assertion safe: find() with type check guarantees CodeBlock
+        const content = (codeBlock as { type: 'code'; content: string }).content;
+        const lines = content.split('\n');
+        expect(lines[lineNum - 1]).toBe('');
+      });
+    });
+
+    RuleScenario('Trailing whitespace is trimmed from each line', ({ Given, When, Then }) => {
+      Given('a description with DocString where lines have trailing spaces', () => {
+        state = initState();
+        // Create content with trailing spaces that should be trimmed
+        state.description =
+          'Intro.\n\n"""typescript\nconst x = 1;   \nconst y = 2;  \n"""\n\nOutro.';
+      });
+
+      When('parsing for DocStrings', () => {
+        state!.result = parseDescriptionWithDocStrings(state!.description);
+      });
+
+      Then('no line in the code block ends with whitespace', () => {
+        const codeBlock = state!.result.find((b) => b.type === 'code');
+        expect(codeBlock).toBeDefined();
+        // Type assertion safe: find() with type check guarantees CodeBlock
+        const content = (codeBlock as { type: 'code'; content: string }).content;
+        const lines = content.split('\n');
+        for (const line of lines) {
+          expect(line).toBe(line.trimEnd());
+        }
+      });
+    });
+
+    RuleScenario('Code with mixed indentation is preserved', ({ Given, When, Then }) => {
+      Given('a description with DocString containing mixed indent code', () => {
+        state = initState();
+        // Code with varying indentation levels
+        state.description = [
+          'Intro.',
+          '',
+          '"""typescript',
+          'if (condition) {',
+          '  doSomething();',
+          '  if (nested) {',
+          '    deeplyNested();',
+          '  }',
+          '}',
+          '"""',
+          '',
+          'Outro.',
+        ].join('\n');
+      });
+
+      When('parsing for DocStrings', () => {
+        state!.result = parseDescriptionWithDocStrings(state!.description);
+      });
+
+      Then('the code block preserves the indentation structure', () => {
+        const codeBlock = state!.result.find((b) => b.type === 'code');
+        expect(codeBlock).toBeDefined();
+        // Type assertion safe: find() with type check guarantees CodeBlock
+        const content = (codeBlock as { type: 'code'; content: string }).content;
+        expect(content).toContain('if (condition) {');
+        expect(content).toContain('  doSomething();');
+        expect(content).toContain('    deeplyNested();');
+        expect(content).toContain('  }');
+      });
+    });
+  });
 });
