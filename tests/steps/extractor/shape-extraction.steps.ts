@@ -181,6 +181,112 @@ describeFeature(feature, ({ Background, Rule }) => {
   });
 
   // ===========================================================================
+  // RULE 2b: Property-Level JSDoc Extraction
+  // ===========================================================================
+
+  Rule('Property-level JSDoc is extracted for interface properties', ({ RuleScenario }) => {
+    RuleScenario('Extract properties with adjacent JSDoc', ({ Given, When, Then, And }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "User"', () => {
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['User']);
+      });
+
+      Then('the shape should have property docs for "id"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'id'
+        );
+        expect(propDoc, 'Property "id" should have docs').toBeDefined();
+      });
+
+      And('the property "id" JSDoc should contain "unique identifier"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'id'
+        );
+        expect(propDoc?.jsDoc).toContain('unique identifier');
+      });
+
+      And('the shape should have property docs for "name"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'name'
+        );
+        expect(propDoc, 'Property "name" should have docs').toBeDefined();
+      });
+
+      And('the property "name" JSDoc should contain "display name"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'name'
+        );
+        expect(propDoc?.jsDoc).toContain('display name');
+      });
+    });
+
+    RuleScenario(
+      'Interface JSDoc not attributed to first property',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+          state.sourceCode = docString;
+        });
+
+        When('extracting shape "User"', () => {
+          state.extractionResult = unwrapExtraction(state.sourceCode, ['User']);
+        });
+
+        Then('the shape JSDoc should contain "Represents a user"', () => {
+          expect(state.extractionResult!.shapes[0].jsDoc).toContain('Represents a user');
+        });
+
+        And('the shape should not have property docs for "id"', () => {
+          const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+            (p) => p.name === 'id'
+          );
+          expect(propDoc, 'Property "id" should NOT have docs').toBeUndefined();
+        });
+
+        And('the shape should not have property docs for "name"', () => {
+          const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+            (p) => p.name === 'name'
+          );
+          expect(propDoc, 'Property "name" should NOT have docs').toBeUndefined();
+        });
+      }
+    );
+
+    RuleScenario('Mixed documented and undocumented properties', ({ Given, When, Then, And }) => {
+      Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+        state.sourceCode = docString;
+      });
+
+      When('extracting shape "Config"', () => {
+        state.extractionResult = unwrapExtraction(state.sourceCode, ['Config']);
+      });
+
+      Then('the shape should have property docs for "apiKey"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'apiKey'
+        );
+        expect(propDoc, 'Property "apiKey" should have docs').toBeDefined();
+      });
+
+      And('the shape should not have property docs for "timeout"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'timeout'
+        );
+        expect(propDoc, 'Property "timeout" should NOT have docs').toBeUndefined();
+      });
+
+      And('the shape should have property docs for "retries"', () => {
+        const propDoc = state.extractionResult!.shapes[0].propertyDocs?.find(
+          (p) => p.name === 'retries'
+        );
+        expect(propDoc, 'Property "retries" should have docs').toBeDefined();
+      });
+    });
+  });
+
+  // ===========================================================================
   // RULE 3: Type Alias Extraction
   // ===========================================================================
 

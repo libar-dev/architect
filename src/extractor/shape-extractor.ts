@@ -573,20 +573,46 @@ function extractJsDocText(jsDoc: string): string | undefined {
 
 /**
  * Convert function declaration to signature-only form.
+ *
+ * Uses brace-matching to find the function body's opening brace,
+ * correctly handling object types in parameters and return types.
+ *
+ * @example
+ * // Object params handled correctly:
+ * functionToSignature('function f(o: { a: string }): void { }')
+ * // Returns: 'function f(o: { a: string }): void;'
  */
 function functionToSignature(sourceText: string): string {
-  // Find the opening brace of the function body
-  const braceIndex = sourceText.indexOf('{');
-  if (braceIndex === -1) {
-    // Already a signature (declaration without body)
+  // Find the function body's opening brace by tracking brace depth.
+  // Object types like { name: string } in params/return types increment
+  // depth to 1, then decrement back to 0. The function body's opening
+  // brace is the first { encountered when depth is 0.
+  let braceDepth = 0;
+  let bodyBraceIndex = -1;
+
+  for (let i = 0; i < sourceText.length; i++) {
+    const char = sourceText[i];
+    if (char === '{') {
+      if (braceDepth === 0) {
+        // This is the function body's opening brace
+        bodyBraceIndex = i;
+        break;
+      }
+      braceDepth++;
+    } else if (char === '}') {
+      braceDepth--;
+    }
+  }
+
+  if (bodyBraceIndex === -1) {
+    // No function body found - already a signature
     return sourceText;
   }
 
-  // Take everything before the brace, trim, and add semicolon
-  let signature = sourceText.slice(0, braceIndex).trim();
+  // Take everything before the body brace, trim, and add semicolon
+  let signature = sourceText.slice(0, bodyBraceIndex).trim();
 
-  // Remove async keyword from arrow functions that might have body
-  // and ensure proper formatting
+  // Handle edge case: arrow functions without proper formatting
   if (!signature.endsWith(')') && !signature.endsWith('>')) {
     // Might have a return type - find the last )
     const lastParen = signature.lastIndexOf(')');

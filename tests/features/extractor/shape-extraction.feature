@@ -88,6 +88,67 @@ Feature: TypeScript Shape Extraction
       Then the extraction should have not-found entry for "NonExistent"
 
   # ============================================================================
+  # RULE 2b: Property-Level JSDoc Extraction
+  # ============================================================================
+
+  Rule: Property-level JSDoc is extracted for interface properties
+
+    The extractor uses strict adjacency (gap = 1 line) to prevent
+    interface-level JSDoc from being misattributed to the first property.
+
+    @acceptance-criteria @unit
+    Scenario: Extract properties with adjacent JSDoc
+      Given TypeScript source code:
+        """
+        export interface User {
+          /** The user's unique identifier */
+          id: string;
+          /** The user's display name */
+          name: string;
+        }
+        """
+      When extracting shape "User"
+      Then the shape should have property docs for "id"
+      And the property "id" JSDoc should contain "unique identifier"
+      And the shape should have property docs for "name"
+      And the property "name" JSDoc should contain "display name"
+
+    @acceptance-criteria @unit @edge-case
+    Scenario: Interface JSDoc not attributed to first property
+      Given TypeScript source code:
+        """
+        /**
+         * Represents a user in the system.
+         * This JSDoc belongs to the interface.
+         */
+        export interface User {
+          id: string;
+          name: string;
+        }
+        """
+      When extracting shape "User"
+      Then the shape JSDoc should contain "Represents a user"
+      And the shape should not have property docs for "id"
+      And the shape should not have property docs for "name"
+
+    @acceptance-criteria @unit
+    Scenario: Mixed documented and undocumented properties
+      Given TypeScript source code:
+        """
+        export interface Config {
+          /** Required API key */
+          apiKey: string;
+          timeout: number;
+          /** Optional retry count */
+          retries: number;
+        }
+        """
+      When extracting shape "Config"
+      Then the shape should have property docs for "apiKey"
+      And the shape should not have property docs for "timeout"
+      And the shape should have property docs for "retries"
+
+  # ============================================================================
   # RULE 3: Type Alias Extraction
   # ============================================================================
 
