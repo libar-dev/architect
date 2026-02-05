@@ -309,6 +309,12 @@ export function generateDetailedOutput(
       extracted.docStrings &&
       extracted.docStrings.length > 0
     ) {
+      // Debug logging to aid troubleshooting when content appears to be missing
+      if (process.env['DEBUG']) {
+        console.debug(
+          `[decision-doc] Filtering self-reference DocString section "${extracted.section}" to prevent duplicate content`
+        );
+      }
       return false;
     }
     return true;

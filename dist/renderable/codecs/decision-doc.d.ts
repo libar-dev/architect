@@ -206,7 +206,7 @@ export declare function parseSourceMappingsFromRules(rules: readonly BusinessRul
  * Check if a source file reference is a self-reference
  *
  * @param sourceFile - The source file path to check
- * @returns True if the reference is to the current decision document
+ * @returns True if the reference is to the current decision document, false for null/undefined
  */
 export declare function isSelfReference(sourceFile: string): boolean;
 /**
