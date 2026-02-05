@@ -507,8 +507,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         });
       });
 
-      When('generating multi-level output', () => {
-        state.generationResult = generateFromDecisionMultiLevel(state.pattern!, {
+      When('generating multi-level output', async () => {
+        state.generationResult = await generateFromDecisionMultiLevel(state.pattern!, {
           baseDir: state.baseDir,
           claudeMdSection: 'test',
         });
@@ -542,8 +542,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         });
       });
 
-      When('generating multi-level output', () => {
-        state.generationResult = generateFromDecisionMultiLevel(state.pattern!, {
+      When('generating multi-level output', async () => {
+        state.generationResult = await generateFromDecisionMultiLevel(state.pattern!, {
           baseDir: state.baseDir,
         });
       });
@@ -687,8 +687,8 @@ export interface TestType {
         );
       });
 
-      When('generating from decision', () => {
-        state.generationResult = generateFromDecision(state.pattern!, {
+      When('generating from decision', async () => {
+        state.generationResult = await generateFromDecision(state.pattern!, {
           baseDir: state.baseDir,
           detailLevel: 'detailed',
         });
@@ -717,8 +717,8 @@ export interface TestType {
           });
         });
 
-        When('generating from decision', () => {
-          state.generationResult = generateFromDecision(state.pattern!, {
+        When('generating from decision', async () => {
+          state.generationResult = await generateFromDecision(state.pattern!, {
             baseDir: state.baseDir,
             detailLevel: 'detailed',
           });

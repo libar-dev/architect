@@ -113,6 +113,15 @@ const SOURCE_PRIORITY: Record<string, number> = {
   feature: 1, // .feature files
 };
 
+/**
+ * Length of fingerprint hex string to display.
+ *
+ * 16 hex characters = 64 bits provides sufficient collision resistance for
+ * documentation deduplication. Birthday paradox collision probability is
+ * less than 0.001% for up to 10,000 sections.
+ */
+const FINGERPRINT_DISPLAY_LENGTH = 16;
+
 // =============================================================================
 // Helper Functions
 // =============================================================================
@@ -141,7 +150,11 @@ function normalizeForFingerprint(content: string): string {
  */
 export function computeFingerprint(content: string): string {
   const normalized = normalizeForFingerprint(content);
-  return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 16);
+  return crypto
+    .createHash('sha256')
+    .update(normalized)
+    .digest('hex')
+    .slice(0, FINGERPRINT_DISPLAY_LENGTH);
 }
 
 /**

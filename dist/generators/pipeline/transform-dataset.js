@@ -31,7 +31,8 @@
  * - **Immutable output**: Returns a new MasterDataset object
  * - **Workflow integration**: Uses workflow config for phase names
  */
-import { normalizeStatus } from '../../taxonomy/index.js';
+import { ExtractedPatternSchema } from '../../validation-schemas/index.js';
+import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
 /**
  * Infer bounded context from file path using configured rules.
  *
@@ -84,6 +85,17 @@ function matchPattern(filePath, pattern) {
     return filePath.startsWith(pattern);
 }
 /**
+ * Check if a status value is a known/valid status.
+ *
+ * @param status - Status value to check
+ * @returns true if status is a known value
+ */
+function isKnownStatus(status) {
+    if (!status)
+        return true; // undefined is acceptable (defaults to planned)
+    return ACCEPTED_STATUS_VALUES.includes(status);
+}
+/**
  * Transform raw extracted data into a MasterDataset with all pre-computed views.
  *
  * This is a ONE-PASS transformation that computes:
@@ -94,6 +106,9 @@ function matchPattern(filePath, pattern) {
  * - Source-based views (TypeScript vs Gherkin, roadmap, PRD)
  * - Aggregate statistics (counts, phase count, category count)
  * - Optional relationship index
+ *
+ * For backward compatibility, this function returns just the dataset.
+ * Use `transformToMasterDatasetWithValidation` to get validation summary.
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow
  * @returns MasterDataset with all pre-computed views
@@ -113,7 +128,72 @@ function matchPattern(filePath, pattern) {
  * ```
  */
 export function transformToMasterDataset(raw) {
+    return transformToMasterDatasetWithValidation(raw).dataset;
+}
+/**
+ * Transform raw extracted data into a MasterDataset with validation summary.
+ *
+ * This is the full transformation that includes:
+ * - Pre-loop validation against ExtractedPatternSchema
+ * - Status-based groupings (completed/active/planned)
+ * - Phase-based groupings with counts
+ * - Quarter-based groupings for timeline views
+ * - Category-based groupings for taxonomy
+ * - Source-based views (TypeScript vs Gherkin, roadmap, PRD)
+ * - Aggregate statistics (counts, phase count, category count)
+ * - Relationship index with dangling reference detection
+ * - Validation summary with malformed patterns and unknown statuses
+ *
+ * @param raw - Raw dataset with patterns, registry, and optional workflow
+ * @returns TransformResult with dataset and validation summary
+ *
+ * @example
+ * ```typescript
+ * const result = transformToMasterDatasetWithValidation({
+ *   patterns: mergedPatterns,
+ *   tagRegistry: registry,
+ *   workflow,
+ * });
+ *
+ * if (result.validation.warningCount > 0) {
+ *   console.warn(`Found ${result.validation.warningCount} validation issues`);
+ * }
+ *
+ * const dataset = result.dataset;
+ * ```
+ */
+export function transformToMasterDatasetWithValidation(raw) {
     const { patterns, tagRegistry, workflow, contextInferenceRules } = raw;
+    // ─────────────────────────────────────────────────────────────────────────
+    // Validation tracking
+    // ─────────────────────────────────────────────────────────────────────────
+    const malformedPatterns = [];
+    const unknownStatuses = [];
+    const danglingReferences = [];
+    // ─────────────────────────────────────────────────────────────────────────
+    // Pre-loop validation: validate each pattern against schema
+    // ─────────────────────────────────────────────────────────────────────────
+    // Build a set of all pattern names for reference checking
+    const allPatternNames = new Set();
+    for (const pattern of patterns) {
+        const key = pattern.patternName ?? pattern.name;
+        allPatternNames.add(key);
+    }
+    for (const pattern of patterns) {
+        // Validate against schema
+        const parseResult = ExtractedPatternSchema.safeParse(pattern);
+        if (!parseResult.success) {
+            const patternId = pattern.patternName ?? pattern.name;
+            const issues = parseResult.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`);
+            malformedPatterns.push({ patternId, issues });
+        }
+        // Check for unknown status values
+        if (pattern.status && !isKnownStatus(pattern.status)) {
+            if (!unknownStatuses.includes(pattern.status)) {
+                unknownStatuses.push(pattern.status);
+            }
+        }
+    }
     // ─────────────────────────────────────────────────────────────────────────
     // Initialize accumulators for single-pass computation
     // ─────────────────────────────────────────────────────────────────────────
@@ -263,6 +343,44 @@ export function transformToMasterDataset(raw) {
         entry.implementedBy.sort((a, b) => a.file.localeCompare(b.file));
     }
     // ─────────────────────────────────────────────────────────────────────────
+    // Third pass: detect dangling references in relationship fields
+    // ─────────────────────────────────────────────────────────────────────────
+    for (const pattern of patterns) {
+        const patternKey = pattern.patternName ?? pattern.name;
+        // Check 'uses' references
+        for (const ref of pattern.uses ?? []) {
+            if (!allPatternNames.has(ref)) {
+                danglingReferences.push({ pattern: patternKey, field: 'uses', missing: ref });
+            }
+        }
+        // Check 'dependsOn' references
+        for (const ref of pattern.dependsOn ?? []) {
+            if (!allPatternNames.has(ref)) {
+                danglingReferences.push({ pattern: patternKey, field: 'dependsOn', missing: ref });
+            }
+        }
+        // Check 'implementsPatterns' references
+        for (const ref of pattern.implementsPatterns ?? []) {
+            if (!allPatternNames.has(ref)) {
+                danglingReferences.push({ pattern: patternKey, field: 'implementsPatterns', missing: ref });
+            }
+        }
+        // Check 'extendsPattern' reference
+        if (pattern.extendsPattern && !allPatternNames.has(pattern.extendsPattern)) {
+            danglingReferences.push({
+                pattern: patternKey,
+                field: 'extendsPattern',
+                missing: pattern.extendsPattern,
+            });
+        }
+        // Check 'seeAlso' references
+        for (const ref of pattern.seeAlso ?? []) {
+            if (!allPatternNames.has(ref)) {
+                danglingReferences.push({ pattern: patternKey, field: 'seeAlso', missing: ref });
+            }
+        }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
     // Build phase groups with counts (sorted by phase number)
     // ─────────────────────────────────────────────────────────────────────────
     const byPhase = Array.from(byPhaseMap.entries())
@@ -294,9 +412,19 @@ export function transformToMasterDataset(raw) {
         total: patterns.length,
     };
     // ─────────────────────────────────────────────────────────────────────────
-    // Return assembled MasterDataset
+    // Build validation summary
     // ─────────────────────────────────────────────────────────────────────────
-    const result = {
+    const validation = {
+        totalPatterns: patterns.length,
+        malformedPatterns,
+        danglingReferences,
+        unknownStatuses,
+        warningCount: malformedPatterns.length + danglingReferences.length + unknownStatuses.length,
+    };
+    // ─────────────────────────────────────────────────────────────────────────
+    // Return assembled MasterDataset with validation
+    // ─────────────────────────────────────────────────────────────────────────
+    const dataset = {
         patterns: patterns,
         tagRegistry,
         byStatus,
@@ -313,9 +441,9 @@ export function transformToMasterDataset(raw) {
     };
     // Only include workflow if defined (exactOptionalPropertyTypes compliance)
     if (workflow !== undefined) {
-        return { ...result, workflow };
+        return { dataset: { ...dataset, workflow }, validation };
     }
-    return result;
+    return { dataset, validation };
 }
 /**
  * Compute status counts for a subset of patterns

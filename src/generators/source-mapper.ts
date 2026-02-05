@@ -29,6 +29,7 @@
  */
 
 import * as fs from 'node:fs';
+import * as fsPromises from 'node:fs/promises';
 import * as path from 'node:path';
 import type { Result } from '../types/result.js';
 import { Result as R } from '../types/result.js';
@@ -50,6 +51,7 @@ import type { ExtractedShape } from '../validation-schemas/extracted-shape.js';
 import { parseFeatureFile } from '../scanner/gherkin-ast-parser.js';
 import type { GherkinRule, GherkinScenario } from '../validation-schemas/feature.js';
 import type { WarningCollector } from './warning-collector.js';
+import type { FileCache } from '../cache/file-cache.js';
 
 // =============================================================================
 // Types
@@ -73,6 +75,9 @@ export interface SourceMapperOptions {
 
   /** Optional warning collector for structured warning handling */
   warningCollector?: WarningCollector;
+
+  /** Optional file cache for avoiding repeated disk reads */
+  fileCache?: FileCache;
 }
 
 /**
@@ -131,11 +136,25 @@ export interface AggregatedContent {
 // =============================================================================
 
 /**
- * Read file content synchronously with error handling
+ * Read file content asynchronously with error handling and optional caching
  */
-function readFileSync(filePath: string): Result<string> {
+async function readFile(filePath: string, fileCache?: FileCache): Promise<Result<string>> {
+  // Check cache first
+  if (fileCache) {
+    const cached = fileCache.get(filePath);
+    if (cached !== undefined) {
+      return R.ok(cached);
+    }
+  }
+
   try {
-    const content = fs.readFileSync(filePath, 'utf-8');
+    const content = await fsPromises.readFile(filePath, 'utf-8');
+
+    // Store in cache if provided
+    if (fileCache) {
+      fileCache.set(filePath, content);
+    }
+
     return R.ok(content);
   } catch (error) {
     return R.err(error instanceof Error ? error : new Error(`Failed to read file: ${filePath}`));
@@ -143,13 +162,18 @@ function readFileSync(filePath: string): Result<string> {
 }
 
 /**
- * Check if file exists.
+ * Check if file exists asynchronously.
  * Captures filesystem errors (EACCES, EPERM, etc.) via warning collector to prevent silent failures.
  */
-function fileExists(filePath: string, warningCollector?: WarningCollector): boolean {
+async function fileExists(filePath: string, warningCollector?: WarningCollector): Promise<boolean> {
   try {
-    return fs.existsSync(filePath);
+    await fsPromises.access(filePath, fs.constants.F_OK);
+    return true;
   } catch (error) {
+    // ENOENT means file doesn't exist - this is expected, not an error
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return false;
+    }
     // Capture actual error for debugging - filesystem errors (EACCES, EPERM, ELOOP, etc.)
     // should not be silently swallowed as they indicate real problems
     if (warningCollector) {
@@ -277,18 +301,18 @@ export function extractFromDecision(
 /**
  * Extract shapes from a TypeScript file using @extract-shapes
  */
-export function extractFromTypeScript(
+export async function extractFromTypeScript(
   filePath: string,
   options: SourceMapperOptions,
   sourceMapping: SourceMappingEntry
-): Result<ExtractedSection> {
+): Promise<Result<ExtractedSection>> {
   const pathResult = resolveAbsolutePath(filePath, options.baseDir);
   if (!pathResult.ok) {
     return R.err(pathResult.error);
   }
   const absolutePath = pathResult.value;
 
-  const fileResult = readFileSync(absolutePath);
+  const fileResult = await readFile(absolutePath, options.fileCache);
   if (!fileResult.ok) {
     return R.err(fileResult.error);
   }
@@ -434,18 +458,18 @@ export function extractFromTypeScript(
 /**
  * Extract Rule blocks or Scenario Outline Examples from a behavior spec
  */
-export function extractFromBehaviorSpec(
+export async function extractFromBehaviorSpec(
   filePath: string,
   options: SourceMapperOptions,
   sourceMapping: SourceMappingEntry
-): Result<ExtractedSection> {
+): Promise<Result<ExtractedSection>> {
   const pathResult = resolveAbsolutePath(filePath, options.baseDir);
   if (!pathResult.ok) {
     return R.err(pathResult.error);
   }
   const absolutePath = pathResult.value;
 
-  const fileResult = readFileSync(absolutePath);
+  const fileResult = await readFile(absolutePath, options.fileCache);
   if (!fileResult.ok) {
     return R.err(fileResult.error);
   }
@@ -605,7 +629,7 @@ function extractScenarioOutlineExamples(
  *
  * @example
  * ```typescript
- * const result = executeSourceMapping(decisionContent.sourceMappings, {
+ * const result = await executeSourceMapping(decisionContent.sourceMappings, {
  *   baseDir: process.cwd(),
  *   decisionDocPath: 'specs/my-decision.feature',
  *   decisionContent: decisionContent,
@@ -619,10 +643,10 @@ function extractScenarioOutlineExamples(
  * }
  * ```
  */
-export function executeSourceMapping(
+export async function executeSourceMapping(
   sourceMappings: readonly SourceMappingEntry[],
   options: SourceMapperOptions
-): AggregatedContent {
+): Promise<AggregatedContent> {
   const sections: ExtractedSection[] = [];
   const warnings: ExtractionWarning[] = [];
 
@@ -640,7 +664,7 @@ export function executeSourceMapping(
         });
         continue;
       }
-      if (!fileExists(pathResult.value, options.warningCollector)) {
+      if (!(await fileExists(pathResult.value, options.warningCollector))) {
         warnings.push({
           severity: 'warning',
           message: `Source file not found: ${mapping.sourceFile}`,
@@ -652,14 +676,14 @@ export function executeSourceMapping(
 
     // Dispatch based on source file type
     if (isSelfReference(mapping.sourceFile)) {
-      // Extract from current decision document
+      // Extract from current decision document (sync - no file I/O)
       result = extractFromDecision(options, mapping);
     } else if (mapping.sourceFile.endsWith('.ts')) {
       // TypeScript file
-      result = extractFromTypeScript(mapping.sourceFile, options, mapping);
+      result = await extractFromTypeScript(mapping.sourceFile, options, mapping);
     } else if (mapping.sourceFile.endsWith('.feature')) {
       // Gherkin behavior spec
-      result = extractFromBehaviorSpec(mapping.sourceFile, options, mapping);
+      result = await extractFromBehaviorSpec(mapping.sourceFile, options, mapping);
     } else {
       // Unknown file type
       warnings.push({
@@ -706,10 +730,10 @@ export function executeSourceMapping(
  * @param options - Mapper options (only baseDir is required)
  * @returns Array of validation warnings
  */
-export function validateSourceMappings(
+export async function validateSourceMappings(
   sourceMappings: readonly SourceMappingEntry[],
   options: Pick<SourceMapperOptions, 'baseDir'>
-): ExtractionWarning[] {
+): Promise<ExtractionWarning[]> {
   const warnings: ExtractionWarning[] = [];
 
   for (const mapping of sourceMappings) {
@@ -729,7 +753,7 @@ export function validateSourceMappings(
       continue;
     }
 
-    if (!fileExists(pathResult.value)) {
+    if (!(await fileExists(pathResult.value))) {
       warnings.push({
         severity: 'warning',
         message: `Source file not found: ${mapping.sourceFile}`,

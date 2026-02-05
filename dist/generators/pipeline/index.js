@@ -22,5 +22,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // Transform Dataset
 // ═══════════════════════════════════════════════════════════════════════════
-export { transformToMasterDataset, completionPercentage, isFullyCompleted, } from './transform-dataset.js';
+export { transformToMasterDataset, transformToMasterDatasetWithValidation, completionPercentage, isFullyCompleted, } from './transform-dataset.js';
 //# sourceMappingURL=index.js.map

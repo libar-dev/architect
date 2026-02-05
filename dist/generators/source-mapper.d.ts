@@ -31,6 +31,7 @@ import type { Result } from '../types/result.js';
 import { type SourceMappingEntry, type DecisionDocContent, type ExtractedDocString } from '../renderable/codecs/decision-doc.js';
 import type { ExtractedShape } from '../validation-schemas/extracted-shape.js';
 import type { WarningCollector } from './warning-collector.js';
+import type { FileCache } from '../cache/file-cache.js';
 /**
  * Options for source mapping execution
  */
@@ -45,6 +46,8 @@ export interface SourceMapperOptions {
     detailLevel?: 'summary' | 'standard' | 'detailed';
     /** Optional warning collector for structured warning handling */
     warningCollector?: WarningCollector;
+    /** Optional file cache for avoiding repeated disk reads */
+    fileCache?: FileCache;
 }
 /**
  * Warning produced during extraction
@@ -92,11 +95,11 @@ export declare function extractFromDecision(options: SourceMapperOptions, source
 /**
  * Extract shapes from a TypeScript file using @extract-shapes
  */
-export declare function extractFromTypeScript(filePath: string, options: SourceMapperOptions, sourceMapping: SourceMappingEntry): Result<ExtractedSection>;
+export declare function extractFromTypeScript(filePath: string, options: SourceMapperOptions, sourceMapping: SourceMappingEntry): Promise<Result<ExtractedSection>>;
 /**
  * Extract Rule blocks or Scenario Outline Examples from a behavior spec
  */
-export declare function extractFromBehaviorSpec(filePath: string, options: SourceMapperOptions, sourceMapping: SourceMappingEntry): Result<ExtractedSection>;
+export declare function extractFromBehaviorSpec(filePath: string, options: SourceMapperOptions, sourceMapping: SourceMappingEntry): Promise<Result<ExtractedSection>>;
 /**
  * Execute source mapping to aggregate content from multiple sources
  *
@@ -111,7 +114,7 @@ export declare function extractFromBehaviorSpec(filePath: string, options: Sourc
  *
  * @example
  * ```typescript
- * const result = executeSourceMapping(decisionContent.sourceMappings, {
+ * const result = await executeSourceMapping(decisionContent.sourceMappings, {
  *   baseDir: process.cwd(),
  *   decisionDocPath: 'specs/my-decision.feature',
  *   decisionContent: decisionContent,
@@ -125,7 +128,7 @@ export declare function extractFromBehaviorSpec(filePath: string, options: Sourc
  * }
  * ```
  */
-export declare function executeSourceMapping(sourceMappings: readonly SourceMappingEntry[], options: SourceMapperOptions): AggregatedContent;
+export declare function executeSourceMapping(sourceMappings: readonly SourceMappingEntry[], options: SourceMapperOptions): Promise<AggregatedContent>;
 /**
  * Validate source mappings before execution
  *
@@ -136,5 +139,5 @@ export declare function executeSourceMapping(sourceMappings: readonly SourceMapp
  * @param options - Mapper options (only baseDir is required)
  * @returns Array of validation warnings
  */
-export declare function validateSourceMappings(sourceMappings: readonly SourceMappingEntry[], options: Pick<SourceMapperOptions, 'baseDir'>): ExtractionWarning[];
+export declare function validateSourceMappings(sourceMappings: readonly SourceMappingEntry[], options: Pick<SourceMapperOptions, 'baseDir'>): Promise<ExtractionWarning[]>;
 //# sourceMappingURL=source-mapper.d.ts.map

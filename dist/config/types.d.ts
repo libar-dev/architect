@@ -19,6 +19,7 @@
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import type { CategoryDefinition } from '../taxonomy/categories.js';
 import type { MetadataTagDefinitionForRegistry } from '../taxonomy/registry-builder.js';
+import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
 /**
  * Configuration for creating a delivery process instance.
  * Uses generics to preserve literal types from presets.
@@ -32,6 +33,21 @@ export interface DeliveryProcessConfig {
     readonly categories: readonly CategoryDefinition[];
     /** Optional metadata tag definitions */
     readonly metadataTags?: readonly MetadataTagDefinitionForRegistry[];
+    /**
+     * Optional context inference rules for auto-inferring bounded context from file paths.
+     *
+     * When provided, these rules are merged with the default rules. User-provided rules
+     * take precedence over defaults (applied first in the rule list).
+     *
+     * @example
+     * ```typescript
+     * contextInferenceRules: [
+     *   { pattern: 'packages/orders/**', context: 'orders' },
+     *   { pattern: 'packages/inventory/**', context: 'inventory' },
+     * ]
+     * ```
+     */
+    readonly contextInferenceRules?: readonly ContextInferenceRule[];
 }
 /**
  * Instance returned by createDeliveryProcess with configured registry

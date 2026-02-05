@@ -216,8 +216,8 @@ export interface TestType {
         );
       });
 
-      When('generating documentation', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -258,9 +258,9 @@ export interface TestType {
           }
         );
 
-        When('generating documentation', () => {
+        When('generating documentation', async () => {
           state!.extractionAttempted = false;
-          state!.result = generateFromDecision(state!.pattern!, {
+          state!.result = await generateFromDecision(state!.pattern!, {
             baseDir: state!.baseDir,
             detailLevel: 'detailed',
             ...state!.options,
@@ -309,8 +309,8 @@ export interface TestType {
           }
         );
 
-        When('generating documentation', () => {
-          state!.result = generateFromDecision(state!.pattern!, {
+        When('generating documentation', async () => {
+          state!.result = await generateFromDecision(state!.pattern!, {
             baseDir: state!.baseDir,
             detailLevel: 'detailed',
             ...state!.options,
@@ -387,8 +387,8 @@ export const LEVELS = {};
         );
       });
 
-      When('generating documentation', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -475,8 +475,8 @@ export const LEVELS = {};
         expect(count).toBe(5); // Verify expectation
       });
 
-      When('generating documentation', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -518,7 +518,7 @@ export const LEVELS = {};
         // The warning text is descriptive for the feature file; actual setup is in When step
       });
 
-      When('generating documentation', () => {
+      When('generating documentation', async () => {
         // Create a pattern that will produce warnings from multiple stages
         state!.pattern = createTestPattern({
           patternName: 'WarningsTest',
@@ -548,7 +548,7 @@ export const EMPTY = {};
 `
         );
 
-        state!.result = generateFromDecision(state!.pattern, {
+        state!.result = await generateFromDecision(state!.pattern, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -603,8 +603,8 @@ export interface TestType {
         // The pattern is valid, so only warnings should be generated
       });
 
-      When('generating documentation', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -654,8 +654,8 @@ export interface TestType { id: string; }
         );
       });
 
-      When('generating documentation', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -690,8 +690,8 @@ export interface TestType { id: string; }
           createTypeScriptFile('src/types.ts', `export const x = 1;`);
         });
 
-        When('generating documentation', () => {
-          state!.result = generateFromDecision(state!.pattern!, {
+        When('generating documentation', async () => {
+          state!.result = await generateFromDecision(state!.pattern!, {
             baseDir: state!.baseDir,
             detailLevel: 'detailed',
             ...state!.options,
@@ -731,8 +731,8 @@ export const x = 1;
         );
       });
 
-      When('generating documentation', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           ...state!.options,
@@ -783,8 +783,8 @@ export const x = 1;
         });
       });
 
-      When('generating documentation with robustness enabled', () => {
-        state!.result = generateFromDecision(state!.pattern!, {
+      When('generating documentation with robustness enabled', async () => {
+        state!.result = await generateFromDecision(state!.pattern!, {
           baseDir: state!.baseDir,
           detailLevel: 'detailed',
           enableValidation: true,
@@ -840,8 +840,8 @@ export const x = 1;
           });
         });
 
-        When('generating documentation with robustness enabled', () => {
-          state!.result = generateFromDecision(state!.pattern!, {
+        When('generating documentation with robustness enabled', async () => {
+          state!.result = await generateFromDecision(state!.pattern!, {
             baseDir: state!.baseDir,
             detailLevel: 'detailed',
             enableValidation: true,

@@ -68,6 +68,22 @@ export interface GenerateOptions {
      * @example "v0.2.0"
      */
     releaseFilter?: string;
+    /**
+     * Custom context inference rules for auto-inferring bounded context from file paths.
+     *
+     * When provided, these rules are prepended to the default rules (user rules take precedence).
+     * Use this to map your project's directory structure to bounded contexts for architecture diagrams.
+     *
+     * @example
+     * contextInferenceRules: [
+     *   { pattern: 'packages/orders/**', context: 'orders' },
+     *   { pattern: 'packages/inventory/**', context: 'inventory' },
+     * ]
+     */
+    contextInferenceRules?: ReadonlyArray<{
+        pattern: string;
+        context: string;
+    }>;
 }
 /**
  * Result of documentation generation

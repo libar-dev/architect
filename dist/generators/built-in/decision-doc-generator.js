@@ -389,7 +389,7 @@ export function generateStandardOutput(decisionContent, aggregatedContent) {
  * @param options - Generator options
  * @returns Pipeline result or error
  */
-function executePipeline(pattern, options) {
+async function executePipeline(pattern, options) {
     // Default options - all robustness features enabled by default
     const enableValidation = options.enableValidation ?? true;
     const enableDeduplication = options.enableDeduplication ?? true;
@@ -463,7 +463,7 @@ function executePipeline(pattern, options) {
         const mapperOptions = warningCollector
             ? { ...baseMapperOptions, warningCollector }
             : baseMapperOptions;
-        aggregatedContent = executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
+        aggregatedContent = await executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
         // Step 5: DEDUPLICATE SECTIONS (if enabled)
         if (enableDeduplication && aggregatedContent.sections.length > 0) {
             const dedupOptions = warningCollector ? { warningCollector } : undefined;
@@ -516,12 +516,17 @@ function isPipelineError(result) {
  * }
  * ```
  */
-export function generateFromDecision(pattern, options) {
+export async function generateFromDecision(pattern, options) {
     // Execute the pipeline
-    const pipelineResult = executePipeline(pattern, options);
+    const pipelineResult = await executePipeline(pattern, options);
     // If pipeline failed, return errors
     if (isPipelineError(pipelineResult)) {
-        return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+        return {
+            files: [],
+            warnings: pipelineResult.warnings,
+            errors: pipelineResult.errors,
+            success: false,
+        };
     }
     const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } = pipelineResult;
     // Generate output at requested detail level
@@ -558,7 +563,7 @@ export function generateFromDecision(pattern, options) {
             ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
             ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
         ];
-    return { files, warnings, errors: [] };
+    return { files, warnings, errors: [], success: true };
 }
 /**
  * Generate both compact and detailed outputs
@@ -570,12 +575,17 @@ export function generateFromDecision(pattern, options) {
  * @param options - Generator options
  * @returns Generation result with both output files
  */
-export function generateFromDecisionMultiLevel(pattern, options) {
+export async function generateFromDecisionMultiLevel(pattern, options) {
     // Execute the pipeline ONCE
-    const pipelineResult = executePipeline(pattern, options);
+    const pipelineResult = await executePipeline(pattern, options);
     // If pipeline failed, return errors
     if (isPipelineError(pipelineResult)) {
-        return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+        return {
+            files: [],
+            warnings: pipelineResult.warnings,
+            errors: pipelineResult.errors,
+            success: false,
+        };
     }
     const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } = pipelineResult;
     // Determine output paths
@@ -599,7 +609,7 @@ export function generateFromDecisionMultiLevel(pattern, options) {
             ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
             ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
         ];
-    return { files, warnings, errors: [] };
+    return { files, warnings, errors: [], success: true };
 }
 // =============================================================================
 // DocumentGenerator Implementation
@@ -613,7 +623,7 @@ export function generateFromDecisionMultiLevel(pattern, options) {
 export class DecisionDocGeneratorImpl {
     name = 'doc-from-decision';
     description = 'Generate documentation from ADR/PDR decision documents';
-    generate(patterns, context) {
+    async generate(patterns, context) {
         const allFiles = [];
         // Filter for decision documents (ADR/PDR patterns with source mappings)
         const decisionPatterns = patterns.filter((p) => {
@@ -631,20 +641,20 @@ export class DecisionDocGeneratorImpl {
         const allErrors = [];
         if (decisionPatterns.length === 0) {
             allWarnings.push('No decision documents with source mappings found. Ensure patterns have source mapping tables.');
-            return Promise.resolve({
+            return {
                 files: [],
                 metadata: {
                     warnings: allWarnings,
                     errors: allErrors,
                     patternsProcessed: 0,
                 },
-            });
+            };
         }
         // Generate documentation for each decision pattern
         for (const pattern of decisionPatterns) {
             // Extract section from pattern tags or default to 'generated'
             const section = extractClaudeMdSection(pattern) ?? 'generated';
-            const result = generateFromDecisionMultiLevel(pattern, {
+            const result = await generateFromDecisionMultiLevel(pattern, {
                 baseDir: context.baseDir,
                 detailLevel: 'detailed', // Generate both levels
                 claudeMdSection: section,
@@ -654,14 +664,14 @@ export class DecisionDocGeneratorImpl {
             allErrors.push(...result.errors);
             allWarnings.push(...result.warnings);
         }
-        return Promise.resolve({
+        return {
             files: allFiles,
             metadata: {
                 warnings: allWarnings,
                 errors: allErrors,
                 patternsProcessed: decisionPatterns.length,
             },
-        });
+        };
     }
 }
 /**

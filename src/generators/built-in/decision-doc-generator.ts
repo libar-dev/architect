@@ -106,6 +106,12 @@ export interface GeneratedOutputPaths {
 
 /**
  * Result of decision doc generation
+ *
+ * **Error Handling:** When errors occur, `success` is set to `false` but the
+ * function still returns successfully (does not throw). This allows partial
+ * generation to proceed - files that could be generated will be in `files`,
+ * while error messages explain what failed. Callers should check the `success`
+ * field to determine if the generation was fully successful.
  */
 export interface DecisionDocGeneratorResult {
   /** Successfully generated output files */
@@ -116,6 +122,16 @@ export interface DecisionDocGeneratorResult {
 
   /** Errors that prevented generation */
   errors: string[];
+
+  /**
+   * Whether generation completed without errors.
+   * - `true`: All requested outputs generated successfully
+   * - `false`: One or more errors occurred (check `errors` array)
+   *
+   * Note: Even when `success` is `false`, partial results may be available
+   * in `files`. Check both `success` and `files.length` to understand the outcome.
+   */
+  success: boolean;
 }
 
 // =============================================================================
@@ -560,10 +576,10 @@ interface PipelineError {
  * @param options - Generator options
  * @returns Pipeline result or error
  */
-function executePipeline(
+async function executePipeline(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
-): PipelineResult | PipelineError {
+): Promise<PipelineResult | PipelineError> {
   // Default options - all robustness features enabled by default
   const enableValidation = options.enableValidation ?? true;
   const enableDeduplication = options.enableDeduplication ?? true;
@@ -654,7 +670,7 @@ function executePipeline(
       ? { ...baseMapperOptions, warningCollector }
       : baseMapperOptions;
 
-    aggregatedContent = executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
+    aggregatedContent = await executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
 
     // Step 5: DEDUPLICATE SECTIONS (if enabled)
     if (enableDeduplication && aggregatedContent.sections.length > 0) {
@@ -715,16 +731,21 @@ function isPipelineError(result: PipelineResult | PipelineError): result is Pipe
  * }
  * ```
  */
-export function generateFromDecision(
+export async function generateFromDecision(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
-): DecisionDocGeneratorResult {
+): Promise<DecisionDocGeneratorResult> {
   // Execute the pipeline
-  const pipelineResult = executePipeline(pattern, options);
+  const pipelineResult = await executePipeline(pattern, options);
 
   // If pipeline failed, return errors
   if (isPipelineError(pipelineResult)) {
-    return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+    return {
+      files: [],
+      warnings: pipelineResult.warnings,
+      errors: pipelineResult.errors,
+      success: false,
+    };
   }
 
   const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } =
@@ -773,7 +794,7 @@ export function generateFromDecision(
         ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
       ];
 
-  return { files, warnings, errors: [] };
+  return { files, warnings, errors: [], success: true };
 }
 
 /**
@@ -786,16 +807,21 @@ export function generateFromDecision(
  * @param options - Generator options
  * @returns Generation result with both output files
  */
-export function generateFromDecisionMultiLevel(
+export async function generateFromDecisionMultiLevel(
   pattern: ExtractedPattern,
   options: DecisionDocGeneratorOptions
-): DecisionDocGeneratorResult {
+): Promise<DecisionDocGeneratorResult> {
   // Execute the pipeline ONCE
-  const pipelineResult = executePipeline(pattern, options);
+  const pipelineResult = await executePipeline(pattern, options);
 
   // If pipeline failed, return errors
   if (isPipelineError(pipelineResult)) {
-    return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+    return {
+      files: [],
+      warnings: pipelineResult.warnings,
+      errors: pipelineResult.errors,
+      success: false,
+    };
   }
 
   const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } =
@@ -830,7 +856,7 @@ export function generateFromDecisionMultiLevel(
         ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
       ];
 
-  return { files, warnings, errors: [] };
+  return { files, warnings, errors: [], success: true };
 }
 
 // =============================================================================
@@ -847,7 +873,7 @@ export class DecisionDocGeneratorImpl implements DocumentGenerator {
   readonly name = 'doc-from-decision';
   readonly description = 'Generate documentation from ADR/PDR decision documents';
 
-  generate(
+  async generate(
     patterns: readonly ExtractedPattern[],
     context: GeneratorContext
   ): Promise<GeneratorOutput> {
@@ -879,14 +905,14 @@ export class DecisionDocGeneratorImpl implements DocumentGenerator {
       allWarnings.push(
         'No decision documents with source mappings found. Ensure patterns have source mapping tables.'
       );
-      return Promise.resolve({
+      return {
         files: [],
         metadata: {
           warnings: allWarnings,
           errors: allErrors,
           patternsProcessed: 0,
         },
-      });
+      };
     }
 
     // Generate documentation for each decision pattern
@@ -894,7 +920,7 @@ export class DecisionDocGeneratorImpl implements DocumentGenerator {
       // Extract section from pattern tags or default to 'generated'
       const section = extractClaudeMdSection(pattern) ?? 'generated';
 
-      const result = generateFromDecisionMultiLevel(pattern, {
+      const result = await generateFromDecisionMultiLevel(pattern, {
         baseDir: context.baseDir,
         detailLevel: 'detailed', // Generate both levels
         claudeMdSection: section,
@@ -907,14 +933,14 @@ export class DecisionDocGeneratorImpl implements DocumentGenerator {
       allWarnings.push(...result.warnings);
     }
 
-    return Promise.resolve({
+    return {
       files: allFiles,
       metadata: {
         warnings: allWarnings,
         errors: allErrors,
         patternsProcessed: decisionPatterns.length,
       },
-    });
+    };
   }
 }
 

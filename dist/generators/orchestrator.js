@@ -221,11 +221,16 @@ export async function generateDocumentation(options) {
     // This is a single-pass transformation that computes all derived views:
     // byStatus, byPhase, byQuarter, byCategory, bySource, counts, relationships
     // Also applies context auto-inference from file paths for architecture diagrams
+    //
+    // Merge context inference rules: user rules take precedence (prepended to defaults)
+    const mergedContextRules = options.contextInferenceRules
+        ? [...options.contextInferenceRules, ...DEFAULT_CONTEXT_INFERENCE_RULES]
+        : DEFAULT_CONTEXT_INFERENCE_RULES;
     const masterDataset = transformToMasterDataset({
         patterns: allPatterns,
         tagRegistry: registry,
         workflow,
-        contextInferenceRules: DEFAULT_CONTEXT_INFERENCE_RULES,
+        contextInferenceRules: mergedContextRules,
     });
     // Step 9: Build codec options for PR-scoped generators
     // Only compute if PR Changes generator is requested

@@ -36,6 +36,7 @@ Feature: Publishing Reference - Auto-Generated Documentation
 | Dry Run | THIS DECISION (Rule: Dry Run) | Rule block with DocString |
 | Verification | THIS DECISION (Rule: Verification) | Rule block with DocString |
 | Troubleshooting | THIS DECISION (Rule: Troubleshooting) | Rule block table |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
     Given the following deliverables:
@@ -380,6 +381,16 @@ Feature: Publishing Reference - Auto-Generated Documentation
     npm cache clean --force
     npm view @libar-dev/delivery-process
     """
+
+  Rule: Related Documentation
+
+    **Context:** Related documentation for package publishing.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| CONFIGURATION-REFERENCE.md | Reference | Package configuration and presets |
+| INSTRUCTIONS-REFERENCE.md | Reference | Annotation tags for release notes |
+| PROCESS-GUARD-REFERENCE.md | Reference | Pre-commit hooks validation |
 
   @acceptance-criteria
   Scenario: Reference generates Publishing documentation

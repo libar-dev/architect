@@ -40,6 +40,7 @@ import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js
 import type { ExtractedShape, PropertyDoc } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
 import { normalizeLineEndings } from '../../utils/string-utils.js';
+import type { WarningCollector } from '../../generators/warning-collector.js';
 
 // Re-export BusinessRule for convenience (consumers can import from codecs/index.ts)
 export type { BusinessRule };
@@ -196,6 +197,14 @@ export interface RichContentOptions {
    * Provide this callback to capture warnings programmatically or suppress them.
    */
   onWarning?: ((warning: RichContentWarning) => void) | undefined;
+  /**
+   * Optional WarningCollector for structured warning capture.
+   *
+   * When provided, warnings are captured using the collector for aggregation
+   * and structured reporting. Takes precedence over `onWarning` callback.
+   * Use this for CI/CD pipelines that need machine-readable warning output.
+   */
+  warningCollector?: WarningCollector | undefined;
 }
 
 /**
@@ -208,7 +217,7 @@ export type ResolvedRichContentOptions = Required<RichContentOptions>;
 /**
  * Default rich content options
  *
- * Note: onWarning is intentionally undefined by default.
+ * Note: onWarning and warningCollector are intentionally undefined by default.
  * When undefined, warnings fall back to console.warn via emitWarning().
  */
 export const DEFAULT_RICH_CONTENT_OPTIONS: ResolvedRichContentOptions = {
@@ -219,6 +228,7 @@ export const DEFAULT_RICH_CONTENT_OPTIONS: ResolvedRichContentOptions = {
   docStringLanguage: 'markdown',
   baseHeadingLevel: 4,
   onWarning: undefined,
+  warningCollector: undefined,
 };
 
 /**
@@ -235,17 +245,78 @@ export function mergeRichContentOptions(options?: RichContentOptions): ResolvedR
 }
 
 /**
- * Emit a warning using the configured handler or console.warn fallback
+ * Structured warning format for CI parsing.
  *
+ * Format: `::warning file={file},code={code}::{message}`
+ *
+ * This format is compatible with GitHub Actions and other CI systems
+ * that support structured annotations.
+ */
+export interface StructuredWarning {
+  /** Warning code for categorization */
+  code: string;
+  /** Human-readable message */
+  message: string;
+  /** Source file (if available) */
+  file?: string;
+  /** Line number (if available) */
+  line?: number;
+}
+
+/**
+ * Format a warning for CI output (GitHub Actions compatible).
+ *
+ * @param warning - The warning to format
+ * @returns Formatted string for CI log parsing
+ */
+export function formatWarningForCI(warning: StructuredWarning): string {
+  const parts: string[] = [];
+  if (warning.file) parts.push(`file=${warning.file}`);
+  if (warning.line !== undefined) parts.push(`line=${warning.line}`);
+  parts.push(`code=${warning.code}`);
+
+  const attributes = parts.join(',');
+  return `::warning ${attributes}::${warning.message}`;
+}
+
+/**
+ * Emit a warning using the configured handler, collector, or console.warn fallback.
+ *
+ * Priority order:
+ * 1. WarningCollector (if provided) - for structured aggregation
+ * 2. onWarning callback (if provided) - for custom handling
+ * 3. console.warn - default fallback
+ *
+ * @param warning - The warning to emit
+ * @param options - Options containing warning handlers
+ * @param source - Optional source file for collector context
  * @internal
  */
-function emitWarning(warning: RichContentWarning, options?: RichContentOptions): void {
+function emitWarning(
+  warning: RichContentWarning,
+  options?: RichContentOptions,
+  source?: string
+): void {
+  // Priority 1: Use WarningCollector if available (structured aggregation)
+  if (options?.warningCollector) {
+    options.warningCollector.capture({
+      source: source ?? 'rich-content-rendering',
+      category: 'format',
+      message: warning.message,
+      subcategory: warning.code,
+    });
+    return;
+  }
+
+  // Priority 2: Use onWarning callback if available
   if (options?.onWarning) {
     options.onWarning(warning);
-  } else {
-    const contextSuffix = warning.context ? ` Context: ${warning.context}` : '';
-    console.warn(`[${warning.code}] ${warning.message}${contextSuffix}`);
+    return;
   }
+
+  // Priority 3: Fall back to console.warn with structured format
+  const contextSuffix = warning.context ? ` Context: ${warning.context}` : '';
+  console.warn(`[${warning.code}] ${warning.message}${contextSuffix}`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -320,16 +391,34 @@ export function renderStepsList(steps: readonly ScenarioStep[]): SectionBlock {
 }
 
 /**
+ * Default tab width for tab-to-space normalization in dedent.
+ */
+const DEFAULT_TAB_WIDTH = 2;
+
+/**
+ * Normalize tabs to spaces for consistent indentation calculation.
+ *
+ * @param text - Text that may contain tabs
+ * @param tabWidth - Number of spaces per tab (default: 2)
+ * @returns Text with tabs replaced by spaces
+ */
+function normalizeTabs(text: string, tabWidth: number = DEFAULT_TAB_WIDTH): string {
+  return text.replace(/\t/g, ' '.repeat(tabWidth));
+}
+
+/**
  * Remove common leading indentation from all lines in a code block.
  *
  * When DocStrings are embedded in Gherkin files, they often have consistent
  * indentation to align with the surrounding scenario structure. This function
  * normalizes that indentation by:
- * 1. Finding the minimum indentation across all non-empty lines
- * 2. Removing that common indentation from every line
- * 3. Trimming trailing whitespace from each line
+ * 1. Normalizing tabs to spaces (default: 2 spaces per tab)
+ * 2. Finding the minimum indentation across all non-empty lines
+ * 3. Removing that common indentation from every line
+ * 4. Trimming trailing whitespace from each line
  *
  * @param text - The code block content to dedent
+ * @param tabWidth - Number of spaces per tab (default: 2)
  * @returns The dedented text with normalized indentation
  *
  * @example
@@ -341,10 +430,16 @@ export function renderStepsList(steps: readonly ScenarioStep[]): SectionBlock {
  * // Mixed indentation (preserves relative indentation):
  * dedent("    function foo() {\n      return 42;\n    }")
  * // Returns: "function foo() {\n  return 42;\n}"
+ *
+ * // Tab-indented code (tabs normalized to spaces):
+ * dedent("\t\tconst x = 1;")
+ * // Returns: "const x = 1;"
  * ```
  */
-function dedent(text: string): string {
-  const lines = text.split('\n');
+export function dedent(text: string, tabWidth: number = DEFAULT_TAB_WIDTH): string {
+  // Normalize tabs to spaces before processing
+  const normalizedText = normalizeTabs(text, tabWidth);
+  const lines = normalizedText.split('\n');
 
   // Find minimum indentation (ignoring empty lines)
   const nonEmptyLines = lines.filter((line) => line.trim().length > 0);
@@ -711,7 +806,11 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   // Extract **API:** See `path` references (can appear multiple times)
   // Note: This pattern looks for content INSIDE backticks, so we use the original
   // textWithoutCode which still has backticks intact (only code fences removed)
-  const apiRefPattern = /\*\*API:\*\*\s*See\s*`([^`]+)`/g;
+  // Pattern is case-insensitive and allows optional bold markers:
+  // - "**API:** See `path`" (standard bold)
+  // - "API: See `path`" (plain text)
+  // - "api: see `path`" (lowercase)
+  const apiRefPattern = /(?:\*\*)?API:(?:\*\*)?\s*See\s*`([^`]+)`/gi;
   const apiRefs: string[] = [];
   let apiMatch;
   while ((apiMatch = apiRefPattern.exec(textWithoutCode)) !== null) {
@@ -738,7 +837,8 @@ export function parseBusinessRuleAnnotations(description: string): BusinessRuleA
   remaining = remaining.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
 
   // Remove **API:** See `path` references (use original pattern for protected text)
-  remaining = remaining.replace(/\*\*API:\*\*\s*See\s*__BT\d+__/g, '');
+  // Pattern matches both bold and non-bold, case-insensitive
+  remaining = remaining.replace(/(?:\*\*)?API:(?:\*\*)?\s*See\s*__LIBAR_BT_\d+__/gi, '');
 
   // Clean up remaining content and restore backticks
   remaining = restore(remaining.trim());

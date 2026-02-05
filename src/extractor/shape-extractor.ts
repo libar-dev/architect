@@ -397,12 +397,17 @@ function extractShape(
 
   // Extract property-level JSDoc for interfaces
   // Uses strict adjacency to prevent interface-level JSDoc from being misattributed to first property
+  // Performance optimization: pre-sort comments once O(c log c), then O(log c) per property lookup
   let propertyDocs: PropertyDoc[] | undefined;
   if (options.includeJsDoc && node.type === 'TSInterfaceDeclaration') {
     const docs: PropertyDoc[] = [];
     // Get the line where the interface body starts (the `{` line)
     // loc is guaranteed by parse options: { range: true, loc: true }
     const interfaceBodyStartLine = node.body.loc.start.line;
+
+    // Pre-process comments once for O(log c) binary search per property
+    // This converts O(m × c) to O(c log c + m log c) where m=properties, c=comments
+    const sortedComments = prepareJsDocComments(comments);
 
     for (const member of node.body.body) {
       if (member.type === 'TSPropertySignature' && member.key.type === 'Identifier') {
@@ -411,7 +416,7 @@ function extractShape(
         const propJsDoc = findStrictlyAdjacentPropertyJsDoc(
           sourceCode,
           member,
-          comments,
+          sortedComments,
           interfaceBodyStartLine
         );
         if (propJsDoc) {
@@ -483,6 +488,94 @@ function extractPrecedingJsDoc(
 }
 
 /**
+ * Internal representation of a JSDoc comment with pre-extracted line info.
+ * Used for O(1) binary search lookups.
+ */
+interface JsDocCommentWithLine {
+  /** Original comment from AST */
+  comment: TSESTree.Comment;
+  /** Line where comment ends (pre-extracted for sorting/searching) */
+  endLine: number;
+  /** Line where comment starts */
+  startLine: number;
+  /** Character position where comment ends */
+  endPosition: number;
+}
+
+/**
+ * Pre-process comments for efficient property JSDoc lookup.
+ *
+ * Filters to only JSDoc block comments and sorts by end line for binary search.
+ * This is O(c log c) but done once per file, enabling O(log c) lookups per property.
+ *
+ * @param comments - All comments from the AST
+ * @returns Sorted array of JSDoc comments with pre-extracted line info
+ */
+function prepareJsDocComments(comments: readonly TSESTree.Comment[]): JsDocCommentWithLine[] {
+  const jsDocComments: JsDocCommentWithLine[] = [];
+
+  for (const comment of comments) {
+    // Filter: Must be a block comment with JSDoc format (starts with *)
+    if (comment.type !== 'Block' || !comment.value.startsWith('*')) {
+      continue;
+    }
+
+    // Pre-extract line info (loc guaranteed by parse options: { loc: true })
+    jsDocComments.push({
+      comment,
+      endLine: comment.loc.end.line,
+      startLine: comment.loc.start.line,
+      endPosition: comment.range[1],
+    });
+  }
+
+  // Sort by end line for binary search
+  jsDocComments.sort((a, b) => a.endLine - b.endLine);
+
+  return jsDocComments;
+}
+
+/**
+ * Binary search to find a JSDoc comment that ends at or near a target line.
+ *
+ * Returns the index of the comment with the largest endLine <= targetLine,
+ * or -1 if no such comment exists.
+ *
+ * @param sortedComments - Comments sorted by endLine
+ * @param targetLine - The line to search for
+ * @returns Index of matching comment, or -1 if not found
+ */
+function findCommentEndingAtLine(
+  sortedComments: readonly JsDocCommentWithLine[],
+  targetLine: number
+): number {
+  if (sortedComments.length === 0) return -1;
+
+  let left = 0;
+  let right = sortedComments.length - 1;
+  let result = -1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const comment = sortedComments[mid];
+    if (!comment) break;
+    const endLine = comment.endLine;
+
+    if (endLine === targetLine) {
+      // Exact match - could be multiple, find the rightmost one
+      result = mid;
+      left = mid + 1;
+    } else if (endLine < targetLine) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Find JSDoc comment strictly adjacent to an interface property member.
  *
  * Unlike extractPrecedingJsDoc which allows a 3-line gap, this function requires:
@@ -492,16 +585,18 @@ function extractPrecedingJsDoc(
  * This prevents interface-level JSDoc from being misattributed to the first property
  * when the interface is tightly formatted.
  *
+ * Performance: O(log c) per property when using pre-sorted comments, vs O(c) previously.
+ *
  * @param sourceCode - Full source code text
  * @param member - The property member node
- * @param comments - All comments from the AST
+ * @param sortedComments - Pre-sorted JSDoc comments (call prepareJsDocComments once per file)
  * @param interfaceBodyStartLine - Line where interface body starts (the `{` line)
  * @returns JSDoc string if found, undefined otherwise
  */
 function findStrictlyAdjacentPropertyJsDoc(
   sourceCode: string,
   member: TSESTree.Node,
-  comments: readonly TSESTree.Comment[],
+  sortedComments: readonly JsDocCommentWithLine[],
   interfaceBodyStartLine: number
 ): string | undefined {
   // Range and loc are guaranteed by parse options: { range: true, loc: true }
@@ -511,28 +606,24 @@ function findStrictlyAdjacentPropertyJsDoc(
   // Property JSDoc must end exactly on the line before the property
   const expectedCommentEndLine = memberStartLine - PROPERTY_JSDOC_MAX_GAP;
 
-  for (const comment of comments) {
-    // Must be a block comment
-    if (comment.type !== 'Block') continue;
+  // Binary search for comment ending at expected line
+  const index = findCommentEndingAtLine(sortedComments, expectedCommentEndLine);
+  if (index === -1) return undefined;
 
-    // Must be JSDoc format (starts with *)
-    if (!comment.value.startsWith('*')) continue;
-
-    const commentEndLine = comment.loc.end.line;
-    const commentStartLine = comment.loc.start.line;
-    const commentEnd = comment.range[1];
+  // Check all comments ending at that line (there could be multiple)
+  // Start from the found index and check backwards/forwards for exact matches
+  for (let i = index; i >= 0; i--) {
+    const entry = sortedComments[i];
+    if (entry?.endLine !== expectedCommentEndLine) break;
 
     // Comment must end before the member starts (character position)
-    if (commentEnd > memberStart) continue;
+    if (entry.endPosition > memberStart) continue;
 
     // Comment must be INSIDE the interface body (after the opening brace line)
-    if (commentStartLine <= interfaceBodyStartLine) continue;
-
-    // Comment must end exactly on the expected line (strictly adjacent)
-    if (commentEndLine !== expectedCommentEndLine) continue;
+    if (entry.startLine <= interfaceBodyStartLine) continue;
 
     // Found a valid property-level JSDoc
-    return sourceCode.slice(comment.range[0], comment.range[1]);
+    return sourceCode.slice(entry.comment.range[0], entry.comment.range[1]);
   }
 
   return undefined;
