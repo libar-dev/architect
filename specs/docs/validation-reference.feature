@@ -30,12 +30,9 @@ Feature: Validation Reference - Auto-Generated Documentation
 | --- | --- | --- |
 | Command Decision Tree | THIS DECISION (Rule: Command Decision Tree) | Rule block content |
 | Command Summary | THIS DECISION (Rule: Command Summary) | Rule block table |
-| lint-patterns Rules | THIS DECISION (Rule: lint-patterns Rules) | Rule block table |
 | lint-patterns Rules | src/lint/rules.ts | @extract-shapes tag |
-| Anti-Pattern Detection | THIS DECISION (Rule: Anti-Pattern Detection) | Rule block table |
 | Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
 | Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
-| DoD Validation | THIS DECISION (Rule: DoD Validation) | Rule block table |
 | DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
 | validate-patterns Flags | THIS DECISION (Rule: validate-patterns Flags) | Rule block table |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
@@ -96,59 +93,28 @@ Feature: Validation Reference - Auto-Generated Documentation
     npx lint-patterns -i "src/**/*.ts" --strict
     """
 
-    **Validation Rules:**
-
-| Rule | Severity | What It Checks |
-| --- | --- | --- |
-| missing-pattern-name | error | Must have pattern tag |
-| invalid-status | error | Status must be valid FSM value |
-| tautological-description | error | Description cannot just repeat name |
-| pattern-conflict-in-implements | error | Pattern cannot implement itself |
-| missing-relationship-target | warning | Relationship targets must exist |
-| missing-status | warning | Should have status tag |
-| missing-when-to-use | warning | Should have When to Use section |
-| missing-relationships | info | Consider adding uses/used-by |
+    Validation rules are extracted from `src/lint/rules.ts` via `@extract-shapes`.
 
   Rule: Anti-Pattern Detection
 
     **Context:** Enforces dual-source architecture ownership between TypeScript and Gherkin files.
 
-    **Anti-Patterns Detected:**
-
-| ID | Severity | Description |
-| --- | --- | --- |
-| process-in-code | error | Process metadata in code (should be features-only) |
-| tag-duplication | error | Dependencies in features (should be code-only) |
-| magic-comments | warning | Generator hints in features |
-| scenario-bloat | warning | Too many scenarios per feature (threshold: 20) |
-| mega-feature | warning | Feature file too large (threshold: 500 lines) |
+    Anti-pattern definitions are extracted from `src/validation/anti-patterns.ts` via `@extract-shapes`.
 
     **Tag Location Constraints:**
 
-| Tag Type | Correct Location | Wrong Location |
-| --- | --- | --- |
-| uses | TypeScript code | Feature files |
-| depends-on | Feature files | TypeScript code |
-| quarter | Feature files | TypeScript code |
-| team | Feature files | TypeScript code |
+    - `uses` tags belong in TypeScript code (runtime dependencies)
+    - `depends-on`, `quarter`, `team` tags belong in Feature files (planning metadata)
 
   Rule: DoD Validation
 
     **Context:** Definition of Done validation ensures completed patterns meet quality criteria.
 
-    **Criteria for completed status:**
+    DoD criteria and completion patterns are extracted from `src/validation/dod-validator.ts`
+    and `src/validation/types.ts` via `@extract-shapes`.
 
-| Criterion | What It Checks |
-| --- | --- |
-| All deliverables complete | Status must be: complete, done, finished, yes, or checkmarks |
-| Acceptance criteria present | At least one scenario with @acceptance-criteria tag |
-
-    **Completion Patterns Recognized:**
-
-    """text
-    Text patterns: complete, completed, done, finished, yes
-    Symbol patterns: check mark, heavy check mark, white check mark, ballot box with check
-    """
+    **Summary:** For `completed` status, all deliverables must be done and at least one
+    `@acceptance-criteria` scenario must exist.
 
   Rule: validate-patterns Flags
 

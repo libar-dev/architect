@@ -185,6 +185,116 @@ This ensures:
 2. The fuzzy matching correctly skips rendering the same content as "Other rules"
 3. No duplicate sections in generated output
 
+### Pattern 7: Content Deduplication - TypeScript vs Feature File
+
+**Problem:** The same data appears in both TypeScript source and Feature file Rule: blocks.
+
+**Root Cause:** When establishing documentation recipes, authors copied tables from TypeScript
+into feature files for "complete" Rule: blocks. This creates maintenance burden and drift risk.
+
+**Example of the problem (from instructions-reference.feature):**
+```gherkin
+Rule: Category Tags
+    **Full Category Table (21 categories):**
+    | Tag | Domain | Priority | Description |
+    | domain | Strategic DDD | 1 | ...
+    ... (21 rows manually copied from categories.ts)
+```
+
+Meanwhile, `src/taxonomy/categories.ts` has the SAME data:
+```typescript
+export const CATEGORIES: readonly CategoryDefinition[] = [
+  { tag: 'domain', domain: 'Strategic DDD', priority: 1, ... },
+  ...
+];
+```
+
+**Solution:** Apply strict content ownership:
+
+| Content Type | Single Source | Never Duplicate In |
+|--------------|---------------|-------------------|
+| Tag definitions (name, format, purpose, example) | TypeScript `registry-builder.ts` | Feature file tables |
+| Category definitions (tag, domain, priority) | TypeScript `categories.ts` | Feature file tables |
+| CLI flags and options | TypeScript `src/cli/*.ts` | Feature file tables |
+| Conceptual context ("When to Use", "Why") | Feature file Rule: blocks | TypeScript JSDoc |
+| Supplementary tables (Source Ownership, Duration) | Feature file Rule: blocks | N/A - unique content |
+| Code examples | Feature file DocStrings | N/A |
+
+**How to Fix:**
+
+1. Check if table data exists in TypeScript with `@extract-shapes` annotation
+2. If yes: REMOVE table from Rule: block, keep only context paragraph
+3. If no: Keep table in Rule: block (it's unique content)
+4. Update Source Mapping to reflect actual extraction sources
+
+**Example fix applied to instructions-reference.feature:**
+
+Before (528 lines):
+```gherkin
+Rule: Category Tags
+    **Full Category Table (21 categories):**
+    | Tag | Domain | Priority | Description |
+    | domain | Strategic DDD | 1 | Bounded contexts... |
+    ... (21 rows)
+```
+
+After (363 lines):
+```gherkin
+Rule: Category Tags
+    **Context:** Category tags classify patterns by domain area.
+    The full category list (21 categories) is extracted from `src/taxonomy/categories.ts`.
+```
+
+### Pattern 8: Identifying Supplementary Tables (Unique Content)
+
+**Problem:** How do you know if a table should be kept or removed?
+
+Some tables in Rule: blocks contain information NOT in TypeScript. These are "supplementary tables"
+that provide human-written guidance rather than data that can be extracted from code.
+
+**Supplementary tables to KEEP:**
+
+| Table Type | Example | Why It's Unique |
+|------------|---------|-----------------|
+| Source Ownership | `uses` → TypeScript, `depends-on` → Feature | Architectural guidance not in code |
+| Format Types Explanation | `flag` → Boolean presence | Parsing behavior explanation |
+| Hierarchy Duration | `epic` → Multi-quarter | Timeline context not in TypeScript |
+| Two-Tier Architecture | Tier 1 → delivery-process/specs | Structural guidance |
+| Escape Hatches | CLI flags with workarounds | Usage guidance |
+
+**Data tables to REMOVE (duplicate TypeScript):**
+
+| Table Type | Why Remove | TypeScript Source |
+|------------|------------|-------------------|
+| Tag definitions | Same columns as MetadataTagDefinition | `registry-builder.ts` |
+| Category definitions | Same structure as CATEGORIES array | `categories.ts` |
+| Enum values | Already in tag definition's `values` property | `registry-builder.ts` |
+| CLI flags | Already extracted via @extract-shapes | `src/cli/*.ts` |
+
+**Identification Rule:** Search TypeScript for the table's data:
+```bash
+grep -r "first-cell-value" src/taxonomy/ src/cli/
+```
+If found → REMOVE the table, extract from TypeScript
+If not found → KEEP the table, it's unique content
+
+---
+
+## File Organization
+
+Documentation recipe files use decision document FORMAT but serve a different PURPOSE:
+
+| Directory | Purpose | Example |
+|-----------|---------|---------|
+| `specs/docs/` | Documentation recipes (Source Mapping tables) | `instructions-reference.feature` |
+| `delivery-process/decisions/` | ADR/PDR documents | `adr-006-process-guard.feature` |
+| `delivery-process/specs/` | Roadmap specifications | `phase-state-machine.feature` |
+
+Documentation recipes:
+- Define WHICH sources feed WHICH documentation sections
+- Don't record decisions made, they configure generation
+- Use Rule: blocks for unique supplementary content only
+
 ---
 
 ## Problem Statement
@@ -411,6 +521,45 @@ You are fixing auto-generated documentation for the delivery-process package.
 **Feature file:** specs/docs/[NAME]-reference.feature
 
 **Your task:**
+
+### Step 0: Check for Content Duplication (NEW - CRITICAL)
+Before fixing missing @extract-shapes, check if Rule: blocks duplicate TypeScript data.
+
+1. For each Rule: block with a data table, search TypeScript:
+   ```bash
+   grep -r "first-cell-value" src/taxonomy/ src/cli/
+   ```
+
+2. If the table data exists in TypeScript:
+   - REMOVE the table from the Rule: block
+   - Keep only the context paragraph
+   - Update Source Mapping to extract from TypeScript
+
+3. If the table data does NOT exist in TypeScript:
+   - KEEP the table (it's supplementary content)
+   - Ensure Source Mapping references the Rule: block
+
+**Duplication red flags:**
+- Table has same columns as TypeScript interface (tag, format, purpose)
+- Table values match constants in TypeScript files
+- Source Mapping says "extract-shapes" but Rule: also has table
+
+**Example fix (from instructions-reference.feature):**
+
+BEFORE (duplicates categories.ts):
+```gherkin
+Rule: Category Tags
+    | Tag | Domain | Priority | Description |
+    | domain | Strategic DDD | 1 | Bounded contexts... |
+    ... (21 rows)
+```
+
+AFTER (removed duplicate):
+```gherkin
+Rule: Category Tags
+    **Context:** Category tags classify patterns by domain area.
+    The full category list is extracted from `src/taxonomy/categories.ts`.
+```
 
 ### Step 1: Analyze Source Mapping Table
 Read the feature file's Source Mapping table and categorize each row:

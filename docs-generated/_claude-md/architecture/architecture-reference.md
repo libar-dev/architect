@@ -130,46 +130,6 @@
 - `RawDataset` - interface
 - `transformToMasterDataset` - function
 
-### Available Codecs
-
-**Context:** The package provides multiple specialized codecs for different documentation needs.
-
-    **Decision:** Codecs are grouped by purpose:
-
-    **Pattern-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| PatternsDocumentCodec | PATTERNS.md + patterns/*.md | Pattern registry by category |
-| RequirementsDocumentCodec | PRODUCT-REQUIREMENTS.md | PRD grouped by product area |
-| AdrDocumentCodec | DECISIONS.md + decisions/*.md | Architecture Decision Records |
-
-    **Timeline-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| RoadmapDocumentCodec | ROADMAP.md + phases/*.md | Development roadmap by phase |
-| CompletedMilestonesCodec | COMPLETED-MILESTONES.md | Historical record by quarter |
-| CurrentWorkCodec | CURRENT-WORK.md | Active development work |
-| ChangelogCodec | CHANGELOG.md | Keep a Changelog format |
-
-    **Session-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| SessionContextCodec | SESSION-CONTEXT.md | Current session for AI agents |
-| RemainingWorkCodec | REMAINING-WORK.md | Incomplete work summary |
-| PrChangesCodec | working/PR-CHANGES.md | PR-scoped view by changed files |
-| TraceabilityCodec | TRACEABILITY.md | Timeline to behavior coverage |
-
-    **Planning Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| PlanningChecklistCodec | PLANNING-CHECKLIST.md | Pre-planning questions |
-| SessionPlanCodec | SESSION-PLAN.md | Implementation plans |
-| SessionFindingsCodec | SESSION-FINDINGS.md | Retrospective discoveries |
-
 ### Progressive Disclosure
 
 **Context:** Large documents are split into main index plus detail files.
@@ -196,41 +156,12 @@
 | standard | Default with all sections |
 | detailed | Maximum detail, all optional sections |
 
-### Codec to Generator Mapping
-
-**Context:** Each codec is exposed via a CLI generator flag.
-
-    **Decision:** The mapping from codec to generator name:
-
-| Codec | Generator Name | CLI Flag |
-| --- | --- | --- |
-| PatternsDocumentCodec | patterns | -g patterns |
-| RoadmapDocumentCodec | roadmap | -g roadmap |
-| CompletedMilestonesCodec | milestones | -g milestones |
-| CurrentWorkCodec | current | -g current |
-| RequirementsDocumentCodec | requirements | -g requirements |
-| SessionContextCodec | session | -g session |
-| RemainingWorkCodec | remaining | -g remaining |
-| PrChangesCodec | pr-changes | -g pr-changes |
-| AdrDocumentCodec | adrs | -g adrs |
-| PlanningChecklistCodec | planning-checklist | -g planning-checklist |
-| SessionPlanCodec | session-plan | -g session-plan |
-| SessionFindingsCodec | session-findings | -g session-findings |
-| ChangelogCodec | changelog | -g changelog |
-| TraceabilityCodec | traceability | -g traceability |
-| OverviewCodec | overview-rdm | -g overview-rdm |
-
 ### Status Normalization
 
-**Context:** Source annotations use various status values that must be normalized.
-
-    **Decision:** All status values are normalized to three canonical states:
-
-| Input Status | Normalized To |
-| --- | --- |
-| completed, implemented | completed |
-| active, partial, in-progress | active |
-| roadmap, planned, deferred, undefined | planned |
+- `NORMALIZED_STATUS_VALUES` - const
+- `NormalizedStatus` - type
+- `STATUS_NORMALIZATION_MAP` - const
+- `normalizeStatus` - function
 
 ### Result Monad Pattern
 

@@ -26,7 +26,7 @@ Feature: Index Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| Package Metadata | THIS DECISION (Rule: Package Metadata) | Rule block table |
+| Package Metadata | package.json | JSON extraction (name, version, description, engines.node, license) |
 | Quick Navigation | THIS DECISION (Rule: Quick Navigation) | Rule block table |
 | Reading Order for New Users | THIS DECISION (Rule: Reading Order for New Users) | Rule block table |
 | Reading Order for Developers | THIS DECISION (Rule: Reading Order for Developers) | Rule block table |
@@ -47,14 +47,7 @@ Feature: Index Reference - Auto-Generated Documentation
 
     **Context:** Essential package information for orientation.
 
-| Field | Value |
-| --- | --- |
-| Package | at-libar-dev/delivery-process |
-| Version | 0.1.0-pre.0 |
-| Purpose | Source-first delivery process - code is the single source of truth |
-| Key Features | Living docs, FSM enforcement, AI-native ProcessStateAPI |
-| Node.js | greater-than-or-equal 18.0.0 |
-| License | MIT |
+    **Extracted from:** `package.json` fields: `name`, `version`, `description`, `engines.node`, `license`
 
   Rule: Quick Navigation
 

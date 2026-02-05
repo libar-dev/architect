@@ -26,25 +26,18 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
-| File-Level Opt-In | THIS DECISION (Rule: File-Level Opt-In) | Rule block table |
-| Category Tags | src/taxonomy/categories.ts | extract-shapes tag |
-| Category Reference | THIS DECISION (Rule: Category Tags) | Rule block table |
-| Metadata Tags | src/taxonomy/registry-builder.ts | extract-shapes tag |
-| Core Metadata | THIS DECISION (Rule: Core Metadata Tags) | Rule block table |
-| Relationship Tags | THIS DECISION (Rule: Relationship Tags) | Rule block table |
-| Process Metadata | THIS DECISION (Rule: Process Metadata) | Rule block table |
-| PRD Tags | THIS DECISION (Rule: PRD and Requirements Tags) | Rule block table |
-| Hierarchy Tags | THIS DECISION (Rule: Hierarchy Tags) | Rule block table |
-| ADR/PDR Tags | THIS DECISION (Rule: ADR and PDR Tags) | Rule block table |
-| Traceability Tags | THIS DECISION (Rule: Traceability Tags) | Rule block table |
-| Architecture Tags | THIS DECISION (Rule: Architecture Diagram Tags) | Rule block table |
-| Aggregation Tags | THIS DECISION (Rule: Aggregation Tags) | Rule block table |
-| Shape Extraction | THIS DECISION (Rule: Shape Extraction Tag) | Rule block table |
-| generate-docs CLI | src/cli/generate-docs.ts | extract-shapes tag |
-| lint-patterns CLI | src/cli/lint-patterns.ts | extract-shapes tag |
-| lint-process CLI | src/cli/lint-process.ts | extract-shapes tag |
-| validate-patterns CLI | src/cli/validate-patterns.ts | extract-shapes tag |
-| generate-tag-taxonomy CLI | src/cli/generate-tag-taxonomy.ts | extract-shapes tag |
+| File-Level Opt-In | THIS DECISION (Rule: File-Level Opt-In) | Rule block content |
+| Categories | src/taxonomy/categories.ts | extract-shapes tag |
+| Metadata Tags (Grouped) | src/taxonomy/registry-builder.ts | extract-shapes tag |
+| Format Types | THIS DECISION (Rule: Format Types) | Rule block table |
+| Source Ownership | THIS DECISION (Rule: Source Ownership) | Rule block table |
+| Hierarchy Duration | THIS DECISION (Rule: Hierarchy Duration) | Rule block table |
+| Two-Tier Spec Architecture | THIS DECISION (Rule: Two-Tier Spec Architecture) | Rule block table |
+| CLI generate-docs | src/cli/generate-docs.ts | extract-shapes tag |
+| CLI lint-patterns | src/cli/lint-patterns.ts | extract-shapes tag |
+| CLI lint-process | src/cli/lint-process.ts | extract-shapes tag |
+| CLI validate-patterns | src/cli/validate-patterns.ts | extract-shapes tag |
+| CLI generate-tag-taxonomy | src/cli/generate-tag-taxonomy.ts | extract-shapes tag |
 | Gherkin Integration | THIS DECISION (Rule: Gherkin Integration) | Rule block content |
 
   Background: Deliverables
@@ -89,31 +82,8 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
     **Context:** Category tags classify patterns by domain area.
 
-    **Full Category Table (ddd-es-cqrs preset - 21 categories):**
-
-| Tag | Domain | Priority | Description |
-| --- | --- | --- | --- |
-| domain | Strategic DDD | 1 | Bounded contexts, aggregates, strategic design |
-| ddd | Domain-Driven Design | 2 | DDD tactical patterns |
-| bounded-context | Bounded Context | 3 | BC contracts and definitions |
-| event-sourcing | Event Sourcing | 4 | Event store, aggregates, replay |
-| decider | Decider | 5 | Decider pattern |
-| fsm | FSM | 5 | Finite state machine patterns |
-| cqrs | CQRS | 5 | Command/query separation |
-| projection | Projection | 6 | Read models, checkpoints |
-| saga | Saga | 7 | Cross-context coordination, process managers |
-| command | Command | 8 | Command handlers, orchestration |
-| arch | Architecture | 9 | Architecture patterns, decisions |
-| infra | Infrastructure | 10 | Infrastructure, composition root |
-| validation | Validation | 11 | Input validation, schemas |
-| testing | Testing | 12 | Test patterns, BDD |
-| performance | Performance | 13 | Optimization, caching |
-| security | Security | 14 | Auth, authorization |
-| core | Core | 15 | Core utilities |
-| api | API | 16 | Public APIs |
-| generator | Generator | 17 | Code generators |
-| middleware | Middleware | 18 | Middleware patterns |
-| correlation | Correlation | 19 | Correlation tracking |
+    The full category list (21 categories in ddd-es-cqrs preset) is extracted from
+    `src/taxonomy/categories.ts`. Each category has: tag, domain, priority, description.
 
     **Simple Presets (generic, libar-generic):** Only core, api, infra categories.
 
@@ -128,21 +98,19 @@ Feature: Instructions Reference - Auto-Generated Documentation
      */
     """
 
-  Rule: Core Metadata Tags
+  Rule: Metadata Tags
 
-    **Context:** Core metadata tags provide essential pattern information.
+    **Context:** Metadata tags are extracted from `src/taxonomy/registry-builder.ts`.
+    The `METADATA_TAGS_BY_GROUP` constant organizes all 42 tags into functional groups:
+    core, relationship, process, prd, adr, hierarchy, traceability, architecture, extraction.
 
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| pattern | value | Explicit pattern name (required) | at-libar-docs-pattern CommandOrchestrator |
-| status | enum | Work item lifecycle status (per FSM) | at-libar-docs-status roadmap |
-| core | flag | Marks as essential/must-know pattern | at-libar-docs-core |
-| usecase | quoted-value | Use case association (repeatable) | at-libar-docs-usecase "When handling failures" |
-| brief | value | Path to pattern brief markdown | at-libar-docs-brief docs/briefs/decider.md |
+    Each tag definition includes: tag name, format, purpose, and example.
 
     **Status Values:** roadmap, active, completed, deferred
 
-    **Format Types:**
+  Rule: Format Types
+
+    **Context:** Format types define how tag values are parsed.
 
 | Format | Parsing | Example |
 | --- | --- | --- |
@@ -153,76 +121,26 @@ Feature: Instructions Reference - Auto-Generated Documentation
 | number | Numeric value | at-libar-docs-phase 15 |
 | quoted-value | Preserves spaces | at-libar-docs-brief:'Multi word' |
 
-  Rule: Relationship Tags
+  Rule: Source Ownership
 
-    **Context:** Relationship tags model pattern dependencies and connections.
+    **Context:** Relationship tags have specific ownership rules.
 
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| uses | csv | Patterns this depends on | at-libar-docs-uses CommandBus, EventStore |
-| used-by | csv | Patterns that depend on this | at-libar-docs-used-by SagaOrchestrator |
-| implements | csv | Patterns this code realizes | at-libar-docs-implements EventStoreDurability |
-| extends | value | Base pattern this extends | at-libar-docs-extends ProjectionCategories |
-| depends-on | csv | Roadmap dependencies | at-libar-docs-depends-on EventStore, CommandBus |
-| enables | csv | Patterns this enables | at-libar-docs-enables SagaOrchestrator |
-| see-also | csv | Related patterns (no dependency) | at-libar-docs-see-also AgentAsBoundedContext |
-| api-ref | csv | File paths to implementation APIs | at-libar-docs-api-ref src/durability/outbox.ts |
-
-    **Source Ownership:**
+    Relationship tag definitions are extracted from `src/taxonomy/registry-builder.ts`.
+    This table defines WHERE each tag type should be used (architectural guidance):
 
 | Tag | Correct Location | Wrong Location |
 | --- | --- | --- |
 | uses | TypeScript | Feature files |
 | depends-on | Feature files | TypeScript |
 
-  Rule: Process Metadata
+    TypeScript files own runtime dependencies (`uses`).
+    Feature files own planning dependencies (`depends-on`).
 
-    **Context:** Process metadata tracks work timeline and assignment.
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| phase | number | Roadmap phase number | at-libar-docs-phase 14 |
-| release | value | Target release version | at-libar-docs-release v0.1.0 |
-| quarter | value | Delivery quarter | at-libar-docs-quarter Q1-2026 |
-| completed | value | Completion date (YYYY-MM-DD) | at-libar-docs-completed 2026-01-08 |
-| effort | value | Estimated effort | at-libar-docs-effort 2d |
-| effort-actual | value | Actual effort spent | at-libar-docs-effort-actual 3d |
-| team | value | Responsible team | at-libar-docs-team platform |
-| workflow | enum | Workflow discipline | at-libar-docs-workflow implementation |
-| risk | enum | Risk level | at-libar-docs-risk medium |
-| priority | enum | Priority level | at-libar-docs-priority high |
-
-    **Enum Values:**
-
-| Tag | Values |
-| --- | --- |
-| workflow | implementation, planning, validation, documentation |
-| risk | low, medium, high |
-| priority | critical, high, medium, low |
-
-  Rule: PRD and Requirements Tags
-
-    **Context:** PRD tags support product requirements documentation.
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| product-area | value | Product area for PRD grouping | at-libar-docs-product-area PlatformCore |
-| user-role | value | Target user persona | at-libar-docs-user-role Developer |
-| business-value | value | Business value statement | at-libar-docs-business-value eliminates-complexity |
-| constraint | value | Technical constraint (repeatable) | at-libar-docs-constraint requires-convex-backend |
-
-    **Note:** Business value uses hyphenated format for tag compatibility.
-
-  Rule: Hierarchy Tags
+  Rule: Hierarchy Duration
 
     **Context:** Hierarchy tags organize work into epic, phase, task structure.
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| level | enum | Hierarchy level | at-libar-docs-level epic |
-| parent | value | Parent pattern in hierarchy | at-libar-docs-parent AggregateArchitecture |
-
-    **Hierarchy Levels:**
+    Tag definitions (level, parent) are extracted from `src/taxonomy/registry-builder.ts`.
+    This table provides planning guidance for duration estimates:
 
 | Level | Duration | Description |
 | --- | --- | --- |
@@ -230,99 +148,16 @@ Feature: Instructions Reference - Auto-Generated Documentation
 | phase | 2-5 days | Standard work units |
 | task | 1-4 hours | Session-level work |
 
-  Rule: ADR and PDR Tags
-
-    **Context:** ADR/PDR tags support architecture decision records.
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| adr | value | ADR/PDR number | at-libar-docs-adr 015 |
-| adr-status | enum | Decision status | at-libar-docs-adr-status accepted |
-| adr-category | value | Category (architecture, process) | at-libar-docs-adr-category architecture |
-| adr-supersedes | value | ADR number this supersedes | at-libar-docs-adr-supersedes 012 |
-| adr-superseded-by | value | ADR that supersedes this | at-libar-docs-adr-superseded-by 020 |
-| adr-theme | enum | Theme grouping | at-libar-docs-adr-theme persistence |
-| adr-layer | enum | Evolutionary layer | at-libar-docs-adr-layer foundation |
-
-    **Enum Values:**
-
-| Tag | Values |
-| --- | --- |
-| adr-status | proposed, accepted, deprecated, superseded |
-| adr-theme | persistence, isolation, commands, projections, coordination, taxonomy, testing |
-| adr-layer | foundation, infrastructure, refinement |
-
-  Rule: Traceability Tags
+  Rule: Two-Tier Spec Architecture
 
     **Context:** Traceability tags link roadmap specs to executable specs (PDR-007).
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| executable-specs | csv | Links to package spec locations | at-libar-docs-executable-specs platform-decider/tests/features |
-| roadmap-spec | value | Links back to roadmap pattern | at-libar-docs-roadmap-spec DeciderPattern |
-
-    **Two-Tier Spec Architecture:**
+    Tag definitions (executable-specs, roadmap-spec) are in `src/taxonomy/registry-builder.ts`.
+    This table explains the two-tier architecture:
 
 | Tier | Location | Purpose |
 | --- | --- | --- |
 | Tier 1 | delivery-process/specs/ | Roadmap and planning specifications |
 | Tier 2 | package/tests/features/ | Executable test specifications |
-
-  Rule: Architecture Diagram Tags
-
-    **Context:** Architecture tags enable automated diagram generation.
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| arch-role | enum | Architectural role for diagrams | at-libar-docs-arch-role projection |
-| arch-context | value | Bounded context for grouping | at-libar-docs-arch-context orders |
-| arch-layer | enum | Architectural layer | at-libar-docs-arch-layer application |
-
-    **Arch-Role Values:**
-
-| Role | Description |
-| --- | --- |
-| bounded-context | BC boundary |
-| command-handler | Command processing |
-| projection | Read model |
-| saga | Cross-context coordination |
-| process-manager | Long-running process |
-| infrastructure | Infrastructure component |
-| repository | Data access |
-| decider | Decider pattern |
-| read-model | Query model |
-
-    **Arch-Layer Values:** domain, application, infrastructure
-
-  Rule: Shape Extraction Tag
-
-    **Context:** Extract TypeScript types for documentation generation (ADR-021).
-
-| Tag | Format | Purpose | Example |
-| --- | --- | --- | --- |
-| extract-shapes | csv | TypeScript type names to extract | at-libar-docs-extract-shapes DeciderInput, Result |
-
-    **Usage:** Add to files containing types that should appear in generated docs.
-
-  Rule: Aggregation Tags
-
-    **Context:** Aggregation tags control document output organization.
-
-| Tag | Target Document | Purpose |
-| --- | --- | --- |
-| overview | OVERVIEW.md | Architecture overview patterns |
-| decision | DECISIONS.md | ADR-style decisions (auto-numbered) |
-| intro | (template) | Package introduction placeholder |
-
-    **Usage Example:**
-
-    """typescript
-    /**
-     * at-libar-docs
-     * at-libar-docs-pattern ArchitectureOverview
-     * at-libar-docs-overview
-     */
-    """
 
   Rule: CLI generate-docs
 

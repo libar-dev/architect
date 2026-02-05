@@ -28,12 +28,9 @@
 | --- | --- | --- |
 | Command Decision Tree | THIS DECISION (Rule: Command Decision Tree) | Rule block content |
 | Command Summary | THIS DECISION (Rule: Command Summary) | Rule block table |
-| lint-patterns Rules | THIS DECISION (Rule: lint-patterns Rules) | Rule block table |
 | lint-patterns Rules | src/lint/rules.ts | @extract-shapes tag |
-| Anti-Pattern Detection | THIS DECISION (Rule: Anti-Pattern Detection) | Rule block table |
 | Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
 | Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
-| DoD Validation | THIS DECISION (Rule: DoD Validation) | Rule block table |
 | DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
 | validate-patterns Flags | THIS DECISION (Rule: validate-patterns Flags) | Rule block table |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
@@ -76,31 +73,7 @@ Need to check annotation quality?
 | lint-process | FSM workflow enforcement | Pre-commit hooks, CI pipelines |
 | validate-patterns | Cross-source + DoD + anti-pattern | Release validation, comprehensive |
 
-### lint-patterns Rules (from this decision (rule: lint-patterns rules))
-
-**Context:** lint-patterns validates annotation quality in TypeScript files.
-
-    **Usage:**
-
-```bash
-npx lint-patterns -i "src/**/*.ts"
-    npx lint-patterns -i "src/**/*.ts" --strict
-```
-
-**Validation Rules:**
-
-| Rule | Severity | What It Checks |
-| --- | --- | --- |
-| missing-pattern-name | error | Must have pattern tag |
-| invalid-status | error | Status must be valid FSM value |
-| tautological-description | error | Description cannot just repeat name |
-| pattern-conflict-in-implements | error | Pattern cannot implement itself |
-| missing-relationship-target | warning | Relationship targets must exist |
-| missing-status | warning | Should have status tag |
-| missing-when-to-use | warning | Should have When to Use section |
-| missing-relationships | info | Consider adding uses/used-by |
-
-### lint-patterns Rules (from rules)
+### lint-patterns Rules
 
 ```typescript
 /**
@@ -271,30 +244,7 @@ const patternConflictInImplements: LintRule;
 const missingRelationshipTarget: LintRule;
 ```
 
-### Anti-Pattern Detection (from this decision (rule: anti-pattern detection))
-
-**Context:** Enforces dual-source architecture ownership between TypeScript and Gherkin files.
-
-    **Anti-Patterns Detected:**
-
-| ID | Severity | Description |
-| --- | --- | --- |
-| process-in-code | error | Process metadata in code (should be features-only) |
-| tag-duplication | error | Dependencies in features (should be code-only) |
-| magic-comments | warning | Generator hints in features |
-| scenario-bloat | warning | Too many scenarios per feature (threshold: 20) |
-| mega-feature | warning | Feature file too large (threshold: 500 lines) |
-
-    **Tag Location Constraints:**
-
-| Tag Type | Correct Location | Wrong Location |
-| --- | --- | --- |
-| uses | TypeScript code | Feature files |
-| depends-on | Feature files | TypeScript code |
-| quarter | Feature files | TypeScript code |
-| team | Feature files | TypeScript code |
-
-### Anti-Pattern Detection (from anti-patterns)
+### Anti-Pattern Detection
 
 ```typescript
 /**
@@ -628,25 +578,7 @@ interface WithTagRegistry {
 }
 ```
 
-### DoD Validation (from this decision (rule: dod validation))
-
-**Context:** Definition of Done validation ensures completed patterns meet quality criteria.
-
-    **Criteria for completed status:**
-
-| Criterion | What It Checks |
-| --- | --- |
-| All deliverables complete | Status must be: complete, done, finished, yes, or checkmarks |
-| Acceptance criteria present | At least one scenario with @acceptance-criteria tag |
-
-    **Completion Patterns Recognized:**
-
-```text
-Text patterns: complete, completed, done, finished, yes
-    Symbol patterns: check mark, heavy check mark, white check mark, ballot box with check
-```
-
-### DoD Validation (from dod-validator)
+### DoD Validation
 
 ```typescript
 /**

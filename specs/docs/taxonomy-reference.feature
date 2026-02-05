@@ -30,10 +30,9 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 | --- | --- | --- |
 | Concept | THIS DECISION (Rule: Concept) | Rule block content |
 | Format Types | src/taxonomy/format-types.ts | @extract-shapes tag |
-| Format Types Table | THIS DECISION (Rule: Format Types) | Rule block table |
 | Categories | src/taxonomy/categories.ts | @extract-shapes tag |
 | Status Values | src/taxonomy/status-values.ts | @extract-shapes tag |
-| Status FSM | THIS DECISION (Rule: Status Values) | Rule block table |
+| Status FSM | THIS DECISION (Rule: Status Values) | Mermaid diagram |
 | Normalized Status | src/taxonomy/normalized-status.ts | @extract-shapes tag |
 | Hierarchy Levels | src/taxonomy/hierarchy-levels.ts | @extract-shapes tag |
 | Risk Levels | src/taxonomy/risk-levels.ts | @extract-shapes tag |
@@ -77,16 +76,8 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 
     **Context:** Tags have different value formats that determine parsing.
 
-    **Decision:** Six format types are supported:
-
-| Format | Example | Parsing |
-| --- | --- | --- |
-| flag | @docs-core | Boolean presence (no value) |
-| value | @docs-pattern MyPattern | Simple string |
-| enum | @docs-status completed | Constrained to predefined list |
-| csv | @docs-uses A, B, C | Comma-separated values |
-| number | @docs-phase 15 | Numeric value |
-| quoted-value | @docs-brief:'Multi word' | Preserves spaces |
+    **Decision:** Six format types are supported. See `src/taxonomy/format-types.ts`
+    for the canonical `FORMAT_TYPES` array with inline documentation.
 
     **Implementation:** The format type is specified in the tag definition
     within the TagRegistry. The extractor uses the format to parse values.
@@ -95,24 +86,9 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 
     **Context:** Status values control the FSM workflow for pattern lifecycle.
 
-    **Decision:** Four canonical status values are defined (per PDR-005):
-
-| Status | Protection | Description |
-| --- | --- | --- |
-| roadmap | none | Planned work, fully editable |
-| active | scope-locked | In progress, cannot add deliverables |
-| completed | hard-locked | Done, requires unlock-reason to modify |
-| deferred | none | On hold, fully editable |
-
-    **Transitions:**
-
-| From | To | Action |
-| --- | --- | --- |
-| roadmap | active | Start work |
-| roadmap | deferred | Postpone |
-| active | completed | Finish work |
-| active | roadmap | Regress (blocked) |
-| deferred | roadmap | Resume planning |
+    **Decision:** Four canonical status values are defined (per PDR-005).
+    See `src/taxonomy/status-values.ts` for the `PROCESS_STATUS_VALUES` array
+    with inline documentation on FSM transitions and protection levels.
 
     **FSM Diagram:**
 
@@ -134,14 +110,9 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 
     **Context:** Display requires mapping 4 FSM states to 3 presentation buckets.
 
-    **Decision:** Raw status values normalize to display status:
-
-| Raw Status | Normalized | Bucket |
-| --- | --- | --- |
-| completed | completed | Work is done |
-| active | active | Work in progress |
-| roadmap | planned | Future work |
-| deferred | planned | Future work (paused) |
+    **Decision:** Raw status values normalize to display status.
+    See `src/taxonomy/normalized-status.ts` for the `STATUS_NORMALIZATION_MAP`
+    and `normalizeStatus()` function with complete mapping logic.
 
     **Rationale:** This separation follows DDD principles - the domain model
     (raw FSM states) is distinct from the view model (normalized display).
@@ -165,13 +136,9 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 
     **Context:** Work items need hierarchical breakdown for planning.
 
-    **Decision:** Three hierarchy levels are defined:
-
-| Level | Duration | Description |
-| --- | --- | --- |
-| epic | Multi-quarter | Strategic initiatives |
-| phase | 2-5 days | Standard work units |
-| task | 1-4 hours | Session-level work |
+    **Decision:** Three hierarchy levels are defined (epic, phase, task).
+    See `src/taxonomy/hierarchy-levels.ts` for the `HIERARCHY_LEVELS` array
+    with JSDoc documentation on duration guidelines and usage.
 
     **Usage:** The level tag organizes work for roadmap generation.
     Phases can have a parent epic; tasks can have a parent phase.

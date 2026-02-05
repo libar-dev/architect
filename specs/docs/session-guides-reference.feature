@@ -242,16 +242,11 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 
     **Context:** The FSM (Finite State Machine) protects work integrity through state-based restrictions.
 
-    **Decision:** Four states with different protection levels:
+    **Decision:** Protection levels and valid transitions are defined in TypeScript source:
+    - Protection levels: See `PROTECTION_LEVELS` in `src/validation/fsm/states.ts`
+    - Valid transitions: See `VALID_TRANSITIONS` in `src/validation/fsm/transitions.ts`
 
-| State | Protection | Can Add Deliverables | Needs Unlock |
-| --- | --- | --- | --- |
-| roadmap | None | Yes | No |
-| active | Scope-locked | No | No |
-| completed | Hard-locked | No | Yes |
-| deferred | None | Yes | No |
-
-    **Valid FSM Transitions:**
+    **Valid FSM Transitions (Visual):**
 
     """
     roadmap --> active --> completed (terminal)
@@ -261,15 +256,6 @@ Feature: Session Guides Reference - Auto-Generated Documentation
         v
     deferred --> roadmap
     """
-
-    **Transition Details:**
-
-| From | To | Notes |
-| --- | --- | --- |
-| roadmap | active, deferred | Start work or postpone |
-| active | completed, roadmap | Finish or regress if blocked |
-| deferred | roadmap | Resume planning |
-| completed | (none) | Terminal - use unlock to modify |
 
   Rule: Handoff Documentation
 

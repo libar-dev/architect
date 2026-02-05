@@ -35,10 +35,10 @@ Feature: Architecture Reference - Auto-Generated Documentation
 | Codec Factory Pattern | THIS DECISION (Rule: Codec Factory Pattern) | Rule block content |
 | Generator Types | src/generators/types.ts | extract-shapes tag |
 | Transform Function | src/generators/pipeline/transform-dataset.ts | extract-shapes tag |
-| Available Codecs | THIS DECISION (Rule: Available Codecs) | Rule block table |
+| Available Codecs | src/renderable/generate.ts | extract-shapes tag + Rule: Available Codecs |
 | Progressive Disclosure | THIS DECISION (Rule: Progressive Disclosure) | Rule block table |
-| Codec to Generator Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block table |
-| Status Normalization | THIS DECISION (Rule: Status Normalization) | Rule block table |
+| Codec to Generator Mapping | src/renderable/generate.ts | extract-shapes tag + Rule: Codec to Generator Mapping |
+| Status Normalization | src/taxonomy/normalized-status.ts | extract-shapes tag + Rule: Status Normalization |
 | Result Monad Pattern | THIS DECISION (Rule: Result Monad Pattern) | Rule block content |
 | Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block table + Mermaid |
 
@@ -176,41 +176,9 @@ Feature: Architecture Reference - Auto-Generated Documentation
 
     **Context:** The package provides multiple specialized codecs for different documentation needs.
 
-    **Decision:** Codecs are grouped by purpose:
+    **Decision:** Codecs are grouped by purpose. Pattern-focused codecs generate pattern registries, requirements, and ADRs. Timeline-focused codecs generate roadmaps, milestones, current work, and changelogs. Session-focused codecs generate session context, remaining work, PR changes, and traceability views. Planning codecs generate checklists, session plans, and findings.
 
-    **Pattern-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| PatternsDocumentCodec | PATTERNS.md + patterns/*.md | Pattern registry by category |
-| RequirementsDocumentCodec | PRODUCT-REQUIREMENTS.md | PRD grouped by product area |
-| AdrDocumentCodec | DECISIONS.md + decisions/*.md | Architecture Decision Records |
-
-    **Timeline-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| RoadmapDocumentCodec | ROADMAP.md + phases/*.md | Development roadmap by phase |
-| CompletedMilestonesCodec | COMPLETED-MILESTONES.md | Historical record by quarter |
-| CurrentWorkCodec | CURRENT-WORK.md | Active development work |
-| ChangelogCodec | CHANGELOG.md | Keep a Changelog format |
-
-    **Session-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| SessionContextCodec | SESSION-CONTEXT.md | Current session for AI agents |
-| RemainingWorkCodec | REMAINING-WORK.md | Incomplete work summary |
-| PrChangesCodec | working/PR-CHANGES.md | PR-scoped view by changed files |
-| TraceabilityCodec | TRACEABILITY.md | Timeline to behavior coverage |
-
-    **Planning Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| PlanningChecklistCodec | PLANNING-CHECKLIST.md | Pre-planning questions |
-| SessionPlanCodec | SESSION-PLAN.md | Implementation plans |
-| SessionFindingsCodec | SESSION-FINDINGS.md | Retrospective discoveries |
+    See src/renderable/generate.ts for the complete DOCUMENT_TYPES registry with all codecs, output paths, and descriptions.
 
   Rule: Progressive Disclosure
 
@@ -242,37 +210,17 @@ Feature: Architecture Reference - Auto-Generated Documentation
 
     **Context:** Source annotations use various status values that must be normalized.
 
-    **Decision:** All status values are normalized to three canonical states:
+    **Decision:** All status values are normalized to three canonical display states: completed, active, and planned. The STATUS_NORMALIZATION_MAP in src/taxonomy/normalized-status.ts defines the mapping from raw FSM states to display buckets.
 
-| Input Status | Normalized To |
-| --- | --- |
-| completed, implemented | completed |
-| active, partial, in-progress | active |
-| roadmap, planned, deferred, undefined | planned |
+    See src/taxonomy/normalized-status.ts for NORMALIZED_STATUS_VALUES, STATUS_NORMALIZATION_MAP, and the normalizeStatus function.
 
   Rule: Codec to Generator Mapping
 
     **Context:** Each codec is exposed via a CLI generator flag.
 
-    **Decision:** The mapping from codec to generator name:
+    **Decision:** The CODEC_MAP and CODEC_FACTORY_MAP in src/renderable/generate.ts define the mapping from generator names to codec instances and factory functions. Generator names match the CLI -g flag values (e.g., -g patterns, -g roadmap).
 
-| Codec | Generator Name | CLI Flag |
-| --- | --- | --- |
-| PatternsDocumentCodec | patterns | -g patterns |
-| RoadmapDocumentCodec | roadmap | -g roadmap |
-| CompletedMilestonesCodec | milestones | -g milestones |
-| CurrentWorkCodec | current | -g current |
-| RequirementsDocumentCodec | requirements | -g requirements |
-| SessionContextCodec | session | -g session |
-| RemainingWorkCodec | remaining | -g remaining |
-| PrChangesCodec | pr-changes | -g pr-changes |
-| AdrDocumentCodec | adrs | -g adrs |
-| PlanningChecklistCodec | planning-checklist | -g planning-checklist |
-| SessionPlanCodec | session-plan | -g session-plan |
-| SessionFindingsCodec | session-findings | -g session-findings |
-| ChangelogCodec | changelog | -g changelog |
-| TraceabilityCodec | traceability | -g traceability |
-| OverviewCodec | overview-rdm | -g overview-rdm |
+    See src/renderable/generate.ts for DOCUMENT_TYPES (output paths), CODEC_MAP (default instances), and CODEC_FACTORY_MAP (factory functions for custom options).
 
   Rule: Result Monad Pattern
 

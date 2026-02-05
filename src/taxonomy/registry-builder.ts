@@ -4,7 +4,7 @@
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
  * @libar-docs-implements TypeScriptTaxonomyImplementation
- * @libar-docs-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry
+ * @libar-docs-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry, METADATA_TAGS_BY_GROUP
  *
  * ## Tag Registry Builder
  *
@@ -71,6 +71,61 @@ interface AggregationTagDefinitionForRegistry {
   targetDoc: string | null;
   purpose: string;
 }
+
+/**
+ * Metadata tags organized by functional group.
+ * Used for documentation generation to create organized sections.
+ *
+ * Groups:
+ * - core: Essential pattern identification (pattern, status, core, usecase, brief)
+ * - relationship: Pattern dependencies and connections
+ * - process: Timeline and assignment tracking
+ * - prd: Product requirements documentation
+ * - adr: Architecture decision records
+ * - hierarchy: Epic/phase/task breakdown
+ * - traceability: Two-tier spec architecture links
+ * - architecture: Diagram generation tags
+ * - extraction: Documentation extraction control
+ */
+export const METADATA_TAGS_BY_GROUP = {
+  core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
+  relationship: [
+    'uses',
+    'used-by',
+    'implements',
+    'extends',
+    'depends-on',
+    'enables',
+    'see-also',
+    'api-ref',
+  ] as const,
+  process: [
+    'phase',
+    'release',
+    'quarter',
+    'completed',
+    'effort',
+    'effort-actual',
+    'team',
+    'workflow',
+    'risk',
+    'priority',
+  ] as const,
+  prd: ['product-area', 'user-role', 'business-value', 'constraint'] as const,
+  adr: [
+    'adr',
+    'adr-status',
+    'adr-category',
+    'adr-supersedes',
+    'adr-superseded-by',
+    'adr-theme',
+    'adr-layer',
+  ] as const,
+  hierarchy: ['level', 'parent'] as const,
+  traceability: ['executable-specs', 'roadmap-spec'] as const,
+  architecture: ['arch-role', 'arch-context', 'arch-layer'] as const,
+  extraction: ['extract-shapes'] as const,
+} as const;
 
 /**
  * Build the complete tag registry from TypeScript constants

@@ -33,10 +33,10 @@
 | Codec Factory Pattern | THIS DECISION (Rule: Codec Factory Pattern) | Rule block content |
 | Generator Types | src/generators/types.ts | extract-shapes tag |
 | Transform Function | src/generators/pipeline/transform-dataset.ts | extract-shapes tag |
-| Available Codecs | THIS DECISION (Rule: Available Codecs) | Rule block table |
+| Available Codecs | src/renderable/generate.ts | extract-shapes tag + Rule: Available Codecs |
 | Progressive Disclosure | THIS DECISION (Rule: Progressive Disclosure) | Rule block table |
-| Codec to Generator Mapping | THIS DECISION (Rule: Codec to Generator Mapping) | Rule block table |
-| Status Normalization | THIS DECISION (Rule: Status Normalization) | Rule block table |
+| Codec to Generator Mapping | src/renderable/generate.ts | extract-shapes tag + Rule: Codec to Generator Mapping |
+| Status Normalization | src/taxonomy/normalized-status.ts | extract-shapes tag + Rule: Status Normalization |
 | Result Monad Pattern | THIS DECISION (Rule: Result Monad Pattern) | Rule block content |
 | Orchestrator Pipeline | THIS DECISION (Rule: Orchestrator Pipeline) | Rule block table + Mermaid |
 
@@ -576,46 +576,6 @@ interface RawDataset {
 function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 ```
 
-### Available Codecs
-
-**Context:** The package provides multiple specialized codecs for different documentation needs.
-
-    **Decision:** Codecs are grouped by purpose:
-
-    **Pattern-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| PatternsDocumentCodec | PATTERNS.md + patterns/*.md | Pattern registry by category |
-| RequirementsDocumentCodec | PRODUCT-REQUIREMENTS.md | PRD grouped by product area |
-| AdrDocumentCodec | DECISIONS.md + decisions/*.md | Architecture Decision Records |
-
-    **Timeline-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| RoadmapDocumentCodec | ROADMAP.md + phases/*.md | Development roadmap by phase |
-| CompletedMilestonesCodec | COMPLETED-MILESTONES.md | Historical record by quarter |
-| CurrentWorkCodec | CURRENT-WORK.md | Active development work |
-| ChangelogCodec | CHANGELOG.md | Keep a Changelog format |
-
-    **Session-Focused Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| SessionContextCodec | SESSION-CONTEXT.md | Current session for AI agents |
-| RemainingWorkCodec | REMAINING-WORK.md | Incomplete work summary |
-| PrChangesCodec | working/PR-CHANGES.md | PR-scoped view by changed files |
-| TraceabilityCodec | TRACEABILITY.md | Timeline to behavior coverage |
-
-    **Planning Codecs:**
-
-| Codec | Output | Purpose |
-| --- | --- | --- |
-| PlanningChecklistCodec | PLANNING-CHECKLIST.md | Pre-planning questions |
-| SessionPlanCodec | SESSION-PLAN.md | Implementation plans |
-| SessionFindingsCodec | SESSION-FINDINGS.md | Retrospective discoveries |
-
 ### Progressive Disclosure
 
 **Context:** Large documents are split into main index plus detail files.
@@ -642,41 +602,67 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 | standard | Default with all sections |
 | detailed | Maximum detail, all optional sections |
 
-### Codec to Generator Mapping
-
-**Context:** Each codec is exposed via a CLI generator flag.
-
-    **Decision:** The mapping from codec to generator name:
-
-| Codec | Generator Name | CLI Flag |
-| --- | --- | --- |
-| PatternsDocumentCodec | patterns | -g patterns |
-| RoadmapDocumentCodec | roadmap | -g roadmap |
-| CompletedMilestonesCodec | milestones | -g milestones |
-| CurrentWorkCodec | current | -g current |
-| RequirementsDocumentCodec | requirements | -g requirements |
-| SessionContextCodec | session | -g session |
-| RemainingWorkCodec | remaining | -g remaining |
-| PrChangesCodec | pr-changes | -g pr-changes |
-| AdrDocumentCodec | adrs | -g adrs |
-| PlanningChecklistCodec | planning-checklist | -g planning-checklist |
-| SessionPlanCodec | session-plan | -g session-plan |
-| SessionFindingsCodec | session-findings | -g session-findings |
-| ChangelogCodec | changelog | -g changelog |
-| TraceabilityCodec | traceability | -g traceability |
-| OverviewCodec | overview-rdm | -g overview-rdm |
-
 ### Status Normalization
 
-**Context:** Source annotations use various status values that must be normalized.
+```typescript
+/**
+ * Normalized status values for display
+ *
+ * Maps raw FSM states to three presentation buckets:
+ * - completed: Work is done
+ * - active: Work in progress
+ * - planned: Future work (includes roadmap and deferred)
+ */
+NORMALIZED_STATUS_VALUES = ['completed', 'active', 'planned'] as const
+```
 
-    **Decision:** All status values are normalized to three canonical states:
+```typescript
+/**
+ * Normalized status values for display
+ *
+ * Maps raw FSM states to three presentation buckets:
+ * - completed: Work is done
+ * - active: Work in progress
+ * - planned: Future work (includes roadmap and deferred)
+ */
+type NormalizedStatus = (typeof NORMALIZED_STATUS_VALUES)[number];
+```
 
-| Input Status | Normalized To |
-| --- | --- |
-| completed, implemented | completed |
-| active, partial, in-progress | active |
-| roadmap, planned, deferred, undefined | planned |
+```typescript
+/**
+ * Maps raw status values → normalized display status
+ *
+ * Includes both:
+ * Canonical taxonomy values (per PDR-005 FSM)
+ */
+const STATUS_NORMALIZATION_MAP: Readonly<Record<string, NormalizedStatus>>;
+```
+
+```typescript
+/**
+ * Normalize any status string to a display bucket
+ *
+ * Maps status values to three canonical display states:
+ * - "completed": completed
+ * - "active": active
+ * - "planned": roadmap, deferred, planned, or any unknown value
+ *
+ * Per PDR-005: deferred items are treated as planned (not actively worked on)
+ *
+ * @param status - Raw status from pattern (case-insensitive)
+ * @returns "completed" | "active" | "planned"
+ *
+ * @example
+ * ```typescript
+ * normalizeStatus("completed")   // → "completed"
+ * normalizeStatus("active")      // → "active"
+ * normalizeStatus("roadmap")     // → "planned"
+ * normalizeStatus("deferred")    // → "planned"
+ * normalizeStatus(undefined)     // → "planned"
+ * ```
+ */
+function normalizeStatus(status: string | undefined): NormalizedStatus;
+```
 
 ### Result Monad Pattern
 
@@ -736,3 +722,14 @@ flowchart TB
         J --> K[renderDocumentWithFiles]
         K --> L[fs.writeFile]
 ```
+
+---
+
+<details>
+<summary>Generation Warnings</summary>
+
+- warning: No @libar-docs-extract-shapes tag found in src/renderable/generate.ts
+
+- warning: No @libar-docs-extract-shapes tag found in src/renderable/generate.ts
+
+</details>
