@@ -5,7 +5,7 @@
  * @libar-docs-status completed
  * @libar-docs-uses ConfigurationTypes, Categories, RegistryBuilder
  * @libar-docs-used-by DeliveryProcessFactory
- * @libar-docs-extract-shapes PresetName, PRESETS
+ * @libar-docs-extract-shapes GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PresetName, PRESETS
  *
  * ## Configuration Presets
  *

@@ -54,6 +54,9 @@
 
 ### Presets
 
+- `GENERIC_PRESET` - const
+- `LIBAR_GENERIC_PRESET` - const
+- `DDD_ES_CQRS_PRESET` - const
 - `PresetName` - type
 - `PRESETS` - const
 
@@ -90,8 +93,11 @@
 ### Config Loader
 
 - `ConfigDiscoveryResult` - interface
-- `loadConfig` - function
+- `ConfigLoadError` - interface
+- `ConfigLoadResult` - type
 - `findConfigFile` - function
+- `loadConfig` - function
+- `formatConfigError` - function
 
 ### RegexBuilders
 

@@ -45,6 +45,27 @@
         CODEC[CODEC<br/>RenderableDocument<br/>to Markdown]
     """
 
+### MasterDataset Schema
+
+- `MasterDataset` - type
+- `StatusGroups` - type
+- `StatusCounts` - type
+- `PhaseGroup` - type
+- `SourceViews` - type
+- `RelationshipEntry` - type
+- `ArchIndex` - type
+
+### RenderableDocument
+
+- `RenderableDocument` - type
+- `SectionBlock` - type
+- `HeadingBlock` - type
+- `TableBlock` - type
+- `ListBlock` - type
+- `CodeBlock` - type
+- `MermaidBlock` - type
+- `CollapsibleBlock` - type
+
 ### Block Vocabulary
 
 **Context:** RenderableDocument uses a fixed vocabulary of 9 section block types.
@@ -96,6 +117,18 @@
 | detailLevel | summary, standard, detailed | standard | Output verbosity |
 | limits.recentItems | number | 10 | Max recent items in summaries |
 | limits.collapseThreshold | number | 5 | Items before collapsing |
+
+### Generator Types
+
+- `DocumentGenerator` - interface
+- `GeneratorContext` - interface
+- `GeneratorOutput` - interface
+
+### Transform Function
+
+- `RuntimeMasterDataset` - interface
+- `RawDataset` - interface
+- `transformToMasterDataset` - function
 
 ### Available Codecs
 

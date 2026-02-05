@@ -55,6 +55,89 @@
 | Schema-First Validation | Zod schemas define types; runtime validation at all boundaries |
 | Result Monad | Explicit error handling via Result T,E instead of exceptions |
 
+### MasterDataset Schema
+
+```typescript
+type MasterDataset = z.infer<typeof MasterDatasetSchema>;
+```
+
+```typescript
+type StatusGroups = z.infer<typeof StatusGroupsSchema>;
+```
+
+```typescript
+type StatusCounts = z.infer<typeof StatusCountsSchema>;
+```
+
+```typescript
+type PhaseGroup = z.infer<typeof PhaseGroupSchema>;
+```
+
+```typescript
+type SourceViews = z.infer<typeof SourceViewsSchema>;
+```
+
+```typescript
+type RelationshipEntry = z.infer<typeof RelationshipEntrySchema>;
+```
+
+```typescript
+type ArchIndex = z.infer<typeof ArchIndexSchema>;
+```
+
+### RenderableDocument
+
+```typescript
+type RenderableDocument = {
+  title: string;
+  purpose?: string;
+  detailLevel?: string;
+  sections: SectionBlock[];
+  additionalFiles?: Record<string, RenderableDocument>;
+};
+```
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
+
+```typescript
+type HeadingBlock = z.infer<typeof HeadingBlockSchema>;
+```
+
+```typescript
+type TableBlock = z.infer<typeof TableBlockSchema>;
+```
+
+```typescript
+type ListBlock = z.infer<typeof ListBlockSchema>;
+```
+
+```typescript
+type CodeBlock = z.infer<typeof CodeBlockSchema>;
+```
+
+```typescript
+type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
+```
+
+```typescript
+type CollapsibleBlock = {
+  type: 'collapsible';
+  summary: string;
+  content: SectionBlock[];
+};
+```
+
 ### Block Vocabulary
 
 **Context:** RenderableDocument uses a fixed vocabulary of 9 section block types.
@@ -80,6 +163,181 @@
 | mermaid | content | Mermaid diagrams |
 | collapsible | summary, content | Expandable sections |
 | link-out | text, path | Links to detail files |
+
+### Generator Types
+
+```typescript
+/**
+ * @libar-docs-generator
+ * @libar-docs-pattern GeneratorTypes
+ * @libar-docs-status completed
+ * @libar-docs-used-by GeneratorRegistry, GeneratorFactory, Orchestrator, SectionRegistry
+ * @libar-docs-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
+ *
+ * ## GeneratorTypes - Pluggable Document Generation Interface
+ *
+ * Minimal interface for pluggable generators that produce documentation from patterns.
+ * Both JSON-configured built-in generators and TypeScript custom generators implement this.
+ *
+ * ### When to Use
+ *
+ * - Creating a new document format (ADRs, planning docs, API specs)
+ * - Building custom generators in TypeScript
+ * - Integrating with the unified CLI
+ *
+ * ### Key Concepts
+ *
+ * - **Generator:** Transforms patterns → document files
+ * - **Context:** Runtime environment (base paths, registries, scenarios)
+ * - **Output:** Map of file paths → content
+ */
+interface DocumentGenerator {
+  /** Unique generator name (e.g., "patterns", "adrs", "planning") */
+  readonly name: string;
+
+  /** Optional description shown in --list-generators */
+  readonly description?: string;
+
+  /**
+   * Generate documentation from extracted patterns.
+   *
+   * @param patterns - Extracted patterns from source code
+   * @param context - Runtime context (paths, registry, scenario map)
+   * @returns Generated files with paths relative to outputDir
+   */
+  generate(
+    patterns: readonly ExtractedPattern[],
+    context: GeneratorContext
+  ): Promise<GeneratorOutput>;
+}
+```
+
+```typescript
+/**
+ * Runtime context provided to generators.
+ */
+interface GeneratorContext {
+  /** Base directory for resolving relative paths */
+  readonly baseDir: string;
+
+  /** Output directory for generated files */
+  readonly outputDir: string;
+
+  /** Tag registry with category/aggregation definitions */
+  readonly registry: TagRegistry;
+
+  /** Optional workflow configuration for status handling */
+  readonly workflow?: LoadedWorkflow;
+
+  /**
+   * Pre-computed pattern views for efficient access.
+   *
+   * Contains patterns grouped by status, phase, quarter, category, and source,
+   * computed in a single pass. Sections should use these pre-computed views
+   * instead of filtering the raw patterns array.
+   */
+  readonly masterDataset?: RuntimeMasterDataset;
+
+  /**
+   * Optional codec-specific options for document generation.
+   *
+   * Used to pass runtime configuration (e.g., changedFiles for PR changes)
+   * through the CLI → Orchestrator → Generator → Codec pipeline.
+   *
+   * @example
+   * ```typescript
+   * const context: GeneratorContext = {
+   *   // ... other fields
+   *   codecOptions: {
+   *     "pr-changes": { changedFiles: ["src/foo.ts"], releaseFilter: "v0.2.0" }
+   *   }
+   * };
+   * ```
+   */
+  readonly codecOptions?: CodecOptions;
+}
+```
+
+```typescript
+/**
+ * Output from generator execution.
+ */
+interface GeneratorOutput {
+  /** Files to write (path relative to outputDir) */
+  readonly files: readonly OutputFile[];
+
+  /** Files to delete for cleanup (path relative to outputDir) */
+  readonly filesToDelete?: readonly string[];
+
+  /** Optional metadata for registry.json or other purposes */
+  readonly metadata?: Record<string, unknown>;
+}
+```
+
+### Transform Function
+
+```typescript
+/**
+ * Runtime MasterDataset with optional workflow
+ *
+ * Extends the Zod-compatible MasterDataset with workflow reference.
+ * LoadedWorkflow contains Maps which aren't JSON-serializable,
+ * so it's kept separate from the Zod schema.
+ */
+interface RuntimeMasterDataset extends MasterDataset {
+  /** Optional workflow configuration (not serializable) */
+  readonly workflow?: LoadedWorkflow;
+}
+```
+
+```typescript
+/**
+ * Raw input data for transformation
+ */
+interface RawDataset {
+  /** Extracted patterns from TypeScript and/or Gherkin sources */
+  readonly patterns: readonly ExtractedPattern[];
+
+  /** Tag registry for category lookups */
+  readonly tagRegistry: TagRegistry;
+
+  /** Optional workflow configuration for phase names (can be undefined) */
+  readonly workflow?: LoadedWorkflow | undefined;
+}
+```
+
+```typescript
+/**
+ * Transform raw extracted data into a MasterDataset with all pre-computed views.
+ *
+ * This is a ONE-PASS transformation that computes:
+ * - Status-based groupings (completed/active/planned)
+ * - Phase-based groupings with counts
+ * - Quarter-based groupings for timeline views
+ * - Category-based groupings for taxonomy
+ * - Source-based views (TypeScript vs Gherkin, roadmap, PRD)
+ * - Aggregate statistics (counts, phase count, category count)
+ * - Optional relationship index
+ *
+ * @param raw - Raw dataset with patterns, registry, and optional workflow
+ * @returns MasterDataset with all pre-computed views
+ *
+ * @example
+ * ```typescript
+ * const masterDataset = transformToMasterDataset({
+ *   patterns: mergedPatterns,
+ *   tagRegistry: registry,
+ *   workflow,
+ * });
+ *
+ * // Access pre-computed views
+ * const completed = masterDataset.byStatus.completed;
+ * const phase3Patterns = masterDataset.byPhase.find(p => p.phaseNumber === 3);
+ * const q42024 = masterDataset.byQuarter["Q4-2024"];
+ * ```
+ */
+function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
+```
 
 ### Available Codecs
 
@@ -454,18 +712,3 @@ flowchart TB
         J --> K[renderDocumentWithFiles]
         K --> L[fs.writeFile]
 ```
-
----
-
-<details>
-<summary>Generation Warnings</summary>
-
-- warning: No @libar-docs-extract-shapes tag found in src/validation-schemas/master-dataset.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/renderable/schema.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/generators/types.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/generators/pipeline/transform-dataset.ts
-
-</details>

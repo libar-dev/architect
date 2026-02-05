@@ -109,6 +109,123 @@ interface LintContext {
 const defaultRules: readonly LintRule[];
 ```
 
+```typescript
+/**
+ * Severity ordering for sorting and filtering
+ * Exported for use by lint engine to avoid duplication
+ */
+const severityOrder: Record<LintSeverity, number>;
+```
+
+```typescript
+/**
+ * Get rules filtered by minimum severity
+ *
+ * @param rules - Rules to filter
+ * @param minSeverity - Minimum severity to include
+ * @returns Filtered rules
+ */
+function filterRulesBySeverity(
+  rules: readonly LintRule[],
+  minSeverity: LintSeverity
+): LintRule[];
+```
+
+```typescript
+/**
+ * Rule: missing-pattern-name
+ *
+ * Patterns must have an explicit name via the pattern tag.
+ * Without a name, the pattern can't be referenced in relationships
+ * or indexed properly.
+ */
+const missingPatternName: LintRule;
+```
+
+```typescript
+/**
+ * Rule: missing-status
+ *
+ * Patterns should have an explicit status (completed, active, roadmap).
+ * This helps readers understand if the pattern is ready for use.
+ */
+const missingStatus: LintRule;
+```
+
+```typescript
+/**
+ * Rule: invalid-status
+ *
+ * Status values must be valid PDR-005 FSM states or recognized legacy aliases.
+ *
+ * Valid FSM values: roadmap, active, completed, deferred
+ * Accepted legacy aliases: implemented → completed, partial → active, in-progress → active, planned → planned
+ */
+const invalidStatus: LintRule;
+```
+
+```typescript
+/**
+ * Rule: missing-when-to-use
+ *
+ * Patterns should have a "When to Use" section for LLM-friendly guidance.
+ * This helps developers understand when the pattern applies.
+ */
+const missingWhenToUse: LintRule;
+```
+
+```typescript
+/**
+ * Rule: tautological-description
+ *
+ * The description should not simply repeat the pattern name.
+ * A tautological description provides no useful information.
+ */
+const tautologicalDescription: LintRule;
+```
+
+```typescript
+/**
+ * Rule: missing-relationships
+ *
+ * Patterns should declare their relationships (uses/usedBy) for
+ * dependency tracking. This is informational only.
+ */
+const missingRelationships: LintRule;
+```
+
+```typescript
+/**
+ * Rule: pattern-conflict-in-implements
+ *
+ * Validates that a file doesn't create a circular reference by defining
+ * a pattern that it also implements. Having both @libar-docs-pattern X
+ * AND @libar-docs-implements X on the same file is a conflict.
+ *
+ * However, a file CAN have both tags when they reference DIFFERENT patterns:
+ * - @libar-docs-pattern SubPattern (defines its own identity)
+ * - @libar-docs-implements ParentSpec (links to parent spec)
+ *
+ * This supports the sub-pattern hierarchy where implementation files can be
+ * named patterns that also implement a larger spec (e.g., MockPaymentActions
+ * implementing DurableEventsIntegration).
+ */
+const patternConflictInImplements: LintRule;
+```
+
+```typescript
+/**
+ * Rule: missing-relationship-target
+ *
+ * Validates that relationship targets (uses, implements) reference
+ * patterns that actually exist. Only triggers when a LintContext with
+ * knownPatterns is provided (strict mode).
+ *
+ * This is a context-aware rule that requires access to the pattern registry.
+ */
+const missingRelationshipTarget: LintRule;
+```
+
 ### Anti-Pattern Detection (from this decision (rule: anti-pattern detection))
 
 **Context:** Enforces dual-source architecture ownership between TypeScript and Gherkin files.
@@ -244,6 +361,25 @@ function detectMegaFeature(
 ): AntiPatternViolation[];
 ```
 
+```typescript
+/**
+ * Format anti-pattern violations for console output
+ *
+ * @param violations - Array of violations to format
+ * @returns Multi-line string for pretty printing
+ */
+function formatAntiPatternReport(violations: AntiPatternViolation[]): string;
+```
+
+```typescript
+/**
+ * Convert anti-pattern violations to ValidationIssue format
+ *
+ * For integration with the existing validate-patterns CLI.
+ */
+function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<;
+```
+
 ### Anti-Pattern Types
 
 ```typescript
@@ -286,6 +422,29 @@ interface AntiPatternViolation {
 
 ```typescript
 type AntiPatternThresholds = z.infer<typeof AntiPatternThresholdsSchema>;
+```
+
+```typescript
+/**
+ * Zod schema for anti-pattern thresholds
+ *
+ * Configurable limits for detecting anti-patterns.
+ */
+AntiPatternThresholdsSchema = z.object({
+  /** Maximum scenarios per feature file before warning */
+  scenarioBloatThreshold: z.number().int().positive().default(20),
+  /** Maximum lines per feature file before warning */
+  megaFeatureLineThreshold: z.number().int().positive().default(500),
+  /** Maximum magic comments before warning */
+  magicCommentThreshold: z.number().int().positive().default(5),
+})
+```
+
+```typescript
+/**
+ * Default thresholds for anti-pattern detection
+ */
+const DEFAULT_THRESHOLDS: AntiPatternThresholds;
 ```
 
 ```typescript
@@ -357,6 +516,73 @@ COMPLETION_PATTERNS = [
 ] as const
 ```
 
+```typescript
+/**
+ * In-progress status detection patterns
+ *
+ * Status values that indicate work is ongoing.
+ */
+IN_PROGRESS_PATTERNS = [
+  'in-progress',
+  'in progress',
+  'active',
+  'wip',
+  'partial',
+  'started',
+  // Emoji patterns
+  '🔄',
+  '⏳',
+  '🚧',
+] as const
+```
+
+```typescript
+/**
+ * Pending status detection patterns
+ *
+ * Status values that indicate work hasn't started.
+ */
+PENDING_PATTERNS = [
+  'pending',
+  'todo',
+  'planned',
+  'not started',
+  'no',
+  // Emoji patterns
+  '⏹',
+  '⬜',
+  '❌',
+] as const
+```
+
+```typescript
+/**
+ * Base interface for options that accept a TagRegistry for prefix-aware behavior.
+ *
+ * Many validation functions need to be aware of the configured tag prefix
+ * (e.g., "@libar-docs-" vs "@docs-"). This interface provides a consistent
+ * way to pass that configuration.
+ *
+ * ### When to Use
+ *
+ * Extend this interface when creating options for functions that:
+ * - Generate error messages referencing tag names
+ * - Detect tags in source code
+ * - Validate tag formats
+ *
+ * @example
+ * ```typescript
+ * export interface MyValidationOptions extends WithTagRegistry {
+ *   readonly strict?: boolean;
+ * }
+ * ```
+ */
+interface WithTagRegistry {
+  /** Tag registry for prefix-aware behavior (defaults to @libar-docs- if not provided) */
+  readonly registry?: TagRegistry;
+}
+```
+
 ### DoD Validation (from dod-validator)
 
 ```typescript
@@ -392,6 +618,16 @@ function isDeliverableComplete(deliverable: Deliverable): boolean;
  * @returns True if at least one @acceptance-criteria scenario exists
  */
 function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean;
+```
+
+```typescript
+/**
+ * Extract acceptance criteria scenario names from a feature
+ *
+ * @param feature - The scanned feature file
+ * @returns Array of scenario names with @acceptance-criteria tag
+ */
+function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile): readonly string[];
 ```
 
 ```typescript
@@ -438,6 +674,16 @@ function validateDoD(
   features: readonly ScannedGherkinFile[],
   phaseFilter: readonly number[] = []
 ): DoDValidationSummary;
+```
+
+```typescript
+/**
+ * Format DoD validation summary for console output
+ *
+ * @param summary - DoD validation summary to format
+ * @returns Multi-line string for pretty printing
+ */
+function formatDoDSummary(summary: DoDValidationSummary): string;
 ```
 
 ### Exit Codes

@@ -11,6 +11,7 @@
  * @libar-docs-used-by Orchestrator
  * @libar-docs-usecase "When computing all pattern views in a single pass"
  * @libar-docs-usecase "When transforming raw extracted data for generators"
+ * @libar-docs-extract-shapes RuntimeMasterDataset, RawDataset, transformToMasterDataset
  *
  * ## TransformDataset - Single-Pass Pattern Transformation
  *

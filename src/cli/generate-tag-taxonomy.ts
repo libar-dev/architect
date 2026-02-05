@@ -6,6 +6,7 @@
  * @libar-docs-pattern TagTaxonomyCLI
  * @libar-docs-status deferred
  * @libar-docs-uses ConfigLoader, TagTaxonomyGenerator
+ * @libar-docs-extract-shapes CLIConfig
  *
  * ## TagTaxonomyCLI - Tag Registry Documentation Generator
  *

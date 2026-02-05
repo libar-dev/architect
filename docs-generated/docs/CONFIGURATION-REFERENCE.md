@@ -89,6 +89,130 @@
 
 ```typescript
 /**
+ * Generic preset for non-DDD projects.
+ *
+ * Minimal categories with @docs- prefix. Suitable for:
+ * - Simple documentation needs
+ * - Non-DDD architectures
+ * - Projects that want basic pattern tracking
+ *
+ * @example
+ * ```typescript
+ * import { createDeliveryProcess, GENERIC_PRESET } from '@libar-dev/delivery-process';
+ *
+ * const dp = createDeliveryProcess({ preset: "generic" });
+ * // Uses @docs-, @docs-pattern, @docs-status, etc.
+ * ```
+ */
+GENERIC_PRESET = {
+  tagPrefix: '@docs-',
+  fileOptInTag: '@docs',
+  categories: [
+    {
+      tag: 'core',
+      domain: 'Core',
+      priority: 1,
+      description: 'Core patterns',
+      aliases: [],
+    },
+    {
+      tag: 'api',
+      domain: 'API',
+      priority: 2,
+      description: 'Public APIs',
+      aliases: [],
+    },
+    {
+      tag: 'infra',
+      domain: 'Infrastructure',
+      priority: 3,
+      description: 'Infrastructure',
+      aliases: ['infrastructure'],
+    },
+  ] as const satisfies readonly CategoryDefinition[],
+} as const satisfies DeliveryProcessConfig
+```
+
+```typescript
+/**
+ * Generic preset with @libar-docs- prefix.
+ *
+ * Same minimal categories as GENERIC_PRESET but with @libar-docs- prefix.
+ * This is the universal default preset for both `createDeliveryProcess()` and
+ * `loadConfig()` fallback.
+ *
+ * Suitable for:
+ * - Most projects (default choice)
+ * - Projects already using @libar-docs- tags
+ * - Package-level configuration (simplified categories, same prefix)
+ * - Gradual adoption without tag migration
+ *
+ * @example
+ * ```typescript
+ * import { createDeliveryProcess } from '@libar-dev/delivery-process';
+ *
+ * // Default preset (libar-generic):
+ * const dp = createDeliveryProcess();
+ * // Uses @libar-docs-, @libar-docs-pattern, @libar-docs-status, etc.
+ * // With 3 category tags: @libar-docs-core, @libar-docs-api, @libar-docs-infra
+ * ```
+ */
+LIBAR_GENERIC_PRESET = {
+  tagPrefix: '@libar-docs-',
+  fileOptInTag: '@libar-docs',
+  categories: [
+    {
+      tag: 'core',
+      domain: 'Core',
+      priority: 1,
+      description: 'Core patterns',
+      aliases: [],
+    },
+    {
+      tag: 'api',
+      domain: 'API',
+      priority: 2,
+      description: 'Public APIs',
+      aliases: [],
+    },
+    {
+      tag: 'infra',
+      domain: 'Infrastructure',
+      priority: 3,
+      description: 'Infrastructure',
+      aliases: ['infrastructure'],
+    },
+  ] as const satisfies readonly CategoryDefinition[],
+} as const satisfies DeliveryProcessConfig
+```
+
+```typescript
+/**
+ * Full DDD/ES/CQRS preset (current @libar-dev taxonomy).
+ *
+ * Complete 21-category taxonomy with @libar-docs- prefix. Suitable for:
+ * - DDD architectures
+ * - Event sourcing projects
+ * - CQRS implementations
+ * - Full roadmap/phase tracking
+ *
+ * @example
+ * ```typescript
+ * import { createDeliveryProcess, DDD_ES_CQRS_PRESET } from '@libar-dev/delivery-process';
+ *
+ * const dp = createDeliveryProcess({ preset: "ddd-es-cqrs" });
+ * ```
+ */
+DDD_ES_CQRS_PRESET = {
+  tagPrefix: '@libar-docs-',
+  fileOptInTag: '@libar-docs',
+  categories: CATEGORIES,
+  metadataTags: buildRegistry().metadataTags,
+} as const satisfies DeliveryProcessConfig
+```
+
+```typescript
+/**
  * Available preset names
  */
 type PresetName = 'generic' | 'libar-generic' | 'ddd-es-cqrs';
@@ -262,6 +386,38 @@ interface ConfigDiscoveryResult {
 
 ```typescript
 /**
+ * Error during config loading
+ */
+interface ConfigLoadError {
+  type: 'config-load-error';
+  path: string;
+  message: string;
+  /** The underlying error that caused the failure (if any) */
+  cause?: Error | undefined;
+}
+```
+
+```typescript
+/**
+ * Result type for config loading
+ */
+type ConfigLoadResult =
+  | { ok: true; value: ConfigDiscoveryResult }
+  | { ok: false; error: ConfigLoadError };
+```
+
+```typescript
+/**
+ * Find config file by walking up from startDir
+ *
+ * @param startDir - Directory to start searching from
+ * @returns Path to config file or null if not found
+ */
+async function findConfigFile(startDir: string): Promise<string | null>;
+```
+
+```typescript
+/**
  * Load configuration from file or use defaults
  *
  * Discovery strategy:
@@ -295,12 +451,12 @@ async function loadConfig(baseDir: string): Promise<ConfigLoadResult>;
 
 ```typescript
 /**
- * Find config file by walking up from startDir
+ * Format config load error for console display
  *
- * @param startDir - Directory to start searching from
- * @returns Path to config file or null if not found
+ * @param error - Config load error
+ * @returns Formatted error message
  */
-async function findConfigFile(startDir: string): Promise<string | null>;
+function formatConfigError(error: ConfigLoadError): string;
 ```
 
 ### RegexBuilders

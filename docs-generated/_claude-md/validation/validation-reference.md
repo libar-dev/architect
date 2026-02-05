@@ -48,6 +48,16 @@
 - `LintRule` - interface
 - `LintContext` - interface
 - `defaultRules` - const
+- `severityOrder` - const
+- `filterRulesBySeverity` - function
+- `missingPatternName` - const
+- `missingStatus` - const
+- `invalidStatus` - const
+- `missingWhenToUse` - const
+- `tautologicalDescription` - const
+- `missingRelationships` - const
+- `patternConflictInImplements` - const
+- `missingRelationshipTarget` - const
 
 ### Anti-Pattern Detection (from this decision (rule: anti-pattern detection))
 
@@ -80,15 +90,22 @@
 - `detectMagicComments` - function
 - `detectScenarioBloat` - function
 - `detectMegaFeature` - function
+- `formatAntiPatternReport` - function
+- `toValidationIssues` - function
 
 ### Anti-Pattern Types
 
 - `AntiPatternId` - type
 - `AntiPatternViolation` - interface
 - `AntiPatternThresholds` - type
+- `AntiPatternThresholdsSchema` - const
+- `DEFAULT_THRESHOLDS` - const
 - `DoDValidationResult` - interface
 - `DoDValidationSummary` - interface
 - `COMPLETION_PATTERNS` - const
+- `IN_PROGRESS_PATTERNS` - const
+- `PENDING_PATTERNS` - const
+- `WithTagRegistry` - interface
 
 ### DoD Validation (from this decision (rule: dod validation))
 
@@ -112,8 +129,10 @@
 
 - `isDeliverableComplete` - function
 - `hasAcceptanceCriteria` - function
+- `extractAcceptanceCriteriaScenarios` - function
 - `validateDoDForPhase` - function
 - `validateDoD` - function
+- `formatDoDSummary` - function
 
 ### Exit Codes
 

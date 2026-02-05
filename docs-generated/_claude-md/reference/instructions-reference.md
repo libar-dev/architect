@@ -280,9 +280,27 @@
      */
     """
 
+### generate-docs CLI
+
+- `CLIConfig` - interface
+
+### lint-patterns CLI
+
+- `LintCLIConfig` - interface
+
 ### lint-process CLI
 
 - `ProcessGuardCLIConfig` - interface
+
+### validate-patterns CLI
+
+- `ValidateCLIConfig` - interface
+- `ValidationIssue` - interface
+- `ValidationSummary` - interface
+
+### generate-tag-taxonomy CLI
+
+- `CLIConfig` - interface
 
 ### Gherkin Integration
 

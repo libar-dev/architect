@@ -6,6 +6,7 @@
  * @libar-docs-pattern LintPatternsCLI
  * @libar-docs-status completed
  * @libar-docs-uses LintEngine, LintRules, PatternScanner
+ * @libar-docs-extract-shapes LintCLIConfig
  *
  * ## LintPatternsCLI - Pattern Annotation Quality Checker
  *

@@ -305,6 +305,56 @@ function buildRegistry(): TagRegistry;
 
     **Arch-Layer Values:** domain, application, infrastructure
 
+### generate-docs CLI
+
+```typescript
+interface CLIConfig {
+  input: string[];
+  exclude: string[];
+  output: string;
+  baseDir: string;
+  generators: string[];
+  overwrite: boolean;
+  features: string[];
+  workflowPath: string | null;
+  listGenerators: boolean;
+  help: boolean;
+  version: boolean;
+  // PR Changes options
+  gitDiffBase: string | null;
+  changedFiles: string[];
+  releaseFilter: string | null;
+}
+```
+
+### lint-patterns CLI
+
+```typescript
+/**
+ * CLI configuration
+ */
+interface LintCLIConfig {
+  /** Glob patterns for input files */
+  input: string[];
+  /** Glob patterns to exclude */
+  exclude: string[];
+  /** Base directory for path resolution */
+  baseDir: string;
+  /** Treat warnings as errors */
+  strict: boolean;
+  /** Output format */
+  format: 'pretty' | 'json';
+  /** Only show errors (suppress warnings/info) */
+  quiet: boolean;
+  /** Minimum severity to report */
+  minSeverity: LintSeverity;
+  /** Show help */
+  help: boolean;
+  /** Show version */
+  version: boolean;
+}
+```
+
 ### lint-process CLI
 
 ```typescript
@@ -329,6 +379,88 @@ interface ProcessGuardCLIConfig {
   /** Show help */
   help: boolean;
   /** Show version */
+  version: boolean;
+}
+```
+
+### validate-patterns CLI
+
+```typescript
+/**
+ * CLI configuration
+ */
+interface ValidateCLIConfig {
+  /** Glob patterns for TypeScript input files */
+  input: string[];
+  /** Glob patterns for Gherkin feature files */
+  features: string[];
+  /** Glob patterns to exclude */
+  exclude: string[];
+  /** Base directory for path resolution */
+  baseDir: string;
+  /** Treat warnings as errors */
+  strict: boolean;
+  /** Output format */
+  format: 'pretty' | 'json';
+  /** Show help */
+  help: boolean;
+  /** Enable DoD validation mode */
+  dod: boolean;
+  /** Specific phases to validate (empty = all completed phases) */
+  phases: number[];
+  /** Enable anti-pattern detection */
+  antiPatterns: boolean;
+  /** Override scenario bloat threshold */
+  scenarioBloatThreshold: number;
+  /** Override mega-feature line threshold */
+  megaFeatureLineThreshold: number;
+  /** Override magic comment threshold */
+  magicCommentThreshold: number;
+  /** Show version */
+  version: boolean;
+}
+```
+
+```typescript
+/**
+ * Validation issue
+ */
+interface ValidationIssue {
+  severity: IssueSeverity;
+  message: string;
+  source: 'typescript' | 'gherkin' | 'cross-source';
+  pattern?: string;
+  file?: string;
+}
+```
+
+```typescript
+/**
+ * Validation summary
+ */
+interface ValidationSummary {
+  issues: ValidationIssue[];
+  stats: {
+    typescriptPatterns: number;
+    gherkinPatterns: number;
+    matched: number;
+    missingInGherkin: number;
+    missingInTypeScript: number;
+  };
+}
+```
+
+### generate-tag-taxonomy CLI
+
+```typescript
+/**
+ * CLI configuration
+ */
+interface CLIConfig {
+  output: string;
+  baseDir: string;
+  overwrite: boolean;
+  help: boolean;
   version: boolean;
 }
 ```
@@ -840,18 +972,3 @@ generate-docs -i "src/**/*.ts" -o docs
 | Problem/Solution | Problem and Solution | Pain point to fix |
 | Value-First | Business Value and How It Works | TDD-style specs |
 | Context/Approach | Context and Approach | Technical patterns |
-
----
-
-<details>
-<summary>Generation Warnings</summary>
-
-- warning: No @libar-docs-extract-shapes tag found in src/cli/generate-docs.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/cli/lint-patterns.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/cli/validate-patterns.ts
-
-- warning: No @libar-docs-extract-shapes tag found in src/cli/generate-tag-taxonomy.ts
-
-</details>
