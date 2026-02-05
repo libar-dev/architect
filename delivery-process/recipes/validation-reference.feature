@@ -32,7 +32,8 @@ Feature: Validation Reference - Auto-Generated Documentation
 | Command Summary | THIS DECISION (Rule: Command Summary) | Rule block table |
 | lint-patterns Rules | src/lint/rules.ts | extract-shapes tag |
 | Anti-Pattern Detection | src/validation/anti-patterns.ts | extract-shapes tag |
-| DoD Validation | src/validation/dod-validator.ts, src/validation/types.ts | extract-shapes tag |
+| DoD Validation | src/validation/dod-validator.ts | extract-shapes tag |
+| DoD Types | src/validation/types.ts | extract-shapes tag |
 | validate-patterns Flags | src/cli/validate-patterns.ts | extract-shapes tag |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
@@ -56,19 +57,12 @@ Feature: Validation Reference - Auto-Generated Documentation
 
     **Decision Tree:**
 
-    """text
-    Need to check annotation quality?
-    --> Yes: lint-patterns
-
-    Need FSM workflow validation?
-    --> Yes: lint-process
-
-    Need cross-source or DoD validation?
-    --> Yes: validate-patterns
-
-    Running pre-commit hook?
-    --> lint-process --staged (default)
-    """
+| Question | Answer | Command |
+| --- | --- | --- |
+| Need annotation quality check? | Yes | lint-patterns |
+| Need FSM workflow validation? | Yes | lint-process |
+| Need cross-source or DoD validation? | Yes | validate-patterns |
+| Running pre-commit hook? | Default | lint-process --staged |
 
   Rule: Command Summary
 
@@ -86,14 +80,37 @@ Feature: Validation Reference - Auto-Generated Documentation
 
     **Context:** lint-patterns validates annotation quality in TypeScript files.
 
-    **Usage:**
+    **CLI Commands:**
 
-    """bash
-    npx lint-patterns -i "src/**/*.ts"
-    npx lint-patterns -i "src/**/*.ts" --strict
-    """
+| Command | Purpose |
+| --- | --- |
+| `npx lint-patterns -i "src/**/*.ts"` | Basic usage |
+| `npx lint-patterns -i "src/**/*.ts" --strict` | Strict mode (CI) |
+
+    **Validation Rules:**
 
     Validation rules are extracted from `src/lint/rules.ts` via `@extract-shapes`.
+
+| Rule | Severity | What It Checks |
+| --- | --- | --- |
+| missing-pattern-name | error | Must have explicit pattern name tag |
+| invalid-status | error | Status must be valid FSM value |
+| tautological-description | error | Description cannot just repeat name |
+| pattern-conflict-in-implements | error | Pattern cannot implement itself (circular reference) |
+| missing-relationship-target | warning | Relationship targets must reference existing patterns |
+| missing-status | warning | Should have status tag |
+| missing-when-to-use | warning | Should have "When to Use" section |
+| missing-relationships | info | Consider adding uses/used-by tags |
+
+    **Rule Error Examples:**
+
+| Rule | Example Error | Fix |
+| --- | --- | --- |
+| missing-pattern-name | Pattern missing explicit name | Add @libar-docs-pattern YourName |
+| invalid-status | Invalid status 'draft' | Use: roadmap, active, completed, deferred |
+| tautological-description | Description repeats pattern name | Provide meaningful context |
+| missing-status | No @libar-docs-status found | Add: @libar-docs-status completed |
+| missing-when-to-use | No "When to Use" section found | Add ### When to Use in description |
 
   Rule: Anti-Pattern Detection
 
@@ -101,10 +118,32 @@ Feature: Validation Reference - Auto-Generated Documentation
 
     Anti-pattern definitions are extracted from `src/validation/anti-patterns.ts` via `@extract-shapes`.
 
+    **Anti-Patterns Detected:**
+
+| ID | Severity | Description | Fix |
+| --- | --- | --- | --- |
+| tag-duplication | error | Dependencies in features (should be code-only) | Move uses tags to TypeScript code |
+| process-in-code | error | Process metadata in code (should be features-only) | Move quarter/team tags to feature files |
+| magic-comments | warning | Generator hints in features (e.g., # GENERATOR:) | Use standard Gherkin tags instead |
+| scenario-bloat | warning | Too many scenarios per feature (threshold: 20) | Split into multiple feature files |
+| mega-feature | warning | Feature file too large (threshold: 500 lines) | Split by component or domain |
+
     **Tag Location Constraints:**
 
-    - `uses` tags belong in TypeScript code (runtime dependencies)
-    - `depends-on`, `quarter`, `team` tags belong in Feature files (planning metadata)
+| Tag | Correct Location | Wrong Location | Reason |
+| --- | --- | --- | --- |
+| @libar-docs-uses | TypeScript code | Feature files | TS owns runtime dependencies |
+| @libar-docs-depends-on | Feature files | TypeScript code | Gherkin owns planning dependencies |
+| @libar-docs-quarter | Feature files | TypeScript code | Gherkin owns timeline metadata |
+| @libar-docs-team | Feature files | TypeScript code | Gherkin owns ownership metadata |
+
+    **Default Thresholds:**
+
+| Threshold | Default Value | Description |
+| --- | --- | --- |
+| scenarioBloatThreshold | 20 | Max scenarios per feature file |
+| megaFeatureLineThreshold | 500 | Max lines per feature file |
+| magicCommentThreshold | 5 | Max magic comments before warning |
 
   Rule: DoD Validation
 
@@ -113,8 +152,32 @@ Feature: Validation Reference - Auto-Generated Documentation
     DoD criteria and completion patterns are extracted from `src/validation/dod-validator.ts`
     and `src/validation/types.ts` via `@extract-shapes`.
 
-    **Summary:** For `completed` status, all deliverables must be done and at least one
-    `@acceptance-criteria` scenario must exist.
+    **DoD Criteria (for completed status):**
+
+| Criterion | Requirement | Failure Message |
+| --- | --- | --- |
+| Deliverables Complete | All deliverables must be marked done | X/Y deliverables incomplete |
+| Acceptance Criteria | At least one @acceptance-criteria scenario | No @acceptance-criteria scenarios found |
+
+    **Recognized Completion Patterns:**
+
+| Type | Patterns |
+| --- | --- |
+| Text (case-insensitive) | complete, completed, done, finished, yes |
+| Symbols | checkmark, heavy checkmark, check box with check, white check |
+
+    **Recognized Pending Patterns:**
+
+| Type | Patterns |
+| --- | --- |
+| Text (case-insensitive) | pending, todo, planned, not started, no |
+
+    **DoD Validation Output Example:**
+
+| Phase | Pattern | Deliverables | AC Scenarios | Result |
+| --- | --- | --- | --- | --- |
+| Phase 14 | MyPattern | 5/5 complete | 3 found | PASS |
+| Phase 15 | OtherPattern | 2/4 complete | 0 found | FAIL |
 
   Rule: validate-patterns Flags
 
@@ -123,48 +186,47 @@ Feature: Validation Reference - Auto-Generated Documentation
     CLI configuration interface (`ValidateCLIConfig`) with all flags and options
     is extracted from `src/cli/validate-patterns.ts` via `@extract-shapes`.
 
-    **Usage:**
+    **CLI Options:**
 
-    """bash
-    npx validate-patterns \
-      -i "src/**/*.ts" \
-      -F "specs/**/*.feature" \
-      --dod \
-      --anti-patterns
-    """
+| Flag | Description |
+| --- | --- |
+| `-i, --include` | TypeScript file glob patterns |
+| `-F, --features` | Feature file glob patterns |
+| `--dod` | Enable DoD validation for completed patterns |
+| `--anti-patterns` | Enable anti-pattern detection |
+| `--cross-source` | Enable cross-source consistency validation |
+
+    **Example Commands:**
+
+| Command | Purpose |
+| --- | --- |
+| `npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod` | DoD only |
+| `npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --anti-patterns` | Anti-patterns only |
+| `npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns` | Full validation |
 
   Rule: CI/CD Integration
 
     **Context:** Validation commands integrate into CI/CD pipelines.
 
-    **Recommended package.json Scripts:**
+    **Recommended npm Scripts:**
 
-    """json
-    {
-      "scripts": {
-        "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
-        "lint:process": "lint-process --staged",
-        "lint:process:ci": "lint-process --all --strict",
-        "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
-      }
-    }
-    """
+| Script Name | Command | Purpose |
+| --- | --- | --- |
+| lint:patterns | lint-patterns -i 'src/**/*.ts' | Annotation quality |
+| lint:process | lint-process --staged | Pre-commit validation |
+| lint:process:ci | lint-process --all --strict | CI pipeline |
+| validate:all | validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns | Full validation |
 
-    **Pre-commit Hook:**
+    **Pre-commit Hook Setup:**
 
-    """bash
-    npx lint-process --staged
-    """
+    Add to `.husky/pre-commit`: `npx lint-process --staged`
 
-    **GitHub Actions:**
+    **GitHub Actions Integration:**
 
-    """yaml
-    - name: Lint annotations
-      run: npx lint-patterns -i "src/**/*.ts" --strict
-
-    - name: Validate patterns
-      run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
-    """
+| Step Name | Command |
+| --- | --- |
+| Lint annotations | npx lint-patterns -i "src/**/*.ts" --strict |
+| Validate patterns | npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns |
 
   Rule: Exit Codes
 
@@ -179,14 +241,28 @@ Feature: Validation Reference - Auto-Generated Documentation
 
     **Context:** All validation tools expose programmatic APIs for custom integrations.
 
+    **API Functions:**
+
+| Category | Function | Description |
+| --- | --- | --- |
+| Linting | lintFiles(files, rules) | Run lint rules on files |
+| Linting | hasFailures(result) | Check for lint failures |
+| Anti-Patterns | detectAntiPatterns(ts, features) | Run all anti-pattern detectors |
+| Anti-Patterns | detectProcessInCode(files) | Find process tags in TypeScript |
+| Anti-Patterns | detectScenarioBloat(features) | Find feature files with too many scenarios |
+| Anti-Patterns | detectMegaFeature(features) | Find feature files that are too large |
+| Anti-Patterns | formatAntiPatternReport(violations) | Format violations for console output |
+| DoD | validateDoD(features) | Validate DoD for all completed phases |
+| DoD | validateDoDForPhase(name, phase, feature) | Validate DoD for single phase |
+| DoD | isDeliverableComplete(deliverable) | Check if deliverable is done |
+| DoD | hasAcceptanceCriteria(feature) | Check for @acceptance-criteria scenarios |
+| DoD | formatDoDSummary(summary) | Format DoD results for console output |
+
     **Import Paths:**
 
     """typescript
     // Pattern linting
     import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
-
-    // Process guard
-    import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
 
     // Anti-patterns and DoD
     import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
@@ -195,39 +271,20 @@ Feature: Validation Reference - Auto-Generated Documentation
     **Anti-Pattern Detection Example:**
 
     """typescript
-    import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery-process/validation';
-    import { scanTypeScript, scanGherkin } from '@libar-dev/delivery-process/scanner';
-
-    const tsFiles = await scanTypeScript(['src/**/*.ts']);
-    const features = await scanGherkin(['specs/**/*.feature']);
+    import { detectAntiPatterns } from '@libar-dev/delivery-process/validation';
 
     const violations = detectAntiPatterns(tsFiles, features, {
-      thresholds: {
-        scenarioBloatThreshold: 15,
-        megaFeatureLineThreshold: 400,
-      },
+      thresholds: { scenarioBloatThreshold: 15 },
     });
-
-    if (violations.length > 0) {
-      console.log(formatAntiPatternReport(violations));
-      process.exit(1);
-    }
     """
 
     **DoD Validation Example:**
 
     """typescript
     import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
-    import { scanGherkin } from '@libar-dev/delivery-process/scanner';
 
-    const features = await scanGherkin(['specs/**/*.feature']);
     const summary = validateDoD(features);
-
     console.log(formatDoDSummary(summary));
-
-    if (summary.failedPhases > 0) {
-      process.exit(1);
-    }
     """
 
   Rule: Related Documentation

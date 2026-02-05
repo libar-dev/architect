@@ -298,3 +298,81 @@ npm login
 npm cache clean --force
     npm view @libar-dev/delivery-process
 ```
+
+## Pre-Publish Checklist
+
+**Context:** Complete this checklist before every publish to avoid common issues.
+
+    **Checklist:**
+
+| Step | Command | Expected Result |
+| --- | --- | --- |
+| 1. Verify npm login | npm whoami | Shows your username |
+| 2. Run tests | pnpm test | All tests pass |
+| 3. Run typecheck | pnpm typecheck | No type errors |
+| 4. Build package | pnpm build | Clean compilation |
+| 5. Verify dist/ is current | git status | No uncommitted changes |
+| 6. Run dry-run | npm publish --dry-run --access public | Preview looks correct |
+| 7. Check version | cat package.json, grep version | Version is correct |
+
+    **Common Pre-Publish Mistakes:**
+
+| Mistake | Prevention |
+| --- | --- |
+| Stale dist/ directory | Always run pnpm build before commit |
+| Wrong version number | Use release scripts, not manual edits |
+| Missing npm login | Run npm whoami before publish |
+| Uncommitted changes | Run git status before publish |
+
+## Package Configuration
+
+**Context:** The package.json configuration controls what gets published.
+
+    **Key Configuration Fields:**
+
+| Field | Value | Purpose |
+| --- | --- | --- |
+| name | @libar-dev/delivery-process | Scoped package name |
+| version | X.Y.Z or X.Y.Z-pre.N | Current version |
+| main | dist/index.js | CommonJS entry point |
+| module | dist/index.mjs | ES module entry point |
+| types | dist/index.d.ts | TypeScript declarations |
+| files | ["dist", "bin"] | Files included in package |
+| publishConfig.access | public | Required for scoped packages |
+
+    **Files Array:** The files array controls what gets published. Only dist/
+    and bin/ directories are included. Source code (src/) is excluded.
+
+    **Exports Configuration:** The exports field defines subpath exports for
+    tree-shaking and module resolution.
+
+## Release Scripts
+
+**Context:** The package provides pnpm scripts for consistent releases.
+
+    **Available Release Scripts:**
+
+| Script | Command | What It Does |
+| --- | --- | --- |
+| release:pre | pnpm release:pre | Bumps pre-release version, commits, tags, pushes |
+| release:patch | pnpm release:patch | Bumps patch version, commits, tags, pushes |
+| release:minor | pnpm release:minor | Bumps minor version, commits, tags, pushes |
+| release:major | pnpm release:major | Bumps major version, commits, tags, pushes |
+
+    **Script Workflow:** Each release script performs these steps automatically:
+
+    1. Bumps version in package.json
+
+    2. Runs pnpm build
+
+    3. Creates git commit with version message
+
+    4. Creates git tag (e.g., v1.0.1)
+
+    5. Pushes commit and tag to remote
+
+    **After Running Script:** You must still run npm publish manually:
+
+```bash
+npm publish --access public
+```

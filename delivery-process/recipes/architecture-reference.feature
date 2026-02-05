@@ -29,6 +29,7 @@ Feature: Architecture Reference - Auto-Generated Documentation
 | --- | --- | --- |
 | Design Principles | THIS DECISION (Rule: Design Principles) | Rule block table |
 | Four-Stage Pipeline | THIS DECISION (Rule: Four-Stage Pipeline) | Rule block content |
+| Module Responsibilities | THIS DECISION (Rule: Module Responsibilities) | Rule block table |
 | MasterDataset Schema | THIS DECISION (Rule: MasterDataset Schema) | Rule block content |
 | RenderableDocument Schema | THIS DECISION (Rule: RenderableDocument Schema) | Rule block content |
 | Block Vocabulary | THIS DECISION (Rule: Block Vocabulary) | Rule block table |
@@ -53,7 +54,7 @@ Feature: Architecture Reference - Auto-Generated Documentation
 
     **Context:** The package follows specific architectural principles.
 
-    **Decision:** These are the key design principles:
+    **Key Design Principles:**
 
 | Principle | Description |
 | --- | --- |
@@ -63,11 +64,20 @@ Feature: Architecture Reference - Auto-Generated Documentation
 | Schema-First Validation | Zod schemas define types; runtime validation at all boundaries |
 | Result Monad | Explicit error handling via Result T,E instead of exceptions |
 
+    **What This Means for Implementation:**
+
+| Aspect | Wrong Mental Model | Correct Mental Model |
+| --- | --- | --- |
+| Scope | Build feature for small output here | Build capability for hundreds of files |
+| ROI | Over-engineered for this repo | Multi-day investment saves weeks of maintenance |
+| Testing | Simple feature, basic tests | Mission-critical infra, comprehensive tests |
+| Shortcuts | Good enough for this repo | Must work across many annotated sources |
+
   Rule: Four-Stage Pipeline
 
     **Context:** The documentation generation pipeline consists of four stages.
 
-    **Decision:** The four stages are:
+    **Pipeline Overview:**
 
 | Stage | Purpose | Key Files | Input | Output |
 | --- | --- | --- | --- | --- |
@@ -87,22 +97,77 @@ Feature: Architecture Reference - Auto-Generated Documentation
         CODEC[CODEC<br/>RenderableDocument<br/>to Markdown]
     """
 
+    **Stage Details:**
+
+| Stage | Scanner Variant | Purpose | File Discovery |
+| --- | --- | --- | --- |
+| Scanner | TypeScript | Parse .ts files with opt-in | glob patterns, hasFileOptIn check |
+| Scanner | Gherkin | Parse .feature files | glob patterns, tag extraction |
+| Extractor | TypeScript | JSDoc annotation extraction | AST parsing, directive extraction |
+| Extractor | Gherkin | Tag and scenario extraction | Cucumber parser, tag mapping |
+
+  Rule: Module Responsibilities
+
+    **Context:** The codebase is organized into modules with specific responsibilities.
+
+    **Core Modules:**
+
+| Module | Location | Purpose |
+| --- | --- | --- |
+| config | src/config/ | Configuration factory, presets (generic, libar-generic, ddd-es-cqrs) |
+| taxonomy | src/taxonomy/ | Tag definitions - categories, status values, format types |
+| scanner | src/scanner/ | TypeScript and Gherkin file scanning |
+| extractor | src/extractor/ | Pattern extraction from AST/Gherkin |
+| generators | src/generators/ | Document generators and orchestrator |
+| renderable | src/renderable/ | Markdown codec system |
+| validation | src/validation/ | FSM validation, DoD checks, anti-patterns |
+| lint | src/lint/ | Pattern linting and process guard |
+| api | src/api/ | Process State API for programmatic access |
+
+    **Key Files by Function:**
+
+| Function | File | Description |
+| --- | --- | --- |
+| Entry point | src/config/factory.ts | createDeliveryProcess() factory |
+| TS scanning | src/scanner/pattern-scanner.ts | TypeScript file discovery and opt-in |
+| Gherkin scanning | src/scanner/gherkin-scanner.ts | Feature file discovery |
+| TS extraction | src/extractor/doc-extractor.ts | Pattern extraction from AST |
+| Gherkin extraction | src/extractor/gherkin-extractor.ts | Pattern extraction from tags |
+| Transformation | src/generators/pipeline/transform-dataset.ts | MasterDataset builder |
+| Orchestration | src/generators/orchestrator.ts | Full pipeline coordination |
+| Codecs | src/renderable/codecs/*.ts | Document type codecs |
+| Rendering | src/renderable/renderer.ts | Block to markdown conversion |
+
   Rule: MasterDataset Schema
 
     **Context:** MasterDataset is the central data structure with all pre-computed views.
 
-    **Decision:** The schema contains:
+    **Schema Structure:**
 
-    - patterns: All extracted patterns (both TypeScript and Gherkin)
-    - tagRegistry: Tag registry for category lookups
-    - byStatus: Patterns grouped by normalized status (completed, active, planned)
-    - byPhase: Patterns grouped by phase number with pre-computed counts
-    - byQuarter: Patterns grouped by quarter (e.g., "Q4-2024")
-    - byCategory: Patterns grouped by category
-    - bySource: Patterns grouped by source type (typescript, gherkin, roadmap, prd)
-    - counts: Overall status counts (completed, active, planned, total)
-    - relationshipIndex: Optional dependency graph (uses, usedBy, dependsOn, enables)
-    - archIndex: Optional architecture index for diagram generation
+| Field | Type | Description |
+| --- | --- | --- |
+| patterns | ExtractedPattern[] | All patterns from both sources |
+| tagRegistry | TagRegistry | Category and tag definitions |
+| byStatus | StatusGroups | Grouped by completed, active, planned |
+| byPhase | PhaseGroup[] | Grouped by phase with counts |
+| byQuarter | Record | Grouped by quarter (e.g., "Q4-2024") |
+| byCategory | Record | Grouped by category |
+| bySource | SourceViews | Grouped by typescript, gherkin, roadmap, prd |
+| counts | StatusCounts | Aggregate status counts |
+| relationshipIndex | Record | Dependency graph (uses, usedBy, dependsOn, enables) |
+| archIndex | ArchIndex | Optional architecture index for diagrams |
+
+    **Pre-computed Views (O(1) Access):**
+
+| View | Access Pattern | Use Case |
+| --- | --- | --- |
+| byStatus.completed | dataset.byStatus.completed | List completed patterns |
+| byStatus.active | dataset.byStatus.active | List active patterns |
+| byStatus.planned | dataset.byStatus.planned | List planned patterns |
+| byPhase | dataset.byPhase[0].patterns | Get phase patterns with counts |
+| byCategory | dataset.byCategory['core'] | Get patterns by category |
+| bySource.typescript | dataset.bySource.typescript | Get TypeScript-origin patterns |
+| bySource.gherkin | dataset.bySource.gherkin | Get Gherkin-origin patterns |
 
     See src/validation-schemas/master-dataset.ts for the complete Zod schema.
 
@@ -110,13 +175,31 @@ Feature: Architecture Reference - Auto-Generated Documentation
 
     **Context:** RenderableDocument is the universal intermediate format.
 
-    **Decision:** All document codecs output this format. The renderer converts it to markdown.
+    **Document Structure:**
 
-    - title: Document title (becomes H1)
-    - purpose: Optional description (rendered as blockquote)
-    - detailLevel: Optional detail level indicator
-    - sections: Array of SectionBlock (the document content)
-    - additionalFiles: Record of path to RenderableDocument for progressive disclosure
+| Field | Type | Description |
+| --- | --- | --- |
+| title | string | Document title (becomes H1) |
+| purpose | string (optional) | Description (rendered as blockquote) |
+| detailLevel | string (optional) | Detail level indicator |
+| sections | SectionBlock[] | Array of content blocks |
+| additionalFiles | Record | Progressive disclosure detail files |
+
+    **Document Building Pattern:**
+
+    """typescript
+    import { document, heading, paragraph, table } from './schema';
+
+    const doc = document('My Document', [
+      heading(2, 'Summary'),
+      paragraph('Document summary text...'),
+      table(['Column 1', 'Column 2'], [
+        ['Row 1 Col 1', 'Row 1 Col 2'],
+      ]),
+    ], {
+      purpose: 'Document purpose description',
+    });
+    """
 
     See src/renderable/schema.ts for block builders and type definitions.
 
@@ -124,7 +207,7 @@ Feature: Architecture Reference - Auto-Generated Documentation
 
     **Context:** RenderableDocument uses a fixed vocabulary of 9 section block types.
 
-    **Decision:** Block types are grouped by purpose:
+    **Block Categories:**
 
 | Category | Block Types | Markdown Output |
 | --- | --- | --- |
@@ -132,25 +215,38 @@ Feature: Architecture Reference - Auto-Generated Documentation
 | Content | table, list, code, mermaid | tables, lists, fenced code |
 | Progressive | collapsible, link-out | details/summary, links to files |
 
-    **Block Type Details:**
+    **Block Type Reference:**
 
-| Block | Key Properties | Usage |
+| Block | Key Properties | Usage | Markdown Output |
+| --- | --- | --- | --- |
+| heading | level (1-6), text | Section headers | ## Title |
+| paragraph | text | Body text | Plain text |
+| separator | (none) | Horizontal rules | --- |
+| table | columns, rows, alignment | Data tables | Pipe tables |
+| list | ordered, items | Bullet or numbered lists | - item or 1. item |
+| code | language, content | Code snippets | Fenced code blocks |
+| mermaid | content | Mermaid diagrams | mermaid code block |
+| collapsible | summary, content | Expandable sections | details/summary HTML |
+| link-out | text, path | Links to detail files | Markdown link |
+
+    **Block Builder Functions:**
+
+| Function | Signature | Example |
 | --- | --- | --- |
-| heading | level (1-6), text | Section headers |
-| paragraph | text | Body text |
-| separator | (none) | Horizontal rules |
-| table | columns, rows, alignment | Data tables |
-| list | ordered, items | Bullet or numbered lists |
-| code | language, content | Code snippets |
-| mermaid | content | Mermaid diagrams |
-| collapsible | summary, content | Expandable sections |
-| link-out | text, path | Links to detail files |
+| heading | heading(level, text) | heading(2, 'Summary') |
+| paragraph | paragraph(text) | paragraph('Some text') |
+| table | table(columns, rows, alignment) | table(['Col'], [['Val']]) |
+| list | list(items, ordered) | list(['Item 1', 'Item 2']) |
+| code | code(language, content) | code('typescript', 'const x = 1') |
+| mermaid | mermaid(content) | mermaid('graph LR; A-->B') |
+| collapsible | collapsible(summary, content) | collapsible('Details', [...]) |
+| linkOut | linkOut(text, path) | linkOut('See more', './detail.md') |
 
   Rule: Codec Factory Pattern
 
     **Context:** Every codec provides both a default instance and a factory function.
 
-    **Decision:** The two-export pattern enables both simple and customized usage:
+    **Two-Export Pattern:**
 
     """typescript
     // Default codec with standard options
@@ -163,28 +259,61 @@ Feature: Architecture Reference - Auto-Generated Documentation
     const doc = codec.decode(dataset);
     """
 
-    **Common Options:**
+    **Common Codec Options:**
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | generateDetailFiles | boolean | true | Create progressive disclosure files |
-| detailLevel | summary, standard, detailed | standard | Output verbosity |
+| detailLevel | summary/standard/detailed | standard | Output verbosity |
 | limits.recentItems | number | 10 | Max recent items in summaries |
 | limits.collapseThreshold | number | 5 | Items before collapsing |
+
+    **Codec Implementation Pattern:**
+
+| Step | Description | Code Location |
+| --- | --- | --- |
+| Define options | TypeScript interface for codec options | codecs/types.ts |
+| Create factory | Function returning configured codec | codecs/*-codec.ts |
+| Implement decode | Transform MasterDataset to RenderableDocument | codecs/*-codec.ts |
+| Export defaults | Pre-configured default codec instance | codecs/index.ts |
 
   Rule: Available Codecs
 
     **Context:** The package provides multiple specialized codecs for different documentation needs.
 
-    **Decision:** Codecs are grouped by purpose. Pattern-focused codecs generate pattern registries, requirements, and ADRs. Timeline-focused codecs generate roadmaps, milestones, current work, and changelogs. Session-focused codecs generate session context, remaining work, PR changes, and traceability views. Planning codecs generate checklists, session plans, and findings.
+    **Codec Categories:**
 
-    See src/renderable/generate.ts for the complete DOCUMENT_TYPES registry with all codecs, output paths, and descriptions.
+| Category | Codecs | Purpose |
+| --- | --- | --- |
+| Pattern-Focused | patterns, requirements, adrs | Pattern registries, requirements, decisions |
+| Timeline-Focused | roadmap, milestones, current, changelog | Roadmaps, history, active work, releases |
+| Session-Focused | session, remaining, pr-changes, traceability | Session context, remaining work, PR changes |
+| Planning | planning-checklist, session-plan, session-findings | Planning checklists, session plans, findings |
+
+    **Codec to Output File Mapping:**
+
+| Codec | Primary Output | Detail Files |
+| --- | --- | --- |
+| PatternsDocumentCodec | PATTERNS.md | patterns/category.md |
+| RoadmapDocumentCodec | ROADMAP.md | phases/phase-N-name.md |
+| CompletedMilestonesCodec | COMPLETED-MILESTONES.md | milestones/quarter.md |
+| CurrentWorkCodec | CURRENT-WORK.md | current/phase-N-name.md |
+| RequirementsDocumentCodec | PRODUCT-REQUIREMENTS.md | requirements/area-slug.md |
+| SessionContextCodec | SESSION-CONTEXT.md | sessions/phase-N-name.md |
+| RemainingWorkCodec | REMAINING-WORK.md | remaining/phase-N-name.md |
+| AdrDocumentCodec | DECISIONS.md | decisions/category-slug.md |
+| ChangelogCodec | CHANGELOG.md | (none) |
+| PrChangesCodec | working/PR-CHANGES.md | (none) |
+| TraceabilityCodec | TRACEABILITY.md | (none) |
+| OverviewCodec | OVERVIEW.md | (none) |
+
+    See src/renderable/generate.ts for the complete DOCUMENT_TYPES registry.
 
   Rule: Progressive Disclosure
 
     **Context:** Large documents are split into main index plus detail files.
 
-    **Decision:** Each codec has specific split logic:
+    **Split Logic by Codec:**
 
 | Codec | Split By | Detail Path Pattern |
 | --- | --- | --- |
@@ -200,38 +329,84 @@ Feature: Architecture Reference - Auto-Generated Documentation
 
     **Detail Level Options:**
 
-| Value | Behavior |
-| --- | --- |
-| summary | Minimal output, key metrics only |
-| standard | Default with all sections |
-| detailed | Maximum detail, all optional sections |
+| Value | Behavior | Use Case |
+| --- | --- | --- |
+| summary | Minimal output, key metrics only | AI context, quick reference |
+| standard | Default with all sections | Regular documentation |
+| detailed | Maximum detail, all optional sections | Deep reference |
+
+    **Disabling Progressive Disclosure:**
+
+    """typescript
+    const codec = createPatternsCodec({ generateDetailFiles: false });
+    // Only produces PATTERNS.md, no patterns/*.md files
+    """
 
   Rule: Status Normalization
 
     **Context:** Source annotations use various status values that must be normalized.
 
-    **Decision:** All status values are normalized to three canonical display states: completed, active, and planned. The STATUS_NORMALIZATION_MAP in src/taxonomy/normalized-status.ts defines the mapping from raw FSM states to display buckets.
+    **Status Mapping:**
 
-    See src/taxonomy/normalized-status.ts for NORMALIZED_STATUS_VALUES, STATUS_NORMALIZATION_MAP, and the normalizeStatus function.
+| Input Status | Normalized To | Display Category |
+| --- | --- | --- |
+| completed | completed | Done |
+| active | active | In Progress |
+| roadmap | planned | Future Work |
+| deferred | planned | Future Work |
+| undefined | planned | Future Work |
+
+    **Normalization Function:**
+
+    """typescript
+    import { normalizeStatus } from 'delivery-process/taxonomy';
+
+    normalizeStatus('roadmap');  // Returns: 'planned'
+    normalizeStatus('active');   // Returns: 'active'
+    normalizeStatus(undefined);  // Returns: 'planned'
+    """
+
+    See src/taxonomy/normalized-status.ts for STATUS_NORMALIZATION_MAP and normalizeStatus.
 
   Rule: Codec to Generator Mapping
 
     **Context:** Each codec is exposed via a CLI generator flag.
 
-    **Decision:** The CODEC_MAP and CODEC_FACTORY_MAP in src/renderable/generate.ts define the mapping from generator names to codec instances and factory functions. Generator names match the CLI -g flag values (e.g., -g patterns, -g roadmap).
+    **Generator CLI Flags:**
 
-    See src/renderable/generate.ts for DOCUMENT_TYPES (output paths), CODEC_MAP (default instances), and CODEC_FACTORY_MAP (factory functions for custom options).
+| Generator Name | Codec | CLI Flag | Output |
+| --- | --- | --- | --- |
+| patterns | PatternsDocumentCodec | -g patterns | PATTERNS.md |
+| roadmap | RoadmapDocumentCodec | -g roadmap | ROADMAP.md |
+| milestones | CompletedMilestonesCodec | -g milestones | COMPLETED-MILESTONES.md |
+| current | CurrentWorkCodec | -g current | CURRENT-WORK.md |
+| requirements | RequirementsDocumentCodec | -g requirements | PRODUCT-REQUIREMENTS.md |
+| session | SessionContextCodec | -g session | SESSION-CONTEXT.md |
+| remaining | RemainingWorkCodec | -g remaining | REMAINING-WORK.md |
+| adrs | AdrDocumentCodec | -g adrs | DECISIONS.md |
+| changelog | ChangelogCodec | -g changelog | CHANGELOG.md |
+| traceability | TraceabilityCodec | -g traceability | TRACEABILITY.md |
+| overview-rdm | OverviewCodec | -g overview-rdm | OVERVIEW.md |
+| pr-changes | PrChangesCodec | -g pr-changes | working/PR-CHANGES.md |
+| planning-checklist | PlanningChecklistCodec | -g planning-checklist | PLANNING-CHECKLIST.md |
+| session-plan | SessionPlanCodec | -g session-plan | SESSION-PLAN.md |
+| session-findings | SessionFindingsCodec | -g session-findings | SESSION-FINDINGS.md |
+
+    See src/renderable/generate.ts for DOCUMENT_TYPES, CODEC_MAP, and CODEC_FACTORY_MAP.
 
   Rule: Result Monad Pattern
 
     **Context:** The package uses explicit error handling instead of exceptions.
 
-    **Decision:** All operations return Result T,E for type-safe error handling:
+    **Result Type Definition:**
 
     """typescript
     type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+    """
 
-    // Usage
+    **Usage Pattern:**
+
+    """typescript
     const result = await scanPatterns(options);
     if (result.ok) {
       const { files } = result.value;
@@ -241,28 +416,32 @@ Feature: Architecture Reference - Auto-Generated Documentation
     """
 
     **Benefits:**
-    - No exception swallowing
-    - Partial success scenarios supported
-    - Type-safe error handling at boundaries
+
+| Benefit | Description |
+| --- | --- |
+| No exception swallowing | Errors must be explicitly handled |
+| Partial success | Can return partial results with warnings |
+| Type-safe | Compiler enforces error handling at boundaries |
+| Composable | Results can be chained and transformed |
 
   Rule: Orchestrator Pipeline
 
     **Context:** The orchestrator coordinates the complete documentation generation pipeline.
 
-    **Decision:** The orchestrator executes these steps:
+    **Orchestrator Steps:**
 
-| Step | Operation | Key Function |
-| --- | --- | --- |
-| 1 | Load configuration | loadConfig() |
-| 2 | Scan TypeScript sources | scanPatterns() |
-| 3 | Extract TypeScript patterns | extractPatterns() |
-| 4 | Scan Gherkin sources | scanGherkinFiles() |
-| 5 | Extract Gherkin patterns | extractPatternsFromGherkin() |
-| 6 | Merge patterns | mergePatterns() |
-| 7 | Compute hierarchy | computeHierarchyChildren() |
-| 8 | Transform to MasterDataset | transformToMasterDataset() |
-| 9 | Run codecs | Codec.decode() for each generator |
-| 10 | Write output files | fs.writeFile() |
+| Step | Operation | Key Function | Description |
+| --- | --- | --- | --- |
+| 1 | Load configuration | loadConfig() | Find and load config file |
+| 2 | Scan TypeScript | scanPatterns() | Discover .ts files with opt-in |
+| 3 | Extract TypeScript | extractPatterns() | Parse JSDoc annotations |
+| 4 | Scan Gherkin | scanGherkinFiles() | Discover .feature files |
+| 5 | Extract Gherkin | extractPatternsFromGherkin() | Parse tags and scenarios |
+| 6 | Merge patterns | mergePatterns() | Combine with conflict detection |
+| 7 | Compute hierarchy | computeHierarchyChildren() | Build parent-child relationships |
+| 8 | Transform | transformToMasterDataset() | Build pre-computed views |
+| 9 | Run codecs | Codec.decode() | Generate RenderableDocuments |
+| 10 | Write files | fs.writeFile() | Output markdown files |
 
     **Orchestrator Flow Diagram:**
 
@@ -280,6 +459,30 @@ Feature: Architecture Reference - Auto-Generated Documentation
         J --> K[renderDocumentWithFiles]
         K --> L[fs.writeFile]
     """
+
+    **Error Handling in Pipeline:**
+
+| Stage | Error Type | Recovery |
+| --- | --- | --- |
+| Config load | ConfigLoadError | Use default preset |
+| Scan | ScanError | Return empty patterns |
+| Extract | ExtractError | Skip malformed patterns |
+| Merge | ConflictError | Return error to caller |
+| Transform | (none) | Pure function, no errors |
+| Codec | (none) | Pure function, no errors |
+| Write | WriteError | Return error to caller |
+
+  Rule: Related Documentation
+
+    **Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| CONFIGURATION-REFERENCE.md | Reference | Presets, tag prefixes, custom config |
+| TAXONOMY-REFERENCE.md | Reference | Categories, status values, tag formats |
+| INSTRUCTIONS-REFERENCE.md | Reference | Complete annotation guide |
+| PROCESS-GUARD-REFERENCE.md | Reference | FSM workflow validation |
+| METHODOLOGY-REFERENCE.md | Background | Code-first documentation philosophy |
 
   @acceptance-criteria
   Scenario: Reference generates Architecture documentation

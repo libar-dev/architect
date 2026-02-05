@@ -49,6 +49,49 @@
 - `AcceptedStatusValue` - type
 - `DEFAULT_STATUS` - const
 
+### Status Values (from this decision (rule: status values))
+
+**Context:** Status values control the FSM workflow for pattern lifecycle.
+
+    **Decision:** Four canonical status values are defined (per PDR-005).
+    See `src/taxonomy/status-values.ts` for the `PROCESS_STATUS_VALUES` array
+    with inline documentation on FSM transitions and protection levels.
+
+    **Status Values Reference:**
+
+| Status | Protection Level | Description | Editable |
+| --- | --- | --- | --- |
+| roadmap | None | Planned work, not yet started | Full editing |
+| active | Scope-locked | Work in progress | Edit existing only |
+| completed | Hard-locked | Work finished | Requires unlock tag |
+| deferred | None | On hold, may resume later | Full editing |
+
+    **Valid FSM Transitions:**
+
+| From | To | Trigger |
+| --- | --- | --- |
+| roadmap | active | Start work |
+| roadmap | deferred | Postpone before start |
+| active | completed | Finish work |
+| active | roadmap | Regress (blocked) |
+| deferred | roadmap | Resume planning |
+
+    **FSM Diagram:**
+
+    """mermaid
+    stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Hard-locked
+        note right of active : Scope-locked
+    """
+
 ### Normalized Status (from normalized-status)
 
 - `NORMALIZED_STATUS_VALUES` - const

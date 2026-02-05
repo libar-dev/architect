@@ -31,6 +31,7 @@
 | Reading Order for New Users | THIS DECISION (Rule: Reading Order for New Users) | Rule block table |
 | Reading Order for Developers | THIS DECISION (Rule: Reading Order for Developers) | Rule block table |
 | Reading Order for Team Leads | THIS DECISION (Rule: Reading Order for Team Leads) | Rule block table |
+| Document Contents Summary | THIS DECISION (Rule: Document Contents Summary) | Rule block table |
 | Dual-Source Architecture | THIS DECISION (Rule: Dual-Source Architecture) | Rule block table |
 | Delivery Workflow FSM | THIS DECISION (Rule: Delivery Workflow FSM) | Fenced code block |
 | ProcessStateAPI | THIS DECISION (Rule: ProcessStateAPI) | Fenced code block |
@@ -112,6 +113,52 @@
 | --- | --- | --- |
 | 8 | PROCESS-GUARD.md | FSM enforcement, pre-commit hooks |
 | 9 | VALIDATION.md | Lint rules, DoD checks, anti-patterns |
+
+### Document Contents Summary
+
+**Context:** Quick reference to key sections within each document.
+
+    **README.md Key Sections:**
+
+| Section | Lines | Topics |
+| --- | --- | --- |
+| The Problem / The Solution | 16-33 | Documentation drift, code as source of truth |
+| Built for AI-Assisted Dev | 36-57 | ProcessStateAPI typed queries |
+| How It Works | 60-111 | Annotation examples, dual-source |
+| Quick Start | 114-170 | Install, annotate, generate, lint |
+| CLI Commands | 173-183 | Command summary table |
+| FSM-Enforced Workflow | 187-217 | State diagram, protection levels |
+
+    **ARCHITECTURE.md Key Sections:**
+
+| Section | Lines | Topics |
+| --- | --- | --- |
+| Executive Summary | 28-66 | What it does, key principles, overview |
+| Four-Stage Pipeline | 140-245 | Scanner, Extractor, Transformer, Codec |
+| Unified Transformation | 248-362 | MasterDataset schema, single-pass |
+| Codec Architecture | 366-407 | Concepts, block vocabulary, factory |
+| Available Codecs | 410-607 | All 16 codecs with options tables |
+| Data Flow Diagrams | 823-980 | Pipeline flow, MasterDataset views |
+
+    **SESSION-GUIDES.md Key Sections:**
+
+| Section | Lines | Topics |
+| --- | --- | --- |
+| Session Decision Tree | 7-24 | Which session type to use |
+| Planning Session | 27-83 | Create roadmap spec, checklist |
+| Design Session | 86-132 | When required, checklist, code stubs |
+| Implementation Session | 135-192 | Pre-flight, execution, FSM transitions |
+| Handoff Documentation | 277-313 | Template, discovery tags |
+
+    **PROCESS-GUARD.md Key Sections:**
+
+| Section | Lines | Topics |
+| --- | --- | --- |
+| Quick Reference | 9-37 | Protection levels, transitions, escapes |
+| Error completed-protection | 40-65 | Fix with unlock reason |
+| Error invalid-status-transition | 68-98 | Follow FSM path |
+| CLI Usage | 187-235 | Modes, options, exit codes |
+| Pre-commit Setup | 238-260 | Husky, package.json scripts |
 
 ### Dual-Source Architecture
 

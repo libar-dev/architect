@@ -227,6 +227,25 @@ const DEFAULT_STATUS: ProcessStatusValue;
     See `src/taxonomy/status-values.ts` for the `PROCESS_STATUS_VALUES` array
     with inline documentation on FSM transitions and protection levels.
 
+    **Status Values Reference:**
+
+| Status | Protection Level | Description | Editable |
+| --- | --- | --- | --- |
+| roadmap | None | Planned work, not yet started | Full editing |
+| active | Scope-locked | Work in progress | Edit existing only |
+| completed | Hard-locked | Work finished | Requires unlock tag |
+| deferred | None | On hold, may resume later | Full editing |
+
+    **Valid FSM Transitions:**
+
+| From | To | Trigger |
+| --- | --- | --- |
+| roadmap | active | Start work |
+| roadmap | deferred | Postpone before start |
+| active | completed | Finish work |
+| active | roadmap | Regress (blocked) |
+| deferred | roadmap | Resume planning |
+
     **FSM Diagram:**
 
 ```mermaid
@@ -624,3 +643,51 @@ npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
 
 **Output:** A markdown file documenting all tags with their formats,
     valid values, and examples - generated from the TagRegistry.
+
+## Complete Category Reference
+
+**Context:** The ddd-es-cqrs preset includes all 21 categories. Simpler
+    presets use subsets (core, api, generator for libar-generic).
+
+    **All Categories:**
+
+| Tag | Domain | Priority | Description | Aliases |
+| --- | --- | --- | --- | --- |
+| domain | Strategic DDD | 1 | Bounded contexts, aggregates, strategic design | - |
+| ddd | Domain-Driven Design | 2 | DDD tactical patterns | - |
+| bounded-context | Bounded Context | 3 | BC contracts and definitions | - |
+| event-sourcing | Event Sourcing | 4 | Event store, aggregates, replay | es |
+| decider | Decider | 5 | Decider pattern | - |
+| fsm | FSM | 5 | Finite state machine patterns | - |
+| cqrs | CQRS | 5 | Command/query separation | - |
+| projection | Projection | 6 | Read models, checkpoints | - |
+| saga | Saga | 7 | Cross-context coordination, process managers | process-manager |
+| command | Command | 8 | Command handlers, orchestration | - |
+| arch | Architecture | 9 | Architecture patterns, decisions | - |
+| infra | Infrastructure | 10 | Infrastructure, composition root | infrastructure |
+| validation | Validation | 11 | Input validation, schemas | - |
+| testing | Testing | 12 | Test patterns, BDD | - |
+| performance | Performance | 13 | Optimization, caching | - |
+| security | Security | 14 | Auth, authorization | - |
+| core | Core | 15 | Core utilities | - |
+| api | API | 16 | Public APIs | - |
+| generator | Generator | 17 | Code generators | - |
+| middleware | Middleware | 18 | Middleware patterns | - |
+| correlation | Correlation | 19 | Correlation tracking | - |
+
+    **Category Selection Guide:**
+
+| Project Type | Recommended Preset | Categories Available |
+| --- | --- | --- |
+| Simple utility packages | libar-generic | core, api, generator |
+| DDD/Event Sourcing systems | ddd-es-cqrs | All 21 categories |
+| Generic projects | generic | core, api, generator |
+
+    **Usage:** Add category tags to patterns using the tag prefix:
+
+```typescript
+// For libar-generic preset
+    // @libar-docs-core      - marks as core utility
+    // @libar-docs-api       - marks as public API
+    // @libar-docs-generator - marks as code generator
+```

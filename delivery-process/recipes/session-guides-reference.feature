@@ -32,9 +32,12 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 | Design Session | THIS DECISION (Rule: Design Session) | Rule block lists |
 | Implementation Session | THIS DECISION (Rule: Implementation Session) | Rule block lists |
 | Planning + Design Session | THIS DECISION (Rule: Planning + Design Session) | Rule block lists |
-| FSM Protection | THIS DECISION (Rule: FSM Protection) | Rule block content |
+| FSM Protection | THIS DECISION (Rule: FSM Protection) | Rule block tables |
+| FSM Error Messages and Fixes | THIS DECISION (Rule: FSM Error Messages and Fixes) | Rule block table |
+| Escape Hatches | THIS DECISION (Rule: Escape Hatches) | Rule block table |
 | Handoff Documentation | THIS DECISION (Rule: Handoff Documentation) | Rule block content |
 | Discovery Tags | THIS DECISION (Rule: Discovery Tags) | Rule block table |
+| Common Mistakes | THIS DECISION (Rule: Common Mistakes) | Rule block tables |
 | Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
@@ -245,16 +248,67 @@ Feature: Session Guides Reference - Auto-Generated Documentation
     - Protection levels: See `PROTECTION_LEVELS` in `src/validation/fsm/states.ts`
     - Valid transitions: See `VALID_TRANSITIONS` in `src/validation/fsm/transitions.ts`
 
-    **Valid FSM Transitions (Visual):**
+    **Protection Levels:**
 
-    """
-    roadmap --> active --> completed (terminal)
-        |          |
-        |          v
-        |       roadmap (blocked/regressed)
-        v
-    deferred --> roadmap
-    """
+| State | Protection | Can Add Deliverables | Needs Unlock | Allowed Actions | Blocked Actions |
+| --- | --- | --- | --- | --- | --- |
+| roadmap | None | Yes | No | Full editing, add deliverables | None |
+| deferred | None | Yes | No | Full editing, add deliverables | None |
+| active | Scope-locked | No | No | Edit existing deliverables | Adding new deliverables |
+| completed | Hard-locked | No | Yes | Nothing | Any change without unlock tag |
+
+    **Valid FSM Transitions:**
+
+| From | To | Trigger | Notes |
+| --- | --- | --- | --- |
+| roadmap | active | Start work | Locks scope |
+| roadmap | deferred | Postpone | For deprioritized work |
+| active | completed | Finish | Terminal state |
+| active | roadmap | Regress | For blocked work |
+| deferred | roadmap | Resume | To restart planning |
+
+    **Invalid Transitions (will fail validation):**
+
+| Attempted | Why Invalid | Valid Path |
+| --- | --- | --- |
+| roadmap to completed | Must go through active | roadmap to active to completed |
+| deferred to active | Must return to roadmap first | deferred to roadmap to active |
+| deferred to completed | Cannot skip two states | deferred to roadmap to active to completed |
+| completed to any | Terminal state | Use unlock-reason tag to modify |
+
+  Rule: FSM Error Messages and Fixes
+
+    **Context:** Process Guard validates FSM rules and provides specific error messages with fixes.
+
+    **Error Reference:**
+
+| Error | Cause | Fix |
+| --- | --- | --- |
+| completed-protection | File has completed status but no unlock tag | Add unlock-reason tag with hyphenated reason |
+| invalid-status-transition | Skipped FSM state (e.g., roadmap to completed) | Follow path: roadmap to active to completed |
+| scope-creep | Added deliverable to active spec | Remove deliverable OR revert to roadmap |
+| session-scope (warning) | Modified file outside session scope | Add to scope OR use --ignore-session |
+| session-excluded | Modified excluded pattern during session | Remove from exclusion OR override |
+| deliverable-removed (warning) | Deliverable was removed from spec | Informational only, verify intentional |
+
+  Rule: Escape Hatches
+
+    **Context:** Sometimes process rules need to be bypassed for legitimate reasons.
+
+    **Available Escape Hatches:**
+
+| Situation | Solution | Example |
+| --- | --- | --- |
+| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
+| CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
+| Emergency hotfix | Combine unlock + ignore | @libar-docs-unlock-reason:'Hotfix' plus --ignore-session |
+
+    **Unlock Reason Constraints:**
+
+    - Values cannot contain spaces (use hyphens)
+    - Must describe why modification is needed
+    - Is committed with the change for audit trail
 
   Rule: Handoff Documentation
 
@@ -313,6 +367,37 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 
     **Note:** Discovery tags use hyphens instead of spaces (tag values cannot contain spaces).
 
+  Rule: Common Mistakes
+
+    **Context:** Developers frequently make these mistakes when following session workflows.
+
+    **Planning Session Mistakes:**
+
+| Mistake | Why It Is Wrong | Correct Approach |
+| --- | --- | --- |
+| Creating .ts implementation files | Planning only creates specs | Create spec file only, no code |
+| Transitioning to active | Active requires implementation readiness | Keep status as roadmap |
+| Asking Ready to implement? | Planning session ends at roadmap spec | End session after spec complete |
+| Writing full implementations | Stubs only if Planning + Design | Save implementation for Implementation session |
+
+    **Implementation Session Mistakes:**
+
+| Mistake | Why It Is Wrong | Correct Approach |
+| --- | --- | --- |
+| Writing code before transition | FSM must be active first | Change status to active FIRST |
+| Adding deliverables to active spec | Scope-locked state prevents this | Revert to roadmap to add scope |
+| Marking completed with incomplete work | Hard-locked state cannot be undone | Finish ALL deliverables first |
+| Skipping FSM transitions | Process Guard will reject | Follow roadmap to active to completed |
+| Editing generated docs directly | Will be overwritten | Regenerate from source |
+
+    **Design Session Mistakes:**
+
+| Mistake | Why It Is Wrong | Correct Approach |
+| --- | --- | --- |
+| Creating implementation plans | Design focuses on architecture | Document options and decisions only |
+| Transitioning spec to active | Requires implementation session | Keep status as roadmap |
+| Writing full implementations | Design creates stubs only | Use throw new Error pattern |
+
   Rule: Related Documentation
 
     **Context:** Session guides connect to other documentation.
@@ -325,6 +410,8 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 | GHERKIN-PATTERNS.md | DataTables, DocStrings, Rule blocks |
 | CONFIGURATION.md | Tag prefixes, presets |
 | INSTRUCTIONS.md | CLI commands, full tag reference |
+| PROCESS-GUARD-REFERENCE.md | FSM validation rules and CLI usage |
+| VALIDATION-REFERENCE.md | DoD validation and anti-pattern detection |
 
   @acceptance-criteria
   Scenario: Reference generates Session Guides documentation
@@ -334,4 +421,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
     And detailed docs are generated with planning session checklist
     And detailed docs are generated with implementation session checklist
     And compact docs are generated with FSM protection table
+    And FSM error messages and fixes are included
+    And escape hatches reference is included
+    And common mistakes tables are included
     And discovery tags reference is included

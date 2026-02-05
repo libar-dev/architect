@@ -26,6 +26,7 @@ Feature: Instructions Reference - Auto-Generated Documentation
 
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
+| Quick Tag Reference | THIS DECISION (Rule: Quick Tag Reference) | Rule block table |
 | File-Level Opt-In | THIS DECISION (Rule: File-Level Opt-In) | Rule block content |
 | Category Tags | src/taxonomy/categories.ts | extract-shapes tag |
 | Metadata Tags | src/taxonomy/registry-builder.ts | extract-shapes tag |
@@ -33,6 +34,8 @@ Feature: Instructions Reference - Auto-Generated Documentation
 | Source Ownership | THIS DECISION (Rule: Source Ownership) | Rule block table |
 | Hierarchy Duration | THIS DECISION (Rule: Hierarchy Duration) | Rule block table |
 | Two-Tier Spec Architecture | THIS DECISION (Rule: Two-Tier Spec Architecture) | Rule block table |
+| CLAUDE.md Generation | THIS DECISION (Rule: CLAUDE.md Generation) | Rule block content |
+| AI Context Optimization | THIS DECISION (Rule: AI Context Optimization) | Rule block table |
 | CLI generate-docs | src/cli/generate-docs.ts | extract-shapes tag |
 | CLI lint-patterns | src/cli/lint-patterns.ts | extract-shapes tag |
 | CLI lint-process | src/cli/lint-process.ts | extract-shapes tag |
@@ -47,6 +50,37 @@ Feature: Instructions Reference - Auto-Generated Documentation
       | Source annotations added | Complete | src/taxonomy/*.ts, src/cli/*.ts |
       | Generated detailed docs | Pending | docs-generated/docs/INSTRUCTIONSREFERENCE.md |
       | Generated compact docs | Pending | docs-generated/_claude-md/reference/instructionsreference.md |
+
+  Rule: Quick Tag Reference
+
+    **Context:** Most commonly used tags for quick lookup.
+
+    **Essential Tags (required for most patterns):**
+
+| Tag | Format | Purpose | Example Value |
+| --- | --- | --- | --- |
+| pattern | value | Pattern identifier | MyPattern |
+| status | enum | FSM state | roadmap, active, completed |
+| phase | number | Roadmap phase | 15 |
+| core | flag | Mark as essential | (no value) |
+
+    **Relationship Tags:**
+
+| Tag | Format | Source | Purpose |
+| --- | --- | --- | --- |
+| uses | csv | TypeScript | Runtime dependencies |
+| used-by | csv | TypeScript | Reverse dependencies |
+| depends-on | csv | Gherkin | Planning dependencies |
+| enables | csv | Either | What this unlocks |
+
+    **Process Tags:**
+
+| Tag | Format | Purpose | Example Value |
+| --- | --- | --- | --- |
+| quarter | value | Timeline | Q1-2026 |
+| effort | value | Estimate | 2d, 4h, 1w |
+| team | value | Assignment | platform-team |
+| priority | enum | Urgency | critical, high, medium, low |
 
   Rule: File-Level Opt-In
 
@@ -158,6 +192,67 @@ Feature: Instructions Reference - Auto-Generated Documentation
 | --- | --- | --- |
 | Tier 1 | delivery-process/specs/ | Roadmap and planning specifications |
 | Tier 2 | package/tests/features/ | Executable test specifications |
+
+  Rule: CLAUDE.md Generation
+
+    **Context:** The package generates CLAUDE.md files for AI assistant context.
+
+    **Output Locations:**
+
+| Format | Location | Purpose |
+| --- | --- | --- |
+| Compact | _claude-md/ subdirectories | Minimal AI context (low token cost) |
+| Detailed | docs/ directory | Full human-readable documentation |
+
+    **Section Routing Tag:** Use `claude-md-section` to route patterns to specific
+    _claude-md subdirectories. This organizes AI context by domain.
+
+    **Available Sections:**
+
+| Section Value | Output Directory | Content Type |
+| --- | --- | --- |
+| index | _claude-md/index/ | Navigation and overview |
+| reference | _claude-md/reference/ | Tag and CLI reference |
+| validation | _claude-md/validation/ | Validation rules and process guard |
+| sessions | _claude-md/sessions/ | Session workflow guides |
+| architecture | _claude-md/architecture/ | System architecture |
+| methodology | _claude-md/methodology/ | Core principles |
+| gherkin | _claude-md/gherkin/ | Gherkin writing patterns |
+| config | _claude-md/config/ | Configuration reference |
+| taxonomy | _claude-md/taxonomy/ | Tag taxonomy |
+| publishing | _claude-md/publishing/ | Publishing guides |
+
+  Rule: AI Context Optimization
+
+    **Context:** Guidelines for writing content that works well in AI assistant context.
+
+    **Compact vs Detailed Format:**
+
+| Aspect | Compact (AI) | Detailed (Human) |
+| --- | --- | --- |
+| Token budget | Minimize (cost-sensitive) | No limit |
+| Examples | 1-2 essential | Many with variations |
+| Tables | Dense, reference-style | Expanded with context |
+| Prose | Bullet points preferred | Full sentences OK |
+| Code | Minimal snippets | Full implementations |
+
+    **Content Optimization Guidelines:**
+
+| Guideline | Rationale |
+| --- | --- |
+| Use tables for reference data | Scannable, low tokens |
+| Prefer bullet lists over paragraphs | AI parses structure well |
+| Include concrete examples | Reduces ambiguity |
+| State constraints explicitly | AI follows rules better |
+| Avoid redundant explanations | Every token costs money |
+
+    **Progressive Disclosure Pattern:**
+
+| Level | Include | Exclude |
+| --- | --- | --- |
+| Summary | Key facts, quick reference | Examples, edge cases |
+| Standard | Core content, common cases | Deep dives, alternatives |
+| Detailed | Everything | Nothing |
 
   Rule: CLI generate-docs
 

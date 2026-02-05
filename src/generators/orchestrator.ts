@@ -39,6 +39,7 @@ import {
   RegistryMetadataOutputSchema,
 } from '../validation-schemas/index.js';
 import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { scanPatterns } from '../scanner/index.js';
 import { extractPatterns } from '../extractor/doc-extractor.js';
 import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
@@ -386,10 +387,12 @@ export async function generateDocumentation(
   // Step 8: Transform patterns into MasterDataset with pre-computed views
   // This is a single-pass transformation that computes all derived views:
   // byStatus, byPhase, byQuarter, byCategory, bySource, counts, relationships
+  // Also applies context auto-inference from file paths for architecture diagrams
   const masterDataset = transformToMasterDataset({
     patterns: allPatterns,
     tagRegistry: registry,
     workflow,
+    contextInferenceRules: DEFAULT_CONTEXT_INFERENCE_RULES,
   });
 
   // Step 9: Build codec options for PR-scoped generators

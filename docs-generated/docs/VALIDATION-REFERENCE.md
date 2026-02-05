@@ -28,14 +28,15 @@
 | --- | --- | --- |
 | Command Decision Tree | THIS DECISION (Rule: Command Decision Tree) | Rule block content |
 | Command Summary | THIS DECISION (Rule: Command Summary) | Rule block table |
-| lint-patterns Rules | src/lint/rules.ts | @extract-shapes tag |
-| Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
-| Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
-| DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
-| validate-patterns Flags | src/cli/validate-patterns.ts | @extract-shapes tag |
+| lint-patterns Rules | src/lint/rules.ts | extract-shapes tag |
+| Anti-Pattern Detection | src/validation/anti-patterns.ts | extract-shapes tag |
+| DoD Validation | src/validation/dod-validator.ts | extract-shapes tag |
+| DoD Types | src/validation/types.ts | extract-shapes tag |
+| validate-patterns Flags | src/cli/validate-patterns.ts | extract-shapes tag |
 | CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
 | Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
 | Programmatic API | THIS DECISION (Rule: Programmatic API) | Fenced code block |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
 ---
 
@@ -47,19 +48,12 @@
 
     **Decision Tree:**
 
-```text
-Need to check annotation quality?
-    --> Yes: lint-patterns
-
-    Need FSM workflow validation?
-    --> Yes: lint-process
-
-    Need cross-source or DoD validation?
-    --> Yes: validate-patterns
-
-    Running pre-commit hook?
-    --> lint-process --staged (default)
-```
+| Question | Answer | Command |
+| --- | --- | --- |
+| Need annotation quality check? | Yes | lint-patterns |
+| Need FSM workflow validation? | Yes | lint-process |
+| Need cross-source or DoD validation? | Yes | validate-patterns |
+| Running pre-commit hook? | Default | lint-process --staged |
 
 ### Command Summary
 
@@ -104,6 +98,13 @@ interface LintRule {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `id` | Unique rule ID |
+| `severity` | Default severity level |
+| `description` | Human-readable rule description |
+| `check` | Check function that returns violation(s) or null if rule passes |
+
 ```typescript
 /**
  * Context for lint rules that need access to the full pattern registry.
@@ -117,6 +118,11 @@ interface LintContext {
   readonly registry?: TagRegistry;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `knownPatterns` | Set of known pattern names for relationship validation |
+| `registry` | Tag registry for prefix-aware error messages (optional) |
 
 ```typescript
 /**
@@ -256,6 +262,10 @@ interface AntiPatternDetectionOptions extends WithTagRegistry {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `thresholds` | Thresholds for warning triggers |
+
 ```typescript
 /**
  * Detect all anti-patterns
@@ -375,209 +385,6 @@ function formatAntiPatternReport(violations: AntiPatternViolation[]): string;
 function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<;
 ```
 
-### Anti-Pattern Types
-
-```typescript
-/**
- * Anti-pattern rule identifiers
- *
- * Each ID corresponds to a specific violation of the dual-source
- * documentation architecture or process hygiene.
- */
-type AntiPatternId =
-  | 'tag-duplication' // Dependencies in features (should be code-only)
-  | 'process-in-code' // Process metadata in code (should be features-only)
-  | 'magic-comments' // Generator hints in features
-  | 'scenario-bloat' // Too many scenarios per feature
-  | 'mega-feature';
-```
-
-```typescript
-/**
- * Anti-pattern detection result
- *
- * Reports a specific anti-pattern violation with context
- * for remediation.
- */
-interface AntiPatternViolation {
-  /** Anti-pattern identifier */
-  readonly id: AntiPatternId;
-  /** Human-readable description */
-  readonly message: string;
-  /** File where violation was found */
-  readonly file: string;
-  /** Line number (if applicable) */
-  readonly line?: number;
-  /** Severity (error = architectural violation, warning = hygiene issue) */
-  readonly severity: 'error' | 'warning';
-  /** Fix guidance */
-  readonly fix?: string;
-}
-```
-
-```typescript
-type AntiPatternThresholds = z.infer<typeof AntiPatternThresholdsSchema>;
-```
-
-```typescript
-/**
- * Zod schema for anti-pattern thresholds
- *
- * Configurable limits for detecting anti-patterns.
- */
-AntiPatternThresholdsSchema = z.object({
-  /** Maximum scenarios per feature file before warning */
-  scenarioBloatThreshold: z.number().int().positive().default(20),
-  /** Maximum lines per feature file before warning */
-  megaFeatureLineThreshold: z.number().int().positive().default(500),
-  /** Maximum magic comments before warning */
-  magicCommentThreshold: z.number().int().positive().default(5),
-})
-```
-
-```typescript
-/**
- * Default thresholds for anti-pattern detection
- */
-const DEFAULT_THRESHOLDS: AntiPatternThresholds;
-```
-
-```typescript
-/**
- * DoD validation result for a single phase/pattern
- *
- * Reports whether a completed phase meets Definition of Done criteria:
- * 1. All deliverables must have "complete" status
- * 2. At least one @acceptance-criteria scenario must exist
- */
-interface DoDValidationResult {
-  /** Pattern name being validated */
-  readonly patternName: string;
-  /** Phase number being validated */
-  readonly phase: number;
-  /** True if all DoD criteria are met */
-  readonly isDoDMet: boolean;
-  /** All deliverables from Background table */
-  readonly deliverables: readonly Deliverable[];
-  /** Deliverables that are not yet complete */
-  readonly incompleteDeliverables: readonly Deliverable[];
-  /** True if no @acceptance-criteria scenarios found */
-  readonly missingAcceptanceCriteria: boolean;
-  /** Human-readable validation messages */
-  readonly messages: readonly string[];
-}
-```
-
-```typescript
-/**
- * Aggregate DoD validation summary
- *
- * Summarizes validation across multiple phases for CLI output.
- */
-interface DoDValidationSummary {
-  /** Per-phase validation results */
-  readonly results: readonly DoDValidationResult[];
-  /** Total phases validated */
-  readonly totalPhases: number;
-  /** Phases that passed DoD */
-  readonly passedPhases: number;
-  /** Phases that failed DoD */
-  readonly failedPhases: number;
-}
-```
-
-```typescript
-/**
- * Completion status detection patterns
- *
- * Various ways to indicate a deliverable is complete.
- */
-COMPLETION_PATTERNS = [
-  // Text patterns (case-insensitive)
-  'complete',
-  'completed',
-  'done',
-  'finished',
-  'yes',
-  // Emoji/symbol patterns
-  '✓',
-  '✔',
-  '✅',
-  '☑',
-  // Checkmark unicode variants
-  '\u2713', // ✓
-  '\u2714', // ✔
-  '\u2611', // ☑
-] as const
-```
-
-```typescript
-/**
- * In-progress status detection patterns
- *
- * Status values that indicate work is ongoing.
- */
-IN_PROGRESS_PATTERNS = [
-  'in-progress',
-  'in progress',
-  'active',
-  'wip',
-  'partial',
-  'started',
-  // Emoji patterns
-  '🔄',
-  '⏳',
-  '🚧',
-] as const
-```
-
-```typescript
-/**
- * Pending status detection patterns
- *
- * Status values that indicate work hasn't started.
- */
-PENDING_PATTERNS = [
-  'pending',
-  'todo',
-  'planned',
-  'not started',
-  'no',
-  // Emoji patterns
-  '⏹',
-  '⬜',
-  '❌',
-] as const
-```
-
-```typescript
-/**
- * Base interface for options that accept a TagRegistry for prefix-aware behavior.
- *
- * Many validation functions need to be aware of the configured tag prefix
- * (e.g., "@libar-docs-" vs "@docs-"). This interface provides a consistent
- * way to pass that configuration.
- *
- * ### When to Use
- *
- * Extend this interface when creating options for functions that:
- * - Generate error messages referencing tag names
- * - Detect tags in source code
- * - Validate tag formats
- *
- * @example
- * ```typescript
- * export interface MyValidationOptions extends WithTagRegistry {
- *   readonly strict?: boolean;
- * }
- * ```
- */
-interface WithTagRegistry {
-  /** Tag registry for prefix-aware behavior (defaults to @libar-docs- if not provided) */
-  readonly registry?: TagRegistry;
-}
-```
-
 ### DoD Validation
 
 ```typescript
@@ -681,6 +488,239 @@ function validateDoD(
 function formatDoDSummary(summary: DoDValidationSummary): string;
 ```
 
+### DoD Types
+
+```typescript
+/**
+ * Anti-pattern rule identifiers
+ *
+ * Each ID corresponds to a specific violation of the dual-source
+ * documentation architecture or process hygiene.
+ */
+type AntiPatternId =
+  | 'tag-duplication' // Dependencies in features (should be code-only)
+  | 'process-in-code' // Process metadata in code (should be features-only)
+  | 'magic-comments' // Generator hints in features
+  | 'scenario-bloat' // Too many scenarios per feature
+  | 'mega-feature';
+```
+
+```typescript
+/**
+ * Anti-pattern detection result
+ *
+ * Reports a specific anti-pattern violation with context
+ * for remediation.
+ */
+interface AntiPatternViolation {
+  /** Anti-pattern identifier */
+  readonly id: AntiPatternId;
+  /** Human-readable description */
+  readonly message: string;
+  /** File where violation was found */
+  readonly file: string;
+  /** Line number (if applicable) */
+  readonly line?: number;
+  /** Severity (error = architectural violation, warning = hygiene issue) */
+  readonly severity: 'error' | 'warning';
+  /** Fix guidance */
+  readonly fix?: string;
+}
+```
+
+| Property | Description |
+| --- | --- |
+| `id` | Anti-pattern identifier |
+| `message` | Human-readable description |
+| `file` | File where violation was found |
+| `line` | Line number (if applicable) |
+| `severity` | Severity (error = architectural violation, warning = hygiene issue) |
+| `fix` | Fix guidance |
+
+```typescript
+type AntiPatternThresholds = z.infer<typeof AntiPatternThresholdsSchema>;
+```
+
+```typescript
+/**
+ * Zod schema for anti-pattern thresholds
+ *
+ * Configurable limits for detecting anti-patterns.
+ */
+AntiPatternThresholdsSchema = z.object({
+  /** Maximum scenarios per feature file before warning */
+  scenarioBloatThreshold: z.number().int().positive().default(20),
+  /** Maximum lines per feature file before warning */
+  megaFeatureLineThreshold: z.number().int().positive().default(500),
+  /** Maximum magic comments before warning */
+  magicCommentThreshold: z.number().int().positive().default(5),
+})
+```
+
+```typescript
+/**
+ * Default thresholds for anti-pattern detection
+ */
+const DEFAULT_THRESHOLDS: AntiPatternThresholds;
+```
+
+```typescript
+/**
+ * DoD validation result for a single phase/pattern
+ *
+ * Reports whether a completed phase meets Definition of Done criteria:
+ * 1. All deliverables must have "complete" status
+ * 2. At least one @acceptance-criteria scenario must exist
+ */
+interface DoDValidationResult {
+  /** Pattern name being validated */
+  readonly patternName: string;
+  /** Phase number being validated */
+  readonly phase: number;
+  /** True if all DoD criteria are met */
+  readonly isDoDMet: boolean;
+  /** All deliverables from Background table */
+  readonly deliverables: readonly Deliverable[];
+  /** Deliverables that are not yet complete */
+  readonly incompleteDeliverables: readonly Deliverable[];
+  /** True if no @acceptance-criteria scenarios found */
+  readonly missingAcceptanceCriteria: boolean;
+  /** Human-readable validation messages */
+  readonly messages: readonly string[];
+}
+```
+
+| Property | Description |
+| --- | --- |
+| `patternName` | Pattern name being validated |
+| `phase` | Phase number being validated |
+| `isDoDMet` | True if all DoD criteria are met |
+| `deliverables` | All deliverables from Background table |
+| `incompleteDeliverables` | Deliverables that are not yet complete |
+| `missingAcceptanceCriteria` | True if no @acceptance-criteria scenarios found |
+| `messages` | Human-readable validation messages |
+
+```typescript
+/**
+ * Aggregate DoD validation summary
+ *
+ * Summarizes validation across multiple phases for CLI output.
+ */
+interface DoDValidationSummary {
+  /** Per-phase validation results */
+  readonly results: readonly DoDValidationResult[];
+  /** Total phases validated */
+  readonly totalPhases: number;
+  /** Phases that passed DoD */
+  readonly passedPhases: number;
+  /** Phases that failed DoD */
+  readonly failedPhases: number;
+}
+```
+
+| Property | Description |
+| --- | --- |
+| `results` | Per-phase validation results |
+| `totalPhases` | Total phases validated |
+| `passedPhases` | Phases that passed DoD |
+| `failedPhases` | Phases that failed DoD |
+
+```typescript
+/**
+ * Completion status detection patterns
+ *
+ * Various ways to indicate a deliverable is complete.
+ */
+COMPLETION_PATTERNS = [
+  // Text patterns (case-insensitive)
+  'complete',
+  'completed',
+  'done',
+  'finished',
+  'yes',
+  // Emoji/symbol patterns
+  '✓',
+  '✔',
+  '✅',
+  '☑',
+  // Checkmark unicode variants
+  '\u2713', // ✓
+  '\u2714', // ✔
+  '\u2611', // ☑
+] as const
+```
+
+```typescript
+/**
+ * In-progress status detection patterns
+ *
+ * Status values that indicate work is ongoing.
+ */
+IN_PROGRESS_PATTERNS = [
+  'in-progress',
+  'in progress',
+  'active',
+  'wip',
+  'partial',
+  'started',
+  // Emoji patterns
+  '🔄',
+  '⏳',
+  '🚧',
+] as const
+```
+
+```typescript
+/**
+ * Pending status detection patterns
+ *
+ * Status values that indicate work hasn't started.
+ */
+PENDING_PATTERNS = [
+  'pending',
+  'todo',
+  'planned',
+  'not started',
+  'no',
+  // Emoji patterns
+  '⏹',
+  '⬜',
+  '❌',
+] as const
+```
+
+```typescript
+/**
+ * Base interface for options that accept a TagRegistry for prefix-aware behavior.
+ *
+ * Many validation functions need to be aware of the configured tag prefix
+ * (e.g., "@libar-docs-" vs "@docs-"). This interface provides a consistent
+ * way to pass that configuration.
+ *
+ * ### When to Use
+ *
+ * Extend this interface when creating options for functions that:
+ * - Generate error messages referencing tag names
+ * - Detect tags in source code
+ * - Validate tag formats
+ *
+ * @example
+ * ```typescript
+ * export interface MyValidationOptions extends WithTagRegistry {
+ *   readonly strict?: boolean;
+ * }
+ * ```
+ */
+interface WithTagRegistry {
+  /** Tag registry for prefix-aware behavior (defaults to @libar-docs- if not provided) */
+  readonly registry?: TagRegistry;
+}
+```
+
+| Property | Description |
+| --- | --- |
+| `registry` | Tag registry for prefix-aware behavior (defaults to @libar-docs- if not provided) |
+
 ### validate-patterns Flags
 
 ```typescript
@@ -719,6 +759,23 @@ interface ValidateCLIConfig {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `input` | Glob patterns for TypeScript input files |
+| `features` | Glob patterns for Gherkin feature files |
+| `exclude` | Glob patterns to exclude |
+| `baseDir` | Base directory for path resolution |
+| `strict` | Treat warnings as errors |
+| `format` | Output format |
+| `help` | Show help |
+| `dod` | Enable DoD validation mode |
+| `phases` | Specific phases to validate (empty = all completed phases) |
+| `antiPatterns` | Enable anti-pattern detection |
+| `scenarioBloatThreshold` | Override scenario bloat threshold |
+| `megaFeatureLineThreshold` | Override mega-feature line threshold |
+| `magicCommentThreshold` | Override magic comment threshold |
+| `version` | Show version |
+
 ```typescript
 /**
  * Validation issue
@@ -752,34 +809,25 @@ interface ValidationSummary {
 
 **Context:** Validation commands integrate into CI/CD pipelines.
 
-    **Recommended package.json Scripts:**
+    **Recommended npm Scripts:**
 
-```json
-{
-      "scripts": {
-        "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
-        "lint:process": "lint-process --staged",
-        "lint:process:ci": "lint-process --all --strict",
-        "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
-      }
-    }
-```
+| Script Name | Command | Purpose |
+| --- | --- | --- |
+| lint:patterns | lint-patterns -i 'src/**/*.ts' | Annotation quality |
+| lint:process | lint-process --staged | Pre-commit validation |
+| lint:process:ci | lint-process --all --strict | CI pipeline |
+| validate:all | validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns | Full validation |
 
-**Pre-commit Hook:**
+    **Pre-commit Hook Setup:**
 
-```bash
-npx lint-process --staged
-```
+    Add to `.husky/pre-commit`: `npx lint-process --staged`
 
-**GitHub Actions:**
+    **GitHub Actions Integration:**
 
-```yaml
-- name: Lint annotations
-      run: npx lint-patterns -i "src/**/*.ts" --strict
-
-    - name: Validate patterns
-      run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
-```
+| Step Name | Command |
+| --- | --- |
+| Lint annotations | npx lint-patterns -i "src/**/*.ts" --strict |
+| Validate patterns | npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns |
 
 ### Exit Codes
 
@@ -794,14 +842,28 @@ npx lint-process --staged
 
 **Context:** All validation tools expose programmatic APIs for custom integrations.
 
+    **API Functions:**
+
+| Category | Function | Description |
+| --- | --- | --- |
+| Linting | lintFiles(files, rules) | Run lint rules on files |
+| Linting | hasFailures(result) | Check for lint failures |
+| Anti-Patterns | detectAntiPatterns(ts, features) | Run all anti-pattern detectors |
+| Anti-Patterns | detectProcessInCode(files) | Find process tags in TypeScript |
+| Anti-Patterns | detectScenarioBloat(features) | Find feature files with too many scenarios |
+| Anti-Patterns | detectMegaFeature(features) | Find feature files that are too large |
+| Anti-Patterns | formatAntiPatternReport(violations) | Format violations for console output |
+| DoD | validateDoD(features) | Validate DoD for all completed phases |
+| DoD | validateDoDForPhase(name, phase, feature) | Validate DoD for single phase |
+| DoD | isDeliverableComplete(deliverable) | Check if deliverable is done |
+| DoD | hasAcceptanceCriteria(feature) | Check for @acceptance-criteria scenarios |
+| DoD | formatDoDSummary(summary) | Format DoD results for console output |
+
     **Import Paths:**
 
 ```typescript
 // Pattern linting
     import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
-
-    // Process guard
-    import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
 
     // Anti-patterns and DoD
     import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
@@ -810,37 +872,29 @@ npx lint-process --staged
 **Anti-Pattern Detection Example:**
 
 ```typescript
-import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery-process/validation';
-    import { scanTypeScript, scanGherkin } from '@libar-dev/delivery-process/scanner';
-
-    const tsFiles = await scanTypeScript(['src/**/*.ts']);
-    const features = await scanGherkin(['specs/**/*.feature']);
+import { detectAntiPatterns } from '@libar-dev/delivery-process/validation';
 
     const violations = detectAntiPatterns(tsFiles, features, {
-      thresholds: {
-        scenarioBloatThreshold: 15,
-        megaFeatureLineThreshold: 400,
-      },
+      thresholds: { scenarioBloatThreshold: 15 },
     });
-
-    if (violations.length > 0) {
-      console.log(formatAntiPatternReport(violations));
-      process.exit(1);
-    }
 ```
 
 **DoD Validation Example:**
 
 ```typescript
 import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
-    import { scanGherkin } from '@libar-dev/delivery-process/scanner';
 
-    const features = await scanGherkin(['specs/**/*.feature']);
     const summary = validateDoD(features);
-
     console.log(formatDoDSummary(summary));
-
-    if (summary.failedPhases > 0) {
-      process.exit(1);
-    }
 ```
+
+### Related Documentation
+
+**Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| PROCESS-GUARD-REFERENCE.md | Sibling | FSM workflow enforcement, pre-commit hooks |
+| CONFIGURATION-REFERENCE.md | Reference | Tag prefixes, presets |
+| TAXONOMY-REFERENCE.md | Reference | Valid status values, tag formats |
+| INSTRUCTIONS-REFERENCE.md | Reference | Complete annotation reference |

@@ -37,6 +37,8 @@ Feature: Gherkin Patterns Reference - Auto-Generated Documentation
 | Feature Description Patterns | THIS DECISION (Rule: Feature Description Patterns) | Rule block table |
 | Valid Rich Content | THIS DECISION (Rule: Valid Rich Content) | Rule block table |
 | Syntax Notes | THIS DECISION (Rule: Syntax Notes) | Rule block content |
+| Forbidden Content | THIS DECISION (Rule: Forbidden Content in Feature Descriptions) | Rule block table |
+| Authoring Checklist | THIS DECISION (Rule: Authoring Checklist) | Rule block tables |
 | Quick Reference | THIS DECISION (Rule: Quick Reference) | Rule block table |
 | Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
@@ -283,6 +285,67 @@ Feature: Gherkin Patterns Reference - Auto-Generated Documentation
     Do not start free-text description lines with Gherkin keywords.
     Reserved keywords: Given, When, Then, And, But, Scenario, Background, Rule, Feature.
     The parser interprets lines starting with these as Gherkin steps.
+
+  Rule: Forbidden Content in Feature Descriptions
+
+    **Context:** Some content types cause Gherkin parser issues or rendering problems.
+    Avoid these patterns in feature descriptions.
+
+    **Forbidden Content:**
+
+| Forbidden | Why | Alternative |
+| --- | --- | --- |
+| Code fences (triple backticks) | Not Gherkin syntax | Use DocStrings with lang hint |
+| at-prefix in free text | Interpreted as Gherkin tag | Remove at-symbol or escape |
+| Nested DocStrings | Gherkin parser error | Reference code stub file |
+| Lines starting with dot | Parser issues in some contexts | Reword sentence |
+| Feature: in DocStrings | Triggers Gherkin keyword parsing | Use different example text |
+| at-tags with space values | Tag parsing fails | Use hyphens instead |
+
+    **DocString Limitations:**
+
+    - DocStrings cannot contain the closing triple-quote sequence
+    - Avoid shell scripts with complex quoting in DocStrings
+    - Keep DocStrings under 50 lines (reference code files for longer examples)
+    - Do not use Gherkin keywords (Feature:, Scenario:) in DocString content
+
+    **Workaround for Complex Examples:**
+
+    Instead of embedding complex code in DocStrings, reference the actual file:
+    "See src/example/module.ts for complete implementation."
+
+  Rule: Authoring Checklist
+
+    **Context:** Quick checklist when authoring new Gherkin specs.
+
+    **Before Writing:**
+
+| Check | Why |
+| --- | --- |
+| Determine spec type (roadmap vs test) | Different tag requirements |
+| Choose description pattern | Problem/Solution, Value-First, or Context/Approach |
+| Identify deliverables | For Background DataTable |
+| List business constraints | Each becomes a Rule block |
+
+    **While Writing:**
+
+| Check | Action |
+| --- | --- |
+| Tags at feature level | at-libar-docs, at-libar-docs-pattern, at-libar-docs-status |
+| Feature description | Use bold headers (**Problem:** etc.) |
+| Background DataTable | Deliverable, Status, Location columns |
+| Rule blocks | One per business constraint |
+| Scenarios per Rule | Minimum 1 happy-path + 1 validation |
+| Scenario tags | at-happy-path, at-edge-case, at-acceptance-criteria |
+
+    **After Writing:**
+
+| Check | Command |
+| --- | --- |
+| Lint passes | pnpm lint |
+| Pattern lint passes | pnpm lint-patterns |
+| Docs generate | pnpm docs:technical |
+| Content appears in output | Check docs-generated/ directory |
 
   Rule: Quick Reference
 

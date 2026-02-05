@@ -30,4 +30,5 @@ export {
   isFullyCompleted,
   type RawDataset,
   type RuntimeMasterDataset,
+  type ContextInferenceRule,
 } from './transform-dataset.js';

@@ -28,6 +28,7 @@ Feature: Methodology Reference - Auto-Generated Documentation
 | Section | Source File | Extraction Method |
 | --- | --- | --- |
 | Core Thesis | THIS DECISION (Rule: Core Thesis) | Rule block table + narrative |
+| Why Generated Documentation | THIS DECISION (Rule: Why Generated Documentation) | Rule block tables |
 | Event Sourcing Insight | THIS DECISION (Rule: Event Sourcing Insight) | Rule block table |
 | Dogfooding | THIS DECISION (Rule: Dogfooding) | Rule block with code examples |
 | Four-Stage Workflow | THIS DECISION (Rule: Four-Stage Workflow) | Rule block table |
@@ -37,6 +38,7 @@ Feature: Methodology Reference - Auto-Generated Documentation
 | Two-Tier Spec Architecture | THIS DECISION (Rule: Two-Tier Spec Architecture) | Rule block table |
 | Code Stub Levels | THIS DECISION (Rule: Code Stub Levels) | Rule block table |
 | Planning Stubs Architecture | THIS DECISION (Rule: Planning Stubs Architecture) | Rule block table |
+| Pattern Extraction Workflow | THIS DECISION (Rule: Pattern Extraction Workflow) | Rule block tables |
 | Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
   Background: Deliverables
@@ -62,6 +64,49 @@ Feature: Methodology Reference - Auto-Generated Documentation
 
     **Principle:** Git is the event store. Documentation artifacts are projections.
     Annotated code is the single source of truth.
+
+  Rule: Why Generated Documentation
+
+    **Context:** Generated documentation addresses fundamental problems with manual docs.
+
+    **Manual Documentation Problems:**
+
+| Problem | Impact |
+| --- | --- |
+| Docs exist outside code | Developers forget to update them |
+| No validation | Stale docs become fiction |
+| Duplicate information | Conflicts between sources |
+| Status is opinion | No way to verify claims |
+| Tribal knowledge | Information locked in heads |
+
+    **Generated Documentation Benefits:**
+
+| Benefit | How Achieved |
+| --- | --- |
+| Always current | Regenerated from source on every build |
+| Single source of truth | Annotations in code ARE the docs |
+| Machine-verifiable status | FSM enforces valid transitions |
+| Typed queries | ProcessStateAPI provides structured access |
+| No drift | Impossible for docs to diverge from code |
+
+    **Cost-Benefit:**
+
+| Investment | Return |
+| --- | --- |
+| Initial annotation setup | Elimination of all manual doc maintenance |
+| Learning annotation syntax | Consistent documentation across team |
+| Running generators | Always-accurate project state |
+| FSM compliance | Prevented scope creep and invalid states |
+
+    **When to Use Generated Docs:**
+
+| Use Generated | Keep Manual |
+| --- | --- |
+| Pattern registry | Conceptual architecture guides |
+| Roadmap status | Marketing materials |
+| Business rules | Tutorials for external users |
+| API reference | High-level overviews |
+| Traceability | Changelog summaries |
 
   Rule: Event Sourcing Insight
 
@@ -262,6 +307,52 @@ Feature: Methodology Reference - Auto-Generated Documentation
 
     This avoids .skip() (forbidden by test safety policy) while preserving planning artifacts.
 
+  Rule: Pattern Extraction Workflow
+
+    **Context:** Understanding how patterns flow from source to docs.
+
+    **Extraction Pipeline:**
+
+| Stage | Input | Output | Module |
+| --- | --- | --- | --- |
+| 1. Scan | File patterns | File list | src/scanner/ |
+| 2. Parse | Files | AST nodes | TypeScript/Gherkin parsers |
+| 3. Extract | AST nodes | Pattern objects | src/extractor/ |
+| 4. Transform | Patterns | MasterDataset | src/generators/pipeline/ |
+| 5. Render | MasterDataset | RenderableDocument | src/renderable/ |
+| 6. Output | RenderableDocument | Markdown files | Codec system |
+
+    **What Gets Extracted:**
+
+| Source | Extracted Data |
+| --- | --- |
+| TypeScript JSDoc | Pattern name, status, uses, used-by, category flags |
+| Feature file tags | Pattern name, status, phase, depends-on, enables |
+| Feature description | Problem/Solution content, tables, lists |
+| Rule blocks | Business constraints, invariants, rationale |
+| Background tables | Deliverables with status |
+| Scenarios | Acceptance criteria, test coverage |
+
+    **Annotation Syntax:**
+
+| Annotation Type | TypeScript Syntax | Gherkin Syntax |
+| --- | --- | --- |
+| Opt-in marker | at-libar-docs (JSDoc) | at-libar-docs (feature tag) |
+| Pattern name | at-libar-docs-pattern Name | at-libar-docs-pattern:Name |
+| Status | at-libar-docs-status active | at-libar-docs-status:active |
+| Dependencies | at-libar-docs-uses A, B | at-libar-docs-depends-on:A |
+| Category | at-libar-docs-core | at-libar-docs-core |
+
+    **MasterDataset Structure:**
+
+    The MasterDataset is the central data structure with pre-computed views:
+    - byName: O(1) pattern lookup by name
+    - byCategory: Patterns grouped by category
+    - byStatus: Patterns grouped by FSM status
+    - bySource: Patterns grouped by file type (typescript, gherkin)
+    - dependencies: Computed dependency graph
+    - metrics: Aggregate statistics
+
   Rule: Related Documentation
 
     **Context:** This methodology document connects to other documentation.
@@ -275,6 +366,7 @@ Feature: Methodology Reference - Auto-Generated Documentation
 | CONFIGURATION.md | Tag prefixes, presets, customization |
 | GHERKIN-PATTERNS.md | Writing effective specs |
 | INSTRUCTIONS.md | Complete tag reference |
+| ARCHITECTURE-REFERENCE.md | Four-stage pipeline details |
 
   @acceptance-criteria
   Scenario: Reference generates Methodology documentation

@@ -26,6 +26,7 @@ Centralizing eliminates duplication and provides a single source of truth.
 - Import these defaults when implementing functions that need fallback values
 - Use `DEFAULT_REGEX_BUILDERS` for opt-in detection when no registry is provided
 - Use `DEFAULT_TAG_PREFIX` in error messages when no registry context exists
+- Use `DEFAULT_CONTEXT_INFERENCE_RULES` to auto-infer bounded contexts from paths
 
 ---
 
