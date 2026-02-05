@@ -147,6 +147,10 @@ Feature: Validation Reference - Auto-Generated Documentation
 
   Rule: DoD Validation
 
+    **Invariant:** Completed patterns must satisfy all DoD criteria defined below.
+    **Rationale:** Ensures completed status reflects verified readiness for production.
+    **Verified by:** @acceptance-criteria Scenario: Reference generates Validation documentation
+
     **Context:** Definition of Done validation ensures completed patterns meet quality criteria.
 
     DoD criteria and completion patterns are extracted from `src/validation/dod-validator.ts`

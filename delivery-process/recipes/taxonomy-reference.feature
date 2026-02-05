@@ -137,7 +137,7 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
 | enum | @libar-docs-status | completed | Constrained to predefined list |
 | csv | @libar-docs-uses | A, B, C | Comma-separated values |
 | number | @libar-docs-phase | 15 | Numeric value |
-| quoted-value | @libar-docs-brief | 'Multi word text' | Preserves spaces in quotes |
+| quoted-value | @libar-docs-brief | 'Multi-word-text' | Preserves quoted values (use hyphens in .feature tags) |
 
     **Implementation:** The format type is specified in the tag definition
     within the TagRegistry. The extractor uses the format to parse values.
