@@ -47,13 +47,13 @@
 
 ### MasterDataset Schema
 
-- `MasterDataset` - type
-- `StatusGroups` - type
-- `StatusCounts` - type
-- `PhaseGroup` - type
-- `SourceViews` - type
-- `RelationshipEntry` - type
-- `ArchIndex` - type
+- `MasterDatasetSchema` - const
+- `StatusGroupsSchema` - const
+- `StatusCountsSchema` - const
+- `PhaseGroupSchema` - const
+- `SourceViewsSchema` - const
+- `RelationshipEntrySchema` - const
+- `ArchIndexSchema` - const
 
 ### RenderableDocument
 

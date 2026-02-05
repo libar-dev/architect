@@ -43,6 +43,22 @@
 
 ## Implementation Details
 
+### Command Decision Tree
+
+```text
+Need to check annotation quality?
+    --> Yes: lint-patterns
+
+    Need FSM workflow validation?
+    --> Yes: lint-process
+
+    Need cross-source or DoD validation?
+    --> Yes: validate-patterns
+
+    Running pre-commit hook?
+    --> lint-process --staged (default)
+```
+
 ### Command Summary
 
 **Context:** Three validation commands serve different purposes.
@@ -54,6 +70,13 @@
 | lint-patterns | Annotation quality | Ensure patterns have required tags |
 | lint-process | FSM workflow enforcement | Pre-commit hooks, CI pipelines |
 | validate-patterns | Cross-source + DoD + anti-pattern | Release validation, comprehensive |
+
+### lint-patterns Rules (from this decision (rule: lint-patterns rules))
+
+```bash
+npx lint-patterns -i "src/**/*.ts"
+    npx lint-patterns -i "src/**/*.ts" --strict
+```
 
 ### lint-patterns Rules (from rules)
 
@@ -583,6 +606,13 @@ interface WithTagRegistry {
 }
 ```
 
+### DoD Validation (from this decision (rule: dod validation))
+
+```text
+Text patterns: complete, completed, done, finished, yes
+    Symbol patterns: check mark, heavy check mark, white check mark, ballot box with check
+```
+
 ### DoD Validation (from dod-validator)
 
 ```typescript
@@ -686,6 +716,31 @@ function validateDoD(
 function formatDoDSummary(summary: DoDValidationSummary): string;
 ```
 
+### CI/CD Integration
+
+```json
+{
+      "scripts": {
+        "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
+        "lint:process": "lint-process --staged",
+        "lint:process:ci": "lint-process --all --strict",
+        "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
+      }
+    }
+```
+
+```bash
+npx lint-process --staged
+```
+
+```yaml
+- name: Lint annotations
+      run: npx lint-patterns -i "src/**/*.ts" --strict
+
+    - name: Validate patterns
+      run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
+```
+
 ### Exit Codes
 
 **Context:** All validation commands use consistent exit codes.
@@ -695,101 +750,51 @@ function formatDoDSummary(summary: DoDValidationSummary): string;
 | 0 | No errors (warnings allowed unless --strict) |
 | 1 | Errors found (or warnings with --strict) |
 
-## Command Decision Tree
+### Programmatic API
 
-**Context:** Developers need to quickly determine which validation command to run.
+```typescript
+// Pattern linting
+    import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
 
-    **Decision Tree:**
+    // Process guard
+    import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
 
-```text
-Need to check annotation quality?
-    --> Yes: lint-patterns
-
-    Need FSM workflow validation?
-    --> Yes: lint-process
-
-    Need cross-source or DoD validation?
-    --> Yes: validate-patterns
-
-    Running pre-commit hook?
-    --> lint-process --staged (default)
+    // Anti-patterns and DoD
+    import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
 ```
 
-## Command Summary
+```typescript
+import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery-process/validation';
+    import { scanTypeScript, scanGherkin } from '@libar-dev/delivery-process/scanner';
 
-**Context:** Three validation commands serve different purposes.
+    const tsFiles = await scanTypeScript(['src/**/*.ts']);
+    const features = await scanGherkin(['specs/**/*.feature']);
 
-    **Commands:**
+    const violations = detectAntiPatterns(tsFiles, features, {
+      thresholds: {
+        scenarioBloatThreshold: 15,
+        megaFeatureLineThreshold: 400,
+      },
+    });
 
-| Command | Purpose | When to Use |
-| --- | --- | --- |
-| lint-patterns | Annotation quality | Ensure patterns have required tags |
-| lint-process | FSM workflow enforcement | Pre-commit hooks, CI pipelines |
-| validate-patterns | Cross-source + DoD + anti-pattern | Release validation, comprehensive |
-
-## lint-patterns Rules
-
-**Context:** lint-patterns validates annotation quality in TypeScript files.
-
-    **Usage:**
-
-```bash
-npx lint-patterns -i "src/**/*.ts"
-    npx lint-patterns -i "src/**/*.ts" --strict
+    if (violations.length > 0) {
+      console.log(formatAntiPatternReport(violations));
+      process.exit(1);
+    }
 ```
 
-**Validation Rules:**
+```typescript
+import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
+    import { scanGherkin } from '@libar-dev/delivery-process/scanner';
 
-| Rule | Severity | What It Checks |
-| --- | --- | --- |
-| missing-pattern-name | error | Must have pattern tag |
-| invalid-status | error | Status must be valid FSM value |
-| tautological-description | error | Description cannot just repeat name |
-| pattern-conflict-in-implements | error | Pattern cannot implement itself |
-| missing-relationship-target | warning | Relationship targets must exist |
-| missing-status | warning | Should have status tag |
-| missing-when-to-use | warning | Should have When to Use section |
-| missing-relationships | info | Consider adding uses/used-by |
+    const features = await scanGherkin(['specs/**/*.feature']);
+    const summary = validateDoD(features);
 
-## Anti-Pattern Detection
+    console.log(formatDoDSummary(summary));
 
-**Context:** Enforces dual-source architecture ownership between TypeScript and Gherkin files.
-
-    **Anti-Patterns Detected:**
-
-| ID | Severity | Description |
-| --- | --- | --- |
-| process-in-code | error | Process metadata in code (should be features-only) |
-| tag-duplication | error | Dependencies in features (should be code-only) |
-| magic-comments | warning | Generator hints in features |
-| scenario-bloat | warning | Too many scenarios per feature (threshold: 20) |
-| mega-feature | warning | Feature file too large (threshold: 500 lines) |
-
-    **Tag Location Constraints:**
-
-| Tag Type | Correct Location | Wrong Location |
-| --- | --- | --- |
-| uses | TypeScript code | Feature files |
-| depends-on | Feature files | TypeScript code |
-| quarter | Feature files | TypeScript code |
-| team | Feature files | TypeScript code |
-
-## DoD Validation
-
-**Context:** Definition of Done validation ensures completed patterns meet quality criteria.
-
-    **Criteria for completed status:**
-
-| Criterion | What It Checks |
-| --- | --- |
-| All deliverables complete | Status must be: complete, done, finished, yes, or checkmarks |
-| Acceptance criteria present | At least one scenario with @acceptance-criteria tag |
-
-    **Completion Patterns Recognized:**
-
-```text
-Text patterns: complete, completed, done, finished, yes
-    Symbol patterns: check mark, heavy check mark, white check mark, ballot box with check
+    if (summary.failedPhases > 0) {
+      process.exit(1);
+    }
 ```
 
 ## validate-patterns Flags
@@ -813,100 +818,3 @@ npx validate-patterns \
 | --dod | Completed patterns have all deliverables done |
 | --anti-patterns | Dual-source ownership rules not violated |
 | --cross-source | Feature/TypeScript metadata consistency |
-
-## CI/CD Integration
-
-**Context:** Validation commands integrate into CI/CD pipelines.
-
-    **Recommended package.json Scripts:**
-
-```json
-{
-      "scripts": {
-        "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
-        "lint:process": "lint-process --staged",
-        "lint:process:ci": "lint-process --all --strict",
-        "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
-      }
-    }
-```
-
-**Pre-commit Hook:**
-
-```bash
-npx lint-process --staged
-```
-
-**GitHub Actions:**
-
-```yaml
-- name: Lint annotations
-      run: npx lint-patterns -i "src/**/*.ts" --strict
-
-    - name: Validate patterns
-      run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
-```
-
-## Exit Codes
-
-**Context:** All validation commands use consistent exit codes.
-
-| Code | Meaning |
-| --- | --- |
-| 0 | No errors (warnings allowed unless --strict) |
-| 1 | Errors found (or warnings with --strict) |
-
-## Programmatic API
-
-**Context:** All validation tools expose programmatic APIs for custom integrations.
-
-    **Import Paths:**
-
-```typescript
-// Pattern linting
-    import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
-
-    // Process guard
-    import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
-
-    // Anti-patterns and DoD
-    import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
-```
-
-**Anti-Pattern Detection Example:**
-
-```typescript
-import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery-process/validation';
-    import { scanTypeScript, scanGherkin } from '@libar-dev/delivery-process/scanner';
-
-    const tsFiles = await scanTypeScript(['src/**/*.ts']);
-    const features = await scanGherkin(['specs/**/*.feature']);
-
-    const violations = detectAntiPatterns(tsFiles, features, {
-      thresholds: {
-        scenarioBloatThreshold: 15,
-        megaFeatureLineThreshold: 400,
-      },
-    });
-
-    if (violations.length > 0) {
-      console.log(formatAntiPatternReport(violations));
-      process.exit(1);
-    }
-```
-
-**DoD Validation Example:**
-
-```typescript
-import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
-    import { scanGherkin } from '@libar-dev/delivery-process/scanner';
-
-    const features = await scanGherkin(['specs/**/*.feature']);
-    const summary = validateDoD(features);
-
-    console.log(formatDoDSummary(summary));
-
-    if (summary.failedPhases > 0) {
-      process.exit(1);
-    }
-```

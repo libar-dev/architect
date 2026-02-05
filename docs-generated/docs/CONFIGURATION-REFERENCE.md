@@ -487,50 +487,32 @@ function formatConfigError(error: ConfigLoadError): string;
 function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuilders;
 ```
 
-## Preset Quick Reference
+### Custom Config
 
-**Context:** Three presets are available with different tag prefixes and category counts.
+```typescript
+const dp = createDeliveryProcess({
+      preset: 'libar-generic',
+      tagPrefix: 'at-team-',
+      fileOptInTag: 'at-team',
+    });
 
-    **Quick Reference Table:**
+    // Your annotations:
+    // /** at-team */
+    // /** at-team-pattern DualSourceExtractor */
+    // /** at-team-core */
+```
 
-| Preset | Tag Prefix | Categories | Use Case |
-| --- | --- | --- | --- |
-| libar-generic (default) | prefix libar-docs- | 3 | Simple projects (this package) |
-| generic | prefix docs- | 3 | Simple projects with docs- prefix |
-| ddd-es-cqrs | prefix libar-docs- | 21 | DDD/Event Sourcing architectures |
-
-    **Note:** The tag prefix begins with the at-symbol followed by the shown prefix.
-
-## Preset Category Behavior
-
-**Context:** Presets define complete category sets that replace base taxonomy.
-
-    **Category Replacement Behavior:**
-
-| Preset | Categories | Count |
-| --- | --- | --- |
-| generic | core, api, infra | 3 |
-| libar-generic | core, api, infra | 3 |
-| ddd-es-cqrs | Full DDD taxonomy | 21 |
-
-    **Design Decision:** Preset categories REPLACE base taxonomy (not merged).
-    If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.),
-    use the ddd-es-cqrs preset explicitly.
-
-## Default Preset Selection
-
-**Context:** All entry points use consistent defaults.
-
-    **Default Preset Table:**
-
-| Entry Point | Default | Context |
-| --- | --- | --- |
-| createDeliveryProcess() | libar-generic (3 categories) | Programmatic API |
-| loadConfig() fallback | libar-generic (3 categories) | CLI tools when no config file |
-| This package config | libar-generic (3 categories) | Standalone package usage |
-
-    **Rationale:** Simple defaults for most users.
-    Use preset ddd-es-cqrs explicitly if you need the full 21-category DDD taxonomy.
+```typescript
+const dp = createDeliveryProcess({
+      tagPrefix: 'at-docs-',
+      fileOptInTag: 'at-docs',
+      categories: [
+        { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
+        { tag: 'extractor', domain: 'Extractor', priority: 2, description: 'Pattern extraction', aliases: [] },
+        { tag: 'generator', domain: 'Generator', priority: 3, description: 'Doc generation', aliases: [] },
+      ],
+    });
+```
 
 ## Libar Generic Preset
 
@@ -646,66 +628,6 @@ my-monorepo/
 ```
 
 CLI tools use the nearest config file to the working directory.
-
-## Custom Configuration
-
-**Context:** Customize tag prefix while keeping preset taxonomy.
-
-    **Custom Tag Prefix:**
-
-```typescript
-const dp = createDeliveryProcess({
-      preset: 'libar-generic',
-      tagPrefix: 'at-team-',
-      fileOptInTag: 'at-team',
-    });
-
-    // Your annotations:
-    // /** at-team */
-    // /** at-team-pattern DualSourceExtractor */
-    // /** at-team-core */
-```
-
-**Custom Categories:**
-
-```typescript
-const dp = createDeliveryProcess({
-      tagPrefix: 'at-docs-',
-      fileOptInTag: 'at-docs',
-      categories: [
-        { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
-        { tag: 'extractor', domain: 'Extractor', priority: 2, description: 'Pattern extraction', aliases: [] },
-        { tag: 'generator', domain: 'Generator', priority: 3, description: 'Doc generation', aliases: [] },
-      ],
-    });
-```
-
-## RegexBuilders API
-
-**Context:** DeliveryProcessInstance includes utilities for tag detection.
-
-    **API Methods:**
-
-| Method | Description |
-| --- | --- |
-| hasFileOptIn(content) | true if content contains file opt-in marker |
-| hasDocDirectives(content) | true if content contains doc directives |
-| normalizeTag(tag) | Strips prefix: at-libar-docs-pattern becomes pattern |
-
-    **Usage Example:**
-
-```typescript
-const dp = createDeliveryProcess(); // Uses libar-generic (default)
-
-    // Check if file should be scanned
-    dp.regexBuilders.hasFileOptIn(fileContent);  // true if contains /** at-libar-docs */
-
-    // Check for any documentation directives
-    dp.regexBuilders.hasDocDirectives(fileContent);  // true if contains at-libar-docs-*
-
-    // Normalize tag for lookup
-    dp.regexBuilders.normalizeTag('at-libar-docs-pattern');  // "pattern"
-```
 
 ## Programmatic Config Loading
 

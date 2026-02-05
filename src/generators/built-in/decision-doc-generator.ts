@@ -45,7 +45,6 @@ import { renderToMarkdown } from '../../renderable/render.js';
 import {
   parseDecisionDocument,
   type DecisionDocContent,
-  isSelfReference,
 } from '../../renderable/codecs/decision-doc.js';
 import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
 import {
@@ -296,25 +295,12 @@ export function generateDetailedOutput(
   }
 
   // Aggregated content sections
-  // Filter to only include sections that aren't already rendered in Rules
+  // Include all sections from Source Mapping - both external files AND self-references
+  // The Source Mapping table defines the canonical order of content
+  // Self-references to rules will be rendered here, and we filter them from "Other rules" below
   const nonDuplicateSections = aggregatedContent.sections.filter((extracted) => {
     // Skip empty content
     if (!extracted.content || extracted.content.trim().length === 0) {
-      return false;
-    }
-    // Skip self-reference sections with DocStrings - these are already rendered in Rule sections
-    // (Context, Decision, Consequences). Only shapes from external TypeScript files should appear here.
-    if (
-      isSelfReference(extracted.sourceFile) &&
-      extracted.docStrings &&
-      extracted.docStrings.length > 0
-    ) {
-      // Debug logging to aid troubleshooting when content appears to be missing
-      if (process.env['DEBUG']) {
-        console.debug(
-          `[decision-doc] Filtering self-reference DocString section "${extracted.section}" to prevent duplicate content`
-        );
-      }
       return false;
     }
     return true;
@@ -362,11 +348,56 @@ export function generateDetailedOutput(
   }
 
   // Other rules (custom sections)
+  // Skip if these rules are already covered by Source Mapping entries
+  // to prevent duplicate content in reference documentation
   if (decisionContent.rules.other.length > 0) {
+    // Build set of section names from Source Mapping (both self-references and external files)
+    const sourceMappedSectionNames = new Set<string>();
+    for (const mapping of decisionContent.sourceMappings) {
+      // Normalize section name for matching (case-insensitive)
+      const normalizedSection = mapping.section.toLowerCase().trim();
+      sourceMappedSectionNames.add(normalizedSection);
+    }
+
+    // Helper: extract significant words (3+ chars) for fuzzy matching
+    const getWords = (text: string): Set<string> =>
+      new Set(
+        text
+          .toLowerCase()
+          .split(/[^a-z]+/)
+          .filter((w) => w.length >= 3)
+      );
+
+    // Only render rules that aren't covered by Source Mapping section names
     for (const rule of decisionContent.rules.other) {
-      sections.push(heading(2, rule.name));
-      if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+      const ruleName = rule.name.toLowerCase().trim();
+      const ruleWords = getWords(ruleName);
+
+      // Check if any Source Mapping section matches this rule name
+      // Match if: exact match, substring match, or 2+ words overlap
+      const isCovered = Array.from(sourceMappedSectionNames).some((sectionName) => {
+        // Exact or substring match
+        if (
+          ruleName === sectionName ||
+          ruleName.includes(sectionName) ||
+          sectionName.includes(ruleName)
+        ) {
+          return true;
+        }
+        // Word overlap match (at least 2 significant words)
+        const sectionWords = getWords(sectionName);
+        let matches = 0;
+        for (const word of ruleWords) {
+          if (sectionWords.has(word)) matches++;
+        }
+        return matches >= 2;
+      });
+
+      if (!isCovered) {
+        sections.push(heading(2, rule.name));
+        if (rule.description) {
+          sections.push(...parseDescriptionWithDocStrings(rule.description));
+        }
       }
     }
   }

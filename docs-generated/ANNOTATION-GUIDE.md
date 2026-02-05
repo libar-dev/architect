@@ -28,6 +28,75 @@
 
 ---
 
+## Fix Patterns Discovered (Exemplar Work)
+
+These patterns were discovered while perfecting the `ARCHITECTURE-REFERENCE.md` exemplar.
+
+### Pattern 1: Zod Schema Extraction
+
+**Problem:** Extracting type aliases like `MasterDataset` shows unhelpful output:
+```typescript
+export type MasterDataset = z.infer<typeof MasterDatasetSchema>;
+```
+
+**Solution:** Extract the schema constant (with `Schema` suffix) instead:
+
+| Wrong (Type Alias) | Correct (Schema Const) |
+|--------------------|------------------------|
+| `MasterDataset` | `MasterDatasetSchema` |
+| `StatusGroups` | `StatusGroupsSchema` |
+| `PhaseGroup` | `PhaseGroupSchema` |
+
+**Why it works:** Schema constants contain the actual `z.object({...})` definition with all fields visible. Type aliases are just inferred wrappers.
+
+**Example annotation:**
+```typescript
+// WRONG - shows z.infer<> wrapper
+* @libar-docs-extract-shapes MasterDataset, StatusGroups
+
+// CORRECT - shows full z.object({}) definition
+* @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema
+```
+
+### Pattern 2: Duplicate Sections Prevention
+
+**Problem:** Content appeared twice in generated docs - once in "Implementation Details" (from Source Mapping) and again in "Other rules" section.
+
+**Root Cause:** The decision doc generator rendered Rule: blocks as standalone sections even when they were already covered by Source Mapping entries.
+
+**Solution:** The generator now performs fuzzy word matching to skip "Other rules" that are covered by Source Mapping section names:
+
+1. Build set of section names from Source Mapping table
+2. For each Rule: block, extract significant words (3+ chars)
+3. Skip the rule if any Source Mapping section has:
+   - Exact name match
+   - Substring match
+   - 2+ overlapping significant words
+
+**This is now implemented in** `src/generators/built-in/decision-doc-generator.ts` (lines ~365-400).
+
+### Pattern 3: Source Mapping Self-References
+
+**Problem:** Source Mapping entries can reference either external files OR the current decision document itself.
+
+**Self-reference syntax:**
+| Reference | Meaning |
+|-----------|---------|
+| `THIS DECISION` | Extract from current document's description |
+| `THIS DECISION (Rule: Context)` | Extract from specific Rule: block |
+
+**External file syntax:**
+| Reference | Meaning |
+|-----------|---------|
+| `src/path/file.ts` | Extract from TypeScript file |
+| `specs/path/file.feature` | Extract from Gherkin file |
+
+**Generator behavior:**
+- Self-references: Content rendered inline (parsed from feature file)
+- External files: Content extracted via `@extract-shapes` annotation
+
+---
+
 ## Problem Statement
 
 The `specs/docs/*.feature` files have **Source Mapping tables** that reference TypeScript files:
@@ -234,13 +303,27 @@ You are fixing auto-generated documentation for the delivery-process package.
    - Read the referenced TypeScript file
    - Check if it has @libar-docs-extract-shapes annotation
    - If missing, add it with key exported types
+   - **IMPORTANT:** For Zod files, extract SCHEMA CONSTANTS (e.g., `MasterDatasetSchema`)
+     NOT type aliases (e.g., `MasterDataset`) - schema constants show full structure
 3. Run: npx tsx scripts/generate-docs-auto.ts [filter]
-4. Verify the generated output contains the extracted types
+4. Verify the generated output:
+   - Contains TypeScript code blocks with actual interfaces/schemas
+   - No duplicate sections (same content appearing twice)
+   - Zod schemas show `z.object({...})` structure, NOT `z.infer<typeof ...>`
 
 **Success criteria:**
 - All referenced TypeScript files have @libar-docs-extract-shapes
 - Generation completes without "No shapes extracted" warnings
-- Generated docs contain TypeScript code blocks with interfaces
+- Generated docs contain TypeScript code blocks with full type definitions
+- No duplicate content between "Implementation Details" and standalone sections
+
+**Common issues and fixes:**
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| `z.infer<typeof X>` shown | Extracted type alias | Extract schema const (`XSchema`) instead |
+| Duplicate sections | Rule block + Source Mapping overlap | Already fixed in generator |
+| Missing shapes | No annotation | Add `@libar-docs-extract-shapes` to file |
+| Empty sections | Wrong shape names | Check `grep "^export"` output for correct names |
 ```
 
 ---
