@@ -1,8 +1,15 @@
 /**
- * Category definitions for DDD/ES/CQRS domain taxonomy
+ * @libar-docs
+ * @libar-docs-pattern CategoryDefinitions
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
+ *
+ * ## Category Definitions
  *
  * Categories are used to classify patterns and organize documentation.
  * Priority determines display order (lower = higher priority).
+ * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
  */
 export interface CategoryDefinition {
     readonly tag: string;

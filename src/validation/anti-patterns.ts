@@ -4,6 +4,7 @@
  * @libar-docs-pattern AntiPatternDetector
  * @libar-docs-status completed
  * @libar-docs-uses DoDValidationTypes, GherkinTypes
+ * @libar-docs-extract-shapes AntiPatternDetectionOptions, detectAntiPatterns, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *

@@ -1,19 +1,22 @@
 /**
- * Normalized status values for display purposes
+ * @libar-docs
+ * @libar-docs-pattern NormalizedStatus
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-extract-shapes NORMALIZED_STATUS_VALUES, NormalizedStatus, STATUS_NORMALIZATION_MAP, normalizeStatus
+ *
+ * ## Normalized Status Values for Display
  *
  * The delivery-process system uses a two-level status taxonomy:
  *
- * 1. **Raw status** (PROCESS_STATUS_VALUES in status-values.ts):
+ * 1. Raw status (PROCESS_STATUS_VALUES in status-values.ts):
  *    The 4 FSM states stored in data: roadmap, active, completed, deferred
  *
- * 2. **Normalized status** (this file):
+ * 2. Normalized status (this file):
  *    The 3 display buckets for UI presentation
  *
  * This separation follows DDD principles - the domain model (raw) is
  * distinct from the view model (normalized).
- *
- * @see status-values.ts for raw FSM status values
- * @see PDR-005 MVP Workflow State Machine
  */
 
 /**

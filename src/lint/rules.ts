@@ -5,6 +5,7 @@
  * @libar-docs-status completed
  * @libar-docs-implements PatternRelationshipModel
  * @libar-docs-used-by LintEngine
+ * @libar-docs-extract-shapes LintRule, LintContext, defaultRules
  *
  * ## LintRules - Annotation Quality Rules
  *

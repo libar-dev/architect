@@ -1,5 +1,11 @@
 /**
- * Hierarchy levels for work item breakdown
+ * @libar-docs
+ * @libar-docs-pattern HierarchyLevels
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-extract-shapes HIERARCHY_LEVELS, HierarchyLevel, DEFAULT_HIERARCHY_LEVEL
+ *
+ * ## Hierarchy Levels for Work Item Breakdown
  *
  * Three-level hierarchy for organizing work:
  * - epic: Multi-quarter strategic initiatives

@@ -4,6 +4,7 @@
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
  * @libar-docs-implements TypeScriptTaxonomyImplementation
+ * @libar-docs-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry
  *
  * ## Tag Registry Builder
  *

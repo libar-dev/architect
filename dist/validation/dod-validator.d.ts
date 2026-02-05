@@ -4,6 +4,7 @@
  * @libar-docs-pattern DoDValidator
  * @libar-docs-status completed
  * @libar-docs-uses DoDValidationTypes, GherkinTypes, DualSourceExtractor
+ * @libar-docs-extract-shapes isDeliverableComplete, hasAcceptanceCriteria, validateDoDForPhase, validateDoD
  *
  * ## DoDValidator - Definition of Done Validation
  *

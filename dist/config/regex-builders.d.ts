@@ -5,6 +5,7 @@
  * @libar-docs-status completed
  * @libar-docs-uses ConfigurationTypes
  * @libar-docs-used-by DeliveryProcessFactory
+ * @libar-docs-extract-shapes createRegexBuilders
  *
  * ## Regex Builders
  *

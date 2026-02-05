@@ -1,0 +1,666 @@
+# ValidationReference
+
+**Purpose:** Full documentation generated from decision document
+**Detail Level:** detailed
+
+---
+
+**Problem:**
+  The project has three validation commands (lint-patterns, lint-process, validate-patterns)
+  with different purposes and options. Developers need quick access to understand which
+  command to run and what each validates. Maintaining this documentation manually leads
+  to drift from actual implementation.
+
+  **Solution:**
+  Auto-generate the Validation reference documentation from annotated source code.
+  The source code defines the validation rules, anti-pattern detectors, and CLI options.
+  Documentation becomes a projection of the implementation, always in sync.
+
+  **Target Documents:**
+
+| Output | Purpose | Detail Level |
+| docs-generated/docs/VALIDATION-REFERENCE.md | Detailed human reference | detailed |
+| docs-generated/_claude-md/validation/validation-reference.md | Compact AI context | summary |
+
+  **Source Mapping:**
+
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| Command Decision Tree | THIS DECISION (Rule: Command Decision Tree) | Rule block content |
+| Command Summary | THIS DECISION (Rule: Command Summary) | Rule block table |
+| lint-patterns Rules | THIS DECISION (Rule: lint-patterns Rules) | Rule block table |
+| lint-patterns Rules | src/lint/rules.ts | @extract-shapes tag |
+| Anti-Pattern Detection | THIS DECISION (Rule: Anti-Pattern Detection) | Rule block table |
+| Anti-Pattern Detection | src/validation/anti-patterns.ts | @extract-shapes tag |
+| Anti-Pattern Types | src/validation/types.ts | @extract-shapes tag |
+| DoD Validation | THIS DECISION (Rule: DoD Validation) | Rule block table |
+| DoD Validation | src/validation/dod-validator.ts | @extract-shapes tag |
+| CI/CD Integration | THIS DECISION (Rule: CI/CD Integration) | Rule block content |
+| Exit Codes | THIS DECISION (Rule: Exit Codes) | Rule block table |
+| Programmatic API | THIS DECISION (Rule: Programmatic API DocString) | Fenced code block |
+
+---
+
+## Implementation Details
+
+### Command Summary
+
+**Context:** Three validation commands serve different purposes.
+
+    **Commands:**
+
+| Command | Purpose | When to Use |
+| --- | --- | --- |
+| lint-patterns | Annotation quality | Ensure patterns have required tags |
+| lint-process | FSM workflow enforcement | Pre-commit hooks, CI pipelines |
+| validate-patterns | Cross-source + DoD + anti-pattern | Release validation, comprehensive |
+
+### lint-patterns Rules (from rules)
+
+```typescript
+/**
+ * A lint rule that checks a parsed directive
+ */
+interface LintRule {
+  /** Unique rule ID */
+  readonly id: string;
+  /** Default severity level */
+  readonly severity: LintSeverity;
+  /** Human-readable rule description */
+  readonly description: string;
+  /**
+   * Check function that returns violation(s) or null if rule passes
+   *
+   * @param directive - Parsed directive to check
+   * @param file - Source file path
+   * @param line - Line number in source
+   * @param context - Optional context with pattern registry for relationship validation
+   * @returns Violation(s) if rule fails, null if passes. Array for rules that can detect multiple issues.
+   */
+  check: (
+    directive: DocDirective,
+    file: string,
+    line: number,
+    context?: LintContext
+  ) => LintViolation | LintViolation[] | null;
+}
+```
+
+```typescript
+/**
+ * Context for lint rules that need access to the full pattern registry.
+ * Used for "strict mode" validation where relationships are checked
+ * against known patterns.
+ */
+interface LintContext {
+  /** Set of known pattern names for relationship validation */
+  readonly knownPatterns: ReadonlySet<string>;
+  /** Tag registry for prefix-aware error messages (optional) */
+  readonly registry?: TagRegistry;
+}
+```
+
+```typescript
+/**
+ * All default lint rules
+ *
+ * Order matters for output - errors first, then warnings, then info.
+ */
+const defaultRules: readonly LintRule[];
+```
+
+### Anti-Pattern Detection (from this decision (rule: anti-pattern detection))
+
+**Context:** Enforces dual-source architecture ownership between TypeScript and Gherkin files.
+
+    **Anti-Patterns Detected:**
+
+| ID | Severity | Description |
+| --- | --- | --- |
+| process-in-code | error | Process metadata in code (should be features-only) |
+| tag-duplication | error | Dependencies in features (should be code-only) |
+| magic-comments | warning | Generator hints in features |
+| scenario-bloat | warning | Too many scenarios per feature (threshold: 20) |
+| mega-feature | warning | Feature file too large (threshold: 500 lines) |
+
+    **Tag Location Constraints:**
+
+| Tag Type | Correct Location | Wrong Location |
+| --- | --- | --- |
+| uses | TypeScript code | Feature files |
+| depends-on | Feature files | TypeScript code |
+| quarter | Feature files | TypeScript code |
+| team | Feature files | TypeScript code |
+
+### Anti-Pattern Detection (from anti-patterns)
+
+```typescript
+/**
+ * Configuration options for anti-pattern detection
+ */
+interface AntiPatternDetectionOptions extends WithTagRegistry {
+  /** Thresholds for warning triggers */
+  readonly thresholds?: Partial<AntiPatternThresholds>;
+}
+```
+
+```typescript
+/**
+ * Detect all anti-patterns
+ *
+ * Runs all anti-pattern detectors and returns combined violations.
+ *
+ * @param scannedFiles - Array of scanned TypeScript files
+ * @param features - Array of scanned feature files
+ * @param options - Optional configuration (registry for prefix, thresholds)
+ * @returns Array of all detected anti-pattern violations
+ *
+ * @example
+ * ```typescript
+ * // With default prefix (@libar-docs-)
+ * const violations = detectAntiPatterns(tsFiles, featureFiles);
+ *
+ * // With custom prefix
+ * const registry = createDefaultTagRegistry();
+ * registry.tagPrefix = "@docs-";
+ * const customViolations = detectAntiPatterns(tsFiles, featureFiles, { registry });
+ *
+ * for (const v of violations) {
+ *   console.log(`[${v.severity.toUpperCase()}] ${v.id}: ${v.message}`);
+ * }
+ * ```
+ */
+function detectAntiPatterns(
+  scannedFiles: readonly ScannedFile[],
+  features: readonly ScannedGherkinFile[],
+  options: AntiPatternDetectionOptions =;
+```
+
+```typescript
+/**
+ * Detect process metadata in code anti-pattern
+ *
+ * Finds process tracking annotations (e.g., @docs-quarter, @docs-team, etc.)
+ * in TypeScript files. Process metadata belongs in feature files.
+ *
+ * @param scannedFiles - Array of scanned TypeScript files
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @libar-docs-)
+ * @returns Array of anti-pattern violations
+ */
+function detectProcessInCode(
+  scannedFiles: readonly ScannedFile[],
+  registry?: TagRegistry
+): AntiPatternViolation[];
+```
+
+```typescript
+/**
+ * Detect magic comments anti-pattern
+ *
+ * Finds generator hints like "# GENERATOR:", "# PARSER:" in feature files.
+ * These create tight coupling between features and generators.
+ *
+ * @param features - Array of scanned feature files
+ * @param threshold - Maximum magic comments before warning (default: 5)
+ * @returns Array of anti-pattern violations
+ */
+function detectMagicComments(
+  features: readonly ScannedGherkinFile[],
+  threshold: number = DEFAULT_THRESHOLDS.magicCommentThreshold
+): AntiPatternViolation[];
+```
+
+```typescript
+/**
+ * Detect scenario bloat anti-pattern
+ *
+ * Finds feature files with too many scenarios, which indicates poor
+ * organization and slows test suites.
+ *
+ * @param features - Array of scanned feature files
+ * @param threshold - Maximum scenarios before warning (default: 20)
+ * @returns Array of anti-pattern violations
+ */
+function detectScenarioBloat(
+  features: readonly ScannedGherkinFile[],
+  threshold: number = DEFAULT_THRESHOLDS.scenarioBloatThreshold
+): AntiPatternViolation[];
+```
+
+```typescript
+/**
+ * Detect mega-feature anti-pattern
+ *
+ * Finds feature files that are too large, which makes them hard to
+ * maintain and review.
+ *
+ * @param features - Array of scanned feature files
+ * @param threshold - Maximum lines before warning (default: 500)
+ * @returns Array of anti-pattern violations
+ */
+function detectMegaFeature(
+  features: readonly ScannedGherkinFile[],
+  threshold: number = DEFAULT_THRESHOLDS.megaFeatureLineThreshold
+): AntiPatternViolation[];
+```
+
+### Anti-Pattern Types
+
+```typescript
+/**
+ * Anti-pattern rule identifiers
+ *
+ * Each ID corresponds to a specific violation of the dual-source
+ * documentation architecture or process hygiene.
+ */
+type AntiPatternId =
+  | 'tag-duplication' // Dependencies in features (should be code-only)
+  | 'process-in-code' // Process metadata in code (should be features-only)
+  | 'magic-comments' // Generator hints in features
+  | 'scenario-bloat' // Too many scenarios per feature
+  | 'mega-feature';
+```
+
+```typescript
+/**
+ * Anti-pattern detection result
+ *
+ * Reports a specific anti-pattern violation with context
+ * for remediation.
+ */
+interface AntiPatternViolation {
+  /** Anti-pattern identifier */
+  readonly id: AntiPatternId;
+  /** Human-readable description */
+  readonly message: string;
+  /** File where violation was found */
+  readonly file: string;
+  /** Line number (if applicable) */
+  readonly line?: number;
+  /** Severity (error = architectural violation, warning = hygiene issue) */
+  readonly severity: 'error' | 'warning';
+  /** Fix guidance */
+  readonly fix?: string;
+}
+```
+
+```typescript
+type AntiPatternThresholds = z.infer<typeof AntiPatternThresholdsSchema>;
+```
+
+```typescript
+/**
+ * DoD validation result for a single phase/pattern
+ *
+ * Reports whether a completed phase meets Definition of Done criteria:
+ * 1. All deliverables must have "complete" status
+ * 2. At least one @acceptance-criteria scenario must exist
+ */
+interface DoDValidationResult {
+  /** Pattern name being validated */
+  readonly patternName: string;
+  /** Phase number being validated */
+  readonly phase: number;
+  /** True if all DoD criteria are met */
+  readonly isDoDMet: boolean;
+  /** All deliverables from Background table */
+  readonly deliverables: readonly Deliverable[];
+  /** Deliverables that are not yet complete */
+  readonly incompleteDeliverables: readonly Deliverable[];
+  /** True if no @acceptance-criteria scenarios found */
+  readonly missingAcceptanceCriteria: boolean;
+  /** Human-readable validation messages */
+  readonly messages: readonly string[];
+}
+```
+
+```typescript
+/**
+ * Aggregate DoD validation summary
+ *
+ * Summarizes validation across multiple phases for CLI output.
+ */
+interface DoDValidationSummary {
+  /** Per-phase validation results */
+  readonly results: readonly DoDValidationResult[];
+  /** Total phases validated */
+  readonly totalPhases: number;
+  /** Phases that passed DoD */
+  readonly passedPhases: number;
+  /** Phases that failed DoD */
+  readonly failedPhases: number;
+}
+```
+
+```typescript
+/**
+ * Completion status detection patterns
+ *
+ * Various ways to indicate a deliverable is complete.
+ */
+COMPLETION_PATTERNS = [
+  // Text patterns (case-insensitive)
+  'complete',
+  'completed',
+  'done',
+  'finished',
+  'yes',
+  // Emoji/symbol patterns
+  '✓',
+  '✔',
+  '✅',
+  '☑',
+  // Checkmark unicode variants
+  '\u2713', // ✓
+  '\u2714', // ✔
+  '\u2611', // ☑
+] as const
+```
+
+### DoD Validation (from dod-validator)
+
+```typescript
+/**
+ * Check if a deliverable status indicates completion
+ *
+ * Matches various completion patterns including text ("Complete", "Done")
+ * and symbols (✓, ✅, ☑).
+ *
+ * @param deliverable - The deliverable to check
+ * @returns True if the deliverable is complete
+ *
+ * @example
+ * ```typescript
+ * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
+ * // => true
+ *
+ * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
+ * // => false
+ * ```
+ */
+function isDeliverableComplete(deliverable: Deliverable): boolean;
+```
+
+```typescript
+/**
+ * Check if a feature has @acceptance-criteria scenarios
+ *
+ * Scans scenarios for the @acceptance-criteria tag, which indicates
+ * BDD-driven acceptance tests.
+ *
+ * @param feature - The scanned feature file to check
+ * @returns True if at least one @acceptance-criteria scenario exists
+ */
+function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean;
+```
+
+```typescript
+/**
+ * Validate DoD for a single phase/pattern
+ *
+ * Checks:
+ * 1. All deliverables have "complete" status
+ * 2. At least one @acceptance-criteria scenario exists
+ *
+ * @param patternName - Name of the pattern being validated
+ * @param phase - Phase number being validated
+ * @param feature - The scanned feature file with deliverables and scenarios
+ * @returns DoD validation result
+ */
+function validateDoDForPhase(
+  patternName: string,
+  phase: number,
+  feature: ScannedGherkinFile
+): DoDValidationResult;
+```
+
+```typescript
+/**
+ * Validate DoD across multiple phases
+ *
+ * Filters to completed phases and validates each against DoD criteria.
+ * Optionally filter to specific phases using phaseFilter.
+ *
+ * @param features - Array of scanned feature files
+ * @param phaseFilter - Optional array of phase numbers to validate (validates all if empty)
+ * @returns Aggregate DoD validation summary
+ *
+ * @example
+ * ```typescript
+ * // Validate all completed phases
+ * const summary = validateDoD(features);
+ *
+ * // Validate specific phase
+ * const summary = validateDoD(features, [14]);
+ * ```
+ */
+function validateDoD(
+  features: readonly ScannedGherkinFile[],
+  phaseFilter: readonly number[] = []
+): DoDValidationSummary;
+```
+
+### Exit Codes
+
+**Context:** All validation commands use consistent exit codes.
+
+| Code | Meaning |
+| --- | --- |
+| 0 | No errors (warnings allowed unless --strict) |
+| 1 | Errors found (or warnings with --strict) |
+
+## Command Decision Tree
+
+**Context:** Developers need to quickly determine which validation command to run.
+
+    **Decision Tree:**
+
+```text
+Need to check annotation quality?
+    --> Yes: lint-patterns
+
+    Need FSM workflow validation?
+    --> Yes: lint-process
+
+    Need cross-source or DoD validation?
+    --> Yes: validate-patterns
+
+    Running pre-commit hook?
+    --> lint-process --staged (default)
+```
+
+## Command Summary
+
+**Context:** Three validation commands serve different purposes.
+
+    **Commands:**
+
+| Command | Purpose | When to Use |
+| --- | --- | --- |
+| lint-patterns | Annotation quality | Ensure patterns have required tags |
+| lint-process | FSM workflow enforcement | Pre-commit hooks, CI pipelines |
+| validate-patterns | Cross-source + DoD + anti-pattern | Release validation, comprehensive |
+
+## lint-patterns Rules
+
+**Context:** lint-patterns validates annotation quality in TypeScript files.
+
+    **Usage:**
+
+```bash
+npx lint-patterns -i "src/**/*.ts"
+    npx lint-patterns -i "src/**/*.ts" --strict
+```
+
+**Validation Rules:**
+
+| Rule | Severity | What It Checks |
+| --- | --- | --- |
+| missing-pattern-name | error | Must have pattern tag |
+| invalid-status | error | Status must be valid FSM value |
+| tautological-description | error | Description cannot just repeat name |
+| pattern-conflict-in-implements | error | Pattern cannot implement itself |
+| missing-relationship-target | warning | Relationship targets must exist |
+| missing-status | warning | Should have status tag |
+| missing-when-to-use | warning | Should have When to Use section |
+| missing-relationships | info | Consider adding uses/used-by |
+
+## Anti-Pattern Detection
+
+**Context:** Enforces dual-source architecture ownership between TypeScript and Gherkin files.
+
+    **Anti-Patterns Detected:**
+
+| ID | Severity | Description |
+| --- | --- | --- |
+| process-in-code | error | Process metadata in code (should be features-only) |
+| tag-duplication | error | Dependencies in features (should be code-only) |
+| magic-comments | warning | Generator hints in features |
+| scenario-bloat | warning | Too many scenarios per feature (threshold: 20) |
+| mega-feature | warning | Feature file too large (threshold: 500 lines) |
+
+    **Tag Location Constraints:**
+
+| Tag Type | Correct Location | Wrong Location |
+| --- | --- | --- |
+| uses | TypeScript code | Feature files |
+| depends-on | Feature files | TypeScript code |
+| quarter | Feature files | TypeScript code |
+| team | Feature files | TypeScript code |
+
+## DoD Validation
+
+**Context:** Definition of Done validation ensures completed patterns meet quality criteria.
+
+    **Criteria for completed status:**
+
+| Criterion | What It Checks |
+| --- | --- |
+| All deliverables complete | Status must be: complete, done, finished, yes, or checkmarks |
+| Acceptance criteria present | At least one scenario with @acceptance-criteria tag |
+
+    **Completion Patterns Recognized:**
+
+```text
+Text patterns: complete, completed, done, finished, yes
+    Symbol patterns: check mark, heavy check mark, white check mark, ballot box with check
+```
+
+## validate-patterns Flags
+
+**Context:** validate-patterns combines multiple validation checks.
+
+    **Usage:**
+
+```bash
+npx validate-patterns \
+      -i "src/**/*.ts" \
+      -F "specs/**/*.feature" \
+      --dod \
+      --anti-patterns
+```
+
+**Available Flags:**
+
+| Flag | What It Validates |
+| --- | --- |
+| --dod | Completed patterns have all deliverables done |
+| --anti-patterns | Dual-source ownership rules not violated |
+| --cross-source | Feature/TypeScript metadata consistency |
+
+## CI/CD Integration
+
+**Context:** Validation commands integrate into CI/CD pipelines.
+
+    **Recommended package.json Scripts:**
+
+```json
+{
+      "scripts": {
+        "lint:patterns": "lint-patterns -i 'src/**/*.ts'",
+        "lint:process": "lint-process --staged",
+        "lint:process:ci": "lint-process --all --strict",
+        "validate:all": "validate-patterns -i 'src/**/*.ts' -F 'specs/**/*.feature' --dod --anti-patterns"
+      }
+    }
+```
+
+**Pre-commit Hook:**
+
+```bash
+npx lint-process --staged
+```
+
+**GitHub Actions:**
+
+```yaml
+- name: Lint annotations
+      run: npx lint-patterns -i "src/**/*.ts" --strict
+
+    - name: Validate patterns
+      run: npx validate-patterns -i "src/**/*.ts" -F "specs/**/*.feature" --dod --anti-patterns
+```
+
+## Exit Codes
+
+**Context:** All validation commands use consistent exit codes.
+
+| Code | Meaning |
+| --- | --- |
+| 0 | No errors (warnings allowed unless --strict) |
+| 1 | Errors found (or warnings with --strict) |
+
+## Programmatic API
+
+**Context:** All validation tools expose programmatic APIs for custom integrations.
+
+    **Import Paths:**
+
+```typescript
+// Pattern linting
+    import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
+
+    // Process guard
+    import { deriveProcessState, validateChanges } from '@libar-dev/delivery-process/lint';
+
+    // Anti-patterns and DoD
+    import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
+```
+
+**Anti-Pattern Detection Example:**
+
+```typescript
+import { detectAntiPatterns, formatAntiPatternReport } from '@libar-dev/delivery-process/validation';
+    import { scanTypeScript, scanGherkin } from '@libar-dev/delivery-process/scanner';
+
+    const tsFiles = await scanTypeScript(['src/**/*.ts']);
+    const features = await scanGherkin(['specs/**/*.feature']);
+
+    const violations = detectAntiPatterns(tsFiles, features, {
+      thresholds: {
+        scenarioBloatThreshold: 15,
+        megaFeatureLineThreshold: 400,
+      },
+    });
+
+    if (violations.length > 0) {
+      console.log(formatAntiPatternReport(violations));
+      process.exit(1);
+    }
+```
+
+**DoD Validation Example:**
+
+```typescript
+import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
+    import { scanGherkin } from '@libar-dev/delivery-process/scanner';
+
+    const features = await scanGherkin(['specs/**/*.feature']);
+    const summary = validateDoD(features);
+
+    console.log(formatDoDSummary(summary));
+
+    if (summary.failedPhases > 0) {
+      process.exit(1);
+    }
+```

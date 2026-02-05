@@ -1,5 +1,11 @@
 /**
- * Feature layer types for test organization
+ * @libar-docs
+ * @libar-docs-pattern LayerTypes
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-extract-shapes LAYER_TYPES, LayerType
+ *
+ * ## Feature Layer Types for Test Organization
  *
  * Inferred from feature file directory paths:
  * - timeline: Process/workflow features (delivery-process)

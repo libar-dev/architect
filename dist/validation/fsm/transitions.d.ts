@@ -5,6 +5,7 @@
  * @libar-docs-status active
  * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-depends-on:PDR005MvpWorkflow
+ * @libar-docs-extract-shapes VALID_TRANSITIONS, isValidTransition, getValidTransitionsFrom, getTransitionErrorMessage
  *
  * ## FSM Transitions - Valid State Transition Matrix
  *
