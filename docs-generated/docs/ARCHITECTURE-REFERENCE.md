@@ -215,6 +215,11 @@ interface DocumentGenerator {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `name` | Unique generator name (e.g., "patterns", "adrs", "planning") |
+| `description` | Optional description shown in --list-generators |
+
 ```typescript
 /**
  * Runtime context provided to generators.
@@ -261,6 +266,15 @@ interface GeneratorContext {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `baseDir` | Base directory for resolving relative paths |
+| `outputDir` | Output directory for generated files |
+| `registry` | Tag registry with category/aggregation definitions |
+| `workflow` | Optional workflow configuration for status handling |
+| `masterDataset` | Pre-computed pattern views for efficient access. |
+| `codecOptions` | Optional codec-specific options for document generation. |
+
 ```typescript
 /**
  * Output from generator execution.
@@ -276,6 +290,12 @@ interface GeneratorOutput {
   readonly metadata?: Record<string, unknown>;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `files` | Files to write (path relative to outputDir) |
+| `filesToDelete` | Files to delete for cleanup (path relative to outputDir) |
+| `metadata` | Optional metadata for registry.json or other purposes |
 
 ### Transform Function
 
@@ -293,6 +313,10 @@ interface RuntimeMasterDataset extends MasterDataset {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `workflow` | Optional workflow configuration (not serializable) |
+
 ```typescript
 /**
  * Raw input data for transformation
@@ -308,6 +332,12 @@ interface RawDataset {
   readonly workflow?: LoadedWorkflow | undefined;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `patterns` | Extracted patterns from TypeScript and/or Gherkin sources |
+| `tagRegistry` | Tag registry for category lookups |
+| `workflow` | Optional workflow configuration for phase names (can be undefined) |
 
 ```typescript
 /**

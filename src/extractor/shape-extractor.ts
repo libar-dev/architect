@@ -48,6 +48,13 @@ import type {
 const MAX_JSDOC_LINE_DISTANCE = 3;
 
 /**
+ * Strict adjacency required for property-level JSDoc.
+ * Property JSDoc must end on the line immediately before the property (no gap allowed).
+ * This prevents interface-level JSDoc from being misattributed to the first property.
+ */
+const PROPERTY_JSDOC_MAX_GAP = 1;
+
+/**
  * Maximum source code size in bytes (5MB).
  * Prevents memory exhaustion from oversized input during AST parsing.
  */
@@ -389,13 +396,24 @@ function extractShape(
   }
 
   // Extract property-level JSDoc for interfaces
+  // Uses strict adjacency to prevent interface-level JSDoc from being misattributed to first property
   let propertyDocs: PropertyDoc[] | undefined;
   if (options.includeJsDoc && node.type === 'TSInterfaceDeclaration') {
     const docs: PropertyDoc[] = [];
+    // Get the line where the interface body starts (the `{` line)
+    // loc is guaranteed by parse options: { range: true, loc: true }
+    const interfaceBodyStartLine = node.body.loc.start.line;
+
     for (const member of node.body.body) {
       if (member.type === 'TSPropertySignature' && member.key.type === 'Identifier') {
         const propName = member.key.name;
-        const propJsDoc = extractPrecedingJsDoc(sourceCode, member, comments);
+        // Use strict adjacency - comment must be inside interface body and immediately before property
+        const propJsDoc = findStrictlyAdjacentPropertyJsDoc(
+          sourceCode,
+          member,
+          comments,
+          interfaceBodyStartLine
+        );
         if (propJsDoc) {
           // Extract just the text content from JSDoc, removing delimiters
           const cleanedJsDoc = extractJsDocText(propJsDoc);
@@ -462,6 +480,62 @@ function extractPrecedingJsDoc(
 
   // Return the full JSDoc including delimiters
   return sourceCode.slice(closestJsDoc.range[0], closestJsDoc.range[1]);
+}
+
+/**
+ * Find JSDoc comment strictly adjacent to an interface property member.
+ *
+ * Unlike extractPrecedingJsDoc which allows a 3-line gap, this function requires:
+ * 1. Comment must be INSIDE the interface body (start line > minLine)
+ * 2. Comment must end exactly at member.startLine - 1 (strictly adjacent)
+ *
+ * This prevents interface-level JSDoc from being misattributed to the first property
+ * when the interface is tightly formatted.
+ *
+ * @param sourceCode - Full source code text
+ * @param member - The property member node
+ * @param comments - All comments from the AST
+ * @param interfaceBodyStartLine - Line where interface body starts (the `{` line)
+ * @returns JSDoc string if found, undefined otherwise
+ */
+function findStrictlyAdjacentPropertyJsDoc(
+  sourceCode: string,
+  member: TSESTree.Node,
+  comments: readonly TSESTree.Comment[],
+  interfaceBodyStartLine: number
+): string | undefined {
+  // Range and loc are guaranteed by parse options: { range: true, loc: true }
+  const memberStartLine = member.loc.start.line;
+  const memberStart = member.range[0];
+
+  // Property JSDoc must end exactly on the line before the property
+  const expectedCommentEndLine = memberStartLine - PROPERTY_JSDOC_MAX_GAP;
+
+  for (const comment of comments) {
+    // Must be a block comment
+    if (comment.type !== 'Block') continue;
+
+    // Must be JSDoc format (starts with *)
+    if (!comment.value.startsWith('*')) continue;
+
+    const commentEndLine = comment.loc.end.line;
+    const commentStartLine = comment.loc.start.line;
+    const commentEnd = comment.range[1];
+
+    // Comment must end before the member starts (character position)
+    if (commentEnd > memberStart) continue;
+
+    // Comment must be INSIDE the interface body (after the opening brace line)
+    if (commentStartLine <= interfaceBodyStartLine) continue;
+
+    // Comment must end exactly on the expected line (strictly adjacent)
+    if (commentEndLine !== expectedCommentEndLine) continue;
+
+    // Found a valid property-level JSDoc
+    return sourceCode.slice(comment.range[0], comment.range[1]);
+  }
+
+  return undefined;
 }
 
 /**

@@ -225,6 +225,14 @@ interface ValidationResult {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `valid` | Whether all checks passed (no errors) |
+| `violations` | Blocking violations (must be fixed) |
+| `warnings` | Non-blocking warnings |
+| `processState` | Process state at time of validation |
+| `changes` | Changes that were validated |
+
 ```typescript
 /**
  * A validation violation from the process guard linter.
@@ -242,6 +250,14 @@ interface ProcessViolation {
   readonly suggestion?: string;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `rule` | Unique rule ID that triggered the violation |
+| `severity` | Severity (error = blocking, warning = informational) |
+| `message` | Human-readable error message |
+| `file` | File that triggered the violation |
+| `suggestion` | Suggested fix or action |
 
 ```typescript
 /**
@@ -266,6 +282,17 @@ interface FileState {
   readonly unlockReason?: string;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `path` | Absolute file path |
+| `relativePath` | Relative path from project root |
+| `status` | Status from @libar-docs-status annotation |
+| `normalizedStatus` | Normalized status for display |
+| `protection` | Protection level from FSM (none/scope/hard) |
+| `deliverables` | Deliverable names from Background table |
+| `hasUnlockReason` | Whether file has @libar-docs-unlock-reason |
+| `unlockReason` | The unlock reason text if present |
 
 ### Decider API
 

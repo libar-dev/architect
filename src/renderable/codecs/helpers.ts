@@ -37,7 +37,7 @@ import type {
   ScenarioRef,
 } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
-import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
+import type { ExtractedShape, PropertyDoc } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock, table, code, list, paragraph, heading } from '../schema.js';
 import { normalizeLineEndings } from '../../utils/string-utils.js';
 
@@ -973,4 +973,37 @@ export function renderShapesAsMarkdown(
   }
 
   return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
+}
+
+/**
+ * Render property documentation as a markdown table.
+ *
+ * Generates a two-column table with property names and their JSDoc descriptions.
+ * Returns empty string if no property docs exist.
+ *
+ * @param propertyDocs - Property documentation array from ExtractedShape
+ * @returns Markdown table string, or empty string if no docs
+ *
+ * @example
+ * ```typescript
+ * const table = renderPropertyDocsTable(shape.propertyDocs);
+ * if (table) {
+ *   sections.push(md(table));
+ * }
+ * ```
+ */
+export function renderPropertyDocsTable(propertyDocs: readonly PropertyDoc[] | undefined): string {
+  if (!propertyDocs || propertyDocs.length === 0) {
+    return '';
+  }
+
+  const lines: string[] = ['| Property | Description |', '| --- | --- |'];
+
+  for (const prop of propertyDocs) {
+    // Escape pipe characters in description to prevent table breakage
+    const escapedDesc = prop.jsDoc.replace(/\|/g, '\\|');
+    lines.push(`| \`${prop.name}\` | ${escapedDesc} |`);
+  }
+
+  return lines.join('\n');
 }

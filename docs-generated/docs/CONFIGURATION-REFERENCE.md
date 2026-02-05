@@ -252,6 +252,13 @@ interface CreateDeliveryProcessOptions {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `preset` | Use a preset configuration |
+| `tagPrefix` | Custom tag prefix (overrides preset) |
+| `fileOptInTag` | Custom file opt-in tag (overrides preset) |
+| `categories` | Custom categories (replaces preset categories entirely) |
+
 ```typescript
 /**
  * Creates a configured delivery process instance.
@@ -314,6 +321,13 @@ interface DeliveryProcessConfig {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `tagPrefix` | Tag prefix for directives (e.g., "@docs-" or "@libar-docs-") |
+| `fileOptInTag` | File-level opt-in tag (e.g., "@docs" or "@libar-docs") |
+| `categories` | Category definitions for pattern classification |
+| `metadataTags` | Optional metadata tag definitions |
+
 ```typescript
 /**
  * Instance returned by createDeliveryProcess with configured registry
@@ -325,6 +339,11 @@ interface DeliveryProcessInstance {
   readonly regexBuilders: RegexBuilders;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `registry` | The fully configured tag registry |
+| `regexBuilders` | Regex builders for tag detection |
 
 ```typescript
 /**
@@ -346,6 +365,11 @@ interface RegexBuilders {
   normalizeTag(tag: string): string;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `fileOptInPattern` | Pattern to match file-level opt-in (e.g., /** @docs *\/) |
+| `directivePattern` | Pattern to match directives (e.g., @docs-pattern, @docs-status) |
 
 ### Hierarchical Configuration
 
@@ -399,6 +423,13 @@ interface ConfigDiscoveryResult {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `found` | Whether a config file was found |
+| `path` | Absolute path to the config file (if found) |
+| `instance` | The loaded configuration instance |
+| `isDefault` | Whether the default configuration was used |
+
 ```typescript
 /**
  * Error during config loading
@@ -414,6 +445,13 @@ interface ConfigLoadError {
   cause?: Error | undefined;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `type` | Discriminant for error type identification |
+| `path` | Absolute path to the config file that failed to load |
+| `message` | Human-readable error description |
+| `cause` | The underlying error that caused the failure (if any) |
 
 ```typescript
 /**

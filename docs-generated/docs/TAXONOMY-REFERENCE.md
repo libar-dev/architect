@@ -126,6 +126,14 @@ interface CategoryDefinition {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `tag` | Category tag name without prefix (e.g., "core", "api", "ddd", "saga") |
+| `domain` | Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") |
+| `priority` | Display order priority - lower values appear first in sorted output |
+| `description` | Brief description of the category's purpose and typical patterns |
+| `aliases` | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+
 ```typescript
 /**
  * All category definitions for the monorepo
@@ -438,6 +446,16 @@ interface TagRegistry {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `version` | Schema version for forward/backward compatibility checking |
+| `categories` | Category definitions for classifying patterns by domain (e.g., core, api, ddd) |
+| `metadataTags` | Metadata tag definitions with format, purpose, and validation rules |
+| `aggregationTags` | Aggregation tag definitions for document-level grouping |
+| `formatOptions` | Available format options for documentation output |
+| `tagPrefix` | Prefix for all tags (e.g., "@libar-docs-") |
+| `fileOptInTag` | File-level opt-in marker tag (e.g., "@libar-docs") |
+
 ```typescript
 interface MetadataTagDefinitionForRegistry {
   /** Tag name without prefix (e.g., "pattern", "status", "phase") */
@@ -458,6 +476,17 @@ interface MetadataTagDefinitionForRegistry {
   example?: string;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `tag` | Tag name without prefix (e.g., "pattern", "status", "phase") |
+| `format` | Value format type determining parsing rules (flag, value, enum, csv, number, quoted-value) |
+| `purpose` | Human-readable description of the tag's purpose and usage |
+| `required` | Whether this tag must be present for valid patterns |
+| `repeatable` | Whether this tag can appear multiple times on a single pattern |
+| `values` | Valid values for enum-type tags (undefined for non-enum formats) |
+| `default` | Default value applied when tag is not specified |
+| `example` | Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") |
 
 ```typescript
 type TagDefinition = MetadataTagDefinitionForRegistry;

@@ -103,6 +103,14 @@ interface CategoryDefinition {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `tag` | Category tag name without prefix (e.g., "core", "api", "ddd", "saga") |
+| `domain` | Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") |
+| `priority` | Display order priority - lower values appear first in sorted output |
+| `description` | Brief description of the category's purpose and typical patterns |
+| `aliases` | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+
 ```typescript
 /**
  * All category definitions for the monorepo
@@ -148,6 +156,16 @@ interface TagRegistry {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `version` | Schema version for forward/backward compatibility checking |
+| `categories` | Category definitions for classifying patterns by domain (e.g., core, api, ddd) |
+| `metadataTags` | Metadata tag definitions with format, purpose, and validation rules |
+| `aggregationTags` | Aggregation tag definitions for document-level grouping |
+| `formatOptions` | Available format options for documentation output |
+| `tagPrefix` | Prefix for all tags (e.g., "@libar-docs-") |
+| `fileOptInTag` | File-level opt-in marker tag (e.g., "@libar-docs") |
+
 ```typescript
 interface MetadataTagDefinitionForRegistry {
   /** Tag name without prefix (e.g., "pattern", "status", "phase") */
@@ -168,6 +186,17 @@ interface MetadataTagDefinitionForRegistry {
   example?: string;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `tag` | Tag name without prefix (e.g., "pattern", "status", "phase") |
+| `format` | Value format type determining parsing rules (flag, value, enum, csv, number, quoted-value) |
+| `purpose` | Human-readable description of the tag's purpose and usage |
+| `required` | Whether this tag must be present for valid patterns |
+| `repeatable` | Whether this tag can appear multiple times on a single pattern |
+| `values` | Valid values for enum-type tags (undefined for non-enum formats) |
+| `default` | Default value applied when tag is not specified |
+| `example` | Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") |
 
 ```typescript
 type TagDefinition = MetadataTagDefinitionForRegistry;
@@ -326,6 +355,23 @@ interface CLIConfig {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `input` | Glob patterns for TypeScript input files (-i, --input). Repeatable. |
+| `exclude` | Glob patterns to exclude from scanning (-e, --exclude). Repeatable. |
+| `output` | Output directory for generated documentation (-o, --output). Default: docs/architecture |
+| `baseDir` | Base directory for path resolution (-b, --base-dir). Default: cwd |
+| `generators` | Generators to run (-g, --generators). Repeatable. Default: patterns |
+| `overwrite` | Overwrite existing files (-f, --overwrite). Default: false |
+| `features` | Glob patterns for Gherkin feature files (--features). Repeatable. |
+| `workflowPath` | Workflow config JSON file path (-w, --workflow). |
+| `listGenerators` | List available generators and exit (--list-generators). |
+| `help` | Show help message (-h, --help). |
+| `version` | Show version number (-v, --version). |
+| `gitDiffBase` | Base branch for git diff (--git-diff-base). For PR Changes generator. |
+| `changedFiles` | Explicit list of changed files (--changed-files). For PR Changes generator. |
+| `releaseFilter` | Filter patterns by release version (--release-filter). |
+
 ### CLI lint-patterns
 
 ```typescript
@@ -354,6 +400,18 @@ interface LintCLIConfig {
 }
 ```
 
+| Property | Description |
+| --- | --- |
+| `input` | Glob patterns for input files |
+| `exclude` | Glob patterns to exclude |
+| `baseDir` | Base directory for path resolution |
+| `strict` | Treat warnings as errors |
+| `format` | Output format |
+| `quiet` | Only show errors (suppress warnings/info) |
+| `minSeverity` | Minimum severity to report |
+| `help` | Show help |
+| `version` | Show version |
+
 ### CLI lint-process
 
 ```typescript
@@ -381,6 +439,18 @@ interface ProcessGuardCLIConfig {
   version: boolean;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `mode` | Validation mode |
+| `files` | Specific files to validate (when mode is 'files') |
+| `strict` | Treat warnings as errors |
+| `ignoreSession` | Ignore session scope rules |
+| `showState` | Show derived process state (debugging) |
+| `baseDir` | Base directory for relative paths |
+| `format` | Output format |
+| `help` | Show help |
+| `version` | Show version |
 
 ### CLI validate-patterns
 
@@ -419,6 +489,23 @@ interface ValidateCLIConfig {
   version: boolean;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `input` | Glob patterns for TypeScript input files |
+| `features` | Glob patterns for Gherkin feature files |
+| `exclude` | Glob patterns to exclude |
+| `baseDir` | Base directory for path resolution |
+| `strict` | Treat warnings as errors |
+| `format` | Output format |
+| `help` | Show help |
+| `dod` | Enable DoD validation mode |
+| `phases` | Specific phases to validate (empty = all completed phases) |
+| `antiPatterns` | Enable anti-pattern detection |
+| `scenarioBloatThreshold` | Override scenario bloat threshold |
+| `megaFeatureLineThreshold` | Override mega-feature line threshold |
+| `magicCommentThreshold` | Override magic comment threshold |
+| `version` | Show version |
 
 ```typescript
 /**
@@ -468,6 +555,14 @@ interface CLIConfig {
   version: boolean;
 }
 ```
+
+| Property | Description |
+| --- | --- |
+| `output` | Output path for TAG_TAXONOMY.md (-o, --output). Default: docs/architecture/TAG_TAXONOMY.md |
+| `baseDir` | Base directory for path resolution (-b, --base-dir). Default: cwd |
+| `overwrite` | Overwrite existing file (-f, --overwrite). Default: false |
+| `help` | Show help message (-h, --help). |
+| `version` | Show version number (-v, --version). |
 
 ### Gherkin Integration
 

@@ -311,8 +311,54 @@ export function extractFromTypeScript(
       if (!extractResult.ok) {
         return R.err(extractResult.error);
       }
-      shapes = [...extractResult.value.shapes]; // Convert readonly to mutable
-      content = renderShapesAsMarkdown(extractResult.value.shapes, { includeJsDoc: true });
+
+      const result = extractResult.value;
+      shapes = [...result.shapes]; // Convert readonly to mutable
+      content = renderShapesAsMarkdown(result.shapes, { includeJsDoc: true });
+
+      // Surface extraction warnings via warning collector
+      if (options.warningCollector) {
+        // Forward any extraction warnings
+        for (const warning of result.warnings) {
+          options.warningCollector.capture({
+            source: filePath,
+            category: 'extraction',
+            subcategory: 'shape',
+            message: warning,
+          });
+        }
+
+        // Warn about shapes not found in file
+        for (const name of result.notFound) {
+          options.warningCollector.capture({
+            source: filePath,
+            category: 'extraction',
+            subcategory: 'shape-not-found',
+            message: `Shape '${name}' not found in file`,
+          });
+        }
+
+        // Warn about imported shapes (should use source file instead)
+        for (const name of result.imported) {
+          options.warningCollector.capture({
+            source: filePath,
+            category: 'extraction',
+            subcategory: 'shape-imported',
+            message: `Shape '${name}' is imported, not defined in this file. Add @libar-docs-extract-shapes to the source file instead.`,
+          });
+        }
+
+        // Warn about re-exported shapes with source module info
+        for (const reExport of result.reExported) {
+          const typeOnlyNote = reExport.typeOnly ? ' (type-only)' : '';
+          options.warningCollector.capture({
+            source: filePath,
+            category: 'extraction',
+            subcategory: 'shape-re-exported',
+            message: `Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`,
+          });
+        }
+      }
     } else {
       // No @extract-shapes tag found - extract all exported types
       // This is a fallback for files without explicit shape tags
