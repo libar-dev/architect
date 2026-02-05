@@ -3,6 +3,8 @@
  * @libar-docs-pattern CategoryDefinitions
  * @libar-docs-status completed
  * @libar-docs-core
+ * @libar-docs-arch-context taxonomy
+ * @libar-docs-arch-layer domain
  * @libar-docs-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
  *
  * ## Category Definitions

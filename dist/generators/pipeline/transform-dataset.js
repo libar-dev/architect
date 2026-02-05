@@ -33,6 +33,57 @@
  */
 import { normalizeStatus } from '../../taxonomy/index.js';
 /**
+ * Infer bounded context from file path using configured rules.
+ *
+ * Iterates through rules in order and returns the context from the first
+ * matching pattern. Returns undefined if no rules match.
+ *
+ * Pattern matching supports:
+ * - Simple prefix matching: `src/validation/` matches files in that directory
+ * - Glob-style wildcards: `src/validation/**` matches all files recursively
+ *
+ * @param filePath - The source file path to check
+ * @param rules - Ordered list of inference rules
+ * @returns The inferred context name, or undefined if no match
+ */
+function inferContext(filePath, rules) {
+    if (!rules || rules.length === 0)
+        return undefined;
+    for (const rule of rules) {
+        if (matchPattern(filePath, rule.pattern)) {
+            return rule.context;
+        }
+    }
+    return undefined;
+}
+/**
+ * Simple pattern matching for file paths.
+ *
+ * Supports:
+ * - Exact prefix matching: `src/validation/` matches `src/validation/foo.ts`
+ * - Glob-style `**` wildcard: `src/validation/**` matches all files recursively
+ *
+ * @param filePath - The file path to check
+ * @param pattern - The pattern to match against
+ * @returns true if the file path matches the pattern
+ */
+function matchPattern(filePath, pattern) {
+    // Handle `**` wildcard patterns (recursive match)
+    if (pattern.endsWith('/**')) {
+        const prefix = pattern.slice(0, -3); // Remove '/**'
+        return filePath.startsWith(prefix);
+    }
+    // Handle `/*` wildcard patterns (single level match)
+    if (pattern.endsWith('/*')) {
+        const prefix = pattern.slice(0, -2); // Remove '/*'
+        const afterPrefix = filePath.slice(prefix.length);
+        // Must start with prefix and have exactly one path segment after
+        return filePath.startsWith(prefix) && !afterPrefix.slice(1).includes('/');
+    }
+    // Simple prefix matching
+    return filePath.startsWith(pattern);
+}
+/**
  * Transform raw extracted data into a MasterDataset with all pre-computed views.
  *
  * This is a ONE-PASS transformation that computes:
@@ -62,7 +113,7 @@ import { normalizeStatus } from '../../taxonomy/index.js';
  * ```
  */
 export function transformToMasterDataset(raw) {
-    const { patterns, tagRegistry, workflow } = raw;
+    const { patterns, tagRegistry, workflow, contextInferenceRules } = raw;
     // ─────────────────────────────────────────────────────────────────────────
     // Initialize accumulators for single-pass computation
     // ─────────────────────────────────────────────────────────────────────────
@@ -144,8 +195,10 @@ export function transformToMasterDataset(raw) {
             apiRef: [...(pattern.apiRef ?? [])],
         };
         // ─── Architecture index (for diagram generation) ──────────────────────
+        // Infer context from file path if not explicitly set
+        const inferredContext = pattern.archContext ?? inferContext(pattern.source.file, contextInferenceRules);
         const hasArchMetadata = pattern.archRole !== undefined ||
-            pattern.archContext !== undefined ||
+            inferredContext !== undefined ||
             pattern.archLayer !== undefined;
         if (hasArchMetadata) {
             archIndex.all.push(p);
@@ -155,8 +208,9 @@ export function transformToMasterDataset(raw) {
                 rolePatterns.push(p);
             }
             // Group by context (orders, inventory, etc.) for subgraph rendering
-            if (pattern.archContext) {
-                const contextPatterns = (archIndex.byContext[pattern.archContext] ??= []);
+            // Uses explicit archContext OR inferred context from file path
+            if (inferredContext) {
+                const contextPatterns = (archIndex.byContext[inferredContext] ??= []);
                 contextPatterns.push(p);
             }
             // Group by layer (domain, application, infrastructure)

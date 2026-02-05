@@ -36,6 +36,29 @@ import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import type { StatusCounts } from '../../validation-schemas/master-dataset.js';
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 /**
+ * Rule for auto-inferring bounded context from file paths.
+ *
+ * When a pattern has an architecture layer (`@libar-docs-arch-layer`) but no explicit
+ * context (`@libar-docs-arch-context`), these rules can infer the context from the
+ * file path. This reduces annotation redundancy when directory structure already
+ * implies the bounded context.
+ *
+ * @example
+ * ```typescript
+ * const rules: ContextInferenceRule[] = [
+ *   { pattern: 'src/validation/**', context: 'validation' },
+ *   { pattern: 'src/lint/**', context: 'lint' },
+ * ];
+ * // File at src/validation/rules.ts will get archContext='validation' if not explicit
+ * ```
+ */
+export interface ContextInferenceRule {
+    /** Glob pattern to match file paths (e.g., 'src/validation/**') */
+    readonly pattern: string;
+    /** Default context name to assign when pattern matches */
+    readonly context: string;
+}
+/**
  * Runtime MasterDataset with optional workflow
  *
  * Extends the Zod-compatible MasterDataset with workflow reference.
@@ -56,6 +79,8 @@ export interface RawDataset {
     readonly tagRegistry: TagRegistry;
     /** Optional workflow configuration for phase names (can be undefined) */
     readonly workflow?: LoadedWorkflow | undefined;
+    /** Optional rules for inferring bounded context from file paths */
+    readonly contextInferenceRules?: readonly ContextInferenceRule[] | undefined;
 }
 /**
  * Transform raw extracted data into a MasterDataset with all pre-computed views.

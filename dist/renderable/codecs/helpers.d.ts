@@ -215,6 +215,7 @@ export declare function renderStepsList(steps: readonly ScenarioStep[]): Section
  * - Normalizes Windows line endings (CRLF → LF) before parsing
  * - Detects unclosed DocStrings (odd count of """) and returns plain paragraph fallback
  * - Handles empty input gracefully
+ * - Dedents code block content to normalize indentation from Gherkin formatting
  *
  * @param description - The description text that may contain DocStrings
  * @param options - Optional rendering options (used for warning callback)

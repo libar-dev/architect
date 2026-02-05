@@ -4,6 +4,8 @@
  * @libar-docs-pattern DecisionDocGenerator
  * @libar-docs-status completed
  * @libar-docs-phase 27
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer application
  * @libar-docs-depends-on DecisionDocCodec,SourceMapper
  *
  * ## Decision Doc Generator - Documentation from Decision Documents

@@ -19,5 +19,5 @@
  *
  * NOTE: Report codecs have been replaced by RDM codecs in src/renderable/codecs/
  */
-export { transformToMasterDataset, completionPercentage, isFullyCompleted, type RawDataset, type RuntimeMasterDataset, } from './transform-dataset.js';
+export { transformToMasterDataset, completionPercentage, isFullyCompleted, type RawDataset, type RuntimeMasterDataset, type ContextInferenceRule, } from './transform-dataset.js';
 //# sourceMappingURL=index.d.ts.map

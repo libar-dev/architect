@@ -197,6 +197,48 @@ export function renderStepsList(steps) {
     return list(stepItems);
 }
 /**
+ * Remove common leading indentation from all lines in a code block.
+ *
+ * When DocStrings are embedded in Gherkin files, they often have consistent
+ * indentation to align with the surrounding scenario structure. This function
+ * normalizes that indentation by:
+ * 1. Finding the minimum indentation across all non-empty lines
+ * 2. Removing that common indentation from every line
+ * 3. Trimming trailing whitespace from each line
+ *
+ * @param text - The code block content to dedent
+ * @returns The dedented text with normalized indentation
+ *
+ * @example
+ * ```typescript
+ * // Input (indented to match Gherkin formatting):
+ * dedent("    const x = 1;\n    const y = 2;")
+ * // Returns: "const x = 1;\nconst y = 2;"
+ *
+ * // Mixed indentation (preserves relative indentation):
+ * dedent("    function foo() {\n      return 42;\n    }")
+ * // Returns: "function foo() {\n  return 42;\n}"
+ * ```
+ */
+function dedent(text) {
+    const lines = text.split('\n');
+    // Find minimum indentation (ignoring empty lines)
+    const nonEmptyLines = lines.filter((line) => line.trim().length > 0);
+    if (nonEmptyLines.length === 0)
+        return text;
+    const minIndent = Math.min(...nonEmptyLines.map((line) => {
+        const match = /^(\s*)/.exec(line);
+        // The regex always matches (even empty string), but TypeScript needs reassurance
+        return match?.[1]?.length ?? 0;
+    }));
+    // If no common indentation, just trim trailing whitespace
+    if (minIndent === 0) {
+        return lines.map((line) => line.trimEnd()).join('\n');
+    }
+    // Remove common indentation and trailing whitespace from each line
+    return lines.map((line) => line.slice(minIndent).trimEnd()).join('\n');
+}
+/**
  * Parse description text for embedded DocStrings and convert to mixed content
  *
  * DocStrings in Gherkin are identified by: """language\n...\n"""
@@ -206,6 +248,7 @@ export function renderStepsList(steps) {
  * - Normalizes Windows line endings (CRLF → LF) before parsing
  * - Detects unclosed DocStrings (odd count of """) and returns plain paragraph fallback
  * - Handles empty input gracefully
+ * - Dedents code block content to normalize indentation from Gherkin formatting
  *
  * @param description - The description text that may contain DocStrings
  * @param options - Optional rendering options (used for warning callback)
@@ -252,8 +295,10 @@ export function parseDescriptionWithDocStrings(description, options) {
             sections.push(paragraph(textBefore));
         }
         // The DocString as a code block (empty string means no language hint)
+        // Apply dedent to normalize indentation from Gherkin formatting
         const language = (match[1] ?? '').length > 0 ? match[1] : 'text';
-        const content = (match[2] ?? '').trim();
+        const rawContent = (match[2] ?? '').trim();
+        const content = dedent(rawContent);
         sections.push(code(content, language));
         lastIndex = match.index + match[0].length;
     }

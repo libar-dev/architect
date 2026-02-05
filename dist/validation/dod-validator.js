@@ -3,6 +3,8 @@
  * @libar-docs-validation
  * @libar-docs-pattern DoDValidator
  * @libar-docs-status completed
+ * @libar-docs-arch-context validation
+ * @libar-docs-arch-layer application
  * @libar-docs-uses DoDValidationTypes, GherkinTypes, DualSourceExtractor
  * @libar-docs-extract-shapes isDeliverableComplete, hasAcceptanceCriteria, extractAcceptanceCriteriaScenarios, validateDoDForPhase, validateDoD, formatDoDSummary
  *
