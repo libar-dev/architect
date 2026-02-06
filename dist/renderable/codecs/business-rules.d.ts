@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern BusinessRulesCodec
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  *
  * ## Business Rules Document Codec
  *
@@ -124,9 +124,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -184,9 +184,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -372,9 +372,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -432,9 +432,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -583,9 +583,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -643,9 +643,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -794,9 +794,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -854,9 +854,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1009,9 +1009,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1069,9 +1069,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1227,9 +1227,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1287,9 +1287,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1438,9 +1438,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1498,9 +1498,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1650,9 +1650,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1710,9 +1710,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1861,9 +1861,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1921,9 +1921,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2072,9 +2072,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2132,9 +2132,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2283,9 +2283,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2343,9 +2343,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2520,9 +2520,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2580,9 +2580,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2731,9 +2731,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2791,9 +2791,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2942,9 +2942,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3002,9 +3002,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3153,9 +3153,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3213,9 +3213,9 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
