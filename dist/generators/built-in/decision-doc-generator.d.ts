@@ -4,6 +4,8 @@
  * @libar-docs-pattern DecisionDocGenerator
  * @libar-docs-status completed
  * @libar-docs-phase 27
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer application
  * @libar-docs-depends-on DecisionDocCodec,SourceMapper
  *
  * ## Decision Doc Generator - Documentation from Decision Documents
@@ -61,6 +63,12 @@ export interface GeneratedOutputPaths {
 }
 /**
  * Result of decision doc generation
+ *
+ * **Error Handling:** When errors occur, `success` is set to `false` but the
+ * function still returns successfully (does not throw). This allows partial
+ * generation to proceed - files that could be generated will be in `files`,
+ * while error messages explain what failed. Callers should check the `success`
+ * field to determine if the generation was fully successful.
  */
 export interface DecisionDocGeneratorResult {
     /** Successfully generated output files */
@@ -69,6 +77,15 @@ export interface DecisionDocGeneratorResult {
     warnings: string[];
     /** Errors that prevented generation */
     errors: string[];
+    /**
+     * Whether generation completed without errors.
+     * - `true`: All requested outputs generated successfully
+     * - `false`: One or more errors occurred (check `errors` array)
+     *
+     * Note: Even when `success` is `false`, partial results may be available
+     * in `files`. Check both `success` and `files.length` to understand the outcome.
+     */
+    success: boolean;
 }
 /**
  * Extract claude-md-section from pattern tags
@@ -173,7 +190,7 @@ export declare function generateStandardOutput(decisionContent: DecisionDocConte
  * }
  * ```
  */
-export declare function generateFromDecision(pattern: ExtractedPattern, options: DecisionDocGeneratorOptions): DecisionDocGeneratorResult;
+export declare function generateFromDecision(pattern: ExtractedPattern, options: DecisionDocGeneratorOptions): Promise<DecisionDocGeneratorResult>;
 /**
  * Generate both compact and detailed outputs
  *
@@ -184,7 +201,7 @@ export declare function generateFromDecision(pattern: ExtractedPattern, options:
  * @param options - Generator options
  * @returns Generation result with both output files
  */
-export declare function generateFromDecisionMultiLevel(pattern: ExtractedPattern, options: DecisionDocGeneratorOptions): DecisionDocGeneratorResult;
+export declare function generateFromDecisionMultiLevel(pattern: ExtractedPattern, options: DecisionDocGeneratorOptions): Promise<DecisionDocGeneratorResult>;
 /**
  * Decision Doc Generator for registry integration
  *

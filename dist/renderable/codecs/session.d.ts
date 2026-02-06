@@ -3,6 +3,8 @@
  * @libar-docs-core
  * @libar-docs-pattern SessionCodec
  * @libar-docs-status completed
+ * @libar-docs-arch-context renderer
+ * @libar-docs-arch-layer application
  *
  * ## Session Document Codec
  *
@@ -298,6 +300,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>;
     tagRegistry: z.ZodObject<{
@@ -542,6 +548,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         active: z.ZodArray<z.ZodObject<{
@@ -749,6 +759,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         planned: z.ZodArray<z.ZodObject<{
@@ -956,6 +970,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
     }, z.core.$strip>;
@@ -1167,6 +1185,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         counts: z.ZodObject<{
@@ -1381,6 +1403,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>>;
     byCategory: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
@@ -1588,6 +1614,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>>;
     bySource: z.ZodObject<{
@@ -1796,6 +1826,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         gherkin: z.ZodArray<z.ZodObject<{
@@ -2003,6 +2037,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         roadmap: z.ZodArray<z.ZodObject<{
@@ -2210,6 +2248,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         prd: z.ZodArray<z.ZodObject<{
@@ -2417,6 +2459,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
     }, z.core.$strip>;
@@ -2650,6 +2696,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
         byContext: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
@@ -2857,6 +2907,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
         byLayer: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
@@ -3064,6 +3118,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
         all: z.ZodArray<z.ZodObject<{
@@ -3271,6 +3329,10 @@ export declare const SessionContextCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
     }, z.core.$strip>>;
@@ -3509,6 +3571,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>;
     tagRegistry: z.ZodObject<{
@@ -3753,6 +3819,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         active: z.ZodArray<z.ZodObject<{
@@ -3960,6 +4030,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         planned: z.ZodArray<z.ZodObject<{
@@ -4167,6 +4241,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
     }, z.core.$strip>;
@@ -4378,6 +4456,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         counts: z.ZodObject<{
@@ -4592,6 +4674,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>>;
     byCategory: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
@@ -4799,6 +4885,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
             extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
+            propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                jsDoc: z.ZodString;
+            }, z.core.$strip>>>>;
         }, z.core.$strip>>>>;
     }, z.core.$strict>>>;
     bySource: z.ZodObject<{
@@ -5007,6 +5097,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         gherkin: z.ZodArray<z.ZodObject<{
@@ -5214,6 +5308,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         roadmap: z.ZodArray<z.ZodObject<{
@@ -5421,6 +5519,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
         prd: z.ZodArray<z.ZodObject<{
@@ -5628,6 +5730,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
     }, z.core.$strip>;
@@ -5861,6 +5967,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
         byContext: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
@@ -6068,6 +6178,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
         byLayer: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
@@ -6275,6 +6389,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>>;
         all: z.ZodArray<z.ZodObject<{
@@ -6482,6 +6600,10 @@ export declare const RemainingWorkCodec: z.ZodCodec<z.ZodObject<{
                 extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
             }, z.core.$strip>>>>;
         }, z.core.$strict>>;
     }, z.core.$strip>>;

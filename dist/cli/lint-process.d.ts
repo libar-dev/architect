@@ -5,7 +5,8 @@
  * @libar-docs-lint
  * @libar-docs-pattern LintProcessCLI
  * @libar-docs-status active
- * @libar-docs-depends-on:ProcessGuardModule
+ * @libar-docs-uses ProcessGuardModule
+ * @libar-docs-extract-shapes ProcessGuardCLIConfig
  *
  * ## LintProcessCLI - Process Guard Linter CLI
  *

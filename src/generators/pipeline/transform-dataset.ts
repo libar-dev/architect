@@ -11,6 +11,7 @@
  * @libar-docs-used-by Orchestrator
  * @libar-docs-usecase "When computing all pattern views in a single pass"
  * @libar-docs-usecase "When transforming raw extracted data for generators"
+ * @libar-docs-extract-shapes RuntimeMasterDataset, RawDataset, transformToMasterDataset
  *
  * ## TransformDataset - Single-Pass Pattern Transformation
  *
@@ -32,6 +33,7 @@
  */
 
 import type { ExtractedPattern, TagRegistry } from '../../validation-schemas/index.js';
+import { ExtractedPatternSchema } from '../../validation-schemas/index.js';
 import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import type {
   StatusGroups,
@@ -44,7 +46,95 @@ import type {
 } from '../../validation-schemas/master-dataset.js';
 
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
+import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
+
+// =============================================================================
+// Validation Summary Types
+// =============================================================================
+
+/**
+ * Information about a malformed pattern that failed schema validation.
+ */
+export interface MalformedPattern {
+  /** Pattern ID or name for identification */
+  patternId: string;
+  /** List of validation issues found */
+  issues: string[];
+}
+
+/**
+ * Information about a dangling reference (reference to non-existent pattern).
+ */
+export interface DanglingReference {
+  /** The pattern containing the dangling reference */
+  pattern: string;
+  /** The field containing the dangling reference (e.g., "uses", "dependsOn") */
+  field: string;
+  /** The referenced pattern name that doesn't exist */
+  missing: string;
+}
+
+/**
+ * Summary of validation results from dataset transformation.
+ *
+ * Provides structured information about data quality issues encountered
+ * during transformation, enabling upstream error handling and reporting.
+ */
+export interface ValidationSummary {
+  /** Total number of patterns processed */
+  totalPatterns: number;
+
+  /** Patterns that failed schema validation */
+  malformedPatterns: MalformedPattern[];
+
+  /** References to patterns that don't exist in the dataset */
+  danglingReferences: DanglingReference[];
+
+  /** Status values that were not recognized (normalized to 'planned') */
+  unknownStatuses: string[];
+
+  /** Total count of all warnings (malformed + dangling + unknown statuses) */
+  warningCount: number;
+}
+
+/**
+ * Result of transformToMasterDataset including both dataset and validation info.
+ */
+export interface TransformResult {
+  /** The transformed MasterDataset */
+  dataset: RuntimeMasterDataset;
+
+  /** Validation summary with any issues found during transformation */
+  validation: ValidationSummary;
+}
+
+// =============================================================================
+// Context Inference Types
+// =============================================================================
+
+/**
+ * Rule for auto-inferring bounded context from file paths.
+ *
+ * When a pattern has an architecture layer (`@libar-docs-arch-layer`) but no explicit
+ * context (`@libar-docs-arch-context`), these rules can infer the context from the
+ * file path. This reduces annotation redundancy when directory structure already
+ * implies the bounded context.
+ *
+ * @example
+ * ```typescript
+ * const rules: ContextInferenceRule[] = [
+ *   { pattern: 'src/validation/**', context: 'validation' },
+ *   { pattern: 'src/lint/**', context: 'lint' },
+ * ];
+ * // File at src/validation/rules.ts will get archContext='validation' if not explicit
+ * ```
+ */
+export interface ContextInferenceRule {
+  /** Glob pattern to match file paths (e.g., 'src/validation/**') */
+  readonly pattern: string;
+  /** Default context name to assign when pattern matches */
+  readonly context: string;
+}
 
 /**
  * Runtime MasterDataset with optional workflow
@@ -70,6 +160,78 @@ export interface RawDataset {
 
   /** Optional workflow configuration for phase names (can be undefined) */
   readonly workflow?: LoadedWorkflow | undefined;
+
+  /** Optional rules for inferring bounded context from file paths */
+  readonly contextInferenceRules?: readonly ContextInferenceRule[] | undefined;
+}
+
+/**
+ * Infer bounded context from file path using configured rules.
+ *
+ * Iterates through rules in order and returns the context from the first
+ * matching pattern. Returns undefined if no rules match.
+ *
+ * Pattern matching supports:
+ * - Simple prefix matching: `src/validation/` matches files in that directory
+ * - Glob-style wildcards: `src/validation/**` matches all files recursively
+ *
+ * @param filePath - The source file path to check
+ * @param rules - Ordered list of inference rules
+ * @returns The inferred context name, or undefined if no match
+ */
+function inferContext(
+  filePath: string,
+  rules: readonly ContextInferenceRule[] | undefined
+): string | undefined {
+  if (!rules || rules.length === 0) return undefined;
+
+  for (const rule of rules) {
+    if (matchPattern(filePath, rule.pattern)) {
+      return rule.context;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Simple pattern matching for file paths.
+ *
+ * Supports:
+ * - Exact prefix matching: `src/validation/` matches `src/validation/foo.ts`
+ * - Glob-style `**` wildcard: `src/validation/**` matches all files recursively
+ *
+ * @param filePath - The file path to check
+ * @param pattern - The pattern to match against
+ * @returns true if the file path matches the pattern
+ */
+function matchPattern(filePath: string, pattern: string): boolean {
+  // Handle `**` wildcard patterns (recursive match)
+  if (pattern.endsWith('/**')) {
+    const prefix = pattern.slice(0, -3); // Remove '/**'
+    return filePath.startsWith(prefix);
+  }
+
+  // Handle `/*` wildcard patterns (single level match)
+  if (pattern.endsWith('/*')) {
+    const prefix = pattern.slice(0, -2); // Remove '/*'
+    const afterPrefix = filePath.slice(prefix.length);
+    // Must start with prefix and have exactly one path segment after
+    return filePath.startsWith(prefix) && !afterPrefix.slice(1).includes('/');
+  }
+
+  // Simple prefix matching
+  return filePath.startsWith(pattern);
+}
+
+/**
+ * Check if a status value is a known/valid status.
+ *
+ * @param status - Status value to check
+ * @returns true if status is a known value
+ */
+function isKnownStatus(status: string | undefined): boolean {
+  if (!status) return true; // undefined is acceptable (defaults to planned)
+  return ACCEPTED_STATUS_VALUES.includes(status as (typeof ACCEPTED_STATUS_VALUES)[number]);
 }
 
 /**
@@ -83,6 +245,9 @@ export interface RawDataset {
  * - Source-based views (TypeScript vs Gherkin, roadmap, PRD)
  * - Aggregate statistics (counts, phase count, category count)
  * - Optional relationship index
+ *
+ * For backward compatibility, this function returns just the dataset.
+ * Use `transformToMasterDatasetWithValidation` to get validation summary.
  *
  * @param raw - Raw dataset with patterns, registry, and optional workflow
  * @returns MasterDataset with all pre-computed views
@@ -102,7 +267,81 @@ export interface RawDataset {
  * ```
  */
 export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset {
-  const { patterns, tagRegistry, workflow } = raw;
+  return transformToMasterDatasetWithValidation(raw).dataset;
+}
+
+/**
+ * Transform raw extracted data into a MasterDataset with validation summary.
+ *
+ * This is the full transformation that includes:
+ * - Pre-loop validation against ExtractedPatternSchema
+ * - Status-based groupings (completed/active/planned)
+ * - Phase-based groupings with counts
+ * - Quarter-based groupings for timeline views
+ * - Category-based groupings for taxonomy
+ * - Source-based views (TypeScript vs Gherkin, roadmap, PRD)
+ * - Aggregate statistics (counts, phase count, category count)
+ * - Relationship index with dangling reference detection
+ * - Validation summary with malformed patterns and unknown statuses
+ *
+ * @param raw - Raw dataset with patterns, registry, and optional workflow
+ * @returns TransformResult with dataset and validation summary
+ *
+ * @example
+ * ```typescript
+ * const result = transformToMasterDatasetWithValidation({
+ *   patterns: mergedPatterns,
+ *   tagRegistry: registry,
+ *   workflow,
+ * });
+ *
+ * if (result.validation.warningCount > 0) {
+ *   console.warn(`Found ${result.validation.warningCount} validation issues`);
+ * }
+ *
+ * const dataset = result.dataset;
+ * ```
+ */
+export function transformToMasterDatasetWithValidation(raw: RawDataset): TransformResult {
+  const { patterns, tagRegistry, workflow, contextInferenceRules } = raw;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Validation tracking
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const malformedPatterns: MalformedPattern[] = [];
+  const unknownStatuses: string[] = [];
+  const danglingReferences: DanglingReference[] = [];
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Pre-loop validation: validate each pattern against schema
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // Build a set of all pattern names for reference checking
+  const allPatternNames = new Set<string>();
+  for (const pattern of patterns) {
+    const key = pattern.patternName ?? pattern.name;
+    allPatternNames.add(key);
+  }
+
+  for (const pattern of patterns) {
+    // Validate against schema
+    const parseResult = ExtractedPatternSchema.safeParse(pattern);
+    if (!parseResult.success) {
+      const patternId = pattern.patternName ?? pattern.name;
+      const issues = parseResult.error.issues.map(
+        (issue) => `${issue.path.join('.')}: ${issue.message}`
+      );
+      malformedPatterns.push({ patternId, issues });
+    }
+
+    // Check for unknown status values
+    if (pattern.status && !isKnownStatus(pattern.status)) {
+      if (!unknownStatuses.includes(pattern.status)) {
+        unknownStatuses.push(pattern.status);
+      }
+    }
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   // Initialize accumulators for single-pass computation
@@ -200,9 +439,13 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
     };
 
     // ─── Architecture index (for diagram generation) ──────────────────────
+    // Infer context from file path if not explicitly set
+    const inferredContext =
+      pattern.archContext ?? inferContext(pattern.source.file, contextInferenceRules);
+
     const hasArchMetadata =
       pattern.archRole !== undefined ||
-      pattern.archContext !== undefined ||
+      inferredContext !== undefined ||
       pattern.archLayer !== undefined;
     if (hasArchMetadata) {
       archIndex.all.push(p);
@@ -214,8 +457,9 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
       }
 
       // Group by context (orders, inventory, etc.) for subgraph rendering
-      if (pattern.archContext) {
-        const contextPatterns = (archIndex.byContext[pattern.archContext] ??= []);
+      // Uses explicit archContext OR inferred context from file path
+      if (inferredContext) {
+        const contextPatterns = (archIndex.byContext[inferredContext] ??= []);
         contextPatterns.push(p);
       }
 
@@ -280,6 +524,51 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Third pass: detect dangling references in relationship fields
+  // ─────────────────────────────────────────────────────────────────────────
+
+  for (const pattern of patterns) {
+    const patternKey = pattern.patternName ?? pattern.name;
+
+    // Check 'uses' references
+    for (const ref of pattern.uses ?? []) {
+      if (!allPatternNames.has(ref)) {
+        danglingReferences.push({ pattern: patternKey, field: 'uses', missing: ref });
+      }
+    }
+
+    // Check 'dependsOn' references
+    for (const ref of pattern.dependsOn ?? []) {
+      if (!allPatternNames.has(ref)) {
+        danglingReferences.push({ pattern: patternKey, field: 'dependsOn', missing: ref });
+      }
+    }
+
+    // Check 'implementsPatterns' references
+    for (const ref of pattern.implementsPatterns ?? []) {
+      if (!allPatternNames.has(ref)) {
+        danglingReferences.push({ pattern: patternKey, field: 'implementsPatterns', missing: ref });
+      }
+    }
+
+    // Check 'extendsPattern' reference
+    if (pattern.extendsPattern && !allPatternNames.has(pattern.extendsPattern)) {
+      danglingReferences.push({
+        pattern: patternKey,
+        field: 'extendsPattern',
+        missing: pattern.extendsPattern,
+      });
+    }
+
+    // Check 'seeAlso' references
+    for (const ref of pattern.seeAlso ?? []) {
+      if (!allPatternNames.has(ref)) {
+        danglingReferences.push({ pattern: patternKey, field: 'seeAlso', missing: ref });
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // Build phase groups with counts (sorted by phase number)
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -318,10 +607,22 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
   };
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Return assembled MasterDataset
+  // Build validation summary
   // ─────────────────────────────────────────────────────────────────────────
 
-  const result: RuntimeMasterDataset = {
+  const validation: ValidationSummary = {
+    totalPatterns: patterns.length,
+    malformedPatterns,
+    danglingReferences,
+    unknownStatuses,
+    warningCount: malformedPatterns.length + danglingReferences.length + unknownStatuses.length,
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Return assembled MasterDataset with validation
+  // ─────────────────────────────────────────────────────────────────────────
+
+  const dataset: RuntimeMasterDataset = {
     patterns: patterns as ExtractedPattern[],
     tagRegistry,
     byStatus,
@@ -339,10 +640,10 @@ export function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset 
 
   // Only include workflow if defined (exactOptionalPropertyTypes compliance)
   if (workflow !== undefined) {
-    return { ...result, workflow };
+    return { dataset: { ...dataset, workflow }, validation };
   }
 
-  return result;
+  return { dataset, validation };
 }
 
 /**

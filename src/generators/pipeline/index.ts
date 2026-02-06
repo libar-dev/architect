@@ -26,8 +26,14 @@
 
 export {
   transformToMasterDataset,
+  transformToMasterDatasetWithValidation,
   completionPercentage,
   isFullyCompleted,
   type RawDataset,
   type RuntimeMasterDataset,
+  type ContextInferenceRule,
+  type ValidationSummary,
+  type MalformedPattern,
+  type DanglingReference,
+  type TransformResult,
 } from './transform-dataset.js';

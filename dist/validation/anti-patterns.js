@@ -3,7 +3,10 @@
  * @libar-docs-validation
  * @libar-docs-pattern AntiPatternDetector
  * @libar-docs-status completed
+ * @libar-docs-arch-context validation
+ * @libar-docs-arch-layer application
  * @libar-docs-uses DoDValidationTypes, GherkinTypes
+ * @libar-docs-extract-shapes AntiPatternDetectionOptions, detectAntiPatterns, detectProcessInCode, detectMagicComments, detectScenarioBloat, detectMegaFeature, formatAntiPatternReport, toValidationIssues
  *
  * ## AntiPatternDetector - Documentation Anti-Pattern Detection
  *

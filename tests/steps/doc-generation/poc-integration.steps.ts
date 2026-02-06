@@ -252,14 +252,14 @@ describeFeature(feature, ({ Background, Rule }) => {
         parsePocDocument();
       });
 
-      When('extracting self-reference {string}', (_ctx: unknown, sourceFile: string) => {
+      When('extracting self-reference {string}', async (_ctx: unknown, sourceFile: string) => {
         state.mapperOptions = createMapperOptions();
         const mapping: SourceMappingEntry = {
           section: 'Context',
           sourceFile,
           extractionMethod: 'Decision rule description',
         };
-        const result = executeSourceMapping([mapping], state.mapperOptions);
+        const result = await executeSourceMapping([mapping], state.mapperOptions);
         state.extractedSection = result.sections[0] ?? null;
       });
 
@@ -276,14 +276,14 @@ describeFeature(feature, ({ Background, Rule }) => {
         parsePocDocument();
       });
 
-      When('extracting self-reference {string}', (_ctx: unknown, sourceFile: string) => {
+      When('extracting self-reference {string}', async (_ctx: unknown, sourceFile: string) => {
         state.mapperOptions = createMapperOptions();
         const mapping: SourceMappingEntry = {
           section: 'Decision',
           sourceFile,
           extractionMethod: 'Decision rule description',
         };
-        const result = executeSourceMapping([mapping], state.mapperOptions);
+        const result = await executeSourceMapping([mapping], state.mapperOptions);
         state.extractedSection = result.sections[0] ?? null;
       });
 
@@ -326,13 +326,13 @@ describeFeature(feature, ({ Background, Rule }) => {
 
       When(
         'extracting from {string} with method {string}',
-        (_ctx: unknown, filePath: string, method: string) => {
+        async (_ctx: unknown, filePath: string, method: string) => {
           const mapping: SourceMappingEntry = {
             section: 'API Types',
             sourceFile: filePath,
             extractionMethod: method,
           };
-          const result = executeSourceMapping([mapping], state.mapperOptions!);
+          const result = await executeSourceMapping([mapping], state.mapperOptions!);
           state.extractedSection = result.sections[0] ?? null;
         }
       );
@@ -356,13 +356,13 @@ describeFeature(feature, ({ Background, Rule }) => {
 
       When(
         'extracting from {string} with method {string}',
-        (_ctx: unknown, filePath: string, method: string) => {
+        async (_ctx: unknown, filePath: string, method: string) => {
           const mapping: SourceMappingEntry = {
             section: 'Decider API',
             sourceFile: filePath,
             extractionMethod: method,
           };
-          const result = executeSourceMapping([mapping], state.mapperOptions!);
+          const result = await executeSourceMapping([mapping], state.mapperOptions!);
           state.extractedSection = result.sections[0] ?? null;
         }
       );
@@ -382,13 +382,13 @@ describeFeature(feature, ({ Background, Rule }) => {
 
       When(
         'extracting from {string} with method {string}',
-        (_ctx: unknown, filePath: string, method: string) => {
+        async (_ctx: unknown, filePath: string, method: string) => {
           const mapping: SourceMappingEntry = {
             section: 'Error Messages',
             sourceFile: filePath,
             extractionMethod: method,
           };
-          const result = executeSourceMapping([mapping], state.mapperOptions!);
+          const result = await executeSourceMapping([mapping], state.mapperOptions!);
           state.extractedSection = result.sections[0] ?? null;
         }
       );
@@ -414,13 +414,13 @@ describeFeature(feature, ({ Background, Rule }) => {
 
       When(
         'extracting from {string} with method {string}',
-        (_ctx: unknown, filePath: string, method: string) => {
+        async (_ctx: unknown, filePath: string, method: string) => {
           const mapping: SourceMappingEntry = {
             section: 'Validation Rules',
             sourceFile: filePath,
             extractionMethod: method,
           };
-          const result = executeSourceMapping([mapping], state.mapperOptions!);
+          const result = await executeSourceMapping([mapping], state.mapperOptions!);
           state.extractedSection = result.sections[0] ?? null;
         }
       );
@@ -443,13 +443,13 @@ describeFeature(feature, ({ Background, Rule }) => {
 
         When(
           'extracting from {string} with method {string}',
-          (_ctx: unknown, filePath: string, method: string) => {
+          async (_ctx: unknown, filePath: string, method: string) => {
             const mapping: SourceMappingEntry = {
               section: 'Protection Levels',
               sourceFile: filePath,
               extractionMethod: method,
             };
-            const result = executeSourceMapping([mapping], state.mapperOptions!);
+            const result = await executeSourceMapping([mapping], state.mapperOptions!);
             state.extractedSection = result.sections[0] ?? null;
           }
         );
@@ -477,13 +477,13 @@ describeFeature(feature, ({ Background, Rule }) => {
 
       When(
         'extracting from {string} with method {string}',
-        (_ctx: unknown, filePath: string, method: string) => {
+        async (_ctx: unknown, filePath: string, method: string) => {
           const mapping: SourceMappingEntry = {
             section: 'CLI Options',
             sourceFile: filePath,
             extractionMethod: method,
           };
-          const result = executeSourceMapping([mapping], state.mapperOptions!);
+          const result = await executeSourceMapping([mapping], state.mapperOptions!);
           state.extractedSection = result.sections[0] ?? null;
         }
       );
@@ -512,8 +512,11 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.mapperOptions = createMapperOptions();
       });
 
-      When('executing all source mappings', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.mapperOptions!);
+      When('executing all source mappings', async () => {
+        state.aggregatedContent = await executeSourceMapping(
+          state.sourceMappings,
+          state.mapperOptions!
+        );
       });
 
       Then('aggregated content should be successful with sections', () => {
@@ -535,8 +538,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.pattern = createPatternFromPoc();
       });
 
-      When('generating with detail level {string}', (_ctx: unknown, _level: string) => {
-        state.generationResult = generateFromDecision(state.pattern!, {
+      When('generating with detail level {string}', async (_ctx: unknown, _level: string) => {
+        state.generationResult = await generateFromDecision(state.pattern!, {
           baseDir: state.baseDir,
           detailLevel: 'summary',
           claudeMdSection: 'validation',
@@ -556,10 +559,10 @@ describeFeature(feature, ({ Background, Rule }) => {
     });
 
     RuleScenario('Compact output contains essential sections', ({ Given, Then }) => {
-      Given('compact output is generated from POC', () => {
+      Given('compact output is generated from POC', async () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern, {
+        state.generationResult = await generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'summary',
           claudeMdSection: 'validation',
@@ -587,8 +590,8 @@ describeFeature(feature, ({ Background, Rule }) => {
         state.pattern = createPatternFromPoc();
       });
 
-      When('generating with detail level {string}', (_ctx: unknown, _level: string) => {
-        state.generationResult = generateFromDecision(state.pattern!, {
+      When('generating with detail level {string}', async (_ctx: unknown, _level: string) => {
+        state.generationResult = await generateFromDecision(state.pattern!, {
           baseDir: state.baseDir,
           detailLevel: 'detailed',
         });
@@ -606,10 +609,10 @@ describeFeature(feature, ({ Background, Rule }) => {
     });
 
     RuleScenario('Detailed output contains full content', ({ Given, Then }) => {
-      Given('detailed output is generated from POC', () => {
+      Given('detailed output is generated from POC', async () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern, {
+        state.generationResult = await generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'detailed',
         });
@@ -630,10 +633,10 @@ describeFeature(feature, ({ Background, Rule }) => {
 
   Rule('Generated output matches quality expectations', ({ RuleScenario }) => {
     RuleScenario('Compact output matches target structure', ({ Given, When, Then }) => {
-      Given('compact output is generated from POC', () => {
+      Given('compact output is generated from POC', async () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern, {
+        state.generationResult = await generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'summary',
           claudeMdSection: 'validation',
@@ -655,10 +658,10 @@ describeFeature(feature, ({ Background, Rule }) => {
     });
 
     RuleScenario('Validation rules are complete in output', ({ Given, Then }) => {
-      Given('detailed output is generated from POC', () => {
+      Given('detailed output is generated from POC', async () => {
         parsePocDocument();
         state.pattern = createPatternFromPoc();
-        state.generationResult = generateFromDecision(state.pattern, {
+        state.generationResult = await generateFromDecision(state.pattern, {
           baseDir: state.baseDir,
           detailLevel: 'detailed',
         });

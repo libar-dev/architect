@@ -4,6 +4,8 @@
  * @libar-docs-pattern DecisionDocGenerator
  * @libar-docs-status completed
  * @libar-docs-phase 27
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer application
  * @libar-docs-depends-on DecisionDocCodec,SourceMapper
  *
  * ## Decision Doc Generator - Documentation from Decision Documents
@@ -29,8 +31,8 @@
  */
 import { heading, paragraph, code, list, separator, collapsible, document as createDocument, } from '../../renderable/schema.js';
 import { renderToMarkdown } from '../../renderable/render.js';
-import { parseDecisionDocument, isSelfReference, } from '../../renderable/codecs/decision-doc.js';
-import { parseDescriptionWithDocStrings } from '../../renderable/codecs/helpers.js';
+import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
+import { parseDescriptionWithDocStrings, renderPropertyDocsTable, } from '../../renderable/codecs/helpers.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
 import { createWarningCollector, } from '../warning-collector.js';
@@ -190,21 +192,12 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         }
     }
     // Aggregated content sections
-    // Filter to only include sections that aren't already rendered in Rules
+    // Include all sections from Source Mapping - both external files AND self-references
+    // The Source Mapping table defines the canonical order of content
+    // Self-references to rules will be rendered here, and we filter them from "Other rules" below
     const nonDuplicateSections = aggregatedContent.sections.filter((extracted) => {
         // Skip empty content
         if (!extracted.content || extracted.content.trim().length === 0) {
-            return false;
-        }
-        // Skip self-reference sections with DocStrings - these are already rendered in Rule sections
-        // (Context, Decision, Consequences). Only shapes from external TypeScript files should appear here.
-        if (isSelfReference(extracted.sourceFile) &&
-            extracted.docStrings &&
-            extracted.docStrings.length > 0) {
-            // Debug logging to aid troubleshooting when content appears to be missing
-            if (process.env['DEBUG']) {
-                console.debug(`[decision-doc] Filtering self-reference DocString section "${extracted.section}" to prevent duplicate content`);
-            }
             return false;
         }
         return true;
@@ -220,15 +213,33 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
                     // Include JSDoc as part of the code block (combined with source)
                     const fullSource = shape.jsDoc ? `${shape.jsDoc}\n${shape.sourceText}` : shape.sourceText;
                     sections.push(code(fullSource, 'typescript'));
+                    // Add property description table for interfaces with documented properties
+                    const propertyTable = renderPropertyDocsTable(shape.propertyDocs);
+                    if (propertyTable) {
+                        sections.push(paragraph(propertyTable));
+                    }
                 }
             }
             else if (extracted.docStrings && extracted.docStrings.length > 0) {
-                // Render DocStrings as code blocks, skipping duplicates
-                for (const ds of extracted.docStrings) {
-                    const contentKey = `${ds.language}:${ds.content}`;
-                    if (!renderedDocStrings.has(contentKey)) {
-                        renderedDocStrings.add(contentKey);
-                        sections.push(code(ds.content, ds.language));
+                // Check if content has meaningful text beyond just DocStrings
+                // Rule block extractions include context text, tables, AND DocStrings
+                // We should render full content to preserve all text, not just DocStrings
+                const contentWithoutDocStrings = extracted.content
+                    .replace(/"""[\w]*\n[\s\S]*?"""/g, '') // Remove Gherkin DocStrings
+                    .replace(/```[\w]*\n[\s\S]*?```/g, '') // Remove markdown code blocks
+                    .trim();
+                if (contentWithoutDocStrings.length > 0) {
+                    // Content has text beyond DocStrings - render full content with inline DocStrings
+                    sections.push(...parseDescriptionWithDocStrings(extracted.content));
+                }
+                else {
+                    // Content is ONLY DocStrings - render them as code blocks, skipping duplicates
+                    for (const ds of extracted.docStrings) {
+                        const contentKey = `${ds.language}:${ds.content}`;
+                        if (!renderedDocStrings.has(contentKey)) {
+                            renderedDocStrings.add(contentKey);
+                            sections.push(code(ds.content, ds.language));
+                        }
                     }
                 }
             }
@@ -249,11 +260,48 @@ export function generateDetailedOutput(decisionContent, aggregatedContent) {
         }
     }
     // Other rules (custom sections)
+    // Skip if these rules are already covered by Source Mapping entries
+    // to prevent duplicate content in reference documentation
     if (decisionContent.rules.other.length > 0) {
+        // Build set of section names from Source Mapping (both self-references and external files)
+        const sourceMappedSectionNames = new Set();
+        for (const mapping of decisionContent.sourceMappings) {
+            // Normalize section name for matching (case-insensitive)
+            const normalizedSection = mapping.section.toLowerCase().trim();
+            sourceMappedSectionNames.add(normalizedSection);
+        }
+        // Helper: extract significant words (3+ chars) for fuzzy matching
+        const getWords = (text) => new Set(text
+            .toLowerCase()
+            .split(/[^a-z]+/)
+            .filter((w) => w.length >= 3));
+        // Only render rules that aren't covered by Source Mapping section names
         for (const rule of decisionContent.rules.other) {
-            sections.push(heading(2, rule.name));
-            if (rule.description) {
-                sections.push(...parseDescriptionWithDocStrings(rule.description));
+            const ruleName = rule.name.toLowerCase().trim();
+            const ruleWords = getWords(ruleName);
+            // Check if any Source Mapping section matches this rule name
+            // Match if: exact match, substring match, or 2+ words overlap
+            const isCovered = Array.from(sourceMappedSectionNames).some((sectionName) => {
+                // Exact or substring match
+                if (ruleName === sectionName ||
+                    ruleName.includes(sectionName) ||
+                    sectionName.includes(ruleName)) {
+                    return true;
+                }
+                // Word overlap match (at least 2 significant words)
+                const sectionWords = getWords(sectionName);
+                let matches = 0;
+                for (const word of ruleWords) {
+                    if (sectionWords.has(word))
+                        matches++;
+                }
+                return matches >= 2;
+            });
+            if (!isCovered) {
+                sections.push(heading(2, rule.name));
+                if (rule.description) {
+                    sections.push(...parseDescriptionWithDocStrings(rule.description));
+                }
             }
         }
     }
@@ -341,7 +389,7 @@ export function generateStandardOutput(decisionContent, aggregatedContent) {
  * @param options - Generator options
  * @returns Pipeline result or error
  */
-function executePipeline(pattern, options) {
+async function executePipeline(pattern, options) {
     // Default options - all robustness features enabled by default
     const enableValidation = options.enableValidation ?? true;
     const enableDeduplication = options.enableDeduplication ?? true;
@@ -415,7 +463,7 @@ function executePipeline(pattern, options) {
         const mapperOptions = warningCollector
             ? { ...baseMapperOptions, warningCollector }
             : baseMapperOptions;
-        aggregatedContent = executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
+        aggregatedContent = await executeSourceMapping(decisionContent.sourceMappings, mapperOptions);
         // Step 5: DEDUPLICATE SECTIONS (if enabled)
         if (enableDeduplication && aggregatedContent.sections.length > 0) {
             const dedupOptions = warningCollector ? { warningCollector } : undefined;
@@ -468,12 +516,17 @@ function isPipelineError(result) {
  * }
  * ```
  */
-export function generateFromDecision(pattern, options) {
+export async function generateFromDecision(pattern, options) {
     // Execute the pipeline
-    const pipelineResult = executePipeline(pattern, options);
+    const pipelineResult = await executePipeline(pattern, options);
     // If pipeline failed, return errors
     if (isPipelineError(pipelineResult)) {
-        return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+        return {
+            files: [],
+            warnings: pipelineResult.warnings,
+            errors: pipelineResult.errors,
+            success: false,
+        };
     }
     const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } = pipelineResult;
     // Generate output at requested detail level
@@ -510,7 +563,7 @@ export function generateFromDecision(pattern, options) {
             ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
             ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
         ];
-    return { files, warnings, errors: [] };
+    return { files, warnings, errors: [], success: true };
 }
 /**
  * Generate both compact and detailed outputs
@@ -522,12 +575,17 @@ export function generateFromDecision(pattern, options) {
  * @param options - Generator options
  * @returns Generation result with both output files
  */
-export function generateFromDecisionMultiLevel(pattern, options) {
+export async function generateFromDecisionMultiLevel(pattern, options) {
     // Execute the pipeline ONCE
-    const pipelineResult = executePipeline(pattern, options);
+    const pipelineResult = await executePipeline(pattern, options);
     // If pipeline failed, return errors
     if (isPipelineError(pipelineResult)) {
-        return { files: [], warnings: pipelineResult.warnings, errors: pipelineResult.errors };
+        return {
+            files: [],
+            warnings: pipelineResult.warnings,
+            errors: pipelineResult.errors,
+            success: false,
+        };
     }
     const { decisionContent, aggregatedContent, warningCollector, patternName, dedupWarnings } = pipelineResult;
     // Determine output paths
@@ -551,7 +609,7 @@ export function generateFromDecisionMultiLevel(pattern, options) {
             ...aggregatedContent.warnings.map((w) => `${w.severity}: ${w.message}`),
             ...dedupWarnings.map((w) => `${w.category}: ${w.message}`),
         ];
-    return { files, warnings, errors: [] };
+    return { files, warnings, errors: [], success: true };
 }
 // =============================================================================
 // DocumentGenerator Implementation
@@ -565,7 +623,7 @@ export function generateFromDecisionMultiLevel(pattern, options) {
 export class DecisionDocGeneratorImpl {
     name = 'doc-from-decision';
     description = 'Generate documentation from ADR/PDR decision documents';
-    generate(patterns, context) {
+    async generate(patterns, context) {
         const allFiles = [];
         // Filter for decision documents (ADR/PDR patterns with source mappings)
         const decisionPatterns = patterns.filter((p) => {
@@ -583,20 +641,20 @@ export class DecisionDocGeneratorImpl {
         const allErrors = [];
         if (decisionPatterns.length === 0) {
             allWarnings.push('No decision documents with source mappings found. Ensure patterns have source mapping tables.');
-            return Promise.resolve({
+            return {
                 files: [],
                 metadata: {
                     warnings: allWarnings,
                     errors: allErrors,
                     patternsProcessed: 0,
                 },
-            });
+            };
         }
         // Generate documentation for each decision pattern
         for (const pattern of decisionPatterns) {
             // Extract section from pattern tags or default to 'generated'
             const section = extractClaudeMdSection(pattern) ?? 'generated';
-            const result = generateFromDecisionMultiLevel(pattern, {
+            const result = await generateFromDecisionMultiLevel(pattern, {
                 baseDir: context.baseDir,
                 detailLevel: 'detailed', // Generate both levels
                 claudeMdSection: section,
@@ -606,14 +664,14 @@ export class DecisionDocGeneratorImpl {
             allErrors.push(...result.errors);
             allWarnings.push(...result.warnings);
         }
-        return Promise.resolve({
+        return {
             files: allFiles,
             metadata: {
                 warnings: allWarnings,
                 errors: allErrors,
                 patternsProcessed: decisionPatterns.length,
             },
-        });
+        };
     }
 }
 /**

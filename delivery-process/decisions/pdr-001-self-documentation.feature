@@ -22,7 +22,8 @@ Feature: PDR-001 - Self-Documentation Process
     |----------|----------|-----------|
     | Roadmap specs | `delivery-process/specs/` | roadmap |
     | Releases | `delivery-process/releases/` | changelog |
-    | Decisions | `delivery-process/decisions/` | adrs |
+    | Decisions | `delivery-process/decisions/` | doc-from-decision |
+    | Recipes | `delivery-process/recipes/` | doc-from-decision |
     | Generated docs | `docs-generated/` | all |
 
     **Key Commands:**

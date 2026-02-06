@@ -3,7 +3,10 @@
  * @libar-docs-core
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
+ * @libar-docs-arch-context taxonomy
+ * @libar-docs-arch-layer domain
  * @libar-docs-implements TypeScriptTaxonomyImplementation
+ * @libar-docs-extract-shapes TagRegistry, MetadataTagDefinitionForRegistry, TagDefinition, buildRegistry, METADATA_TAGS_BY_GROUP
  *
  * ## Tag Registry Builder
  *
@@ -21,6 +24,60 @@ import { ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, GLOBAL_FORMAT_OP
 import { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS } from './hierarchy-levels.js';
 import { RISK_LEVELS } from './risk-levels.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
+/**
+ * Metadata tags organized by functional group.
+ * Used for documentation generation to create organized sections.
+ *
+ * Groups:
+ * - core: Essential pattern identification (pattern, status, core, usecase, brief)
+ * - relationship: Pattern dependencies and connections
+ * - process: Timeline and assignment tracking
+ * - prd: Product requirements documentation
+ * - adr: Architecture decision records
+ * - hierarchy: Epic/phase/task breakdown
+ * - traceability: Two-tier spec architecture links
+ * - architecture: Diagram generation tags
+ * - extraction: Documentation extraction control
+ */
+export const METADATA_TAGS_BY_GROUP = {
+    core: ['pattern', 'status', 'core', 'usecase', 'brief'],
+    relationship: [
+        'uses',
+        'used-by',
+        'implements',
+        'extends',
+        'depends-on',
+        'enables',
+        'see-also',
+        'api-ref',
+    ],
+    process: [
+        'phase',
+        'release',
+        'quarter',
+        'completed',
+        'effort',
+        'effort-actual',
+        'team',
+        'workflow',
+        'risk',
+        'priority',
+    ],
+    prd: ['product-area', 'user-role', 'business-value', 'constraint'],
+    adr: [
+        'adr',
+        'adr-status',
+        'adr-category',
+        'adr-supersedes',
+        'adr-superseded-by',
+        'adr-theme',
+        'adr-layer',
+    ],
+    hierarchy: ['level', 'parent'],
+    traceability: ['executable-specs', 'roadmap-spec'],
+    architecture: ['arch-role', 'arch-context', 'arch-layer'],
+    extraction: ['extract-shapes'],
+};
 /**
  * Build the complete tag registry from TypeScript constants
  *

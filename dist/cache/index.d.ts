@@ -1,0 +1,5 @@
+/**
+ * Cache module exports
+ */
+export { createFileCache, type FileCache, type FileCacheStats } from './file-cache.js';
+//# sourceMappingURL=index.d.ts.map

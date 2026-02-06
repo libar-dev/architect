@@ -20,6 +20,7 @@
  * - Import these defaults when implementing functions that need fallback values
  * - Use `DEFAULT_REGEX_BUILDERS` for opt-in detection when no registry is provided
  * - Use `DEFAULT_TAG_PREFIX` in error messages when no registry context exists
+ * - Use `DEFAULT_CONTEXT_INFERENCE_RULES` to auto-infer bounded contexts from paths
  */
 import { createRegexBuilders } from './regex-builders.js';
 /**
@@ -66,4 +67,39 @@ export const DEFAULT_FILE_OPT_IN_TAG = '@libar-docs';
  * ```
  */
 export const DEFAULT_REGEX_BUILDERS = createRegexBuilders(DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG);
+/**
+ * Default context inference rules for auto-inferring bounded context from file paths.
+ *
+ * These rules map directory paths to bounded context names. When a pattern has
+ * an `@libar-docs-arch-layer` but no explicit `@libar-docs-arch-context`, the
+ * context is inferred from the file path using these rules.
+ *
+ * **Why This Exists:**
+ * In most codebases, directory structure already implies bounded context:
+ * - `src/validation/` → validation context
+ * - `src/lint/` → lint context
+ * - `src/generators/` → generator context
+ *
+ * Auto-inference eliminates redundant annotations while preserving the ability
+ * to override with explicit `@libar-docs-arch-context` when needed.
+ *
+ * @example
+ * ```typescript
+ * // Pattern at src/validation/rules.ts with @libar-docs-arch-layer:application
+ * // will automatically get archContext='validation' without explicit annotation
+ * ```
+ */
+export const DEFAULT_CONTEXT_INFERENCE_RULES = [
+    { pattern: 'src/validation/**', context: 'validation' },
+    { pattern: 'src/scanner/**', context: 'scanner' },
+    { pattern: 'src/lint/**', context: 'lint' },
+    { pattern: 'src/config/**', context: 'config' },
+    { pattern: 'src/taxonomy/**', context: 'taxonomy' },
+    { pattern: 'src/generators/**', context: 'generator' },
+    { pattern: 'src/renderable/**', context: 'renderer' },
+    { pattern: 'src/extractor/**', context: 'extractor' },
+    { pattern: 'src/api/**', context: 'api' },
+    { pattern: 'src/cli/**', context: 'cli' },
+    { pattern: 'src/types/**', context: 'types' },
+];
 //# sourceMappingURL=defaults.js.map

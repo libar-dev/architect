@@ -10,6 +10,7 @@ import type { CodecOptions } from '../renderable/generate.js';
  * @libar-docs-pattern GeneratorTypes
  * @libar-docs-status completed
  * @libar-docs-used-by GeneratorRegistry, GeneratorFactory, Orchestrator, SectionRegistry
+ * @libar-docs-extract-shapes DocumentGenerator, GeneratorContext, GeneratorOutput
  *
  * ## GeneratorTypes - Pluggable Document Generation Interface
  *

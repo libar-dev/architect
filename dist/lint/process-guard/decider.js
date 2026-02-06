@@ -3,6 +3,8 @@
  * @libar-docs-lint
  * @libar-docs-pattern ProcessGuardDecider
  * @libar-docs-status active
+ * @libar-docs-arch-context lint
+ * @libar-docs-arch-layer application
  * @libar-docs-implements ProcessGuardLinter
  * @libar-docs-depends-on:FSMValidator,DeriveProcessState,DetectChanges
  * @libar-docs-extract-shapes validateChanges

@@ -8,6 +8,7 @@
  * @libar-docs-used-by npm scripts, CI pipelines
  * @libar-docs-usecase "When generating documentation from command line"
  * @libar-docs-usecase "When integrating doc generation into npm scripts"
+ * @libar-docs-extract-shapes CLIConfig
  *
  * ## generate-docs - Single Entry Point for All Documentation Generation
  *
@@ -35,20 +36,33 @@ import { printVersionAndExit } from './version.js';
 import '../generators/built-in/index.js';
 
 interface CLIConfig {
+  /** Glob patterns for TypeScript input files (-i, --input). Repeatable. */
   input: string[];
+  /** Glob patterns to exclude from scanning (-e, --exclude). Repeatable. */
   exclude: string[];
+  /** Output directory for generated documentation (-o, --output). Default: docs/architecture */
   output: string;
+  /** Base directory for path resolution (-b, --base-dir). Default: cwd */
   baseDir: string;
+  /** Generators to run (-g, --generators). Repeatable. Default: patterns */
   generators: string[];
+  /** Overwrite existing files (-f, --overwrite). Default: false */
   overwrite: boolean;
+  /** Glob patterns for Gherkin feature files (--features). Repeatable. */
   features: string[];
+  /** Workflow config JSON file path (-w, --workflow). */
   workflowPath: string | null;
+  /** List available generators and exit (--list-generators). */
   listGenerators: boolean;
+  /** Show help message (-h, --help). */
   help: boolean;
+  /** Show version number (-v, --version). */
   version: boolean;
-  // PR Changes options
+  /** Base branch for git diff (--git-diff-base). For PR Changes generator. */
   gitDiffBase: string | null;
+  /** Explicit list of changed files (--changed-files). For PR Changes generator. */
   changedFiles: string[];
+  /** Filter patterns by release version (--release-filter). */
   releaseFilter: string | null;
 }
 

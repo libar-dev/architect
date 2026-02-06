@@ -3,8 +3,11 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigLoader
  * @libar-docs-status completed
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-layer infrastructure
  * @libar-docs-uses DeliveryProcessFactory, ConfigurationTypes
  * @libar-docs-used-by CLI
+ * @libar-docs-extract-shapes ConfigDiscoveryResult, ConfigLoadError, ConfigLoadResult, findConfigFile, loadConfig, formatConfigError
  *
  * ## Config Loader - TypeScript Configuration File Discovery
  *
@@ -51,20 +54,27 @@ export interface ConfigDiscoveryResult {
  * Error during config loading
  */
 export interface ConfigLoadError {
+    /** Discriminant for error type identification */
     type: 'config-load-error';
+    /** Absolute path to the config file that failed to load */
     path: string;
+    /** Human-readable error description */
     message: string;
     /** The underlying error that caused the failure (if any) */
     cause?: Error | undefined;
 }
 /**
- * Result type for config loading
+ * Result type for config loading (discriminated union)
  */
 export type ConfigLoadResult = {
+    /** Indicates successful config resolution */
     ok: true;
+    /** The discovery result containing configuration instance */
     value: ConfigDiscoveryResult;
 } | {
+    /** Indicates config loading failure */
     ok: false;
+    /** Error details for the failed load */
     error: ConfigLoadError;
 };
 /**

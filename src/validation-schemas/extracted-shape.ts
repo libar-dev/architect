@@ -30,6 +30,26 @@ export const ShapeKindSchema = z.enum(['interface', 'type', 'enum', 'function', 
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
 
 // =============================================================================
+// Property Documentation Schema
+// =============================================================================
+
+/**
+ * JSDoc documentation for an interface property.
+ *
+ * Used to capture property-level documentation from interfaces,
+ * enabling generation of description tables alongside code blocks.
+ */
+export const PropertyDocSchema = z.object({
+  /** Property name */
+  name: z.string(),
+
+  /** JSDoc comment text (without delimiters) */
+  jsDoc: z.string(),
+});
+
+export type PropertyDoc = z.infer<typeof PropertyDocSchema>;
+
+// =============================================================================
 // Extracted Shape Schema
 // =============================================================================
 
@@ -66,6 +86,9 @@ export const ExtractedShapeSchema = z.object({
 
   /** Whether this is an exported shape */
   exported: z.boolean().default(true),
+
+  /** For interfaces: JSDoc documentation for each property */
+  propertyDocs: z.array(PropertyDocSchema).readonly().optional(),
 });
 
 /**

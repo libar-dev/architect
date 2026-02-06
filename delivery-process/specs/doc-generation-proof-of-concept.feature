@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-adr:021
-@libar-docs-adr-status:accepted
+@libar-docs-adr-status:superseded
 @libar-docs-adr-category:documentation
 @libar-docs-pattern:DocGenerationProofOfConcept
 @libar-docs-status:completed
@@ -12,6 +12,10 @@
 @libar-docs-business-value:eliminates-manual-documentation-maintenance
 @libar-docs-priority:high
 Feature: ADR-021 - Documentation Generation from Annotated Sources
+
+  **Status: SUPERSEDED** - This POC has been implemented. See:
+  - `delivery-process/recipes/` - 11 documentation recipes implementing this pattern
+  - `docs-generated/ANNOTATION-GUIDE.md` - Comprehensive guide for fixing generated docs
 
   This decision establishes the pattern for generating technical documentation
   from annotated source files. It serves as both the DECISION (why/how) and

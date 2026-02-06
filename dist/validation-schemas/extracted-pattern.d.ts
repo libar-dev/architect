@@ -264,6 +264,10 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         exported: z.ZodDefault<z.ZodBoolean>;
+        propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            jsDoc: z.ZodString;
+        }, z.core.$strip>>>>;
     }, z.core.$strip>>>>;
 }, z.core.$strict>;
 /**

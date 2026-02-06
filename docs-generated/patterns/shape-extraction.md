@@ -26,7 +26,7 @@
   pattern in doc-generation-proof-of-concept.feature.
 
   Current pattern (duplication):
-  ```typescript
+  """typescript
   /**
    * @libar-docs
    *
@@ -46,7 +46,7 @@
     state: ProcessState;
     changes: ChangeDetection;
   }
-  ```
+  """
 
   **Solution:**
   New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
@@ -54,7 +54,7 @@
   generated documentation as fenced code blocks.
 
   Target pattern (single source):
-  ```typescript
+  """typescript
   /**
    * @libar-docs
    * @libar-docs-extract-shapes DeciderInput, ValidationResult
@@ -68,7 +68,7 @@
     state: ProcessState;
     changes: ChangeDetection;
   }
-  ```
+  """
 
   **Why It Matters:**
   | Benefit | How |

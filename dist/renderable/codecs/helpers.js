@@ -94,7 +94,7 @@ export function partitionRulesByPrefix(rules, options = {}) {
 /**
  * Default rich content options
  *
- * Note: onWarning is intentionally undefined by default.
+ * Note: onWarning and warningCollector are intentionally undefined by default.
  * When undefined, warnings fall back to console.warn via emitWarning().
  */
 export const DEFAULT_RICH_CONTENT_OPTIONS = {
@@ -105,6 +105,7 @@ export const DEFAULT_RICH_CONTENT_OPTIONS = {
     docStringLanguage: 'markdown',
     baseHeadingLevel: 4,
     onWarning: undefined,
+    warningCollector: undefined,
 };
 /**
  * Merge user options with defaults
@@ -119,18 +120,53 @@ export function mergeRichContentOptions(options) {
     };
 }
 /**
- * Emit a warning using the configured handler or console.warn fallback
+ * Format a warning for CI output (GitHub Actions compatible).
  *
+ * @param warning - The warning to format
+ * @returns Formatted string for CI log parsing
+ */
+export function formatWarningForCI(warning) {
+    const parts = [];
+    if (warning.file)
+        parts.push(`file=${warning.file}`);
+    if (warning.line !== undefined)
+        parts.push(`line=${warning.line}`);
+    parts.push(`code=${warning.code}`);
+    const attributes = parts.join(',');
+    return `::warning ${attributes}::${warning.message}`;
+}
+/**
+ * Emit a warning using the configured handler, collector, or console.warn fallback.
+ *
+ * Priority order:
+ * 1. WarningCollector (if provided) - for structured aggregation
+ * 2. onWarning callback (if provided) - for custom handling
+ * 3. console.warn - default fallback
+ *
+ * @param warning - The warning to emit
+ * @param options - Options containing warning handlers
+ * @param source - Optional source file for collector context
  * @internal
  */
-function emitWarning(warning, options) {
+function emitWarning(warning, options, source) {
+    // Priority 1: Use WarningCollector if available (structured aggregation)
+    if (options?.warningCollector) {
+        options.warningCollector.capture({
+            source: source ?? 'rich-content-rendering',
+            category: 'format',
+            message: warning.message,
+            subcategory: warning.code,
+        });
+        return;
+    }
+    // Priority 2: Use onWarning callback if available
     if (options?.onWarning) {
         options.onWarning(warning);
+        return;
     }
-    else {
-        const contextSuffix = warning.context ? ` Context: ${warning.context}` : '';
-        console.warn(`[${warning.code}] ${warning.message}${contextSuffix}`);
-    }
+    // Priority 3: Fall back to console.warn with structured format
+    const contextSuffix = warning.context ? ` Context: ${warning.context}` : '';
+    console.warn(`[${warning.code}] ${warning.message}${contextSuffix}`);
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Granular Helpers
@@ -197,6 +233,70 @@ export function renderStepsList(steps) {
     return list(stepItems);
 }
 /**
+ * Default tab width for tab-to-space normalization in dedent.
+ */
+const DEFAULT_TAB_WIDTH = 2;
+/**
+ * Normalize tabs to spaces for consistent indentation calculation.
+ *
+ * @param text - Text that may contain tabs
+ * @param tabWidth - Number of spaces per tab (default: 2)
+ * @returns Text with tabs replaced by spaces
+ */
+function normalizeTabs(text, tabWidth = DEFAULT_TAB_WIDTH) {
+    return text.replace(/\t/g, ' '.repeat(tabWidth));
+}
+/**
+ * Remove common leading indentation from all lines in a code block.
+ *
+ * When DocStrings are embedded in Gherkin files, they often have consistent
+ * indentation to align with the surrounding scenario structure. This function
+ * normalizes that indentation by:
+ * 1. Normalizing tabs to spaces (default: 2 spaces per tab)
+ * 2. Finding the minimum indentation across all non-empty lines
+ * 3. Removing that common indentation from every line
+ * 4. Trimming trailing whitespace from each line
+ *
+ * @param text - The code block content to dedent
+ * @param tabWidth - Number of spaces per tab (default: 2)
+ * @returns The dedented text with normalized indentation
+ *
+ * @example
+ * ```typescript
+ * // Input (indented to match Gherkin formatting):
+ * dedent("    const x = 1;\n    const y = 2;")
+ * // Returns: "const x = 1;\nconst y = 2;"
+ *
+ * // Mixed indentation (preserves relative indentation):
+ * dedent("    function foo() {\n      return 42;\n    }")
+ * // Returns: "function foo() {\n  return 42;\n}"
+ *
+ * // Tab-indented code (tabs normalized to spaces):
+ * dedent("\t\tconst x = 1;")
+ * // Returns: "const x = 1;"
+ * ```
+ */
+export function dedent(text, tabWidth = DEFAULT_TAB_WIDTH) {
+    // Normalize tabs to spaces before processing
+    const normalizedText = normalizeTabs(text, tabWidth);
+    const lines = normalizedText.split('\n');
+    // Find minimum indentation (ignoring empty lines)
+    const nonEmptyLines = lines.filter((line) => line.trim().length > 0);
+    if (nonEmptyLines.length === 0)
+        return text;
+    const minIndent = Math.min(...nonEmptyLines.map((line) => {
+        const match = /^(\s*)/.exec(line);
+        // The regex always matches (even empty string), but TypeScript needs reassurance
+        return match?.[1]?.length ?? 0;
+    }));
+    // If no common indentation, just trim trailing whitespace
+    if (minIndent === 0) {
+        return lines.map((line) => line.trimEnd()).join('\n');
+    }
+    // Remove common indentation and trailing whitespace from each line
+    return lines.map((line) => line.slice(minIndent).trimEnd()).join('\n');
+}
+/**
  * Parse description text for embedded DocStrings and convert to mixed content
  *
  * DocStrings in Gherkin are identified by: """language\n...\n"""
@@ -206,6 +306,7 @@ export function renderStepsList(steps) {
  * - Normalizes Windows line endings (CRLF → LF) before parsing
  * - Detects unclosed DocStrings (odd count of """) and returns plain paragraph fallback
  * - Handles empty input gracefully
+ * - Dedents code block content to normalize indentation from Gherkin formatting
  *
  * @param description - The description text that may contain DocStrings
  * @param options - Optional rendering options (used for warning callback)
@@ -252,8 +353,10 @@ export function parseDescriptionWithDocStrings(description, options) {
             sections.push(paragraph(textBefore));
         }
         // The DocString as a code block (empty string means no language hint)
+        // Apply dedent to normalize indentation from Gherkin formatting
         const language = (match[1] ?? '').length > 0 ? match[1] : 'text';
-        const content = (match[2] ?? '').trim();
+        const rawContent = (match[2] ?? '').trim();
+        const content = dedent(rawContent);
         sections.push(code(content, language));
         lastIndex = match.index + match[0].length;
     }
@@ -464,7 +567,11 @@ export function parseBusinessRuleAnnotations(description) {
     // Extract **API:** See `path` references (can appear multiple times)
     // Note: This pattern looks for content INSIDE backticks, so we use the original
     // textWithoutCode which still has backticks intact (only code fences removed)
-    const apiRefPattern = /\*\*API:\*\*\s*See\s*`([^`]+)`/g;
+    // Pattern is case-insensitive and allows optional bold markers:
+    // - "**API:** See `path`" (standard bold)
+    // - "API: See `path`" (plain text)
+    // - "api: see `path`" (lowercase)
+    const apiRefPattern = /(?:\*\*)?API:(?:\*\*)?\s*See\s*`([^`]+)`/gi;
     const apiRefs = [];
     let apiMatch;
     while ((apiMatch = apiRefPattern.exec(textWithoutCode)) !== null) {
@@ -486,7 +593,8 @@ export function parseBusinessRuleAnnotations(description) {
     // Remove **Verified by:** block
     remaining = remaining.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
     // Remove **API:** See `path` references (use original pattern for protected text)
-    remaining = remaining.replace(/\*\*API:\*\*\s*See\s*__BT\d+__/g, '');
+    // Pattern matches both bold and non-bold, case-insensitive
+    remaining = remaining.replace(/(?:\*\*)?API:(?:\*\*)?\s*See\s*__LIBAR_BT_\d+__/gi, '');
     // Clean up remaining content and restore backticks
     remaining = restore(remaining.trim());
     // Strip markdown tables from remaining content (tables are extracted separately
@@ -707,5 +815,34 @@ export function renderShapesAsMarkdown(shapes, options = {}) {
         return '```typescript\n' + content + '\n```';
     }
     return shapes.map((shape) => '```typescript\n' + renderShape(shape) + '\n```').join('\n\n');
+}
+/**
+ * Render property documentation as a markdown table.
+ *
+ * Generates a two-column table with property names and their JSDoc descriptions.
+ * Returns empty string if no property docs exist.
+ *
+ * @param propertyDocs - Property documentation array from ExtractedShape
+ * @returns Markdown table string, or empty string if no docs
+ *
+ * @example
+ * ```typescript
+ * const table = renderPropertyDocsTable(shape.propertyDocs);
+ * if (table) {
+ *   sections.push(md(table));
+ * }
+ * ```
+ */
+export function renderPropertyDocsTable(propertyDocs) {
+    if (!propertyDocs || propertyDocs.length === 0) {
+        return '';
+    }
+    const lines = ['| Property | Description |', '| --- | --- |'];
+    for (const prop of propertyDocs) {
+        // Escape pipe characters in description to prevent table breakage
+        const escapedDesc = prop.jsDoc.replace(/\|/g, '\\|');
+        lines.push(`| \`${prop.name}\` | ${escapedDesc} |`);
+    }
+    return lines.join('\n');
 }
 //# sourceMappingURL=helpers.js.map

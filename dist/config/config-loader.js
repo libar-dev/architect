@@ -3,8 +3,11 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigLoader
  * @libar-docs-status completed
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-layer infrastructure
  * @libar-docs-uses DeliveryProcessFactory, ConfigurationTypes
  * @libar-docs-used-by CLI
+ * @libar-docs-extract-shapes ConfigDiscoveryResult, ConfigLoadError, ConfigLoadResult, findConfigFile, loadConfig, formatConfigError
  *
  * ## Config Loader - TypeScript Configuration File Discovery
  *

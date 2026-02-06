@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 81/120 (68% complete)
+**Overall:** [██████████████░░░░░░] 93/131 (71% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 81 |
+| ✅ Completed | 93 |
 | 🚧 Active | 13 |
-| 📋 Planned | 26 |
-| **Total** | 120 |
+| 📋 Planned | 25 |
+| **Total** | 131 |
 
 ---
 
@@ -22,8 +22,9 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (51)
-- [DDD](#ddd) (25)
+- [Core](#core) (61)
+- [DDD](#ddd) (26)
+- [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
 - [Infra](#infra) (1)
@@ -36,7 +37,7 @@
 - [Opportunity 8](#opportunity-8) (1)
 - [Pattern](#pattern) (2)
 - [Scanner](#scanner) (2)
-- [Validation](#validation) (12)
+- [Validation](#validation) (11)
 
 ---
 
@@ -48,6 +49,7 @@
 | ✅ Anti Pattern Detector | Validation | completed | Detects violations of the dual-source documentation architecture and process hygiene issues that lead to... |
 | ✅ Architecture Codec | Core | completed | Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source... |
 | ✅ Built In Generators | Generator | completed | Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture. |
+| ✅ Category Definitions | Core | completed | Categories are used to classify patterns and organize documentation. |
 | ✅ CLI Error Handler | Cli | completed | Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern. |
 | ✅ CLI Version Helper | Cli | completed | Reads package version from package.json for CLI --version flag. |
 | ✅ Codec Based Generator | Core | completed | Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface. |
@@ -59,11 +61,12 @@
 | ✅ Configuration Defaults | Core | completed | Centralized default constants for the delivery-process package. |
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
+| ✅ Content Deduplicator | Core | completed | Identifies and merges duplicate sections extracted from multiple sources. |
 | ✅ Decision Doc Codec | Core | completed | Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation. |
 | ✅ Decision Doc Generator | Core | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
 | ✅ Doc Directive Schema | Validation | completed | Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments. |
-| ✅ Doc Generation Proof Of Concept | DDD | completed | This decision establishes the pattern for generating technical documentation from annotated source files. |
+| ✅ Doc Generation Proof Of Concept | DDD | completed | Status: SUPERSEDED - This POC has been implemented. |
 | ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and... |
 | ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts... |
 | ✅ Documentation Generator CLI | Core | completed | Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run. |
@@ -75,19 +78,23 @@
 | ✅ Dual Source Schemas | Validation | completed | Zod schemas for dual-source extraction types. |
 | ✅ Extracted Pattern Schema | Validation | completed | Zod schema for validating complete extracted patterns with code, metadata, relationships, and source information. |
 | ✅ Extracted Shape Schema | Pattern | completed | Zod schema for TypeScript type definitions extracted from source files via the @libar-docs-extract-shapes tag. |
+| ✅ Format Types | Core | completed | Defines how tag values are parsed and validated. |
 | ✅ Generator Registry | Generator | completed | Manages registration and lookup of document generators (both built-in and custom). |
 | ✅ Generator Types | Generator | completed | Minimal interface for pluggable generators that produce documentation from patterns. |
 | ✅ Gherkin AST Parser | Scanner | completed | Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,... |
 | ✅ Gherkin Extractor | Extractor | completed | Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation. |
 | ✅ Gherkin Rules Support | DDD | completed | Feature files were limited to flat scenario lists. |
 | ✅ Gherkin Scanner | Scanner | completed | Scans .feature files for pattern metadata encoded in Gherkin tags. |
+| ✅ Hierarchy Levels | Core | completed | Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units... |
 | ✅ Layer Inference | Extractor | completed | Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns. |
+| ✅ Layer Types | Core | completed | Inferred from feature file directory paths: - timeline: Process/workflow features (delivery-process) - domain:... |
 | ✅ Lint Engine | Lint | completed | Orchestrates lint rule execution against parsed directives. |
 | ✅ Lint Module | Lint | completed | Provides lint rules and engine for pattern annotation quality checking. |
 | ✅ Lint Patterns CLI | Cli | completed | Validates pattern annotations for quality and completeness. |
 | ✅ Lint Rules | Lint | completed | Defines lint rules that check @libar-docs-* directives for completeness and quality. |
 | ✅ Master Dataset | Core | completed | Defines the schema for a pre-computed dataset that holds all extracted patterns along with derived views (by status,... |
 | ✅ Mvp Workflow Implementation | DDD | completed | PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package... |
+| ✅ Normalized Status | Core | completed | The delivery-process system uses a two-level status taxonomy: 1. |
 | ✅ Output Schemas | Core | completed | Zod schemas for JSON output formats used by CLI tools. |
 | ✅ Pattern Scanner | Core | completed | Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in. |
 | ✅ Pattern Id Generator | Core | completed | Generates unique, deterministic pattern IDs based on file path and line number. |
@@ -106,11 +113,14 @@
 | ✅ Reporting Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for reporting outputs: - CHANGELOG-GENERATED.md (Keep a Changelog... |
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
 | ✅ Rich Content Helpers | Core | completed | Shared helper functions for rendering Gherkin rich content in document codecs. |
+| ✅ Risk Levels | Core | completed | Three-tier risk classification for roadmap planning. |
 | ✅ Session Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session... |
 | ✅ Shape Extraction | DDD | completed | Documentation comments duplicate type definitions that exist in the same file. |
 | ✅ Shape Extractor | Pattern | completed | Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for... |
 | ✅ Shared Codec Schema | Core | completed | Provides a simplified RenderableDocument output schema for use with Zod 4 codecs. |
 | ✅ Source Mapper | Core | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
+| ✅ Source Mapping Validator | Core | completed | Performs pre-flight checks on source mapping tables before extraction begins. |
+| ✅ Status Values | Core | completed | THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM). |
 | ✅ String Utilities | Core | completed | Provides shared utilities for string manipulation used across the delivery-process package, including slugification... |
 | ✅ Tag Registry Configuration | Core | completed | Defines the structure and validation for tag taxonomy configuration. |
 | ✅ Tag Registry Builder | Core | completed | Constructs a complete TagRegistry from TypeScript constants. |
@@ -119,20 +129,23 @@
 | ✅ Transform Dataset | Core | completed | Transforms raw extracted patterns into a MasterDataset with all pre-computed views. |
 | ✅ TypeScript AST Parser | Core | completed | Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with... |
 | ✅ TypeScript Taxonomy Implementation | DDD | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |
+| ✅ Universal Doc Generator Robustness | DDD | completed | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
 | ✅ Universal Renderer | Core | completed | Converts RenderableDocument to Markdown. |
 | ✅ Utils Module | Core | completed | Common helper functions used across the delivery-process package. |
 | ✅ Validate Patterns CLI | Cli | completed | Cross-validates TypeScript patterns vs Gherkin feature files. |
 | ✅ Validation Module | Validation | completed | Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -... |
+| ✅ Validation Rules Codec | Core | completed | Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference. |
+| ✅ Warning Collector | Core | completed | Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation. |
 | ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact... |
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 FSM Module | Validation | active | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
-| 🚧 FSM States | Validation | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
+| 🚧 FSM States | Extract | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
-| 🚧 Lint Process CLI | Cli | active | :ProcessGuardModule Validates git changes against delivery process rules. |
+| 🚧 Lint Process CLI | Cli | active | Validates git changes against delivery process rules. |
 | 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
@@ -163,7 +176,6 @@
 | ⏸️ Tag Taxonomy CLI | Cli | planned | by the codec-based TaxonomyCodec which: - Fits the MasterDataset pipeline architecture - Provides progressive... |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
-| 📋 Validation Rules Codec | Core | planned | Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference. |
 
 ---
 
@@ -190,10 +202,11 @@
 
 ### Core
 
-46/51 complete (90%)
+57/61 complete (93%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
+- [✅ Category Definitions](patterns/category-definitions.md)
 - [✅ Codec Based Generator](patterns/codec-based-generator.md)
 - [✅ Codec Base Options](patterns/codec-base-options.md)
 - [✅ Codec Generator Registration](patterns/codec-generator-registration.md)
@@ -203,6 +216,7 @@
 - [✅ Configuration Defaults](patterns/configuration-defaults.md)
 - [✅ Configuration Presets](patterns/configuration-presets.md)
 - [✅ Configuration Types](patterns/configuration-types.md)
+- [✅ Content Deduplicator](patterns/content-deduplicator.md)
 - [✅ Decision Doc Codec](patterns/decision-doc-codec.md)
 - [✅ Decision Doc Generator](patterns/decision-doc-generator.md)
 - [✅ Delivery Process Factory](patterns/delivery-process-factory.md)
@@ -211,7 +225,11 @@
 - [✅ Documentation Generator CLI](patterns/documentation-generator-cli.md)
 - [✅ Document Codecs](patterns/document-codecs.md)
 - [✅ Document Generator](patterns/document-generator.md)
+- [✅ Format Types](patterns/format-types.md)
+- [✅ Hierarchy Levels](patterns/hierarchy-levels.md)
+- [✅ Layer Types](patterns/layer-types.md)
 - [✅ Master Dataset](patterns/master-dataset.md)
+- [✅ Normalized Status](patterns/normalized-status.md)
 - [✅ Output Schemas](patterns/output-schemas.md)
 - [✅ Pattern Scanner](patterns/pattern-scanner.md)
 - [✅ Pattern Id Generator](patterns/pattern-id-generator.md)
@@ -226,9 +244,12 @@
 - [✅ Reporting Codecs](patterns/reporting-codecs.md)
 - [✅ Requirements Codec](patterns/requirements-codec.md)
 - [✅ Rich Content Helpers](patterns/rich-content-helpers.md)
+- [✅ Risk Levels](patterns/risk-levels.md)
 - [✅ Session Codec](patterns/session-codec.md)
 - [✅ Shared Codec Schema](patterns/shared-codec-schema.md)
 - [✅ Source Mapper](patterns/source-mapper.md)
+- [✅ Source Mapping Validator](patterns/source-mapping-validator.md)
+- [✅ Status Values](patterns/status-values.md)
 - [✅ String Utilities](patterns/string-utilities.md)
 - [✅ Tag Registry Configuration](patterns/tag-registry-configuration.md)
 - [✅ Tag Registry Builder](patterns/tag-registry-builder.md)
@@ -238,17 +259,18 @@
 - [✅ TypeScript AST Parser](patterns/type-script-ast-parser.md)
 - [✅ Universal Renderer](patterns/universal-renderer.md)
 - [✅ Utils Module](patterns/utils-module.md)
+- [✅ Validation Rules Codec](patterns/validation-rules-codec.md)
+- [✅ Warning Collector](patterns/warning-collector.md)
 - [🚧 API Module](patterns/api-module.md)
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
 - [📋 Business Rules Codec](patterns/business-rules-codec.md)
-- [📋 Validation Rules Codec](patterns/validation-rules-codec.md)
 
 ---
 
 ### DDD
 
-8/25 complete (32%)
+9/26 complete (35%)
 
 - [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
@@ -258,6 +280,7 @@
 - [✅ Process Guard Linter](patterns/process-guard-linter.md)
 - [✅ Shape Extraction](patterns/shape-extraction.md)
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
+- [✅ Universal Doc Generator Robustness](patterns/universal-doc-generator-robustness.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
 - [📋 Claude Module Generation](patterns/claude-module-generation.md)
@@ -275,6 +298,14 @@
 - [📋 Step Definition Completion](patterns/step-definition-completion.md)
 - [📋 Streaming Git Diff](patterns/streaming-git-diff.md)
 - [📋 Traceability Generator](patterns/traceability-generator.md)
+
+---
+
+### Extract
+
+0/1 complete (0%)
+
+- [🚧 FSM States](patterns/fsm-states.md)
 
 ---
 
@@ -389,7 +420,7 @@
 
 ### Validation
 
-8/12 complete (67%)
+8/11 complete (73%)
 
 - [✅ Anti Pattern Detector](patterns/anti-pattern-detector.md)
 - [✅ Doc Directive Schema](patterns/doc-directive-schema.md)
@@ -400,7 +431,6 @@
 - [✅ Validation Module](patterns/validation-module.md)
 - [✅ Workflow Config Schema](patterns/workflow-config-schema.md)
 - [🚧 FSM Module](patterns/fsm-module.md)
-- [🚧 FSM States](patterns/fsm-states.md)
 - [🚧 FSM Transitions](patterns/fsm-transitions.md)
 - [🚧 FSM Validator](patterns/fsm-validator.md)
 
@@ -466,6 +496,23 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -478,22 +525,6 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> ConfigLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -516,6 +547,7 @@ graph TD
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration

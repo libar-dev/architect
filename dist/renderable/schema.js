@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern RenderableDocument
  * @libar-docs-status completed
+ * @libar-docs-extract-shapes RenderableDocument, SectionBlock, HeadingBlock, TableBlock, ListBlock, CodeBlock, MermaidBlock, CollapsibleBlock
  *
  * ## RenderableDocument Schema
  *

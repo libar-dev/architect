@@ -4,6 +4,8 @@
  * @libar-docs-pattern SourceMapper
  * @libar-docs-status completed
  * @libar-docs-phase 27
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer infrastructure
  * @libar-docs-depends-on DecisionDocCodec,ShapeExtractor,GherkinASTParser
  *
  * ## Source Mapper - Multi-Source Content Aggregation
@@ -26,6 +28,7 @@
  * - **Order Preservation**: Aggregated content maintains mapping table order
  */
 import * as fs from 'node:fs';
+import * as fsPromises from 'node:fs/promises';
 import * as path from 'node:path';
 import { Result as R } from '../types/result.js';
 import { isSelfReference, parseSelfReference, normalizeExtractionMethod, findRuleByName, extractDocStrings, } from '../renderable/codecs/decision-doc.js';
@@ -36,11 +39,22 @@ import { parseFeatureFile } from '../scanner/gherkin-ast-parser.js';
 // File Utilities
 // =============================================================================
 /**
- * Read file content synchronously with error handling
+ * Read file content asynchronously with error handling and optional caching
  */
-function readFileSync(filePath) {
+async function readFile(filePath, fileCache) {
+    // Check cache first
+    if (fileCache) {
+        const cached = fileCache.get(filePath);
+        if (cached !== undefined) {
+            return R.ok(cached);
+        }
+    }
     try {
-        const content = fs.readFileSync(filePath, 'utf-8');
+        const content = await fsPromises.readFile(filePath, 'utf-8');
+        // Store in cache if provided
+        if (fileCache) {
+            fileCache.set(filePath, content);
+        }
         return R.ok(content);
     }
     catch (error) {
@@ -48,14 +62,19 @@ function readFileSync(filePath) {
     }
 }
 /**
- * Check if file exists.
+ * Check if file exists asynchronously.
  * Captures filesystem errors (EACCES, EPERM, etc.) via warning collector to prevent silent failures.
  */
-function fileExists(filePath, warningCollector) {
+async function fileExists(filePath, warningCollector) {
     try {
-        return fs.existsSync(filePath);
+        await fsPromises.access(filePath, fs.constants.F_OK);
+        return true;
     }
     catch (error) {
+        // ENOENT means file doesn't exist - this is expected, not an error
+        if (error.code === 'ENOENT') {
+            return false;
+        }
         // Capture actual error for debugging - filesystem errors (EACCES, EPERM, ELOOP, etc.)
         // should not be silently swallowed as they indicate real problems
         if (warningCollector) {
@@ -164,13 +183,13 @@ export function extractFromDecision(options, sourceMapping) {
 /**
  * Extract shapes from a TypeScript file using @extract-shapes
  */
-export function extractFromTypeScript(filePath, options, sourceMapping) {
+export async function extractFromTypeScript(filePath, options, sourceMapping) {
     const pathResult = resolveAbsolutePath(filePath, options.baseDir);
     if (!pathResult.ok) {
         return R.err(pathResult.error);
     }
     const absolutePath = pathResult.value;
-    const fileResult = readFileSync(absolutePath);
+    const fileResult = await readFile(absolutePath, options.fileCache);
     if (!fileResult.ok) {
         return R.err(fileResult.error);
     }
@@ -190,8 +209,49 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
             if (!extractResult.ok) {
                 return R.err(extractResult.error);
             }
-            shapes = [...extractResult.value.shapes]; // Convert readonly to mutable
-            content = renderShapesAsMarkdown(extractResult.value.shapes, { includeJsDoc: true });
+            const result = extractResult.value;
+            shapes = [...result.shapes]; // Convert readonly to mutable
+            content = renderShapesAsMarkdown(result.shapes, { includeJsDoc: true });
+            // Surface extraction warnings via warning collector
+            if (options.warningCollector) {
+                // Forward any extraction warnings
+                for (const warning of result.warnings) {
+                    options.warningCollector.capture({
+                        source: filePath,
+                        category: 'extraction',
+                        subcategory: 'shape',
+                        message: warning,
+                    });
+                }
+                // Warn about shapes not found in file
+                for (const name of result.notFound) {
+                    options.warningCollector.capture({
+                        source: filePath,
+                        category: 'extraction',
+                        subcategory: 'shape-not-found',
+                        message: `Shape '${name}' not found in file`,
+                    });
+                }
+                // Warn about imported shapes (should use source file instead)
+                for (const name of result.imported) {
+                    options.warningCollector.capture({
+                        source: filePath,
+                        category: 'extraction',
+                        subcategory: 'shape-imported',
+                        message: `Shape '${name}' is imported, not defined in this file. Add @libar-docs-extract-shapes to the source file instead.`,
+                    });
+                }
+                // Warn about re-exported shapes with source module info
+                for (const reExport of result.reExported) {
+                    const typeOnlyNote = reExport.typeOnly ? ' (type-only)' : '';
+                    options.warningCollector.capture({
+                        source: filePath,
+                        category: 'extraction',
+                        subcategory: 'shape-re-exported',
+                        message: `Shape '${reExport.name}' is re-exported${typeOnlyNote} from '${reExport.sourceModule}'. Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`,
+                    });
+                }
+            }
         }
         else {
             // No @extract-shapes tag found - extract all exported types
@@ -262,13 +322,13 @@ export function extractFromTypeScript(filePath, options, sourceMapping) {
 /**
  * Extract Rule blocks or Scenario Outline Examples from a behavior spec
  */
-export function extractFromBehaviorSpec(filePath, options, sourceMapping) {
+export async function extractFromBehaviorSpec(filePath, options, sourceMapping) {
     const pathResult = resolveAbsolutePath(filePath, options.baseDir);
     if (!pathResult.ok) {
         return R.err(pathResult.error);
     }
     const absolutePath = pathResult.value;
-    const fileResult = readFileSync(absolutePath);
+    const fileResult = await readFile(absolutePath, options.fileCache);
     if (!fileResult.ok) {
         return R.err(fileResult.error);
     }
@@ -406,7 +466,7 @@ function extractScenarioOutlineExamples(scenarios, sectionName) {
  *
  * @example
  * ```typescript
- * const result = executeSourceMapping(decisionContent.sourceMappings, {
+ * const result = await executeSourceMapping(decisionContent.sourceMappings, {
  *   baseDir: process.cwd(),
  *   decisionDocPath: 'specs/my-decision.feature',
  *   decisionContent: decisionContent,
@@ -420,7 +480,7 @@ function extractScenarioOutlineExamples(scenarios, sectionName) {
  * }
  * ```
  */
-export function executeSourceMapping(sourceMappings, options) {
+export async function executeSourceMapping(sourceMappings, options) {
     const sections = [];
     const warnings = [];
     for (const mapping of sourceMappings) {
@@ -436,7 +496,7 @@ export function executeSourceMapping(sourceMappings, options) {
                 });
                 continue;
             }
-            if (!fileExists(pathResult.value, options.warningCollector)) {
+            if (!(await fileExists(pathResult.value, options.warningCollector))) {
                 warnings.push({
                     severity: 'warning',
                     message: `Source file not found: ${mapping.sourceFile}`,
@@ -447,16 +507,16 @@ export function executeSourceMapping(sourceMappings, options) {
         }
         // Dispatch based on source file type
         if (isSelfReference(mapping.sourceFile)) {
-            // Extract from current decision document
+            // Extract from current decision document (sync - no file I/O)
             result = extractFromDecision(options, mapping);
         }
         else if (mapping.sourceFile.endsWith('.ts')) {
             // TypeScript file
-            result = extractFromTypeScript(mapping.sourceFile, options, mapping);
+            result = await extractFromTypeScript(mapping.sourceFile, options, mapping);
         }
         else if (mapping.sourceFile.endsWith('.feature')) {
             // Gherkin behavior spec
-            result = extractFromBehaviorSpec(mapping.sourceFile, options, mapping);
+            result = await extractFromBehaviorSpec(mapping.sourceFile, options, mapping);
         }
         else {
             // Unknown file type
@@ -502,7 +562,7 @@ export function executeSourceMapping(sourceMappings, options) {
  * @param options - Mapper options (only baseDir is required)
  * @returns Array of validation warnings
  */
-export function validateSourceMappings(sourceMappings, options) {
+export async function validateSourceMappings(sourceMappings, options) {
     const warnings = [];
     for (const mapping of sourceMappings) {
         // Self-references don't need file validation
@@ -519,7 +579,7 @@ export function validateSourceMappings(sourceMappings, options) {
             });
             continue;
         }
-        if (!fileExists(pathResult.value)) {
+        if (!(await fileExists(pathResult.value))) {
             warnings.push({
                 severity: 'warning',
                 message: `Source file not found: ${mapping.sourceFile}`,

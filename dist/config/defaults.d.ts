@@ -20,8 +20,10 @@
  * - Import these defaults when implementing functions that need fallback values
  * - Use `DEFAULT_REGEX_BUILDERS` for opt-in detection when no registry is provided
  * - Use `DEFAULT_TAG_PREFIX` in error messages when no registry context exists
+ * - Use `DEFAULT_CONTEXT_INFERENCE_RULES` to auto-infer bounded contexts from paths
  */
 import { type RegexBuilders } from './regex-builders.js';
+import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
 /**
  * Default tag prefix for @libar-docs-* annotations.
  *
@@ -66,4 +68,27 @@ export declare const DEFAULT_FILE_OPT_IN_TAG = "@libar-docs";
  * ```
  */
 export declare const DEFAULT_REGEX_BUILDERS: RegexBuilders;
+/**
+ * Default context inference rules for auto-inferring bounded context from file paths.
+ *
+ * These rules map directory paths to bounded context names. When a pattern has
+ * an `@libar-docs-arch-layer` but no explicit `@libar-docs-arch-context`, the
+ * context is inferred from the file path using these rules.
+ *
+ * **Why This Exists:**
+ * In most codebases, directory structure already implies bounded context:
+ * - `src/validation/` → validation context
+ * - `src/lint/` → lint context
+ * - `src/generators/` → generator context
+ *
+ * Auto-inference eliminates redundant annotations while preserving the ability
+ * to override with explicit `@libar-docs-arch-context` when needed.
+ *
+ * @example
+ * ```typescript
+ * // Pattern at src/validation/rules.ts with @libar-docs-arch-layer:application
+ * // will automatically get archContext='validation' without explicit annotation
+ * ```
+ */
+export declare const DEFAULT_CONTEXT_INFERENCE_RULES: readonly ContextInferenceRule[];
 //# sourceMappingURL=defaults.d.ts.map

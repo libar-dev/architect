@@ -4,6 +4,8 @@
  * @libar-docs-pattern ContentDeduplicator
  * @libar-docs-status completed
  * @libar-docs-phase 28
+ * @libar-docs-arch-context generator
+ * @libar-docs-arch-layer infrastructure
  *
  * ## Content Deduplicator - Duplicate Content Detection and Merging
  *
@@ -111,6 +113,15 @@ const SOURCE_PRIORITY: Record<string, number> = {
   feature: 1, // .feature files
 };
 
+/**
+ * Length of fingerprint hex string to display.
+ *
+ * 16 hex characters = 64 bits provides sufficient collision resistance for
+ * documentation deduplication. Birthday paradox collision probability is
+ * less than 0.001% for up to 10,000 sections.
+ */
+const FINGERPRINT_DISPLAY_LENGTH = 16;
+
 // =============================================================================
 // Helper Functions
 // =============================================================================
@@ -139,32 +150,45 @@ function normalizeForFingerprint(content: string): string {
  */
 export function computeFingerprint(content: string): string {
   const normalized = normalizeForFingerprint(content);
-  return crypto.createHash('sha256').update(normalized).digest('hex').slice(0, 16);
+  return crypto
+    .createHash('sha256')
+    .update(normalized)
+    .digest('hex')
+    .slice(0, FINGERPRINT_DISPLAY_LENGTH);
 }
 
 /**
- * Determine source type from file path
+ * Result of source type detection, includes flag for unknown types.
  */
-function getSourceType(sourceFile: string): 'typescript' | 'decision' | 'feature' {
+interface SourceTypeResult {
+  type: 'typescript' | 'decision' | 'feature';
+  isUnknown: boolean;
+}
+
+/**
+ * Determine source type from file path.
+ * Returns isUnknown=true for unrecognized file extensions.
+ */
+function getSourceType(sourceFile: string): SourceTypeResult {
   if (sourceFile.endsWith('.ts')) {
-    return 'typescript';
+    return { type: 'typescript', isUnknown: false };
   }
   if (sourceFile.toUpperCase().includes('THIS DECISION')) {
-    return 'decision';
+    return { type: 'decision', isUnknown: false };
   }
   if (sourceFile.endsWith('.feature')) {
-    return 'feature';
+    return { type: 'feature', isUnknown: false };
   }
   // Default to feature (lowest priority) for unknown types
-  return 'feature';
+  return { type: 'feature', isUnknown: true };
 }
 
 /**
  * Get priority value for a source file
  */
 function getSourcePriority(sourceFile: string): number {
-  const sourceType = getSourceType(sourceFile);
-  return SOURCE_PRIORITY[sourceType] ?? 1;
+  const { type } = getSourceType(sourceFile);
+  return SOURCE_PRIORITY[type] ?? 1;
 }
 
 /**
@@ -324,6 +348,28 @@ export function deduplicateSections(
     return { sections: [], mergedPairs: [], warnings: [] };
   }
 
+  // Check for unknown source types and warn (prevents silent data deprioritization)
+  const seenUnknownExtensions = new Set<string>();
+  for (const section of sections) {
+    const { isUnknown } = getSourceType(section.sourceFile);
+    if (isUnknown) {
+      const ext = section.sourceFile.slice(section.sourceFile.lastIndexOf('.'));
+      // Only warn once per extension type to avoid flooding
+      if (!seenUnknownExtensions.has(ext)) {
+        seenUnknownExtensions.add(ext);
+        const warning: Warning = {
+          source: section.sourceFile,
+          category: 'deduplication',
+          message: `Unknown file type "${ext}" treated as feature (lowest priority)`,
+        };
+        warnings.push(warning);
+        if (options?.warningCollector) {
+          options.warningCollector.capture(warning);
+        }
+      }
+    }
+  }
+
   // Convert to content blocks with original indices for precise removal
   const blocks = sections.map((section, index) => sectionToBlock(section, index));
 
@@ -335,8 +381,12 @@ export function deduplicateSections(
 
   // Process each duplicate group
   for (const [_fingerprint, duplicateBlocks] of duplicates) {
-    // SAFETY: findDuplicates() only returns groups with 2+ blocks (see filter at line 216),
-    // so the type assertion to non-empty tuple is guaranteed to be correct at runtime.
+    // Defensive guard: findDuplicates() should only return groups with 2+ blocks
+    // (see filter at line 216), but we guard against invariant violations.
+    if (duplicateBlocks.length === 0) {
+      continue;
+    }
+
     const winner = chooseWinner(duplicateBlocks as [ContentBlock, ...ContentBlock[]]);
 
     // Mark losers for removal using their original indices

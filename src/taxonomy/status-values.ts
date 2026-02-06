@@ -1,17 +1,22 @@
 /**
- * Process workflow status values (per PDR-005 FSM)
+ * @libar-docs
+ * @libar-docs-pattern StatusValues
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS
  *
- * THE single source of truth for FSM state values in the monorepo.
+ * ## Process Workflow Status Values
+ *
+ * THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM).
  *
  * FSM transitions:
- * - roadmap → active (start work)
- * - active → completed (finish work)
- * - active → deferred (pause work)
- * - deferred → active (resume work)
- *
- * @see PDR-005 MVP Workflow State Machine
- * @see ACCEPTED_STATUS_VALUES for extraction/validation (includes legacy)
- * @see normalized-status.ts for normalization mapping
+ * - roadmap to active (start work)
+ * - roadmap to deferred (pause before start)
+ * - deferred to roadmap (resume planning)
+ * - active to completed (finish work)
+ * - active to deferred (pause work)
+ * - deferred to active (resume work)
+ * - active cannot regress to roadmap
  */
 export const PROCESS_STATUS_VALUES = [
   'roadmap', // Planned work, fully editable

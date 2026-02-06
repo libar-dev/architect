@@ -168,8 +168,11 @@ describeFeature(feature, ({ Background, Rule }) => {
           state.options = createDefaultOptions();
         });
 
-        When('executing source mapping', () => {
-          state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+        When('executing source mapping', async () => {
+          state.aggregatedContent = await executeSourceMapping(
+            state.sourceMappings,
+            state.options!
+          );
           // Track which extractor was used based on source file type
           if (state.sourceMappings[0]?.sourceFile.includes('THIS DECISION')) {
             state.extractorUsed = 'decision';
@@ -220,8 +223,8 @@ export interface TestInterface {
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
         if (state.sourceMappings[0]?.sourceFile.endsWith('.ts')) {
           state.extractorUsed = 'typescript';
         }
@@ -272,8 +275,11 @@ export interface TestInterface {
           state.options = createDefaultOptions();
         });
 
-        When('executing source mapping', () => {
-          state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+        When('executing source mapping', async () => {
+          state.aggregatedContent = await executeSourceMapping(
+            state.sourceMappings,
+            state.options!
+          );
           if (state.sourceMappings[0]?.sourceFile.endsWith('.feature')) {
             state.extractorUsed = 'behaviorSpec';
           }
@@ -320,8 +326,11 @@ export interface TestInterface {
           state.options = createDefaultOptions();
         });
 
-        When('executing source mapping', () => {
-          state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+        When('executing source mapping', async () => {
+          state.aggregatedContent = await executeSourceMapping(
+            state.sourceMappings,
+            state.options!
+          );
         });
 
         Then('content should contain the context rule description', () => {
@@ -352,8 +361,8 @@ export interface TestInterface {
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then('content should contain code blocks', () => {
@@ -387,8 +396,8 @@ export interface TestInterface {
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then('content should be extracted', () => {
@@ -453,8 +462,8 @@ export interface MyInterface { id: string; }
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then('{int} sections should be extracted', (_ctx: unknown, count: number) => {
@@ -515,8 +524,8 @@ export type Type = string;
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then(
@@ -549,8 +558,8 @@ export type Type = string;
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then('a warning should be produced for {string}', (_ctx: unknown, fileName: string) => {
@@ -580,7 +589,7 @@ export type Type = string;
         }
       );
 
-      When('executing source mapping', () => {
+      When('executing source mapping', async () => {
         // Setup decision content for the "Present" mapping
         state.decisionContent.rules.context.push({
           name: 'Context',
@@ -590,7 +599,7 @@ export type Type = string;
         });
         state.options = createDefaultOptions();
 
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options);
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options);
       });
 
       Then('{int} section should be extracted', (_ctx: unknown, count: number) => {
@@ -610,8 +619,8 @@ export type Type = string;
         ];
       });
 
-      When('validating source mappings', () => {
-        state.validationWarnings = validateSourceMappings(state.sourceMappings, {
+      When('validating source mappings', async () => {
+        state.validationWarnings = await validateSourceMappings(state.sourceMappings, {
           baseDir: state.baseDir,
         });
       });
@@ -651,8 +660,8 @@ export type Type = string;
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then('an info warning should be produced', () => {
@@ -690,8 +699,8 @@ export type Type = string;
         state.options = createDefaultOptions();
       });
 
-      When('executing source mapping', () => {
-        state.aggregatedContent = executeSourceMapping(state.sourceMappings, state.options!);
+      When('executing source mapping', async () => {
+        state.aggregatedContent = await executeSourceMapping(state.sourceMappings, state.options!);
       });
 
       Then('an info warning should be produced', () => {
@@ -745,8 +754,8 @@ export type Type = string;
         ];
       });
 
-      When('validating source mappings', () => {
-        state.validationWarnings = validateSourceMappings(state.sourceMappings, {
+      When('validating source mappings', async () => {
+        state.validationWarnings = await validateSourceMappings(state.sourceMappings, {
           baseDir: state.baseDir,
         });
       });

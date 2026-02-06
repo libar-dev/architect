@@ -7,6 +7,7 @@
  * @libar-docs-used-by Orchestrator, SectionRenderer, ReportCodecs
  * @libar-docs-usecase "When providing pre-computed views to section renderers"
  * @libar-docs-usecase "When eliminating redundant filtering across generators"
+ * @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema, StatusCountsSchema, PhaseGroupSchema, SourceViewsSchema, RelationshipEntrySchema, ArchIndexSchema
  *
  * ## MasterDataset - Unified Pattern Views Schema
  *

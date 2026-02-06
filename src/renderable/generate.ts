@@ -21,6 +21,7 @@
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { RenderableDocument } from './schema.js';
 import { renderDocumentWithFiles, type OutputFile } from './render.js';
+import { Result } from '../types/result.js';
 
 // Default codec instances
 import {
@@ -226,11 +227,124 @@ export interface CodecOptions {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Codec Map
+// Codec Registry
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Factory function type for creating codecs with options.
+ */
+type CodecFactory = (opts?: BaseCodecOptions) => DocumentCodec;
+
+// Private storage for the CodecRegistry
+const _codecStore = new Map<DocumentType, DocumentCodec>();
+const _factoryStore = new Map<DocumentType, CodecFactory>();
+
+/**
+ * Registry for document codecs providing a single source of truth.
+ *
+ * The CodecRegistry centralizes codec and factory registration, eliminating
+ * the need to manually synchronize CODEC_MAP and CODEC_FACTORY_MAP.
+ *
+ * @example
+ * ```typescript
+ * // Register a codec and its factory
+ * CodecRegistry.register('patterns', PatternsDocumentCodec);
+ * CodecRegistry.registerFactory('patterns', createPatternsCodec);
+ *
+ * // Retrieve codec or factory
+ * const codec = CodecRegistry.get('patterns');
+ * const factory = CodecRegistry.getFactory('patterns');
+ * ```
+ */
+export const CodecRegistry = {
+  /**
+   * Register a default codec for a document type.
+   *
+   * @param type - The document type to register
+   * @param codec - The codec instance to use
+   */
+  register(type: DocumentType, codec: DocumentCodec): void {
+    _codecStore.set(type, codec);
+  },
+
+  /**
+   * Register a factory function for a document type.
+   *
+   * Factory functions are used when codec options are provided,
+   * allowing customization of codec behavior at runtime.
+   *
+   * @param type - The document type to register
+   * @param factory - The factory function to create codecs with options
+   */
+  registerFactory(type: DocumentType, factory: CodecFactory): void {
+    _factoryStore.set(type, factory);
+  },
+
+  /**
+   * Get the default codec for a document type.
+   *
+   * @param type - The document type to retrieve
+   * @returns The codec instance, or undefined if not registered
+   */
+  get(type: DocumentType): DocumentCodec | undefined {
+    return _codecStore.get(type);
+  },
+
+  /**
+   * Get the factory function for a document type.
+   *
+   * @param type - The document type to retrieve
+   * @returns The factory function, or undefined if not registered
+   */
+  getFactory(type: DocumentType): CodecFactory | undefined {
+    return _factoryStore.get(type);
+  },
+
+  /**
+   * Check if a codec is registered for a document type.
+   *
+   * @param type - The document type to check
+   * @returns True if a codec is registered
+   */
+  has(type: DocumentType): boolean {
+    return _codecStore.has(type);
+  },
+
+  /**
+   * Check if a factory is registered for a document type.
+   *
+   * @param type - The document type to check
+   * @returns True if a factory is registered
+   */
+  hasFactory(type: DocumentType): boolean {
+    return _factoryStore.has(type);
+  },
+
+  /**
+   * Get all registered document types.
+   *
+   * @returns Array of registered document types
+   */
+  getRegisteredTypes(): DocumentType[] {
+    return Array.from(_codecStore.keys());
+  },
+
+  /**
+   * Clear all registrations (useful for testing).
+   */
+  clear(): void {
+    _codecStore.clear();
+    _factoryStore.clear();
+  },
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Codec Map (for backward compatibility)
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
  * Map document types to their default codecs (no options)
+ * @deprecated Use CodecRegistry.get() instead
  */
 const CODEC_MAP = {
   patterns: PatternsDocumentCodec,
@@ -257,6 +371,7 @@ const CODEC_MAP = {
 /**
  * Map document types to their factory functions.
  * Used when options are provided to create a codec with custom configuration.
+ * @deprecated Use CodecRegistry.getFactory() instead
  */
 const CODEC_FACTORY_MAP = {
   patterns: createPatternsCodec,
@@ -281,8 +396,112 @@ const CODEC_FACTORY_MAP = {
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Registry Initialization
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Initialize the registry with all codecs and factories on module load
+// This ensures backward compatibility while enabling the new registry pattern
+for (const [type, codec] of Object.entries(CODEC_MAP)) {
+  CodecRegistry.register(type as DocumentType, codec);
+}
+for (const [type, factory] of Object.entries(CODEC_FACTORY_MAP)) {
+  CodecRegistry.registerFactory(type as DocumentType, factory as CodecFactory);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Error Types
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Error that occurred during document generation.
+ *
+ * Provides structured information about what went wrong during the
+ * codec decode or render phase.
+ */
+export interface GenerationError {
+  /** The document type that failed to generate */
+  documentType: DocumentType;
+  /** Error message describing what went wrong */
+  message: string;
+  /** The original error (if available) */
+  cause?: Error | undefined;
+  /** Phase where the error occurred */
+  phase: 'decode' | 'render';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Generation Functions
 // ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Generate a single document type with Result-based error handling.
+ *
+ * This function wraps codec.decode() and renderDocumentWithFiles() in try/catch,
+ * returning a Result type instead of throwing exceptions. Use this when you need
+ * explicit error handling without try/catch at the call site.
+ *
+ * @param type - Document type to generate
+ * @param dataset - MasterDataset with pattern data
+ * @param options - Optional codec-specific options
+ * @returns Result containing OutputFile[] on success, or GenerationError on failure
+ *
+ * @example
+ * ```typescript
+ * const result = generateDocumentSafe("patterns", masterDataset);
+ * if (Result.isOk(result)) {
+ *   for (const file of result.value) {
+ *     fs.writeFileSync(file.path, file.content);
+ *   }
+ * } else {
+ *   console.error(`Failed to generate ${result.error.documentType}: ${result.error.message}`);
+ * }
+ * ```
+ */
+export function generateDocumentSafe(
+  type: DocumentType,
+  dataset: MasterDataset,
+  options?: CodecOptions
+): Result<OutputFile[], GenerationError> {
+  const outputPath = DOCUMENT_TYPES[type].outputPath;
+
+  // Get options for this specific document type
+  const typeOptions = options?.[type];
+
+  // Use factory function if options provided, otherwise use default codec
+  let codec: DocumentCodec;
+  if (typeOptions) {
+    const factory = CODEC_FACTORY_MAP[type] as (opts?: BaseCodecOptions) => DocumentCodec;
+    codec = factory(typeOptions);
+  } else {
+    codec = CODEC_MAP[type];
+  }
+
+  // Decode: MasterDataset → RenderableDocument (with error handling)
+  let doc: RenderableDocument;
+  try {
+    doc = codec.decode(dataset) as RenderableDocument;
+  } catch (err) {
+    return Result.err({
+      documentType: type,
+      message: err instanceof Error ? err.message : String(err),
+      cause: err instanceof Error ? err : undefined,
+      phase: 'decode',
+    });
+  }
+
+  // Render: RenderableDocument → OutputFile[] (with error handling)
+  try {
+    const files = renderDocumentWithFiles(doc, outputPath);
+    return Result.ok(files);
+  } catch (err) {
+    return Result.err({
+      documentType: type,
+      message: err instanceof Error ? err.message : String(err),
+      cause: err instanceof Error ? err : undefined,
+      phase: 'render',
+    });
+  }
+}
 
 /**
  * Generate a single document type
@@ -295,6 +514,10 @@ const CODEC_FACTORY_MAP = {
  * When options are provided for the requested document type, the factory function
  * is used to create a codec with custom configuration. Otherwise, the default
  * codec instance is used.
+ *
+ * **Error Handling:** This function may throw if codec.decode() or rendering fails.
+ * For explicit error handling without exceptions, use `generateDocumentSafe()` which
+ * returns a Result type instead.
  *
  * @example
  * ```typescript

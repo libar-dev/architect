@@ -32,8 +32,9 @@
  */
 import type { ScenarioDataTable, ScenarioStep, ScenarioRef } from '../../validation-schemas/scenario-ref.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
-import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
+import type { ExtractedShape, PropertyDoc } from '../../validation-schemas/extracted-shape.js';
 import { type SectionBlock } from '../schema.js';
+import type { WarningCollector } from '../../generators/warning-collector.js';
 export type { BusinessRule };
 /**
  * Result of partitioning business rules by ADR-style prefixes.
@@ -138,6 +139,14 @@ export interface RichContentOptions {
      * Provide this callback to capture warnings programmatically or suppress them.
      */
     onWarning?: ((warning: RichContentWarning) => void) | undefined;
+    /**
+     * Optional WarningCollector for structured warning capture.
+     *
+     * When provided, warnings are captured using the collector for aggregation
+     * and structured reporting. Takes precedence over `onWarning` callback.
+     * Use this for CI/CD pipelines that need machine-readable warning output.
+     */
+    warningCollector?: WarningCollector | undefined;
 }
 /**
  * Default options type - all fields are required values from RichContentOptions.
@@ -148,7 +157,7 @@ export type ResolvedRichContentOptions = Required<RichContentOptions>;
 /**
  * Default rich content options
  *
- * Note: onWarning is intentionally undefined by default.
+ * Note: onWarning and warningCollector are intentionally undefined by default.
  * When undefined, warnings fall back to console.warn via emitWarning().
  */
 export declare const DEFAULT_RICH_CONTENT_OPTIONS: ResolvedRichContentOptions;
@@ -156,6 +165,31 @@ export declare const DEFAULT_RICH_CONTENT_OPTIONS: ResolvedRichContentOptions;
  * Merge user options with defaults
  */
 export declare function mergeRichContentOptions(options?: RichContentOptions): ResolvedRichContentOptions;
+/**
+ * Structured warning format for CI parsing.
+ *
+ * Format: `::warning file={file},code={code}::{message}`
+ *
+ * This format is compatible with GitHub Actions and other CI systems
+ * that support structured annotations.
+ */
+export interface StructuredWarning {
+    /** Warning code for categorization */
+    code: string;
+    /** Human-readable message */
+    message: string;
+    /** Source file (if available) */
+    file?: string;
+    /** Line number (if available) */
+    line?: number;
+}
+/**
+ * Format a warning for CI output (GitHub Actions compatible).
+ *
+ * @param warning - The warning to format
+ * @returns Formatted string for CI log parsing
+ */
+export declare function formatWarningForCI(warning: StructuredWarning): string;
 /**
  * Render a Gherkin DataTable as a markdown table block
  *
@@ -206,6 +240,37 @@ export declare function renderDocString(docString: string | {
  */
 export declare function renderStepsList(steps: readonly ScenarioStep[]): SectionBlock;
 /**
+ * Remove common leading indentation from all lines in a code block.
+ *
+ * When DocStrings are embedded in Gherkin files, they often have consistent
+ * indentation to align with the surrounding scenario structure. This function
+ * normalizes that indentation by:
+ * 1. Normalizing tabs to spaces (default: 2 spaces per tab)
+ * 2. Finding the minimum indentation across all non-empty lines
+ * 3. Removing that common indentation from every line
+ * 4. Trimming trailing whitespace from each line
+ *
+ * @param text - The code block content to dedent
+ * @param tabWidth - Number of spaces per tab (default: 2)
+ * @returns The dedented text with normalized indentation
+ *
+ * @example
+ * ```typescript
+ * // Input (indented to match Gherkin formatting):
+ * dedent("    const x = 1;\n    const y = 2;")
+ * // Returns: "const x = 1;\nconst y = 2;"
+ *
+ * // Mixed indentation (preserves relative indentation):
+ * dedent("    function foo() {\n      return 42;\n    }")
+ * // Returns: "function foo() {\n  return 42;\n}"
+ *
+ * // Tab-indented code (tabs normalized to spaces):
+ * dedent("\t\tconst x = 1;")
+ * // Returns: "const x = 1;"
+ * ```
+ */
+export declare function dedent(text: string, tabWidth?: number): string;
+/**
  * Parse description text for embedded DocStrings and convert to mixed content
  *
  * DocStrings in Gherkin are identified by: """language\n...\n"""
@@ -215,6 +280,7 @@ export declare function renderStepsList(steps: readonly ScenarioStep[]): Section
  * - Normalizes Windows line endings (CRLF → LF) before parsing
  * - Detects unclosed DocStrings (odd count of """) and returns plain paragraph fallback
  * - Handles empty input gracefully
+ * - Dedents code block content to normalize indentation from Gherkin formatting
  *
  * @param description - The description text that may contain DocStrings
  * @param options - Optional rendering options (used for warning callback)
@@ -463,4 +529,22 @@ export interface RenderShapesOptions {
  * @returns Markdown string with fenced code blocks
  */
 export declare function renderShapesAsMarkdown(shapes: readonly ExtractedShape[], options?: RenderShapesOptions): string;
+/**
+ * Render property documentation as a markdown table.
+ *
+ * Generates a two-column table with property names and their JSDoc descriptions.
+ * Returns empty string if no property docs exist.
+ *
+ * @param propertyDocs - Property documentation array from ExtractedShape
+ * @returns Markdown table string, or empty string if no docs
+ *
+ * @example
+ * ```typescript
+ * const table = renderPropertyDocsTable(shape.propertyDocs);
+ * if (table) {
+ *   sections.push(md(table));
+ * }
+ * ```
+ */
+export declare function renderPropertyDocsTable(propertyDocs: readonly PropertyDoc[] | undefined): string;
 //# sourceMappingURL=helpers.d.ts.map
