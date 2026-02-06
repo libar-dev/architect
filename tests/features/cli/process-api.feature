@@ -129,8 +129,50 @@ Feature: process-api CLI
       Then exit code is 0
       And stdout is valid JSON
 
+    @happy-path
+    Scenario: Arch layer lists layers with counts
+      Given TypeScript files with architecture annotations
+      When running "process-api -i 'src/**/*.ts' arch layer"
+      Then exit code is 0
+      And stdout is valid JSON
+
+    @happy-path
+    Scenario: Arch graph returns dependency data
+      Given TypeScript files with architecture annotations and dependencies
+      When running "process-api -i 'src/**/*.ts' arch graph ScannerService"
+      Then exit code is 0
+      And stdout is valid JSON
+      And stdout contains "ScannerService"
+
   # ============================================================================
-  # RULE 7: Edge Cases
+  # RULE 7: Error Handling for Missing Arguments
+  # ============================================================================
+
+  Rule: CLI shows errors for missing subcommand arguments
+
+    @validation
+    Scenario: Query without method name shows error
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' query"
+      Then exit code is 1
+      And output contains "Usage:"
+
+    @validation
+    Scenario: Pattern without name shows error
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' pattern"
+      Then exit code is 1
+      And output contains "Usage:"
+
+    @validation
+    Scenario: Unknown subcommand shows error
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' foobar"
+      Then exit code is 1
+      And output contains "Unknown subcommand"
+
+  # ============================================================================
+  # RULE 8: Edge Cases
   # ============================================================================
 
   Rule: CLI handles argument edge cases

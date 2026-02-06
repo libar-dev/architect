@@ -176,7 +176,7 @@ pnpm process:query -- arch graph ProcessStateAPI
 npx tsx src/cli/process-api.ts -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' query getPatternsByCategory projection | jq '.[].patternName'
 ```
 
-See `docs/PROCESS-API.md` for the complete 28-method API reference.
+See `docs/PROCESS-API.md` for the complete 27-method API reference.
 
 ---
 

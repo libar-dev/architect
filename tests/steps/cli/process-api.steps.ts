@@ -95,6 +95,33 @@ function createArchPatternFiles(): Array<{ path: string; content: string }> {
   ];
 }
 
+function createArchPatternFilesWithDeps(): Array<{ path: string; content: string }> {
+  return [
+    {
+      path: 'src/scanner-service.ts',
+      content: createTsFileWithDirective({
+        patternName: 'ScannerService',
+        status: 'completed',
+        archRole: 'service',
+        archContext: 'scanner',
+        archLayer: 'application',
+        uses: ['FileCache'],
+      }),
+    },
+    {
+      path: 'src/file-cache.ts',
+      content: createTsFileWithDirective({
+        patternName: 'FileCache',
+        status: 'completed',
+        archRole: 'infrastructure',
+        archContext: 'scanner',
+        archLayer: 'infrastructure',
+        usedBy: ['ScannerService'],
+      }),
+    },
+  ];
+}
+
 // =============================================================================
 // Feature Definition
 // =============================================================================
@@ -160,6 +187,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   async function writeArchPatternFiles(): Promise<void> {
     const dir = getTempDir();
     for (const file of createArchPatternFiles()) {
+      await writeTempFile(dir, file.path, file.content);
+    }
+  }
+
+  async function writeArchPatternFilesWithDeps(): Promise<void> {
+    const dir = getTempDir();
+    for (const file of createArchPatternFilesWithDeps()) {
       await writeTempFile(dir, file.path, file.content);
     }
   }
@@ -425,6 +459,111 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And('stdout is valid JSON', () => {
         const result = getResult();
         expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+      });
+    });
+
+    RuleScenario('Arch layer lists layers with counts', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with architecture annotations', async () => {
+        await writeArchPatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout is valid JSON', () => {
+        const result = getResult();
+        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+      });
+    });
+
+    RuleScenario('Arch graph returns dependency data', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with architecture annotations and dependencies', async () => {
+        await writeArchPatternFilesWithDeps();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout is valid JSON', () => {
+        const result = getResult();
+        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+      });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).toContain(text);
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: CLI shows errors for missing subcommand arguments
+  // ---------------------------------------------------------------------------
+
+  Rule('CLI shows errors for missing subcommand arguments', ({ RuleScenario }) => {
+    RuleScenario('Query without method name shows error', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('output contains {string}', (_ctx: unknown, text: string) => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).toContain(text);
+      });
+    });
+
+    RuleScenario('Pattern without name shows error', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('output contains {string}', (_ctx: unknown, text: string) => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).toContain(text);
+      });
+    });
+
+    RuleScenario('Unknown subcommand shows error', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('output contains {string}', (_ctx: unknown, text: string) => {
+        const combined = getResult().stdout + getResult().stderr;
+        expect(combined).toContain(text);
       });
     });
   });

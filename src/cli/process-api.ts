@@ -227,7 +227,7 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<RuntimeMaster
   // Step 2: Scan TypeScript source files
   const scanResult = await scanPatterns({ patterns: config.input, baseDir }, registry);
   if (!scanResult.ok) {
-    console.error('Failed to scan source files');
+    console.error(`Failed to scan source files: ${String(scanResult.error)}`);
     process.exit(1);
   }
   const { files: scannedFiles } = scanResult.value;
@@ -244,11 +244,13 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<RuntimeMaster
     });
     if (gherkinScanResult.ok) {
       const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, {
-        baseDir: config.baseDir,
+        baseDir,
         tagRegistry: registry,
         scenariosAsUseCases: true,
       });
       gherkinPatterns = gherkinResult.patterns;
+    } else {
+      console.error(`Warning: Failed to scan Gherkin files: ${String(gherkinScanResult.error)}`);
     }
   }
 
