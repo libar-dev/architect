@@ -170,8 +170,8 @@ export interface CMSState {
 
 | File |
 | --- |
-| src/roadmap-stubs/reservation-pattern.ts |
-| src/api-stubs/durability-types.ts |
+| delivery-process/stubs/reservation-pattern/reservation-pattern.ts |
+| delivery-process/stubs/durability-types/durability-types.ts |
 
 **Default configuration relaxes no-unused-vars**
 
@@ -295,8 +295,7 @@ _Verified by: CLI generates ESLint ignore file list, JSON output mode for progra
 // eslint.config.js - directory-based exclusions pattern
     {
       files: [
-        "**/src/roadmap-stubs/**",
-        "**/src/api-stubs/**",
+        "**/delivery-process/stubs/**",
         // ... patterns for roadmap/deferred files
       ],
       rules: {

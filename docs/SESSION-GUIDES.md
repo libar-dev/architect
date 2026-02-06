@@ -103,15 +103,21 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 - [ ] **Get approval** — User must approve recommended approach
 
-- [ ] **Create code stubs** with interfaces:
+- [ ] **Create code stubs** in `delivery-process/stubs/{pattern-name}/`:
 
   ```typescript
+  // delivery-process/stubs/{pattern-name}/my-function.ts
   /**
    * @<prefix>
    * @<prefix>-status roadmap
+   * @<prefix>-implements MyPattern
    * @<prefix>-uses Workpool, EventStore
    *
    * ## My Pattern - Description
+   *
+   * Target: src/path/to/final/location.ts
+   * See: PDR-001 (Design Decision)
+   * Since: DS-1
    */
   export interface MyResult {
     id: string;
@@ -121,6 +127,8 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
     throw new Error('MyPattern not yet implemented - roadmap pattern');
   }
   ```
+
+  Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues. They are scanned by the documentation pipeline via `-i 'delivery-process/stubs/**/*.ts'`.
 
 - [ ] **Move to approved** after user approval: `designs/draft/` → `designs/approved/`
 

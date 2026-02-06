@@ -177,7 +177,32 @@ export function reserve(ctx: MutationCtx, args: ReserveArgs): Promise<Reservatio
 
 ---
 
-## Planning Stubs Architecture
+## Stubs Architecture
+
+Two types of stubs serve different purposes and live in different locations:
+
+### Code Stubs (Design Session Artifacts)
+
+Design session code stubs define API shapes with `throw new Error("Not implemented")`. They live **outside `src/`** to avoid TypeScript compilation and ESLint issues:
+
+```
+delivery-process/
+├── stubs/                    # Design session code stubs (not compiled)
+│   └── {pattern-name}/      # One directory per pattern
+│       └── *.ts             # API shapes, interfaces, throw-not-implemented
+├── specs/                    # Tier 1 roadmap specs
+└── ...
+```
+
+| Phase          | Location                            | Status                               |
+| -------------- | ----------------------------------- | ------------------------------------ |
+| Design         | `delivery-process/stubs/{pattern}/` | `throw new Error("Not implemented")` |
+| Implementation | Move/copy to `src/`                 | Replace with real logic              |
+| Completed      | `src/`                              | Production code                      |
+
+Stubs are scanned by the documentation pipeline (via `-i 'delivery-process/stubs/**/*.ts'`) but excluded from TypeScript compilation (`tsconfig.json` includes only `src/**/*`) and ESLint (`eslint` targets `src tests`).
+
+### Planning Stubs (Test Step Definition Stubs)
 
 Step definitions created during Planning sessions go in a separate directory excluded from test execution:
 

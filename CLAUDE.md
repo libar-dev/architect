@@ -203,17 +203,18 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 
 ### Module Structure
 
-| Module            | Purpose                                                   |
-| ----------------- | --------------------------------------------------------- |
-| `src/config/`     | Configuration factory, presets (generic, ddd-es-cqrs)     |
-| `src/taxonomy/`   | Tag definitions - categories, status values, format types |
-| `src/scanner/`    | TypeScript and Gherkin file scanning                      |
-| `src/extractor/`  | Pattern extraction from AST/Gherkin                       |
-| `src/generators/` | Document generators and orchestrator                      |
-| `src/renderable/` | Markdown codec system                                     |
-| `src/validation/` | FSM validation, DoD checks, anti-patterns                 |
-| `src/lint/`       | Pattern linting and process guard                         |
-| `src/api/`        | Process State API for programmatic access                 |
+| Module                    | Purpose                                                          |
+| ------------------------- | ---------------------------------------------------------------- |
+| `src/config/`             | Configuration factory, presets (generic, ddd-es-cqrs)            |
+| `src/taxonomy/`           | Tag definitions - categories, status values, format types        |
+| `src/scanner/`            | TypeScript and Gherkin file scanning                             |
+| `src/extractor/`          | Pattern extraction from AST/Gherkin                              |
+| `src/generators/`         | Document generators and orchestrator                             |
+| `src/renderable/`         | Markdown codec system                                            |
+| `src/validation/`         | FSM validation, DoD checks, anti-patterns                        |
+| `src/lint/`               | Pattern linting and process guard                                |
+| `src/api/`                | Process State API for programmatic access                        |
+| `delivery-process/stubs/` | Design session code stubs (outside src/ for TS/ESLint isolation) |
 
 ### Three Presets
 
@@ -526,20 +527,28 @@ Starting from pattern brief?
 | New patterns/capabilities  | Bug fix             |
 | Cross-context coordination | Clear requirements  |
 
-**Code Stub Pattern:**
+**Code Stub Pattern** — stubs go in `delivery-process/stubs/{pattern-name}/`:
 
 ```typescript
+// delivery-process/stubs/{pattern-name}/my-function.ts
 /**
  * @libar-docs
  * @libar-docs-status roadmap
+ * @libar-docs-implements MyPattern
  * @libar-docs-uses Workpool, EventStore
  *
  * ## My Pattern - Description
+ *
+ * Target: src/path/to/final/location.ts
+ * See: PDR-001 (Design Decision)
+ * Since: DS-1
  */
 export function myFunction(args: MyArgs): Promise<MyResult> {
   throw new Error('MyPattern not yet implemented - roadmap pattern');
 }
 ```
+
+Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues.
 
 ### Implementation Session
 

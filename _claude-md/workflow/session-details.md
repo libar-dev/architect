@@ -20,20 +20,28 @@
 | New patterns/capabilities  | Bug fix             |
 | Cross-context coordination | Clear requirements  |
 
-**Code Stub Pattern:**
+**Code Stub Pattern** — stubs go in `delivery-process/stubs/{pattern-name}/`:
 
 ```typescript
+// delivery-process/stubs/{pattern-name}/my-function.ts
 /**
  * @libar-docs
  * @libar-docs-status roadmap
+ * @libar-docs-implements MyPattern
  * @libar-docs-uses Workpool, EventStore
  *
  * ## My Pattern - Description
+ *
+ * Target: src/path/to/final/location.ts
+ * See: PDR-001 (Design Decision)
+ * Since: DS-1
  */
 export function myFunction(args: MyArgs): Promise<MyResult> {
   throw new Error('MyPattern not yet implemented - roadmap pattern');
 }
 ```
+
+Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues.
 
 ### Implementation Session
 

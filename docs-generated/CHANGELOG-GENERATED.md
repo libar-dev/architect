@@ -14,12 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
-- **Lint Process CLI**: Validates git changes against delivery process rules.
 - **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
 - **Process State API**: TypeScript interface for querying delivery process state.
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
+- **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
+- **Lint Process CLI**: Validates git changes against delivery process rules.
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -87,6 +87,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
+- **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
+- **Configuration Types**: Type definitions for the delivery process configuration system.
+- **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
+- **Configuration Presets**: Predefined configuration presets for common use cases.
+- **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
+- **Configuration Defaults**: Centralized default constants for the delivery-process package.
+- **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -100,13 +107,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
 - **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
 - **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
-- **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
-- **Configuration Types**: Type definitions for the delivery process configuration system.
-- **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
-- **Configuration Presets**: Predefined configuration presets for common use cases.
-- **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
-- **Configuration Defaults**: Centralized default constants for the delivery-process package.
-- **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 - **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
 - **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
 - **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
@@ -125,6 +125,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Document Codecs**: Barrel export for all document codecs.
 - **Rich Content Helpers**: Shared helper functions for rendering Gherkin rich content in document codecs.
 - **Decision Doc Codec**: Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation.
+- **Business Rules Codec**: Transforms MasterDataset into a RenderableDocument for business rules output.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
 - **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.

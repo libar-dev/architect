@@ -252,8 +252,7 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
     // eslint.config.js - directory-based exclusions pattern
     {
       files: [
-        "**/src/roadmap-stubs/**",
-        "**/src/api-stubs/**",
+        "**/delivery-process/stubs/**",
         // ... patterns for roadmap/deferred files
       ],
       rules: {
@@ -288,8 +287,8 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
     Scenario: Existing roadmap files still pass lint
       Given roadmap files that previously relied on directory exclusions:
         | File |
-        | src/roadmap-stubs/reservation-pattern.ts |
-        | src/api-stubs/durability-types.ts |
+        | delivery-process/stubs/reservation-pattern/reservation-pattern.ts |
+        | delivery-process/stubs/durability-types/durability-types.ts |
       When running "pnpm lint" after migration
       Then files pass lint (no unused-vars errors)
       And files have @libar-docs-status:roadmap annotations
