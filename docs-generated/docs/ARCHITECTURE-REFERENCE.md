@@ -461,6 +461,9 @@ interface RawDataset {
  * - Aggregate statistics (counts, phase count, category count)
  * - Optional relationship index
  *
+ * For backward compatibility, this function returns just the dataset.
+ * Use `transformToMasterDatasetWithValidation` to get validation summary.
+ *
  * @param raw - Raw dataset with patterns, registry, and optional workflow
  * @returns MasterDataset with all pre-computed views
  *

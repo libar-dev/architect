@@ -39,6 +39,12 @@
   | Session efficiency | "What's next?" answered in 100ms vs 10s regeneration |
   | Completes API promise | Makes CLAUDE.md documentation accurate |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`process-api.ts`](../../src/cli/process-api.ts) - ## process-api - CLI Query Interface to ProcessStateAPI
+
 ## Acceptance Criteria
 
 **Query active patterns**

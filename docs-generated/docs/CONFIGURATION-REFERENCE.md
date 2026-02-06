@@ -421,6 +421,21 @@ interface DeliveryProcessConfig {
   readonly categories: readonly CategoryDefinition[];
   /** Optional metadata tag definitions */
   readonly metadataTags?: readonly MetadataTagDefinitionForRegistry[];
+  /**
+   * Optional context inference rules for auto-inferring bounded context from file paths.
+   *
+   * When provided, these rules are merged with the default rules. User-provided rules
+   * take precedence over defaults (applied first in the rule list).
+   *
+   * @example
+   * ```typescript
+   * contextInferenceRules: [
+   *   { pattern: 'packages/orders/**', context: 'orders' },
+   *   { pattern: 'packages/inventory/**', context: 'inventory' },
+   * ]
+   * ```
+   */
+  readonly contextInferenceRules?: readonly ContextInferenceRule[];
 }
 ```
 
@@ -430,6 +445,7 @@ interface DeliveryProcessConfig {
 | `fileOptInTag` | File-level opt-in tag (e.g., "@docs" or "@libar-docs") |
 | `categories` | Category definitions for pattern classification |
 | `metadataTags` | Optional metadata tag definitions |
+| `contextInferenceRules` | Optional context inference rules for auto-inferring bounded context from file paths. |
 
 ```typescript
 /**

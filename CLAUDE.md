@@ -117,7 +117,66 @@ pnpm validate:all       # All validations including anti-patterns
 # Documentation generation
 pnpm docs:patterns      # Generate pattern docs
 pnpm docs:all           # Generate all doc types (patterns, roadmap, remaining, changelog)
+
+# Process API queries (JSON output, pipeable to jq)
+pnpm process:query -- status                              # Delivery status counts
+pnpm process:query -- query <method> [args]               # Any ProcessStateAPI method
+pnpm process:query -- pattern <name>                      # Full pattern detail
+pnpm process:query -- arch context <name>                 # Architecture by bounded context
 ```
+
+---
+
+## Process API CLI
+
+### Process API CLI
+
+Query delivery process state directly from the terminal instead of reading generated markdown. Returns JSON, pipeable to `jq`.
+
+**Prefer the CLI over reading `PATTERNS.md` or `ROADMAP.md`** — targeted queries use 5-10x less context than reading full documents.
+
+#### Subcommands
+
+```bash
+# Delivery status overview
+pnpm process:query -- status
+
+# Execute any ProcessStateAPI method by name
+pnpm process:query -- query getCurrentWork
+pnpm process:query -- query getPatternsByCategory projection
+pnpm process:query -- query getPatternsByPhase 18
+pnpm process:query -- query isValidTransition roadmap active
+
+# Full detail for one pattern (metadata + deliverables + dependencies + relationships)
+pnpm process:query -- pattern OrderFulfillmentSaga
+
+# Architecture queries (bounded contexts, layers, roles, dependency graphs)
+pnpm process:query -- arch roles
+pnpm process:query -- arch context scanner
+pnpm process:query -- arch layer domain
+pnpm process:query -- arch graph ProcessStateAPI
+```
+
+#### Session Workflows
+
+| Session Start Task       | Command                                                        |
+| ------------------------ | -------------------------------------------------------------- |
+| Quick status check       | `pnpm process:query -- status`                                 |
+| Find active work         | `pnpm process:query -- query getCurrentWork`                   |
+| Check roadmap items      | `pnpm process:query -- query getRoadmapItems`                  |
+| Validate a transition    | `pnpm process:query -- query isValidTransition roadmap active` |
+| Get pattern dependencies | `pnpm process:query -- query getPatternRelationships <name>`   |
+| Explore architecture     | `pnpm process:query -- arch context <name>`                    |
+
+#### Clean JSON Piping
+
+`pnpm` outputs a banner line to stdout (`> @libar-dev/...`). For clean JSON piping to `jq`, use `npx tsx` directly:
+
+```bash
+npx tsx src/cli/process-api.ts -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' query getPatternsByCategory projection | jq '.[].patternName'
+```
+
+See `docs/PROCESS-API.md` for the complete 28-method API reference.
 
 ---
 
@@ -315,6 +374,53 @@ The library behaves differently than standard Cucumber.js.
 | Feature descriptions     | Starting a description line with `Given`, `When`, or `Then` breaks the parser                  | Ensure free-text descriptions do not start with reserved Gherkin keywords                               |
 | Multiple And same text   | Multiple `And` steps with identical text (different values) fail                               | Consolidate into single step with DataTable                                                             |
 | No regex step patterns   | `Then(/pattern/, ...)` throws `StepAbleStepExpressionError`                                    | Use only string patterns with `{string}`, `{int}` placeholders                                          |
+
+### Gherkin Parser: Hash Comments in Descriptions (CRITICAL)
+
+**Root Cause:** The @cucumber/gherkin parser interprets `#` at the start of a line as a Gherkin comment, even inside Feature/Rule descriptions. This terminates the description context and causes subsequent lines to fail parsing.
+
+**Symptom:** Parse error like:
+
+```
+expected: #EOF, #Comment, #BackgroundLine, #TagLine, #ScenarioLine, #RuleLine, #Empty
+got 'generate-docs --decisions ...'
+```
+
+**The Problem:**
+
+When you embed code examples in Rule descriptions using `"""` (which becomes literal text, NOT a DocString), any `#` comment inside will break parsing:
+
+```gherkin
+Rule: My Rule
+
+    """bash
+    # This comment breaks parsing!
+    generate-docs --output docs
+    """
+```
+
+The parser sees:
+
+1. `"""bash` → literal text in description
+2. `# This comment...` → Gherkin comment (TERMINATES description)
+3. `generate-docs...` → unexpected content (PARSE ERROR)
+
+**Why This Happens:**
+
+- `"""` in descriptions is NOT parsed as DocString delimiters (those only work as step arguments)
+- The content becomes plain description text
+- `#` at line start is ALWAYS a Gherkin comment in description context
+
+**Workarounds:**
+
+| Option                 | Example                                   | When to Use                        |
+| ---------------------- | ----------------------------------------- | ---------------------------------- |
+| Remove hash comments   | `generate-docs --output docs`             | Simple cases                       |
+| Use `//` instead       | `// Generate docs`                        | When comment syntax doesn't matter |
+| Move to step DocString | `Given the script: """bash...`            | When you need executable examples  |
+| Manual parsing         | Regex extraction bypassing Gherkin parser | When file must contain `#`         |
+
+**Note:** The `parseDescriptionWithDocStrings()` helper extracts `"""` blocks from description text AFTER parsing succeeds. The issue is the Gherkin parser itself failing before that helper runs.
 
 ### Common Test Implementation Issues
 

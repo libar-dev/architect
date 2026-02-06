@@ -7,15 +7,15 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 93/131 (71%)
+**Patterns:** [██████████████░░░░░░] 93/133 (70%)
 
-**Phases:** 3/12 complete
+**Phases:** 2/12 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 131 |
+| Total Patterns | 133 |
 | Completed | 93 |
-| Active | 13 |
+| Active | 15 |
 | Planned | 25 |
 
 ---
@@ -28,7 +28,7 @@
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
-| ✅ [SourceMapper](phases/phase-27-source-mapper.md) | 3/3 | 100% |
+| 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
@@ -82,14 +82,15 @@
 
 ---
 
-### ✅ SourceMapper
+### 🚧 SourceMapper
 
-[███████████████] 3/3 100% complete
+[███████████░░░░] 3/4 75% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Doc Generation Proof Of Concept | completed | Status: SUPERSEDED - This POC has been implemented. |
+| 🚧 File Cache | active | Simple Map-based cache for file contents during a single generation run. |
 | ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 
 ---

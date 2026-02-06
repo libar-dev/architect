@@ -39,7 +39,7 @@ import { extractPatterns } from '../extractor/doc-extractor.js';
 import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
 import { extractPatternsFromGherkin, computeHierarchyChildren, } from '../extractor/gherkin-extractor.js';
 import { mergePatterns } from '../generators/orchestrator.js';
-import { loadDefaultWorkflow, loadWorkflowFromPath, } from '../config/workflow-loader.js';
+import { loadDefaultWorkflow, loadWorkflowFromPath } from '../config/workflow-loader.js';
 import { transformToMasterDataset } from '../generators/pipeline/index.js';
 import { createProcessStateAPI } from '../api/process-state.js';
 import { handleCliError } from './error-handler.js';
@@ -203,7 +203,11 @@ async function buildPipeline(config) {
             baseDir,
         });
         if (gherkinScanResult.ok) {
-            const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, { baseDir: config.baseDir, tagRegistry: registry, scenariosAsUseCases: true });
+            const gherkinResult = extractPatternsFromGherkin(gherkinScanResult.value.files, {
+                baseDir: config.baseDir,
+                tagRegistry: registry,
+                scenariosAsUseCases: true,
+            });
             gherkinPatterns = gherkinResult.patterns;
         }
     }
@@ -260,15 +264,33 @@ function coerceArg(arg) {
     return arg;
 }
 const API_METHODS = [
-    'getPatternsByNormalizedStatus', 'getPatternsByStatus', 'getStatusCounts',
-    'getStatusDistribution', 'getCompletionPercentage',
-    'getPatternsByPhase', 'getPhaseProgress', 'getActivePhases', 'getAllPhases',
-    'isValidTransition', 'checkTransition', 'getValidTransitionsFrom', 'getProtectionInfo',
-    'getPattern', 'getPatternDependencies', 'getPatternRelationships',
-    'getRelatedPatterns', 'getApiReferences', 'getPatternDeliverables',
-    'getPatternsByCategory', 'getCategories',
-    'getPatternsByQuarter', 'getQuarters', 'getCurrentWork', 'getRoadmapItems',
-    'getRecentlyCompleted', 'getMasterDataset',
+    'getPatternsByNormalizedStatus',
+    'getPatternsByStatus',
+    'getStatusCounts',
+    'getStatusDistribution',
+    'getCompletionPercentage',
+    'getPatternsByPhase',
+    'getPhaseProgress',
+    'getActivePhases',
+    'getAllPhases',
+    'isValidTransition',
+    'checkTransition',
+    'getValidTransitionsFrom',
+    'getProtectionInfo',
+    'getPattern',
+    'getPatternDependencies',
+    'getPatternRelationships',
+    'getRelatedPatterns',
+    'getApiReferences',
+    'getPatternDeliverables',
+    'getPatternsByCategory',
+    'getCategories',
+    'getPatternsByQuarter',
+    'getQuarters',
+    'getCurrentWork',
+    'getRoadmapItems',
+    'getRecentlyCompleted',
+    'getMasterDataset',
 ];
 function handleQuery(api, args) {
     const methodName = args[0];

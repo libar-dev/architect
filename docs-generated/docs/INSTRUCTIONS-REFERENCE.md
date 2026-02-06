@@ -41,6 +41,7 @@
 | CLI validate-patterns | src/cli/validate-patterns.ts | extract-shapes tag |
 | CLI generate-tag-taxonomy | src/cli/generate-tag-taxonomy.ts | extract-shapes tag |
 | Gherkin Integration | THIS DECISION (Rule: Gherkin Integration) | Rule block content |
+| Related Documentation | THIS DECISION (Rule: Related Documentation) | Rule block table |
 
 ---
 
@@ -115,6 +116,7 @@
  * @libar-docs-pattern CategoryDefinitions
  * @libar-docs-status completed
  * @libar-docs-core
+ * @libar-docs-arch-role read-model
  * @libar-docs-arch-context taxonomy
  * @libar-docs-arch-layer domain
  * @libar-docs-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
@@ -706,3 +708,15 @@ interface CLIConfig {
 | Problem/Solution | Problem and Solution | Pain point to fix |
 | Value-First | Business Value and How It Works | TDD-style specs |
 | Context/Approach | Context and Approach | Technical patterns |
+
+### Related Documentation
+
+**Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| TAXONOMY-REFERENCE.md | Reference | Tag definitions, categories, status values |
+| CONFIGURATION-REFERENCE.md | Reference | Preset system and tag prefix configuration |
+| PROCESS-GUARD-REFERENCE.md | Reference | FSM workflow validation rules |
+| SESSION-GUIDES-REFERENCE.md | Reference | Session workflows using annotations |
+| GHERKIN-PATTERNS-REFERENCE.md | Reference | Feature file structure and patterns |

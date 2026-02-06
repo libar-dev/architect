@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 93/131 (71% complete)
+**Overall:** [██████████████░░░░░░] 93/133 (70% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 93 |
-| 🚧 Active | 13 |
+| 🚧 Active | 15 |
 | 📋 Planned | 25 |
-| **Total** | 131 |
+| **Total** | 133 |
 
 ---
 
@@ -22,7 +22,7 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (61)
+- [Core](#core) (62)
 - [DDD](#ddd) (26)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
@@ -35,7 +35,7 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
-- [Pattern](#pattern) (2)
+- [Pattern](#pattern) (3)
 - [Scanner](#scanner) (2)
 - [Validation](#validation) (11)
 
@@ -141,11 +141,13 @@
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
+| 🚧 File Cache | Pattern | active | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 FSM Module | Validation | active | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
 | 🚧 FSM States | Extract | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
 | 🚧 Lint Process CLI | Cli | active | Validates git changes against delivery process rules. |
+| 🚧 Process API CLI Impl | Core | active | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
@@ -202,7 +204,7 @@
 
 ### Core
 
-57/61 complete (93%)
+57/62 complete (92%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -262,6 +264,7 @@
 - [✅ Validation Rules Codec](patterns/validation-rules-codec.md)
 - [✅ Warning Collector](patterns/warning-collector.md)
 - [🚧 API Module](patterns/api-module.md)
+- [🚧 Process API CLI Impl](patterns/process-apicli-impl.md)
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
 - [📋 Business Rules Codec](patterns/business-rules-codec.md)
@@ -402,10 +405,11 @@
 
 ### Pattern
 
-2/2 complete (100%)
+2/3 complete (67%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
 - [✅ Shape Extractor](patterns/shape-extractor.md)
+- [🚧 File Cache](patterns/file-cache.md)
 
 ---
 
@@ -496,23 +500,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> ConfigLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -525,6 +512,30 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> Doc_Extractor
+    ProcessAPICLIImpl --> Gherkin_Scanner
+    ProcessAPICLIImpl --> Gherkin_Extractor
+    ProcessAPICLIImpl ..-> ProcessStateAPICLI
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation

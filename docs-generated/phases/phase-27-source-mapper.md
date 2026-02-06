@@ -6,14 +6,37 @@
 
 ## Summary
 
-**Progress:** [████████████████████] 3/3 (100%)
+**Progress:** [███████████████░░░░░] 3/4 (75%)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 3 |
-| 🚧 Active | 0 |
+| 🚧 Active | 1 |
 | 📋 Planned | 0 |
-| **Total** | 3 |
+| **Total** | 4 |
+
+---
+
+## 🚧 Active Patterns
+
+### 🚧 File Cache
+
+| Property | Value |
+| --- | --- |
+| Status | active |
+
+## File Cache - Request-Scoped Content Caching
+
+Simple Map-based cache for file contents during a single generation run.
+Avoids repeated disk reads for files accessed multiple times during
+extraction and deduplication phases.
+
+### Design Rationale
+
+- **Request-scoped**: Created fresh per orchestrator run, naturally cleared when done
+- **No eviction needed**: Generation runs are bounded in duration and file count
+- **Thread-safe**: Single-threaded Node.js, no locking required
+- **Stats tracking**: Optional hit/miss tracking for performance analysis
 
 ---
 

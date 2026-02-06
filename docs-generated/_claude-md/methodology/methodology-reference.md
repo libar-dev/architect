@@ -98,7 +98,11 @@
 
 ### Skip Conditions
 
-**Context:** Not all stages are required for every task.
+**Invariant:** Stages may only be skipped when conditions below are met.
+    **Rationale:** Prevents accidental omissions while allowing efficiency for simple tasks.
+    **Verified by:** @acceptance-criteria Scenario: Reference generates Methodology documentation
+
+    **Context:** Not all stages are required for every task.
 
     **Decision:** When to skip stages:
 
