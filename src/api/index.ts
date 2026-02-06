@@ -48,6 +48,7 @@ export type {
   PhaseProgress,
   PhaseGroup,
   PatternDependencies,
+  PatternRelationships,
   PatternDeliverable,
   QuarterGroup,
   TransitionCheck,

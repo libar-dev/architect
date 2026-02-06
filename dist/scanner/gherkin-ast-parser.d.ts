@@ -6,6 +6,9 @@
  * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes
  * @libar-docs-used-by GherkinScanner
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context scanner
+ * @libar-docs-arch-layer infrastructure
  *
  * ## GherkinASTParser - Parse Feature Files Using Cucumber Gherkin
  *

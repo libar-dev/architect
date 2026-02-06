@@ -6,6 +6,9 @@
  * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinASTParser, GherkinTypes
  * @libar-docs-used-by DualSourceExtractor, Orchestrator
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context scanner
+ * @libar-docs-arch-layer infrastructure
  *
  * ## GherkinScanner - Multi-Source Pattern Extraction from Feature Files
  *

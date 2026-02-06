@@ -5,6 +5,9 @@
  * @libar-docs-status completed
  * @libar-docs-uses DocExtractor, GherkinExtractor, GherkinScanner
  * @libar-docs-used-by Orchestrator
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context extractor
+ * @libar-docs-arch-layer application
  *
  * ## DualSourceExtractor - Compose Pattern Data from Code + Features
  *

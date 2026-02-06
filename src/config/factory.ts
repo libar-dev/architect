@@ -3,6 +3,7 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern DeliveryProcessFactory
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context config
  * @libar-docs-arch-layer application
  * @libar-docs-uses ConfigurationTypes, ConfigurationPresets, RegexBuilders, TagRegistry

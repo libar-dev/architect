@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern SessionCodec
  * @libar-docs-status completed
+ * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
  *

@@ -5,6 +5,9 @@
  * @libar-docs-status active
  * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-depends-on:PDR005MvpWorkflow
+ * @libar-docs-arch-role decider
+ * @libar-docs-arch-context validation
+ * @libar-docs-arch-layer application
  *
  * ## FSM Validator - Pure Validation Functions
  *

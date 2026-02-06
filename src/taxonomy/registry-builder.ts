@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context taxonomy
  * @libar-docs-arch-layer domain
  * @libar-docs-implements TypeScriptTaxonomyImplementation

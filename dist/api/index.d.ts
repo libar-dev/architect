@@ -36,7 +36,7 @@
  * }
  * ```
  */
-export type { QuerySuccess, QueryError, QueryErrorCode, QueryResult, StatusCounts, StatusDistribution, PhaseProgress, PhaseGroup, PatternDependencies, PatternDeliverable, QuarterGroup, TransitionCheck, ProtectionInfo, } from './types.js';
+export type { QuerySuccess, QueryError, QueryErrorCode, QueryResult, StatusCounts, StatusDistribution, PhaseProgress, PhaseGroup, PatternDependencies, PatternRelationships, PatternDeliverable, QuarterGroup, TransitionCheck, ProtectionInfo, } from './types.js';
 export { createSuccess, createError } from './types.js';
 export type { ProcessStateAPI } from './process-state.js';
 export { createProcessStateAPI } from './process-state.js';

@@ -8,6 +8,9 @@
  * @libar-docs-usecase "When providing pre-computed views to section renderers"
  * @libar-docs-usecase "When eliminating redundant filtering across generators"
  * @libar-docs-extract-shapes MasterDatasetSchema, StatusGroupsSchema, StatusCountsSchema, PhaseGroupSchema, SourceViewsSchema, RelationshipEntrySchema, ArchIndexSchema
+ * @libar-docs-arch-role read-model
+ * @libar-docs-arch-context api
+ * @libar-docs-arch-layer domain
  *
  * ## MasterDataset - Unified Pattern Views Schema
  *

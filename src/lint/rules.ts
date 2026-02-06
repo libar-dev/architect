@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern LintRules
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context lint
  * @libar-docs-arch-layer application
  * @libar-docs-implements PatternRelationshipModel

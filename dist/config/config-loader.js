@@ -3,6 +3,7 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigLoader
  * @libar-docs-status completed
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-arch-context config
  * @libar-docs-arch-layer infrastructure
  * @libar-docs-uses DeliveryProcessFactory, ConfigurationTypes

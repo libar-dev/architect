@@ -5,6 +5,9 @@
  * @libar-docs-status completed
  * @libar-docs-uses LintRules, CodecUtils
  * @libar-docs-used-by LintPatternsCLI
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context lint
+ * @libar-docs-arch-layer application
  *
  * ## LintEngine - Rule Execution Orchestrator
  *

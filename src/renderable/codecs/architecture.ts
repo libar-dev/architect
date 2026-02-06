@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern ArchitectureCodec
  * @libar-docs-status completed
+ * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
  * @libar-docs-uses MasterDataset, ArchIndex

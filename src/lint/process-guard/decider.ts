@@ -3,6 +3,7 @@
  * @libar-docs-lint
  * @libar-docs-pattern ProcessGuardDecider
  * @libar-docs-status active
+ * @libar-docs-arch-role decider
  * @libar-docs-arch-context lint
  * @libar-docs-arch-layer application
  * @libar-docs-implements ProcessGuardLinter

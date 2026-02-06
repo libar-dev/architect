@@ -169,6 +169,9 @@ export function createTsFileWithDirective(options: {
   useCases?: string[];
   uses?: string[];
   usedBy?: string[];
+  archRole?: string;
+  archContext?: string;
+  archLayer?: string;
   includeFileOptIn?: boolean;
 }): string {
   const {
@@ -179,6 +182,9 @@ export function createTsFileWithDirective(options: {
     useCases = [],
     usedBy = [],
     uses = [],
+    archRole,
+    archContext,
+    archLayer,
     includeFileOptIn = true,
   } = options;
 
@@ -212,6 +218,16 @@ export function createTsFileWithDirective(options: {
 
   for (const usedBy_ of usedBy) {
     lines.push(` * @libar-docs-used-by ${usedBy_}`);
+  }
+
+  if (archRole) {
+    lines.push(` * @libar-docs-arch-role ${archRole}`);
+  }
+  if (archContext) {
+    lines.push(` * @libar-docs-arch-context ${archContext}`);
+  }
+  if (archLayer) {
+    lines.push(` * @libar-docs-arch-layer ${archLayer}`);
   }
 
   lines.push(' *');

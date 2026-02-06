@@ -27,6 +27,7 @@
 | Write Gherkin specs            | [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | 1-343  |
 | Enforce delivery process rules | [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | 1-335  |
 | Validate annotation quality    | [VALIDATION.md](./VALIDATION.md)             | 1-199  |
+| Query process state via CLI    | [PROCESS-API.md](./PROCESS-API.md)           | 1-225  |
 | Look up tag definitions        | [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | 1-344  |
 | Understand the taxonomy        | [TAXONOMY.md](./TAXONOMY.md)                 | 1-95   |
 | Publish to npm                 | [PUBLISHING.md](./PUBLISHING.md)             | 1-149  |
@@ -41,17 +42,18 @@
 2. **[CONFIGURATION.md](./CONFIGURATION.md)** — Presets, tag prefixes, config files
 3. **[METHODOLOGY.md](./METHODOLOGY.md)** — Core thesis, dual-source architecture
 
-### For Developers
+### For Developers / AI
 
 4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Four-stage pipeline, codecs, MasterDataset
-5. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
-6. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
-7. **[INSTRUCTIONS.md](../INSTRUCTIONS.md)** — Complete tag and CLI reference
+5. **[PROCESS-API.md](./PROCESS-API.md)** — CLI query interface, ProcessStateAPI from terminal
+6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
+7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
+8. **[INSTRUCTIONS.md](../INSTRUCTIONS.md)** — Complete tag and CLI reference
 
 ### For Team Leads / CI
 
-8. **[PROCESS-GUARD.md](./PROCESS-GUARD.md)** — FSM enforcement, pre-commit hooks
-9. **[VALIDATION.md](./VALIDATION.md)** — Lint rules, DoD checks, anti-patterns
+9. **[PROCESS-GUARD.md](./PROCESS-GUARD.md)** — FSM enforcement, pre-commit hooks
+10. **[VALIDATION.md](./VALIDATION.md)** — Lint rules, DoD checks, anti-patterns
 
 ---
 
@@ -285,16 +287,17 @@ api.getPattern('TransformDataset');
 
 ## Document Roles Summary
 
-| Document            | Audience    | Focus                             |
-| ------------------- | ----------- | --------------------------------- |
-| README.md           | Everyone    | Quick start, value proposition    |
-| METHODOLOGY.md      | Everyone    | Why — core thesis, principles     |
-| CONFIGURATION.md    | Users       | Setup — presets, tags, config     |
-| ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas   |
-| SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage       |
-| GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
-| PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |
-| VALIDATION.md       | CI/CD       | Quality — automated checks        |
-| INSTRUCTIONS.md     | Reference   | Lookup — tag and CLI reference    |
-| TAXONOMY.md         | Reference   | Lookup — tag format definitions   |
-| PUBLISHING.md       | Maintainers | Release — npm publishing          |
+| Document            | Audience    | Focus                                               |
+| ------------------- | ----------- | --------------------------------------------------- |
+| README.md           | Everyone    | Quick start, value proposition                      |
+| METHODOLOGY.md      | Everyone    | Why — core thesis, principles                       |
+| CONFIGURATION.md    | Users       | Setup — presets, tags, config                       |
+| ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas                     |
+| PROCESS-API.md      | AI/Devs     | CLI query interface — ProcessStateAPI from terminal |
+| SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage                         |
+| GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin                   |
+| PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules                      |
+| VALIDATION.md       | CI/CD       | Quality — automated checks                          |
+| INSTRUCTIONS.md     | Reference   | Lookup — tag and CLI reference                      |
+| TAXONOMY.md         | Reference   | Lookup — tag format definitions                     |
+| PUBLISHING.md       | Maintainers | Release — npm publishing                            |

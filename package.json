@@ -62,7 +62,8 @@
     "lint-patterns": "./dist/cli/lint-patterns.js",
     "lint-process": "./dist/cli/lint-process.js",
     "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
-    "validate-patterns": "./dist/cli/validate-patterns.js"
+    "validate-patterns": "./dist/cli/validate-patterns.js",
+    "process-api": "./dist/cli/process-api.js"
   },
   "scripts": {
     "build": "tsc",
@@ -90,6 +91,7 @@
     "docs:taxonomy": "tsx src/cli/generate-docs.ts -g taxonomy -i 'src/**/*.ts' -o docs-generated -f",
     "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules -i 'src/**/*.ts' -o docs-generated -f",
     "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:technical && pnpm docs:taxonomy && pnpm docs:validation",
+    "process:query": "tsx src/cli/process-api.ts -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature'",
     "docs:tag-taxonomy": "tsx src/cli/generate-tag-taxonomy.ts --output delivery-process/tag-taxonomy.md --overwrite",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
