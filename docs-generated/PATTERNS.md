@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 94/141 (67% complete)
+**Overall:** [█████████████░░░░░░░] 94/145 (65% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 94 |
 | 🚧 Active | 17 |
-| 📋 Planned | 30 |
-| **Total** | 141 |
+| 📋 Planned | 34 |
+| **Total** | 145 |
 
 ---
 
@@ -37,6 +37,7 @@
 - [Opportunity 8](#opportunity-8) (1)
 - [Pattern](#pattern) (3)
 - [Scanner](#scanner) (2)
+- [Status](#status) (4)
 - [Validation](#validation) (11)
 
 ---
@@ -173,8 +174,11 @@
 | 📋 Data API Stub Integration | DDD | planned | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
+| 📋 FuzzyMatcher — Pattern Name Fuzzy Search | Status | planned | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
 | 📋 Generator Infrastructure Testing | DDD | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
+| 📋 OutputPipeline — CLI Output Shaping and Formatting | Status | planned | Post-processing pipeline that transforms raw API results into shaped CLI output. |
+| 📋 PatternSummarizer — Compact Pattern Projection | Status | planned | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
@@ -183,6 +187,7 @@
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
+| 📋 StubResolver — Design Stub Discovery and Resolution | Status | planned | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | ⏸️ Tag Taxonomy CLI | Cli | planned | by the codec-based TaxonomyCodec which: - Fits the MasterDataset pipeline architecture - Provides progressive... |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
@@ -438,6 +443,17 @@
 
 ---
 
+### Status
+
+0/4 complete (0%)
+
+- [📋 FuzzyMatcher — Pattern Name Fuzzy Search](patterns/fuzzy-matcher-pattern-name-fuzzy-search.md)
+- [📋 OutputPipeline — CLI Output Shaping and Formatting](patterns/output-pipeline-cli-output-shaping-and-formatting.md)
+- [📋 PatternSummarizer — Compact Pattern Projection](patterns/pattern-summarizer-compact-pattern-projection.md)
+- [📋 StubResolver — Design Stub Discovery and Resolution](patterns/stub-resolver-design-stub-discovery-and-resolution.md)
+
+---
+
 ### Validation
 
 8/11 complete (73%)
@@ -462,21 +478,18 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
+    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
+    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    PatternSummarizer___Compact_Pattern_Projection --> ProcessStateAPI
+    PatternSummarizer___Compact_Pattern_Projection ..-> DataAPIOutputShaping
+    OutputPipeline___CLI_Output_Shaping_and_Formatting --> PatternSummarizer
+    OutputPipeline___CLI_Output_Shaping_and_Formatting ..-> DataAPIOutputShaping
+    FuzzyMatcher___Pattern_Name_Fuzzy_Search ..-> DataAPIOutputShaping
     DoDValidator --> DoDValidationTypes
     DoDValidator --> GherkinTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
     AntiPatternDetector --> GherkinTypes
-    OutputSchemas --> Zod
-    OutputSchemas --> LintSeveritySchema
-    MasterDataset --> Zod
-    MasterDataset --> ExtractedPattern
-    MasterDataset --> TagRegistry
-    ExtractedShapeSchema ..-> ShapeExtraction
-    ExtractedPatternSchema --> DocDirectiveSchema
-    DualSourceSchemas ..-> MvpWorkflowImplementation
-    DocDirectiveSchema ..-> MvpWorkflowImplementation
-    CodecUtils --> Zod
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
     TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
@@ -490,21 +503,21 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
+    OutputSchemas --> Zod
+    OutputSchemas --> LintSeveritySchema
+    MasterDataset --> Zod
+    MasterDataset --> ExtractedPattern
+    MasterDataset --> TagRegistry
+    ExtractedShapeSchema ..-> ShapeExtraction
+    ExtractedPatternSchema --> DocDirectiveSchema
+    DualSourceSchemas ..-> MvpWorkflowImplementation
+    DocDirectiveSchema ..-> MvpWorkflowImplementation
+    CodecUtils --> Zod
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -516,18 +529,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -552,6 +563,18 @@ graph TD
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
     ProcessStateAPI ..-> PhaseStateMachineValidation
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation

@@ -199,7 +199,7 @@
     "tag": "pre"
   },
   "lint-staged": {
-    "*.ts": [
+    "{src,tests}/**/*.ts": [
       "eslint --fix",
       "prettier --write"
     ],

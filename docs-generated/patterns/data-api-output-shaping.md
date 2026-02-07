@@ -39,6 +39,14 @@
   | Config defaults | No more repeating --input and --features paths |
   | Composable filters | One command replaces multiple API method calls |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`fuzzy-match.ts`](../../delivery-process/stubs/data-api-output-shaping/fuzzy-match.ts) - ## FuzzyMatcher — Pattern Name Fuzzy Search
+- [`output-pipeline.ts`](../../delivery-process/stubs/data-api-output-shaping/output-pipeline.ts) - ## OutputPipeline — CLI Output Shaping and Formatting
+- [`summarize.ts`](../../delivery-process/stubs/data-api-output-shaping/summarize.ts) - ## PatternSummarizer — Compact Pattern Projection
+
 ## Acceptance Criteria
 
 **List queries return compact summaries**

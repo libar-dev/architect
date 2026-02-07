@@ -45,6 +45,12 @@
   | Design decision queries | Surface AD-N decisions for review |
   | PDR cross-referencing | Find all patterns related to a decision |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`stub-resolver.ts`](../../delivery-process/stubs/data-api-stub-integration/stub-resolver.ts) - ## StubResolver — Design Stub Discovery and Resolution
+
 ## Acceptance Criteria
 
 **Annotated stubs are discoverable by the scanner**
