@@ -20,9 +20,7 @@ from ~594KB to ~4KB for typical codebases.
 Uses Zod schema-first pattern: PatternSummarySchema defines the type,
 and PatternSummary is inferred from it.
 
-Target: src/api/summarize.ts
 See: DataAPIOutputShaping spec, Rule 1 (Pattern Summarization)
-Since: DS-A
 
 ---
 

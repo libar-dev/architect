@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIArchitectureQueries
  * @libar-docs-uses ProcessStateAPI, MasterDataset, Pattern Scanner
  * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/api/arch-queries.ts
+ * @libar-docs-since DS-D
  *
  * ## ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context
  *
@@ -23,11 +25,9 @@
  * New top-level subcommands: tags, sources, unannotated
  * All use SubcommandContext for access to CLI config and registry.
  *
- * Target: src/api/arch-queries.ts (neighborhood, compare, tags, sources)
  * Note: SubcommandContext should be defined in src/cli/types.ts (cross-cutting CLI type).
  *       NeighborEntry should be unified in src/api/types.ts (shared with ContextAssembler).
  * See: DataAPIArchitectureQueries spec, Rules 1-3
- * Since: DS-D
  */
 
 // ---------------------------------------------------------------------------

@@ -112,6 +112,7 @@ interface AggregationTagDefinitionForRegistry {
  * - traceability: Two-tier spec architecture links
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
+ * - stub: Design session stub metadata
  */
 export const METADATA_TAGS_BY_GROUP = {
   core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
@@ -151,6 +152,7 @@ export const METADATA_TAGS_BY_GROUP = {
   traceability: ['executable-specs', 'roadmap-spec'] as const,
   architecture: ['arch-role', 'arch-context', 'arch-layer'] as const,
   extraction: ['extract-shapes'] as const,
+  stub: ['target', 'since'] as const,
 } as const;
 
 /**
@@ -448,6 +450,19 @@ export function buildRegistry(): TagRegistry {
         purpose: 'Architectural layer for layered diagrams',
         values: ['domain', 'application', 'infrastructure'] as const,
         example: '@libar-docs-arch-layer application',
+      },
+      // Design session stub metadata tags (DataAPIStubIntegration Phase B)
+      {
+        tag: 'target',
+        format: 'value',
+        purpose: 'Target implementation path for stub files',
+        example: '@libar-docs-target src/api/stub-resolver.ts',
+      },
+      {
+        tag: 'since',
+        format: 'value',
+        purpose: 'Design session that created this pattern',
+        example: '@libar-docs-since DS-A',
       },
     ],
 

@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 95/152 (63%)
+**Patterns:** [█████████████░░░░░░░] 96/153 (63%)
 
 **Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 152 |
-| Completed | 95 |
-| Active | 20 |
-| Planned | 37 |
+| Total Patterns | 153 |
+| Completed | 96 |
+| Active | 21 |
+| Planned | 36 |
 
 ---
 
@@ -27,7 +27,7 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 0/2 | 0% |
-| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 1/9 | 11% |
+| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 2/9 | 22% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
@@ -75,7 +75,7 @@
 
 ### 📋 DataAPIStubIntegration
 
-[██░░░░░░░░░░░░░] 1/9 11% complete
+[███░░░░░░░░░░░░] 2/9 22% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -87,7 +87,7 @@
 | ✅ Data API Output Shaping | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
 | 📋 Data API Platform Integration | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
-| 📋 Data API Stub Integration | planned | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
+| ✅ Data API Stub Integration | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 
 ---
 

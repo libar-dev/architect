@@ -41,9 +41,7 @@ the ContextFormatter renders as plain text (see ADR-008).
 | FSM state | no | no | yes |
 | Test files | no | no | yes |
 
-Target: src/api/context-assembler.ts
 See: DataAPIContextAssembly spec, Rules 1-5
-Since: DS-C
 
 ---
 

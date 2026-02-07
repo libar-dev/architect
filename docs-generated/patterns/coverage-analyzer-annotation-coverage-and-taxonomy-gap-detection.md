@@ -33,9 +33,7 @@ this is a fast regex check, not AST parsing.
 - Excluding: node_modules, dist, test files, declaration files
 - Same exclusion rules as the scanner: findFilesToScan() defaults
 
-Target: src/api/coverage-analyzer.ts
 See: DataAPIArchitectureQueries spec, Rule 2 (Architecture Coverage)
-Since: DS-D
 
 ---
 

@@ -583,6 +583,9 @@ function parseDirective(
   const archRole = metadataResults.get('arch-role') as string | undefined;
   const archContext = metadataResults.get('arch-context') as string | undefined;
   const archLayer = metadataResults.get('arch-layer') as string | undefined;
+  // Design session stub metadata tags
+  const target = metadataResults.get('target') as string | undefined;
+  const since = metadataResults.get('since') as string | undefined;
   // Shape extraction tags
   const extractShapes = metadataResults.get('extract-shapes') as string[] | undefined;
 
@@ -662,6 +665,9 @@ function parseDirective(
     // Cross-reference and API navigation fields (PatternRelationshipModel enhancement)
     ...(seeAlso && seeAlso.length > 0 && { seeAlso }),
     ...(apiRef && apiRef.length > 0 && { apiRef }),
+    // Design session stub metadata fields
+    ...(target && { target }),
+    ...(since && { since }),
     // Architecture diagram generation fields
     ...(archRole && { archRole }),
     ...(archContext && { archContext }),

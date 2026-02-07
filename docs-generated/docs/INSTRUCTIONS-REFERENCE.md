@@ -265,6 +265,7 @@ function buildRegistry(): TagRegistry;
  * - traceability: Two-tier spec architecture links
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
+ * - stub: Design session stub metadata
  */
 METADATA_TAGS_BY_GROUP = {
   core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
@@ -304,6 +305,7 @@ METADATA_TAGS_BY_GROUP = {
   traceability: ['executable-specs', 'roadmap-spec'] as const,
   architecture: ['arch-role', 'arch-context', 'arch-layer'] as const,
   extraction: ['extract-shapes'] as const,
+  stub: ['target', 'since'] as const,
 } as const
 ```
 

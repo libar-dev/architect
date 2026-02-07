@@ -27,7 +27,7 @@ export interface TestDeliverable {
   name: string;
   status: string;
   tests: number;
-  location?: string;
+  location: string;
   finding?: string;
   /** Release version this deliverable belongs to (e.g., "v0.2.0") */
   release?: string;
@@ -108,6 +108,12 @@ export interface TestPatternOptions {
   discoveredRisks?: string[];
   /** Business value statement (default: none) */
   businessValue?: string;
+  /** Target implementation path for stub files (default: none) */
+  targetPath?: string;
+  /** Design session that created this pattern (default: none) */
+  since?: string;
+  /** Related patterns for cross-reference (default: none) */
+  seeAlso?: string[];
 }
 
 /**
@@ -192,6 +198,10 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     discoveredLearnings,
     discoveredRisks,
     businessValue,
+    // Stub metadata
+    targetPath,
+    since,
+    seeAlso,
   } = options;
 
   const directive: DocDirective = {
@@ -207,6 +217,9 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
     ...(dependsOn && dependsOn.length > 0 ? { dependsOn } : {}),
     ...(enables && enables.length > 0 ? { enables } : {}),
+    ...(targetPath ? { target: targetPath } : {}),
+    ...(since ? { since } : {}),
+    ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
   };
 
   return {
@@ -255,6 +268,10 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(discoveredLearnings && discoveredLearnings.length > 0 ? { discoveredLearnings } : {}),
     ...(discoveredRisks && discoveredRisks.length > 0 ? { discoveredRisks } : {}),
     ...(businessValue ? { businessValue } : {}),
+    // Stub metadata
+    ...(targetPath ? { targetPath } : {}),
+    ...(since ? { since } : {}),
+    ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
   };
 }
 

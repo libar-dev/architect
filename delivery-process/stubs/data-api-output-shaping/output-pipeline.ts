@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-uses PatternSummarizer
  * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/cli/output-pipeline.ts
+ * @libar-docs-since DS-A
  *
  * ## OutputPipeline — CLI Output Shaping and Formatting
  *
@@ -19,9 +21,7 @@
  * discriminated union — the router knows which methods return ExtractedPattern[]
  * via a static PATTERN_ARRAY_METHODS set.
  *
- * Target: src/cli/output-pipeline.ts
  * See: DataAPIOutputShaping spec, Rule 2 (Output Modifiers), Rule 3 (Output Format)
- * Since: DS-A
  */
 
 // ---------------------------------------------------------------------------

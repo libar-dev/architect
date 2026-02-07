@@ -45,7 +45,9 @@ export type QueryErrorCode =
   | 'PATTERN_NOT_FOUND'
   | 'PHASE_NOT_FOUND'
   | 'QUARTER_NOT_FOUND'
-  | 'CATEGORY_NOT_FOUND';
+  | 'CATEGORY_NOT_FOUND'
+  | 'STUB_NOT_FOUND'
+  | 'PDR_NOT_FOUND';
 
 /**
  * Failed query response

@@ -58,6 +58,13 @@ import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { fuzzyMatchPatterns, findBestMatch } from '../api/fuzzy-match.js';
 import {
+  findStubPatterns,
+  resolveStubs,
+  groupStubsByPattern,
+  extractDecisionItems,
+  findPdrReferences,
+} from '../api/stub-resolver.js';
+import {
   applyOutputPipeline,
   applyListFilters,
   validateModifiers,
@@ -268,6 +275,10 @@ Subcommands:
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
   arch graph <pattern>      Dependency graph for pattern
+  stubs [pattern]           List design stubs with implementation status
+  stubs --unresolved        Show only stubs with missing target files
+  decisions <pattern>       Show AD-N design decisions from stub descriptions
+  pdr <number>              Cross-reference patterns mentioning a PDR number
 
 List Filters:
   --status <status>         Filter by FSM status (roadmap, active, completed, deferred)
@@ -720,6 +731,135 @@ function handleArch(api: ProcessStateAPI, args: string[]): unknown {
 }
 
 // =============================================================================
+// Stub Integration Handlers
+// =============================================================================
+
+function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+  const stubs = findStubPatterns(dataset);
+  const baseDir = process.cwd();
+  const resolutions = resolveStubs(stubs, baseDir);
+
+  // Parse optional pattern name and --unresolved flag
+  let patternFilter: string | undefined;
+  let unresolvedOnly = false;
+
+  for (const arg of subArgs) {
+    if (arg === '--unresolved') {
+      unresolvedOnly = true;
+    } else {
+      patternFilter = arg;
+    }
+  }
+
+  let filtered = resolutions;
+
+  // Filter by pattern name if provided
+  if (patternFilter !== undefined) {
+    const lowerFilter = patternFilter.toLowerCase();
+    filtered = filtered.filter(
+      (r) =>
+        r.implementsPattern?.toLowerCase() === lowerFilter ||
+        r.stubName.toLowerCase() === lowerFilter
+    );
+    if (filtered.length === 0) {
+      // Try fuzzy match for suggestions
+      const allPatternNames = [
+        ...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName)),
+      ];
+      const suggestion = findBestMatch(patternFilter, allPatternNames);
+      const hint = suggestion !== undefined ? `\nDid you mean: ${suggestion.patternName}?` : '';
+      throw new CLIQueryError(
+        'STUB_NOT_FOUND',
+        `No stubs found for pattern: "${patternFilter}"${hint}`
+      );
+    }
+  }
+
+  // Filter unresolved only
+  if (unresolvedOnly) {
+    filtered = filtered.filter((r) => !r.targetExists);
+  }
+
+  return groupStubsByPattern(filtered);
+}
+
+function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+  const patternName = subArgs[0];
+  if (patternName === undefined) {
+    throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: decisions <pattern>');
+  }
+
+  // Find stubs implementing this pattern
+  const stubs = findStubPatterns(dataset);
+  const patternStubs = stubs.filter((s) => {
+    const implName =
+      s.implementsPatterns !== undefined && s.implementsPatterns.length > 0
+        ? s.implementsPatterns[0]
+        : undefined;
+    return (
+      implName?.toLowerCase() === patternName.toLowerCase() ||
+      (s.patternName ?? s.name).toLowerCase() === patternName.toLowerCase()
+    );
+  });
+
+  if (patternStubs.length === 0) {
+    const allStubNames = [
+      ...new Set(
+        stubs.map((s) => {
+          const impl =
+            s.implementsPatterns !== undefined && s.implementsPatterns.length > 0
+              ? s.implementsPatterns[0]
+              : undefined;
+          return impl ?? s.patternName ?? s.name;
+        })
+      ),
+    ];
+    const suggestion = findBestMatch(patternName, allStubNames);
+    const hint = suggestion !== undefined ? `\nDid you mean: ${suggestion.patternName}?` : '';
+    throw new CLIQueryError(
+      'STUB_NOT_FOUND',
+      `No stubs found for pattern: "${patternName}"${hint}`
+    );
+  }
+
+  // Extract decisions from each stub's description
+  const decisions = patternStubs.map((stub) => ({
+    stub: stub.patternName ?? stub.name,
+    file: stub.source.file,
+    since: stub.since,
+    decisions: extractDecisionItems(stub.directive.description),
+  }));
+
+  return {
+    pattern: patternName,
+    stubs: decisions,
+    totalDecisions: decisions.reduce((sum, d) => sum + d.decisions.length, 0),
+  };
+}
+
+function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+  const pdrNumber = subArgs[0];
+  if (pdrNumber === undefined) {
+    throw new CLIQueryError('PDR_NOT_FOUND', 'Usage: pdr <number> (e.g., pdr 012)');
+  }
+
+  // Normalize: strip leading "PDR-" if user passed it
+  const normalizedNumber = pdrNumber.replace(/^PDR-/i, '').padStart(3, '0');
+
+  const references = findPdrReferences(dataset.patterns, normalizedNumber);
+
+  if (references.length === 0) {
+    throw new CLIQueryError('PDR_NOT_FOUND', `No patterns reference PDR-${normalizedNumber}`);
+  }
+
+  return {
+    pdr: `PDR-${normalizedNumber}`,
+    referenceCount: references.length,
+    references,
+  };
+}
+
+// =============================================================================
 // Subcommand Router
 // =============================================================================
 
@@ -761,10 +901,19 @@ function routeSubcommand(ctx: RouteContext): unknown {
     case 'arch':
       return handleArch(ctx.api, ctx.subArgs);
 
+    case 'stubs':
+      return handleStubs(ctx.dataset, ctx.subArgs);
+
+    case 'decisions':
+      return handleDecisions(ctx.dataset, ctx.subArgs);
+
+    case 'pdr':
+      return handlePdr(ctx.dataset, ctx.subArgs);
+
     default:
       throw new CLIQueryError(
         'PATTERN_NOT_FOUND',
-        `Unknown subcommand: ${ctx.subcommand}\nAvailable: status, query, pattern, list, search, arch`
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: status, query, pattern, list, search, arch, stubs, decisions, pdr`
       );
   }
 }

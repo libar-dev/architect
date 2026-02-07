@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIStubIntegration
  * @libar-docs-uses ProcessStateAPI
  * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/api/stub-resolver.ts
+ * @libar-docs-since DS-B
  *
  * ## StubResolver — Design Stub Discovery and Resolution
  *
@@ -18,9 +20,7 @@
  * targetPath — not pipeline data — because target files may not have `@libar-docs`
  * annotations. The callback enables testing without filesystem side effects.
  *
- * Target: src/api/stub-resolver.ts
  * See: DataAPIStubIntegration spec, Rule 2 (Stubs Subcommand)
- * Since: DS-B
  */
 
 // ---------------------------------------------------------------------------

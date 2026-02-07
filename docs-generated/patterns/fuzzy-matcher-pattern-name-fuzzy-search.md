@@ -22,9 +22,7 @@ Used by:
 - `search` subcommand: ranked results via fuzzyMatchPatterns()
 - `pattern` subcommand: "Did you mean...?" fallback via findBestMatch()
 
-Target: src/api/fuzzy-match.ts
 See: DataAPIOutputShaping spec, Rule 4 (Filtering and Search)
-Since: DS-A
 
 ---
 

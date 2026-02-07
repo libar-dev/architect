@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 95/152 (63% complete)
+**Overall:** [█████████████░░░░░░░] 96/153 (63% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 95 |
-| 🚧 Active | 20 |
-| 📋 Planned | 37 |
-| **Total** | 152 |
+| ✅ Completed | 96 |
+| 🚧 Active | 21 |
+| 📋 Planned | 36 |
+| **Total** | 153 |
 
 ---
 
@@ -35,7 +35,7 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
-- [Pattern](#pattern) (3)
+- [Pattern](#pattern) (4)
 - [Scanner](#scanner) (2)
 - [Status](#status) (8)
 - [Validation](#validation) (11)
@@ -65,6 +65,7 @@
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
 | ✅ Content Deduplicator | Core | completed | Identifies and merges duplicate sections extracted from multiple sources. |
 | ✅ Data API Output Shaping | DDD | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
+| ✅ Data API Stub Integration | DDD | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 | ✅ Decision Doc Codec | Core | completed | Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation. |
 | ✅ Decision Doc Generator | Core | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
@@ -161,6 +162,7 @@
 | 🚧 Process State API CLI | DDD | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
+| 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 | 📋 ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context | Status | planned | Extends the existing `arch` subcommand with deeper analysis and adds new top-level discovery commands (tags, sources). |
@@ -178,7 +180,6 @@
 | 📋 Data API Design Session Support | DDD | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
 | 📋 Data API Platform Integration | DDD | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | DDD | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
-| 📋 Data API Stub Integration | DDD | planned | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
 | 📋 FuzzyMatcher — Pattern Name Fuzzy Search | Status | planned | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
@@ -296,9 +297,10 @@
 
 ### DDD
 
-10/34 complete (29%)
+11/34 complete (32%)
 
 - [✅ Data API Output Shaping](patterns/data-api-output-shaping.md)
+- [✅ Data API Stub Integration](patterns/data-api-stub-integration.md)
 - [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -322,7 +324,6 @@
 - [📋 Data API Design Session Support](patterns/data-api-design-session-support.md)
 - [📋 Data API Platform Integration](patterns/data-api-platform-integration.md)
 - [📋 Data API Relationship Graph](patterns/data-api-relationship-graph.md)
-- [📋 Data API Stub Integration](patterns/data-api-stub-integration.md)
 - [📋 Generator Infrastructure Testing](patterns/generator-infrastructure-testing.md)
 - [📋 Phase Numbering Conventions](patterns/phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](patterns/prd-implementation-section.md)
@@ -436,11 +437,12 @@
 
 ### Pattern
 
-2/3 complete (67%)
+2/4 complete (50%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
 - [✅ Shape Extractor](patterns/shape-extractor.md)
 - [🚧 File Cache](patterns/file-cache.md)
+- [🚧 Stub Resolver Impl](patterns/stub-resolver-impl.md)
 
 ---
 
@@ -512,6 +514,11 @@ graph TD
     ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
     ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
     ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> GherkinTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    AntiPatternDetector --> GherkinTypes
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -522,14 +529,8 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> GherkinTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
-    AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -540,11 +541,22 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -556,28 +568,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -604,8 +594,22 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
+    StubResolverImpl --> ProcessStateAPI
+    StubResolverImpl ..-> DataAPIStubIntegration
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
     ProcessStateAPI ..-> PhaseStateMachineValidation

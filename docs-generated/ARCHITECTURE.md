@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 99 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 100 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 99 |
+| Total Components | 100 |
 | Bounded Contexts | 10 |
 | Component Roles | 4 |
 
@@ -27,6 +27,7 @@ graph TB
         MasterDataset["MasterDataset[read-model]"]
         ProcessStateTypes["ProcessStateTypes"]
         PatternSummarizerImpl["PatternSummarizerImpl"]
+        StubResolverImpl["StubResolverImpl"]
         ProcessStateAPI["ProcessStateAPI"]
         APIModule["APIModule"]
         FuzzyMatcherImpl["FuzzyMatcherImpl"]
@@ -68,11 +69,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator"]
         FileCache["FileCache[infrastructure]"]
-        TransformDataset["TransformDataset"]
-        PipelineModule["PipelineModule"]
         BuiltInGenerators["BuiltInGenerators"]
         DecisionDocGenerator["DecisionDocGenerator"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
+        TransformDataset["TransformDataset"]
+        PipelineModule["PipelineModule"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules"]
@@ -153,21 +154,17 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
+        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
@@ -180,9 +177,21 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         ProcessStateTypes["ProcessStateTypes"]
+        StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
         FSMModule["FSMModule"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
+        PipelineModule["PipelineModule"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -195,13 +204,6 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
-        PipelineModule["PipelineModule"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
     DoDValidator --> DoDValidationTypes
@@ -219,10 +221,6 @@ graph TB
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -246,17 +244,22 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
+    StubResolverImpl --> ProcessStateAPI
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
-    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
-    TransformDataset --> MasterDataset
-    PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    TransformDataset --> MasterDataset
+    PipelineModule --> TransformDataset
+    ArchitectureCodec --> MasterDataset
 ```
 
 ---
@@ -367,6 +370,7 @@ All components with architecture annotations:
 | ✅ Shared Codec Schema | - | - | - | src/renderable/codecs/shared-schema.ts |
 | ✅ Source Mapping Validator | - | - | - | src/generators/source-mapping-validator.ts |
 | ✅ Status Values | - | - | - | src/taxonomy/status-values.ts |
+| 🚧 Stub Resolver Impl | - | - | - | src/api/stub-resolver.ts |
 | ✅ Tag Registry Configuration | - | - | - | src/validation-schemas/tag-registry.ts |
 | ⏸️ Tag Taxonomy CLI | - | - | - | src/cli/generate-tag-taxonomy.ts |
 | ✅ Taxonomy Codec | - | - | - | src/renderable/codecs/taxonomy.ts |

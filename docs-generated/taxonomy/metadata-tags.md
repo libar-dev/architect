@@ -6,7 +6,7 @@
 
 ## Metadata Tag Definitions
 
-42 metadata tags with full details.
+44 metadata tags with full details.
 
 | Tag | Format | Purpose | Required | Repeatable | Values | Default |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -52,6 +52,8 @@
 | `arch-role` | enum | Architectural role for diagram generation (component type) | No | No | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model | - |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | No | - | - |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | No | domain, application, infrastructure | - |
+| `target` | value | Target implementation path for stub files | No | No | - | - |
+| `since` | value | Design session that created this pattern | No | No | - | - |
 
 ## Tag Details
 
@@ -487,6 +489,26 @@
 | Repeatable | No |
 | Valid Values | domain, application, infrastructure |
 | Example | `@libar-docs-arch-layer application` |
+
+### `target`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Target implementation path for stub files |
+| Required | No |
+| Repeatable | No |
+| Example | `@libar-docs-target src/api/stub-resolver.ts` |
+
+### `since`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Design session that created this pattern |
+| Required | No |
+| Repeatable | No |
+| Example | `@libar-docs-since DS-A` |
 
 ---
 

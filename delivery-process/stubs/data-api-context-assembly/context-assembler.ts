@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIContextAssembly
  * @libar-docs-uses ProcessStateAPI, MasterDataset, PatternSummarizer
  * @libar-docs-used-by ProcessAPICLIImpl, ContextFormatter
+ * @libar-docs-target src/api/context-assembler.ts
+ * @libar-docs-since DS-C
  *
  * ## ContextAssembler — Session-Oriented Context Bundle Builder
  *
@@ -35,9 +37,7 @@
  * | FSM state | no | no | yes |
  * | Test files | no | no | yes |
  *
- * Target: src/api/context-assembler.ts
  * See: DataAPIContextAssembly spec, Rules 1-5
- * Since: DS-C
  */
 
 // ---------------------------------------------------------------------------

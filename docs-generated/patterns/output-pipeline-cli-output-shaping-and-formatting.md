@@ -25,9 +25,7 @@ The pipeline discriminates pattern arrays from scalars using a PipelineInput
 discriminated union — the router knows which methods return ExtractedPattern[]
 via a static PATTERN_ARRAY_METHODS set.
 
-Target: src/cli/output-pipeline.ts
 See: DataAPIOutputShaping spec, Rule 2 (Output Modifiers), Rule 3 (Output Format)
-Since: DS-A
 
 ---
 

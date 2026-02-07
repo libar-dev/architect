@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-uses ProcessStateAPI
  * @libar-docs-used-by OutputPipeline, ProcessAPICLIImpl
+ * @libar-docs-target src/api/summarize.ts
+ * @libar-docs-since DS-A
  *
  * ## PatternSummarizer — Compact Pattern Projection
  *
@@ -14,9 +16,7 @@
  * Uses Zod schema-first pattern: PatternSummarySchema defines the type,
  * and PatternSummary is inferred from it.
  *
- * Target: src/api/summarize.ts
  * See: DataAPIOutputShaping spec, Rule 1 (Pattern Summarization)
- * Since: DS-A
  */
 
 import { z } from 'zod';

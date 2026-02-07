@@ -3,6 +3,8 @@
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/api/fuzzy-match.ts
+ * @libar-docs-since DS-A
  *
  * ## FuzzyMatcher — Pattern Name Fuzzy Search
  *
@@ -15,9 +17,7 @@
  * - `search` subcommand: ranked results via fuzzyMatchPatterns()
  * - `pattern` subcommand: "Did you mean...?" fallback via findBestMatch()
  *
- * Target: src/api/fuzzy-match.ts
  * See: DataAPIOutputShaping spec, Rule 4 (Filtering and Search)
- * Since: DS-A
  */
 
 // ---------------------------------------------------------------------------

@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIArchitectureQueries
  * @libar-docs-uses Pattern Scanner, MasterDataset
  * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/api/coverage-analyzer.ts
+ * @libar-docs-since DS-D
  *
  * ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection
  *
@@ -27,9 +29,7 @@
  * - Excluding: node_modules, dist, test files, declaration files
  * - Same exclusion rules as the scanner: findFilesToScan() defaults
  *
- * Target: src/api/coverage-analyzer.ts
  * See: DataAPIArchitectureQueries spec, Rule 2 (Architecture Coverage)
- * Since: DS-D
  */
 
 // ---------------------------------------------------------------------------

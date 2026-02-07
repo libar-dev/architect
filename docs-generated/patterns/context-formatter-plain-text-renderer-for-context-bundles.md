@@ -34,9 +34,7 @@ May reuse from src/renderable/codecs/helpers.ts:
 - extractFirstSentence() for metadata summary
 - truncateText() for long descriptions
 
-Target: src/api/context-formatter.ts
 See: DataAPIContextAssembly spec, ADR-008 (text output path)
-Since: DS-C
 
 ---
 

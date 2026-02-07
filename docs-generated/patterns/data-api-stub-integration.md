@@ -1,4 +1,4 @@
-# 📋 Data API Stub Integration
+# ✅ Data API Stub Integration
 
 **Purpose:** Detailed documentation for the Data API Stub Integration pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | completed |
 | Category | DDD |
 | Phase | 25 |
 
@@ -50,6 +50,7 @@
 Files that implement this pattern:
 
 - [`stub-resolver.ts`](../../delivery-process/stubs/data-api-stub-integration/stub-resolver.ts) - ## StubResolver — Design Stub Discovery and Resolution
+- [`stub-resolver.ts`](../../src/api/stub-resolver.ts) - ## StubResolver — Design Stub Discovery and Resolution
 
 ## Acceptance Criteria
 

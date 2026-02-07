@@ -1,6 +1,6 @@
-# 📋 StubResolver — Design Stub Discovery and Resolution
+# 🚧 Stub Resolver Impl
 
-**Purpose:** Detailed documentation for the StubResolver — Design Stub Discovery and Resolution pattern
+**Purpose:** Detailed documentation for the Stub Resolver Impl pattern
 
 ---
 
@@ -8,8 +8,8 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
-| Category | Status |
+| Status | active |
+| Category | Pattern |
 
 ## Description
 
@@ -23,8 +23,6 @@ Stub identification heuristic:
 Resolution uses a `fileExists` callback (defaulting to `fs.existsSync()`) on
 targetPath — not pipeline data — because target files may not have `@libar-docs`
 annotations. The callback enables testing without filesystem side effects.
-
-See: DataAPIStubIntegration spec, Rule 2 (Stubs Subcommand)
 
 ---
 

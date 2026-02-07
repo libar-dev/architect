@@ -4,6 +4,8 @@
  * @libar-docs-implements DataAPIContextAssembly
  * @libar-docs-uses ContextAssembler
  * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/api/context-formatter.ts
+ * @libar-docs-since DS-C
  *
  * ## ContextFormatter — Plain Text Renderer for Context Bundles
  *
@@ -28,9 +30,7 @@
  * - extractFirstSentence() for metadata summary
  * - truncateText() for long descriptions
  *
- * Target: src/api/context-formatter.ts
  * See: DataAPIContextAssembly spec, ADR-008 (text output path)
- * Since: DS-C
  */
 
 import type {
