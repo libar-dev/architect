@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIContextAssembly
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:25b
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:3d
@@ -40,7 +40,7 @@ Feature: Data API Context Assembly - One-Command Session Context
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | ContextBundle type | planned | src/api/types.ts | Yes | unit |
+      | ContextBundle type | planned | src/api/context-assembler.ts | Yes | unit |
       | Context assembler | planned | src/api/context-assembler.ts | Yes | unit |
       | context subcommand | planned | src/cli/process-api.ts | Yes | integration |
       | files subcommand | planned | src/cli/process-api.ts | Yes | integration |

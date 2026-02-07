@@ -47,7 +47,8 @@ export type QueryErrorCode =
   | 'QUARTER_NOT_FOUND'
   | 'CATEGORY_NOT_FOUND'
   | 'STUB_NOT_FOUND'
-  | 'PDR_NOT_FOUND';
+  | 'PDR_NOT_FOUND'
+  | 'CONTEXT_ASSEMBLY_ERROR';
 
 /**
  * Failed query response

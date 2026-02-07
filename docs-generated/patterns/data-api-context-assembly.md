@@ -1,4 +1,4 @@
-# 📋 Data API Context Assembly
+# ✅ Data API Context Assembly
 
 **Purpose:** Detailed documentation for the Data API Context Assembly pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | completed |
 | Category | DDD |
 | Phase | 25 |
 
@@ -53,6 +53,8 @@ Files that implement this pattern:
 
 - [`context-assembler.ts`](../../delivery-process/stubs/data-api-context-assembly/context-assembler.ts) - ## ContextAssembler — Session-Oriented Context Bundle Builder
 - [`context-formatter.ts`](../../delivery-process/stubs/data-api-context-assembly/context-formatter.ts) - ## ContextFormatter — Plain Text Renderer for Context Bundles
+- [`context-assembler.ts`](../../src/api/context-assembler.ts) - ## ContextAssembler — Session-Oriented Context Bundle Builder
+- [`context-formatter.ts`](../../src/api/context-formatter.ts) - ## ContextFormatter — Plain Text Renderer for Context Bundles
 
 ## Acceptance Criteria
 

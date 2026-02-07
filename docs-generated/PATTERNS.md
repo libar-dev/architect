@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 96/153 (63% complete)
+**Overall:** [█████████████░░░░░░░] 97/155 (63% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 96 |
-| 🚧 Active | 21 |
-| 📋 Planned | 36 |
-| **Total** | 153 |
+| ✅ Completed | 97 |
+| 🚧 Active | 23 |
+| 📋 Planned | 35 |
+| **Total** | 155 |
 
 ---
 
@@ -35,7 +35,7 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
-- [Pattern](#pattern) (4)
+- [Pattern](#pattern) (6)
 - [Scanner](#scanner) (2)
 - [Status](#status) (8)
 - [Validation](#validation) (11)
@@ -64,6 +64,7 @@
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
 | ✅ Content Deduplicator | Core | completed | Identifies and merges duplicate sections extracted from multiple sources. |
+| ✅ Data API Context Assembly | DDD | completed | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
 | ✅ Data API Output Shaping | DDD | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
 | ✅ Data API Stub Integration | DDD | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 | ✅ Decision Doc Codec | Core | completed | Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation. |
@@ -143,6 +144,8 @@
 | ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact... |
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
+| 🚧 Context Assembler Impl | Pattern | active | Pure function composition over MasterDataset. |
+| 🚧 Context Formatter Impl | Pattern | active | First plain-text formatter in the codebase. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 File Cache | Pattern | active | Simple Map-based cache for file contents during a single generation run. |
@@ -176,7 +179,6 @@
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
 | 📋 Data API Architecture Queries | DDD | planned | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
 | 📋 Data API CLI Ergonomics | DDD | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
-| 📋 Data API Context Assembly | DDD | planned | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
 | 📋 Data API Design Session Support | DDD | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
 | 📋 Data API Platform Integration | DDD | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | DDD | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
@@ -297,8 +299,9 @@
 
 ### DDD
 
-11/34 complete (32%)
+12/34 complete (35%)
 
+- [✅ Data API Context Assembly](patterns/data-api-context-assembly.md)
 - [✅ Data API Output Shaping](patterns/data-api-output-shaping.md)
 - [✅ Data API Stub Integration](patterns/data-api-stub-integration.md)
 - [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
@@ -320,7 +323,6 @@
 - [📋 Cross Source Validation](patterns/cross-source-validation.md)
 - [📋 Data API Architecture Queries](patterns/data-api-architecture-queries.md)
 - [📋 Data API CLI Ergonomics](patterns/data-apicli-ergonomics.md)
-- [📋 Data API Context Assembly](patterns/data-api-context-assembly.md)
 - [📋 Data API Design Session Support](patterns/data-api-design-session-support.md)
 - [📋 Data API Platform Integration](patterns/data-api-platform-integration.md)
 - [📋 Data API Relationship Graph](patterns/data-api-relationship-graph.md)
@@ -437,10 +439,12 @@
 
 ### Pattern
 
-2/4 complete (50%)
+2/6 complete (33%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
 - [✅ Shape Extractor](patterns/shape-extractor.md)
+- [🚧 Context Assembler Impl](patterns/context-assembler-impl.md)
+- [🚧 Context Formatter Impl](patterns/context-formatter-impl.md)
 - [🚧 File Cache](patterns/file-cache.md)
 - [🚧 Stub Resolver Impl](patterns/stub-resolver-impl.md)
 
@@ -514,11 +518,6 @@ graph TD
     ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
     ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
     ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> GherkinTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
-    AntiPatternDetector --> GherkinTypes
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -529,8 +528,14 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> GherkinTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -541,22 +546,11 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -568,6 +562,18 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -594,18 +600,16 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -614,6 +618,14 @@ graph TD
     ProcessStateAPI --> FSMValidator
     ProcessStateAPI ..-> PhaseStateMachineValidation
     FuzzyMatcherImpl ..-> DataAPIOutputShaping
+    ContextFormatterImpl --> ContextAssemblerImpl
+    ContextFormatterImpl ..-> DataAPIContextAssembly
+    ContextAssemblerImpl --> ProcessStateAPI
+    ContextAssemblerImpl --> MasterDataset
+    ContextAssemblerImpl --> PatternSummarizerImpl
+    ContextAssemblerImpl --> FuzzyMatcherImpl
+    ContextAssemblerImpl --> StubResolverImpl
+    ContextAssemblerImpl ..-> DataAPIContextAssembly
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -626,16 +638,16 @@ graph TD
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction

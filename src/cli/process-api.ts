@@ -75,6 +75,21 @@ import {
   type PipelineInput,
   type ListFilters,
 } from './output-pipeline.js';
+import {
+  assembleContext,
+  buildDepTree,
+  buildFileReadingList,
+  buildOverview,
+  ContextAssemblyError,
+  isValidSessionType,
+  type SessionType,
+} from '../api/context-assembler.js';
+import {
+  formatContextBundle,
+  formatDepTree,
+  formatFileReadingList,
+  formatOverview,
+} from '../api/context-formatter.js';
 
 // =============================================================================
 // CLIQueryError
@@ -109,6 +124,7 @@ interface ProcessAPICLIConfig {
   version: boolean;
   modifiers: OutputModifiers;
   format: 'json' | 'compact';
+  sessionType: SessionType | null;
 }
 
 // =============================================================================
@@ -127,6 +143,7 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
     version: false,
     modifiers: { ...DEFAULT_OUTPUT_MODIFIERS },
     format: 'json',
+    sessionType: null,
   };
 
   // Mutable modifiers for parsing
@@ -223,6 +240,14 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
           i++;
           break;
 
+        case '--session':
+          if (!nextArg || !isValidSessionType(nextArg)) {
+            throw new Error(`${arg} must be "planning", "design", or "implement"`);
+          }
+          config.sessionType = nextArg;
+          i++;
+          break;
+
         default:
           throw new Error(`Unknown option: ${arg}`);
       }
@@ -275,6 +300,10 @@ Subcommands:
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
   arch graph <pattern>      Dependency graph for pattern
+  context <pattern> [--session planning|design|implement]  Curated context bundle (text)
+  files <pattern> [--related]                             File reading list (text)
+  dep-tree <pattern> [--depth N]                          Dependency tree (text)
+  overview                                                Executive project summary (text)
   stubs [pattern]           List design stubs with implementation status
   stubs --unresolved        Show only stubs with missing target files
   decisions <pattern>       Show AD-N design decisions from stub descriptions
@@ -869,10 +898,118 @@ interface RouteContext {
   subcommand: string;
   subArgs: string[];
   modifiers: OutputModifiers;
+  sessionType: SessionType | null;
+  baseDir: string;
 }
+
+// =============================================================================
+// Context Assembly Handlers (text output — ADR-008)
+// =============================================================================
+
+function parseSessionFromSubArgs(subArgs: string[]): SessionType | null {
+  const idx = subArgs.indexOf('--session');
+  if (idx === -1) return null;
+  const val = subArgs[idx + 1];
+  if (val !== undefined && isValidSessionType(val)) return val;
+  return null;
+}
+
+function handleContext(ctx: RouteContext): string {
+  const patternNames: string[] = [];
+  for (let i = 0; i < ctx.subArgs.length; i++) {
+    const arg = ctx.subArgs[i];
+    if (arg === '--session') {
+      i++; // skip the value
+      continue;
+    }
+    if (arg !== undefined && !arg.startsWith('-')) {
+      patternNames.push(arg);
+    }
+  }
+
+  if (patternNames.length === 0) {
+    throw new CLIQueryError(
+      'CONTEXT_ASSEMBLY_ERROR',
+      'Usage: process-api context <pattern> [pattern2...] [--session planning|design|implement]'
+    );
+  }
+
+  const sessionType = ctx.sessionType ?? parseSessionFromSubArgs(ctx.subArgs) ?? 'design';
+  const bundle = assembleContext(ctx.dataset, ctx.api, {
+    patterns: patternNames,
+    sessionType,
+    baseDir: ctx.baseDir,
+  });
+  return formatContextBundle(bundle);
+}
+
+function handleFiles(ctx: RouteContext): string {
+  const patternName = ctx.subArgs.find((a) => !a.startsWith('-'));
+  if (patternName === undefined) {
+    throw new CLIQueryError(
+      'CONTEXT_ASSEMBLY_ERROR',
+      'Usage: process-api files <pattern> [--related]'
+    );
+  }
+
+  const includeRelated = ctx.subArgs.includes('--related');
+  const list = buildFileReadingList(ctx.dataset, patternName, includeRelated);
+  return formatFileReadingList(list);
+}
+
+function handleDepTreeCmd(ctx: RouteContext): string {
+  const patternName = ctx.subArgs.find((a) => !a.startsWith('-'));
+  if (patternName === undefined) {
+    throw new CLIQueryError(
+      'CONTEXT_ASSEMBLY_ERROR',
+      'Usage: process-api dep-tree <pattern> [--depth N]'
+    );
+  }
+
+  // Parse --depth N
+  let maxDepth = 3;
+  const depthIdx = ctx.subArgs.indexOf('--depth');
+  if (depthIdx !== -1) {
+    const depthVal = ctx.subArgs[depthIdx + 1];
+    if (depthVal !== undefined) {
+      const parsed = parseInt(depthVal, 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        maxDepth = parsed;
+      }
+    }
+  }
+
+  const tree = buildDepTree(ctx.dataset, {
+    pattern: patternName,
+    maxDepth,
+    includeImplementationDeps: true,
+  });
+  return formatDepTree(tree);
+}
+
+function handleOverviewCmd(ctx: RouteContext): string {
+  const overview = buildOverview(ctx.dataset);
+  return formatOverview(overview);
+}
+
+// =============================================================================
+// Subcommand Router
+// =============================================================================
 
 function routeSubcommand(ctx: RouteContext): unknown {
   switch (ctx.subcommand) {
+    case 'context':
+      return handleContext(ctx);
+
+    case 'files':
+      return handleFiles(ctx);
+
+    case 'dep-tree':
+      return handleDepTreeCmd(ctx);
+
+    case 'overview':
+      return handleOverviewCmd(ctx);
+
     case 'status':
       return handleStatus(ctx.api);
 
@@ -913,7 +1050,7 @@ function routeSubcommand(ctx: RouteContext): unknown {
     default:
       throw new CLIQueryError(
         'PATTERN_NOT_FOUND',
-        `Unknown subcommand: ${ctx.subcommand}\nAvailable: status, query, pattern, list, search, arch, stubs, decisions, pdr`
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr`
       );
   }
 }
@@ -963,19 +1100,36 @@ async function main(): Promise<void> {
     subcommand: opts.subcommand,
     subArgs: opts.subArgs,
     modifiers: opts.modifiers,
+    sessionType: opts.sessionType,
+    baseDir: path.resolve(opts.baseDir),
   });
 
-  // Wrap in QueryResult envelope and output
-  const envelope = createSuccess(result, masterDataset.counts.total);
-  const output =
-    opts.format === 'compact' ? formatOutput(envelope, 'compact') : formatOutput(envelope, 'json');
-  console.log(output);
+  // Dual output path (ADR-008):
+  // Text commands (context, files, dep-tree, overview) return string → output directly.
+  // JSON commands return objects → wrap in QueryResult envelope.
+  if (typeof result === 'string') {
+    console.log(result);
+  } else {
+    const envelope = createSuccess(result, masterDataset.counts.total);
+    const output =
+      opts.format === 'compact'
+        ? formatOutput(envelope, 'compact')
+        : formatOutput(envelope, 'json');
+    console.log(output);
+  }
 }
 
 void main().catch((error: unknown) => {
   // CLIQueryError -> structured error envelope
   if (error instanceof CLIQueryError) {
     const envelope = createError(error.code, error.message);
+    console.log(JSON.stringify(envelope, null, 2));
+    process.exit(1);
+    return;
+  }
+  // ContextAssemblyError -> structured error envelope
+  if (error instanceof ContextAssemblyError) {
+    const envelope = createError('CONTEXT_ASSEMBLY_ERROR', error.message);
     console.log(JSON.stringify(envelope, null, 2));
     process.exit(1);
     return;
