@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIArchitectureQueries
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:25b
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:2d
