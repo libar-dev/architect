@@ -20,8 +20,9 @@ Stub identification heuristic:
 - Source file path contains `/stubs/` (lives in stubs directory), OR
 - Pattern has a `targetPath` field (from @libar-docs-target tag)
 
-Resolution uses `fs.existsSync()` on targetPath — not pipeline data —
-because target files may not have `@libar-docs` annotations.
+Resolution uses a `fileExists` callback (defaulting to `fs.existsSync()`) on
+targetPath — not pipeline data — because target files may not have `@libar-docs`
+annotations. The callback enables testing without filesystem side effects.
 
 Target: src/api/stub-resolver.ts
 See: DataAPIStubIntegration spec, Rule 2 (Stubs Subcommand)

@@ -41,21 +41,21 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 17 |
-| ✅ Ready to Start | 36 |
-| ⚠️ Blocked | 2 |
+| ✅ Ready to Start | 34 |
+| ⚠️ Blocked | 4 |
 
 ### Top Ready to Start
 
 - Traceability Generator (Phase 18)
 - Architecture Diagram Generation (Phase 23)
-- Data API Architecture Queries (Phase 25)
 - Data API CLI Ergonomics (Phase 25)
-- Data API Context Assembly (Phase 25)
 - Data API Output Shaping (Phase 25)
 - Data API Platform Integration (Phase 25)
 - Data API Relationship Graph (Phase 25)
 - Data API Stub Integration (Phase 25)
 - Prd Implementation Section (Phase 99)
+- Status Aware Eslint Suppression (Phase 99)
+- Streaming Git Diff (Phase 99)
 
 See phase detail files for full list.
 
@@ -67,10 +67,10 @@ Items ready to start (no blocking dependencies):
 
 - 📋 Traceability Generator (Phase 18) - 2d
 - 📋 Architecture Diagram Generation (Phase 23) - 1w
-- 📋 Data API Architecture Queries (Phase 25) - 2d
 - 📋 Data API CLI Ergonomics (Phase 25) - 2d
-- 📋 Data API Context Assembly (Phase 25) - 3d
+- 📋 Data API Output Shaping (Phase 25) - 4d
+- 📋 Data API Platform Integration (Phase 25) - 3d
 
-Showing 5 of 36 actionable items.
+Showing 5 of 34 actionable items.
 
 ---

@@ -67,6 +67,13 @@ Files that implement this pattern:
 - Then the pattern's targetPath field contains "platform-core/src/agent/router.ts"
 - And the targetPath is available via ProcessStateAPI queries
 
+**Stub without libar-docs opt-in is invisible to scanner**
+
+- Given a stub file without the @libar-docs marker
+- When running the scanner pipeline with stubs input glob
+- Then the stub does NOT appear in the MasterDataset
+- And no error is raised for the missing marker
+
 **List all stubs with implementation status**
 
 - Given stubs exist for 4 patterns with targets
@@ -88,6 +95,13 @@ Files that implement this pattern:
 - When running "process-api stubs --unresolved"
 - Then only the 2 stubs without existing target files are returned
 
+**Stubs for nonexistent pattern returns empty result**
+
+- Given no stubs implement "NonExistentPattern"
+- When running "process-api stubs NonExistentPattern"
+- Then the result is empty
+- And the error message suggests checking the pattern name
+
 **Query design decisions for a pattern**
 
 - Given stubs for "AgentCommandInfrastructure" with AD-N items
@@ -103,6 +117,13 @@ Files that implement this pattern:
 - Then the output lists all patterns referencing PDR-012
 - And the output shows the decision feature file location
 - And the output shows stub count per pattern
+
+**PDR query for nonexistent number returns empty**
+
+- Given no patterns or stubs reference "PDR-999"
+- When running "process-api pdr 999"
+- Then the result indicates no references found
+- And the output includes "No patterns reference PDR-999"
 
 ## Business Rules
 
@@ -125,7 +146,7 @@ Files that implement this pattern:
 
     **Verified by:** All stubs scanned, Stub metadata extracted
 
-_Verified by: Annotated stubs are discoverable by the scanner, Stub target path is extracted as structured field_
+_Verified by: Annotated stubs are discoverable by the scanner, Stub target path is extracted as structured field, Stub without libar-docs opt-in is invisible to scanner_
 
 **Stubs subcommand lists design stubs with implementation status**
 
@@ -147,7 +168,7 @@ _Verified by: Annotated stubs are discoverable by the scanner, Stub target path 
 
     **Verified by:** List all stubs, List stubs for pattern, Filter unresolved
 
-_Verified by: List all stubs with implementation status, List stubs for a specific pattern, Filter unresolved stubs_
+_Verified by: List all stubs with implementation status, List stubs for a specific pattern, Filter unresolved stubs, Stubs for nonexistent pattern returns empty result_
 
 **Decisions and PDR commands surface design rationale**
 
@@ -180,7 +201,7 @@ _Verified by: List all stubs with implementation status, List stubs for a specif
 
     **Verified by:** Decisions for pattern, PDR cross-reference
 
-_Verified by: Query design decisions for a pattern, Cross-reference a PDR number_
+_Verified by: Query design decisions for a pattern, Cross-reference a PDR number, PDR query for nonexistent number returns empty_
 
 ---
 

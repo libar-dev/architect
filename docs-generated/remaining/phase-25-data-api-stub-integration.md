@@ -18,10 +18,8 @@ These patterns can be started immediately:
 
 | Pattern | Effort | Business Value |
 | --- | --- | --- |
-| 📋 Data API Architecture Queries | 2d | deep architecture exploration for design sessions |
 | 📋 Data API CLI Ergonomics | 2d | fast interactive cli for repeated queries |
-| 📋 Data API Context Assembly | 3d | replace explore agents with one command |
-| 📋 Data API Output Shaping | 3d | compact output for ai agents |
+| 📋 Data API Output Shaping | 4d | compact output for ai agents |
 | 📋 Data API Platform Integration | 3d | native claude code integration and monorepo support |
 | 📋 Data API Relationship Graph | 2d | deep dependency analysis and health checks |
 | 📋 Data API Stub Integration | 2d | unlock design session stub metadata |
@@ -35,6 +33,8 @@ These patterns are waiting on dependencies:
 | Pattern | Blocked By | Effort |
 | --- | --- | --- |
 | Claude Module Generation | ArchitectureDiagramGeneration | 1.5d |
+| Data API Architecture Queries | DataAPIOutputShaping | 2d |
+| Data API Context Assembly | DataAPIOutputShaping, DataAPIStubIntegration | 3d |
 | Data API Design Session Support | DataAPIContextAssembly, DataAPIStubIntegration | 1d |
 
 ---
@@ -435,6 +435,7 @@ _Verified by: Detailed mode includes scenario descriptions, Summary mode produce
 | Status | planned |
 | Effort | 2d |
 | Business Value | deep architecture exploration for design sessions |
+| Dependencies | DataAPIOutputShaping |
 
 **Problem:**
   The current `arch` subcommand provides basic queries (roles, context, layer, graph)
@@ -479,6 +480,13 @@ _Verified by: Detailed mode includes scenario descriptions, Summary mode produce
 - And the output shows unique dependencies per context
 - And the output identifies integration points
 
+**Neighborhood for nonexistent pattern returns error**
+
+- Given no pattern named "NonExistent" exists
+- When running "process-api arch neighborhood NonExistent"
+- Then the command fails with a pattern-not-found error
+- And the error message suggests checking the pattern name
+
 **Architecture coverage report**
 
 - Given 41 annotated files out of 50 scannable files
@@ -493,6 +501,13 @@ _Verified by: Detailed mode includes scenario descriptions, Summary mode produce
 - When running "process-api unannotated --path 'src/generators/**/*.ts'"
 - Then the output lists only unannotated files matching the glob
 - And each file shows its location relative to base directory
+
+**Coverage with no scannable files returns zero coverage**
+
+- Given the input globs match 0 files
+- When running "process-api arch coverage"
+- Then the output shows "0/0 files annotated (0%)"
+- And the unannotated files list is empty
 
 **List all tags with usage counts**
 
@@ -509,6 +524,13 @@ _Verified by: Detailed mode includes scenario descriptions, Summary mode produce
 - Then the output shows file counts by type
 - And the output shows location patterns for each type
 - And the total matches the pipeline scan count
+
+**Tags listing with no patterns returns empty report**
+
+- Given the pipeline has 0 patterns
+- When running "process-api tags"
+- Then the output shows an empty tag report with 0 pattern count
+- And no tag entries are listed
 
 #### Business Rules
 
@@ -531,7 +553,7 @@ _Verified by: Detailed mode includes scenario descriptions, Summary mode produce
 
     **Verified by:** Neighborhood view, Cross-context comparison
 
-_Verified by: Pattern neighborhood shows direct connections, Cross-context comparison_
+_Verified by: Pattern neighborhood shows direct connections, Cross-context comparison, Neighborhood for nonexistent pattern returns error_
 
 **Coverage analysis reports annotation completeness with gaps**
 
@@ -553,7 +575,7 @@ _Verified by: Pattern neighborhood shows direct connections, Cross-context compa
 
     **Verified by:** Coverage report, Unannotated file discovery
 
-_Verified by: Architecture coverage report, Find unannotated files with path filter_
+_Verified by: Architecture coverage report, Find unannotated files with path filter, Coverage with no scannable files returns zero coverage_
 
 **Tags and sources commands provide taxonomy and inventory views**
 
@@ -580,7 +602,7 @@ _Verified by: Architecture coverage report, Find unannotated files with path fil
 
     **Verified by:** Tags listing, Sources inventory
 
-_Verified by: List all tags with usage counts, Source file inventory_
+_Verified by: List all tags with usage counts, Source file inventory, Tags listing with no patterns returns empty report_
 
 ### 📋 Data API CLI Ergonomics
 
@@ -720,6 +742,7 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 | Status | planned |
 | Effort | 3d |
 | Business Value | replace explore agents with one command |
+| Dependencies | DataAPIOutputShaping, DataAPIStubIntegration |
 
 **Problem:**
   Starting a Claude Code design or implementation session requires assembling
@@ -780,6 +803,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - And the output contains FSM state and valid transitions
 - And the output contains test file locations
 
+**Context for nonexistent pattern returns error with suggestion**
+
+- Given a pattern "AgentLLMIntegration" exists
+- When running "process-api context NonExistentPattern --session design"
+- Then the command fails with a pattern-not-found error
+- And the error message suggests similar pattern names
+
 **File reading list with related patterns**
 
 - Given a pattern "OrderSaga" with uses and usedBy relationships
@@ -796,6 +826,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - Then the output lists only the primary spec and stub files
 - And no dependency or neighbor files are included
 
+**Files for pattern with no resolvable paths returns minimal output**
+
+- Given a pattern "MinimalPattern" with no stubs or dependencies
+- When running "process-api files MinimalPattern --related"
+- Then the output lists only the primary spec file
+- And the completed, roadmap, and neighbor sections are empty
+
 **Dependency tree with status markers**
 
 - Given a dependency chain: A (completed) -> B (completed) -> C (roadmap)
@@ -811,6 +848,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - Then the output shows at most 2 levels of dependencies
 - And truncated branches are indicated
 
+**Dependency tree handles circular dependencies safely**
+
+- Given patterns A depends on B and B depends on A
+- When running "process-api dep-tree A"
+- Then the output shows the cycle without infinite recursion
+- And the visited node is marked to indicate a cycle
+
 **Multi-pattern context merges dependencies**
 
 - Given patterns "AgentLLM" and "AgentCommand" sharing dependency "AgentBC"
@@ -819,6 +863,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - And unique dependencies are listed per pattern
 - And the combined context is smaller than two separate calls
 
+**Multi-pattern context with one invalid name reports error**
+
+- Given a pattern "AgentLLM" exists but "InvalidName" does not
+- When running "process-api context AgentLLM InvalidName --session design"
+- Then the command fails with a pattern-not-found error for "InvalidName"
+- And no partial context is returned
+
 **Executive overview**
 
 - Given 36 completed, 3 active, and 30 planned patterns
@@ -826,6 +877,14 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - Then the output shows "69 patterns (36 completed, 3 active, 30 planned) = 52%"
 - And the output lists active phases with counts
 - And the output shows blocking relationships
+
+**Overview with empty pipeline returns zero-state summary**
+
+- Given the pipeline has 0 patterns
+- When running "process-api overview"
+- Then the output shows "0 patterns (0 completed, 0 active, 0 planned) = 0%"
+- And the active phases section is empty
+- And the blocking section is empty
 
 #### Business Rules
 
@@ -858,7 +917,7 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 
     **Verified by:** Design session context, Planning session context, Implementation context
 
-_Verified by: Assemble design session context, Assemble planning session context, Assemble implementation session context_
+_Verified by: Assemble design session context, Assemble planning session context, Assemble implementation session context, Context for nonexistent pattern returns error with suggestion_
 
 **Files command returns only file paths organized by relevance**
 
@@ -880,7 +939,7 @@ _Verified by: Assemble design session context, Assemble planning session context
 
     **Verified by:** Files with related patterns, Files without related
 
-_Verified by: File reading list with related patterns, File reading list without related patterns_
+_Verified by: File reading list with related patterns, File reading list without related patterns, Files for pattern with no resolvable paths returns minimal output_
 
 **Dep-tree command shows recursive dependency chain with status**
 
@@ -903,7 +962,7 @@ _Verified by: File reading list with related patterns, File reading list without
 
     **Verified by:** Dep-tree with status, Dep-tree with depth limit
 
-_Verified by: Dependency tree with status markers, Dependency tree with depth limit_
+_Verified by: Dependency tree with status markers, Dependency tree with depth limit, Dependency tree handles circular dependencies safely_
 
 **Context command supports multiple patterns with merged output**
 
@@ -917,7 +976,7 @@ _Verified by: Dependency tree with status markers, Dependency tree with depth li
 
     **Verified by:** Multi-pattern context
 
-_Verified by: Multi-pattern context merges dependencies_
+_Verified by: Multi-pattern context merges dependencies, Multi-pattern context with one invalid name reports error_
 
 **Overview provides executive project summary**
 
@@ -936,7 +995,7 @@ _Verified by: Multi-pattern context merges dependencies_
 
     **Verified by:** Executive overview
 
-_Verified by: Executive overview_
+_Verified by: Executive overview, Overview with empty pipeline returns zero-state summary_
 
 ### 📋 Data API Design Session Support
 
@@ -1072,7 +1131,7 @@ _Verified by: Generate handoff for in-progress pattern, Handoff captures discove
 | Property | Value |
 | --- | --- |
 | Status | planned |
-| Effort | 3d |
+| Effort | 4d |
 | Business Value | compact output for ai agents |
 
 **Problem:**
@@ -1124,6 +1183,13 @@ _Verified by: Generate handoff for in-progress pattern, Handoff captures discove
 - Then the output contains full pattern detail
 - And the output includes deliverables, dependencies, and relationships
 
+**Full flag combined with names-only is rejected**
+
+- Given patterns exist in the dataset
+- When running "process-api query getCurrentWork --full --names-only"
+- Then the command fails with an error about conflicting modifiers
+- And the error message lists the conflicting flags
+
 **Names-only output for list queries**
 
 - Given 5 patterns exist with status "roadmap"
@@ -1143,6 +1209,13 @@ _Verified by: Generate handoff for in-progress pattern, Handoff captures discove
 - When running "process-api query getCurrentWork --fields patternName,status,phase"
 - Then each pattern in the output contains only the requested fields
 - And no other fields are present
+
+**Invalid field name in field selection is rejected**
+
+- Given patterns exist in the dataset
+- When running "process-api query getCurrentWork --fields patternName,nonExistentField"
+- Then the command fails with an error about invalid field names
+- And the error message lists valid field names for the current output mode
 
 **Successful query returns typed envelope**
 
@@ -1193,6 +1266,13 @@ _Verified by: Generate handoff for in-progress pattern, Handoff captures discove
 - Then exactly 5 patterns are returned
 - And they start from the 11th pattern
 
+**Search with no results returns empty with suggestion**
+
+- Given patterns exist but none match "zzNonexistent"
+- When running "process-api search zzNonexistent"
+- Then the result contains an empty matches array
+- And the output includes a hint that no patterns matched
+
 **Config file provides default input paths**
 
 - Given a delivery-process.config.ts exists with input and features paths
@@ -1237,7 +1317,7 @@ _Verified by: Generate handoff for in-progress pattern, Handoff captures discove
 
     **Verified by:** List returns summaries, Full flag returns raw patterns, Pattern detail unchanged
 
-_Verified by: List queries return compact summaries, Full flag returns complete patterns, Single pattern detail is unaffected_
+_Verified by: List queries return compact summaries, Full flag returns complete patterns, Single pattern detail is unaffected, Full flag combined with names-only is rejected_
 
 **Global output modifier flags apply to any list-returning command**
 
@@ -1256,7 +1336,7 @@ _Verified by: List queries return compact summaries, Full flag returns complete 
 
     **Verified by:** Names-only output, Count output, Field selection
 
-_Verified by: Names-only output for list queries, Count output for list queries, Field selection for list queries_
+_Verified by: Names-only output for list queries, Count output for list queries, Field selection for list queries, Invalid field name in field selection is rejected_
 
 **Output format is configurable with typed response envelope**
 
@@ -1283,6 +1363,7 @@ _Verified by: Successful query returns typed envelope, Failed query returns erro
 
 **Invariant:** The `list` subcommand replaces the need to call specific
     `getPatternsByX` methods. Filters are composable via AND logic.
+    The `query` subcommand remains available for programmatic/raw access.
 
     **Rationale:** Currently, filtering by status AND category requires calling
     `getPatternsByCategory` then manually filtering by status. A single `list`
@@ -1300,7 +1381,7 @@ _Verified by: Successful query returns typed envelope, Failed query returns erro
 
     **Verified by:** Single filter, Composed filters, Fuzzy search, Pagination
 
-_Verified by: List with single filter, List with composed filters, Search with fuzzy matching, Pagination with limit and offset_
+_Verified by: List with single filter, List with composed filters, Search with fuzzy matching, Pagination with limit and offset, Search with no results returns empty with suggestion_
 
 **CLI provides ergonomic defaults and helpful error messages**
 
@@ -1676,6 +1757,13 @@ _Verified by: Detect dangling references, Detect orphan patterns, Show blocking 
 - Then the pattern's targetPath field contains "platform-core/src/agent/router.ts"
 - And the targetPath is available via ProcessStateAPI queries
 
+**Stub without libar-docs opt-in is invisible to scanner**
+
+- Given a stub file without the @libar-docs marker
+- When running the scanner pipeline with stubs input glob
+- Then the stub does NOT appear in the MasterDataset
+- And no error is raised for the missing marker
+
 **List all stubs with implementation status**
 
 - Given stubs exist for 4 patterns with targets
@@ -1697,6 +1785,13 @@ _Verified by: Detect dangling references, Detect orphan patterns, Show blocking 
 - When running "process-api stubs --unresolved"
 - Then only the 2 stubs without existing target files are returned
 
+**Stubs for nonexistent pattern returns empty result**
+
+- Given no stubs implement "NonExistentPattern"
+- When running "process-api stubs NonExistentPattern"
+- Then the result is empty
+- And the error message suggests checking the pattern name
+
 **Query design decisions for a pattern**
 
 - Given stubs for "AgentCommandInfrastructure" with AD-N items
@@ -1712,6 +1807,13 @@ _Verified by: Detect dangling references, Detect orphan patterns, Show blocking 
 - Then the output lists all patterns referencing PDR-012
 - And the output shows the decision feature file location
 - And the output shows stub count per pattern
+
+**PDR query for nonexistent number returns empty**
+
+- Given no patterns or stubs reference "PDR-999"
+- When running "process-api pdr 999"
+- Then the result indicates no references found
+- And the output includes "No patterns reference PDR-999"
 
 #### Business Rules
 
@@ -1734,7 +1836,7 @@ _Verified by: Detect dangling references, Detect orphan patterns, Show blocking 
 
     **Verified by:** All stubs scanned, Stub metadata extracted
 
-_Verified by: Annotated stubs are discoverable by the scanner, Stub target path is extracted as structured field_
+_Verified by: Annotated stubs are discoverable by the scanner, Stub target path is extracted as structured field, Stub without libar-docs opt-in is invisible to scanner_
 
 **Stubs subcommand lists design stubs with implementation status**
 
@@ -1756,7 +1858,7 @@ _Verified by: Annotated stubs are discoverable by the scanner, Stub target path 
 
     **Verified by:** List all stubs, List stubs for pattern, Filter unresolved
 
-_Verified by: List all stubs with implementation status, List stubs for a specific pattern, Filter unresolved stubs_
+_Verified by: List all stubs with implementation status, List stubs for a specific pattern, Filter unresolved stubs, Stubs for nonexistent pattern returns empty result_
 
 **Decisions and PDR commands surface design rationale**
 
@@ -1789,7 +1891,7 @@ _Verified by: List all stubs with implementation status, List stubs for a specif
 
     **Verified by:** Decisions for pattern, PDR cross-reference
 
-_Verified by: Query design decisions for a pattern, Cross-reference a PDR number_
+_Verified by: Query design decisions for a pattern, Cross-reference a PDR number, PDR query for nonexistent number returns empty_
 
 ---
 

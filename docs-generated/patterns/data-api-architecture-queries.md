@@ -37,6 +37,10 @@
   | Taxonomy discovery | Know what tags and categories are available |
   | Cross-context analysis | Compare bounded contexts for integration |
 
+## Dependencies
+
+- Depends on: DataAPIOutputShaping
+
 ## Implementations
 
 Files that implement this pattern:
@@ -64,6 +68,13 @@ Files that implement this pattern:
 - And the output shows unique dependencies per context
 - And the output identifies integration points
 
+**Neighborhood for nonexistent pattern returns error**
+
+- Given no pattern named "NonExistent" exists
+- When running "process-api arch neighborhood NonExistent"
+- Then the command fails with a pattern-not-found error
+- And the error message suggests checking the pattern name
+
 **Architecture coverage report**
 
 - Given 41 annotated files out of 50 scannable files
@@ -78,6 +89,13 @@ Files that implement this pattern:
 - When running "process-api unannotated --path 'src/generators/**/*.ts'"
 - Then the output lists only unannotated files matching the glob
 - And each file shows its location relative to base directory
+
+**Coverage with no scannable files returns zero coverage**
+
+- Given the input globs match 0 files
+- When running "process-api arch coverage"
+- Then the output shows "0/0 files annotated (0%)"
+- And the unannotated files list is empty
 
 **List all tags with usage counts**
 
@@ -94,6 +112,13 @@ Files that implement this pattern:
 - Then the output shows file counts by type
 - And the output shows location patterns for each type
 - And the total matches the pipeline scan count
+
+**Tags listing with no patterns returns empty report**
+
+- Given the pipeline has 0 patterns
+- When running "process-api tags"
+- Then the output shows an empty tag report with 0 pattern count
+- And no tag entries are listed
 
 ## Business Rules
 
@@ -116,7 +141,7 @@ Files that implement this pattern:
 
     **Verified by:** Neighborhood view, Cross-context comparison
 
-_Verified by: Pattern neighborhood shows direct connections, Cross-context comparison_
+_Verified by: Pattern neighborhood shows direct connections, Cross-context comparison, Neighborhood for nonexistent pattern returns error_
 
 **Coverage analysis reports annotation completeness with gaps**
 
@@ -138,7 +163,7 @@ _Verified by: Pattern neighborhood shows direct connections, Cross-context compa
 
     **Verified by:** Coverage report, Unannotated file discovery
 
-_Verified by: Architecture coverage report, Find unannotated files with path filter_
+_Verified by: Architecture coverage report, Find unannotated files with path filter, Coverage with no scannable files returns zero coverage_
 
 **Tags and sources commands provide taxonomy and inventory views**
 
@@ -165,7 +190,7 @@ _Verified by: Architecture coverage report, Find unannotated files with path fil
 
     **Verified by:** Tags listing, Sources inventory
 
-_Verified by: List all tags with usage counts, Source file inventory_
+_Verified by: List all tags with usage counts, Source file inventory, Tags listing with no patterns returns empty report_
 
 ---
 

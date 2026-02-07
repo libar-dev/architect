@@ -42,6 +42,11 @@
   | Session-type tailoring | Right context for the right workflow |
   | Dependency chain visibility | Know blocking status before starting |
 
+## Dependencies
+
+- Depends on: DataAPIOutputShaping
+- Depends on: DataAPIStubIntegration
+
 ## Implementations
 
 Files that implement this pattern:
@@ -80,6 +85,13 @@ Files that implement this pattern:
 - And the output contains FSM state and valid transitions
 - And the output contains test file locations
 
+**Context for nonexistent pattern returns error with suggestion**
+
+- Given a pattern "AgentLLMIntegration" exists
+- When running "process-api context NonExistentPattern --session design"
+- Then the command fails with a pattern-not-found error
+- And the error message suggests similar pattern names
+
 **File reading list with related patterns**
 
 - Given a pattern "OrderSaga" with uses and usedBy relationships
@@ -96,6 +108,13 @@ Files that implement this pattern:
 - Then the output lists only the primary spec and stub files
 - And no dependency or neighbor files are included
 
+**Files for pattern with no resolvable paths returns minimal output**
+
+- Given a pattern "MinimalPattern" with no stubs or dependencies
+- When running "process-api files MinimalPattern --related"
+- Then the output lists only the primary spec file
+- And the completed, roadmap, and neighbor sections are empty
+
 **Dependency tree with status markers**
 
 - Given a dependency chain: A (completed) -> B (completed) -> C (roadmap)
@@ -111,6 +130,13 @@ Files that implement this pattern:
 - Then the output shows at most 2 levels of dependencies
 - And truncated branches are indicated
 
+**Dependency tree handles circular dependencies safely**
+
+- Given patterns A depends on B and B depends on A
+- When running "process-api dep-tree A"
+- Then the output shows the cycle without infinite recursion
+- And the visited node is marked to indicate a cycle
+
 **Multi-pattern context merges dependencies**
 
 - Given patterns "AgentLLM" and "AgentCommand" sharing dependency "AgentBC"
@@ -119,6 +145,13 @@ Files that implement this pattern:
 - And unique dependencies are listed per pattern
 - And the combined context is smaller than two separate calls
 
+**Multi-pattern context with one invalid name reports error**
+
+- Given a pattern "AgentLLM" exists but "InvalidName" does not
+- When running "process-api context AgentLLM InvalidName --session design"
+- Then the command fails with a pattern-not-found error for "InvalidName"
+- And no partial context is returned
+
 **Executive overview**
 
 - Given 36 completed, 3 active, and 30 planned patterns
@@ -126,6 +159,14 @@ Files that implement this pattern:
 - Then the output shows "69 patterns (36 completed, 3 active, 30 planned) = 52%"
 - And the output lists active phases with counts
 - And the output shows blocking relationships
+
+**Overview with empty pipeline returns zero-state summary**
+
+- Given the pipeline has 0 patterns
+- When running "process-api overview"
+- Then the output shows "0 patterns (0 completed, 0 active, 0 planned) = 0%"
+- And the active phases section is empty
+- And the blocking section is empty
 
 ## Business Rules
 
@@ -158,7 +199,7 @@ Files that implement this pattern:
 
     **Verified by:** Design session context, Planning session context, Implementation context
 
-_Verified by: Assemble design session context, Assemble planning session context, Assemble implementation session context_
+_Verified by: Assemble design session context, Assemble planning session context, Assemble implementation session context, Context for nonexistent pattern returns error with suggestion_
 
 **Files command returns only file paths organized by relevance**
 
@@ -180,7 +221,7 @@ _Verified by: Assemble design session context, Assemble planning session context
 
     **Verified by:** Files with related patterns, Files without related
 
-_Verified by: File reading list with related patterns, File reading list without related patterns_
+_Verified by: File reading list with related patterns, File reading list without related patterns, Files for pattern with no resolvable paths returns minimal output_
 
 **Dep-tree command shows recursive dependency chain with status**
 
@@ -203,7 +244,7 @@ _Verified by: File reading list with related patterns, File reading list without
 
     **Verified by:** Dep-tree with status, Dep-tree with depth limit
 
-_Verified by: Dependency tree with status markers, Dependency tree with depth limit_
+_Verified by: Dependency tree with status markers, Dependency tree with depth limit, Dependency tree handles circular dependencies safely_
 
 **Context command supports multiple patterns with merged output**
 
@@ -217,7 +258,7 @@ _Verified by: Dependency tree with status markers, Dependency tree with depth li
 
     **Verified by:** Multi-pattern context
 
-_Verified by: Multi-pattern context merges dependencies_
+_Verified by: Multi-pattern context merges dependencies, Multi-pattern context with one invalid name reports error_
 
 **Overview provides executive project summary**
 
@@ -236,7 +277,7 @@ _Verified by: Multi-pattern context merges dependencies_
 
     **Verified by:** Executive overview
 
-_Verified by: Executive overview_
+_Verified by: Executive overview, Overview with empty pipeline returns zero-state summary_
 
 ---
 

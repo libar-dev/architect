@@ -71,6 +71,13 @@ Files that implement this pattern:
 - Then the output contains full pattern detail
 - And the output includes deliverables, dependencies, and relationships
 
+**Full flag combined with names-only is rejected**
+
+- Given patterns exist in the dataset
+- When running "process-api query getCurrentWork --full --names-only"
+- Then the command fails with an error about conflicting modifiers
+- And the error message lists the conflicting flags
+
 **Names-only output for list queries**
 
 - Given 5 patterns exist with status "roadmap"
@@ -90,6 +97,13 @@ Files that implement this pattern:
 - When running "process-api query getCurrentWork --fields patternName,status,phase"
 - Then each pattern in the output contains only the requested fields
 - And no other fields are present
+
+**Invalid field name in field selection is rejected**
+
+- Given patterns exist in the dataset
+- When running "process-api query getCurrentWork --fields patternName,nonExistentField"
+- Then the command fails with an error about invalid field names
+- And the error message lists valid field names for the current output mode
 
 **Successful query returns typed envelope**
 
@@ -140,6 +154,13 @@ Files that implement this pattern:
 - Then exactly 5 patterns are returned
 - And they start from the 11th pattern
 
+**Search with no results returns empty with suggestion**
+
+- Given patterns exist but none match "zzNonexistent"
+- When running "process-api search zzNonexistent"
+- Then the result contains an empty matches array
+- And the output includes a hint that no patterns matched
+
 **Config file provides default input paths**
 
 - Given a delivery-process.config.ts exists with input and features paths
@@ -184,7 +205,7 @@ Files that implement this pattern:
 
     **Verified by:** List returns summaries, Full flag returns raw patterns, Pattern detail unchanged
 
-_Verified by: List queries return compact summaries, Full flag returns complete patterns, Single pattern detail is unaffected_
+_Verified by: List queries return compact summaries, Full flag returns complete patterns, Single pattern detail is unaffected, Full flag combined with names-only is rejected_
 
 **Global output modifier flags apply to any list-returning command**
 
@@ -203,7 +224,7 @@ _Verified by: List queries return compact summaries, Full flag returns complete 
 
     **Verified by:** Names-only output, Count output, Field selection
 
-_Verified by: Names-only output for list queries, Count output for list queries, Field selection for list queries_
+_Verified by: Names-only output for list queries, Count output for list queries, Field selection for list queries, Invalid field name in field selection is rejected_
 
 **Output format is configurable with typed response envelope**
 
@@ -230,6 +251,7 @@ _Verified by: Successful query returns typed envelope, Failed query returns erro
 
 **Invariant:** The `list` subcommand replaces the need to call specific
     `getPatternsByX` methods. Filters are composable via AND logic.
+    The `query` subcommand remains available for programmatic/raw access.
 
     **Rationale:** Currently, filtering by status AND category requires calling
     `getPatternsByCategory` then manually filtering by status. A single `list`
@@ -247,7 +269,7 @@ _Verified by: Successful query returns typed envelope, Failed query returns erro
 
     **Verified by:** Single filter, Composed filters, Fuzzy search, Pagination
 
-_Verified by: List with single filter, List with composed filters, Search with fuzzy matching, Pagination with limit and offset_
+_Verified by: List with single filter, List with composed filters, Search with fuzzy matching, Pagination with limit and offset, Search with no results returns empty with suggestion_
 
 **CLI provides ergonomic defaults and helpful error messages**
 
