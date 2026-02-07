@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIStubIntegration
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:25a
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:2d
