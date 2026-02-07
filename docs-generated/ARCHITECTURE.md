@@ -71,11 +71,11 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator"]
         FileCache["FileCache[infrastructure]"]
+        TransformDataset["TransformDataset"]
+        PipelineModule["PipelineModule"]
         BuiltInGenerators["BuiltInGenerators"]
         DecisionDocGenerator["DecisionDocGenerator"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
-        TransformDataset["TransformDataset"]
-        PipelineModule["PipelineModule"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules"]
@@ -156,26 +156,22 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        LintModule["LintModule"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        LintModule["LintModule"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -183,14 +179,14 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
         FSMModule["FSMModule"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -203,30 +199,25 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
-        PipelineModule["PipelineModule"]
         CodecBaseOptions["CodecBaseOptions"]
     end
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
     ExtractedPatternSchema --> DocDirectiveSchema
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -236,6 +227,10 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
@@ -250,6 +245,11 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ProcessStateAPI --> MasterDataset
@@ -260,14 +260,14 @@ graph TB
     ContextAssemblerImpl --> PatternSummarizerImpl
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ContextAssemblerImpl --> StubResolverImpl
-    DetectChanges --> DeriveProcessState
     ArchitectureCodec --> MasterDataset
+    DetectChanges --> DeriveProcessState
+    TransformDataset --> MasterDataset
+    PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    TransformDataset --> MasterDataset
-    PipelineModule --> TransformDataset
 ```
 
 ---

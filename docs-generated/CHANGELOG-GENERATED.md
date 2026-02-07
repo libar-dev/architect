@@ -92,14 +92,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Universal Renderer**: Converts RenderableDocument to Markdown.
 - **Renderable Document Model(RDM)**: Unified document generation using codecs and a universal renderer.
 - **Document Generator**: Simplified document generation using codecs.
-- **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
-- **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
-- **Lint Engine**: Orchestrates lint rule execution against parsed directives.
 - **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
 - **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
 - **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
 - **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
 - **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
+- **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
+- **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
+- **Lint Engine**: Orchestrates lint rule execution against parsed directives.
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -136,11 +136,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Business Rules Codec**: Transforms MasterDataset into a RenderableDocument for business rules output.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
+- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
-- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
-- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
 - **PDR 001 Self Documentation**
 - **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...

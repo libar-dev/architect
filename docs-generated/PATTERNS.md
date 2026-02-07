@@ -562,6 +562,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -574,6 +584,22 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    PatternSummarizerImpl --> ProcessStateAPI
+    PatternSummarizerImpl ..-> DataAPIOutputShaping
+    StubResolverImpl --> ProcessStateAPI
+    StubResolverImpl ..-> DataAPIStubIntegration
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
+    FuzzyMatcherImpl ..-> DataAPIOutputShaping
+    ContextFormatterImpl --> ContextAssemblerImpl
+    ContextFormatterImpl ..-> DataAPIContextAssembly
+    ContextAssemblerImpl --> ProcessStateAPI
+    ContextAssemblerImpl --> MasterDataset
+    ContextAssemblerImpl --> PatternSummarizerImpl
+    ContextAssemblerImpl --> FuzzyMatcherImpl
+    ContextAssemblerImpl --> StubResolverImpl
+    ContextAssemblerImpl ..-> DataAPIContextAssembly
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -600,54 +626,28 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
-    PatternSummarizerImpl --> ProcessStateAPI
-    PatternSummarizerImpl ..-> DataAPIOutputShaping
-    StubResolverImpl --> ProcessStateAPI
-    StubResolverImpl ..-> DataAPIStubIntegration
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
-    FuzzyMatcherImpl ..-> DataAPIOutputShaping
-    ContextFormatterImpl --> ContextAssemblerImpl
-    ContextFormatterImpl ..-> DataAPIContextAssembly
-    ContextAssemblerImpl --> ProcessStateAPI
-    ContextAssemblerImpl --> MasterDataset
-    ContextAssemblerImpl --> PatternSummarizerImpl
-    ContextAssemblerImpl --> FuzzyMatcherImpl
-    ContextAssemblerImpl --> StubResolverImpl
-    ContextAssemblerImpl ..-> DataAPIContextAssembly
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
-    PatternsCodec ..-> PatternRelationshipModel
-    ArchitectureCodec --> MasterDataset
-    ArchitectureCodec --> ArchIndex
     ProcessGuardTypes ..-> ProcessGuardLinter
     ProcessGuardModule ..-> ProcessGuardLinter
     DetectChanges --> DeriveProcessState
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
+    PatternsCodec ..-> PatternRelationshipModel
+    ArchitectureCodec --> MasterDataset
+    ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction

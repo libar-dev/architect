@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIContextAssembly
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:25b
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:3d
@@ -40,13 +40,13 @@ Feature: Data API Context Assembly - One-Command Session Context
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | ContextBundle type | planned | src/api/context-assembler.ts | Yes | unit |
-      | Context assembler | planned | src/api/context-assembler.ts | Yes | unit |
-      | context subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | files subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | dep-tree subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | overview subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | Context text renderer | planned | src/api/context-formatter.ts | Yes | unit |
+      | ContextBundle type | Done | src/api/context-assembler.ts | Yes | unit |
+      | Context assembler | Done | src/api/context-assembler.ts | Yes | unit |
+      | context subcommand | Done | src/cli/process-api.ts | Yes | integration |
+      | files subcommand | Done | src/cli/process-api.ts | Yes | integration |
+      | dep-tree subcommand | Done | src/cli/process-api.ts | Yes | integration |
+      | overview subcommand | Done | src/cli/process-api.ts | Yes | integration |
+      | Context text renderer | Done | src/api/context-formatter.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Single Pattern Context
