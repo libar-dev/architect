@@ -90,3 +90,11 @@ Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
       Given "OrderHandler" implements "OrderSaga"
       When computing the neighborhood of "OrderSaga"
       Then the neighborhood implementedBy list contains "OrderHandler"
+
+    @acceptance-criteria @happy-path
+    Scenario: Neighborhood includes dependsOn and enables relationships
+      Given a pattern "App" that depends on "Infra"
+      And "Infra" enables "App" via reverse computation
+      When computing the neighborhood of "App"
+      Then the neighborhood dependsOn list contains "Infra"
+      And the neighborhood enables list for "Infra" contains "App"

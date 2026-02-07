@@ -762,6 +762,60 @@ describeFeature(feature, ({ Rule }) => {
       });
     });
 
+    RuleScenario(
+      'File list includes implementation files for completed dependencies',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a pattern {string} that depends on {string}',
+          (_ctx: unknown, name: string, dep: string) => {
+            state = initState();
+            state.patterns = [
+              createTestPattern({
+                name,
+                status: 'roadmap',
+                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                dependsOn: [dep],
+              }),
+              createTestPattern({
+                name: dep,
+                status: 'completed',
+                filePath: `delivery-process/specs/${dep.toLowerCase()}.feature`,
+              }),
+              // Implementation pattern that declares @libar-docs-implements CompletedLib
+              createTestPattern({
+                name: `${dep}Impl`,
+                status: 'completed',
+                filePath: 'src/lib/completed-lib.ts',
+                implementsPatterns: [dep],
+              }),
+            ];
+          }
+        );
+
+        And(
+          '{string} is completed and implemented by {string}',
+          (_ctx: unknown, _dep: string, _implFile: string) => {
+            // Setup already done in Given step — patterns include the implementation
+            buildDatasetAndApi(state!.patterns);
+          }
+        );
+
+        When(
+          'I build the file reading list for {string} with related',
+          (_ctx: unknown, name: string) => {
+            state!.fileList = buildFileReadingList(state!.dataset!, name, true);
+          }
+        );
+
+        Then(
+          'completed dependency files include {string}',
+          (_ctx: unknown, expectedFile: string) => {
+            expect(state!.fileList!.completedDeps).toContain(expectedFile);
+          }
+        );
+      }
+    );
+
     RuleScenario('File list without related returns only primary', ({ Given, When, Then, And }) => {
       Given('a pattern {string} with dependencies', (_ctx: unknown, name: string) => {
         state = initState();

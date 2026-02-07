@@ -165,13 +165,15 @@ graph TB
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
+        LintModule["LintModule"]
         RenderableUtils["RenderableUtils"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
@@ -187,9 +189,11 @@ graph TB
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         FSMModule["FSMModule"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -202,10 +206,6 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
         PipelineModule["PipelineModule"]
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
@@ -226,6 +226,10 @@ graph TB
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -263,12 +267,8 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
+    ArchitectureCodec --> MasterDataset
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry

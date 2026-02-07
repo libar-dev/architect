@@ -61,10 +61,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - **Public API**: Main entry point for the @libar-dev/delivery-process package.
-- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
-- **Validation Module**: Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -...
-- **DoD Validator**: Validates that completed phases meet Definition of Done criteria: 1.
-- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
 - **Workflow Config Schema**: Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact...
 - **Tag Registry Configuration**: Defines the structure and validation for tag taxonomy configuration.
 - **Output Schemas**: Zod schemas for JSON output formats used by CLI tools.
@@ -74,6 +70,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Dual Source Schemas**: Zod schemas for dual-source extraction types.
 - **Doc Directive Schema**: Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
 - **Codec Utils**: Provides factory functions for creating type-safe JSON parsing and serialization pipelines using Zod schemas.
+- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
+- **Validation Module**: Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -...
+- **DoD Validator**: Validates that completed phases meet Definition of Done criteria: 1.
+- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
 - **String Utilities**: Provides shared utilities for string manipulation used across the delivery-process package, including slugification...
 - **Utils Module**: Common helper functions used across the delivery-process package.
 - **Pattern Id Generator**: Generates unique, deterministic pattern IDs based on file path and line number.
@@ -91,20 +91,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Universal Renderer**: Converts RenderableDocument to Markdown.
 - **Renderable Document Model(RDM)**: Unified document generation using codecs and a universal renderer.
 - **Document Generator**: Simplified document generation using codecs.
+- **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
+- **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
+- **Lint Engine**: Orchestrates lint rule execution against parsed directives.
 - **Pattern Scanner**: Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in.
 - **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
 - **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
 - **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with...
-- **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
-- **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
-- **Lint Engine**: Orchestrates lint rule execution against parsed directives.
-- **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
-- **Configuration Types**: Type definitions for the delivery process configuration system.
-- **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
-- **Configuration Presets**: Predefined configuration presets for common use cases.
-- **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
-- **Configuration Defaults**: Centralized default constants for the delivery-process package.
-- **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -118,6 +111,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
 - **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
 - **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
+- **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
+- **Configuration Types**: Type definitions for the delivery process configuration system.
+- **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
+- **Configuration Presets**: Predefined configuration presets for common use cases.
+- **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
+- **Configuration Defaults**: Centralized default constants for the delivery-process package.
+- **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
 - **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
 - **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
 - **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
@@ -139,19 +139,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Business Rules Codec**: Transforms MasterDataset into a RenderableDocument for business rules output.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
-- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
-- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
+- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
+- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
-- **Universal Doc Generator Robustness**: This feature transforms the PoC document generator into a production-ready universal generator capable of operating...
-- **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
-- **Doc Generation Proof Of Concept**: Status: SUPERSEDED - This POC has been implemented.
-- **Data API Stub Integration**: Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file...
-- **Data API Output Shaping**: The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
-- **Data API Context Assembly**: Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context...
-- **Data API Architecture Queries**: The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed...
 - **PDR 001 Self Documentation**
 - **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
 - **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
@@ -159,5 +152,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
 - **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
 - **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
+- **Universal Doc Generator Robustness**: This feature transforms the PoC document generator into a production-ready universal generator capable of operating...
+- **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
+- **Doc Generation Proof Of Concept**: Status: SUPERSEDED - This POC has been implemented.
+- **Data API Stub Integration**: Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file...
+- **Data API Output Shaping**: The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
+- **Data API Context Assembly**: Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context...
+- **Data API Architecture Queries**: The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed...
 
 ---

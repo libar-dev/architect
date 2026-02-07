@@ -735,7 +735,8 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
           `Context not found: "${contextName}"\nAvailable: ${Object.keys(archIndex.byContext).join(', ')}`
         );
       }
-      return contextPatterns;
+      const ctxInput: PipelineInput = { kind: 'patterns', data: contextPatterns };
+      return applyOutputPipeline(ctxInput, ctx.modifiers);
     }
 
     case 'layer': {
@@ -754,7 +755,8 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
           `Layer not found: "${layerName}"\nAvailable: ${Object.keys(archIndex.byLayer).join(', ')}`
         );
       }
-      return layerPatterns;
+      const layerInput: PipelineInput = { kind: 'patterns', data: layerPatterns };
+      return applyOutputPipeline(layerInput, ctx.modifiers);
     }
 
     case 'graph': {
@@ -895,7 +897,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
     const hint = suggestPattern(patternName, stubNames);
     throw new QueryApiError(
       'STUB_NOT_FOUND',
-      `No stubs found for pattern: "${patternName}".${hint}`
+      `No decisions found for pattern: "${patternName}".${hint}`
     );
   }
 

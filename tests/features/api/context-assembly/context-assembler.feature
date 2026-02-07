@@ -119,6 +119,13 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       And roadmap dependency files are listed
 
     @acceptance-criteria @happy-path
+    Scenario: File list includes implementation files for completed dependencies
+      Given a pattern "Feature" that depends on "CompletedLib"
+      And "CompletedLib" is completed and implemented by "src/lib/completed-lib.ts"
+      When I build the file reading list for "Feature" with related
+      Then completed dependency files include "src/lib/completed-lib.ts"
+
+    @acceptance-criteria @happy-path
     Scenario: File list without related returns only primary
       Given a pattern "OrderSaga" with dependencies
       When I build the file reading list without related

@@ -488,5 +488,55 @@ describeFeature(feature, ({ Background, Rule }) => {
         expect(state!.neighborhood!.implementedBy).toContain('OrderHandler');
       });
     });
+
+    // -------------------------------------------------------------------------
+    // Scenario: dependsOn and enables in neighborhood
+    // -------------------------------------------------------------------------
+    RuleScenario(
+      'Neighborhood includes dependsOn and enables relationships',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a pattern {string} that depends on {string}',
+          (_ctx: unknown, name: string, dep: string) => {
+            state = initState();
+            state.patterns.push(
+              createTestPattern({
+                name,
+                filePath: `src/${name.toLowerCase()}.ts`,
+                dependsOn: [dep],
+              }),
+              createTestPattern({
+                name: dep,
+                filePath: `src/${dep.toLowerCase()}.ts`,
+              })
+            );
+          }
+        );
+
+        And('{string} enables {string} via reverse computation', () => {
+          // Reverse computation happens in createTestMasterDataset -> transformToMasterDataset
+          buildDataset();
+        });
+
+        When('computing the neighborhood of {string}', (_ctx: unknown, name: string) => {
+          state!.neighborhood = computeNeighborhood(name, state!.dataset!);
+        });
+
+        Then('the neighborhood dependsOn list contains {string}', (_ctx: unknown, dep: string) => {
+          expect(state!.neighborhood).toBeDefined();
+          expect(state!.neighborhood!.dependsOn.map((n) => n.name)).toContain(dep);
+        });
+
+        And(
+          'the neighborhood enables list for {string} contains {string}',
+          (_ctx: unknown, target: string, enabled: string) => {
+            // Compute neighborhood for the target pattern to check enables
+            const targetNeighborhood = computeNeighborhood(target, state!.dataset!);
+            expect(targetNeighborhood).toBeDefined();
+            expect(targetNeighborhood!.enables.map((n) => n.name)).toContain(enabled);
+          }
+        );
+      }
+    );
   });
 });

@@ -46,6 +46,8 @@ export interface NeighborhoodResult {
   readonly layer: string | undefined;
   readonly uses: readonly NeighborEntry[];
   readonly usedBy: readonly NeighborEntry[];
+  readonly dependsOn: readonly NeighborEntry[];
+  readonly enables: readonly NeighborEntry[];
   readonly sameContext: readonly NeighborEntry[];
   readonly implements: readonly string[];
   readonly implementedBy: readonly string[];
@@ -129,9 +131,11 @@ export function computeNeighborhood(
   const patternName = getPatternName(pattern);
   const rels = getRelationships(dataset, patternName);
 
-  // Resolve uses/usedBy to NeighborEntry
+  // Resolve relationship fields to NeighborEntry
   const uses = (rels?.uses ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
   const usedBy = (rels?.usedBy ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
+  const dependsOn = (rels?.dependsOn ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
+  const enables = (rels?.enables ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
 
   // Same-context siblings
   const ctx = pattern.archContext;
@@ -154,6 +158,8 @@ export function computeNeighborhood(
     layer: pattern.archLayer,
     uses,
     usedBy,
+    dependsOn,
+    enables,
     sameContext,
     implements: rels?.implementsPatterns ?? [],
     implementedBy: (rels?.implementedBy ?? []).map((r) => r.name),
