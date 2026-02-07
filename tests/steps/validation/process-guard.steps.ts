@@ -313,6 +313,45 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
           });
         }
       );
+
+      RuleScenario(
+        'File transitioning to completed does not require unlock-reason',
+        ({ Given, And, When, Then }) => {
+          Given('a file "specs/finishing.feature" with status "completed"', () => {
+            const fileState = createFileState('specs/finishing.feature', 'completed');
+            state!.files.set('specs/finishing.feature', fileState);
+            state!.currentFile = 'specs/finishing.feature';
+          });
+
+          And('the file does not have unlock-reason', () => {
+            // Default state - no unlock reason
+          });
+
+          And('the file has a status transition from "active" to "completed"', () => {
+            state!.statusTransitions.set(state!.currentFile, {
+              from: 'active' as ProcessStatusValue,
+              to: 'completed' as ProcessStatusValue,
+            });
+          });
+
+          When('the file is modified', () => {
+            state!.modifiedFiles.push(state!.currentFile);
+          });
+
+          And('validating changes', () => {
+            executeValidation();
+          });
+
+          Then('validation passes', () => {
+            expect(state!.output!.result.valid).toBe(true);
+          });
+
+          And('no "completed-protection" violation is reported', () => {
+            const violation = getViolationForRule('completed-protection');
+            expect(violation).toBeUndefined();
+          });
+        }
+      );
     }
   );
 

@@ -182,6 +182,10 @@ function checkProtectionLevel(
 
     // Check hard protection (completed)
     if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
+      // Exempt files transitioning TO completed — this is a completion, not a post-completion edit
+      if (changes.statusTransitions.get(file)?.to === 'completed') {
+        continue;
+      }
       violations.push(
         createViolation(
           'completed-protection',

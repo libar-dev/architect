@@ -61,6 +61,16 @@ Feature: Process Guard Linter
         | roadmap   | no       |
         | deferred  | no       |
 
+    @happy-path @rule:completed-protection
+    Scenario: File transitioning to completed does not require unlock-reason
+      Given a file "specs/finishing.feature" with status "completed"
+      And the file does not have unlock-reason
+      And the file has a status transition from "active" to "completed"
+      When the file is modified
+      And validating changes
+      Then validation passes
+      And no "completed-protection" violation is reported
+
   # ==========================================================================
   # invalid-status-transition Rule
   # ==========================================================================
