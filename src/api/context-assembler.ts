@@ -23,13 +23,15 @@ import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
-import type { NeighborEntry, QueryErrorCode } from './types.js';
+import type { NeighborEntry } from './types.js';
+import { QueryApiError } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
 import { extractFirstSentence } from '../utils/string-utils.js';
 import {
   getPatternName,
   findPatternByName as findPatternByNameFromList,
   getRelationships,
+  allPatternNames,
 } from './pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
@@ -39,6 +41,8 @@ import {
 export type SessionType = 'planning' | 'design' | 'implement';
 
 const VALID_SESSION_TYPES: readonly string[] = ['planning', 'design', 'implement'];
+
+const VALID_STATUSES: ReadonlySet<string> = new Set(['roadmap', 'active', 'completed', 'deferred']);
 
 export function isValidSessionType(value: string): value is SessionType {
   return VALID_SESSION_TYPES.includes(value);
@@ -85,8 +89,6 @@ export interface DepEntry {
   readonly file: string;
   readonly kind: 'planning' | 'implementation';
 }
-
-export type { NeighborEntry } from './types.js';
 
 export interface DeliverableEntry {
   readonly name: string;
@@ -175,24 +177,16 @@ export interface OverviewSummary {
 // Internal Helpers
 // ---------------------------------------------------------------------------
 
-function getAllPatternNames(dataset: MasterDataset): readonly string[] {
-  return dataset.patterns.map(getPatternName);
-}
-
-function findPatternByName(dataset: MasterDataset, name: string): ExtractedPattern | undefined {
-  return findPatternByNameFromList(dataset.patterns, name);
-}
-
 /**
- * Find a pattern by name or throw ContextAssemblyError with a fuzzy suggestion.
+ * Find a pattern by name or throw QueryApiError with a fuzzy suggestion.
  */
 function requirePattern(dataset: MasterDataset, name: string): ExtractedPattern {
-  const pattern = findPatternByName(dataset, name);
+  const pattern = findPatternByNameFromList(dataset.patterns, name);
   if (pattern !== undefined) return pattern;
-  const allNames = getAllPatternNames(dataset);
+  const allNames = allPatternNames(dataset);
   const best = findBestMatch(name, [...allNames]);
   const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
-  throw new ContextAssemblyError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
+  throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
 }
 
 function resolveDepEntry(
@@ -200,7 +194,7 @@ function resolveDepEntry(
   depName: string,
   kind: 'planning' | 'implementation'
 ): DepEntry {
-  const pattern = findPatternByName(dataset, depName);
+  const pattern = findPatternByNameFromList(dataset.patterns, depName);
   return {
     name: depName,
     status: pattern?.status,
@@ -228,7 +222,7 @@ function resolveStubRefs(dataset: MasterDataset, patternName: string): readonly 
     .filter((ref) => ref.file.includes('/stubs/'))
     .map((ref) => ({
       stubFile: ref.file,
-      targetPath: findPatternByName(dataset, ref.name)?.targetPath ?? '',
+      targetPath: findPatternByNameFromList(dataset.patterns, ref.name)?.targetPath ?? '',
       name: ref.name,
     }));
 }
@@ -269,12 +263,6 @@ function resolveDeliverables(
 
 function resolveFsm(api: ProcessStateAPI, status: string | undefined): FsmContext | undefined {
   if (status === undefined) return undefined;
-  const VALID_STATUSES: ReadonlySet<string> = new Set([
-    'roadmap',
-    'active',
-    'completed',
-    'deferred',
-  ]);
   if (!VALID_STATUSES.has(status)) return undefined;
   const validStatus = status as ProcessStatusValue;
   const transitions = api.getValidTransitionsFrom(validStatus);
@@ -478,7 +466,7 @@ function findDepTreeRoot(
     const allParents = [...parents, ...implParents];
 
     const unvisitedParent = allParents.find(
-      (p) => !visited.has(p) && findPatternByName(dataset, p) !== undefined
+      (p) => !visited.has(p) && findPatternByNameFromList(dataset.patterns, p) !== undefined
     );
     if (unvisitedParent === undefined) break;
 
@@ -497,7 +485,7 @@ function buildTreeNode(
   includeImplementationDeps: boolean,
   visited: Set<string>
 ): DepTreeNode {
-  const pattern = findPatternByName(dataset, name);
+  const pattern = findPatternByNameFromList(dataset.patterns, name);
   const isFocal = name.toLowerCase() === focalName.toLowerCase();
 
   if (visited.has(name)) {
@@ -545,7 +533,7 @@ function buildTreeNode(
 
   // Filter to children that actually exist in the dataset
   const children = childNames
-    .filter((childName) => findPatternByName(dataset, childName) !== undefined)
+    .filter((childName) => findPatternByNameFromList(dataset.patterns, childName) !== undefined)
     .map((childName) =>
       buildTreeNode(
         dataset,
@@ -605,7 +593,7 @@ export function buildFileReadingList(
   const rels = getRelationships(dataset, name);
   if (rels !== undefined) {
     for (const depName of rels.dependsOn) {
-      const depPattern = findPatternByName(dataset, depName);
+      const depPattern = findPatternByNameFromList(dataset.patterns, depName);
       if (depPattern === undefined) continue;
       if (depPattern.status === 'completed') {
         completedDeps.push(depPattern.source.file);
@@ -676,7 +664,7 @@ export function buildOverview(dataset: MasterDataset): OverviewSummary {
     if (rels === undefined) continue;
 
     const incompleteDeps = rels.dependsOn.filter((depName) => {
-      const depPattern = findPatternByName(dataset, depName);
+      const depPattern = findPatternByNameFromList(dataset.patterns, depName);
       return depPattern !== undefined && depPattern.status !== 'completed';
     });
 
@@ -695,16 +683,6 @@ export function buildOverview(dataset: MasterDataset): OverviewSummary {
 // ---------------------------------------------------------------------------
 // Error Type
 // ---------------------------------------------------------------------------
-
-export class ContextAssemblyError extends Error {
-  readonly code: QueryErrorCode;
-
-  constructor(code: QueryErrorCode, message: string) {
-    super(message);
-    this.name = 'ContextAssemblyError';
-    this.code = code;
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Helpers

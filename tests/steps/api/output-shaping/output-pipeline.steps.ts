@@ -218,6 +218,42 @@ describeFeature(feature, ({ Rule }) => {
       });
     });
 
+    RuleScenario('Full combined with count is rejected', ({ When, Then }) => {
+      When('I validate modifiers with full and count both true', () => {
+        state = initState();
+        try {
+          validateModifiers({ ...DEFAULT_OUTPUT_MODIFIERS, full: true, count: true });
+        } catch (e) {
+          state.error = e instanceof Error ? e : new Error(String(e));
+        }
+      });
+
+      Then('validation fails with {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.error).not.toBeNull();
+        expect(state!.error?.message).toContain(expected);
+      });
+    });
+
+    RuleScenario('Full combined with fields is rejected', ({ When, Then }) => {
+      When(
+        'I validate modifiers with full and fields {string}',
+        (_ctx: unknown, fieldsStr: string) => {
+          state = initState();
+          const fields = fieldsStr.split(',');
+          try {
+            validateModifiers({ ...DEFAULT_OUTPUT_MODIFIERS, full: true, fields });
+          } catch (e) {
+            state.error = e instanceof Error ? e : new Error(String(e));
+          }
+        }
+      );
+
+      Then('validation fails with {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.error).not.toBeNull();
+        expect(state!.error?.message).toContain(expected);
+      });
+    });
+
     RuleScenario('Invalid field name is rejected', ({ When, Then }) => {
       When('I validate modifiers with fields {string}', (_ctx: unknown, fieldsStr: string) => {
         state = initState();
@@ -349,9 +385,13 @@ describeFeature(feature, ({ Rule }) => {
 
       Then(
         '{int} patterns are returned starting from index {int}',
-        (_ctx: unknown, count: number, _startIndex: number) => {
+        (_ctx: unknown, count: number, startIndex: number) => {
           const results = state!.output as ExtractedPattern[];
           expect(results.length).toBe(count);
+          // Verify the offset is correct — patterns are named Roadmap0..Roadmap9
+          const firstPattern = results[0];
+          expect(firstPattern).toBeDefined();
+          expect(firstPattern.name).toBe(`Roadmap${startIndex}`);
         }
       );
     });

@@ -270,3 +270,17 @@ export function createError(code: QueryErrorCode, message: string): QueryError {
     code,
   };
 }
+
+/**
+ * Structured error for API and CLI domain errors.
+ * Caught at the CLI boundary and converted to QueryError envelope.
+ */
+export class QueryApiError extends Error {
+  readonly code: QueryErrorCode;
+
+  constructor(code: QueryErrorCode, message: string) {
+    super(message);
+    this.name = 'QueryApiError';
+    this.code = code;
+  }
+}

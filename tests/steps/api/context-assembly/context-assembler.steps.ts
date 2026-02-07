@@ -12,13 +12,13 @@ import {
   buildDepTree,
   buildFileReadingList,
   buildOverview,
-  ContextAssemblyError,
   type ContextBundle,
   type DepTreeNode,
   type FileReadingList,
   type OverviewSummary,
   type SessionType,
 } from '../../../../src/api/context-assembler.js';
+import { QueryApiError } from '../../../../src/api/types.js';
 import { createProcessStateAPI } from '../../../../src/api/process-state.js';
 import type { ProcessStateAPI } from '../../../../src/api/process-state.js';
 import type { RuntimeMasterDataset } from '../../../../src/generators/pipeline/transform-dataset.js';
@@ -333,8 +333,8 @@ describeFeature(feature, ({ Rule }) => {
       'Multi-pattern context merges metadata from both patterns',
       ({ Given, When, Then, And }) => {
         Given(
-          'a pattern {string} with status {string} in phase {int}',
-          (_ctx: unknown, name: string, status: string, phase: number) => {
+          'a pattern {string} with status {string} in phase {int} depending on {string}',
+          (_ctx: unknown, name: string, status: string, phase: number, dep: string) => {
             state = initState();
             state.patterns.push(
               createTestPattern({
@@ -342,20 +342,35 @@ describeFeature(feature, ({ Rule }) => {
                 status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
                 phase,
                 filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                dependsOn: [dep],
               })
             );
           }
         );
 
         And(
-          'a second pattern {string} with status {string} in phase {int}',
-          (_ctx: unknown, name: string, status: string, phase: number) => {
+          'a second pattern {string} with status {string} in phase {int} depending on {string}',
+          (_ctx: unknown, name: string, status: string, phase: number, dep: string) => {
             state!.patterns.push(
               createTestPattern({
                 name,
                 status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
                 phase,
                 filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+                dependsOn: [dep],
+              })
+            );
+          }
+        );
+
+        And(
+          'a shared dependency pattern {string} with status {string}',
+          (_ctx: unknown, name: string, status: string) => {
+            state!.patterns.push(
+              createTestPattern({
+                name,
+                status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+                filePath: `src/${name.toLowerCase()}.ts`,
               })
             );
             buildDatasetAndApi(state!.patterns);
@@ -365,8 +380,10 @@ describeFeature(feature, ({ Rule }) => {
         When(
           'I assemble context for both patterns with session {string}',
           (_ctx: unknown, session: string) => {
+            // Assemble context for the first two patterns (not the dependency)
+            const patternNames = state!.patterns.slice(0, 2).map((p) => p.patternName);
             state!.bundle = assembleContext(state!.dataset!, state!.api!, {
-              patterns: state!.patterns.map((p) => p.patternName),
+              patterns: patternNames,
               sessionType: session as SessionType,
               baseDir: process.cwd(),
             });
@@ -382,6 +399,13 @@ describeFeature(feature, ({ Rule }) => {
           const found = state!.bundle!.metadata.find((m) => m.name === name);
           expect(found).toBeDefined();
         });
+
+        And(
+          'the bundle lists {string} as a shared dependency',
+          (_ctx: unknown, depName: string) => {
+            expect(state!.bundle!.sharedDependencies).toContain(depName);
+          }
+        );
       }
     );
 
@@ -408,8 +432,8 @@ describeFeature(feature, ({ Rule }) => {
       );
 
       Then('an error is thrown with code {string}', (_ctx: unknown, code: string) => {
-        expect(state!.error).toBeInstanceOf(ContextAssemblyError);
-        expect((state!.error as ContextAssemblyError).code).toBe(code);
+        expect(state!.error).toBeInstanceOf(QueryApiError);
+        expect((state!.error as QueryApiError).code).toBe(code);
       });
     });
   });
@@ -593,13 +617,12 @@ describeFeature(feature, ({ Rule }) => {
       );
 
       And('active phases are listed', () => {
-        // With active patterns, there should be at least one active phase
-        // (depends on whether patterns have phases assigned)
-        expect(state!.overview!.activePhases).toBeDefined();
+        expect(Array.isArray(state!.overview!.activePhases)).toBe(true);
+        expect(state!.overview!.activePhases.length).toBeGreaterThanOrEqual(0);
       });
 
       And('blocking relationships are reported', () => {
-        expect(state!.overview!.blocking).toBeDefined();
+        expect(Array.isArray(state!.overview!.blocking)).toBe(true);
       });
     });
 

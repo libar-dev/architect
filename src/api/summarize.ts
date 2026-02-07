@@ -68,7 +68,7 @@ export const SUMMARY_FIELDS: ReadonlySet<string> = new Set([
 /**
  * Derive source type from file extension.
  */
-function deriveSource(filePath: string): 'typescript' | 'gherkin' {
+export function deriveSource(filePath: string): 'typescript' | 'gherkin' {
   return filePath.endsWith('.feature') ? 'gherkin' : 'typescript';
 }
 

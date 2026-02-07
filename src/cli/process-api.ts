@@ -52,9 +52,8 @@ import { createProcessStateAPI } from '../api/process-state.js';
 import type { ProcessStateAPI } from '../api/process-state.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
-import type { QueryErrorCode } from '../api/types.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';
-import { createSuccess, createError } from '../api/types.js';
+import { createSuccess, createError, QueryApiError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
@@ -82,7 +81,6 @@ import {
   buildDepTree,
   buildFileReadingList,
   buildOverview,
-  ContextAssemblyError,
   isValidSessionType,
   type SessionType,
 } from '../api/context-assembler.js';
@@ -99,24 +97,6 @@ import {
   buildSourceInventory,
 } from '../api/arch-queries.js';
 import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.js';
-
-// =============================================================================
-// CLIQueryError
-// =============================================================================
-
-/**
- * Structured error for CLI domain errors.
- * Caught in main() and converted to QueryError envelope.
- */
-class CLIQueryError extends Error {
-  readonly code: QueryErrorCode;
-
-  constructor(code: QueryErrorCode, message: string) {
-    super(message);
-    this.name = 'CLIQueryError';
-    this.code = code;
-  }
-}
 
 // =============================================================================
 // CLI Config
@@ -365,7 +345,7 @@ Available API Methods (for 'query'):
  * If --input and --features are not provided, try to load defaults from config.
  * When a delivery-process.config.ts exists, use conventional paths.
  */
-function resolveConfigDefaults(config: ProcessAPICLIConfig): void {
+function applyConfigDefaults(config: ProcessAPICLIConfig): void {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
@@ -532,14 +512,14 @@ function handleQuery(
 ): { methodName: string; result: unknown } {
   const methodName = args[0];
   if (!methodName) {
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'INVALID_ARGUMENT',
       'Usage: process-api query <method> [args...]\nMethods: ' + API_METHODS.join(', ')
     );
   }
 
   if (!API_METHODS.includes(methodName as (typeof API_METHODS)[number])) {
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'UNKNOWN_METHOD',
       `Unknown API method: ${methodName}\nAvailable: ${API_METHODS.join(', ')}`
     );
@@ -549,7 +529,7 @@ function handleQuery(
   const apiRecord = api as unknown as Record<string, (...a: unknown[]) => unknown>;
   const method = apiRecord[methodName];
   if (method === undefined) {
-    throw new CLIQueryError('UNKNOWN_METHOD', `Method not found on API: ${methodName}`);
+    throw new QueryApiError('UNKNOWN_METHOD', `Method not found on API: ${methodName}`);
   }
   const coercedArgs = args.slice(1).map(coerceArg);
   return { methodName, result: method.apply(api, coercedArgs) };
@@ -558,13 +538,13 @@ function handleQuery(
 function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
   const name = args[0];
   if (!name) {
-    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api pattern <name>');
+    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api pattern <name>');
   }
 
   const pattern = api.getPattern(name);
   if (!pattern) {
     const hint = suggestPattern(name, allPatternNames(api.getMasterDataset()));
-    throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${name}".${hint}`);
+    throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${name}".${hint}`);
   }
 
   return {
@@ -598,7 +578,7 @@ function parseListFilters(subArgs: string[]): ListFilters {
       case '--phase': {
         const parsed = next !== undefined ? parseInt(next, 10) : NaN;
         if (isNaN(parsed)) {
-          throw new CLIQueryError(
+          throw new QueryApiError(
             'INVALID_ARGUMENT',
             `Invalid --phase value: "${next ?? ''}". Expected an integer.`
           );
@@ -622,7 +602,7 @@ function parseListFilters(subArgs: string[]): ListFilters {
       case '--limit': {
         const parsed = next !== undefined ? parseInt(next, 10) : NaN;
         if (isNaN(parsed) || parsed < 1) {
-          throw new CLIQueryError(
+          throw new QueryApiError(
             'INVALID_ARGUMENT',
             `Invalid --limit value: "${next ?? ''}". Expected a positive integer.`
           );
@@ -634,7 +614,7 @@ function parseListFilters(subArgs: string[]): ListFilters {
       case '--offset': {
         const parsed = next !== undefined ? parseInt(next, 10) : NaN;
         if (isNaN(parsed) || parsed < 0) {
-          throw new CLIQueryError(
+          throw new QueryApiError(
             'INVALID_ARGUMENT',
             `Invalid --offset value: "${next ?? ''}". Expected a non-negative integer.`
           );
@@ -705,7 +685,7 @@ function handleList(
 function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
   const query = subArgs[0];
   if (!query) {
-    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
+    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
   }
 
   const names = allPatternNames(api.getMasterDataset());
@@ -725,7 +705,7 @@ function handleArch(ctx: RouteContext): unknown {
   const archIndex = ctx.dataset.archIndex;
 
   if (!archIndex || archIndex.all.length === 0) {
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'PATTERN_NOT_FOUND',
       'No architecture data available. Ensure patterns have @libar-docs-arch-role annotations.'
     );
@@ -742,15 +722,15 @@ function handleArch(ctx: RouteContext): unknown {
     case 'context': {
       const contextName = args[1];
       if (!contextName) {
-        return Object.entries(archIndex.byContext).map(([ctx, patterns]) => ({
-          context: ctx,
+        return Object.entries(archIndex.byContext).map(([ctxName, patterns]) => ({
+          context: ctxName,
           count: patterns.length,
           patterns: patterns.map((p) => p.name),
         }));
       }
       const contextPatterns = archIndex.byContext[contextName];
       if (!contextPatterns) {
-        throw new CLIQueryError(
+        throw new QueryApiError(
           'CATEGORY_NOT_FOUND',
           `Context not found: "${contextName}"\nAvailable: ${Object.keys(archIndex.byContext).join(', ')}`
         );
@@ -769,7 +749,7 @@ function handleArch(ctx: RouteContext): unknown {
       }
       const layerPatterns = archIndex.byLayer[layerName];
       if (!layerPatterns) {
-        throw new CLIQueryError(
+        throw new QueryApiError(
           'CATEGORY_NOT_FOUND',
           `Layer not found: "${layerName}"\nAvailable: ${Object.keys(archIndex.byLayer).join(', ')}`
         );
@@ -780,12 +760,12 @@ function handleArch(ctx: RouteContext): unknown {
     case 'graph': {
       const patternName = args[1];
       if (!patternName) {
-        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api arch graph <pattern>');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api arch graph <pattern>');
       }
       const dependencies = ctx.api.getPatternDependencies(patternName);
       const relationships = ctx.api.getPatternRelationships(patternName);
       if (!dependencies && !relationships) {
-        throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
+        throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
       }
       return { pattern: patternName, dependencies, relationships };
     }
@@ -793,7 +773,7 @@ function handleArch(ctx: RouteContext): unknown {
     case 'neighborhood': {
       const patternName = args[1];
       if (!patternName) {
-        throw new CLIQueryError(
+        throw new QueryApiError(
           'INVALID_ARGUMENT',
           'Usage: process-api arch neighborhood <pattern>'
         );
@@ -801,7 +781,7 @@ function handleArch(ctx: RouteContext): unknown {
       const neighborhood = computeNeighborhood(patternName, ctx.dataset);
       if (neighborhood === undefined) {
         const hint = suggestPattern(patternName, allPatternNames(ctx.dataset));
-        throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}".${hint}`);
+        throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}".${hint}`);
       }
       return neighborhood;
     }
@@ -810,7 +790,7 @@ function handleArch(ctx: RouteContext): unknown {
       const ctx1Name = args[1];
       const ctx2Name = args[2];
       if (!ctx1Name || !ctx2Name) {
-        throw new CLIQueryError(
+        throw new QueryApiError(
           'INVALID_ARGUMENT',
           'Usage: process-api arch compare <ctx1> <ctx2>'
         );
@@ -818,7 +798,7 @@ function handleArch(ctx: RouteContext): unknown {
       const comparison = compareContexts(ctx1Name, ctx2Name, ctx.dataset);
       if (comparison === undefined) {
         const available = Object.keys(archIndex.byContext).join(', ');
-        throw new CLIQueryError('CONTEXT_NOT_FOUND', `Context not found. Available: ${available}`);
+        throw new QueryApiError('CONTEXT_NOT_FOUND', `Context not found. Available: ${available}`);
       }
       return comparison;
     }
@@ -827,7 +807,7 @@ function handleArch(ctx: RouteContext): unknown {
       return analyzeCoverage(ctx.dataset, ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry);
 
     default:
-      throw new CLIQueryError(
+      throw new QueryApiError(
         'UNKNOWN_METHOD',
         `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>, neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`
       );
@@ -867,7 +847,7 @@ function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: 
     if (filtered.length === 0) {
       const stubNames = [...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName))];
       const hint = suggestPattern(patternFilter, stubNames);
-      throw new CLIQueryError(
+      throw new QueryApiError(
         'STUB_NOT_FOUND',
         `No stubs found for pattern: "${patternFilter}".${hint}`
       );
@@ -885,7 +865,7 @@ function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: 
 function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
   const patternName = subArgs[0];
   if (patternName === undefined) {
-    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: decisions <pattern>');
+    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: decisions <pattern>');
   }
 
   // Find stubs implementing this pattern
@@ -901,7 +881,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
   if (patternStubs.length === 0) {
     const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
     const hint = suggestPattern(patternName, stubNames);
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'STUB_NOT_FOUND',
       `No stubs found for pattern: "${patternName}".${hint}`
     );
@@ -925,7 +905,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
 function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
   const pdrNumber = subArgs[0];
   if (pdrNumber === undefined) {
-    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: pdr <number> (e.g., pdr 012)');
+    throw new QueryApiError('INVALID_ARGUMENT', 'Usage: pdr <number> (e.g., pdr 012)');
   }
 
   // Normalize: strip leading "PDR-" if user passed it
@@ -934,7 +914,7 @@ function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
   const references = findPdrReferences(dataset.patterns, normalizedNumber);
 
   if (references.length === 0) {
-    throw new CLIQueryError('PDR_NOT_FOUND', `No patterns reference PDR-${normalizedNumber}`);
+    throw new QueryApiError('PDR_NOT_FOUND', `No patterns reference PDR-${normalizedNumber}`);
   }
 
   return {
@@ -945,7 +925,7 @@ function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
 }
 
 // =============================================================================
-// Subcommand Router
+// Context Assembly & Session Handlers
 // =============================================================================
 
 interface RouteContext {
@@ -990,7 +970,7 @@ function handleContext(ctx: RouteContext): string {
   }
 
   if (patternNames.length === 0) {
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'CONTEXT_ASSEMBLY_ERROR',
       'Usage: process-api context <pattern> [pattern2...] [--session planning|design|implement]'
     );
@@ -1008,7 +988,7 @@ function handleContext(ctx: RouteContext): string {
 function handleFiles(ctx: RouteContext): string {
   const patternName = ctx.subArgs.find((a) => !a.startsWith('-'));
   if (patternName === undefined) {
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'CONTEXT_ASSEMBLY_ERROR',
       'Usage: process-api files <pattern> [--related]'
     );
@@ -1022,7 +1002,7 @@ function handleFiles(ctx: RouteContext): string {
 function handleDepTreeCmd(ctx: RouteContext): string {
   const patternName = ctx.subArgs.find((a) => !a.startsWith('-'));
   if (patternName === undefined) {
-    throw new CLIQueryError(
+    throw new QueryApiError(
       'CONTEXT_ASSEMBLY_ERROR',
       'Usage: process-api dep-tree <pattern> [--depth N]'
     );
@@ -1132,7 +1112,7 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
     }
 
     default:
-      throw new CLIQueryError(
+      throw new QueryApiError(
         'UNKNOWN_METHOD',
         `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`
       );
@@ -1159,7 +1139,7 @@ async function main(): Promise<void> {
   validateModifiers(opts.modifiers);
 
   // Resolve config file defaults if --input and --features not provided
-  resolveConfigDefaults(opts);
+  applyConfigDefaults(opts);
 
   if (opts.input.length === 0) {
     console.error(
@@ -1203,16 +1183,9 @@ async function main(): Promise<void> {
 }
 
 void main().catch((error: unknown) => {
-  // CLIQueryError -> structured error envelope
-  if (error instanceof CLIQueryError) {
+  // QueryApiError -> structured error envelope
+  if (error instanceof QueryApiError) {
     const envelope = createError(error.code, error.message);
-    console.log(JSON.stringify(envelope, null, 2));
-    process.exit(1);
-    return;
-  }
-  // ContextAssemblyError -> structured error envelope
-  if (error instanceof ContextAssemblyError) {
-    const envelope = createError('CONTEXT_ASSEMBLY_ERROR', error.message);
     console.log(JSON.stringify(envelope, null, 2));
     process.exit(1);
     return;

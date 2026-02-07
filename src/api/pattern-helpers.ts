@@ -75,7 +75,5 @@ export function suggestPattern(query: string, candidates: readonly string[]): st
  * Get the first implements-pattern name from a pattern, if any.
  */
 export function firstImplements(pattern: ExtractedPattern): string | undefined {
-  return pattern.implementsPatterns !== undefined && pattern.implementsPatterns.length > 0
-    ? pattern.implementsPatterns[0]
-    : undefined;
+  return pattern.implementsPatterns?.[0];
 }

@@ -24,7 +24,7 @@
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { QueryResult } from '../api/types.js';
-import { summarizePatterns, SUMMARY_FIELDS } from '../api/summarize.js';
+import { summarizePatterns, SUMMARY_FIELDS, deriveSource } from '../api/summarize.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -231,8 +231,7 @@ export function applyListFilters(
   if (filters.source !== null) {
     const source = filters.source;
     candidates = candidates.filter((p) => {
-      const patternSource = p.source.file.endsWith('.feature') ? 'gherkin' : 'typescript';
-      return patternSource === source;
+      return deriveSource(p.source.file) === source;
     });
   }
 

@@ -105,7 +105,12 @@ function resolveDeliverables(api, patternName) {
 function resolveFsm(api, status) {
     if (status === undefined)
         return undefined;
-    const VALID_STATUSES = new Set(['roadmap', 'active', 'completed', 'deferred']);
+    const VALID_STATUSES = new Set([
+        'roadmap',
+        'active',
+        'completed',
+        'deferred',
+    ]);
     if (!VALID_STATUSES.has(status))
         return undefined;
     const validStatus = status;

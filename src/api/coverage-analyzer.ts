@@ -16,8 +16,8 @@
  * findFilesToScan() — cheap (~1ms) and avoids changing buildPipeline().
  */
 
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { findFilesToScan, hasFileOptIn } from '../scanner/pattern-scanner.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { TagRegistry } from '../validation-schemas/tag-registry.js';

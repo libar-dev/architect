@@ -688,9 +688,7 @@ function handleStubs(dataset, subArgs, baseDir) {
         filtered = filtered.filter((r) => r.implementsPattern?.toLowerCase() === lowerFilter ||
             r.stubName.toLowerCase() === lowerFilter);
         if (filtered.length === 0) {
-            const stubNames = [
-                ...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName)),
-            ];
+            const stubNames = [...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName))];
             const hint = suggestPattern(patternFilter, stubNames);
             throw new CLIQueryError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternFilter}".${hint}`);
         }
@@ -714,9 +712,7 @@ function handleDecisions(dataset, subArgs) {
             (s.patternName ?? s.name).toLowerCase() === patternName.toLowerCase());
     });
     if (patternStubs.length === 0) {
-        const stubNames = [
-            ...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name)),
-        ];
+        const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
         const hint = suggestPattern(patternName, stubNames);
         throw new CLIQueryError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternName}".${hint}`);
     }

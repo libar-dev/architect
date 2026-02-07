@@ -53,6 +53,16 @@ Feature: Output Modifier Pipeline
       Then validation fails with "Conflicting modifiers"
 
     @acceptance-criteria @validation
+    Scenario: Full combined with count is rejected
+      When I validate modifiers with full and count both true
+      Then validation fails with "Conflicting modifiers"
+
+    @acceptance-criteria @validation
+    Scenario: Full combined with fields is rejected
+      When I validate modifiers with full and fields "patternName"
+      Then validation fails with "Conflicting modifiers"
+
+    @acceptance-criteria @validation
     Scenario: Invalid field name is rejected
       When I validate modifiers with fields "patternName,bogusField"
       Then validation fails with "Invalid field names: bogusField"
