@@ -16,10 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
 - **Lint Process CLI**: Validates git changes against delivery process rules.
+- **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
 - **Process State API**: TypeScript interface for querying delivery process state.
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
-- **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -29,6 +29,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Detect Changes**: Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status...
 - **Derive Process State**: :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files.
 - **Process Guard Decider**: :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules.
+- **Process State API Relationship Queries**: Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks...
+- **Process State API CLI**: The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use...
 
 ---
 
@@ -87,11 +89,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
-- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
-- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
-- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
-- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
-- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -100,11 +97,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Documentation Generation Orchestrator**: Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts...
 - **Content Deduplicator**: Identifies and merges duplicate sections extracted from multiple sources.
 - **Codec Based Generator**: Adapts the new RenderableDocument Model (RDM) codec system to the existing DocumentGenerator interface.
-- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
-- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
-- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
-- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
-- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
 - **Workflow Loader**: Loads and validates workflow configuration from JSON files in the catalogue.
 - **Configuration Types**: Type definitions for the delivery process configuration system.
 - **Regex Builders**: Type-safe regex factory functions for tag detection and normalization.
@@ -112,6 +104,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Delivery Process Factory**: Main factory function for creating configured delivery process instances.
 - **Configuration Defaults**: Centralized default constants for the delivery-process package.
 - **Config Loader**: Discovers and loads `delivery-process.config.ts` files for hierarchical configuration.
+- **CLI Version Helper**: Reads package version from package.json for CLI --version flag.
+- **Validate Patterns CLI**: Cross-validates TypeScript patterns vs Gherkin feature files.
+- **Lint Patterns CLI**: Validates pattern annotations for quality and completeness.
+- **Documentation Generator CLI**: Replaces multiple specialized CLIs with one unified interface that supports multiple generators in a single run.
+- **CLI Error Handler**: Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern.
+- **Shape Extractor**: Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for...
+- **Layer Inference**: Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns.
+- **Gherkin Extractor**: Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation.
+- **Dual Source Extractor**: Extracts pattern metadata from both TypeScript code stubs (@libar-docs-*) and Gherkin feature files (@libar-docs-*),...
+- **Document Extractor**: Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and...
 - **Validation Rules Codec**: Transforms MasterDataset into a RenderableDocument for Process Guard validation rules reference.
 - **Timeline Codec**: Transforms MasterDataset into RenderableDocuments for timeline outputs: - ROADMAP.md (phase breakdown with progress)...
 - **Taxonomy Codec**: Transforms MasterDataset into a RenderableDocument for taxonomy reference output.
@@ -134,9 +136,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
-- **Universal Doc Generator Robustness**: This feature transforms the PoC document generator into a production-ready universal generator capable of operating...
-- **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
-- **Doc Generation Proof Of Concept**: Status: SUPERSEDED - This POC has been implemented.
 - **PDR 001 Self Documentation**
 - **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
 - **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
@@ -144,5 +143,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
 - **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
 - **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
+- **Universal Doc Generator Robustness**: This feature transforms the PoC document generator into a production-ready universal generator capable of operating...
+- **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
+- **Doc Generation Proof Of Concept**: Status: SUPERSEDED - This POC has been implemented.
 
 ---

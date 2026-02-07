@@ -163,13 +163,15 @@ graph TB
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
+        ProcessStateTypes["ProcessStateTypes"]
+        APIModule["APIModule"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -177,8 +179,6 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        ProcessStateTypes["ProcessStateTypes"]
-        APIModule["APIModule"]
         FSMModule["FSMModule"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
@@ -216,6 +216,10 @@ graph TB
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -225,10 +229,8 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
@@ -239,8 +241,6 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset

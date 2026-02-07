@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 94/133 (71%)
+**Patterns:** [█████████████░░░░░░░] 94/141 (67%)
 
-**Phases:** 2/12 complete
+**Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 133 |
+| Total Patterns | 141 |
 | Completed | 94 |
-| Active | 15 |
-| Planned | 24 |
+| Active | 17 |
+| Planned | 30 |
 
 ---
 
@@ -26,11 +26,12 @@
 | --- | --- | --- |
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
-| 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
+| 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 0/2 | 0% |
+| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 0/9 | 0% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
@@ -61,13 +62,32 @@
 
 ---
 
-### 📋 ClaudeModuleGeneration
+### 🚧 ProcessStateAPIRelationshipQueries
 
-[░░░░░░░░░░░░░░░] 0/1 0% complete
+[░░░░░░░░░░░░░░░] 0/2 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 🚧 Process State API CLI | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 🚧 Process State API Relationship Queries | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
+
+---
+
+### 📋 DataAPIStubIntegration
+
+[░░░░░░░░░░░░░░░] 0/9 0% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | 📋 Claude Module Generation | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
+| 📋 Data API Architecture Queries | planned | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
+| 📋 Data API CLI Ergonomics | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
+| 📋 Data API Context Assembly | planned | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
+| 📋 Data API Design Session Support | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
+| 📋 Data API Output Shaping | planned | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
+| 📋 Data API Platform Integration | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
+| 📋 Data API Relationship Graph | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
+| 📋 Data API Stub Integration | planned | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 
 ---
 
@@ -110,7 +130,7 @@
 
 ### 📋 TypeScriptTaxonomyImplementation
 
-[███████░░░░░░░░] 4/9 44% complete
+[█████████░░░░░░] 4/7 57% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -118,8 +138,6 @@
 | ✅ Pattern Relationship Model | completed | Problem: The delivery process lacks a comprehensive relationship model between artifacts. |
 | 📋 Prd Implementation Section | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | ✅ Process Guard Linter | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
-| 📋 Process State API CLI | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
-| 📋 Process State API Relationship Queries | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
 | ✅ TypeScript Taxonomy Implementation | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |

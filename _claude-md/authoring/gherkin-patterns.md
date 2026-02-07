@@ -40,16 +40,18 @@ Feature: Process Guard Linter
 | `@acceptance-criteria` | Required for DoD validation |
 | `@integration`         | Cross-component behavior    |
 
-#### Rule Block Structure
+#### Rule Block Structure (Mandatory)
 
-For business constraints, use `Rule:` blocks with structured annotations:
+Every feature file MUST use `Rule:` blocks with structured descriptions:
 
 ```gherkin
 Rule: Reservations prevent race conditions
 
-  **Invariant:** Only one reservation can exist for a key.
-  **Rationale:** Check-then-create has TOCTOU vulnerabilities.
-  **Verified by:** @happy-path, @edge-case scenarios below.
+  **Invariant:** Only one reservation can exist for a given key at a time.
+
+  **Rationale:** Check-then-create patterns have TOCTOU vulnerabilities.
+
+  **Verified by:** Concurrent reservations, Expired reservation cleanup
 
   @acceptance-criteria @happy-path
   Scenario: Concurrent reservations are prevented
@@ -57,3 +59,9 @@ Rule: Reservations prevent race conditions
     When another process attempts to reserve "order-123"
     Then the reservation fails with "already reserved"
 ```
+
+| Element            | Purpose                                 | Extracted By             |
+| ------------------ | --------------------------------------- | ------------------------ |
+| `**Invariant:**`   | Business constraint (what must be true) | Business Rules generator |
+| `**Rationale:**`   | Business justification (why it exists)  | Business Rules generator |
+| `**Verified by:**` | Comma-separated scenario names          | Traceability generator   |

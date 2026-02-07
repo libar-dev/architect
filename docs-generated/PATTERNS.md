@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 94/133 (71% complete)
+**Overall:** [█████████████░░░░░░░] 94/141 (67% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 94 |
-| 🚧 Active | 15 |
-| 📋 Planned | 24 |
-| **Total** | 133 |
+| 🚧 Active | 17 |
+| 📋 Planned | 30 |
+| **Total** | 141 |
 
 ---
 
@@ -23,7 +23,7 @@
 - [Cli](#cli) (6)
 - [Config](#config) (1)
 - [Core](#core) (62)
-- [DDD](#ddd) (26)
+- [DDD](#ddd) (34)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
@@ -153,6 +153,8 @@
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
 | 🚧 Process State API | Core | active | TypeScript interface for querying delivery process state. |
+| 🚧 Process State API CLI | DDD | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
@@ -161,14 +163,20 @@
 | 📋 Cli Behavior Testing | DDD | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
 | 📋 Codec Behavior Testing | DDD | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
+| 📋 Data API Architecture Queries | DDD | planned | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
+| 📋 Data API CLI Ergonomics | DDD | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
+| 📋 Data API Context Assembly | DDD | planned | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
+| 📋 Data API Design Session Support | DDD | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
+| 📋 Data API Output Shaping | DDD | planned | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
+| 📋 Data API Platform Integration | DDD | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
+| 📋 Data API Relationship Graph | DDD | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
+| 📋 Data API Stub Integration | DDD | planned | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
 | 📋 Generator Infrastructure Testing | DDD | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
-| 📋 Process State API CLI | DDD | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
-| 📋 Process State API Relationship Queries | DDD | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
@@ -273,7 +281,7 @@
 
 ### DDD
 
-9/26 complete (35%)
+9/34 complete (26%)
 
 - [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
@@ -284,17 +292,25 @@
 - [✅ Shape Extraction](patterns/shape-extraction.md)
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
 - [✅ Universal Doc Generator Robustness](patterns/universal-doc-generator-robustness.md)
+- [🚧 Process State API CLI](patterns/process-state-apicli.md)
+- [🚧 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
 - [📋 Claude Module Generation](patterns/claude-module-generation.md)
 - [📋 Cli Behavior Testing](patterns/cli-behavior-testing.md)
 - [📋 Codec Behavior Testing](patterns/codec-behavior-testing.md)
 - [📋 Cross Source Validation](patterns/cross-source-validation.md)
+- [📋 Data API Architecture Queries](patterns/data-api-architecture-queries.md)
+- [📋 Data API CLI Ergonomics](patterns/data-apicli-ergonomics.md)
+- [📋 Data API Context Assembly](patterns/data-api-context-assembly.md)
+- [📋 Data API Design Session Support](patterns/data-api-design-session-support.md)
+- [📋 Data API Output Shaping](patterns/data-api-output-shaping.md)
+- [📋 Data API Platform Integration](patterns/data-api-platform-integration.md)
+- [📋 Data API Relationship Graph](patterns/data-api-relationship-graph.md)
+- [📋 Data API Stub Integration](patterns/data-api-stub-integration.md)
 - [📋 Generator Infrastructure Testing](patterns/generator-infrastructure-testing.md)
 - [📋 Phase Numbering Conventions](patterns/phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](patterns/prd-implementation-section.md)
-- [📋 Process State API CLI](patterns/process-state-apicli.md)
-- [📋 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
@@ -561,6 +577,8 @@ graph TD
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction
+    DataAPIDesignSessionSupport -.-> DataAPIContextAssembly
+    DataAPIDesignSessionSupport -.-> DataAPIStubIntegration
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```
 
