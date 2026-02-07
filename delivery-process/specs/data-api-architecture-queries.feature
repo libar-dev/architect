@@ -5,6 +5,7 @@
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:2d
 @libar-docs-priority:high
+@libar-docs-depends-on:DataAPIOutputShaping
 @libar-docs-business-value:deep-architecture-exploration-for-design-sessions
 Feature: Data API Architecture Queries - Deep Architecture Exploration
 
@@ -82,6 +83,13 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
       And the output shows unique dependencies per context
       And the output identifies integration points
 
+    @acceptance-criteria @validation
+    Scenario: Neighborhood for nonexistent pattern returns error
+      Given no pattern named "NonExistent" exists
+      When running "process-api arch neighborhood NonExistent"
+      Then the command fails with a pattern-not-found error
+      And the error message suggests checking the pattern name
+
   # ============================================================================
   # RULE 2: Architecture Coverage
   # ============================================================================
@@ -120,6 +128,13 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
       When running "process-api unannotated --path 'src/generators/**/*.ts'"
       Then the output lists only unannotated files matching the glob
       And each file shows its location relative to base directory
+
+    @acceptance-criteria @validation
+    Scenario: Coverage with no scannable files returns zero coverage
+      Given the input globs match 0 files
+      When running "process-api arch coverage"
+      Then the output shows "0/0 files annotated (0%)"
+      And the unannotated files list is empty
 
   # ============================================================================
   # RULE 3: Taxonomy Discovery
@@ -165,3 +180,10 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
       Then the output shows file counts by type
       And the output shows location patterns for each type
       And the total matches the pipeline scan count
+
+    @acceptance-criteria @validation
+    Scenario: Tags listing with no patterns returns empty report
+      Given the pipeline has 0 patterns
+      When running "process-api tags"
+      Then the output shows an empty tag report with 0 pattern count
+      And no tag entries are listed

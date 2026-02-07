@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:25a
 @libar-docs-product-area:DeliveryProcess
-@libar-docs-effort:3d
+@libar-docs-effort:4d
 @libar-docs-priority:high
 @libar-docs-business-value:compact-output-for-ai-agents
 Feature: Data API Output Shaping - Compact Output for AI Agents
@@ -38,7 +38,7 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
       | Deliverable | Status | Location | Tests | Test Type |
       | summarizePattern() projection | planned | src/api/summarize.ts | Yes | unit |
       | Output modifier pipeline | planned | src/cli/output-pipeline.ts | Yes | unit |
-      | QueryResult envelope wiring | planned | src/api/types.ts | Yes | unit |
+      | QueryResult envelope wiring | planned | src/cli/process-api.ts | Yes | unit |
       | list subcommand | planned | src/cli/process-api.ts | Yes | integration |
       | search subcommand | planned | src/cli/process-api.ts | Yes | integration |
       | Fuzzy pattern matching | planned | src/api/fuzzy-match.ts | Yes | unit |
@@ -92,6 +92,13 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
       Then the output contains full pattern detail
       And the output includes deliverables, dependencies, and relationships
 
+    @acceptance-criteria @validation
+    Scenario: Full flag combined with names-only is rejected
+      Given patterns exist in the dataset
+      When running "process-api query getCurrentWork --full --names-only"
+      Then the command fails with an error about conflicting modifiers
+      And the error message lists the conflicting flags
+
   # ============================================================================
   # RULE 2: Output Modifiers
   # ============================================================================
@@ -132,6 +139,13 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
       When running "process-api query getCurrentWork --fields patternName,status,phase"
       Then each pattern in the output contains only the requested fields
       And no other fields are present
+
+    @acceptance-criteria @validation
+    Scenario: Invalid field name in field selection is rejected
+      Given patterns exist in the dataset
+      When running "process-api query getCurrentWork --fields patternName,nonExistentField"
+      Then the command fails with an error about invalid field names
+      And the error message lists valid field names for the current output mode
 
   # ============================================================================
   # RULE 3: Output Format and Envelope
@@ -186,6 +200,7 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
 
     **Invariant:** The `list` subcommand replaces the need to call specific
     `getPatternsByX` methods. Filters are composable via AND logic.
+    The `query` subcommand remains available for programmatic/raw access.
 
     **Rationale:** Currently, filtering by status AND category requires calling
     `getPatternsByCategory` then manually filtering by status. A single `list`
@@ -229,6 +244,13 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
       When running "process-api list --status roadmap --limit 5 --offset 10"
       Then exactly 5 patterns are returned
       And they start from the 11th pattern
+
+    @acceptance-criteria @validation
+    Scenario: Search with no results returns empty with suggestion
+      Given patterns exist but none match "zzNonexistent"
+      When running "process-api search zzNonexistent"
+      Then the result contains an empty matches array
+      And the output includes a hint that no patterns matched
 
   # ============================================================================
   # RULE 5: CLI Ergonomics

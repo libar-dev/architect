@@ -45,6 +45,14 @@ Feature: ADR-008 Text Output Path for Context and Discovery Commands
   - JSON commands continue working unchanged
   - SubcommandContext is a CLI-internal type, not part of the public API
 
+  **Parallel Rendering Path:**
+  This decision creates a second rendering path alongside the existing
+  Codec/RenderableDocument/UniversalRenderer pipeline. The justification:
+  Codecs produce Markdown for human documentation (detailed, structured).
+  ContextFormatter produces compact text for AI agent consumption (minimal,
+  machine-parseable). Different audiences require different rendering systems.
+  Future features needing both formats must implement both paths.
+
   Background: Decision Context
     Given the following options were considered:
       | Option | Approach | Impact |

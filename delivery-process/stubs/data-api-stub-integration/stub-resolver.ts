@@ -14,8 +14,9 @@
  * - Source file path contains `/stubs/` (lives in stubs directory), OR
  * - Pattern has a `targetPath` field (from @libar-docs-target tag)
  *
- * Resolution uses `fs.existsSync()` on targetPath — not pipeline data —
- * because target files may not have `@libar-docs` annotations.
+ * Resolution uses a `fileExists` callback (defaulting to `fs.existsSync()`) on
+ * targetPath — not pipeline data — because target files may not have `@libar-docs`
+ * annotations. The callback enables testing without filesystem side effects.
  *
  * Target: src/api/stub-resolver.ts
  * See: DataAPIStubIntegration spec, Rule 2 (Stubs Subcommand)
@@ -81,16 +82,19 @@ export function findStubPatterns(_dataset: unknown): readonly unknown[] {
  *
  * For each stub pattern with a `targetPath`:
  * - Resolves the path relative to baseDir
- * - Checks if the target file exists via `fs.existsSync()`
+ * - Checks if the target file exists via `fileExists` callback
  * - Extracts stub metadata (since, implementsPattern)
  *
  * @param stubs - Stub patterns to resolve
  * @param baseDir - Base directory for resolving target paths
+ * @param fileExists - Optional callback for checking file existence (default: fs.existsSync).
+ *                     Inject a Map lookup for testing without filesystem side effects.
  * @returns Array of StubResolution objects
  */
 export function resolveStubs(
   _stubs: readonly unknown[],
-  _baseDir: string
+  _baseDir: string,
+  _fileExists?: (path: string) => boolean
 ): readonly StubResolution[] {
   throw new Error('DataAPIStubIntegration not yet implemented — roadmap pattern');
 }

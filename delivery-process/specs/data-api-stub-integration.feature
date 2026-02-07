@@ -42,7 +42,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Scan path configuration | completed | package.json | No | N/A |
+      | Scan path configuration (pre-existing) | completed | package.json | No | N/A |
       | libar-docs-target taxonomy tag | planned | src/taxonomy/registry-builder.ts | Yes | unit |
       | libar-docs-since taxonomy tag | planned | src/taxonomy/registry-builder.ts | Yes | unit |
       | stubs subcommand | planned | src/cli/process-api.ts | Yes | integration |
@@ -86,6 +86,13 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
       When the stub is scanned and extracted
       Then the pattern's targetPath field contains "platform-core/src/agent/router.ts"
       And the targetPath is available via ProcessStateAPI queries
+
+    @acceptance-criteria @validation
+    Scenario: Stub without libar-docs opt-in is invisible to scanner
+      Given a stub file without the @libar-docs marker
+      When running the scanner pipeline with stubs input glob
+      Then the stub does NOT appear in the MasterDataset
+      And no error is raised for the missing marker
 
   # ============================================================================
   # RULE 2: Stubs Subcommand
@@ -131,6 +138,13 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
       Given 3 stubs with existing targets and 2 without
       When running "process-api stubs --unresolved"
       Then only the 2 stubs without existing target files are returned
+
+    @acceptance-criteria @validation
+    Scenario: Stubs for nonexistent pattern returns empty result
+      Given no stubs implement "NonExistentPattern"
+      When running "process-api stubs NonExistentPattern"
+      Then the result is empty
+      And the error message suggests checking the pattern name
 
   # ============================================================================
   # RULE 3: Design Decision Queries
@@ -182,3 +196,10 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
       Then the output lists all patterns referencing PDR-012
       And the output shows the decision feature file location
       And the output shows stub count per pattern
+
+    @acceptance-criteria @validation
+    Scenario: PDR query for nonexistent number returns empty
+      Given no patterns or stubs reference "PDR-999"
+      When running "process-api pdr 999"
+      Then the result indicates no references found
+      And the output includes "No patterns reference PDR-999"

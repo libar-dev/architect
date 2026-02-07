@@ -5,6 +5,7 @@
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:3d
 @libar-docs-priority:high
+@libar-docs-depends-on:DataAPIOutputShaping,DataAPIStubIntegration
 @libar-docs-business-value:replace-explore-agents-with-one-command
 Feature: Data API Context Assembly - One-Command Session Context
 
@@ -109,6 +110,13 @@ Feature: Data API Context Assembly - One-Command Session Context
       And the output contains FSM state and valid transitions
       And the output contains test file locations
 
+    @acceptance-criteria @validation
+    Scenario: Context for nonexistent pattern returns error with suggestion
+      Given a pattern "AgentLLMIntegration" exists
+      When running "process-api context NonExistentPattern --session design"
+      Then the command fails with a pattern-not-found error
+      And the error message suggests similar pattern names
+
   # ============================================================================
   # RULE 2: File Reading List
   # ============================================================================
@@ -148,6 +156,13 @@ Feature: Data API Context Assembly - One-Command Session Context
       When running "process-api files OrderSaga"
       Then the output lists only the primary spec and stub files
       And no dependency or neighbor files are included
+
+    @acceptance-criteria @validation
+    Scenario: Files for pattern with no resolvable paths returns minimal output
+      Given a pattern "MinimalPattern" with no stubs or dependencies
+      When running "process-api files MinimalPattern --related"
+      Then the output lists only the primary spec file
+      And the completed, roadmap, and neighbor sections are empty
 
   # ============================================================================
   # RULE 3: Dependency Tree
@@ -189,6 +204,13 @@ Feature: Data API Context Assembly - One-Command Session Context
       Then the output shows at most 2 levels of dependencies
       And truncated branches are indicated
 
+    @acceptance-criteria @validation
+    Scenario: Dependency tree handles circular dependencies safely
+      Given patterns A depends on B and B depends on A
+      When running "process-api dep-tree A"
+      Then the output shows the cycle without infinite recursion
+      And the visited node is marked to indicate a cycle
+
   # ============================================================================
   # RULE 4: Multi-Pattern Context
   # ============================================================================
@@ -212,6 +234,13 @@ Feature: Data API Context Assembly - One-Command Session Context
       Then shared dependencies appear once with a "shared" marker
       And unique dependencies are listed per pattern
       And the combined context is smaller than two separate calls
+
+    @acceptance-criteria @validation
+    Scenario: Multi-pattern context with one invalid name reports error
+      Given a pattern "AgentLLM" exists but "InvalidName" does not
+      When running "process-api context AgentLLM InvalidName --session design"
+      Then the command fails with a pattern-not-found error for "InvalidName"
+      And no partial context is returned
 
   # ============================================================================
   # RULE 5: Executive Overview
@@ -241,3 +270,11 @@ Feature: Data API Context Assembly - One-Command Session Context
       Then the output shows "69 patterns (36 completed, 3 active, 30 planned) = 52%"
       And the output lists active phases with counts
       And the output shows blocking relationships
+
+    @acceptance-criteria @validation
+    Scenario: Overview with empty pipeline returns zero-state summary
+      Given the pipeline has 0 patterns
+      When running "process-api overview"
+      Then the output shows "0 patterns (0 completed, 0 active, 0 planned) = 0%"
+      And the active phases section is empty
+      And the blocking section is empty

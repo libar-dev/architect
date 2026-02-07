@@ -24,6 +24,8 @@
  * All use SubcommandContext for access to CLI config and registry.
  *
  * Target: src/api/arch-queries.ts (neighborhood, compare, tags, sources)
+ * Note: SubcommandContext should be defined in src/cli/types.ts (cross-cutting CLI type).
+ *       NeighborEntry should be unified in src/api/types.ts (shared with ContextAssembler).
  * See: DataAPIArchitectureQueries spec, Rules 1-3
  * Since: DS-D
  */
@@ -60,13 +62,18 @@ export interface SubcommandContext {
 // ---------------------------------------------------------------------------
 
 /**
- * Entry for a neighboring pattern with context and role metadata.
+ * Entry for a neighboring pattern with context, role, and file metadata.
+ *
+ * IMPLEMENTATION NOTE: Unify with ContextAssembler's NeighborEntry into a single
+ * shared type in src/api/types.ts. Both modules should import from there.
+ * Fields: name, status, archRole, archContext, file.
  */
 export interface NeighborEntry {
   readonly name: string;
-  readonly context: string | undefined;
-  readonly role: string | undefined;
+  readonly archContext: string | undefined;
+  readonly archRole: string | undefined;
   readonly status: string | undefined;
+  readonly file: string | undefined;
 }
 
 /**

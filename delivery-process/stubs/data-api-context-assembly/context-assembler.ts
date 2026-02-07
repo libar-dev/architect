@@ -75,7 +75,7 @@ export interface ContextOptions {
 export interface DepTreeOptions {
   /** Focal pattern name. */
   readonly pattern: string;
-  /** Maximum depth to walk (default: 10). */
+  /** Maximum depth to walk (default: 3). Override via --depth flag. */
   readonly maxDepth: number;
   /**
    * Whether to include implementation deps (uses/usedBy) in addition
@@ -126,13 +126,18 @@ export interface DepEntry {
 }
 
 /**
- * Architecture neighbor entry with role metadata.
+ * Architecture neighbor entry with role, context, and file metadata.
+ *
+ * IMPLEMENTATION NOTE: Unify with ArchQueries' NeighborEntry into a single
+ * shared type in src/api/types.ts. Both modules should import from there.
+ * Fields: name, status, archRole, archContext, file.
  */
 export interface NeighborEntry {
   readonly name: string;
   readonly status: string | undefined;
   readonly archRole: string | undefined;
-  readonly file: string;
+  readonly archContext: string | undefined;
+  readonly file: string | undefined;
 }
 
 /**
@@ -158,6 +163,10 @@ export interface FsmContext {
  *
  * Session tailoring populates/omits sections — no discriminated union needed.
  * The formatter renders whatever sections are present.
+ *
+ * IMPLEMENTATION NOTE: Use builder functions (createPlanningBundle(), createDesignBundle(),
+ * createImplementBundle()) to enforce the inclusion matrix at construction time.
+ * This provides runtime guarantees without the type complexity of a discriminated union.
  *
  * Design: DS-C-1 (flat type, not discriminated union)
  */
