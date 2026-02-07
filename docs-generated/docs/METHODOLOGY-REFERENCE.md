@@ -164,7 +164,7 @@ Run pnpm docs:patterns and these annotations become a searchable pattern registr
 | Stage | Input | Output | FSM State |
 | --- | --- | --- | --- |
 | Ideation | Pattern brief | Roadmap spec (.feature) | roadmap |
-| Design | Complex requirement | Design document | roadmap |
+| Design | Complex requirement | Decision specs + code stubs | roadmap |
 | Planning | Roadmap spec | Implementation plan | roadmap |
 | Coding | Implementation plan | Code + tests | roadmap to active to completed |
 

@@ -122,6 +122,10 @@ graph TB
         CategoryDefinitions["CategoryDefinitions[read-model]"]
     end
     subgraph validation["Validation BC"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator"]
+        AntiPatternDetector["AntiPatternDetector"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -130,16 +134,14 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator"]
-        AntiPatternDetector["AntiPatternDetector"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -148,8 +150,6 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -168,8 +168,6 @@ graph TB
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        ProcessStateTypes["ProcessStateTypes"]
-        APIModule["APIModule"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
         CLIVersionHelper["CLIVersionHelper"]
@@ -179,6 +177,8 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        ProcessStateTypes["ProcessStateTypes"]
+        APIModule["APIModule"]
         FSMModule["FSMModule"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
@@ -201,10 +201,10 @@ graph TB
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
-    ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    ExtractedPatternSchema --> DocDirectiveSchema
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
@@ -225,8 +225,6 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
@@ -241,6 +239,8 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset

@@ -15,12 +15,12 @@ Starting from pattern brief?
                         → No  → Planning
 ```
 
-| Session           | Input               | Output                    | FSM Change                 |
-| ----------------- | ------------------- | ------------------------- | -------------------------- |
-| Planning          | Pattern brief       | Roadmap spec (`.feature`) | Creates `roadmap`          |
-| Design            | Complex requirement | Design doc + code stubs   | None                       |
-| Implementation    | Roadmap spec        | Code + tests              | `roadmap→active→completed` |
-| Planning + Design | Pattern brief       | Spec + stubs              | Creates `roadmap`          |
+| Session           | Input               | Output                      | FSM Change                 |
+| ----------------- | ------------------- | --------------------------- | -------------------------- |
+| Planning          | Pattern brief       | Roadmap spec (`.feature`)   | Creates `roadmap`          |
+| Design            | Complex requirement | Decision specs + code stubs | None                       |
+| Implementation    | Roadmap spec        | Code + tests                | `roadmap→active→completed` |
+| Planning + Design | Pattern brief       | Spec + stubs                | Creates `roadmap`          |
 
 ---
 
@@ -97,7 +97,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 ### Checklist
 
-- [ ] **Create design doc** at `{plans-directory}/designs/draft/DESIGN-{name}.md`
+- [ ] **Record decisions** as PDR `.feature` files in `delivery-process/decisions/`
 
 - [ ] **Document options** — At least 2-3 approaches with pros/cons
 
@@ -130,10 +130,9 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
   Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues. They are scanned by the documentation pipeline via `-i 'delivery-process/stubs/**/*.ts'`.
 
-- [ ] **Move to approved** after user approval: `designs/draft/` → `designs/approved/`
-
 ### Do NOT
 
+- Create markdown design documents (use decision specs instead)
 - Create implementation plans
 - Transition spec to `active`
 - Write full implementations (stubs only)
@@ -147,7 +146,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 ### Pre-flight
 
 - [ ] Roadmap spec exists with `@<prefix>-status:roadmap`
-- [ ] Design doc approved (if needed)
+- [ ] Decision specs approved (if needed)
 - [ ] Implementation plan exists (for multi-session work)
 
 ### Execution Checklist

@@ -328,26 +328,26 @@ Many projects mix design artifacts with production code:
 
 This causes confusion, accidental imports of unimplemented code, and maintenance burden.
 
-### The Solution: Design Artifacts in specs/
+### The Solution: Design Artifacts Outside src/
 
-| Location              | Content                                       | ESLint     | When Moved                 |
-| --------------------- | --------------------------------------------- | ---------- | -------------------------- |
-| `specs/stubs/*.ts`    | API shapes, interfaces, throw-not-implemented | Full rules | Implementation session     |
-| `specs/examples/*.ts` | Code examples for documentation               | Full rules | Never (stays as reference) |
-| `src/**/*.ts`         | **Production code only**                      | Full rules | Already there              |
+| Location                                     | Content                                       | ESLint     | When Moved             |
+| -------------------------------------------- | --------------------------------------------- | ---------- | ---------------------- |
+| `delivery-process/stubs/{pattern-name}/*.ts` | API shapes, interfaces, throw-not-implemented | Excluded   | Implementation session |
+| `src/**/*.ts`                                | **Production code only**                      | Full rules | Already there          |
 
 **Design stub pattern:**
 
 ```typescript
-// specs/stubs/my-feature.ts
+// delivery-process/stubs/my-feature/my-feature.ts
 /**
  * @libar-docs
- * @libar-docs-pattern MyFeature
  * @libar-docs-status roadmap
+ * @libar-docs-implements MyFeature
  *
  * ## My Feature - Design Stub
  *
  * API design for the upcoming feature.
+ * Target: src/path/to/final/location.ts
  */
 export interface MyConfig {
   timeout: number;
@@ -360,8 +360,8 @@ export function myFeature(config: MyConfig): Result {
 
 **Benefits:**
 
-- No ESLint exceptions needed
-- Clear separation: `specs/` = design, `src/` = production
+- No ESLint exceptions needed — stubs are excluded from linting
+- Clear separation: `delivery-process/stubs/` = design, `src/` = production
 - Safe iteration on API shapes without breaking anything
 - Moving to `src/` signals implementation started
 

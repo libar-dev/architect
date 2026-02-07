@@ -498,12 +498,12 @@ Starting from pattern brief?
                         → No  → Planning
 ```
 
-| Session           | Input               | Output                    | FSM Change                 |
-| ----------------- | ------------------- | ------------------------- | -------------------------- |
-| Planning          | Pattern brief       | Roadmap spec (`.feature`) | Creates `roadmap`          |
-| Design            | Complex requirement | Design doc + code stubs   | None                       |
-| Implementation    | Roadmap spec        | Code + tests              | `roadmap→active→completed` |
-| Planning + Design | Pattern brief       | Spec + stubs              | Creates `roadmap`          |
+| Session           | Input               | Output                      | FSM Change                 |
+| ----------------- | ------------------- | --------------------------- | -------------------------- |
+| Planning          | Pattern brief       | Roadmap spec (`.feature`)   | Creates `roadmap`          |
+| Design            | Complex requirement | Decision specs + code stubs | None                       |
+| Implementation    | Roadmap spec        | Code + tests                | `roadmap→active→completed` |
+| Planning + Design | Pattern brief       | Spec + stubs                | Creates `roadmap`          |
 
 ### Planning Session
 
