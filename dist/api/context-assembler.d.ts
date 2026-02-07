@@ -20,7 +20,7 @@
  */
 import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
-import type { NeighborEntry, QueryErrorCode } from './types.js';
+import type { NeighborEntry } from './types.js';
 export type SessionType = 'planning' | 'design' | 'implement';
 export declare function isValidSessionType(value: string): value is SessionType;
 export interface ContextOptions {
@@ -52,7 +52,6 @@ export interface DepEntry {
     readonly file: string;
     readonly kind: 'planning' | 'implementation';
 }
-export type { NeighborEntry } from './types.js';
 export interface DeliverableEntry {
     readonly name: string;
     readonly status: string;
@@ -119,8 +118,4 @@ export declare function assembleContext(dataset: MasterDataset, api: ProcessStat
 export declare function buildDepTree(dataset: MasterDataset, options: DepTreeOptions): DepTreeNode;
 export declare function buildFileReadingList(dataset: MasterDataset, patternName: string, includeRelated: boolean): FileReadingList;
 export declare function buildOverview(dataset: MasterDataset): OverviewSummary;
-export declare class ContextAssemblyError extends Error {
-    readonly code: QueryErrorCode;
-    constructor(code: QueryErrorCode, message: string);
-}
 //# sourceMappingURL=context-assembler.d.ts.map

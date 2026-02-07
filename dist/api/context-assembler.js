@@ -18,36 +18,32 @@
  * The assembler does NOT format output. It produces structured data that
  * the ContextFormatter renders as plain text (see ADR-008).
  */
+import { QueryApiError } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
 import { extractFirstSentence } from '../utils/string-utils.js';
-import { getPatternName, findPatternByName as findPatternByNameFromList, getRelationships, } from './pattern-helpers.js';
+import { getPatternName, findPatternByName as findPatternByNameFromList, getRelationships, allPatternNames, } from './pattern-helpers.js';
 const VALID_SESSION_TYPES = ['planning', 'design', 'implement'];
+const VALID_STATUSES = new Set(['roadmap', 'active', 'completed', 'deferred']);
 export function isValidSessionType(value) {
     return VALID_SESSION_TYPES.includes(value);
 }
 // ---------------------------------------------------------------------------
 // Internal Helpers
 // ---------------------------------------------------------------------------
-function getAllPatternNames(dataset) {
-    return dataset.patterns.map(getPatternName);
-}
-function findPatternByName(dataset, name) {
-    return findPatternByNameFromList(dataset.patterns, name);
-}
 /**
- * Find a pattern by name or throw ContextAssemblyError with a fuzzy suggestion.
+ * Find a pattern by name or throw QueryApiError with a fuzzy suggestion.
  */
 function requirePattern(dataset, name) {
-    const pattern = findPatternByName(dataset, name);
+    const pattern = findPatternByNameFromList(dataset.patterns, name);
     if (pattern !== undefined)
         return pattern;
-    const allNames = getAllPatternNames(dataset);
+    const allNames = allPatternNames(dataset);
     const best = findBestMatch(name, [...allNames]);
     const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
-    throw new ContextAssemblyError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
+    throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
 }
 function resolveDepEntry(dataset, depName, kind) {
-    const pattern = findPatternByName(dataset, depName);
+    const pattern = findPatternByNameFromList(dataset.patterns, depName);
     return {
         name: depName,
         status: pattern?.status,
@@ -73,7 +69,7 @@ function resolveStubRefs(dataset, patternName) {
         .filter((ref) => ref.file.includes('/stubs/'))
         .map((ref) => ({
         stubFile: ref.file,
-        targetPath: findPatternByName(dataset, ref.name)?.targetPath ?? '',
+        targetPath: findPatternByNameFromList(dataset.patterns, ref.name)?.targetPath ?? '',
         name: ref.name,
     }));
 }
@@ -105,12 +101,6 @@ function resolveDeliverables(api, patternName) {
 function resolveFsm(api, status) {
     if (status === undefined)
         return undefined;
-    const VALID_STATUSES = new Set([
-        'roadmap',
-        'active',
-        'completed',
-        'deferred',
-    ]);
     if (!VALID_STATUSES.has(status))
         return undefined;
     const validStatus = status;
@@ -272,7 +262,7 @@ function findDepTreeRoot(dataset, focalName, includeImplementationDeps) {
         const parents = rels.dependsOn;
         const implParents = includeImplementationDeps ? rels.uses : [];
         const allParents = [...parents, ...implParents];
-        const unvisitedParent = allParents.find((p) => !visited.has(p) && findPatternByName(dataset, p) !== undefined);
+        const unvisitedParent = allParents.find((p) => !visited.has(p) && findPatternByNameFromList(dataset.patterns, p) !== undefined);
         if (unvisitedParent === undefined)
             break;
         current = unvisitedParent;
@@ -280,7 +270,7 @@ function findDepTreeRoot(dataset, focalName, includeImplementationDeps) {
     return current;
 }
 function buildTreeNode(dataset, name, focalName, depth, maxDepth, includeImplementationDeps, visited) {
-    const pattern = findPatternByName(dataset, name);
+    const pattern = findPatternByNameFromList(dataset.patterns, name);
     const isFocal = name.toLowerCase() === focalName.toLowerCase();
     if (visited.has(name)) {
         return {
@@ -322,7 +312,7 @@ function buildTreeNode(dataset, name, focalName, depth, maxDepth, includeImpleme
     }
     // Filter to children that actually exist in the dataset
     const children = childNames
-        .filter((childName) => findPatternByName(dataset, childName) !== undefined)
+        .filter((childName) => findPatternByNameFromList(dataset.patterns, childName) !== undefined)
         .map((childName) => buildTreeNode(dataset, childName, focalName, depth + 1, maxDepth, includeImplementationDeps, visited));
     return {
         name,
@@ -361,7 +351,7 @@ export function buildFileReadingList(dataset, patternName, includeRelated) {
     const rels = getRelationships(dataset, name);
     if (rels !== undefined) {
         for (const depName of rels.dependsOn) {
-            const depPattern = findPatternByName(dataset, depName);
+            const depPattern = findPatternByNameFromList(dataset.patterns, depName);
             if (depPattern === undefined)
                 continue;
             if (depPattern.status === 'completed') {
@@ -428,7 +418,7 @@ export function buildOverview(dataset) {
         if (rels === undefined)
             continue;
         const incompleteDeps = rels.dependsOn.filter((depName) => {
-            const depPattern = findPatternByName(dataset, depName);
+            const depPattern = findPatternByNameFromList(dataset.patterns, depName);
             return depPattern !== undefined && depPattern.status !== 'completed';
         });
         if (incompleteDeps.length > 0) {
@@ -444,14 +434,6 @@ export function buildOverview(dataset) {
 // ---------------------------------------------------------------------------
 // Error Type
 // ---------------------------------------------------------------------------
-export class ContextAssemblyError extends Error {
-    code;
-    constructor(code, message) {
-        super(message);
-        this.name = 'ContextAssemblyError';
-        this.code = code;
-    }
-}
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

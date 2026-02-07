@@ -49,6 +49,10 @@ export type PatternSummary = z.infer<typeof PatternSummarySchema>;
  */
 export declare const SUMMARY_FIELDS: ReadonlySet<string>;
 /**
+ * Derive source type from file extension.
+ */
+export declare function deriveSource(filePath: string): 'typescript' | 'gherkin';
+/**
  * Project an ExtractedPattern to a compact PatternSummary.
  *
  * - `patternName` prefers explicit @libar-docs-pattern tag, falls back to `name`

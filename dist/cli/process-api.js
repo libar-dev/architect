@@ -45,32 +45,17 @@ import { mergePatterns } from '../generators/orchestrator.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../config/workflow-loader.js';
 import { transformToMasterDataset } from '../generators/pipeline/index.js';
 import { createProcessStateAPI } from '../api/process-state.js';
-import { createSuccess, createError } from '../api/types.js';
+import { createSuccess, createError, QueryApiError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
 import { allPatternNames, suggestPattern, firstImplements } from '../api/pattern-helpers.js';
 import { findStubPatterns, resolveStubs, groupStubsByPattern, extractDecisionItems, findPdrReferences, } from '../api/stub-resolver.js';
 import { applyOutputPipeline, applyListFilters, validateModifiers, formatOutput, PATTERN_ARRAY_METHODS, DEFAULT_OUTPUT_MODIFIERS, } from './output-pipeline.js';
-import { assembleContext, buildDepTree, buildFileReadingList, buildOverview, ContextAssemblyError, isValidSessionType, } from '../api/context-assembler.js';
+import { assembleContext, buildDepTree, buildFileReadingList, buildOverview, isValidSessionType, } from '../api/context-assembler.js';
 import { formatContextBundle, formatDepTree, formatFileReadingList, formatOverview, } from '../api/context-formatter.js';
 import { computeNeighborhood, compareContexts, aggregateTagUsage, buildSourceInventory, } from '../api/arch-queries.js';
 import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.js';
-// =============================================================================
-// CLIQueryError
-// =============================================================================
-/**
- * Structured error for CLI domain errors.
- * Caught in main() and converted to QueryError envelope.
- */
-class CLIQueryError extends Error {
-    code;
-    constructor(code, message) {
-        super(message);
-        this.name = 'CLIQueryError';
-        this.code = code;
-    }
-}
 // =============================================================================
 // Argument Parsing
 // =============================================================================
@@ -281,7 +266,7 @@ Available API Methods (for 'query'):
  * If --input and --features are not provided, try to load defaults from config.
  * When a delivery-process.config.ts exists, use conventional paths.
  */
-function resolveConfigDefaults(config) {
+function applyConfigDefaults(config) {
     const baseDir = path.resolve(config.baseDir);
     if (config.input.length === 0) {
         // Check for config file existence as signal to use defaults
@@ -430,16 +415,16 @@ const API_METHODS = [
 function handleQuery(api, args) {
     const methodName = args[0];
     if (!methodName) {
-        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api query <method> [args...]\nMethods: ' + API_METHODS.join(', '));
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api query <method> [args...]\nMethods: ' + API_METHODS.join(', '));
     }
     if (!API_METHODS.includes(methodName)) {
-        throw new CLIQueryError('UNKNOWN_METHOD', `Unknown API method: ${methodName}\nAvailable: ${API_METHODS.join(', ')}`);
+        throw new QueryApiError('UNKNOWN_METHOD', `Unknown API method: ${methodName}\nAvailable: ${API_METHODS.join(', ')}`);
     }
     // Safe to cast: we validated methodName is in API_METHODS above
     const apiRecord = api;
     const method = apiRecord[methodName];
     if (method === undefined) {
-        throw new CLIQueryError('UNKNOWN_METHOD', `Method not found on API: ${methodName}`);
+        throw new QueryApiError('UNKNOWN_METHOD', `Method not found on API: ${methodName}`);
     }
     const coercedArgs = args.slice(1).map(coerceArg);
     return { methodName, result: method.apply(api, coercedArgs) };
@@ -447,12 +432,12 @@ function handleQuery(api, args) {
 function handlePattern(api, args) {
     const name = args[0];
     if (!name) {
-        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api pattern <name>');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api pattern <name>');
     }
     const pattern = api.getPattern(name);
     if (!pattern) {
         const hint = suggestPattern(name, allPatternNames(api.getMasterDataset()));
-        throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${name}".${hint}`);
+        throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${name}".${hint}`);
     }
     return {
         ...pattern,
@@ -482,7 +467,7 @@ function parseListFilters(subArgs) {
             case '--phase': {
                 const parsed = next !== undefined ? parseInt(next, 10) : NaN;
                 if (isNaN(parsed)) {
-                    throw new CLIQueryError('INVALID_ARGUMENT', `Invalid --phase value: "${next ?? ''}". Expected an integer.`);
+                    throw new QueryApiError('INVALID_ARGUMENT', `Invalid --phase value: "${next ?? ''}". Expected an integer.`);
                 }
                 phase = parsed;
                 i++;
@@ -504,7 +489,7 @@ function parseListFilters(subArgs) {
             case '--limit': {
                 const parsed = next !== undefined ? parseInt(next, 10) : NaN;
                 if (isNaN(parsed) || parsed < 1) {
-                    throw new CLIQueryError('INVALID_ARGUMENT', `Invalid --limit value: "${next ?? ''}". Expected a positive integer.`);
+                    throw new QueryApiError('INVALID_ARGUMENT', `Invalid --limit value: "${next ?? ''}". Expected a positive integer.`);
                 }
                 limit = parsed;
                 i++;
@@ -513,7 +498,7 @@ function parseListFilters(subArgs) {
             case '--offset': {
                 const parsed = next !== undefined ? parseInt(next, 10) : NaN;
                 if (isNaN(parsed) || parsed < 0) {
-                    throw new CLIQueryError('INVALID_ARGUMENT', `Invalid --offset value: "${next ?? ''}". Expected a non-negative integer.`);
+                    throw new QueryApiError('INVALID_ARGUMENT', `Invalid --offset value: "${next ?? ''}". Expected a non-negative integer.`);
                 }
                 offset = parsed;
                 i++;
@@ -567,7 +552,7 @@ function handleList(dataset, subArgs, modifiers) {
 function handleSearch(api, subArgs) {
     const query = subArgs[0];
     if (!query) {
-        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
     }
     const names = allPatternNames(api.getMasterDataset());
     const matches = fuzzyMatchPatterns(query, names);
@@ -577,12 +562,12 @@ function handleSearch(api, subArgs) {
     }
     return { matches };
 }
-function handleArch(ctx) {
+async function handleArch(ctx) {
     const args = ctx.subArgs;
     const subCmd = args[0];
     const archIndex = ctx.dataset.archIndex;
     if (!archIndex || archIndex.all.length === 0) {
-        throw new CLIQueryError('PATTERN_NOT_FOUND', 'No architecture data available. Ensure patterns have @libar-docs-arch-role annotations.');
+        throw new QueryApiError('PATTERN_NOT_FOUND', 'No architecture data available. Ensure patterns have @libar-docs-arch-role annotations.');
     }
     switch (subCmd) {
         case 'roles':
@@ -594,15 +579,15 @@ function handleArch(ctx) {
         case 'context': {
             const contextName = args[1];
             if (!contextName) {
-                return Object.entries(archIndex.byContext).map(([ctx, patterns]) => ({
-                    context: ctx,
+                return Object.entries(archIndex.byContext).map(([ctxName, patterns]) => ({
+                    context: ctxName,
                     count: patterns.length,
                     patterns: patterns.map((p) => p.name),
                 }));
             }
             const contextPatterns = archIndex.byContext[contextName];
             if (!contextPatterns) {
-                throw new CLIQueryError('CATEGORY_NOT_FOUND', `Context not found: "${contextName}"\nAvailable: ${Object.keys(archIndex.byContext).join(', ')}`);
+                throw new QueryApiError('CATEGORY_NOT_FOUND', `Context not found: "${contextName}"\nAvailable: ${Object.keys(archIndex.byContext).join(', ')}`);
             }
             return contextPatterns;
         }
@@ -617,31 +602,31 @@ function handleArch(ctx) {
             }
             const layerPatterns = archIndex.byLayer[layerName];
             if (!layerPatterns) {
-                throw new CLIQueryError('CATEGORY_NOT_FOUND', `Layer not found: "${layerName}"\nAvailable: ${Object.keys(archIndex.byLayer).join(', ')}`);
+                throw new QueryApiError('CATEGORY_NOT_FOUND', `Layer not found: "${layerName}"\nAvailable: ${Object.keys(archIndex.byLayer).join(', ')}`);
             }
             return layerPatterns;
         }
         case 'graph': {
             const patternName = args[1];
             if (!patternName) {
-                throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api arch graph <pattern>');
+                throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api arch graph <pattern>');
             }
             const dependencies = ctx.api.getPatternDependencies(patternName);
             const relationships = ctx.api.getPatternRelationships(patternName);
             if (!dependencies && !relationships) {
-                throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
+                throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
             }
             return { pattern: patternName, dependencies, relationships };
         }
         case 'neighborhood': {
             const patternName = args[1];
             if (!patternName) {
-                throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api arch neighborhood <pattern>');
+                throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api arch neighborhood <pattern>');
             }
             const neighborhood = computeNeighborhood(patternName, ctx.dataset);
             if (neighborhood === undefined) {
                 const hint = suggestPattern(patternName, allPatternNames(ctx.dataset));
-                throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}".${hint}`);
+                throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}".${hint}`);
             }
             return neighborhood;
         }
@@ -649,19 +634,24 @@ function handleArch(ctx) {
             const ctx1Name = args[1];
             const ctx2Name = args[2];
             if (!ctx1Name || !ctx2Name) {
-                throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api arch compare <ctx1> <ctx2>');
+                throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api arch compare <ctx1> <ctx2>');
             }
             const comparison = compareContexts(ctx1Name, ctx2Name, ctx.dataset);
             if (comparison === undefined) {
                 const available = Object.keys(archIndex.byContext).join(', ');
-                throw new CLIQueryError('CONTEXT_NOT_FOUND', `Context not found. Available: ${available}`);
+                throw new QueryApiError('CONTEXT_NOT_FOUND', `Context not found. Available: ${available}`);
             }
             return comparison;
         }
         case 'coverage':
-            return analyzeCoverage(ctx.dataset, ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry);
+            try {
+                return await analyzeCoverage(ctx.dataset, ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry);
+            }
+            catch (err) {
+                throw new QueryApiError('INVALID_ARGUMENT', `Coverage analysis failed: ${err instanceof Error ? err.message : String(err)}`);
+            }
         default:
-            throw new CLIQueryError('UNKNOWN_METHOD', `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>, neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`);
+            throw new QueryApiError('UNKNOWN_METHOD', `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>, neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`);
     }
 }
 // =============================================================================
@@ -690,7 +680,7 @@ function handleStubs(dataset, subArgs, baseDir) {
         if (filtered.length === 0) {
             const stubNames = [...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName))];
             const hint = suggestPattern(patternFilter, stubNames);
-            throw new CLIQueryError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternFilter}".${hint}`);
+            throw new QueryApiError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternFilter}".${hint}`);
         }
     }
     // Filter unresolved only
@@ -702,7 +692,7 @@ function handleStubs(dataset, subArgs, baseDir) {
 function handleDecisions(dataset, subArgs) {
     const patternName = subArgs[0];
     if (patternName === undefined) {
-        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: decisions <pattern>');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: decisions <pattern>');
     }
     // Find stubs implementing this pattern
     const stubs = findStubPatterns(dataset);
@@ -714,7 +704,7 @@ function handleDecisions(dataset, subArgs) {
     if (patternStubs.length === 0) {
         const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
         const hint = suggestPattern(patternName, stubNames);
-        throw new CLIQueryError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternName}".${hint}`);
+        throw new QueryApiError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternName}".${hint}`);
     }
     // Extract decisions from each stub's description
     const decisions = patternStubs.map((stub) => ({
@@ -732,13 +722,13 @@ function handleDecisions(dataset, subArgs) {
 function handlePdr(dataset, subArgs) {
     const pdrNumber = subArgs[0];
     if (pdrNumber === undefined) {
-        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: pdr <number> (e.g., pdr 012)');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: pdr <number> (e.g., pdr 012)');
     }
     // Normalize: strip leading "PDR-" if user passed it
     const normalizedNumber = pdrNumber.replace(/^PDR-/i, '').padStart(3, '0');
     const references = findPdrReferences(dataset.patterns, normalizedNumber);
     if (references.length === 0) {
-        throw new CLIQueryError('PDR_NOT_FOUND', `No patterns reference PDR-${normalizedNumber}`);
+        throw new QueryApiError('PDR_NOT_FOUND', `No patterns reference PDR-${normalizedNumber}`);
     }
     return {
         pdr: `PDR-${normalizedNumber}`,
@@ -771,7 +761,7 @@ function handleContext(ctx) {
         }
     }
     if (patternNames.length === 0) {
-        throw new CLIQueryError('CONTEXT_ASSEMBLY_ERROR', 'Usage: process-api context <pattern> [pattern2...] [--session planning|design|implement]');
+        throw new QueryApiError('CONTEXT_ASSEMBLY_ERROR', 'Usage: process-api context <pattern> [pattern2...] [--session planning|design|implement]');
     }
     const sessionType = ctx.sessionType ?? parseSessionFromSubArgs(ctx.subArgs) ?? 'design';
     const bundle = assembleContext(ctx.dataset, ctx.api, {
@@ -784,7 +774,7 @@ function handleContext(ctx) {
 function handleFiles(ctx) {
     const patternName = ctx.subArgs.find((a) => !a.startsWith('-'));
     if (patternName === undefined) {
-        throw new CLIQueryError('CONTEXT_ASSEMBLY_ERROR', 'Usage: process-api files <pattern> [--related]');
+        throw new QueryApiError('CONTEXT_ASSEMBLY_ERROR', 'Usage: process-api files <pattern> [--related]');
     }
     const includeRelated = ctx.subArgs.includes('--related');
     const list = buildFileReadingList(ctx.dataset, patternName, includeRelated);
@@ -793,7 +783,7 @@ function handleFiles(ctx) {
 function handleDepTreeCmd(ctx) {
     const patternName = ctx.subArgs.find((a) => !a.startsWith('-'));
     if (patternName === undefined) {
-        throw new CLIQueryError('CONTEXT_ASSEMBLY_ERROR', 'Usage: process-api dep-tree <pattern> [--depth N]');
+        throw new QueryApiError('CONTEXT_ASSEMBLY_ERROR', 'Usage: process-api dep-tree <pattern> [--depth N]');
     }
     // Parse --depth N
     let maxDepth = 3;
@@ -871,10 +861,15 @@ async function routeSubcommand(ctx) {
                     break;
                 }
             }
-            return findUnannotatedFiles(ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry, pathFilter);
+            try {
+                return await findUnannotatedFiles(ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry, pathFilter);
+            }
+            catch (err) {
+                throw new QueryApiError('INVALID_ARGUMENT', `Unannotated file scan failed: ${err instanceof Error ? err.message : String(err)}`);
+            }
         }
         default:
-            throw new CLIQueryError('UNKNOWN_METHOD', `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`);
+            throw new QueryApiError('UNKNOWN_METHOD', `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`);
     }
 }
 // =============================================================================
@@ -892,7 +887,7 @@ async function main() {
     // Validate output modifiers before any expensive work
     validateModifiers(opts.modifiers);
     // Resolve config file defaults if --input and --features not provided
-    resolveConfigDefaults(opts);
+    applyConfigDefaults(opts);
     if (opts.input.length === 0) {
         console.error('Error: --input is required (or place delivery-process.config.ts in cwd for auto-detection)');
         console.error('');
@@ -929,16 +924,9 @@ async function main() {
     }
 }
 void main().catch((error) => {
-    // CLIQueryError -> structured error envelope
-    if (error instanceof CLIQueryError) {
+    // QueryApiError -> structured error envelope
+    if (error instanceof QueryApiError) {
         const envelope = createError(error.code, error.message);
-        console.log(JSON.stringify(envelope, null, 2));
-        process.exit(1);
-        return;
-    }
-    // ContextAssemblyError -> structured error envelope
-    if (error instanceof ContextAssemblyError) {
-        const envelope = createError('CONTEXT_ASSEMBLY_ERROR', error.message);
         console.log(JSON.stringify(envelope, null, 2));
         process.exit(1);
         return;

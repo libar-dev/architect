@@ -59,7 +59,7 @@ export const SUMMARY_FIELDS = new Set([
 /**
  * Derive source type from file extension.
  */
-function deriveSource(filePath) {
+export function deriveSource(filePath) {
     return filePath.endsWith('.feature') ? 'gherkin' : 'typescript';
 }
 /**

@@ -37,11 +37,23 @@
  * ```
  */
 export type { QuerySuccess, QueryError, QueryErrorCode, QueryResult, StatusCounts, StatusDistribution, PhaseProgress, PhaseGroup, PatternDependencies, PatternRelationships, PatternDeliverable, QuarterGroup, TransitionCheck, ProtectionInfo, } from './types.js';
-export { createSuccess, createError } from './types.js';
+export { createSuccess, createError, QueryApiError } from './types.js';
+export type { NeighborEntry } from './types.js';
 export type { ProcessStateAPI } from './process-state.js';
 export { createProcessStateAPI } from './process-state.js';
 export type { PatternSummary } from './summarize.js';
 export { PatternSummarySchema, SUMMARY_FIELDS, summarizePattern, summarizePatterns, } from './summarize.js';
 export type { FuzzyMatch } from './fuzzy-match.js';
-export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';
+export { fuzzyMatchPatterns, findBestMatch } from './fuzzy-match.js';
+export { getPatternName, findPatternByName, getRelationships, allPatternNames, suggestPattern, firstImplements, } from './pattern-helpers.js';
+export type { StubResolution, StubSummary, DecisionItem, PdrReference } from './stub-resolver.js';
+export { findStubPatterns, resolveStubs, groupStubsByPattern, extractDecisionItems, findPdrReferences, } from './stub-resolver.js';
+export type { SessionType, ContextOptions, DepTreeOptions, PatternContextMeta, StubRef, DepEntry, DeliverableEntry, FsmContext, ContextBundle, DepTreeNode, FileReadingList, ProgressSummary, ActivePhaseSummary, BlockingEntry, OverviewSummary, } from './context-assembler.js';
+export { isValidSessionType, assembleContext, buildDepTree, buildFileReadingList, buildOverview, } from './context-assembler.js';
+export { formatContextBundle, formatDepTree, formatFileReadingList, formatOverview, } from './context-formatter.js';
+export type { NeighborhoodResult, ContextComparison, TagUsageReport, SourceInventory, } from './arch-queries.js';
+export { computeNeighborhood, compareContexts, aggregateTagUsage, buildSourceInventory, } from './arch-queries.js';
+export type { CoverageReport } from './coverage-analyzer.js';
+export { analyzeCoverage, findUnannotatedFiles, findUnusedTaxonomy } from './coverage-analyzer.js';
+export { deriveSource } from './summarize.js';
 //# sourceMappingURL=index.d.ts.map

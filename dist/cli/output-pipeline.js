@@ -20,7 +20,8 @@
  * middleware chain. The 4 modifiers are mutually exclusive with clear precedence:
  * count > namesOnly > fields > default summarize.
  */
-import { summarizePatterns, SUMMARY_FIELDS } from '../api/summarize.js';
+import { QueryApiError } from '../api/types.js';
+import { summarizePatterns, SUMMARY_FIELDS, deriveSource } from '../api/summarize.js';
 export const DEFAULT_OUTPUT_MODIFIERS = {
     namesOnly: false,
     count: false,
@@ -59,19 +60,19 @@ export const PATTERN_ARRAY_METHODS = new Set([
  */
 export function validateModifiers(modifiers) {
     if (modifiers.full && modifiers.namesOnly) {
-        throw new Error('Conflicting modifiers: --full and --names-only cannot be used together');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Conflicting modifiers: --full and --names-only cannot be used together');
     }
     if (modifiers.full && modifiers.count) {
-        throw new Error('Conflicting modifiers: --full and --count cannot be used together');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Conflicting modifiers: --full and --count cannot be used together');
     }
     if (modifiers.full && modifiers.fields !== null) {
-        throw new Error('Conflicting modifiers: --full and --fields cannot be used together');
+        throw new QueryApiError('INVALID_ARGUMENT', 'Conflicting modifiers: --full and --fields cannot be used together');
     }
     if (modifiers.fields !== null) {
         const validFields = SUMMARY_FIELDS;
         const invalidFields = modifiers.fields.filter((f) => !validFields.has(f));
         if (invalidFields.length > 0) {
-            throw new Error(`Invalid field names: ${invalidFields.join(', ')}. Valid fields: ${[...validFields].join(', ')}`);
+            throw new QueryApiError('INVALID_ARGUMENT', `Invalid field names: ${invalidFields.join(', ')}. Valid fields: ${[...validFields].join(', ')}`);
         }
     }
 }
@@ -151,8 +152,7 @@ export function applyListFilters(dataset, filters) {
     if (filters.source !== null) {
         const source = filters.source;
         candidates = candidates.filter((p) => {
-            const patternSource = p.source.file.endsWith('.feature') ? 'gherkin' : 'typescript';
-            return patternSource === source;
+            return deriveSource(p.source.file) === source;
         });
     }
     // Apply pagination

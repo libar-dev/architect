@@ -63,8 +63,6 @@ export function suggestPattern(query, candidates) {
  * Get the first implements-pattern name from a pattern, if any.
  */
 export function firstImplements(pattern) {
-    return pattern.implementsPatterns !== undefined && pattern.implementsPatterns.length > 0
-        ? pattern.implementsPatterns[0]
-        : undefined;
+    return pattern.implementsPatterns?.[0];
 }
 //# sourceMappingURL=pattern-helpers.js.map

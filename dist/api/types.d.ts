@@ -193,4 +193,12 @@ export declare function createSuccess<T>(data: T, patternCount: number): QuerySu
  * Create an error response
  */
 export declare function createError(code: QueryErrorCode, message: string): QueryError;
+/**
+ * Structured error for API and CLI domain errors.
+ * Caught at the CLI boundary and converted to QueryError envelope.
+ */
+export declare class QueryApiError extends Error {
+    readonly code: QueryErrorCode;
+    constructor(code: QueryErrorCode, message: string);
+}
 //# sourceMappingURL=types.d.ts.map

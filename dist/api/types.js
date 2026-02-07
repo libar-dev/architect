@@ -41,4 +41,16 @@ export function createError(code, message) {
         code,
     };
 }
+/**
+ * Structured error for API and CLI domain errors.
+ * Caught at the CLI boundary and converted to QueryError envelope.
+ */
+export class QueryApiError extends Error {
+    code;
+    constructor(code, message) {
+        super(message);
+        this.name = 'QueryApiError';
+        this.code = code;
+    }
+}
 //# sourceMappingURL=types.js.map

@@ -36,8 +36,18 @@
  * }
  * ```
  */
-export { createSuccess, createError } from './types.js';
+export { createSuccess, createError, QueryApiError } from './types.js';
 export { createProcessStateAPI } from './process-state.js';
 export { PatternSummarySchema, SUMMARY_FIELDS, summarizePattern, summarizePatterns, } from './summarize.js';
-export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';
+export { fuzzyMatchPatterns, findBestMatch } from './fuzzy-match.js';
+// Pattern Helpers
+export { getPatternName, findPatternByName, getRelationships, allPatternNames, suggestPattern, firstImplements, } from './pattern-helpers.js';
+export { findStubPatterns, resolveStubs, groupStubsByPattern, extractDecisionItems, findPdrReferences, } from './stub-resolver.js';
+export { isValidSessionType, assembleContext, buildDepTree, buildFileReadingList, buildOverview, } from './context-assembler.js';
+// Context Formatting
+export { formatContextBundle, formatDepTree, formatFileReadingList, formatOverview, } from './context-formatter.js';
+export { computeNeighborhood, compareContexts, aggregateTagUsage, buildSourceInventory, } from './arch-queries.js';
+export { analyzeCoverage, findUnannotatedFiles, findUnusedTaxonomy } from './coverage-analyzer.js';
+// Pattern Summarization (extended)
+export { deriveSource } from './summarize.js';
 //# sourceMappingURL=index.js.map
