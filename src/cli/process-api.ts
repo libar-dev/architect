@@ -8,7 +8,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context cli
  * @libar-docs-arch-layer application
- * @libar-docs-uses ProcessStateAPI, MasterDataset, Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor
+ * @libar-docs-uses ProcessStateAPI, MasterDataset, Pattern Scanner, Doc Extractor, Gherkin Scanner, Gherkin Extractor, PatternSummarizerImpl, FuzzyMatcherImpl, OutputPipelineImpl
  * @libar-docs-used-by npm scripts, Claude Code sessions
  * @libar-docs-usecase "When querying delivery process state from CLI"
  * @libar-docs-usecase "When Claude Code needs real-time delivery state queries"
@@ -16,7 +16,7 @@
  * ## process-api - CLI Query Interface to ProcessStateAPI
  *
  * Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
- * Runs pipeline steps 1-8 (config → scan → extract → transform),
+ * Runs pipeline steps 1-8 (config -> scan -> extract -> transform),
  * then routes subcommands to API methods.
  *
  * ### When to Use
@@ -30,9 +30,12 @@
  * - **Subcommand Routing**: CLI subcommands map to ProcessStateAPI methods
  * - **JSON Output**: All output is JSON to stdout, errors to stderr
  * - **Pipeline Reuse**: Steps 1-8 match generate-docs exactly
+ * - **QueryResult Envelope**: All output wrapped in success/error discriminated union
+ * - **Output Shaping**: 594KB -> 4KB via summarization and modifiers
  */
 
 import * as path from 'path';
+import * as fs from 'fs';
 import { loadConfig, formatConfigError } from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { scanPatterns } from '../scanner/index.js';
@@ -49,8 +52,40 @@ import { createProcessStateAPI } from '../api/process-state.js';
 import type { ProcessStateAPI } from '../api/process-state.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
+import type { QueryErrorCode } from '../api/types.js';
+import { createSuccess, createError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
+import { fuzzyMatchPatterns, findBestMatch } from '../api/fuzzy-match.js';
+import {
+  applyOutputPipeline,
+  applyListFilters,
+  validateModifiers,
+  formatOutput,
+  PATTERN_ARRAY_METHODS,
+  DEFAULT_OUTPUT_MODIFIERS,
+  type OutputModifiers,
+  type PipelineInput,
+  type ListFilters,
+} from './output-pipeline.js';
+
+// =============================================================================
+// CLIQueryError
+// =============================================================================
+
+/**
+ * Structured error for CLI domain errors.
+ * Caught in main() and converted to QueryError envelope.
+ */
+class CLIQueryError extends Error {
+  readonly code: QueryErrorCode;
+
+  constructor(code: QueryErrorCode, message: string) {
+    super(message);
+    this.name = 'CLIQueryError';
+    this.code = code;
+  }
+}
 
 // =============================================================================
 // CLI Config
@@ -65,6 +100,8 @@ interface ProcessAPICLIConfig {
   subArgs: string[];
   help: boolean;
   version: boolean;
+  modifiers: OutputModifiers;
+  format: 'json' | 'compact';
 }
 
 // =============================================================================
@@ -81,8 +118,15 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
     subArgs: [],
     help: false,
     version: false,
+    modifiers: { ...DEFAULT_OUTPUT_MODIFIERS },
+    format: 'json',
   };
 
+  // Mutable modifiers for parsing
+  let namesOnly = false;
+  let count = false;
+  let fields: string[] | null = null;
+  let full = false;
   let parsingFlags = true;
 
   for (let i = 0; i < argv.length; i++) {
@@ -116,6 +160,7 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
           i++;
           break;
 
+        case '-f':
         case '--features':
           if (!nextArg || nextArg.startsWith('-')) {
             throw new Error(`${arg} requires a value`);
@@ -142,6 +187,35 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
           i++;
           break;
 
+        // Output modifiers
+        case '--names-only':
+          namesOnly = true;
+          break;
+
+        case '--count':
+          count = true;
+          break;
+
+        case '--fields':
+          if (!nextArg || nextArg.startsWith('-')) {
+            throw new Error(`${arg} requires a value (comma-separated field names)`);
+          }
+          fields = nextArg.split(',').map((f) => f.trim());
+          i++;
+          break;
+
+        case '--full':
+          full = true;
+          break;
+
+        case '--format':
+          if (nextArg !== 'json' && nextArg !== 'compact') {
+            throw new Error(`${arg} must be "json" or "compact"`);
+          }
+          config.format = nextArg;
+          i++;
+          break;
+
         default:
           throw new Error(`Unknown option: ${arg}`);
       }
@@ -155,6 +229,7 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
     }
   }
 
+  config.modifiers = { namesOnly, count, fields, full };
   return config;
 }
 
@@ -170,29 +245,47 @@ Usage: process-api [options] <subcommand> [args...]
 
 Options:
   -i, --input <pattern>   Glob patterns for TypeScript files (repeatable)
-  --features <pattern>    Glob patterns for .feature files (repeatable)
+  -f, --features <pattern> Glob patterns for .feature files (repeatable)
   -b, --base-dir <dir>    Base directory (default: cwd)
   -w, --workflow <file>   Workflow config JSON file
   -h, --help              Show this help message
   -v, --version           Show version number
 
+Output Modifiers:
+  --names-only            Return array of pattern name strings
+  --count                 Return count of matching patterns
+  --fields <f1,f2,...>    Return only specified fields per pattern
+  --full                  Bypass summarization, return raw patterns
+  --format <json|compact> Output format (default: json)
+
 Subcommands:
   status                    Status counts and completion percentage
   query <method> [args...]  Execute any ProcessStateAPI method
   pattern <name>            Full detail for one pattern
+  list [filters]            List patterns with composable filters
+  search <query>            Fuzzy search for pattern names
   arch roles                List all arch-roles with counts
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
   arch graph <pattern>      Dependency graph for pattern
 
+List Filters:
+  --status <status>         Filter by FSM status (roadmap, active, completed, deferred)
+  --phase <number>          Filter by roadmap phase number
+  --category <name>         Filter by category
+  --source <ts|gherkin>     Filter by source type
+  --limit <n>               Maximum results
+  --offset <n>              Skip first n results
+
 Examples:
-  process-api -i "src/**/*.ts" --features "specs/*.feature" status
+  process-api -i "src/**/*.ts" -f "specs/*.feature" status
   process-api -i "src/**/*.ts" query getCurrentWork
-  process-api -i "src/**/*.ts" query getPatternsByPhase 18
-  process-api -i "src/**/*.ts" query isValidTransition roadmap active
+  process-api -i "src/**/*.ts" query getCurrentWork --names-only
+  process-api -i "src/**/*.ts" list --status active
+  process-api -i "src/**/*.ts" list --status roadmap --category projection --count
+  process-api -i "src/**/*.ts" search ProcessState
   process-api -i "src/**/*.ts" pattern ProcessGuardLinter
   process-api -i "src/**/*.ts" arch roles
-  process-api -i "src/**/*.ts" arch context validation
 
 Available API Methods (for 'query'):
   Status:   getPatternsByNormalizedStatus, getPatternsByStatus, getStatusCounts,
@@ -207,6 +300,42 @@ Available API Methods (for 'query'):
             getRecentlyCompleted
   Raw:      getMasterDataset
 `);
+}
+
+// =============================================================================
+// Config File Default Resolution
+// =============================================================================
+
+/**
+ * If --input and --features are not provided, try to load defaults from config.
+ * When a delivery-process.config.ts exists, use conventional paths.
+ */
+function resolveConfigDefaults(config: ProcessAPICLIConfig): void {
+  const baseDir = path.resolve(config.baseDir);
+
+  if (config.input.length === 0) {
+    // Check for config file existence as signal to use defaults
+    const configPath = path.join(baseDir, 'delivery-process.config.ts');
+    if (fs.existsSync(configPath)) {
+      config.input.push('src/**/*.ts');
+      // Also check for stubs directory
+      const stubsDir = path.join(baseDir, 'delivery-process', 'stubs');
+      if (fs.existsSync(stubsDir)) {
+        config.input.push('delivery-process/stubs/**/*.ts');
+      }
+    }
+  }
+
+  if (config.features.length === 0) {
+    const specsDir = path.join(baseDir, 'delivery-process', 'specs');
+    if (fs.existsSync(specsDir)) {
+      config.features.push('delivery-process/specs/*.feature');
+    }
+    const releasesDir = path.join(baseDir, 'delivery-process', 'releases');
+    if (fs.existsSync(releasesDir)) {
+      config.features.push('delivery-process/releases/*.feature');
+    }
+  }
 }
 
 // =============================================================================
@@ -342,42 +471,48 @@ const API_METHODS = [
   'getMasterDataset',
 ] as const;
 
-function handleQuery(api: ProcessStateAPI, args: string[]): unknown {
+function handleQuery(
+  api: ProcessStateAPI,
+  args: string[]
+): { methodName: string; result: unknown } {
   const methodName = args[0];
   if (!methodName) {
-    console.error('Usage: process-api query <method> [args...]');
-    console.error(`Methods: ${API_METHODS.join(', ')}`);
-    process.exit(1);
+    throw new CLIQueryError(
+      'PATTERN_NOT_FOUND',
+      'Usage: process-api query <method> [args...]\nMethods: ' + API_METHODS.join(', ')
+    );
   }
 
   if (!API_METHODS.includes(methodName as (typeof API_METHODS)[number])) {
-    console.error(`Unknown API method: ${methodName}`);
-    console.error(`Available: ${API_METHODS.join(', ')}`);
-    process.exit(1);
+    throw new CLIQueryError(
+      'PATTERN_NOT_FOUND',
+      `Unknown API method: ${methodName}\nAvailable: ${API_METHODS.join(', ')}`
+    );
   }
 
   // Safe to cast: we validated methodName is in API_METHODS above
   const apiRecord = api as unknown as Record<string, (...a: unknown[]) => unknown>;
   const method = apiRecord[methodName];
   if (method === undefined) {
-    console.error(`Method not found on API: ${methodName}`);
-    process.exit(1);
+    throw new CLIQueryError('PATTERN_NOT_FOUND', `Method not found on API: ${methodName}`);
   }
   const coercedArgs = args.slice(1).map(coerceArg);
-  return method.apply(api, coercedArgs);
+  return { methodName, result: method.apply(api, coercedArgs) };
 }
 
 function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
   const name = args[0];
   if (!name) {
-    console.error('Usage: process-api pattern <name>');
-    process.exit(1);
+    throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api pattern <name>');
   }
 
   const pattern = api.getPattern(name);
   if (!pattern) {
-    console.error(`Pattern not found: "${name}"`);
-    process.exit(1);
+    // Fuzzy suggestion
+    const allNames = api.getMasterDataset().patterns.map((p) => p.patternName ?? p.name);
+    const best = findBestMatch(name, allNames);
+    const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
+    throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
   }
 
   return {
@@ -388,16 +523,133 @@ function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
   };
 }
 
+/**
+ * Parse list-specific filter flags from subArgs.
+ */
+function parseListFilters(subArgs: string[]): ListFilters {
+  let status: string | null = null;
+  let phase: number | null = null;
+  let category: string | null = null;
+  let source: 'typescript' | 'gherkin' | null = null;
+  let limit: number | null = null;
+  let offset: number | null = null;
+
+  for (let i = 0; i < subArgs.length; i++) {
+    const arg = subArgs[i];
+    const next = subArgs[i + 1];
+
+    switch (arg) {
+      case '--status':
+        status = next ?? null;
+        i++;
+        break;
+      case '--phase':
+        phase = next !== undefined ? parseInt(next, 10) : null;
+        i++;
+        break;
+      case '--category':
+        category = next ?? null;
+        i++;
+        break;
+      case '--source':
+        if (next === 'typescript' || next === 'ts') {
+          source = 'typescript';
+        } else if (next === 'gherkin' || next === 'feature') {
+          source = 'gherkin';
+        }
+        i++;
+        break;
+      case '--limit':
+        limit = next !== undefined ? parseInt(next, 10) : null;
+        i++;
+        break;
+      case '--offset':
+        offset = next !== undefined ? parseInt(next, 10) : null;
+        i++;
+        break;
+      default:
+        break;
+    }
+  }
+
+  return { status, phase, category, source, limit, offset };
+}
+
+/**
+ * Generate contextual hint for empty list results.
+ */
+function generateEmptyHint(
+  dataset: RuntimeMasterDataset,
+  filters: ListFilters
+): string | undefined {
+  if (filters.status !== null) {
+    const counts = dataset.counts;
+    const alternatives: string[] = [];
+    if (counts.active > 0 && filters.status !== 'active') {
+      alternatives.push(`${counts.active} active`);
+    }
+    if (counts.planned > 0 && filters.status !== 'roadmap') {
+      alternatives.push(`${counts.planned} roadmap`);
+    }
+    if (counts.completed > 0 && filters.status !== 'completed') {
+      alternatives.push(`${counts.completed} completed`);
+    }
+    if (alternatives.length > 0) {
+      const altStatus = filters.status === 'active' ? 'roadmap' : 'active';
+      return `No ${filters.status} patterns. ${alternatives.join(', ')} exist. Try: list --status ${altStatus}`;
+    }
+  }
+  return undefined;
+}
+
+function handleList(
+  dataset: RuntimeMasterDataset,
+  subArgs: string[],
+  modifiers: OutputModifiers
+): unknown {
+  const filters = parseListFilters(subArgs);
+  const filtered = applyListFilters(dataset, filters);
+
+  if (filtered.length === 0) {
+    const hint = generateEmptyHint(dataset, filters);
+    return { patterns: [], hint };
+  }
+
+  const input: PipelineInput = { kind: 'patterns', data: filtered };
+  return applyOutputPipeline(input, modifiers);
+}
+
+function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
+  const query = subArgs[0];
+  if (!query) {
+    throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api search <query>');
+  }
+
+  const allNames = api.getMasterDataset().patterns.map((p) => p.patternName ?? p.name);
+  const matches = fuzzyMatchPatterns(query, allNames);
+
+  if (matches.length === 0) {
+    const best = findBestMatch(query, allNames);
+    const hint =
+      best !== undefined
+        ? `No patterns matched "${query}". Did you mean: ${best.patternName}?`
+        : `No patterns matched "${query}".`;
+    return { matches: [], hint };
+  }
+
+  return { matches };
+}
+
 function handleArch(api: ProcessStateAPI, args: string[]): unknown {
   const subCmd = args[0];
   const dataset = api.getMasterDataset();
   const archIndex = dataset.archIndex;
 
   if (!archIndex || archIndex.all.length === 0) {
-    console.error(
+    throw new CLIQueryError(
+      'PATTERN_NOT_FOUND',
       'No architecture data available. Ensure patterns have @libar-docs-arch-role annotations.'
     );
-    process.exit(1);
   }
 
   switch (subCmd) {
@@ -419,9 +671,10 @@ function handleArch(api: ProcessStateAPI, args: string[]): unknown {
       }
       const contextPatterns = archIndex.byContext[contextName];
       if (!contextPatterns) {
-        console.error(`Context not found: "${contextName}"`);
-        console.error(`Available: ${Object.keys(archIndex.byContext).join(', ')}`);
-        process.exit(1);
+        throw new CLIQueryError(
+          'CATEGORY_NOT_FOUND',
+          `Context not found: "${contextName}"\nAvailable: ${Object.keys(archIndex.byContext).join(', ')}`
+        );
       }
       return contextPatterns;
     }
@@ -437,9 +690,10 @@ function handleArch(api: ProcessStateAPI, args: string[]): unknown {
       }
       const layerPatterns = archIndex.byLayer[layerName];
       if (!layerPatterns) {
-        console.error(`Layer not found: "${layerName}"`);
-        console.error(`Available: ${Object.keys(archIndex.byLayer).join(', ')}`);
-        process.exit(1);
+        throw new CLIQueryError(
+          'CATEGORY_NOT_FOUND',
+          `Layer not found: "${layerName}"\nAvailable: ${Object.keys(archIndex.byLayer).join(', ')}`
+        );
       }
       return layerPatterns;
     }
@@ -447,22 +701,21 @@ function handleArch(api: ProcessStateAPI, args: string[]): unknown {
     case 'graph': {
       const patternName = args[1];
       if (!patternName) {
-        console.error('Usage: process-api arch graph <pattern>');
-        process.exit(1);
+        throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api arch graph <pattern>');
       }
       const dependencies = api.getPatternDependencies(patternName);
       const relationships = api.getPatternRelationships(patternName);
       if (!dependencies && !relationships) {
-        console.error(`Pattern not found: "${patternName}"`);
-        process.exit(1);
+        throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
       }
       return { pattern: patternName, dependencies, relationships };
     }
 
     default:
-      console.error(`Unknown arch subcommand: ${subCmd ?? '(none)'}`);
-      console.error('Available: roles, context [name], layer [name], graph <pattern>');
-      process.exit(1);
+      throw new CLIQueryError(
+        'PATTERN_NOT_FOUND',
+        `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>`
+      );
   }
 }
 
@@ -470,20 +723,49 @@ function handleArch(api: ProcessStateAPI, args: string[]): unknown {
 // Subcommand Router
 // =============================================================================
 
-function routeSubcommand(api: ProcessStateAPI, subcommand: string, subArgs: string[]): unknown {
-  switch (subcommand) {
+interface RouteContext {
+  api: ProcessStateAPI;
+  dataset: RuntimeMasterDataset;
+  subcommand: string;
+  subArgs: string[];
+  modifiers: OutputModifiers;
+}
+
+function routeSubcommand(ctx: RouteContext): unknown {
+  switch (ctx.subcommand) {
     case 'status':
-      return handleStatus(api);
-    case 'query':
-      return handleQuery(api, subArgs);
+      return handleStatus(ctx.api);
+
+    case 'query': {
+      const { methodName, result } = handleQuery(ctx.api, ctx.subArgs);
+      // Apply output pipeline for pattern-array methods
+      if (PATTERN_ARRAY_METHODS.has(methodName)) {
+        const input: PipelineInput = {
+          kind: 'patterns',
+          data: result as readonly ExtractedPattern[],
+        };
+        return applyOutputPipeline(input, ctx.modifiers);
+      }
+      return result;
+    }
+
     case 'pattern':
-      return handlePattern(api, subArgs);
+      return handlePattern(ctx.api, ctx.subArgs);
+
+    case 'list':
+      return handleList(ctx.dataset, ctx.subArgs, ctx.modifiers);
+
+    case 'search':
+      return handleSearch(ctx.api, ctx.subArgs);
+
     case 'arch':
-      return handleArch(api, subArgs);
+      return handleArch(ctx.api, ctx.subArgs);
+
     default:
-      console.error(`Unknown subcommand: ${subcommand}`);
-      console.error('Available: status, query, pattern, arch');
-      process.exit(1);
+      throw new CLIQueryError(
+        'PATTERN_NOT_FOUND',
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: status, query, pattern, list, search, arch`
+      );
   }
 }
 
@@ -503,8 +785,16 @@ async function main(): Promise<void> {
     process.exit(opts.help ? 0 : 1);
   }
 
+  // Validate output modifiers before any expensive work
+  validateModifiers(opts.modifiers);
+
+  // Resolve config file defaults if --input and --features not provided
+  resolveConfigDefaults(opts);
+
   if (opts.input.length === 0) {
-    console.error('Error: --input is required');
+    console.error(
+      'Error: --input is required (or place delivery-process.config.ts in cwd for auto-detection)'
+    );
     console.error('');
     console.error('Example:');
     console.error('  process-api -i "src/**/*.ts" status');
@@ -518,12 +808,28 @@ async function main(): Promise<void> {
   const api = createProcessStateAPI(masterDataset);
 
   // Route and execute subcommand
-  const result = routeSubcommand(api, opts.subcommand, opts.subArgs);
+  const result = routeSubcommand({
+    api,
+    dataset: masterDataset,
+    subcommand: opts.subcommand,
+    subArgs: opts.subArgs,
+    modifiers: opts.modifiers,
+  });
 
-  // Output JSON to stdout
-  console.log(JSON.stringify(result, null, 2));
+  // Wrap in QueryResult envelope and output
+  const envelope = createSuccess(result, masterDataset.counts.total);
+  const output =
+    opts.format === 'compact' ? formatOutput(envelope, 'compact') : formatOutput(envelope, 'json');
+  console.log(output);
 }
 
 void main().catch((error: unknown) => {
+  // CLIQueryError -> structured error envelope
+  if (error instanceof CLIQueryError) {
+    const envelope = createError(error.code, error.message);
+    console.log(JSON.stringify(envelope, null, 2));
+    process.exit(1);
+    return;
+  }
   handleCliError(error, 1);
 });

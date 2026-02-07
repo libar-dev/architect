@@ -92,6 +92,7 @@
     "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -o docs-generated -f",
     "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:technical && pnpm docs:taxonomy && pnpm docs:validation",
     "process:query": "tsx src/cli/process-api.ts -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature'",
+    "process:q": "tsx src/cli/process-api.ts",
     "docs:tag-taxonomy": "tsx src/cli/generate-tag-taxonomy.ts --output delivery-process/tag-taxonomy.md --overwrite",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",

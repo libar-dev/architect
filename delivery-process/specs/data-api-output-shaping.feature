@@ -36,14 +36,14 @@ Feature: Data API Output Shaping - Compact Output for AI Agents
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | summarizePattern() projection | planned | src/api/summarize.ts | Yes | unit |
-      | Output modifier pipeline | planned | src/cli/output-pipeline.ts | Yes | unit |
-      | QueryResult envelope wiring | planned | src/cli/process-api.ts | Yes | unit |
-      | list subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | search subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | Fuzzy pattern matching | planned | src/api/fuzzy-match.ts | Yes | unit |
-      | Config file default resolution | planned | src/cli/process-api.ts | Yes | unit |
-      | pnpm banner fix | planned | package.json | No | N/A |
+      | summarizePattern() projection | completed | src/api/summarize.ts | Yes | unit |
+      | Output modifier pipeline | completed | src/cli/output-pipeline.ts | Yes | unit |
+      | QueryResult envelope wiring | completed | src/cli/process-api.ts | Yes | unit |
+      | list subcommand | completed | src/cli/process-api.ts | Yes | integration |
+      | search subcommand | completed | src/cli/process-api.ts | Yes | integration |
+      | Fuzzy pattern matching | completed | src/api/fuzzy-match.ts | Yes | unit |
+      | Config file default resolution | completed | src/cli/process-api.ts | Yes | unit |
+      | pnpm banner fix | completed | package.json | No | N/A |
 
   # ============================================================================
   # RULE 1: Pattern Summarization

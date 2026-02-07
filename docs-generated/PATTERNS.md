@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 94/149 (63% complete)
+**Overall:** [█████████████░░░░░░░] 95/152 (63% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 94 |
-| 🚧 Active | 17 |
-| 📋 Planned | 38 |
-| **Total** | 149 |
+| ✅ Completed | 95 |
+| 🚧 Active | 20 |
+| 📋 Planned | 37 |
+| **Total** | 152 |
 
 ---
 
@@ -22,7 +22,7 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (62)
+- [Core](#core) (65)
 - [DDD](#ddd) (34)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
@@ -64,6 +64,7 @@
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
 | ✅ Content Deduplicator | Core | completed | Identifies and merges duplicate sections extracted from multiple sources. |
+| ✅ Data API Output Shaping | DDD | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
 | ✅ Decision Doc Codec | Core | completed | Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation. |
 | ✅ Decision Doc Generator | Core | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
@@ -148,7 +149,10 @@
 | 🚧 FSM States | Extract | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
+| 🚧 Fuzzy Matcher Impl | Core | active | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
 | 🚧 Lint Process CLI | Cli | active | Validates git changes against delivery process rules. |
+| 🚧 Output Pipeline Impl | Core | active | Post-processing pipeline that transforms raw API results into shaped CLI output. |
+| 🚧 Pattern Summarizer Impl | Core | active | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
 | 🚧 Process API CLI Impl | Core | active | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
@@ -172,7 +176,6 @@
 | 📋 Data API CLI Ergonomics | DDD | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
 | 📋 Data API Context Assembly | DDD | planned | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
 | 📋 Data API Design Session Support | DDD | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
-| 📋 Data API Output Shaping | DDD | planned | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
 | 📋 Data API Platform Integration | DDD | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | DDD | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
 | 📋 Data API Stub Integration | DDD | planned | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
@@ -221,7 +224,7 @@
 
 ### Core
 
-58/62 complete (94%)
+58/65 complete (89%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -282,6 +285,9 @@
 - [✅ Validation Rules Codec](patterns/validation-rules-codec.md)
 - [✅ Warning Collector](patterns/warning-collector.md)
 - [🚧 API Module](patterns/api-module.md)
+- [🚧 Fuzzy Matcher Impl](patterns/fuzzy-matcher-impl.md)
+- [🚧 Output Pipeline Impl](patterns/output-pipeline-impl.md)
+- [🚧 Pattern Summarizer Impl](patterns/pattern-summarizer-impl.md)
 - [🚧 Process API CLI Impl](patterns/process-apicli-impl.md)
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
@@ -290,8 +296,9 @@
 
 ### DDD
 
-9/34 complete (26%)
+10/34 complete (29%)
 
+- [✅ Data API Output Shaping](patterns/data-api-output-shaping.md)
 - [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -313,7 +320,6 @@
 - [📋 Data API CLI Ergonomics](patterns/data-apicli-ergonomics.md)
 - [📋 Data API Context Assembly](patterns/data-api-context-assembly.md)
 - [📋 Data API Design Session Support](patterns/data-api-design-session-support.md)
-- [📋 Data API Output Shaping](patterns/data-api-output-shaping.md)
 - [📋 Data API Platform Integration](patterns/data-api-platform-integration.md)
 - [📋 Data API Relationship Graph](patterns/data-api-relationship-graph.md)
 - [📋 Data API Stub Integration](patterns/data-api-stub-integration.md)
@@ -523,6 +529,7 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -533,7 +540,6 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
@@ -583,7 +589,12 @@ graph TD
     ProcessAPICLIImpl --> Doc_Extractor
     ProcessAPICLIImpl --> Gherkin_Scanner
     ProcessAPICLIImpl --> Gherkin_Extractor
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
     ProcessAPICLIImpl ..-> ProcessStateAPICLI
+    OutputPipelineImpl --> PatternSummarizerImpl
+    OutputPipelineImpl ..-> DataAPIOutputShaping
     LintProcessCLI --> ProcessGuardModule
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
@@ -593,9 +604,12 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
+    PatternSummarizerImpl --> ProcessStateAPI
+    PatternSummarizerImpl ..-> DataAPIOutputShaping
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
     ProcessStateAPI ..-> PhaseStateMachineValidation
+    FuzzyMatcherImpl ..-> DataAPIOutputShaping
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation

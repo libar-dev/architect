@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 96 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 99 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 96 |
+| Total Components | 99 |
 | Bounded Contexts | 10 |
 | Component Roles | 4 |
 
@@ -26,13 +26,16 @@ graph TB
     subgraph api["Api BC"]
         MasterDataset["MasterDataset[read-model]"]
         ProcessStateTypes["ProcessStateTypes"]
+        PatternSummarizerImpl["PatternSummarizerImpl"]
         ProcessStateAPI["ProcessStateAPI"]
         APIModule["APIModule"]
+        FuzzyMatcherImpl["FuzzyMatcherImpl"]
     end
     subgraph cli["Cli BC"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         ProcessAPICLIImpl["ProcessAPICLIImpl"]
+        OutputPipelineImpl["OutputPipelineImpl"]
         LintProcessCLI["LintProcessCLI"]
         LintPatternsCLI["LintPatternsCLI"]
         TagTaxonomyCLI["TagTaxonomyCLI"]
@@ -122,6 +125,10 @@ graph TB
         CategoryDefinitions["CategoryDefinitions[read-model]"]
     end
     subgraph validation["Validation BC"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator"]
+        AntiPatternDetector["AntiPatternDetector"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -130,16 +137,14 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator"]
-        AntiPatternDetector["AntiPatternDetector"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -148,17 +153,15 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        LintModule["LintModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -170,8 +173,6 @@ graph TB
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        ProcessStateTypes["ProcessStateTypes"]
-        APIModule["APIModule"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -179,6 +180,8 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        ProcessStateTypes["ProcessStateTypes"]
+        APIModule["APIModule"]
         FSMModule["FSMModule"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
@@ -201,10 +204,10 @@ graph TB
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
-    ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    ExtractedPatternSchema --> DocDirectiveSchema
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
@@ -229,18 +232,23 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
     ProcessAPICLIImpl --> ProcessStateAPI
     ProcessAPICLIImpl --> MasterDataset
     ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
     LintProcessCLI --> ProcessGuardModule
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
+    PatternSummarizerImpl --> ProcessStateAPI
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
@@ -270,8 +278,11 @@ All components with architecture annotations:
 
 | Component | Context | Role | Layer | Source File |
 | --- | --- | --- | --- | --- |
+| 🚧 Fuzzy Matcher Impl | api | - | application | src/api/fuzzy-match.ts |
+| 🚧 Pattern Summarizer Impl | api | - | application | src/api/summarize.ts |
 | 🚧 Process State API | api | - | application | src/api/process-state.ts |
 | ✅ Master Dataset | api | read-model | domain | src/validation-schemas/master-dataset.ts |
+| 🚧 Output Pipeline Impl | cli | - | application | src/cli/output-pipeline.ts |
 | 🚧 Process API CLI Impl | cli | - | application | src/cli/process-api.ts |
 | ✅ Delivery Process Factory | config | - | application | src/config/factory.ts |
 | ✅ Config Loader | config | infrastructure | infrastructure | src/config/config-loader.ts |

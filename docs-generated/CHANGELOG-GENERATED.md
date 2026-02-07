@@ -16,10 +16,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
+- **Output Pipeline Impl**: Post-processing pipeline that transforms raw API results into shaped CLI output.
 - **Lint Process CLI**: Validates git changes against delivery process rules.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
+- **Pattern Summarizer Impl**: Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries.
 - **Process State API**: TypeScript interface for querying delivery process state.
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
+- **Fuzzy Matcher Impl**: Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >...
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -69,6 +72,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Utils Module**: Common helper functions used across the delivery-process package.
 - **Pattern Id Generator**: Generates unique, deterministic pattern IDs based on file path and line number.
 - **Collection Utilities**: Provides shared utilities for working with arrays and collections, such as grouping items by a key function.
+- **Renderable Utils**: Utility functions for document codecs.
+- **Renderable Document**: Universal intermediate format for all generated documentation.
+- **Universal Renderer**: Converts RenderableDocument to Markdown.
+- **Renderable Document Model(RDM)**: Unified document generation using codecs and a universal renderer.
+- **Document Generator**: Simplified document generation using codecs.
 - **Status Values**: THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM).
 - **Risk Levels**: Three-tier risk classification for roadmap planning.
 - **Tag Registry Builder**: Constructs a complete TagRegistry from TypeScript constants.
@@ -81,11 +89,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
 - **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
 - **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with...
-- **Renderable Utils**: Utility functions for document codecs.
-- **Renderable Document**: Universal intermediate format for all generated documentation.
-- **Universal Renderer**: Converts RenderableDocument to Markdown.
-- **Renderable Document Model(RDM)**: Unified document generation using codecs and a universal renderer.
-- **Document Generator**: Simplified document generation using codecs.
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
@@ -130,15 +133,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Business Rules Codec**: Transforms MasterDataset into a RenderableDocument for business rules output.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
-- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
-- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
+- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
+- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
 - **Universal Doc Generator Robustness**: This feature transforms the PoC document generator into a production-ready universal generator capable of operating...
 - **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
 - **Doc Generation Proof Of Concept**: Status: SUPERSEDED - This POC has been implemented.
+- **Data API Output Shaping**: The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
 - **PDR 001 Self Documentation**
 - **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
 - **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.

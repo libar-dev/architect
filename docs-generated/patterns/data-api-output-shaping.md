@@ -1,4 +1,4 @@
-# 📋 Data API Output Shaping
+# ✅ Data API Output Shaping
 
 **Purpose:** Detailed documentation for the Data API Output Shaping pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | completed |
 | Category | DDD |
 | Phase | 25 |
 
@@ -46,6 +46,9 @@ Files that implement this pattern:
 - [`fuzzy-match.ts`](../../delivery-process/stubs/data-api-output-shaping/fuzzy-match.ts) - ## FuzzyMatcher — Pattern Name Fuzzy Search
 - [`output-pipeline.ts`](../../delivery-process/stubs/data-api-output-shaping/output-pipeline.ts) - ## OutputPipeline — CLI Output Shaping and Formatting
 - [`summarize.ts`](../../delivery-process/stubs/data-api-output-shaping/summarize.ts) - ## PatternSummarizer — Compact Pattern Projection
+- [`fuzzy-match.ts`](../../src/api/fuzzy-match.ts) - ## FuzzyMatcher — Pattern Name Fuzzy Search
+- [`summarize.ts`](../../src/api/summarize.ts) - ## PatternSummarizer — Compact Pattern Projection
+- [`output-pipeline.ts`](../../src/cli/output-pipeline.ts) - ## OutputPipeline — CLI Output Shaping and Formatting
 
 ## Acceptance Criteria
 

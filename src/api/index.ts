@@ -60,3 +60,16 @@ export { createSuccess, createError } from './types.js';
 // Process State API
 export type { ProcessStateAPI } from './process-state.js';
 export { createProcessStateAPI } from './process-state.js';
+
+// Pattern Summarization
+export type { PatternSummary } from './summarize.js';
+export {
+  PatternSummarySchema,
+  SUMMARY_FIELDS,
+  summarizePattern,
+  summarizePatterns,
+} from './summarize.js';
+
+// Fuzzy Matching
+export type { FuzzyMatch } from './fuzzy-match.js';
+export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';

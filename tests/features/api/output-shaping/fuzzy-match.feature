@@ -1,0 +1,74 @@
+@libar-docs
+@libar-docs-pattern:FuzzyMatchTests
+@libar-docs-status:active
+Feature: Fuzzy Pattern Matching
+
+  Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
+
+  Rule: Fuzzy matching uses tiered scoring
+
+    @acceptance-criteria @happy-path
+    Scenario: Exact match scores 1.0
+      Given pattern names "OrderSaga", "EventStore", "ProcessGuard"
+      When I fuzzy match "OrderSaga"
+      Then the top result is "OrderSaga" with score "1.0" and matchType "exact"
+
+    @acceptance-criteria @happy-path
+    Scenario: Exact match is case-insensitive
+      Given pattern names "OrderSaga", "EventStore"
+      When I fuzzy match "ordersaga"
+      Then the top result is "OrderSaga" with score "1.0" and matchType "exact"
+
+    @acceptance-criteria @happy-path
+    Scenario: Prefix match scores 0.9
+      Given pattern names "AgentCommandInfrastructure", "EventStore"
+      When I fuzzy match "AgentCommand"
+      Then the top result is "AgentCommandInfrastructure" with score "0.9" and matchType "prefix"
+
+    @acceptance-criteria @happy-path
+    Scenario: Substring match scores 0.7
+      Given pattern names "AgentCommandInfrastructure", "EventStore"
+      When I fuzzy match "Command"
+      Then the top result is "AgentCommandInfrastructure" with score "0.7" and matchType "substring"
+
+    @acceptance-criteria @happy-path
+    Scenario: Levenshtein match for close typos
+      Given pattern names "OrderSaga", "EventStore"
+      When I fuzzy match "OrdrSaga"
+      Then the top result is "OrderSaga" with matchType "fuzzy"
+      And the top result score is above "0.3"
+
+    @acceptance-criteria @happy-path
+    Scenario: Results are sorted by score descending
+      Given pattern names "Command", "AgentCommandInfrastructure", "CommandHandler"
+      When I fuzzy match "Command"
+      Then the first result has score "1.0"
+      And the second result has score at least "0.7"
+
+  Rule: findBestMatch returns single suggestion
+
+    @acceptance-criteria @happy-path
+    Scenario: Best match returns suggestion above threshold
+      Given pattern names "OrderSaga", "EventStore", "ProcessGuard"
+      When I find the best match for "OrderSag"
+      Then the suggestion is "OrderSaga"
+
+    @acceptance-criteria @edge-case
+    Scenario: No match returns undefined when below threshold
+      Given pattern names "OrderSaga", "EventStore"
+      When I find the best match for "zzCompletelyDifferent"
+      Then no suggestion is returned
+
+  Rule: Levenshtein distance computation
+
+    @acceptance-criteria @happy-path
+    Scenario: Identical strings have distance 0
+      Given strings "hello" and "hello"
+      When I compute the Levenshtein distance
+      Then the distance is 0
+
+    @acceptance-criteria @happy-path
+    Scenario: Single character difference
+      Given strings "kitten" and "sitten"
+      When I compute the Levenshtein distance
+      Then the distance is 1

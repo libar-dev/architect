@@ -14,7 +14,7 @@
 ## Description
 
 Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
-Runs pipeline steps 1-8 (config → scan → extract → transform),
+Runs pipeline steps 1-8 (config -> scan -> extract -> transform),
 then routes subcommands to API methods.
 
 ### When to Use
@@ -28,6 +28,8 @@ then routes subcommands to API methods.
 - **Subcommand Routing**: CLI subcommands map to ProcessStateAPI methods
 - **JSON Output**: All output is JSON to stdout, errors to stderr
 - **Pipeline Reuse**: Steps 1-8 match generate-docs exactly
+- **QueryResult Envelope**: All output wrapped in success/error discriminated union
+- **Output Shaping**: 594KB -> 4KB via summarization and modifiers
 
 ## Use Cases
 
