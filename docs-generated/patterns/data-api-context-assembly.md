@@ -42,6 +42,13 @@
   | Session-type tailoring | Right context for the right workflow |
   | Dependency chain visibility | Know blocking status before starting |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`context-assembler.ts`](../../delivery-process/stubs/data-api-context-assembly/context-assembler.ts) - ## ContextAssembler — Session-Oriented Context Bundle Builder
+- [`context-formatter.ts`](../../delivery-process/stubs/data-api-context-assembly/context-formatter.ts) - ## ContextFormatter — Plain Text Renderer for Context Bundles
+
 ## Acceptance Criteria
 
 **Assemble design session context**

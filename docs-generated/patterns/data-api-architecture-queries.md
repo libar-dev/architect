@@ -37,6 +37,13 @@
   | Taxonomy discovery | Know what tags and categories are available |
   | Cross-context analysis | Compare bounded contexts for integration |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`arch-queries.ts`](../../delivery-process/stubs/data-api-architecture-queries/arch-queries.ts) - ## ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context
+- [`coverage-analyzer.ts`](../../delivery-process/stubs/data-api-architecture-queries/coverage-analyzer.ts) - ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection
+
 ## Acceptance Criteria
 
 **Pattern neighborhood shows direct connections**
