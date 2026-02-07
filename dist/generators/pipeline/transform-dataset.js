@@ -301,7 +301,7 @@ export function transformToMasterDatasetWithValidation(raw) {
         }
     }
     // ─────────────────────────────────────────────────────────────────────────
-    // Second pass: compute reverse lookups (implementedBy, extendedBy)
+    // Second pass: compute reverse lookups (implementedBy, extendedBy, enables, usedBy)
     // ─────────────────────────────────────────────────────────────────────────
     // We iterate over patterns again to have access to source.file for implementedBy
     for (const pattern of patterns) {
@@ -337,10 +337,26 @@ export function transformToMasterDatasetWithValidation(raw) {
                 target.extendedBy.push(patternKey);
             }
         }
+        // Build enables reverse lookup (dependsOn -> enables)
+        for (const dep of entry.dependsOn) {
+            const target = relationshipIndex[dep];
+            if (target && !target.enables.includes(patternKey)) {
+                target.enables.push(patternKey);
+            }
+        }
+        // Build usedBy reverse lookup (uses -> usedBy)
+        for (const used of entry.uses) {
+            const target = relationshipIndex[used];
+            if (target && !target.usedBy.includes(patternKey)) {
+                target.usedBy.push(patternKey);
+            }
+        }
     }
-    // Sort implementedBy alphabetically by file path for consistent output
+    // Sort reverse-computed arrays for consistent output
     for (const entry of Object.values(relationshipIndex)) {
         entry.implementedBy.sort((a, b) => a.file.localeCompare(b.file));
+        entry.enables.sort((a, b) => a.localeCompare(b));
+        entry.usedBy.sort((a, b) => a.localeCompare(b));
     }
     // ─────────────────────────────────────────────────────────────────────────
     // Third pass: detect dangling references in relationship fields

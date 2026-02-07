@@ -23,6 +23,8 @@ export interface NeighborhoodResult {
     readonly layer: string | undefined;
     readonly uses: readonly NeighborEntry[];
     readonly usedBy: readonly NeighborEntry[];
+    readonly dependsOn: readonly NeighborEntry[];
+    readonly enables: readonly NeighborEntry[];
     readonly sameContext: readonly NeighborEntry[];
     readonly implements: readonly string[];
     readonly implementedBy: readonly string[];

@@ -356,6 +356,15 @@ export function buildFileReadingList(dataset, patternName, includeRelated) {
                 continue;
             if (depPattern.status === 'completed') {
                 completedDeps.push(depPattern.source.file);
+                // Include implementation files for completed dependencies
+                const depRels = getRelationships(dataset, depName);
+                if (depRels !== undefined) {
+                    for (const implRef of depRels.implementedBy) {
+                        if (!completedDeps.includes(implRef.file)) {
+                            completedDeps.push(implRef.file);
+                        }
+                    }
+                }
             }
             else {
                 roadmapDeps.push(depPattern.source.file);

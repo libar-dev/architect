@@ -34,9 +34,11 @@ export function computeNeighborhood(name, dataset) {
         return undefined;
     const patternName = getPatternName(pattern);
     const rels = getRelationships(dataset, patternName);
-    // Resolve uses/usedBy to NeighborEntry
+    // Resolve relationship fields to NeighborEntry
     const uses = (rels?.uses ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
     const usedBy = (rels?.usedBy ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
+    const dependsOn = (rels?.dependsOn ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
+    const enables = (rels?.enables ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));
     // Same-context siblings
     const ctx = pattern.archContext;
     const sameContext = [];
@@ -57,6 +59,8 @@ export function computeNeighborhood(name, dataset) {
         layer: pattern.archLayer,
         uses,
         usedBy,
+        dependsOn,
+        enables,
         sameContext,
         implements: rels?.implementsPatterns ?? [],
         implementedBy: (rels?.implementedBy ?? []).map((r) => r.name),

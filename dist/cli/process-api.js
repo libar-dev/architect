@@ -589,7 +589,8 @@ async function handleArch(ctx) {
             if (!contextPatterns) {
                 throw new QueryApiError('CATEGORY_NOT_FOUND', `Context not found: "${contextName}"\nAvailable: ${Object.keys(archIndex.byContext).join(', ')}`);
             }
-            return contextPatterns;
+            const ctxInput = { kind: 'patterns', data: contextPatterns };
+            return applyOutputPipeline(ctxInput, ctx.modifiers);
         }
         case 'layer': {
             const layerName = args[1];
@@ -604,7 +605,8 @@ async function handleArch(ctx) {
             if (!layerPatterns) {
                 throw new QueryApiError('CATEGORY_NOT_FOUND', `Layer not found: "${layerName}"\nAvailable: ${Object.keys(archIndex.byLayer).join(', ')}`);
             }
-            return layerPatterns;
+            const layerInput = { kind: 'patterns', data: layerPatterns };
+            return applyOutputPipeline(layerInput, ctx.modifiers);
         }
         case 'graph': {
             const patternName = args[1];
@@ -704,7 +706,7 @@ function handleDecisions(dataset, subArgs) {
     if (patternStubs.length === 0) {
         const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
         const hint = suggestPattern(patternName, stubNames);
-        throw new QueryApiError('STUB_NOT_FOUND', `No stubs found for pattern: "${patternName}".${hint}`);
+        throw new QueryApiError('STUB_NOT_FOUND', `No decisions found for pattern: "${patternName}".${hint}`);
     }
     // Extract decisions from each stub's description
     const decisions = patternStubs.map((stub) => ({
