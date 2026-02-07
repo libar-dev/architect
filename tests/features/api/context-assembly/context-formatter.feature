@@ -50,3 +50,18 @@ Feature: Context Formatter - Plain Text Rendering
         | 69 patterns    |
         | 52%            |
         | === PROGRESS ===|
+
+  Rule: formatFileReadingList renders categorized file paths
+
+    @acceptance-criteria @happy-path
+    Scenario: File list renders primary and dependency sections
+      Given a file reading list with primary and dependency files
+      When I format the file reading list
+      Then the output contains "=== PRIMARY ==="
+      And the output contains "=== COMPLETED DEPENDENCIES ==="
+
+    @acceptance-criteria @edge-case
+    Scenario: Empty file reading list renders minimal output
+      Given an empty file reading list
+      When I format the file reading list
+      Then the output is a single newline

@@ -605,6 +605,14 @@ export function extractPatternTags(tags) {
         else if (normalized.startsWith('adr-superseded-by:')) {
             metadata.adrSupersededBy = normalized.substring(18).padStart(3, '0');
         }
+        // @libar-docs-target:src/api/stub-resolver.ts
+        else if (normalized.startsWith('target:')) {
+            metadata.target = normalized.substring(7);
+        }
+        // @libar-docs-since:DS-A
+        else if (normalized.startsWith('since:')) {
+            metadata.since = normalized.substring(6);
+        }
         // Category tags: @ddd, @core, @event-sourcing, etc.
         // These don't have a colon, so treat them as category tags
         // Skip "libar-docs" (the bare opt-in marker) - it's not a domain category

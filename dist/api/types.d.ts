@@ -32,7 +32,7 @@ export interface QuerySuccess<T> {
 /**
  * Error codes for query failures
  */
-export type QueryErrorCode = 'INVALID_STATUS' | 'INVALID_TRANSITION' | 'PATTERN_NOT_FOUND' | 'PHASE_NOT_FOUND' | 'QUARTER_NOT_FOUND' | 'CATEGORY_NOT_FOUND';
+export type QueryErrorCode = 'INVALID_ARGUMENT' | 'INVALID_STATUS' | 'INVALID_TRANSITION' | 'PATTERN_NOT_FOUND' | 'PHASE_NOT_FOUND' | 'QUARTER_NOT_FOUND' | 'CATEGORY_NOT_FOUND' | 'CONTEXT_NOT_FOUND' | 'STUB_NOT_FOUND' | 'PDR_NOT_FOUND' | 'CONTEXT_ASSEMBLY_ERROR' | 'UNKNOWN_METHOD';
 /**
  * Failed query response
  */
@@ -173,6 +173,17 @@ export interface ProtectionInfo {
     description: string;
     canAddDeliverables: boolean;
     requiresUnlock: boolean;
+}
+/**
+ * Entry for a neighboring pattern with architecture metadata.
+ * Shared between ContextAssembler and ArchQueries.
+ */
+export interface NeighborEntry {
+    readonly name: string;
+    readonly status: string | undefined;
+    readonly archRole: string | undefined;
+    readonly archContext: string | undefined;
+    readonly file: string | undefined;
 }
 /**
  * Create a success response

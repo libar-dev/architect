@@ -57,7 +57,8 @@ import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { createSuccess, createError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
-import { fuzzyMatchPatterns, findBestMatch } from '../api/fuzzy-match.js';
+import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
+import { allPatternNames, suggestPattern, firstImplements } from '../api/pattern-helpers.js';
 import {
   findStubPatterns,
   resolveStubs,
@@ -523,7 +524,7 @@ const API_METHODS = [
   'getRoadmapItems',
   'getRecentlyCompleted',
   'getMasterDataset',
-] as const;
+] as const satisfies ReadonlyArray<keyof ProcessStateAPI>;
 
 function handleQuery(
   api: ProcessStateAPI,
@@ -562,11 +563,8 @@ function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
 
   const pattern = api.getPattern(name);
   if (!pattern) {
-    // Fuzzy suggestion
-    const allNames = api.getMasterDataset().patterns.map((p) => p.patternName ?? p.name);
-    const best = findBestMatch(name, allNames);
-    const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
-    throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
+    const hint = suggestPattern(name, allPatternNames(api.getMasterDataset()));
+    throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${name}".${hint}`);
   }
 
   return {
@@ -710,15 +708,11 @@ function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
     throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
   }
 
-  const allNames = api.getMasterDataset().patterns.map((p) => p.patternName ?? p.name);
-  const matches = fuzzyMatchPatterns(query, allNames);
+  const names = allPatternNames(api.getMasterDataset());
+  const matches = fuzzyMatchPatterns(query, names);
 
   if (matches.length === 0) {
-    const best = findBestMatch(query, allNames);
-    const hint =
-      best !== undefined
-        ? `No patterns matched "${query}". Did you mean: ${best.patternName}?`
-        : `No patterns matched "${query}".`;
+    const hint = `No patterns matched "${query}".${suggestPattern(query, names)}`;
     return { matches: [], hint };
   }
 
@@ -800,15 +794,13 @@ function handleArch(ctx: RouteContext): unknown {
       const patternName = args[1];
       if (!patternName) {
         throw new CLIQueryError(
-          'PATTERN_NOT_FOUND',
+          'INVALID_ARGUMENT',
           'Usage: process-api arch neighborhood <pattern>'
         );
       }
       const neighborhood = computeNeighborhood(patternName, ctx.dataset);
       if (neighborhood === undefined) {
-        const allNames = ctx.dataset.patterns.map((p) => p.patternName ?? p.name);
-        const best = findBestMatch(patternName, allNames);
-        const hint = best !== undefined ? ` Did you mean: ${best.patternName}?` : '';
+        const hint = suggestPattern(patternName, allPatternNames(ctx.dataset));
         throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}".${hint}`);
       }
       return neighborhood;
@@ -819,7 +811,7 @@ function handleArch(ctx: RouteContext): unknown {
       const ctx2Name = args[2];
       if (!ctx1Name || !ctx2Name) {
         throw new CLIQueryError(
-          'CONTEXT_NOT_FOUND',
+          'INVALID_ARGUMENT',
           'Usage: process-api arch compare <ctx1> <ctx2>'
         );
       }
@@ -873,15 +865,11 @@ function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: 
         r.stubName.toLowerCase() === lowerFilter
     );
     if (filtered.length === 0) {
-      // Try fuzzy match for suggestions
-      const allPatternNames = [
-        ...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName)),
-      ];
-      const suggestion = findBestMatch(patternFilter, allPatternNames);
-      const hint = suggestion !== undefined ? `\nDid you mean: ${suggestion.patternName}?` : '';
+      const stubNames = [...new Set(resolutions.map((r) => r.implementsPattern ?? r.stubName))];
+      const hint = suggestPattern(patternFilter, stubNames);
       throw new CLIQueryError(
         'STUB_NOT_FOUND',
-        `No stubs found for pattern: "${patternFilter}"${hint}`
+        `No stubs found for pattern: "${patternFilter}".${hint}`
       );
     }
   }
@@ -903,10 +891,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
   // Find stubs implementing this pattern
   const stubs = findStubPatterns(dataset);
   const patternStubs = stubs.filter((s) => {
-    const implName =
-      s.implementsPatterns !== undefined && s.implementsPatterns.length > 0
-        ? s.implementsPatterns[0]
-        : undefined;
+    const implName = firstImplements(s);
     return (
       implName?.toLowerCase() === patternName.toLowerCase() ||
       (s.patternName ?? s.name).toLowerCase() === patternName.toLowerCase()
@@ -914,22 +899,11 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
   });
 
   if (patternStubs.length === 0) {
-    const allStubNames = [
-      ...new Set(
-        stubs.map((s) => {
-          const impl =
-            s.implementsPatterns !== undefined && s.implementsPatterns.length > 0
-              ? s.implementsPatterns[0]
-              : undefined;
-          return impl ?? s.patternName ?? s.name;
-        })
-      ),
-    ];
-    const suggestion = findBestMatch(patternName, allStubNames);
-    const hint = suggestion !== undefined ? `\nDid you mean: ${suggestion.patternName}?` : '';
+    const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
+    const hint = suggestPattern(patternName, stubNames);
     throw new CLIQueryError(
       'STUB_NOT_FOUND',
-      `No stubs found for pattern: "${patternName}"${hint}`
+      `No stubs found for pattern: "${patternName}".${hint}`
     );
   }
 
@@ -951,7 +925,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
 function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
   const pdrNumber = subArgs[0];
   if (pdrNumber === undefined) {
-    throw new CLIQueryError('PDR_NOT_FOUND', 'Usage: pdr <number> (e.g., pdr 012)');
+    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: pdr <number> (e.g., pdr 012)');
   }
 
   // Normalize: strip leading "PDR-" if user passed it
@@ -1084,7 +1058,7 @@ function handleOverviewCmd(ctx: RouteContext): string {
 // Subcommand Router
 // =============================================================================
 
-function routeSubcommand(ctx: RouteContext): unknown {
+async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
   switch (ctx.subcommand) {
     case 'context':
       return handleContext(ctx);
@@ -1223,10 +1197,7 @@ async function main(): Promise<void> {
     console.log(result);
   } else {
     const envelope = createSuccess(result, masterDataset.counts.total);
-    const output =
-      opts.format === 'compact'
-        ? formatOutput(envelope, 'compact')
-        : formatOutput(envelope, 'json');
+    const output = formatOutput(envelope, opts.format);
     console.log(output);
   }
 }

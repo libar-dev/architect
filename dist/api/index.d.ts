@@ -40,4 +40,8 @@ export type { QuerySuccess, QueryError, QueryErrorCode, QueryResult, StatusCount
 export { createSuccess, createError } from './types.js';
 export type { ProcessStateAPI } from './process-state.js';
 export { createProcessStateAPI } from './process-state.js';
+export type { PatternSummary } from './summarize.js';
+export { PatternSummarySchema, SUMMARY_FIELDS, summarizePattern, summarizePatterns, } from './summarize.js';
+export type { FuzzyMatch } from './fuzzy-match.js';
+export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';
 //# sourceMappingURL=index.d.ts.map

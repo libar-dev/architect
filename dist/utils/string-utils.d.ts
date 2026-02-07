@@ -126,4 +126,14 @@ export declare function camelCaseToTitleCase(text: string): string;
  * ```
  */
 export declare function normalizeLineEndings(text: string): string;
+/**
+ * Extract the first sentence from a text string.
+ *
+ * Finds sentence-ending punctuation (.!?) followed by whitespace + uppercase
+ * (new sentence) or end of string. Handles periods in file extensions correctly.
+ *
+ * @param text - Input text
+ * @returns First sentence, or full trimmed text if no sentence boundary found
+ */
+export declare function extractFirstSentence(text: string): string;
 //# sourceMappingURL=string-utils.d.ts.map

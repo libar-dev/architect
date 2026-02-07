@@ -83,22 +83,14 @@ function deriveSource(filePath: string): 'typescript' | 'gherkin' {
  * @returns Compact PatternSummary (~100 bytes JSON)
  */
 export function summarizePattern(pattern: ExtractedPattern): PatternSummary {
-  const summary: PatternSummary = {
+  return {
     patternName: pattern.patternName ?? pattern.name,
     category: pattern.category,
     file: pattern.source.file,
     source: deriveSource(pattern.source.file),
+    ...(pattern.status !== undefined && { status: pattern.status }),
+    ...(pattern.phase !== undefined && { phase: pattern.phase }),
   };
-
-  if (pattern.status !== undefined) {
-    summary.status = pattern.status;
-  }
-
-  if (pattern.phase !== undefined) {
-    summary.phase = pattern.phase;
-  }
-
-  return summary;
 }
 
 /**

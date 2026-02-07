@@ -153,6 +153,10 @@ function checkProtectionLevel(state, changes, registry) {
             continue;
         // Check hard protection (completed)
         if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
+            // Exempt files transitioning TO completed — this is a completion, not a post-completion edit
+            if (changes.statusTransitions.get(file)?.to === 'completed') {
+                continue;
+            }
             violations.push(createViolation('completed-protection', 'error', `Cannot modify completed spec '${file}' without unlock reason`, file, `Add ${tagPrefix}unlock-reason:'your reason' to proceed`));
         }
     }

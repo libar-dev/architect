@@ -329,6 +329,62 @@ describeFeature(feature, ({ Rule }) => {
       }
     );
 
+    RuleScenario(
+      'Multi-pattern context merges metadata from both patterns',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a pattern {string} with status {string} in phase {int}',
+          (_ctx: unknown, name: string, status: string, phase: number) => {
+            state = initState();
+            state.patterns.push(
+              createTestPattern({
+                name,
+                status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+                phase,
+                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+              })
+            );
+          }
+        );
+
+        And(
+          'a second pattern {string} with status {string} in phase {int}',
+          (_ctx: unknown, name: string, status: string, phase: number) => {
+            state!.patterns.push(
+              createTestPattern({
+                name,
+                status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
+                phase,
+                filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+              })
+            );
+            buildDatasetAndApi(state!.patterns);
+          }
+        );
+
+        When(
+          'I assemble context for both patterns with session {string}',
+          (_ctx: unknown, session: string) => {
+            state!.bundle = assembleContext(state!.dataset!, state!.api!, {
+              patterns: state!.patterns.map((p) => p.patternName),
+              sessionType: session as SessionType,
+              baseDir: process.cwd(),
+            });
+          }
+        );
+
+        Then('the bundle contains metadata for {string}', (_ctx: unknown, name: string) => {
+          const found = state!.bundle!.metadata.find((m) => m.name === name);
+          expect(found).toBeDefined();
+        });
+
+        And('the bundle contains metadata for {string}', (_ctx: unknown, name: string) => {
+          const found = state!.bundle!.metadata.find((m) => m.name === name);
+          expect(found).toBeDefined();
+        });
+      }
+    );
+
     RuleScenario('Pattern not found returns error with suggestion', ({ Given, When, Then }) => {
       Given('a pattern {string} exists in the dataset', (_ctx: unknown, name: string) => {
         state = initState();

@@ -131,7 +131,7 @@ export async function analyzeCoverage(
   // Collect annotated file paths (normalized to absolute)
   const annotatedFiles = new Set<string>();
   for (const p of dataset.patterns) {
-    const filePath = String(p.source.file);
+    const filePath = p.source.file;
     // Normalize: resolve relative paths against baseDir
     const absolute = path.isAbsolute(filePath) ? filePath : path.resolve(resolvedBaseDir, filePath);
     annotatedFiles.add(absolute);

@@ -46,6 +46,14 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       And the bundle does NOT contain stubs
       And the bundle does NOT contain consumers
 
+    @acceptance-criteria @happy-path
+    Scenario: Multi-pattern context merges metadata from both patterns
+      Given a pattern "OrderSaga" with status "roadmap" in phase 22
+      And a second pattern "PaymentSaga" with status "roadmap" in phase 22
+      When I assemble context for both patterns with session "design"
+      Then the bundle contains metadata for "OrderSaga"
+      And the bundle contains metadata for "PaymentSaga"
+
     @acceptance-criteria @validation
     Scenario: Pattern not found returns error with suggestion
       Given a pattern "OrderSaga" exists in the dataset

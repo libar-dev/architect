@@ -225,6 +225,9 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         // UML-inspired relationship fields (PatternRelationshipModel)
         assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
         assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
+        // Design session stub metadata
+        assignIfDefined(rawPattern, 'targetPath', metadata.target);
+        assignIfDefined(rawPattern, 'since', metadata.since);
         assignIfDefined(rawPattern, 'quarter', metadata.quarter);
         assignIfDefined(rawPattern, 'completed', metadata.completed);
         assignIfDefined(rawPattern, 'effort', metadata.effort);
@@ -475,6 +478,9 @@ export async function extractPatternsFromGherkinAsync(scannedFiles, config) {
         // UML-inspired relationship fields (PatternRelationshipModel)
         assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
         assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
+        // Design session stub metadata
+        assignIfDefined(rawPattern, 'targetPath', metadata.target);
+        assignIfDefined(rawPattern, 'since', metadata.since);
         assignIfDefined(rawPattern, 'quarter', metadata.quarter);
         assignIfDefined(rawPattern, 'completed', metadata.completed);
         assignIfDefined(rawPattern, 'effort', metadata.effort);

@@ -58,6 +58,7 @@ import {
   isValidTransition,
   getValidTransitionsFrom,
 } from '../validation/fsm/index.js';
+import { getPatternName } from './pattern-helpers.js';
 import type {
   StatusCounts,
   StatusDistribution,
@@ -425,7 +426,7 @@ export function createProcessStateAPI(dataset: MasterDataset): ProcessStateAPI {
 
     getPattern(name) {
       const lowerName = name.toLowerCase();
-      return dataset.patterns.find((p) => p.name.toLowerCase() === lowerName);
+      return dataset.patterns.find((p) => getPatternName(p).toLowerCase() === lowerName);
     },
 
     getPatternDependencies(name) {

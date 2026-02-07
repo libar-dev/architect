@@ -25,7 +25,7 @@ import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.j
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 import type { NeighborEntry, QueryErrorCode } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
-import { extractFirstSentence } from '../renderable/codecs/helpers.js';
+import { extractFirstSentence } from '../utils/string-utils.js';
 import {
   getPatternName,
   findPatternByName as findPatternByNameFromList,
@@ -203,7 +203,7 @@ function resolveDepEntry(
   const pattern = findPatternByName(dataset, depName);
   return {
     name: depName,
-    status: pattern?.status ?? undefined,
+    status: pattern?.status,
     file: pattern?.source.file ?? '',
     kind,
   };
@@ -212,8 +212,8 @@ function resolveDepEntry(
 function buildMetadata(pattern: ExtractedPattern): PatternContextMeta {
   return {
     name: getPatternName(pattern),
-    status: pattern.status ?? undefined,
-    phase: pattern.phase ?? undefined,
+    status: pattern.status,
+    phase: pattern.phase,
     category: pattern.category,
     file: pattern.source.file,
     summary: extractFirstSentence(pattern.directive.description),
@@ -248,9 +248,9 @@ function resolveArchNeighbors(
     .filter((p) => !focalNames.has(getPatternName(p)))
     .map((p) => ({
       name: getPatternName(p),
-      status: p.status ?? undefined,
-      archRole: p.archRole ?? undefined,
-      archContext: p.archContext ?? undefined,
+      status: p.status,
+      archRole: p.archRole,
+      archContext: p.archContext,
       file: p.source.file,
     }));
 }
@@ -269,8 +269,16 @@ function resolveDeliverables(
 
 function resolveFsm(api: ProcessStateAPI, status: string | undefined): FsmContext | undefined {
   if (status === undefined) return undefined;
-  const transitions = api.getValidTransitionsFrom(status as ProcessStatusValue);
-  const protection = api.getProtectionInfo(status as ProcessStatusValue);
+  const VALID_STATUSES: ReadonlySet<string> = new Set([
+    'roadmap',
+    'active',
+    'completed',
+    'deferred',
+  ]);
+  if (!VALID_STATUSES.has(status)) return undefined;
+  const validStatus = status as ProcessStatusValue;
+  const transitions = api.getValidTransitionsFrom(validStatus);
+  const protection = api.getProtectionInfo(validStatus);
   return {
     currentStatus: status,
     validTransitions: transitions,
@@ -375,18 +383,10 @@ export function assembleContext(
       }
     }
 
-    // Deliverables (implement only)
+    // Deliverables, FSM, and test files (implement only)
     if (sessionType === 'implement') {
       allDeliverables.push(...resolveDeliverables(api, name));
-    }
-
-    // FSM (implement only — use last focal pattern's status)
-    if (sessionType === 'implement') {
       fsm = resolveFsm(api, pattern.status);
-    }
-
-    // Test files (implement only)
-    if (sessionType === 'implement') {
       allTestFiles.push(...resolveTestFiles(pattern));
     }
   }
@@ -468,26 +468,21 @@ function findDepTreeRoot(
   const visited = new Set<string>();
   let current = focalName;
 
-  let walking = true;
-  while (walking) {
-    walking = false;
+  for (;;) {
     visited.add(current);
     const rels = getRelationships(dataset, current);
-    if (rels === undefined) continue;
+    if (rels === undefined) break;
 
     const parents = rels.dependsOn;
     const implParents = includeImplementationDeps ? rels.uses : [];
     const allParents = [...parents, ...implParents];
 
-    const unvisitedParent = allParents.find((p) => !visited.has(p));
-    if (unvisitedParent === undefined) continue;
-
-    // Verify the parent pattern actually exists
-    const parentPattern = findPatternByName(dataset, unvisitedParent);
-    if (parentPattern === undefined) continue;
+    const unvisitedParent = allParents.find(
+      (p) => !visited.has(p) && findPatternByName(dataset, p) !== undefined
+    );
+    if (unvisitedParent === undefined) break;
 
     current = unvisitedParent;
-    walking = true;
   }
 
   return current;
@@ -508,8 +503,8 @@ function buildTreeNode(
   if (visited.has(name)) {
     return {
       name,
-      status: pattern?.status ?? undefined,
-      phase: pattern?.phase ?? undefined,
+      status: pattern?.status,
+      phase: pattern?.phase,
       isFocal,
       truncated: false,
       children: [], // cycle detected — don't recurse
@@ -526,8 +521,8 @@ function buildTreeNode(
       (rels.enables.length > 0 || (includeImplementationDeps && rels.usedBy.length > 0));
     return {
       name,
-      status: pattern?.status ?? undefined,
-      phase: pattern?.phase ?? undefined,
+      status: pattern?.status,
+      phase: pattern?.phase,
       isFocal,
       truncated: hasChildren,
       children: [],
@@ -565,8 +560,8 @@ function buildTreeNode(
 
   return {
     name,
-    status: pattern?.status ?? undefined,
-    phase: pattern?.phase ?? undefined,
+    status: pattern?.status,
+    phase: pattern?.phase,
     isFocal,
     truncated: false,
     children,
@@ -688,7 +683,7 @@ export function buildOverview(dataset: MasterDataset): OverviewSummary {
     if (incompleteDeps.length > 0) {
       blocking.push({
         pattern: name,
-        status: pattern.status ?? undefined,
+        status: pattern.status,
         blockedBy: incompleteDeps,
       });
     }

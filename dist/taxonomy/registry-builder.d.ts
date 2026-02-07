@@ -71,6 +71,7 @@ interface AggregationTagDefinitionForRegistry {
  * - traceability: Two-tier spec architecture links
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
+ * - stub: Design session stub metadata
  */
 export declare const METADATA_TAGS_BY_GROUP: {
     readonly core: readonly ["pattern", "status", "core", "usecase", "brief"];
@@ -82,6 +83,7 @@ export declare const METADATA_TAGS_BY_GROUP: {
     readonly traceability: readonly ["executable-specs", "roadmap-spec"];
     readonly architecture: readonly ["arch-role", "arch-context", "arch-layer"];
     readonly extraction: readonly ["extract-shapes"];
+    readonly stub: readonly ["target", "since"];
 };
 /**
  * Build the complete tag registry from TypeScript constants

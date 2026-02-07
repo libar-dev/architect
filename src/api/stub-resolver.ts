@@ -24,7 +24,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
-import { getPatternName } from './pattern-helpers.js';
+import { getPatternName, firstImplements } from './pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -126,10 +126,7 @@ export function resolveStubs(
       stubFile: stub.source.file,
       targetPath,
       since: stub.since,
-      implementsPattern:
-        stub.implementsPatterns !== undefined && stub.implementsPatterns.length > 0
-          ? stub.implementsPatterns[0]
-          : undefined,
+      implementsPattern: firstImplements(stub),
       targetExists,
     };
   });

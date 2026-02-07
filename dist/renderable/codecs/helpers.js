@@ -431,36 +431,7 @@ export function truncateText(text, maxLength) {
     const cutPoint = lastSpace > 0 ? lastSpace : truncateAt;
     return text.slice(0, cutPoint).trim() + '...';
 }
-/**
- * Extract the first sentence from text.
- *
- * Looks for sentence-ending punctuation (. ! ?) followed by whitespace or end.
- * Useful for creating compact summaries of longer descriptions.
- *
- * @param text - The text to extract from
- * @returns First sentence, or full text if no sentence boundary found
- *
- * @example
- * ```typescript
- * extractFirstSentence("Events are immutable. This ensures audit integrity.");
- * // Returns: "Events are immutable."
- * ```
- */
-export function extractFirstSentence(text) {
-    if (!text)
-        return '';
-    // Find sentence-ending punctuation followed by:
-    // - whitespace + uppercase letter (new sentence), OR
-    // - end of string
-    // This correctly handles periods in file extensions (.feature, .md, etc.)
-    const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
-    const match = sentenceEndPattern.exec(text);
-    if (match) {
-        return text.slice(0, match.index + 1).trim();
-    }
-    // If no clear sentence boundary found, return whole text trimmed
-    return text.trim();
-}
+export { extractFirstSentence } from '../../utils/string-utils.js';
 /**
  * Parse structured annotations from a business rule description.
  *

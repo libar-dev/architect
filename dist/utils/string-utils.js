@@ -237,4 +237,23 @@ export function camelCaseToTitleCase(text) {
 export function normalizeLineEndings(text) {
     return text.replace(/\r\n/g, '\n');
 }
+/**
+ * Extract the first sentence from a text string.
+ *
+ * Finds sentence-ending punctuation (.!?) followed by whitespace + uppercase
+ * (new sentence) or end of string. Handles periods in file extensions correctly.
+ *
+ * @param text - Input text
+ * @returns First sentence, or full trimmed text if no sentence boundary found
+ */
+export function extractFirstSentence(text) {
+    if (!text)
+        return '';
+    const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
+    const match = sentenceEndPattern.exec(text);
+    if (match) {
+        return text.slice(0, match.index + 1).trim();
+    }
+    return text.trim();
+}
 //# sourceMappingURL=string-utils.js.map

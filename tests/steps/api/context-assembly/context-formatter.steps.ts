@@ -10,11 +10,13 @@ import { expect } from 'vitest';
 import {
   formatContextBundle,
   formatDepTree,
+  formatFileReadingList,
   formatOverview,
 } from '../../../../src/api/context-formatter.js';
 import type {
   ContextBundle,
   DepTreeNode,
+  FileReadingList,
   OverviewSummary,
 } from '../../../../src/api/context-assembler.js';
 
@@ -28,6 +30,7 @@ interface TestState {
   bundle: ContextBundle | null;
   tree: DepTreeNode | null;
   overview: OverviewSummary | null;
+  fileList: FileReadingList | null;
   output: string;
 }
 
@@ -38,6 +41,7 @@ function initState(): TestState {
     bundle: null,
     tree: null,
     overview: null,
+    fileList: null,
     output: '',
   };
 }
@@ -266,6 +270,59 @@ describeFeature(feature, ({ Rule }) => {
           }
         }
       );
+    });
+  });
+
+  // ===========================================================================
+  // Rule 4: formatFileReadingList renders categorized file paths
+  // ===========================================================================
+
+  Rule('formatFileReadingList renders categorized file paths', ({ RuleScenario }) => {
+    RuleScenario(
+      'File list renders primary and dependency sections',
+      ({ Given, When, Then, And }) => {
+        Given('a file reading list with primary and dependency files', () => {
+          state = initState();
+          state.fileList = {
+            primary: ['specs/order-saga.feature', 'stubs/order-saga/saga.ts'],
+            completedDeps: ['src/domain/event-store.ts'],
+            roadmapDeps: ['specs/payment-saga.feature'],
+            architectureNeighbors: [],
+          };
+        });
+
+        When('I format the file reading list', () => {
+          state!.output = formatFileReadingList(state!.fileList!);
+        });
+
+        Then('the output contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.output).toContain(text);
+        });
+
+        And('the output contains {string}', (_ctx: unknown, text: string) => {
+          expect(state!.output).toContain(text);
+        });
+      }
+    );
+
+    RuleScenario('Empty file reading list renders minimal output', ({ Given, When, Then }) => {
+      Given('an empty file reading list', () => {
+        state = initState();
+        state.fileList = {
+          primary: [],
+          completedDeps: [],
+          roadmapDeps: [],
+          architectureNeighbors: [],
+        };
+      });
+
+      When('I format the file reading list', () => {
+        state!.output = formatFileReadingList(state!.fileList!);
+      });
+
+      Then('the output is a single newline', () => {
+        expect(state!.output).toBe('\n');
+      });
     });
   });
 });

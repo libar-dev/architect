@@ -55,20 +55,27 @@ describeFeature(feature, ({ Rule }) => {
   });
 
   Rule('Tags are part of the stub metadata group', ({ RuleScenario }) => {
-    RuleScenario('Stub group contains target and since', ({ Given, When, Then }) => {
-      Given('the metadata tags by group', () => {
-        state = { registry: null, targetTag: undefined, sinceTag: undefined };
-      });
+    RuleScenario(
+      'Built registry groups target and since as stub tags',
+      ({ Given, When, Then, And }) => {
+        Given('the default tag registry', () => {
+          state = { registry: buildRegistry(), targetTag: undefined, sinceTag: undefined };
+        });
 
-      When('checking the "stub" group', () => {
-        // Just verify the constant
-      });
+        When('I look up tags in the "stub" metadata group', () => {
+          // Registry is built, group lookup happens in Then
+        });
 
-      Then('it contains "target" and "since"', () => {
-        const stubGroup = METADATA_TAGS_BY_GROUP.stub;
-        expect(stubGroup).toContain('target');
-        expect(stubGroup).toContain('since');
-      });
-    });
+        Then('the group contains {string}', (_ctx: unknown, tagName: string) => {
+          const stubGroup = METADATA_TAGS_BY_GROUP.stub;
+          expect(stubGroup).toContain(tagName);
+        });
+
+        And('the group contains {string}', (_ctx: unknown, tagName: string) => {
+          const stubGroup = METADATA_TAGS_BY_GROUP.stub;
+          expect(stubGroup).toContain(tagName);
+        });
+      }
+    );
   });
 });

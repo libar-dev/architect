@@ -38,4 +38,6 @@
  */
 export { createSuccess, createError } from './types.js';
 export { createProcessStateAPI } from './process-state.js';
+export { PatternSummarySchema, SUMMARY_FIELDS, summarizePattern, summarizePatterns, } from './summarize.js';
+export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';
 //# sourceMappingURL=index.js.map

@@ -14,6 +14,7 @@
 
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { MasterDataset, RelationshipEntry } from '../validation-schemas/master-dataset.js';
+import { findBestMatch } from './fuzzy-match.js';
 
 /**
  * Get the display name for a pattern: prefers explicit `patternName` tag,
@@ -52,4 +53,29 @@ export function getRelationships(
     if (key.toLowerCase() === lower) return value;
   }
   return undefined;
+}
+
+/**
+ * Get all pattern display names from the dataset.
+ */
+export function allPatternNames(dataset: MasterDataset): readonly string[] {
+  return dataset.patterns.map((p) => getPatternName(p));
+}
+
+/**
+ * Build a "Did you mean: X?" suggestion string using fuzzy matching.
+ * Returns empty string if no good match is found.
+ */
+export function suggestPattern(query: string, candidates: readonly string[]): string {
+  const best = findBestMatch(query, candidates);
+  return best !== undefined ? ` Did you mean: ${best.patternName}?` : '';
+}
+
+/**
+ * Get the first implements-pattern name from a pattern, if any.
+ */
+export function firstImplements(pattern: ExtractedPattern): string | undefined {
+  return pattern.implementsPatterns !== undefined && pattern.implementsPatterns.length > 0
+    ? pattern.implementsPatterns[0]
+    : undefined;
 }

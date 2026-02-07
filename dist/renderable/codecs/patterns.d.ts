@@ -114,9 +114,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -139,6 +139,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             workflow: z.ZodOptional<z.ZodString>;
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
+            target: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
@@ -174,9 +176,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -220,6 +222,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extendsPattern: z.ZodOptional<z.ZodString>;
+        targetPath: z.ZodOptional<z.ZodString>;
+        since: z.ZodOptional<z.ZodString>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -362,9 +366,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -387,6 +391,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -422,9 +428,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -468,6 +474,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -573,9 +581,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -598,6 +606,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -633,9 +643,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -679,6 +689,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -784,9 +796,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -809,6 +821,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -844,9 +858,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -890,6 +904,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -999,9 +1015,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1024,6 +1040,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -1059,9 +1077,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1105,6 +1123,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1217,9 +1237,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1242,6 +1262,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             workflow: z.ZodOptional<z.ZodString>;
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
+            target: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
@@ -1277,9 +1299,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1323,6 +1345,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extendsPattern: z.ZodOptional<z.ZodString>;
+        targetPath: z.ZodOptional<z.ZodString>;
+        since: z.ZodOptional<z.ZodString>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -1428,9 +1452,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1453,6 +1477,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             workflow: z.ZodOptional<z.ZodString>;
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
+            target: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
@@ -1488,9 +1514,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
             deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1534,6 +1560,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
         enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extendsPattern: z.ZodOptional<z.ZodString>;
+        targetPath: z.ZodOptional<z.ZodString>;
+        since: z.ZodOptional<z.ZodString>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -1640,9 +1668,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1665,6 +1693,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -1700,9 +1730,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1746,6 +1776,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1851,9 +1883,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1876,6 +1908,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -1911,9 +1945,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -1957,6 +1991,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2062,9 +2098,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2087,6 +2123,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2122,9 +2160,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2168,6 +2206,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2273,9 +2313,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2298,6 +2338,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2333,9 +2375,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2379,6 +2421,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2510,9 +2554,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2535,6 +2579,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2570,9 +2616,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2616,6 +2662,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2721,9 +2769,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2746,6 +2794,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2781,9 +2831,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2827,6 +2877,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2932,9 +2984,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -2957,6 +3009,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2992,9 +3046,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3038,6 +3092,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -3143,9 +3199,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
                     deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3168,6 +3224,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -3203,9 +3261,9 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
                 deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
@@ -3249,6 +3307,8 @@ export declare const PatternsDocumentCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;

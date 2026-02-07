@@ -23,7 +23,8 @@ Feature: Stub Integration Taxonomy Tags
   Rule: Tags are part of the stub metadata group
 
     @acceptance-criteria @happy-path
-    Scenario: Stub group contains target and since
-      Given the metadata tags by group
-      When checking the "stub" group
-      Then it contains "target" and "since"
+    Scenario: Built registry groups target and since as stub tags
+      Given the default tag registry
+      When I look up tags in the "stub" metadata group
+      Then the group contains "target"
+      And the group contains "since"

@@ -346,11 +346,8 @@ function deriveLocationPattern(files: readonly string[]): string {
   // Find common prefix directory
   const parts = files[0]?.split('/') ?? [];
   let commonDepth = 0;
-  outer: for (let i = 0; i < parts.length - 1; i++) {
-    const segment = parts[i];
-    for (const f of files) {
-      if (f.split('/')[i] !== segment) break outer;
-    }
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (files.some((f) => f.split('/')[i] !== parts[i])) break;
     commonDepth = i + 1;
   }
   const prefix = parts.slice(0, commonDepth).join('/');
@@ -359,23 +356,22 @@ function deriveLocationPattern(files: readonly string[]): string {
 }
 
 export function buildSourceInventory(dataset: MasterDataset): SourceInventory {
-  const groups = new Map<string, string[]>();
+  const groupSets = new Map<string, Set<string>>();
 
   for (const p of dataset.patterns) {
     const filePath = p.source.file;
     const type = categorizeFile(filePath, p);
-    let files = groups.get(type);
-    if (files === undefined) {
-      files = [];
-      groups.set(type, files);
+    let fileSet = groupSets.get(type);
+    if (fileSet === undefined) {
+      fileSet = new Set<string>();
+      groupSets.set(type, fileSet);
     }
-    if (!files.includes(filePath)) {
-      files.push(filePath);
-    }
+    fileSet.add(filePath);
   }
 
   const types: SourceTypeEntry[] = [];
-  for (const [type, files] of groups) {
+  for (const [type, fileSet] of groupSets) {
+    const files = [...fileSet];
     types.push({
       type,
       count: files.length,
