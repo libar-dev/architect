@@ -180,6 +180,42 @@ describeFeature(feature, ({ Rule }) => {
         expect(state!.results[1].score).toBeGreaterThanOrEqual(parseFloat(scoreStr));
       });
     });
+
+    RuleScenario('Empty query matches all patterns as prefix', ({ Given, When, Then }) => {
+      Given('pattern names {string}, {string}', (_ctx: unknown, a: string, b: string) => {
+        state = initState();
+        state.patternNames = [a, b];
+      });
+
+      When('I fuzzy match with query {string}', (_ctx: unknown, query: string) => {
+        state!.results = fuzzyMatchPatterns(query, state!.patternNames);
+      });
+
+      Then(
+        'all {int} patterns are returned with matchType {string}',
+        (_ctx: unknown, count: number, matchType: string) => {
+          expect(state!.results.length).toBe(count);
+          for (const result of state!.results) {
+            expect(result.matchType).toBe(matchType);
+          }
+        }
+      );
+    });
+
+    RuleScenario('No candidate patterns returns no results', ({ Given, When, Then }) => {
+      Given('no pattern names exist', () => {
+        state = initState();
+        state.patternNames = [];
+      });
+
+      When('I fuzzy match with query {string}', (_ctx: unknown, query: string) => {
+        state!.results = fuzzyMatchPatterns(query, state!.patternNames);
+      });
+
+      Then('no matches are returned', () => {
+        expect(state!.results.length).toBe(0);
+      });
+    });
   });
 
   Rule('findBestMatch returns single suggestion', ({ RuleScenario }) => {

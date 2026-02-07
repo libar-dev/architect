@@ -53,6 +53,18 @@ Feature: Stub Resolver - Design Stub Discovery and Resolution
       And the first has id "AD-1" and a PDR reference
       And the second has id "AD-2" without a PDR reference
 
+    @edge-case
+    Scenario: Empty description returns no decision items
+      Given a stub pattern with empty description
+      When extracting decision items from the stub description
+      Then 0 decision items are returned
+
+    @edge-case
+    Scenario: Malformed AD items are skipped
+      Given a stub pattern with description "AD-X: not a number and AD-: missing"
+      When extracting decision items from the stub description
+      Then 0 decision items are returned
+
   Rule: PDR references are found across patterns
 
     @acceptance-criteria @happy-path

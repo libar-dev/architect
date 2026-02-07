@@ -1,5 +1,4 @@
 /**
- * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIContextAssembly
  * @libar-docs-uses ContextAssembler

@@ -45,6 +45,18 @@ Feature: Fuzzy Pattern Matching
       Then the first result has score "1.0"
       And the second result has score at least "0.7"
 
+    @edge-case
+    Scenario: Empty query matches all patterns as prefix
+      Given pattern names "OrderSaga", "EventStore"
+      When I fuzzy match with query ""
+      Then all 2 patterns are returned with matchType "prefix"
+
+    @edge-case
+    Scenario: No candidate patterns returns no results
+      Given no pattern names exist
+      When I fuzzy match with query "OrderSaga"
+      Then no matches are returned
+
   Rule: findBestMatch returns single suggestion
 
     @acceptance-criteria @happy-path

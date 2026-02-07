@@ -585,6 +585,38 @@ describeFeature(feature, ({ Rule }) => {
         expect(state!.tree!.name).toBeDefined();
       });
     });
+
+    RuleScenario('Standalone pattern returns single-node tree', ({ Given, When, Then, And }) => {
+      Given('a standalone pattern {string} with no dependencies', (_ctx: unknown, name: string) => {
+        state = initState();
+        state.patterns = [
+          createTestPattern({
+            name,
+            status: 'active',
+          }),
+        ];
+        buildDatasetAndApi(state.patterns);
+      });
+
+      When(
+        'I build a dep-tree for {string} with depth {int}',
+        (_ctx: unknown, name: string, depth: number) => {
+          state!.tree = buildDepTree(state!.dataset!, {
+            pattern: name,
+            maxDepth: depth,
+            includeImplementationDeps: true,
+          });
+        }
+      );
+
+      Then('the tree root is {string}', (_ctx: unknown, rootName: string) => {
+        expect(state!.tree!.name).toBe(rootName);
+      });
+
+      And('the tree has no children', () => {
+        expect(state!.tree!.children.length).toBe(0);
+      });
+    });
   });
 
   // ===========================================================================
@@ -592,39 +624,67 @@ describeFeature(feature, ({ Rule }) => {
   // ===========================================================================
 
   Rule('buildOverview provides executive project summary', ({ RuleScenario }) => {
-    RuleScenario('Overview shows progress and blocking', ({ Given, When, Then, And }) => {
-      Given(
-        'a dataset with {int} completed, {int} active, and {int} planned patterns',
-        (_ctx: unknown, completed: number, active: number, planned: number) => {
+    RuleScenario(
+      'Overview shows progress, active phases, and blocking',
+      ({ Given, When, Then, And }) => {
+        Given('a dataset with phased patterns including dependencies', () => {
           state = initState();
+          // Create patterns with explicit phases and a dependency chain
+          // so that activePhases and blocking are non-empty
+          const completedDep = createTestPattern({
+            name: 'CompletedDep',
+            status: 'completed',
+            phase: 10,
+          });
+          const activePattern = createTestPattern({
+            name: 'ActiveWork',
+            status: 'active',
+            phase: 11,
+            dependsOn: ['IncompleteDep'],
+          });
+          const incompleteDep = createTestPattern({
+            name: 'IncompleteDep',
+            status: 'roadmap',
+            phase: 11,
+          });
+          const planned = createTestPattern({
+            name: 'PlannedWork',
+            status: 'roadmap',
+            phase: 12,
+          });
           state.dataset = createTestMasterDataset({
-            statusDistribution: { completed, active, planned },
+            patterns: [completedDep, activePattern, incompleteDep, planned],
           });
           state.api = createProcessStateAPI(state.dataset);
-        }
-      );
+        });
 
-      When('I build the overview', () => {
-        state!.overview = buildOverview(state!.dataset!);
-      });
+        When('I build the overview', () => {
+          state!.overview = buildOverview(state!.dataset!);
+        });
 
-      Then(
-        'the progress shows total {int} with {int} percent',
-        (_ctx: unknown, total: number, percent: number) => {
-          expect(state!.overview!.progress.total).toBe(total);
-          expect(state!.overview!.progress.percentage).toBe(percent);
-        }
-      );
+        Then('the progress shows completed, active, and planned counts', () => {
+          expect(state!.overview!.progress.total).toBe(4);
+          expect(state!.overview!.progress.completed).toBe(1);
+          expect(state!.overview!.progress.active).toBe(1);
+          expect(state!.overview!.progress.planned).toBeGreaterThanOrEqual(2);
+        });
 
-      And('active phases are listed', () => {
-        expect(Array.isArray(state!.overview!.activePhases)).toBe(true);
-        expect(state!.overview!.activePhases.length).toBeGreaterThanOrEqual(0);
-      });
+        And('at least one active phase is listed with pattern counts', () => {
+          expect(state!.overview!.activePhases.length).toBeGreaterThan(0);
+          const firstPhase = state!.overview!.activePhases[0];
+          expect(firstPhase).toBeDefined();
+          expect(firstPhase.phase).toBeDefined();
+          expect(firstPhase.activeCount).toBeGreaterThan(0);
+        });
 
-      And('blocking relationships are reported', () => {
-        expect(Array.isArray(state!.overview!.blocking)).toBe(true);
-      });
-    });
+        And('blocking entries include patterns with incomplete dependencies', () => {
+          expect(state!.overview!.blocking.length).toBeGreaterThan(0);
+          const blockedEntry = state!.overview!.blocking.find((b) => b.pattern === 'ActiveWork');
+          expect(blockedEntry).toBeDefined();
+          expect(blockedEntry!.blockedBy).toContain('IncompleteDep');
+        });
+      }
+    );
 
     RuleScenario('Empty dataset returns zero-state overview', ({ Given, When, Then, And }) => {
       Given('an empty dataset with {int} patterns', (_ctx: unknown, _count: number) => {

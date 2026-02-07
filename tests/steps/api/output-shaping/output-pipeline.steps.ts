@@ -199,6 +199,40 @@ describeFeature(feature, ({ Rule }) => {
         expect(state!.output).toEqual(state!.scalarInput);
       });
     });
+
+    RuleScenario(
+      'Fields with single field returns objects with one key',
+      ({ Given, When, Then }) => {
+        Given('{int} patterns in the pipeline', (_ctx: unknown, count: number) => {
+          state = initState();
+          state.patterns = Array.from({ length: count }, (_, i) =>
+            createTestPattern({
+              name: `Pattern${i}`,
+              status: 'active',
+              filePath: `src/p${i}.ts`,
+            })
+          );
+        });
+
+        When(
+          'I apply the output pipeline with fields {string}',
+          (_ctx: unknown, fieldsStr: string) => {
+            const fields = fieldsStr.split(',');
+            const input: PipelineInput = { kind: 'patterns', data: state!.patterns };
+            state!.output = applyOutputPipeline(input, {
+              ...DEFAULT_OUTPUT_MODIFIERS,
+              fields,
+            });
+          }
+        );
+
+        Then('each result object has exactly {int} key', (_ctx: unknown, keyCount: number) => {
+          for (const item of state!.output as Array<Record<string, unknown>>) {
+            expect(Object.keys(item).length).toBe(keyCount);
+          }
+        });
+      }
+    );
   });
 
   Rule('Modifier conflicts are rejected', ({ RuleScenario }) => {
@@ -394,6 +428,36 @@ describeFeature(feature, ({ Rule }) => {
           expect(firstPattern.name).toBe(`Roadmap${startIndex}`);
         }
       );
+    });
+
+    RuleScenario('Offset beyond array length returns empty results', ({ Given, When, Then }) => {
+      Given('a dataset with {int} roadmap patterns', (_ctx: unknown, count: number) => {
+        state = initState();
+        const patterns = Array.from({ length: count }, (_, i) =>
+          createTestPattern({
+            name: `Roadmap${i}`,
+            status: 'roadmap',
+            filePath: `src/r${i}.ts`,
+          })
+        );
+        state.dataset = createTestMasterDataset({ patterns });
+      });
+
+      When(
+        'I apply list filters with status {string} and limit {int} and offset {int}',
+        (_ctx: unknown, status: string, limit: number, offset: number) => {
+          state!.output = applyListFilters(state!.dataset!, {
+            ...DEFAULT_LIST_FILTERS,
+            status,
+            limit,
+            offset,
+          });
+        }
+      );
+
+      Then('{int} patterns are returned', (_ctx: unknown, count: number) => {
+        expect((state!.output as unknown[]).length).toBe(count);
+      });
     });
   });
 

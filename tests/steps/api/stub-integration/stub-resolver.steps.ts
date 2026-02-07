@@ -251,6 +251,35 @@ describeFeature(feature, ({ Rule }) => {
         expect(state!.decisions[1]!.pdr).toBeUndefined();
       });
     });
+
+    RuleScenario('Empty description returns no decision items', ({ Given, When, Then }) => {
+      Given('a stub pattern with empty description', () => {
+        state = initState();
+      });
+
+      When('extracting decision items from the stub description', () => {
+        state!.decisions = extractDecisionItems('');
+      });
+
+      Then('{int} decision items are returned', (_ctx: unknown, count: number) => {
+        expect(state!.decisions).toHaveLength(count);
+      });
+    });
+
+    RuleScenario('Malformed AD items are skipped', ({ Given, When, Then }) => {
+      Given('a stub pattern with description {string}', (_ctx: unknown, description: string) => {
+        state = initState();
+        state.patterns = [createTestPattern({ name: 'MalformedStub', description })];
+      });
+
+      When('extracting decision items from the stub description', () => {
+        state!.decisions = extractDecisionItems(state!.patterns[0]!.directive);
+      });
+
+      Then('{int} decision items are returned', (_ctx: unknown, count: number) => {
+        expect(state!.decisions).toHaveLength(count);
+      });
+    });
   });
 
   Rule('PDR references are found across patterns', ({ RuleScenario }) => {
@@ -279,11 +308,16 @@ describeFeature(feature, ({ Rule }) => {
       });
 
       Then('the referencing patterns are returned with source locations', () => {
-        expect(state!.pdrRefs.length).toBeGreaterThanOrEqual(1);
+        // Expect exactly 2: one from description, one from seeAlso
+        expect(state!.pdrRefs.length).toBe(2);
         const descRef = state!.pdrRefs.find(
           (r) => r.pattern === 'PatternWithPDR' && r.source === 'description'
         );
         expect(descRef).toBeDefined();
+        const seeAlsoRef = state!.pdrRefs.find(
+          (r) => r.pattern === 'PatternWithSeeAlso' && r.source === 'seeAlso'
+        );
+        expect(seeAlsoRef).toBeDefined();
       });
     });
 

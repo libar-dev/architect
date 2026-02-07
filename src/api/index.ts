@@ -73,7 +73,7 @@ export {
 
 // Fuzzy Matching
 export type { FuzzyMatch } from './fuzzy-match.js';
-export { fuzzyMatchPatterns, findBestMatch, levenshteinDistance } from './fuzzy-match.js';
+export { fuzzyMatchPatterns, findBestMatch } from './fuzzy-match.js';
 
 // Pattern Helpers
 export {

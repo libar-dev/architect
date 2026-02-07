@@ -699,7 +699,7 @@ function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
   return { matches };
 }
 
-function handleArch(ctx: RouteContext): unknown {
+async function handleArch(ctx: RouteContext): Promise<unknown> {
   const args = ctx.subArgs;
   const subCmd = args[0];
   const archIndex = ctx.dataset.archIndex;
@@ -804,7 +804,19 @@ function handleArch(ctx: RouteContext): unknown {
     }
 
     case 'coverage':
-      return analyzeCoverage(ctx.dataset, ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry);
+      try {
+        return await analyzeCoverage(
+          ctx.dataset,
+          ctx.cliConfig.input,
+          ctx.cliConfig.baseDir,
+          ctx.registry
+        );
+      } catch (err) {
+        throw new QueryApiError(
+          'INVALID_ARGUMENT',
+          `Coverage analysis failed: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
 
     default:
       throw new QueryApiError(
@@ -1103,12 +1115,19 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
           break;
         }
       }
-      return findUnannotatedFiles(
-        ctx.cliConfig.input,
-        ctx.cliConfig.baseDir,
-        ctx.registry,
-        pathFilter
-      );
+      try {
+        return await findUnannotatedFiles(
+          ctx.cliConfig.input,
+          ctx.cliConfig.baseDir,
+          ctx.registry,
+          pathFilter
+        );
+      } catch (err) {
+        throw new QueryApiError(
+          'INVALID_ARGUMENT',
+          `Unannotated file scan failed: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
     }
 
     default:

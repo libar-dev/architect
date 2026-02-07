@@ -58,8 +58,7 @@ Feature: process-api CLI
       Given TypeScript files with pattern annotations
       When running "process-api -i 'src/**/*.ts' status"
       Then exit code is 0
-      And stdout contains "counts"
-      And stdout is valid JSON
+      And stdout is valid JSON with key "success"
 
   # ============================================================================
   # RULE 4: Query Subcommand
@@ -199,7 +198,7 @@ Feature: process-api CLI
       Given TypeScript files with pattern annotations
       When running "process-api -i 'src/**/*.ts' list"
       Then exit code is 0
-      And stdout is valid JSON
+      And stdout is valid JSON with key "success"
 
     @validation
     Scenario: List with invalid phase shows error
@@ -241,6 +240,7 @@ Feature: process-api CLI
       When running "process-api -i 'src/**/*.ts' context CompletedPattern"
       Then exit code is 0
       And stdout is non-empty
+      And stdout contains "CompletedPattern"
 
     @validation
     Scenario: Context without pattern name shows error
@@ -255,6 +255,7 @@ Feature: process-api CLI
       When running "process-api -i 'src/**/*.ts' overview"
       Then exit code is 0
       And stdout is non-empty
+      And stdout contains "PROGRESS"
 
     @happy-path
     Scenario: Dep-tree returns dependency tree text
@@ -274,7 +275,7 @@ Feature: process-api CLI
       Given TypeScript files with pattern annotations
       When running "process-api -i 'src/**/*.ts' tags"
       Then exit code is 0
-      And stdout is valid JSON
+      And stdout is valid JSON with key "data"
 
     @happy-path
     Scenario: Sources returns file inventory

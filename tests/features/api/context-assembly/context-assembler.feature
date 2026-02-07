@@ -83,15 +83,22 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       When I build a dep-tree for "A" with depth 5
       Then the tree does not infinitely recurse
 
+    @edge-case
+    Scenario: Standalone pattern returns single-node tree
+      Given a standalone pattern "Standalone" with no dependencies
+      When I build a dep-tree for "Standalone" with depth 3
+      Then the tree root is "Standalone"
+      And the tree has no children
+
   Rule: buildOverview provides executive project summary
 
     @acceptance-criteria @happy-path
-    Scenario: Overview shows progress and blocking
-      Given a dataset with 10 completed, 3 active, and 5 planned patterns
+    Scenario: Overview shows progress, active phases, and blocking
+      Given a dataset with phased patterns including dependencies
       When I build the overview
-      Then the progress shows total 18 with 56 percent
-      And active phases are listed
-      And blocking relationships are reported
+      Then the progress shows completed, active, and planned counts
+      And at least one active phase is listed with pattern counts
+      And blocking entries include patterns with incomplete dependencies
 
     @acceptance-criteria @validation
     Scenario: Empty dataset returns zero-state overview

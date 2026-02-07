@@ -1,5 +1,4 @@
 /**
- * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIStubIntegration
  * @libar-docs-uses ProcessStateAPI

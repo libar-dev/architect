@@ -353,13 +353,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(getResult().exitCode).toBe(code);
       });
 
-      And('stdout contains {string}', (_ctx: unknown, text: string) => {
-        expect(getResult().stdout).toContain(text);
-      });
-
-      And('stdout is valid JSON', () => {
+      And('stdout is valid JSON with key {string}', (_ctx: unknown, key: string) => {
         const result = getResult();
-        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+        const parsed = JSON.parse(result.stdout) as Record<string, unknown>;
+        expect(parsed).toHaveProperty(key);
       });
     });
   });
@@ -672,9 +669,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(getResult().exitCode).toBe(code);
       });
 
-      And('stdout is valid JSON', () => {
+      And('stdout is valid JSON with key {string}', (_ctx: unknown, key: string) => {
         const result = getResult();
-        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+        const parsed = JSON.parse(result.stdout) as Record<string, unknown>;
+        expect(parsed).toHaveProperty(key);
       });
     });
 
@@ -767,6 +765,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And('stdout is non-empty', () => {
         expect(getResult().stdout.trim().length).toBeGreaterThan(0);
       });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).toContain(text);
+      });
     });
 
     RuleScenario('Context without pattern name shows error', ({ Given, When, Then, And }) => {
@@ -803,6 +805,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
 
       And('stdout is non-empty', () => {
         expect(getResult().stdout.trim().length).toBeGreaterThan(0);
+      });
+
+      And('stdout contains {string}', (_ctx: unknown, text: string) => {
+        expect(getResult().stdout).toContain(text);
       });
     });
 
@@ -843,9 +849,10 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(getResult().exitCode).toBe(code);
       });
 
-      And('stdout is valid JSON', () => {
+      And('stdout is valid JSON with key {string}', (_ctx: unknown, key: string) => {
         const result = getResult();
-        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
+        const parsed = JSON.parse(result.stdout) as Record<string, unknown>;
+        expect(parsed).toHaveProperty(key);
       });
     });
 

@@ -45,6 +45,12 @@ Feature: Output Modifier Pipeline
       When I apply the output pipeline with default modifiers
       Then the output equals the original scalar
 
+    @edge-case
+    Scenario: Fields with single field returns objects with one key
+      Given 5 patterns in the pipeline
+      When I apply the output pipeline with fields "patternName"
+      Then each result object has exactly 1 key
+
   Rule: Modifier conflicts are rejected
 
     @acceptance-criteria @validation
@@ -86,6 +92,12 @@ Feature: Output Modifier Pipeline
       Given a dataset with 10 roadmap patterns
       When I apply list filters with limit 3 and offset 2
       Then 3 patterns are returned starting from index 2
+
+    @edge-case
+    Scenario: Offset beyond array length returns empty results
+      Given a dataset with 3 roadmap patterns
+      When I apply list filters with status "roadmap" and limit 5 and offset 10
+      Then 0 patterns are returned
 
   Rule: Empty stripping removes noise
 

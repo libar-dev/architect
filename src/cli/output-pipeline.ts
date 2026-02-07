@@ -23,6 +23,7 @@
 
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import { QueryApiError } from '../api/types.js';
 import type { QueryResult } from '../api/types.js';
 import { summarizePatterns, SUMMARY_FIELDS, deriveSource } from '../api/summarize.js';
 
@@ -119,19 +120,29 @@ export const PATTERN_ARRAY_METHODS: ReadonlySet<string> = new Set([
  */
 export function validateModifiers(modifiers: OutputModifiers): void {
   if (modifiers.full && modifiers.namesOnly) {
-    throw new Error('Conflicting modifiers: --full and --names-only cannot be used together');
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      'Conflicting modifiers: --full and --names-only cannot be used together'
+    );
   }
   if (modifiers.full && modifiers.count) {
-    throw new Error('Conflicting modifiers: --full and --count cannot be used together');
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      'Conflicting modifiers: --full and --count cannot be used together'
+    );
   }
   if (modifiers.full && modifiers.fields !== null) {
-    throw new Error('Conflicting modifiers: --full and --fields cannot be used together');
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      'Conflicting modifiers: --full and --fields cannot be used together'
+    );
   }
   if (modifiers.fields !== null) {
     const validFields = SUMMARY_FIELDS;
     const invalidFields = modifiers.fields.filter((f) => !validFields.has(f));
     if (invalidFields.length > 0) {
-      throw new Error(
+      throw new QueryApiError(
+        'INVALID_ARGUMENT',
         `Invalid field names: ${invalidFields.join(', ')}. Valid fields: ${[...validFields].join(', ')}`
       );
     }

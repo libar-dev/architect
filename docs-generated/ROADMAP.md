@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [████████████░░░░░░░░] 98/158 (62%)
+**Patterns:** [█████████████░░░░░░░] 98/152 (64%)
 
 **Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 158 |
+| Total Patterns | 152 |
 | Completed | 98 |
 | Active | 26 |
-| Planned | 34 |
+| Planned | 28 |
 
 ---
 

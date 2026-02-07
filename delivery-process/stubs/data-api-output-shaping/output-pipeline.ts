@@ -1,5 +1,4 @@
 /**
- * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-uses PatternSummarizer
