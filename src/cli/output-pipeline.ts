@@ -197,9 +197,9 @@ export function applyOutputPipeline(input: PipelineInput, modifiers: OutputModif
 // ---------------------------------------------------------------------------
 
 /**
- * Apply composable filters to the pattern list using MasterDataset views.
+ * Apply composable filters to the pattern list.
  *
- * Uses Set-based intersection for O(n) composition across pre-computed views.
+ * Sequential filter composition: status → phase → category → source.
  * Pagination (offset/limit) applies after all filters.
  */
 export function applyListFilters(

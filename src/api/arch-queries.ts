@@ -22,22 +22,7 @@ import type {
 } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { NeighborEntry } from './types.js';
-
-// ---------------------------------------------------------------------------
-// Helper: get pattern name (patternName or name)
-// ---------------------------------------------------------------------------
-
-function getPatternName(p: ExtractedPattern): string {
-  return p.patternName ?? p.name;
-}
-
-function findPatternByName(
-  patterns: readonly ExtractedPattern[],
-  name: string
-): ExtractedPattern | undefined {
-  const lower = name.toLowerCase();
-  return patterns.find((p) => getPatternName(p).toLowerCase() === lower);
-}
+import { getPatternName, findPatternByName, getRelationships } from './pattern-helpers.js';
 
 function resolveNeighborEntry(patterns: readonly ExtractedPattern[], name: string): NeighborEntry {
   const p = findPatternByName(patterns, name);
@@ -142,7 +127,7 @@ export function computeNeighborhood(
   if (pattern === undefined) return undefined;
 
   const patternName = getPatternName(pattern);
-  const rels: RelationshipEntry | undefined = dataset.relationshipIndex?.[patternName];
+  const rels = getRelationships(dataset, patternName);
 
   // Resolve uses/usedBy to NeighborEntry
   const uses = (rels?.uses ?? []).map((n) => resolveNeighborEntry(dataset.patterns, n));

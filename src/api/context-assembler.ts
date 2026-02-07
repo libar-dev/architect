@@ -20,12 +20,17 @@
  */
 
 import type { ProcessStateAPI } from './process-state.js';
-import type { MasterDataset, RelationshipEntry } from '../validation-schemas/master-dataset.js';
+import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
 import type { NeighborEntry } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
 import { extractFirstSentence } from '../renderable/codecs/helpers.js';
+import {
+  getPatternName,
+  findPatternByName as findPatternByNameFromList,
+  getRelationships,
+} from './pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Session Types
@@ -170,29 +175,12 @@ export interface OverviewSummary {
 // Internal Helpers
 // ---------------------------------------------------------------------------
 
-function getPatternName(p: ExtractedPattern): string {
-  return p.patternName ?? p.name;
-}
-
 function getAllPatternNames(dataset: MasterDataset): readonly string[] {
   return dataset.patterns.map(getPatternName);
 }
 
 function findPatternByName(dataset: MasterDataset, name: string): ExtractedPattern | undefined {
-  const lower = name.toLowerCase();
-  return dataset.patterns.find((p) => getPatternName(p).toLowerCase() === lower);
-}
-
-function getRelationships(dataset: MasterDataset, name: string): RelationshipEntry | undefined {
-  if (dataset.relationshipIndex === undefined) return undefined;
-  // Try exact match first, then case-insensitive
-  const entry = dataset.relationshipIndex[name];
-  if (entry !== undefined) return entry;
-  const lower = name.toLowerCase();
-  for (const [key, value] of Object.entries(dataset.relationshipIndex)) {
-    if (key.toLowerCase() === lower) return value;
-  }
-  return undefined;
+  return findPatternByNameFromList(dataset.patterns, name);
 }
 
 function resolveDepEntry(

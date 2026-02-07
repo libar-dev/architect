@@ -40,6 +40,7 @@ export interface QuerySuccess<T> {
  * Error codes for query failures
  */
 export type QueryErrorCode =
+  | 'INVALID_ARGUMENT'
   | 'INVALID_STATUS'
   | 'INVALID_TRANSITION'
   | 'PATTERN_NOT_FOUND'
@@ -49,7 +50,8 @@ export type QueryErrorCode =
   | 'CONTEXT_NOT_FOUND'
   | 'STUB_NOT_FOUND'
   | 'PDR_NOT_FOUND'
-  | 'CONTEXT_ASSEMBLY_ERROR';
+  | 'CONTEXT_ASSEMBLY_ERROR'
+  | 'UNKNOWN_METHOD';
 
 /**
  * Failed query response

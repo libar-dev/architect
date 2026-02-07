@@ -526,14 +526,14 @@ function handleQuery(
   const methodName = args[0];
   if (!methodName) {
     throw new CLIQueryError(
-      'PATTERN_NOT_FOUND',
+      'INVALID_ARGUMENT',
       'Usage: process-api query <method> [args...]\nMethods: ' + API_METHODS.join(', ')
     );
   }
 
   if (!API_METHODS.includes(methodName as (typeof API_METHODS)[number])) {
     throw new CLIQueryError(
-      'PATTERN_NOT_FOUND',
+      'UNKNOWN_METHOD',
       `Unknown API method: ${methodName}\nAvailable: ${API_METHODS.join(', ')}`
     );
   }
@@ -542,7 +542,7 @@ function handleQuery(
   const apiRecord = api as unknown as Record<string, (...a: unknown[]) => unknown>;
   const method = apiRecord[methodName];
   if (method === undefined) {
-    throw new CLIQueryError('PATTERN_NOT_FOUND', `Method not found on API: ${methodName}`);
+    throw new CLIQueryError('UNKNOWN_METHOD', `Method not found on API: ${methodName}`);
   }
   const coercedArgs = args.slice(1).map(coerceArg);
   return { methodName, result: method.apply(api, coercedArgs) };
@@ -551,7 +551,7 @@ function handleQuery(
 function handlePattern(api: ProcessStateAPI, args: string[]): unknown {
   const name = args[0];
   if (!name) {
-    throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api pattern <name>');
+    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api pattern <name>');
   }
 
   const pattern = api.getPattern(name);
@@ -591,10 +591,18 @@ function parseListFilters(subArgs: string[]): ListFilters {
         status = next ?? null;
         i++;
         break;
-      case '--phase':
-        phase = next !== undefined ? parseInt(next, 10) : null;
+      case '--phase': {
+        const parsed = next !== undefined ? parseInt(next, 10) : NaN;
+        if (isNaN(parsed)) {
+          throw new CLIQueryError(
+            'INVALID_ARGUMENT',
+            `Invalid --phase value: "${next ?? ''}". Expected an integer.`
+          );
+        }
+        phase = parsed;
         i++;
         break;
+      }
       case '--category':
         category = next ?? null;
         i++;
@@ -607,14 +615,30 @@ function parseListFilters(subArgs: string[]): ListFilters {
         }
         i++;
         break;
-      case '--limit':
-        limit = next !== undefined ? parseInt(next, 10) : null;
+      case '--limit': {
+        const parsed = next !== undefined ? parseInt(next, 10) : NaN;
+        if (isNaN(parsed) || parsed < 1) {
+          throw new CLIQueryError(
+            'INVALID_ARGUMENT',
+            `Invalid --limit value: "${next ?? ''}". Expected a positive integer.`
+          );
+        }
+        limit = parsed;
         i++;
         break;
-      case '--offset':
-        offset = next !== undefined ? parseInt(next, 10) : null;
+      }
+      case '--offset': {
+        const parsed = next !== undefined ? parseInt(next, 10) : NaN;
+        if (isNaN(parsed) || parsed < 0) {
+          throw new CLIQueryError(
+            'INVALID_ARGUMENT',
+            `Invalid --offset value: "${next ?? ''}". Expected a non-negative integer.`
+          );
+        }
+        offset = parsed;
         i++;
         break;
+      }
       default:
         break;
     }
@@ -643,7 +667,15 @@ function generateEmptyHint(
       alternatives.push(`${counts.completed} completed`);
     }
     if (alternatives.length > 0) {
-      const altStatus = filters.status === 'active' ? 'roadmap' : 'active';
+      // Pick the first available alternative for the suggestion command
+      const altStatus =
+        counts.active > 0 && filters.status !== 'active'
+          ? 'active'
+          : counts.planned > 0 && filters.status !== 'roadmap'
+            ? 'roadmap'
+            : counts.completed > 0 && filters.status !== 'completed'
+              ? 'completed'
+              : 'active';
       return `No ${filters.status} patterns. ${alternatives.join(', ')} exist. Try: list --status ${altStatus}`;
     }
   }
@@ -670,7 +702,7 @@ function handleList(
 function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
   const query = subArgs[0];
   if (!query) {
-    throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api search <query>');
+    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api search <query>');
   }
 
   const allNames = api.getMasterDataset().patterns.map((p) => p.patternName ?? p.name);
@@ -749,7 +781,7 @@ function handleArch(ctx: RouteContext): unknown {
     case 'graph': {
       const patternName = args[1];
       if (!patternName) {
-        throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api arch graph <pattern>');
+        throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: process-api arch graph <pattern>');
       }
       const dependencies = ctx.api.getPatternDependencies(patternName);
       const relationships = ctx.api.getPatternRelationships(patternName);
@@ -799,7 +831,7 @@ function handleArch(ctx: RouteContext): unknown {
 
     default:
       throw new CLIQueryError(
-        'PATTERN_NOT_FOUND',
+        'UNKNOWN_METHOD',
         `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>, neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`
       );
   }
@@ -809,9 +841,8 @@ function handleArch(ctx: RouteContext): unknown {
 // Stub Integration Handlers
 // =============================================================================
 
-function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
+function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[], baseDir: string): unknown {
   const stubs = findStubPatterns(dataset);
-  const baseDir = process.cwd();
   const resolutions = resolveStubs(stubs, baseDir);
 
   // Parse optional pattern name and --unresolved flag
@@ -861,7 +892,7 @@ function handleStubs(dataset: RuntimeMasterDataset, subArgs: string[]): unknown 
 function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
   const patternName = subArgs[0];
   if (patternName === undefined) {
-    throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: decisions <pattern>');
+    throw new CLIQueryError('INVALID_ARGUMENT', 'Usage: decisions <pattern>');
   }
 
   // Find stubs implementing this pattern
@@ -1026,7 +1057,7 @@ function handleDepTreeCmd(ctx: RouteContext): string {
     if (depthVal !== undefined) {
       const parsed = parseInt(depthVal, 10);
       if (!isNaN(parsed) && parsed > 0) {
-        maxDepth = parsed;
+        maxDepth = Math.min(parsed, 10);
       }
     }
   }
@@ -1091,7 +1122,7 @@ function routeSubcommand(ctx: RouteContext): unknown {
       return handleArch(ctx);
 
     case 'stubs':
-      return handleStubs(ctx.dataset, ctx.subArgs);
+      return handleStubs(ctx.dataset, ctx.subArgs, ctx.cliConfig.baseDir);
 
     case 'decisions':
       return handleDecisions(ctx.dataset, ctx.subArgs);
@@ -1123,7 +1154,7 @@ function routeSubcommand(ctx: RouteContext): unknown {
 
     default:
       throw new CLIQueryError(
-        'PATTERN_NOT_FOUND',
+        'UNKNOWN_METHOD',
         `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`
       );
   }
