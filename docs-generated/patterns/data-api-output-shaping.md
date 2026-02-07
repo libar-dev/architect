@@ -47,6 +47,7 @@ Files that implement this pattern:
 - [`output-pipeline.ts`](../../delivery-process/stubs/data-api-output-shaping/output-pipeline.ts) - ## OutputPipeline — CLI Output Shaping and Formatting
 - [`summarize.ts`](../../delivery-process/stubs/data-api-output-shaping/summarize.ts) - ## PatternSummarizer — Compact Pattern Projection
 - [`fuzzy-match.ts`](../../src/api/fuzzy-match.ts) - ## FuzzyMatcher — Pattern Name Fuzzy Search
+- [`pattern-helpers.ts`](../../src/api/pattern-helpers.ts) - ## Pattern Helpers — Shared Lookup Utilities
 - [`summarize.ts`](../../src/api/summarize.ts) - ## PatternSummarizer — Compact Pattern Projection
 - [`output-pipeline.ts`](../../src/cli/output-pipeline.ts) - ## OutputPipeline — CLI Output Shaping and Formatting
 

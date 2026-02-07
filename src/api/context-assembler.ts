@@ -23,7 +23,7 @@ import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
-import type { NeighborEntry } from './types.js';
+import type { NeighborEntry, QueryErrorCode } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
 import { extractFirstSentence } from '../renderable/codecs/helpers.js';
 import {
@@ -183,6 +183,18 @@ function findPatternByName(dataset: MasterDataset, name: string): ExtractedPatte
   return findPatternByNameFromList(dataset.patterns, name);
 }
 
+/**
+ * Find a pattern by name or throw ContextAssemblyError with a fuzzy suggestion.
+ */
+function requirePattern(dataset: MasterDataset, name: string): ExtractedPattern {
+  const pattern = findPatternByName(dataset, name);
+  if (pattern !== undefined) return pattern;
+  const allNames = getAllPatternNames(dataset);
+  const best = findBestMatch(name, [...allNames]);
+  const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
+  throw new ContextAssemblyError('PATTERN_NOT_FOUND', `Pattern not found: "${name}"${suggestion}`);
+}
+
 function resolveDepEntry(
   dataset: MasterDataset,
   depName: string,
@@ -267,11 +279,7 @@ function resolveFsm(api: ProcessStateAPI, status: string | undefined): FsmContex
 }
 
 function resolveTestFiles(pattern: ExtractedPattern): readonly string[] {
-  const files: string[] = [];
-  if (pattern.behaviorFile !== undefined) {
-    files.push(pattern.behaviorFile);
-  }
-  return files;
+  return pattern.behaviorFile !== undefined ? [pattern.behaviorFile] : [];
 }
 
 // ---------------------------------------------------------------------------
@@ -290,19 +298,9 @@ export function assembleContext(
   }
 
   // Resolve all focal patterns
-  const allNames = getAllPatternNames(dataset);
   const focalPatterns: ExtractedPattern[] = [];
   for (const name of patternNames) {
-    const pattern = findPatternByName(dataset, name);
-    if (pattern === undefined) {
-      const best = findBestMatch(name, [...allNames]);
-      const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
-      throw new ContextAssemblyError(
-        'PATTERN_NOT_FOUND',
-        `Pattern not found: "${name}"${suggestion}`
-      );
-    }
-    focalPatterns.push(pattern);
+    focalPatterns.push(requirePattern(dataset, name));
   }
 
   const focalNameSet = new Set(focalPatterns.map(getPatternName));
@@ -422,7 +420,7 @@ export function assembleContext(
   }
 
   return {
-    patterns: patternNames.map((n) => n),
+    patterns: [...patternNames],
     sessionType,
     metadata: allMetadata,
     specFiles: allSpecFiles,
@@ -444,16 +442,7 @@ export function assembleContext(
 export function buildDepTree(dataset: MasterDataset, options: DepTreeOptions): DepTreeNode {
   const { pattern: focalName, maxDepth, includeImplementationDeps } = options;
 
-  const focalPattern = findPatternByName(dataset, focalName);
-  if (focalPattern === undefined) {
-    const allNames = getAllPatternNames(dataset);
-    const best = findBestMatch(focalName, [...allNames]);
-    const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
-    throw new ContextAssemblyError(
-      'PATTERN_NOT_FOUND',
-      `Pattern not found: "${focalName}"${suggestion}`
-    );
-  }
+  requirePattern(dataset, focalName);
 
   // Find the root of the dependency chain by walking up
   const rootName = findDepTreeRoot(dataset, focalName, includeImplementationDeps);
@@ -478,34 +467,27 @@ function findDepTreeRoot(
   // Walk up dependsOn/enables chains to find the root ancestor
   const visited = new Set<string>();
   let current = focalName;
-  let keepWalking = true;
 
-  while (keepWalking) {
+  let walking = true;
+  while (walking) {
+    walking = false;
     visited.add(current);
     const rels = getRelationships(dataset, current);
-    if (rels === undefined) {
-      keepWalking = false;
-      continue;
-    }
+    if (rels === undefined) continue;
 
     const parents = rels.dependsOn;
     const implParents = includeImplementationDeps ? rels.uses : [];
     const allParents = [...parents, ...implParents];
 
     const unvisitedParent = allParents.find((p) => !visited.has(p));
-    if (unvisitedParent === undefined) {
-      keepWalking = false;
-      continue;
-    }
+    if (unvisitedParent === undefined) continue;
 
     // Verify the parent pattern actually exists
     const parentPattern = findPatternByName(dataset, unvisitedParent);
-    if (parentPattern === undefined) {
-      keepWalking = false;
-      continue;
-    }
+    if (parentPattern === undefined) continue;
 
     current = unvisitedParent;
+    walking = true;
   }
 
   return current;
@@ -600,17 +582,7 @@ export function buildFileReadingList(
   patternName: string,
   includeRelated: boolean
 ): FileReadingList {
-  const pattern = findPatternByName(dataset, patternName);
-  if (pattern === undefined) {
-    const allNames = getAllPatternNames(dataset);
-    const best = findBestMatch(patternName, [...allNames]);
-    const suggestion = best !== undefined ? `\nDid you mean: ${best.patternName}?` : '';
-    throw new ContextAssemblyError(
-      'PATTERN_NOT_FOUND',
-      `Pattern not found: "${patternName}"${suggestion}`
-    );
-  }
-
+  const pattern = requirePattern(dataset, patternName);
   const name = getPatternName(pattern);
 
   // Primary: spec file + stub files
@@ -730,9 +702,9 @@ export function buildOverview(dataset: MasterDataset): OverviewSummary {
 // ---------------------------------------------------------------------------
 
 export class ContextAssemblyError extends Error {
-  readonly code: string;
+  readonly code: QueryErrorCode;
 
-  constructor(code: string, message: string) {
+  constructor(code: QueryErrorCode, message: string) {
     super(message);
     this.name = 'ContextAssemblyError';
     this.code = code;

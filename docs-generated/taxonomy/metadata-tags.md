@@ -49,7 +49,7 @@
 | `see-also` | csv | Related patterns for cross-reference without dependency implication | No | No | - | - |
 | `api-ref` | csv | File paths to implementation APIs (replaces 'See:' Markdown text in Rules) | No | No | - | - |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | No | - | - |
-| `arch-role` | enum | Architectural role for diagram generation (component type) | No | No | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model | - |
+| `arch-role` | enum | Architectural role for diagram generation (component type) | No | No | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model, service | - |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | No | - | - |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | No | domain, application, infrastructure | - |
 | `target` | value | Target implementation path for stub files | No | No | - | - |
@@ -466,7 +466,7 @@
 | Purpose | Architectural role for diagram generation (component type) |
 | Required | No |
 | Repeatable | No |
-| Valid Values | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model |
+| Valid Values | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model, service |
 | Example | `@libar-docs-arch-role projection` |
 
 ### `arch-context`

@@ -24,6 +24,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import { getPatternName } from './pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -86,15 +87,6 @@ export interface PdrReference {
 }
 
 // ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Get the display name for a pattern (patternName override or name) */
-function getPatternDisplayName(pattern: ExtractedPattern): string {
-  return pattern.patternName ?? pattern.name;
-}
-
-// ---------------------------------------------------------------------------
 // Functions
 // ---------------------------------------------------------------------------
 
@@ -130,7 +122,7 @@ export function resolveStubs(
     const targetExists = targetPath !== '' && fileExists(absoluteTarget);
 
     return {
-      stubName: getPatternDisplayName(stub),
+      stubName: getPatternName(stub),
       stubFile: stub.source.file,
       targetPath,
       since: stub.since,
@@ -221,7 +213,7 @@ export function findPdrReferences(
   const pdrTag = `PDR-${pdrNumber}`;
 
   for (const pattern of patterns) {
-    const displayName = getPatternDisplayName(pattern);
+    const displayName = getPatternName(pattern);
 
     // Check description text (lives on the directive)
     if (pattern.directive.description.includes(pdrTag)) {

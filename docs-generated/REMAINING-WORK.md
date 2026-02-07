@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 98/157 (62%)
+**Overall Progress:** [████████████░░░░░░░░] 98/158 (62%)
 
 | Status | Count |
 | --- | --- |
-| 🚧 Active | 25 |
+| 🚧 Active | 26 |
 | 📋 Planned | 34 |
-| **Total Remaining** | 59 |
+| **Total Remaining** | 60 |
 
 ---
 
@@ -32,7 +32,7 @@
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 31 | 22 | 0% |
+| 🚧 Backlog (No Phase) | 32 | 23 | 0% |
 
 ---
 
@@ -40,7 +40,7 @@
 
 | Priority | Count |
 | --- | --- |
-| 🚧 In Progress | 25 |
+| 🚧 In Progress | 26 |
 | ✅ Ready to Start | 33 |
 | ⚠️ Blocked | 1 |
 

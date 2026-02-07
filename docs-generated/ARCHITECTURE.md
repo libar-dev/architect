@@ -7,13 +7,13 @@
 
 ## Overview
 
-This diagram was auto-generated from 104 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 105 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 104 |
+| Total Components | 105 |
 | Bounded Contexts | 10 |
-| Component Roles | 4 |
+| Component Roles | 5 |
 
 ---
 
@@ -26,21 +26,22 @@ graph TB
     subgraph api["Api BC"]
         MasterDataset["MasterDataset[read-model]"]
         ProcessStateTypes["ProcessStateTypes"]
-        PatternSummarizerImpl["PatternSummarizerImpl"]
+        PatternSummarizerImpl["PatternSummarizerImpl[service]"]
         StubResolverImpl["StubResolverImpl"]
-        ProcessStateAPI["ProcessStateAPI"]
+        ProcessStateAPI["ProcessStateAPI[service]"]
+        PatternHelpers["PatternHelpers"]
         APIModule["APIModule"]
-        FuzzyMatcherImpl["FuzzyMatcherImpl"]
-        CoverageAnalyzerImpl["CoverageAnalyzerImpl"]
-        ContextFormatterImpl["ContextFormatterImpl"]
-        ContextAssemblerImpl["ContextAssemblerImpl"]
-        ArchQueriesImpl["ArchQueriesImpl"]
+        FuzzyMatcherImpl["FuzzyMatcherImpl[service]"]
+        CoverageAnalyzerImpl["CoverageAnalyzerImpl[service]"]
+        ContextFormatterImpl["ContextFormatterImpl[service]"]
+        ContextAssemblerImpl["ContextAssemblerImpl[service]"]
+        ArchQueriesImpl["ArchQueriesImpl[service]"]
     end
     subgraph cli["Cli BC"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
-        ProcessAPICLIImpl["ProcessAPICLIImpl"]
-        OutputPipelineImpl["OutputPipelineImpl"]
+        ProcessAPICLIImpl["ProcessAPICLIImpl[service]"]
+        OutputPipelineImpl["OutputPipelineImpl[service]"]
         LintProcessCLI["LintProcessCLI"]
         LintPatternsCLI["LintPatternsCLI"]
         TagTaxonomyCLI["TagTaxonomyCLI"]
@@ -52,16 +53,16 @@ graph TB
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
-        DeliveryProcessFactory["DeliveryProcessFactory"]
+        DeliveryProcessFactory["DeliveryProcessFactory[service]"]
         ConfigurationDefaults["ConfigurationDefaults"]
         ConfigLoader["ConfigLoader[infrastructure]"]
     end
     subgraph extractor["Extractor BC"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
-        GherkinExtractor["GherkinExtractor"]
-        DualSourceExtractor["DualSourceExtractor"]
-        Document_Extractor["Document Extractor"]
+        GherkinExtractor["GherkinExtractor[service]"]
+        DualSourceExtractor["DualSourceExtractor[service]"]
+        Document_Extractor["Document Extractor[service]"]
     end
     subgraph generator["Generator BC"]
         WarningCollector["WarningCollector"]
@@ -69,20 +70,20 @@ graph TB
         SourceMappingValidator["SourceMappingValidator"]
         SourceMapper["SourceMapper[infrastructure]"]
         GeneratorRegistry["GeneratorRegistry"]
-        Documentation_Generation_Orchestrator["Documentation Generation Orchestrator"]
+        Documentation_Generation_Orchestrator["Documentation Generation Orchestrator[service]"]
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
-        CodecBasedGenerator["CodecBasedGenerator"]
+        CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
-        TransformDataset["TransformDataset"]
+        TransformDataset["TransformDataset[service]"]
         PipelineModule["PipelineModule"]
         BuiltInGenerators["BuiltInGenerators"]
-        DecisionDocGenerator["DecisionDocGenerator"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
     end
     subgraph lint["Lint BC"]
-        LintRules["LintRules"]
+        LintRules["LintRules[service]"]
         LintModule["LintModule"]
-        LintEngine["LintEngine"]
+        LintEngine["LintEngine[service]"]
         ProcessGuardTypes["ProcessGuardTypes"]
         ProcessGuardModule["ProcessGuardModule"]
         DetectChanges["DetectChanges"]
@@ -92,9 +93,9 @@ graph TB
     subgraph renderer["Renderer BC"]
         RenderableUtils["RenderableUtils"]
         RenderableDocument["RenderableDocument[read-model]"]
-        UniversalRenderer["UniversalRenderer"]
+        UniversalRenderer["UniversalRenderer[service]"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        DocumentGenerator["DocumentGenerator"]
+        DocumentGenerator["DocumentGenerator[service]"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -122,7 +123,7 @@ graph TB
     subgraph taxonomy["Taxonomy BC"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
-        TagRegistryBuilder["TagRegistryBuilder"]
+        TagRegistryBuilder["TagRegistryBuilder[service]"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
@@ -140,8 +141,8 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator"]
-        AntiPatternDetector["AntiPatternDetector"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
@@ -158,19 +159,21 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
+        LintModule["LintModule"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
@@ -183,8 +186,6 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -201,13 +202,13 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        PipelineModule["PipelineModule"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         ProcessGuardTypes["ProcessGuardTypes"]
         ProcessGuardModule["ProcessGuardModule"]
         DetectChanges["DetectChanges"]
         DeriveProcessState["DeriveProcessState"]
-        PipelineModule["PipelineModule"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
@@ -216,15 +217,19 @@ graph TB
     AntiPatternDetector --> DoDValidationTypes
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
-    LintModule --> LintRules
-    LintModule --> LintEngine
-    LintEngine --> LintRules
-    LintEngine --> CodecUtils
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    LintModule --> LintRules
+    LintModule --> LintEngine
+    LintEngine --> LintRules
+    LintEngine --> CodecUtils
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -248,10 +253,6 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ProcessStateAPI --> MasterDataset
@@ -267,13 +268,13 @@ graph TB
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
     ArchitectureCodec --> MasterDataset
-    DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    DetectChanges --> DeriveProcessState
 ```
 
 ---
@@ -295,49 +296,50 @@ All components with architecture annotations:
 
 | Component | Context | Role | Layer | Source File |
 | --- | --- | --- | --- | --- |
-| 🚧 Arch Queries Impl | api | - | domain | src/api/arch-queries.ts |
-| 🚧 Context Assembler Impl | api | - | application | src/api/context-assembler.ts |
-| 🚧 Context Formatter Impl | api | - | application | src/api/context-formatter.ts |
-| 🚧 Coverage Analyzer Impl | api | - | application | src/api/coverage-analyzer.ts |
-| 🚧 Fuzzy Matcher Impl | api | - | application | src/api/fuzzy-match.ts |
-| 🚧 Pattern Summarizer Impl | api | - | application | src/api/summarize.ts |
-| 🚧 Process State API | api | - | application | src/api/process-state.ts |
+| 🚧 Pattern Helpers | api | - | domain | src/api/pattern-helpers.ts |
 | ✅ Master Dataset | api | read-model | domain | src/validation-schemas/master-dataset.ts |
-| 🚧 Output Pipeline Impl | cli | - | application | src/cli/output-pipeline.ts |
-| 🚧 Process API CLI Impl | cli | - | application | src/cli/process-api.ts |
-| ✅ Delivery Process Factory | config | - | application | src/config/factory.ts |
+| 🚧 Arch Queries Impl | api | service | domain | src/api/arch-queries.ts |
+| 🚧 Context Assembler Impl | api | service | application | src/api/context-assembler.ts |
+| 🚧 Context Formatter Impl | api | service | application | src/api/context-formatter.ts |
+| 🚧 Coverage Analyzer Impl | api | service | application | src/api/coverage-analyzer.ts |
+| 🚧 Fuzzy Matcher Impl | api | service | application | src/api/fuzzy-match.ts |
+| 🚧 Pattern Summarizer Impl | api | service | application | src/api/summarize.ts |
+| 🚧 Process State API | api | service | application | src/api/process-state.ts |
+| 🚧 Output Pipeline Impl | cli | service | application | src/cli/output-pipeline.ts |
+| 🚧 Process API CLI Impl | cli | service | application | src/cli/process-api.ts |
 | ✅ Config Loader | config | infrastructure | infrastructure | src/config/config-loader.ts |
-| ✅ Document Extractor | extractor | - | application | src/extractor/doc-extractor.ts |
-| ✅ Dual Source Extractor | extractor | - | application | src/extractor/dual-source-extractor.ts |
-| ✅ Gherkin Extractor | extractor | - | application | src/extractor/gherkin-extractor.ts |
-| ✅ Codec Based Generator | generator | - | application | src/generators/codec-based.ts |
-| ✅ Decision Doc Generator | generator | - | application | src/generators/built-in/decision-doc-generator.ts |
-| ✅ Documentation Generation Orchestrator | generator | - | application | src/generators/orchestrator.ts |
-| ✅ Transform Dataset | generator | - | application | src/generators/pipeline/transform-dataset.ts |
+| ✅ Delivery Process Factory | config | service | application | src/config/factory.ts |
+| ✅ Document Extractor | extractor | service | application | src/extractor/doc-extractor.ts |
+| ✅ Dual Source Extractor | extractor | service | application | src/extractor/dual-source-extractor.ts |
+| ✅ Gherkin Extractor | extractor | service | application | src/extractor/gherkin-extractor.ts |
 | ✅ Content Deduplicator | generator | infrastructure | infrastructure | src/generators/content-deduplicator.ts |
 | 🚧 File Cache | generator | infrastructure | infrastructure | src/cache/file-cache.ts |
 | ✅ Source Mapper | generator | infrastructure | infrastructure | src/generators/source-mapper.ts |
-| ✅ Lint Engine | lint | - | application | src/lint/engine.ts |
-| ✅ Lint Rules | lint | - | application | src/lint/rules.ts |
+| ✅ Codec Based Generator | generator | service | application | src/generators/codec-based.ts |
+| ✅ Decision Doc Generator | generator | service | application | src/generators/built-in/decision-doc-generator.ts |
+| ✅ Documentation Generation Orchestrator | generator | service | application | src/generators/orchestrator.ts |
+| ✅ Transform Dataset | generator | service | application | src/generators/pipeline/transform-dataset.ts |
 | 🚧 Process Guard Decider | lint | decider | application | src/lint/process-guard/decider.ts |
-| ✅ Document Generator | renderer | - | application | src/renderable/generate.ts |
-| ✅ Universal Renderer | renderer | - | application | src/renderable/render.ts |
+| ✅ Lint Engine | lint | service | application | src/lint/engine.ts |
+| ✅ Lint Rules | lint | service | application | src/lint/rules.ts |
 | ✅ Architecture Codec | renderer | projection | application | src/renderable/codecs/architecture.ts |
 | ✅ Decision Doc Codec | renderer | projection | application | src/renderable/codecs/decision-doc.ts |
 | ✅ Patterns Codec | renderer | projection | application | src/renderable/codecs/patterns.ts |
 | ✅ Session Codec | renderer | projection | application | src/renderable/codecs/session.ts |
 | ✅ Renderable Document | renderer | read-model | domain | src/renderable/schema.ts |
+| ✅ Document Generator | renderer | service | application | src/renderable/generate.ts |
+| ✅ Universal Renderer | renderer | service | application | src/renderable/render.ts |
 | ✅ Gherkin AST Parser | scanner | infrastructure | infrastructure | src/scanner/gherkin-ast-parser.ts |
 | ✅ Gherkin Scanner | scanner | infrastructure | infrastructure | src/scanner/gherkin-scanner.ts |
 | ✅ Pattern Scanner | scanner | infrastructure | infrastructure | src/scanner/pattern-scanner.ts |
 | ✅ TypeScript AST Parser | scanner | infrastructure | infrastructure | src/scanner/ast-parser.ts |
-| ✅ Tag Registry Builder | taxonomy | - | domain | src/taxonomy/registry-builder.ts |
 | ✅ Category Definitions | taxonomy | read-model | domain | src/taxonomy/categories.ts |
-| ✅ Anti Pattern Detector | validation | - | application | src/validation/anti-patterns.ts |
-| ✅ DoD Validator | validation | - | application | src/validation/dod-validator.ts |
+| ✅ Tag Registry Builder | taxonomy | service | domain | src/taxonomy/registry-builder.ts |
 | 🚧 FSM Validator | validation | decider | application | src/validation/fsm/validator.ts |
 | 🚧 FSM States | validation | read-model | domain | src/validation/fsm/states.ts |
 | 🚧 FSM Transitions | validation | read-model | domain | src/validation/fsm/transitions.ts |
+| ✅ Anti Pattern Detector | validation | service | application | src/validation/anti-patterns.ts |
+| ✅ DoD Validator | validation | service | application | src/validation/dod-validator.ts |
 | ✅ Adr Document Codec | - | - | - | src/renderable/codecs/adr.ts |
 | 🚧 API Module | - | - | - | src/api/index.ts |
 | ✅ Built In Generators | - | - | - | src/generators/built-in/index.ts |

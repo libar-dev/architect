@@ -363,15 +363,14 @@ export function buildSourceInventory(dataset: MasterDataset): SourceInventory {
 
   for (const p of dataset.patterns) {
     const filePath = p.source.file;
-    const type = categorizeFile(String(filePath), p);
+    const type = categorizeFile(filePath, p);
     let files = groups.get(type);
     if (files === undefined) {
       files = [];
       groups.set(type, files);
     }
-    const fileStr = String(filePath);
-    if (!files.includes(fileStr)) {
-      files.push(fileStr);
+    if (!files.includes(filePath)) {
+      files.push(filePath);
     }
   }
 

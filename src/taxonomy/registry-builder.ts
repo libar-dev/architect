@@ -435,6 +435,7 @@ export function buildRegistry(): TagRegistry {
           'repository',
           'decider',
           'read-model',
+          'service',
         ] as const,
         example: '@libar-docs-arch-role projection',
       },

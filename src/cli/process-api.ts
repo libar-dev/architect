@@ -308,6 +308,9 @@ Subcommands:
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
   arch graph <pattern>      Dependency graph for pattern
+  arch neighborhood <pat>   Uses, usedBy, same-context siblings for pattern
+  arch compare <c1> <c2>    Compare two bounded contexts (shared deps, integration)
+  arch coverage             Annotation coverage analysis across input files
   context <pattern> [--session planning|design|implement]  Curated context bundle (text)
   files <pattern> [--related]                             File reading list (text)
   dep-tree <pattern> [--depth N]                          Dependency tree (text)
@@ -316,6 +319,9 @@ Subcommands:
   stubs --unresolved        Show only stubs with missing target files
   decisions <pattern>       Show AD-N design decisions from stub descriptions
   pdr <number>              Cross-reference patterns mentioning a PDR number
+  tags                      Tag usage report (counts per tag and value)
+  sources                   Source file inventory grouped by type
+  unannotated [--path dir]  Find TypeScript files without @libar-docs annotations
 
 List Filters:
   --status <status>         Filter by FSM status (roadmap, active, completed, deferred)
@@ -668,14 +674,13 @@ function generateEmptyHint(
     }
     if (alternatives.length > 0) {
       // Pick the first available alternative for the suggestion command
+      const statusPriority = [
+        { status: 'active', count: counts.active },
+        { status: 'roadmap', count: counts.planned },
+        { status: 'completed', count: counts.completed },
+      ];
       const altStatus =
-        counts.active > 0 && filters.status !== 'active'
-          ? 'active'
-          : counts.planned > 0 && filters.status !== 'roadmap'
-            ? 'roadmap'
-            : counts.completed > 0 && filters.status !== 'completed'
-              ? 'completed'
-              : 'active';
+        statusPriority.find((s) => s.count > 0 && s.status !== filters.status)?.status ?? 'active';
       return `No ${filters.status} patterns. ${alternatives.join(', ')} exist. Try: list --status ${altStatus}`;
     }
   }
