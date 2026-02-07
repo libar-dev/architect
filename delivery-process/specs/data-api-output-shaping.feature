@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:DataAPIOutputShaping
-@libar-docs-status:active
+@libar-docs-status:completed
+@libar-docs-unlock-reason:All-8-deliverables-implemented-and-verified
 @libar-docs-phase:25a
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:4d
