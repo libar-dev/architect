@@ -53,6 +53,7 @@ import type { ProcessStateAPI } from '../api/process-state.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
 import type { RuntimeMasterDataset } from '../generators/pipeline/index.js';
 import type { QueryErrorCode } from '../api/types.js';
+import type { TagRegistry } from '../validation-schemas/tag-registry.js';
 import { createSuccess, createError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
@@ -90,6 +91,13 @@ import {
   formatFileReadingList,
   formatOverview,
 } from '../api/context-formatter.js';
+import {
+  computeNeighborhood,
+  compareContexts,
+  aggregateTagUsage,
+  buildSourceInventory,
+} from '../api/arch-queries.js';
+import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.js';
 
 // =============================================================================
 // CLIQueryError
@@ -680,10 +688,10 @@ function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
   return { matches };
 }
 
-function handleArch(api: ProcessStateAPI, args: string[]): unknown {
+function handleArch(ctx: RouteContext): unknown {
+  const args = ctx.subArgs;
   const subCmd = args[0];
-  const dataset = api.getMasterDataset();
-  const archIndex = dataset.archIndex;
+  const archIndex = ctx.dataset.archIndex;
 
   if (!archIndex || archIndex.all.length === 0) {
     throw new CLIQueryError(
@@ -743,18 +751,56 @@ function handleArch(api: ProcessStateAPI, args: string[]): unknown {
       if (!patternName) {
         throw new CLIQueryError('PATTERN_NOT_FOUND', 'Usage: process-api arch graph <pattern>');
       }
-      const dependencies = api.getPatternDependencies(patternName);
-      const relationships = api.getPatternRelationships(patternName);
+      const dependencies = ctx.api.getPatternDependencies(patternName);
+      const relationships = ctx.api.getPatternRelationships(patternName);
       if (!dependencies && !relationships) {
         throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
       }
       return { pattern: patternName, dependencies, relationships };
     }
 
+    case 'neighborhood': {
+      const patternName = args[1];
+      if (!patternName) {
+        throw new CLIQueryError(
+          'PATTERN_NOT_FOUND',
+          'Usage: process-api arch neighborhood <pattern>'
+        );
+      }
+      const neighborhood = computeNeighborhood(patternName, ctx.dataset);
+      if (neighborhood === undefined) {
+        const allNames = ctx.dataset.patterns.map((p) => p.patternName ?? p.name);
+        const best = findBestMatch(patternName, allNames);
+        const hint = best !== undefined ? ` Did you mean: ${best.patternName}?` : '';
+        throw new CLIQueryError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}".${hint}`);
+      }
+      return neighborhood;
+    }
+
+    case 'compare': {
+      const ctx1Name = args[1];
+      const ctx2Name = args[2];
+      if (!ctx1Name || !ctx2Name) {
+        throw new CLIQueryError(
+          'CONTEXT_NOT_FOUND',
+          'Usage: process-api arch compare <ctx1> <ctx2>'
+        );
+      }
+      const comparison = compareContexts(ctx1Name, ctx2Name, ctx.dataset);
+      if (comparison === undefined) {
+        const available = Object.keys(archIndex.byContext).join(', ');
+        throw new CLIQueryError('CONTEXT_NOT_FOUND', `Context not found. Available: ${available}`);
+      }
+      return comparison;
+    }
+
+    case 'coverage':
+      return analyzeCoverage(ctx.dataset, ctx.cliConfig.input, ctx.cliConfig.baseDir, ctx.registry);
+
     default:
       throw new CLIQueryError(
         'PATTERN_NOT_FOUND',
-        `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>`
+        `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>, neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`
       );
   }
 }
@@ -900,6 +946,12 @@ interface RouteContext {
   modifiers: OutputModifiers;
   sessionType: SessionType | null;
   baseDir: string;
+  cliConfig: {
+    readonly input: readonly string[];
+    readonly features: readonly string[];
+    readonly baseDir: string;
+  };
+  registry: TagRegistry;
 }
 
 // =============================================================================
@@ -1036,7 +1088,7 @@ function routeSubcommand(ctx: RouteContext): unknown {
       return handleSearch(ctx.api, ctx.subArgs);
 
     case 'arch':
-      return handleArch(ctx.api, ctx.subArgs);
+      return handleArch(ctx);
 
     case 'stubs':
       return handleStubs(ctx.dataset, ctx.subArgs);
@@ -1047,10 +1099,32 @@ function routeSubcommand(ctx: RouteContext): unknown {
     case 'pdr':
       return handlePdr(ctx.dataset, ctx.subArgs);
 
+    case 'tags':
+      return aggregateTagUsage(ctx.dataset);
+
+    case 'sources':
+      return buildSourceInventory(ctx.dataset);
+
+    case 'unannotated': {
+      let pathFilter: string | undefined;
+      for (let i = 0; i < ctx.subArgs.length; i++) {
+        if (ctx.subArgs[i] === '--path') {
+          pathFilter = ctx.subArgs[i + 1];
+          break;
+        }
+      }
+      return findUnannotatedFiles(
+        ctx.cliConfig.input,
+        ctx.cliConfig.baseDir,
+        ctx.registry,
+        pathFilter
+      );
+    }
+
     default:
       throw new CLIQueryError(
         'PATTERN_NOT_FOUND',
-        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr`
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`
       );
   }
 }
@@ -1094,7 +1168,7 @@ async function main(): Promise<void> {
   const api = createProcessStateAPI(masterDataset);
 
   // Route and execute subcommand
-  const result = routeSubcommand({
+  const result = await routeSubcommand({
     api,
     dataset: masterDataset,
     subcommand: opts.subcommand,
@@ -1102,6 +1176,8 @@ async function main(): Promise<void> {
     modifiers: opts.modifiers,
     sessionType: opts.sessionType,
     baseDir: path.resolve(opts.baseDir),
+    cliConfig: { input: opts.input, features: opts.features, baseDir: opts.baseDir },
+    registry: masterDataset.tagRegistry,
   });
 
   // Dual output path (ADR-008):

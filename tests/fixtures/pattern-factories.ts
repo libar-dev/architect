@@ -114,6 +114,13 @@ export interface TestPatternOptions {
   since?: string;
   /** Related patterns for cross-reference (default: none) */
   seeAlso?: string[];
+  // Architecture fields
+  /** Architecture role (default: none) */
+  archRole?: string;
+  /** Architecture bounded context (default: none) */
+  archContext?: string;
+  /** Architecture layer (default: none) */
+  archLayer?: string;
 }
 
 /**
@@ -202,6 +209,10 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     targetPath,
     since,
     seeAlso,
+    // Architecture fields
+    archRole,
+    archContext,
+    archLayer,
   } = options;
 
   const directive: DocDirective = {
@@ -272,6 +283,10 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(targetPath ? { targetPath } : {}),
     ...(since ? { since } : {}),
     ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
+    // Architecture fields
+    ...(archRole ? { archRole } : {}),
+    ...(archContext ? { archContext } : {}),
+    ...(archLayer ? { archLayer } : {}),
   };
 }
 

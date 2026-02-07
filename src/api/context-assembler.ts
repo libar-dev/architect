@@ -23,6 +23,7 @@ import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset, RelationshipEntry } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
+import type { NeighborEntry } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
 import { extractFirstSentence } from '../renderable/codecs/helpers.js';
 
@@ -80,13 +81,7 @@ export interface DepEntry {
   readonly kind: 'planning' | 'implementation';
 }
 
-export interface NeighborEntry {
-  readonly name: string;
-  readonly status: string | undefined;
-  readonly archRole: string | undefined;
-  readonly archContext: string | undefined;
-  readonly file: string | undefined;
-}
+export type { NeighborEntry } from './types.js';
 
 export interface DeliverableEntry {
   readonly name: string;

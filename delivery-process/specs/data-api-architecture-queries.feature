@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIArchitectureQueries
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:25b
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:2d
@@ -35,12 +35,12 @@ Feature: Data API Architecture Queries - Deep Architecture Exploration
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | arch neighborhood handler | planned | src/cli/process-api.ts | Yes | integration |
-      | arch compare handler | planned | src/cli/process-api.ts | Yes | integration |
-      | arch coverage analyzer | planned | src/api/coverage-analyzer.ts | Yes | unit |
-      | tags subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | sources subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | unannotated subcommand | planned | src/cli/process-api.ts | Yes | integration |
+      | arch neighborhood handler | Done | src/cli/process-api.ts | Yes | integration |
+      | arch compare handler | Done | src/cli/process-api.ts | Yes | integration |
+      | arch coverage analyzer | Done | src/api/coverage-analyzer.ts | Yes | unit |
+      | tags subcommand | Done | src/cli/process-api.ts | Yes | integration |
+      | sources subcommand | Done | src/cli/process-api.ts | Yes | integration |
+      | unannotated subcommand | Done | src/cli/process-api.ts | Yes | integration |
 
   # ============================================================================
   # RULE 1: Extended Architecture Queries

@@ -46,6 +46,7 @@ export type QueryErrorCode =
   | 'PHASE_NOT_FOUND'
   | 'QUARTER_NOT_FOUND'
   | 'CATEGORY_NOT_FOUND'
+  | 'CONTEXT_NOT_FOUND'
   | 'STUB_NOT_FOUND'
   | 'PDR_NOT_FOUND'
   | 'CONTEXT_ASSEMBLY_ERROR';
@@ -221,6 +222,22 @@ export interface ProtectionInfo {
   description: string;
   canAddDeliverables: boolean;
   requiresUnlock: boolean;
+}
+
+// =============================================================================
+// Architecture Query Types
+// =============================================================================
+
+/**
+ * Entry for a neighboring pattern with architecture metadata.
+ * Shared between ContextAssembler and ArchQueries.
+ */
+export interface NeighborEntry {
+  readonly name: string;
+  readonly status: string | undefined;
+  readonly archRole: string | undefined;
+  readonly archContext: string | undefined;
+  readonly file: string | undefined;
 }
 
 // =============================================================================

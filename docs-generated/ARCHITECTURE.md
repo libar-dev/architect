@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 102 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 104 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 102 |
+| Total Components | 104 |
 | Bounded Contexts | 10 |
 | Component Roles | 4 |
 
@@ -31,8 +31,10 @@ graph TB
         ProcessStateAPI["ProcessStateAPI"]
         APIModule["APIModule"]
         FuzzyMatcherImpl["FuzzyMatcherImpl"]
+        CoverageAnalyzerImpl["CoverageAnalyzerImpl"]
         ContextFormatterImpl["ContextFormatterImpl"]
         ContextAssemblerImpl["ContextAssemblerImpl"]
+        ArchQueriesImpl["ArchQueriesImpl"]
     end
     subgraph cli["Cli BC"]
         CLIVersionHelper["CLIVersionHelper"]
@@ -128,10 +130,6 @@ graph TB
         CategoryDefinitions["CategoryDefinitions[read-model]"]
     end
     subgraph validation["Validation BC"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator"]
-        AntiPatternDetector["AntiPatternDetector"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -140,14 +138,16 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator"]
+        AntiPatternDetector["AntiPatternDetector"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -156,6 +156,8 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -165,13 +167,15 @@ graph TB
         RenderableUtils["RenderableUtils"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -179,10 +183,8 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -208,16 +210,21 @@ graph TB
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
+    ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
-    ExtractedPatternSchema --> DocDirectiveSchema
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -227,10 +234,6 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
@@ -245,21 +248,24 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
+    CoverageAnalyzerImpl --> Pattern_Scanner
+    CoverageAnalyzerImpl --> MasterDataset
     ContextFormatterImpl --> ContextAssemblerImpl
     ContextAssemblerImpl --> ProcessStateAPI
     ContextAssemblerImpl --> MasterDataset
     ContextAssemblerImpl --> PatternSummarizerImpl
     ContextAssemblerImpl --> FuzzyMatcherImpl
     ContextAssemblerImpl --> StubResolverImpl
+    ArchQueriesImpl --> ProcessStateAPI
+    ArchQueriesImpl --> MasterDataset
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
@@ -289,8 +295,10 @@ All components with architecture annotations:
 
 | Component | Context | Role | Layer | Source File |
 | --- | --- | --- | --- | --- |
+| 🚧 Arch Queries Impl | api | - | domain | src/api/arch-queries.ts |
 | 🚧 Context Assembler Impl | api | - | application | src/api/context-assembler.ts |
 | 🚧 Context Formatter Impl | api | - | application | src/api/context-formatter.ts |
+| 🚧 Coverage Analyzer Impl | api | - | application | src/api/coverage-analyzer.ts |
 | 🚧 Fuzzy Matcher Impl | api | - | application | src/api/fuzzy-match.ts |
 | 🚧 Pattern Summarizer Impl | api | - | application | src/api/summarize.ts |
 | 🚧 Process State API | api | - | application | src/api/process-state.ts |

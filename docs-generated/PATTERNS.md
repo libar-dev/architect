@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 97/155 (63% complete)
+**Overall:** [████████████░░░░░░░░] 98/157 (62% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 97 |
-| 🚧 Active | 23 |
-| 📋 Planned | 35 |
-| **Total** | 155 |
+| ✅ Completed | 98 |
+| 🚧 Active | 25 |
+| 📋 Planned | 34 |
+| **Total** | 157 |
 
 ---
 
@@ -35,7 +35,7 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
-- [Pattern](#pattern) (6)
+- [Pattern](#pattern) (8)
 - [Scanner](#scanner) (2)
 - [Status](#status) (8)
 - [Validation](#validation) (11)
@@ -64,6 +64,7 @@
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
 | ✅ Content Deduplicator | Core | completed | Identifies and merges duplicate sections extracted from multiple sources. |
+| ✅ Data API Architecture Queries | DDD | completed | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
 | ✅ Data API Context Assembly | DDD | completed | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
 | ✅ Data API Output Shaping | DDD | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
 | ✅ Data API Stub Integration | DDD | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
@@ -144,8 +145,10 @@
 | ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact... |
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
+| 🚧 Arch Queries Impl | Pattern | active | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Context Assembler Impl | Pattern | active | Pure function composition over MasterDataset. |
 | 🚧 Context Formatter Impl | Pattern | active | First plain-text formatter in the codebase. |
+| 🚧 Coverage Analyzer Impl | Pattern | active | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 File Cache | Pattern | active | Simple Map-based cache for file contents during a single generation run. |
@@ -177,7 +180,6 @@
 | 📋 ContextFormatter — Plain Text Renderer for Context Bundles | Status | planned | First plain-text formatter in the codebase. |
 | 📋 CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection | Status | planned | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
-| 📋 Data API Architecture Queries | DDD | planned | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
 | 📋 Data API CLI Ergonomics | DDD | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
 | 📋 Data API Design Session Support | DDD | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
 | 📋 Data API Platform Integration | DDD | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
@@ -299,8 +301,9 @@
 
 ### DDD
 
-12/34 complete (35%)
+13/34 complete (38%)
 
+- [✅ Data API Architecture Queries](patterns/data-api-architecture-queries.md)
 - [✅ Data API Context Assembly](patterns/data-api-context-assembly.md)
 - [✅ Data API Output Shaping](patterns/data-api-output-shaping.md)
 - [✅ Data API Stub Integration](patterns/data-api-stub-integration.md)
@@ -321,7 +324,6 @@
 - [📋 Cli Behavior Testing](patterns/cli-behavior-testing.md)
 - [📋 Codec Behavior Testing](patterns/codec-behavior-testing.md)
 - [📋 Cross Source Validation](patterns/cross-source-validation.md)
-- [📋 Data API Architecture Queries](patterns/data-api-architecture-queries.md)
 - [📋 Data API CLI Ergonomics](patterns/data-apicli-ergonomics.md)
 - [📋 Data API Design Session Support](patterns/data-api-design-session-support.md)
 - [📋 Data API Platform Integration](patterns/data-api-platform-integration.md)
@@ -439,12 +441,14 @@
 
 ### Pattern
 
-2/6 complete (33%)
+2/8 complete (25%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
 - [✅ Shape Extractor](patterns/shape-extractor.md)
+- [🚧 Arch Queries Impl](patterns/arch-queries-impl.md)
 - [🚧 Context Assembler Impl](patterns/context-assembler-impl.md)
 - [🚧 Context Formatter Impl](patterns/context-formatter-impl.md)
+- [🚧 Coverage Analyzer Impl](patterns/coverage-analyzer-impl.md)
 - [🚧 File Cache](patterns/file-cache.md)
 - [🚧 Stub Resolver Impl](patterns/stub-resolver-impl.md)
 
@@ -498,26 +502,6 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
-    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
-    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
-    PatternSummarizer___Compact_Pattern_Projection --> ProcessStateAPI
-    PatternSummarizer___Compact_Pattern_Projection ..-> DataAPIOutputShaping
-    OutputPipeline___CLI_Output_Shaping_and_Formatting --> PatternSummarizer
-    OutputPipeline___CLI_Output_Shaping_and_Formatting ..-> DataAPIOutputShaping
-    FuzzyMatcher___Pattern_Name_Fuzzy_Search ..-> DataAPIOutputShaping
-    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles --> ContextAssembler
-    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles ..-> DataAPIContextAssembly
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> ProcessStateAPI
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> MasterDataset
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> PatternSummarizer
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -533,8 +517,6 @@ graph TD
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
     AntiPatternDetector --> GherkinTypes
-    UtilsModule --> StringUtilities
-    UtilsModule --> CollectionUtilities
     TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
@@ -562,16 +544,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -584,22 +556,6 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    PatternSummarizerImpl --> ProcessStateAPI
-    PatternSummarizerImpl ..-> DataAPIOutputShaping
-    StubResolverImpl --> ProcessStateAPI
-    StubResolverImpl ..-> DataAPIStubIntegration
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
-    FuzzyMatcherImpl ..-> DataAPIOutputShaping
-    ContextFormatterImpl --> ContextAssemblerImpl
-    ContextFormatterImpl ..-> DataAPIContextAssembly
-    ContextAssemblerImpl --> ProcessStateAPI
-    ContextAssemblerImpl --> MasterDataset
-    ContextAssemblerImpl --> PatternSummarizerImpl
-    ContextAssemblerImpl --> FuzzyMatcherImpl
-    ContextAssemblerImpl --> StubResolverImpl
-    ContextAssemblerImpl ..-> DataAPIContextAssembly
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -626,6 +582,60 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
+    UtilsModule --> StringUtilities
+    UtilsModule --> CollectionUtilities
+    PatternSummarizerImpl --> ProcessStateAPI
+    PatternSummarizerImpl ..-> DataAPIOutputShaping
+    StubResolverImpl --> ProcessStateAPI
+    StubResolverImpl ..-> DataAPIStubIntegration
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
+    FuzzyMatcherImpl ..-> DataAPIOutputShaping
+    CoverageAnalyzerImpl --> Pattern_Scanner
+    CoverageAnalyzerImpl --> MasterDataset
+    CoverageAnalyzerImpl ..-> DataAPIArchitectureQueries
+    ContextFormatterImpl --> ContextAssemblerImpl
+    ContextFormatterImpl ..-> DataAPIContextAssembly
+    ContextAssemblerImpl --> ProcessStateAPI
+    ContextAssemblerImpl --> MasterDataset
+    ContextAssemblerImpl --> PatternSummarizerImpl
+    ContextAssemblerImpl --> FuzzyMatcherImpl
+    ContextAssemblerImpl --> StubResolverImpl
+    ContextAssemblerImpl ..-> DataAPIContextAssembly
+    ArchQueriesImpl --> ProcessStateAPI
+    ArchQueriesImpl --> MasterDataset
+    ArchQueriesImpl ..-> DataAPIArchitectureQueries
+    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
+    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles --> ContextAssembler
+    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles ..-> DataAPIContextAssembly
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> ProcessStateAPI
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> MasterDataset
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> PatternSummarizer
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
+    PatternSummarizer___Compact_Pattern_Projection --> ProcessStateAPI
+    PatternSummarizer___Compact_Pattern_Projection ..-> DataAPIOutputShaping
+    OutputPipeline___CLI_Output_Shaping_and_Formatting --> PatternSummarizer
+    OutputPipeline___CLI_Output_Shaping_and_Formatting ..-> DataAPIOutputShaping
+    FuzzyMatcher___Pattern_Name_Fuzzy_Search ..-> DataAPIOutputShaping
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
