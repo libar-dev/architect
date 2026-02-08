@@ -40,7 +40,7 @@ import {
   ValidationSummaryOutputSchema,
 } from '../validation-schemas/index.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
-import { normalizeStatus } from '../taxonomy/index.js';
+import { normalizeStatus, isPatternComplete } from '../taxonomy/index.js';
 import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
 import {
   validateDoD,
@@ -49,7 +49,6 @@ import {
   formatAntiPatternReport,
   toValidationIssues,
   DEFAULT_THRESHOLDS,
-  isStatusComplete,
 } from '../validation/index.js';
 
 /**
@@ -451,7 +450,7 @@ export function validatePatterns(
 
   // Check deliverables for completed patterns
   for (const gherkinPattern of gherkinPatterns) {
-    if (isStatusComplete(gherkinPattern.status ?? '')) {
+    if (isPatternComplete(gherkinPattern.status)) {
       if (gherkinPattern.deliverables.length === 0) {
         issues.push({
           severity: 'warning',

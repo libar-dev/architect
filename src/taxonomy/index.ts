@@ -30,9 +30,12 @@ export {
   type ProcessStatusValue,
 } from './status-values.js';
 
-// Normalized status (display buckets)
+// Normalized status (display buckets) and pattern-domain helpers
 export {
   normalizeStatus,
+  isPatternComplete,
+  isPatternActive,
+  isPatternPlanned,
   NORMALIZED_STATUS_VALUES,
   STATUS_NORMALIZATION_MAP,
   type NormalizedStatus,

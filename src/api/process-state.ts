@@ -52,7 +52,11 @@ import type {
   PhaseGroup as MasterPhaseGroup,
 } from '../validation-schemas/index.js';
 import type { ProcessStatusValue } from '../taxonomy/index.js';
-import { normalizeStatus } from '../taxonomy/normalized-status.js';
+import {
+  isPatternComplete,
+  isPatternActive,
+  isPatternPlanned,
+} from '../taxonomy/normalized-status.js';
 import {
   validateTransition,
   getProtectionSummary,
@@ -544,9 +548,9 @@ export function createProcessStateAPI(dataset: MasterDataset): ProcessStateAPI {
       return Object.entries(dataset.byQuarter)
         .map(([quarter, patterns]) => {
           const counts = {
-            completed: patterns.filter((p) => normalizeStatus(p.status) === 'completed').length,
-            active: patterns.filter((p) => normalizeStatus(p.status) === 'active').length,
-            planned: patterns.filter((p) => normalizeStatus(p.status) === 'planned').length,
+            completed: patterns.filter((p) => isPatternComplete(p.status)).length,
+            active: patterns.filter((p) => isPatternActive(p.status)).length,
+            planned: patterns.filter((p) => isPatternPlanned(p.status)).length,
             total: patterns.length,
           };
           return { quarter, patterns, counts };

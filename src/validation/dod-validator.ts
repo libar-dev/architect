@@ -26,6 +26,7 @@ import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/inde
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
 import type { DoDValidationResult, DoDValidationSummary } from './types.js';
 import { isStatusComplete } from './types.js';
+import { isPatternComplete } from '../taxonomy/normalized-status.js';
 
 /**
  * Check if a deliverable status indicates completion
@@ -165,7 +166,7 @@ export function validateDoD(
     if (!metadata) continue;
 
     // Only validate completed phases (or phases matching filter)
-    const isCompleted = isStatusComplete(metadata.status);
+    const isCompleted = isPatternComplete(metadata.status);
 
     // If phase filter specified, validate those specific phases
     // Otherwise, only validate completed phases

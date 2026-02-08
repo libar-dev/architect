@@ -38,7 +38,7 @@ import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js'
 import { getStatusEmoji, getDisplayName } from '../utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
 import { isStatusComplete, getDeliverableStatusEmoji } from '../../validation/types.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
+import { normalizeStatus, isPatternPlanned } from '../../taxonomy/index.js';
 import { groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
@@ -294,10 +294,7 @@ function buildPlanningChecklistDocument(
       [
         ['Phases to Plan', String(phasesToCheck.length)],
         ['Active', String(dataset.byStatus.active.filter((p) => phasesToCheck.includes(p)).length)],
-        [
-          'Next Actionable',
-          String(phasesToCheck.filter((p) => normalizeStatus(p.status) === 'planned').length),
-        ],
+        ['Next Actionable', String(phasesToCheck.filter((p) => isPatternPlanned(p.status)).length)],
       ]
     ),
     separator()

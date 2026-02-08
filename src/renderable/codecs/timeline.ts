@@ -44,7 +44,12 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
+import {
+  normalizeStatus,
+  isPatternComplete,
+  isPatternActive,
+  isPatternPlanned,
+} from '../../taxonomy/index.js';
 import { getDeliverableStatusEmoji, getPhaseStatusEmoji } from '../../validation/types.js';
 import {
   getStatusEmoji,
@@ -408,7 +413,7 @@ function buildQuarterlyTimeline(dataset: MasterDataset): SectionBlock[] {
 
   const rows = quarters.map((quarter) => {
     const patterns = dataset.byQuarter[quarter] ?? [];
-    const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed').length;
+    const completed = patterns.filter((p) => isPatternComplete(p.status)).length;
     const isCurrent = quarter === currentQuarter;
     const marker = isCurrent ? ' ← Current' : '';
 
@@ -537,9 +542,9 @@ function buildPhaseDetailDocument(
   );
 
   // Patterns by status
-  const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
-  const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
-  const planned = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
+  const completed = patterns.filter((p) => isPatternComplete(p.status));
+  const active = patterns.filter((p) => isPatternActive(p.status));
+  const planned = patterns.filter((p) => isPatternPlanned(p.status));
 
   if (active.length > 0) {
     sections.push(heading(2, '🚧 Active Patterns'));
@@ -1060,7 +1065,7 @@ function buildActivePhases(
     const displayName = phaseName ?? `Phase ${phaseNumber}`;
 
     // Only show active patterns in this phase
-    const activeInPhase = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+    const activeInPhase = patterns.filter((p) => isPatternActive(p.status));
     const progress = completionPercentage(counts);
     const progressBar = renderProgressBar(counts.completed, counts.total, 15);
 
@@ -1182,7 +1187,7 @@ function buildCurrentPhaseDetailDocument(
   );
 
   // Active patterns detail
-  const activePatterns = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+  const activePatterns = patterns.filter((p) => isPatternActive(p.status));
 
   if (activePatterns.length > 0) {
     sections.push(heading(2, '🚧 Active Work'));
@@ -1193,7 +1198,7 @@ function buildCurrentPhaseDetailDocument(
   }
 
   // Recently completed in this phase
-  const completedPatterns = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
+  const completedPatterns = patterns.filter((p) => isPatternComplete(p.status));
   if (completedPatterns.length > 0) {
     sections.push(heading(2, '✅ Recently Completed'));
 
@@ -1208,7 +1213,7 @@ function buildCurrentPhaseDetailDocument(
   }
 
   // Upcoming in this phase
-  const plannedPatterns = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
+  const plannedPatterns = patterns.filter((p) => isPatternPlanned(p.status));
   if (plannedPatterns.length > 0) {
     const plannedContent: SectionBlock[] = [];
     const rows = sortByPhaseAndName([...plannedPatterns]).map((p) => {

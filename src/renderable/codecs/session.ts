@@ -47,8 +47,13 @@ import {
   linkOut,
   document,
 } from '../schema.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
-import { getPhaseStatusEmoji, isStatusInProgress } from '../../validation/types.js';
+import {
+  normalizeStatus,
+  isPatternComplete,
+  isPatternActive,
+  isPatternPlanned,
+} from '../../taxonomy/index.js';
+import { getPhaseStatusEmoji } from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -451,12 +456,12 @@ function buildBlockedItems(dataset: MasterDataset): SectionBlock[] {
 
   for (const pattern of dataset.patterns) {
     if (!pattern.dependsOn || pattern.dependsOn.length === 0) continue;
-    if (normalizeStatus(pattern.status) === 'completed') continue;
+    if (isPatternComplete(pattern.status)) continue;
 
     // Check if any dependency is not completed
     const hasUnmetDep = pattern.dependsOn.some((depName) => {
       const dep = dataset.patterns.find((p) => p.patternName === depName || p.name === depName);
-      return dep !== undefined && normalizeStatus(dep.status) !== 'completed';
+      return dep !== undefined && !isPatternComplete(dep.status);
     });
 
     if (hasUnmetDep) {
@@ -593,14 +598,14 @@ function buildSessionPhaseDetailDocument(
   );
 
   // Active patterns (priority)
-  const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+  const active = patterns.filter((p) => isPatternActive(p.status));
   if (active.length > 0) {
     sections.push(heading(2, '🚧 Active Work'));
     sections.push(...buildSessionPatternList(active, true));
   }
 
   // Planned patterns
-  const planned = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
+  const planned = patterns.filter((p) => isPatternPlanned(p.status));
   if (planned.length > 0) {
     sections.push(heading(2, '📋 Planned Work'));
 
@@ -617,7 +622,7 @@ function buildSessionPhaseDetailDocument(
 
         const hasUnmetDep = pattern.dependsOn.some((depName) => {
           const dep = dataset.patterns.find((p) => p.patternName === depName || p.name === depName);
-          return dep !== undefined && normalizeStatus(dep.status) !== 'completed';
+          return dep !== undefined && !isPatternComplete(dep.status);
         });
 
         if (hasUnmetDep) {
@@ -643,7 +648,7 @@ function buildSessionPhaseDetailDocument(
   }
 
   // Completed patterns (collapsible)
-  const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
+  const completed = patterns.filter((p) => isPatternComplete(p.status));
   if (completed.length > 0) {
     const completedContent: SectionBlock[] = [];
     const items = completed.map((p) => `✅ ${getDisplayName(p)}`);
@@ -810,7 +815,7 @@ function buildNextActionableItems(
 
   // Find patterns that are not blocked
   const actionable = incomplete.filter((pattern) => {
-    if (normalizeStatus(pattern.status) !== 'planned') {
+    if (!isPatternPlanned(pattern.status)) {
       return false; // Active items are already being worked on
     }
 
@@ -821,7 +826,7 @@ function buildNextActionableItems(
     // Check if all dependencies are completed
     const allDepsComplete = pattern.dependsOn.every((depName) => {
       const dep = dataset.patterns.find((p) => p.patternName === depName || p.name === depName);
-      return dep === undefined || normalizeStatus(dep.status) === 'completed';
+      return dep === undefined || isPatternComplete(dep.status);
     });
 
     return allDepsComplete;
@@ -862,8 +867,8 @@ function buildRemainingWorkSummary(
   dataset: MasterDataset,
   incomplete: ExtractedPattern[]
 ): SectionBlock[] {
-  const active = incomplete.filter((p) => normalizeStatus(p.status) === 'active');
-  const planned = incomplete.filter((p) => normalizeStatus(p.status) === 'planned');
+  const active = incomplete.filter((p) => isPatternActive(p.status));
+  const planned = incomplete.filter((p) => isPatternPlanned(p.status));
 
   const progress = completionPercentage(dataset.counts);
   const progressBar = renderProgressBar(dataset.counts.completed, dataset.counts.total, 20);
@@ -944,7 +949,7 @@ function buildRemainingPhaseNavigation(
   const backlogPatterns = incomplete.filter((p) => !patternsWithPhase.has(p.id));
 
   if (backlogPatterns.length > 0) {
-    const backlogActive = backlogPatterns.filter((p) => isStatusInProgress(p.status ?? '')).length;
+    const backlogActive = backlogPatterns.filter((p) => isPatternActive(p.status)).length;
     const statusEmoji = getPhaseStatusEmoji(false, backlogActive > 0);
     rows.push([
       `${statusEmoji} Backlog (No Phase)`,
@@ -981,7 +986,7 @@ function buildRemainingByPrioritySummary(
 
     const hasUnmetDep = pattern.dependsOn.some((depName) => {
       const dep = dataset.patterns.find((p) => p.patternName === depName || p.name === depName);
-      return dep !== undefined && normalizeStatus(dep.status) !== 'completed';
+      return dep !== undefined && !isPatternComplete(dep.status);
     });
 
     if (hasUnmetDep) {
@@ -994,8 +999,8 @@ function buildRemainingByPrioritySummary(
   sections.push(heading(2, 'By Priority'));
 
   // Summary table
-  const readyCount = unblocked.filter((p) => normalizeStatus(p.status) === 'planned').length;
-  const activeCount = incomplete.filter((p) => normalizeStatus(p.status) === 'active').length;
+  const readyCount = unblocked.filter((p) => isPatternPlanned(p.status)).length;
+  const activeCount = incomplete.filter((p) => isPatternActive(p.status)).length;
 
   sections.push(
     table(
@@ -1010,7 +1015,7 @@ function buildRemainingByPrioritySummary(
 
   // Show top ready to start (use limits from options with safe default)
   const limit = options.limits.recentItems ?? 10;
-  const readyToStart = unblocked.filter((p) => normalizeStatus(p.status) === 'planned');
+  const readyToStart = unblocked.filter((p) => isPatternPlanned(p.status));
   if (readyToStart.length > 0) {
     sections.push(heading(3, 'Top Ready to Start'));
     const items = sortByPhaseAndName(readyToStart)
@@ -1081,7 +1086,7 @@ function buildRemainingPhaseDetailDocument(
   );
 
   // Get incomplete patterns
-  const incompletePatterns = patterns.filter((p) => normalizeStatus(p.status) !== 'completed');
+  const incompletePatterns = patterns.filter((p) => !isPatternComplete(p.status));
 
   // Categorize by priority
   const active: ExtractedPattern[] = [];
@@ -1089,7 +1094,7 @@ function buildRemainingPhaseDetailDocument(
   const blocked: ExtractedPattern[] = [];
 
   for (const pattern of incompletePatterns) {
-    if (normalizeStatus(pattern.status) === 'active') {
+    if (isPatternActive(pattern.status)) {
       active.push(pattern);
       continue;
     }
@@ -1101,7 +1106,7 @@ function buildRemainingPhaseDetailDocument(
 
     const hasUnmetDep = pattern.dependsOn.some((depName) => {
       const dep = dataset.patterns.find((p) => p.patternName === depName || p.name === depName);
-      return dep !== undefined && normalizeStatus(dep.status) !== 'completed';
+      return dep !== undefined && !isPatternComplete(dep.status);
     });
 
     if (hasUnmetDep) {
