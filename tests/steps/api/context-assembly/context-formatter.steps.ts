@@ -80,7 +80,10 @@ function createDesignBundle(): ContextBundle {
     sharedDependencies: [],
     consumers: [],
     architectureNeighbors: [],
-    deliverables: [],
+    deliverables: [
+      { name: 'API design', status: 'Pending', location: 'src/api/design.ts' },
+      { name: 'Interface stubs', status: 'Done', location: 'src/api/stubs.ts' },
+    ],
     fsm: undefined,
     testFiles: [],
   };
@@ -174,7 +177,7 @@ describeFeature(feature, ({ Rule }) => {
 
   Rule('formatContextBundle renders section markers', ({ RuleScenario }) => {
     RuleScenario('Design bundle renders all populated sections', ({ Given, When, Then }) => {
-      Given('a design context bundle with metadata, stubs, and dependencies', () => {
+      Given('a design context bundle with metadata, stubs, dependencies, and deliverables', () => {
         state = initState();
         state.bundle = createDesignBundle();
       });

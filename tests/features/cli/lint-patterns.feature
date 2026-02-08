@@ -58,8 +58,8 @@ Feature: lint-patterns CLI
     Scenario: Report violations for incomplete annotations
       Given a TypeScript file "src/missing.ts" without pattern name
       When running "lint-patterns -i src/missing.ts"
-      Then exit code is 0
-      And stdout contains "warning"
+      Then exit code is 1
+      And stdout contains "error"
 
   # ============================================================================
   # RULE 5: Output Formats

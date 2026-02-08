@@ -14,13 +14,14 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       And the pattern has dependencies "EventStore" and "Workpool"
       And the pattern has stubs in the relationship index
       And the pattern has architecture context "orders"
+      And the pattern has deliverables
       When I assemble context for "OrderSaga" with session "design"
       Then the bundle contains metadata for "OrderSaga"
       And the bundle contains spec files
       And the bundle contains stubs
       And the bundle contains dependencies
       And the bundle contains architecture neighbors
-      And the bundle does NOT contain deliverables
+      And the bundle contains deliverables
       And the bundle does NOT contain FSM context
 
     @acceptance-criteria @happy-path
@@ -61,6 +62,12 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       Given a pattern "OrderSaga" exists in the dataset
       When I assemble context for "NonExistent" with session "design"
       Then an error is thrown with code "PATTERN_NOT_FOUND"
+
+    @acceptance-criteria @happy-path
+    Scenario: Description preserves Problem and Solution structure
+      Given a pattern "OrderSaga" with structured description
+      When I assemble context for "OrderSaga" with session "design"
+      Then the metadata summary contains "Problem:" and "Solution:"
 
   Rule: buildDepTree walks dependency chains with cycle detection
 

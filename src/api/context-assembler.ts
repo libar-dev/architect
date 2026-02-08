@@ -26,7 +26,7 @@ import type { ProcessStatusValue } from '../taxonomy/index.js';
 import type { NeighborEntry } from './types.js';
 import { QueryApiError } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
-import { extractFirstSentence } from '../utils/string-utils.js';
+import { extractDescription } from '../utils/string-utils.js';
 import {
   getPatternName,
   findPatternByName as findPatternByNameFromList,
@@ -210,7 +210,7 @@ function buildMetadata(pattern: ExtractedPattern): PatternContextMeta {
     phase: pattern.phase,
     category: pattern.category,
     file: pattern.source.file,
-    summary: extractFirstSentence(pattern.directive.description),
+    summary: extractDescription(pattern.directive.description),
   };
 }
 
@@ -371,9 +371,13 @@ export function assembleContext(
       }
     }
 
-    // Deliverables, FSM, and test files (implement only)
-    if (sessionType === 'implement') {
+    // Deliverables (design + implement)
+    if (sessionType === 'design' || sessionType === 'implement') {
       allDeliverables.push(...resolveDeliverables(api, name));
+    }
+
+    // FSM and test files (implement only)
+    if (sessionType === 'implement') {
       fsm = resolveFsm(api, pattern.status);
       allTestFiles.push(...resolveTestFiles(pattern));
     }

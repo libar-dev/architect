@@ -10,13 +10,14 @@ Feature: Context Formatter - Plain Text Rendering
 
     @acceptance-criteria @happy-path
     Scenario: Design bundle renders all populated sections
-      Given a design context bundle with metadata, stubs, and dependencies
+      Given a design context bundle with metadata, stubs, dependencies, and deliverables
       When I format the bundle
       Then the output contains all expected sections
         | section              |
         | === PATTERN:         |
         | === STUBS ===        |
         | === DEPENDENCIES === |
+        | === DELIVERABLES === |
 
     @acceptance-criteria @happy-path
     Scenario: Implement bundle renders deliverables and FSM

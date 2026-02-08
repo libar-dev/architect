@@ -278,3 +278,28 @@ export function extractFirstSentence(text: string): string {
   }
   return text.trim();
 }
+
+/**
+ * Extract a compact description preserving Problem/Solution structure.
+ *
+ * If the text uses `**Problem:**` / `**Solution:**` markers, extracts the
+ * first sentence from each section and combines them. Otherwise falls back
+ * to extractFirstSentence() behavior.
+ *
+ * @param text - Description text, possibly with Problem/Solution structure
+ * @returns Compact description preserving both halves if structured
+ */
+export function extractDescription(text: string): string {
+  if (!text) return '';
+
+  const problemMatch = /\*\*Problem:\*\*\s*([\s\S]+?)(?=\*\*Solution:\*\*|$)/.exec(text);
+  const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
+
+  if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
+    const problem = extractFirstSentence(problemMatch[1].trim());
+    const solution = extractFirstSentence(solutionMatch[1].trim());
+    return `Problem: ${problem} Solution: ${solution}`;
+  }
+
+  return extractFirstSentence(text);
+}

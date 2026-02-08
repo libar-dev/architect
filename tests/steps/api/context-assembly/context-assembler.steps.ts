@@ -90,6 +90,10 @@ describeFeature(feature, ({ Rule }) => {
               status: status as 'roadmap' | 'active' | 'completed' | 'deferred',
               phase,
               filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+              deliverables: [
+                { name: 'API design', status: 'Pending', tests: 0, location: 'src/api/design.ts' },
+                { name: 'Interface stubs', status: 'Done', tests: 1, location: 'src/api/stubs.ts' },
+              ],
             });
             // Manually add arch fields (not in TestPatternOptions)
             state.patterns.push({
@@ -155,6 +159,10 @@ describeFeature(feature, ({ Rule }) => {
           buildDatasetAndApi(state!.patterns);
         });
 
+        And('the pattern has deliverables', () => {
+          // Already set in Given step via deliverables option
+        });
+
         When(
           'I assemble context for {string} with session {string}',
           (_ctx: unknown, name: string, session: string) => {
@@ -187,8 +195,8 @@ describeFeature(feature, ({ Rule }) => {
           expect(state!.bundle!.architectureNeighbors.length).toBeGreaterThan(0);
         });
 
-        And('the bundle does NOT contain deliverables', () => {
-          expect(state!.bundle!.deliverables.length).toBe(0);
+        And('the bundle contains deliverables', () => {
+          expect(state!.bundle!.deliverables.length).toBeGreaterThan(0);
         });
 
         And('the bundle does NOT contain FSM context', () => {
@@ -436,6 +444,51 @@ describeFeature(feature, ({ Rule }) => {
         expect((state!.error as QueryApiError).code).toBe(code);
       });
     });
+
+    RuleScenario(
+      'Description preserves Problem and Solution structure',
+      ({ Given, When, Then }) => {
+        Given('a pattern {string} with structured description', (_ctx: unknown, name: string) => {
+          state = initState();
+          const base = createTestPattern({
+            name,
+            status: 'roadmap',
+            phase: 22,
+            filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+          });
+          state.patterns.push({
+            ...base,
+            directive: {
+              ...base.directive,
+              description:
+                '**Problem:** Orders fail silently during checkout. ' +
+                '**Solution:** Implement saga pattern for reliable order processing.',
+            },
+          } as ExtractedPattern);
+          buildDatasetAndApi(state.patterns);
+        });
+
+        When(
+          'I assemble context for {string} with session {string}',
+          (_ctx: unknown, name: string, session: string) => {
+            state!.bundle = assembleContext(state!.dataset!, state!.api!, {
+              patterns: [name],
+              sessionType: session as SessionType,
+              baseDir: process.cwd(),
+            });
+          }
+        );
+
+        Then(
+          'the metadata summary contains {string} and {string}',
+          (_ctx: unknown, part1: string, part2: string) => {
+            const summary = state!.bundle!.metadata[0]?.summary ?? '';
+            expect(summary).toContain(part1);
+            expect(summary).toContain(part2);
+          }
+        );
+      }
+    );
   });
 
   // ===========================================================================
