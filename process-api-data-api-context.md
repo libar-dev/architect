@@ -1,11 +1,10 @@
 # Process API Data API — Consolidated Session Context
 
-> **Purpose:** Self-contained context for sequencing design sessions, executing
-> implementation sessions, and creating the PR description for the Data API feature.
+> **Purpose:** PR scope tracker and session context for the Data API feature.
+> Tracks what's completed, what remains, and provides session checklists and templates.
 >
 > **Branch:** `feature/process-api-cli`
-> **Base commit:** `324c5e7` (plan-level specs complete)
-> **Created:** 2026-02-07
+> **Created:** 2026-02-07 | **Updated:** 2026-02-08 (post-validation consolidation)
 
 ---
 
@@ -27,10 +26,10 @@ that AI agents need.
 
 A multi-tier API improvement:
 
-- **Tier 1 (MVP):** Output shaping (594KB → 4KB) + stub integration
-- **Tier 2 (MVP):** Context assembly (one-command session start) + architecture queries
-- **Tier 3 (Next PR):** Session support (handoff, scope-validate) + relationship graph
-- **Tier 4 (Future):** CLI ergonomics (caching, REPL) + platform integration (MCP)
+- **Tier 1 (MVP):** Output shaping (594KB → 4KB) + stub integration — **DONE**
+- **Tier 2 (MVP):** Context assembly (one-command session start) + architecture queries — **DONE**
+- **Tier 3 (This PR):** Session support (handoff, scope-validate) + validation fixes (3A, 3B)
+- **Tier 4 (Future):** Relationship graph, CLI ergonomics (caching, REPL), platform integration (MCP)
 
 ### Key Architectural Insight
 
@@ -48,7 +47,7 @@ The gaps are:
 
 ## 2. What Already Exists (V1 Foundation)
 
-### V1 CLI (`src/cli/process-api.ts` — 529 lines, active)
+### CLI (`src/cli/process-api.ts` — 1216 lines, active)
 
 | Subcommand                          | What it does                               |
 | ----------------------------------- | ------------------------------------------ |
@@ -59,53 +58,60 @@ The gaps are:
 
 **V1 Specs (Phase 24, active with unlock):**
 
-- `ProcessStateAPICLI` — 6 deliverables (4 completed, 1 deferred: text formatter)
-- `ProcessStateAPIRelationshipQueries` — 4 deliverables (1 completed, 3 superseded)
+- `ProcessStateAPICLI` — 6 deliverables (4 completed, 1 deferred: text formatter, superseded by Data API)
+- `ProcessStateAPIRelationshipQueries` — 4 deliverables (1 completed, 3 superseded by DataAPIRelationshipGraph)
 
-### Existing Infrastructure
+### Infrastructure (Updated Post-MVP)
 
-| Component          | Location                    | Status                                                 |
-| ------------------ | --------------------------- | ------------------------------------------------------ |
-| ProcessStateAPI    | `src/api/process-state.ts`  | 27 methods, production                                 |
-| QueryResult types  | `src/api/types.ts`          | Defined but NOT wired into CLI                         |
-| MasterDataset      | `src/generators/pipeline/`  | Full pre-computed views                                |
-| Tag registry       | `src/taxonomy/`             | Extensible, supports new tags                          |
-| Relationship index | In MasterDataset            | `uses`, `usedBy`, `dependsOn`, `enables`, `implements` |
-| Architecture index | In MasterDataset            | `byContext`, `byLayer`, `byRole`                       |
-| CLI arg parsing    | `src/cli/process-api.ts`    | Manual for-loop + switch pattern                       |
-| Stub scan paths    | `package.json` (15 scripts) | `-i 'delivery-process/stubs/**/*.ts'` configured       |
+| Component          | Location                       | Status                                                      |
+| ------------------ | ------------------------------ | ----------------------------------------------------------- |
+| ProcessStateAPI    | `src/api/process-state.ts`     | 27 methods, production                                      |
+| QueryResult types  | `src/api/types.ts`             | Wired into CLI via output pipeline                          |
+| PatternSummarizer  | `src/api/summarize.ts`         | 594KB → 100 bytes per pattern projection                    |
+| FuzzyMatcher       | `src/api/fuzzy-match.ts`       | Tiered scoring: exact > prefix > substring > Levenshtein    |
+| ContextAssembler   | `src/api/context-assembler.ts` | Session-oriented context bundles from 5 MasterDataset views |
+| ContextFormatter   | `src/api/context-formatter.ts` | Plain text renderer (`=== SECTION ===` markers, ADR-008)    |
+| StubResolver       | `src/api/stub-resolver.ts`     | Stub discovery, resolution, AD-N decision extraction        |
+| ArchQueries        | `src/api/arch-queries.ts`      | Neighborhood, compare, tag usage, source inventory          |
+| CoverageAnalyzer   | `src/api/coverage-analyzer.ts` | Annotation coverage analysis, unannotated file detection    |
+| PatternHelpers     | `src/api/pattern-helpers.ts`   | Shared lookups: case-insensitive find, suggestions          |
+| OutputPipeline     | `src/cli/output-pipeline.ts`   | `--names-only`, `--count`, `--fields`, `--format`           |
+| MasterDataset      | `src/generators/pipeline/`     | Full pre-computed views                                     |
+| Tag registry       | `src/taxonomy/`                | Extended with `@libar-docs-target` and `@libar-docs-since`  |
+| Relationship index | In MasterDataset               | `uses`, `usedBy`, `dependsOn`, `enables`, `implements`      |
+| Architecture index | In MasterDataset               | `byContext`, `byLayer`, `byRole`                            |
+| CLI arg parsing    | `src/cli/process-api.ts`       | Manual for-loop + switch, 16+ subcommands                   |
+| Stub scan paths    | `package.json` (15 scripts)    | `-i 'delivery-process/stubs/**/*.ts'` configured            |
 
 ### Stub Annotation Status
 
-All 23 stubs in `delivery-process/stubs/` have been restructured:
+All stubs in `delivery-process/stubs/` are fully structured:
 
 - `@libar-docs` opt-in + `@libar-docs-implements` added to all stubs
+- `@libar-docs-target` and `@libar-docs-since` registered as taxonomy tags (DataAPIStubIntegration, completed)
 - `@target`/`@see`/`@since` converted to plain text (`Target:`, `See:`, `Since:`)
-- Stubs are scannable by the pipeline
-
-Phase B (registering `@libar-docs-target` and `@libar-docs-since` as taxonomy
-tags for structured access) is planned in DataAPIStubIntegration.
+- Stubs are scannable by the pipeline, visible via `stubs` and `decisions` subcommands
 
 ---
 
 ## 3. Data API Spec Inventory (8 Specs)
 
-### Dependency Graph (Post-Review)
+### Dependency Graph (with Status)
 
 ```
-                     ┌── DataAPIOutputShaping (25a, 3d)
+                     ┌── DataAPIOutputShaping (25a) ─────── [DONE] 8/8
 ProcessStateAPI ─────┤
-(V1, exists)         └── DataAPIContextAssembly (25b, 3d)
+(V1, exists)         └── DataAPIContextAssembly (25b) ───── [DONE] 7/7
                               │
-                              └── DataAPIDesignSessionSupport (25c, 1d)
+                              └── DataAPIDesignSessionSupport (25c) ── [DESIGNED]
                                     │
-DataAPIStubIntegration (25a, 2d) ──┘
+DataAPIStubIntegration (25a) ──────┘ ─────────────────────── [DONE] 7/7
 
-DataAPIArchitectureQueries (25b, 2d)     ← independent
+DataAPIArchitectureQueries (25b) ────────────────────────── [DONE] 6/6
 
-DataAPIRelationshipGraph (25c, 2d)       ← independent
-DataAPICLIErgonomics (25d, 2d)           ← independent, post-MVP
-DataAPIPlatformIntegration (25d, 3d)     ← independent, future
+DataAPIRelationshipGraph (25c) ──────────────────────────── [ROADMAP]
+DataAPICLIErgonomics (25d) ──────────────────────────────── [DEPRIORITIZED]
+DataAPIPlatformIntegration (25d) ────────────────────────── [FUTURE]
 ```
 
 **Key design decision:** OutputShaping and ContextAssembly are parallel consumers
@@ -115,169 +121,151 @@ while output shaping transforms pattern lists.
 
 ### Spec Detail Summary
 
-| Spec                            | Phase | Priority | Effort | Deliverables | Key Subcommands                                                                            |
-| ------------------------------- | ----- | -------- | ------ | ------------ | ------------------------------------------------------------------------------------------ |
-| **DataAPIOutputShaping**        | 25a   | high     | 3d     | 8            | `list`, `search`, `--names-only`, `--count`, `--fields`                                    |
-| **DataAPIStubIntegration**      | 25a   | high     | 2d     | 7 (1 done)   | `stubs`, `decisions`, `pdr`                                                                |
-| **DataAPIContextAssembly**      | 25b   | high     | 3d     | 7            | `context`, `files`, `dep-tree`, `overview`                                                 |
-| **DataAPIArchitectureQueries**  | 25b   | high     | 2d     | 6            | `arch neighborhood`, `arch compare`, `arch coverage`, `tags`, `sources`, `unannotated`     |
-| **DataAPIDesignSessionSupport** | 25c   | high     | 1d     | 4            | `scope-validate`, `handoff`                                                                |
-| **DataAPIRelationshipGraph**    | 25c   | medium   | 2d     | 6            | `graph`, `graph impact`, `graph path`, `graph dangling`, `graph orphans`, `graph blocking` |
-| **DataAPICLIErgonomics**        | 25d   | medium   | 2d     | 6            | `repl`, `--dry-run`, per-subcommand `--help`                                               |
-| **DataAPIPlatformIntegration**  | 25d   | medium   | 3d     | 8            | MCP server, `generate-context-layer`, `cross-package`, `watch`                             |
+| Spec                            | Phase | Status                         | Deliverables | Key Subcommands                                                                            |
+| ------------------------------- | ----- | ------------------------------ | ------------ | ------------------------------------------------------------------------------------------ |
+| **DataAPIOutputShaping**        | 25a   | **completed** (8/8 done)       | 8            | `list`, `search`, `--names-only`, `--count`, `--fields`                                    |
+| **DataAPIStubIntegration**      | 25a   | **completed** (7/7 done)       | 7            | `stubs`, `decisions`, `pdr`                                                                |
+| **DataAPIContextAssembly**      | 25b   | **completed** (7/7 done)       | 7            | `context`, `files`, `dep-tree`, `overview`                                                 |
+| **DataAPIArchitectureQueries**  | 25b   | **completed** (6/6 done)       | 6            | `arch neighborhood`, `arch compare`, `arch coverage`, `tags`, `sources`, `unannotated`     |
+| **DataAPIDesignSessionSupport** | 25c   | **designed** (stubs + PDR-002) | 4            | `scope-validate`, `handoff`                                                                |
+| **DataAPIRelationshipGraph**    | 25c   | roadmap                        | 6            | `graph`, `graph impact`, `graph path`, `graph dangling`, `graph orphans`, `graph blocking` |
+| **DataAPICLIErgonomics**        | 25d   | deprioritized                  | 6            | `repl`, `--dry-run`, per-subcommand `--help`                                               |
+| **DataAPIPlatformIntegration**  | 25d   | future                         | 8            | MCP server, `generate-context-layer`, `cross-package`, `watch`                             |
 
 ---
 
-## 4. MVP Scope for Current PR
+## 4. PR Scope
 
-### What Ships in This PR
+### Completed (Tier 1+2 MVP — 28 deliverables, 16 subcommands, 4 code reviews)
 
-**Tier 1 + Tier 2 specs** — the specs that transform the CLI from unusable to useful:
+| Spec                       | Deliverables | Impact                                                                       |
+| -------------------------- | ------------ | ---------------------------------------------------------------------------- |
+| DataAPIOutputShaping       | 8/8 done     | 594KB → 4KB, `summarizePattern()`, `--names-only`, `--count`, fuzzy matching |
+| DataAPIStubIntegration     | 7/7 done     | Taxonomy tags (`target`, `since`), `stubs`, `decisions` subcommands          |
+| DataAPIContextAssembly     | 7/7 done     | `context --session`, `dep-tree`, `overview` — core value prop                |
+| DataAPIArchitectureQueries | 6/6 done     | `arch neighborhood`, `arch coverage`, `tags`, `sources`, `unannotated`       |
 
-| Spec                       | Why MVP                                         | Highest-Impact Deliverables                                     |
-| -------------------------- | ----------------------------------------------- | --------------------------------------------------------------- |
-| DataAPIOutputShaping       | 594KB → 4KB, eliminates #1 usability problem    | `summarizePattern()`, `--names-only`, `--count`, fuzzy matching |
-| DataAPIStubIntegration     | Unlocks design session stub metadata            | taxonomy tags (`target`, `since`), `stubs` subcommand           |
-| DataAPIContextAssembly     | "Replace 5-10 explore agents" — core value prop | `context --session`, `dep-tree`, `overview`                     |
-| DataAPIArchitectureQueries | Deep architecture exploration for sessions      | `arch neighborhood`, `arch coverage`, `tags`                    |
+**Validated:** First real design session using API achieved 60% explore agent elimination,
+25-35% token reduction. See `process-api-validation-learnings.md` for full metrics.
 
-**Estimated total: ~10d of implementation work** across 4 specs.
+### Remaining This PR
 
-### What Does NOT Ship in This PR
+| Item                                               | Effort   | Priority | Status                   |
+| -------------------------------------------------- | -------- | -------- | ------------------------ |
+| Fix 3A: deliverables in `context --session design` | Small    | P0       | Pending                  |
+| Fix 3B: full Problem/Solution in context output    | Small    | P0       | Pending                  |
+| CLAUDE.md update with 16 new subcommands           | ~1-2 hrs | P1       | Pending                  |
+| DataAPIDesignSessionSupport implementation         | ~1 day   | P1       | Design done, stubs exist |
+| Update dist                                        | 10 min   | P1       | Pending                  |
+| Validation: design session using updated API       | ~30 min  | P1       | Pending                  |
 
-| Spec                        | Why Deferred                                 | When    |
-| --------------------------- | -------------------------------------------- | ------- |
-| DataAPIDesignSessionSupport | Depends on ContextAssembly + StubIntegration | Next PR |
-| DataAPIRelationshipGraph    | Medium priority, not blocking sessions       | Next PR |
-| DataAPICLIErgonomics        | Performance optimization, post-MVP           | Future  |
-| DataAPIPlatformIntegration  | MCP server, monorepo features                | Future  |
+**Fix 3A detail:** `context --session design` omits the deliverables table. The session-type
+inclusion matrix in `context-assembler.ts` shows deliverables only for `implement`. During
+validation, the agent had to read the spec file separately to see deliverables — the table
+defines stub targets and is critical input for design sessions.
+
+**Fix 3B detail:** `context --session design` truncates description to the first line. The
+full Problem/Solution block is the actual design input. Extending to include the full
+description (or first paragraph) makes design context self-contained.
+
+### Deferred
+
+| Spec                       | Why Deferred                                                                                                            | When               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| DataAPIRelationshipGraph   | Medium priority, not blocking sessions. Good next-PR candidate.                                                         | Next PR            |
+| DataAPICLIErgonomics       | Deprioritized per validation: response times fine (~5s), information completeness per command has higher ROI than speed | Future             |
+| DataAPIPlatformIntegration | MCP server + monorepo cross-package queries. Large scope (3d, 8 deliverables). Needs real monorepo validation first.    | Post-monorepo bump |
+| 3C: `pattern --full`       | Scenario text extraction from Gherkin AST. Medium effort, high ROI.                                                     | Next PR            |
 
 ### Success Criteria
 
-The PR is done when:
+| Criterion                                                           | Status  |
+| ------------------------------------------------------------------- | ------- |
+| `list --status active` returns compact summaries (not 594KB JSON)   | **MET** |
+| `context <pattern> --session design` returns curated context bundle | **MET** |
+| `stubs <pattern>` returns stub files with target paths              | **MET** |
+| `arch coverage` reports annotation completeness                     | **MET** |
+| All existing tests pass                                             | **MET** |
+| CLAUDE.md updated with new subcommand documentation                 | Pending |
+| `pnpm process:query -- <subcommand>` works for all new subcommands  | **MET** |
+| 3A+3B fixes validated (design context includes deliverables + desc) | Pending |
+| DataAPIDesignSessionSupport `scope-validate` + `handoff` working    | Pending |
 
-1. `process-api list --status active` returns compact summaries (not 594KB JSON)
-2. `process-api context <pattern> --session design` returns curated context bundle
-3. `process-api stubs <pattern>` returns stub files with target paths
-4. `process-api arch coverage` reports annotation completeness
-5. All existing tests continue to pass
-6. CLAUDE.md updated with new subcommand documentation
-7. `pnpm process:query -- <subcommand>` works for all new subcommands
+### Monorepo Pre-Bump Checklist
 
----
-
-## 5. Design Session Sequencing
-
-Design sessions expand plan-level specs into implementation-level detail.
-Sessions can run in parallel where specs are independent.
-
-### Recommended Session Order
-
-#### Wave 1 (Can run in parallel — no dependencies between them)
-
-**DS-A: DataAPIOutputShaping Design**
-
-- Input: OutputShaping spec + V1 CLI code + `src/api/types.ts`
-- Decisions needed:
-  - `summarizePattern()` field selection and type
-  - Output modifier pipeline architecture (middleware chain vs. post-processing)
-  - QueryResult envelope wiring strategy
-  - Config file format and resolution (reuse `delivery-process.config.ts`?)
-  - Fuzzy matching algorithm (Levenshtein vs. substring vs. custom)
-- Stubs to create: `src/api/summarize.ts`, `src/cli/output-pipeline.ts`
-
-**DS-B: DataAPIStubIntegration Design**
-
-- Input: StubIntegration spec + taxonomy module + existing stub files
-- Decisions needed:
-  - `@libar-docs-target` and `@libar-docs-since` tag format (value type)
-  - `ExtractedPattern` schema extension for `targetPath` and `since` fields
-  - Stub-to-implementation resolver approach (file existence check)
-  - AD-N decision extraction strategy (regex from description text)
-- Stubs to create: `src/api/stub-resolver.ts`
-
-#### Wave 2 (After Wave 1 designs are complete)
-
-**DS-C: DataAPIContextAssembly Design**
-
-- Input: ContextAssembly spec + MasterDataset schema + relationship/arch indexes
-- Decisions needed:
-  - `ContextBundle` type design (what fields, what structure)
-  - Context assembler algorithm (walk order, what to include per session type)
-  - Text renderer format (section headers, indentation, markers)
-  - Multi-pattern merge strategy (dedup shared deps)
-  - `overview` aggregation logic
-- Stubs to create: `src/api/context-assembler.ts`, `src/api/context-formatter.ts`
-- Note: Can start after DS-A if `summarizePattern()` type is settled (for dep lists)
-
-**DS-D: DataAPIArchitectureQueries Design**
-
-- Input: ArchitectureQueries spec + existing `arch` subcommand code + archIndex
-- Decisions needed:
-  - Neighborhood algorithm (1-hop vs. configurable depth)
-  - Coverage analyzer scope (what counts as "scannable"?)
-  - Cross-context comparison output format
-  - Tags/sources aggregation from MasterDataset
-- Stubs to create: `src/api/coverage-analyzer.ts`
-- Note: Independent of DS-A/DS-B, can run in Wave 1 if capacity allows
-
-### Design Session Context Pattern
-
-For each design session, use:
-
-```bash
-pnpm process:query -- pattern <SpecPatternName>
-```
-
-Plus read:
-
-- The spec file (from the pattern's filePath)
-- The V1 CLI (`src/cli/process-api.ts`)
-- The ProcessStateAPI (`src/api/process-state.ts`)
-- The relevant MasterDataset types (`src/validation-schemas/master-dataset.ts`)
+- [ ] Fix 3A: Include deliverables in `--session design` context
+- [ ] Fix 3B: Extend description to full Problem/Solution block
+- [ ] Update CLAUDE.md with new subcommand documentation
+- [ ] Implement DataAPIDesignSessionSupport (4 deliverables)
+- [ ] Commit and update dist
+- [ ] Bump package version in monorepo
+- [ ] Update monorepo's DESIGN-SESSION-GUIDE.md with Process API commands
+- [ ] Run DS-3 as first monorepo validation
 
 ---
 
-## 6. Implementation Session Sequencing
+## 5. Design Session Results
 
-After design sessions complete, implementation follows the FSM workflow:
-`roadmap → active → completed`
+### MVP Design Sessions (DS-A through DS-D — Implicit)
 
-### Recommended Implementation Order
+The 4 MVP specs (OutputShaping, StubIntegration, ContextAssembly, ArchitectureQueries)
+proceeded directly from plan-level specs to implementation without explicit design sessions.
+Design decisions were made during implementation and captured in ADR-007 (QueryResult envelope
+at CLI layer) and ADR-008 (text output path for context commands).
 
-1. **DataAPIOutputShaping** — builds foundation all other specs benefit from
-   - `summarizePattern()` used by list, context, arch queries
-   - Output modifier pipeline (`--names-only`, `--count`, `--fields`) is reusable
-   - QueryResult envelope applies to all subcommands
-   - Config file defaults reduce all subcommand invocations
+### DS-E: DataAPIDesignSessionSupport (Explicit — 2026-02-07)
 
-2. **DataAPIStubIntegration** — enables richer context assembly
-   - Taxonomy tags make stub metadata structured
-   - `stubs` subcommand validates stub visibility
-   - Must complete before DesignSessionSupport can ship
+The first real API-validated design session. Self-referential: designed the session support
+tools (`scope-validate`, `handoff`) while using the API to gather context.
 
-3. **DataAPIContextAssembly** — the flagship feature
-   - `context --session` is the "replace elaborate prompts" command
-   - Uses `summarizePattern()` from OutputShaping
-   - Uses stub metadata from StubIntegration (enrichment, not blocker)
+**Artifacts created:**
 
-4. **DataAPIArchitectureQueries** — extends existing `arch` subcommand
-   - Can run in parallel with ContextAssembly (independent)
-   - `arch coverage` is high-value for dogfooding
+| File                                                                      | Purpose                                                        |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `delivery-process/decisions/pdr-002-session-workflow-commands.feature`    | 7 design decisions (DD-1 through DD-7)                         |
+| `delivery-process/stubs/DataAPIDesignSessionSupport/scope-validator.ts`   | Types + 8 function signatures for composable pre-flight checks |
+| `delivery-process/stubs/DataAPIDesignSessionSupport/handoff-generator.ts` | Types + 2 function signatures for session handoff generation   |
 
-### Implementation Session FSM Transitions
+**Key design decisions (DD-1 through DD-7):**
 
-For each spec being implemented:
+| DD   | Decision                                                 | Rationale                                                 |
+| ---- | -------------------------------------------------------- | --------------------------------------------------------- |
+| DD-1 | Text output with `=== MARKERS ===`                       | AI-consumption focused, per ADR-008                       |
+| DD-2 | Git integration opt-in via `--git` flag                  | Keeps core logic pure and testable                        |
+| DD-3 | Session type inferred from FSM status                    | `active`→implement, `roadmap`→design, `completed`→review  |
+| DD-4 | BLOCKED for hard prerequisites, WARN for recommendations | Matches Process Guard severity model                      |
+| DD-5 | Current date only for handoff                            | Backdating is a rare edge case                            |
+| DD-6 | Both positional and flag forms for `--type`              | CLI ergonomics, consistent with existing patterns         |
+| DD-7 | Co-located formatter functions                           | Simpler than assembler/formatter split for these commands |
 
-```gherkin
-# Before any code:
-@libar-docs-status:active    # in the spec file
+**Validation baseline:** 60% explore agent elimination, 25-35% token reduction, 41%
+context headroom remaining. See `process-api-validation-learnings.md` for full metrics
+and `process-api-integration-assessment.md` §5 for the consolidated validation baseline.
 
-# After ALL deliverables complete:
-@libar-docs-status:completed  # in the spec file
-```
+---
 
-Active = scope-locked (no new deliverables). Completed = hard-locked (needs unlock).
+## 6. Implementation Status
+
+### Completed Specs (28/32 deliverables)
+
+| Spec                       | FSM Journey                  | Deliverables | Code Reviews |
+| -------------------------- | ---------------------------- | ------------ | ------------ |
+| DataAPIOutputShaping       | roadmap → active → completed | 8/8          | 4 rounds     |
+| DataAPIStubIntegration     | roadmap → active → completed | 7/7          | 4 rounds     |
+| DataAPIContextAssembly     | roadmap → active → completed | 7/7          | 4 rounds     |
+| DataAPIArchitectureQueries | roadmap → active → completed | 6/6          | 4 rounds     |
+
+### Next: DataAPIDesignSessionSupport (4 deliverables)
+
+Design session completed (2026-02-07). Stubs and PDR-002 decision spec created.
+Ready for implementation session: `roadmap → active → completed`.
+
+| Deliverable                | Location                     | Stub Exists |
+| -------------------------- | ---------------------------- | ----------- |
+| Scope validation logic     | src/api/scope-validator.ts   | Yes         |
+| scope-validate subcommand  | src/cli/process-api.ts       | —           |
+| Handoff document generator | src/api/handoff-generator.ts | Yes         |
+| handoff subcommand         | src/cli/process-api.ts       | —           |
 
 ---
 
@@ -330,6 +318,7 @@ build on them, not revisit them.
 | **Config file reuses `delivery-process.config.ts`**   | Already exists, already loaded by pipeline. Add default paths.                                                                                    |
 | **Manual arg parsing continues**                      | Consistent with existing CLI pattern (for-loop + switch, no commander.js).                                                                        |
 | **QueryResult envelope for all output**               | Types exist in `src/api/types.ts`. Wire into CLI output layer.                                                                                    |
+| **Session support: co-located formatters (DD-7)**     | `scope-validator.ts` and `handoff-generator.ts` each export both builder + formatter. See PDR-002 for DD-1 through DD-7.                          |
 
 ---
 
@@ -337,7 +326,7 @@ build on them, not revisit them.
 
 ### PR Title
 
-`feat: Data API output shaping, context assembly, architecture queries, and stub integration`
+`feat: Process API Data API — output shaping, context assembly, architecture queries, stub integration, and session support`
 
 ### PR Summary Points
 
@@ -355,8 +344,21 @@ build on them, not revisit them.
    with implementation status. `decisions` and `pdr` surface design rationale.
 
 4. **Architecture Queries** — `arch neighborhood` shows 1-hop connections.
-   `arch coverage` reports annotation completeness. `tags` and `sources` provide
-   taxonomy and inventory discovery. `unannotated` finds files missing annotations.
+   `arch coverage` reports annotation completeness (85%, 112/138 files). `tags` and
+   `sources` provide taxonomy and inventory discovery. `unannotated` finds gaps.
+
+5. **Session Support** — `scope-validate` runs pre-flight checks (dependency status,
+   FSM readiness, deliverables defined). `handoff` generates session state summaries
+   for multi-session work. Composable check functions, individually testable.
+
+### Validated Impact
+
+- **60% explore agent elimination** on first real design session use
+- **25-35% token reduction** (189K vs estimated 250-300K pre-API)
+- **41% context headroom remaining** (vs ~20% in pre-API sessions)
+- Explore agents dropped from 5-7 → 1 (comprehension-only)
+- Better design quality: API-assisted sessions produced stricter pure-function
+  discipline, cross-cutting consistency, and composable architecture
 
 ### What This Enables
 
@@ -364,6 +366,7 @@ build on them, not revisit them.
 - AI agents get compact, targeted output instead of 594KB JSON dumps
 - Design session context (spec + stubs + deps + architecture) assembled automatically
 - Architecture coverage gaps are discoverable and trackable
+- Pre-flight session checks prevent wasted effort on unready patterns
 
 ---
 
@@ -395,22 +398,29 @@ All new tests must be `.feature` files with step definitions. No `.test.ts` file
 
 ### For Any Design/Implementation Session
 
-| Priority | File                                       | Why                                          |
-| -------- | ------------------------------------------ | -------------------------------------------- |
-| Must     | The spec being worked on                   | Requirements and acceptance criteria         |
-| Must     | `src/cli/process-api.ts`                   | V1 CLI structure, arg parsing pattern        |
-| Must     | `src/api/process-state.ts`                 | ProcessStateAPI methods                      |
-| Must     | `src/api/types.ts`                         | QueryResult types, existing type definitions |
-| Should   | `src/validation-schemas/master-dataset.ts` | MasterDataset schema                         |
-| Should   | `src/generators/pipeline/index.ts`         | Transform pipeline                           |
-| Should   | `src/taxonomy/registry-builder.ts`         | Tag registration (for StubIntegration)       |
+| Priority | File                                       | Why                                           |
+| -------- | ------------------------------------------ | --------------------------------------------- |
+| Must     | The spec being worked on                   | Requirements and acceptance criteria          |
+| Must     | `src/cli/process-api.ts`                   | CLI structure, arg parsing, subcommand router |
+| Must     | `src/api/process-state.ts`                 | ProcessStateAPI 27 methods                    |
+| Must     | `src/api/types.ts`                         | QueryResult types, existing type definitions  |
+| Should   | `src/api/context-assembler.ts`             | Session-oriented context bundle builder       |
+| Should   | `src/api/context-formatter.ts`             | Text formatter with `=== SECTION ===` markers |
+| Should   | `src/api/stub-resolver.ts`                 | Stub discovery, AD-N extraction, PDR refs     |
+| Should   | `src/cli/output-pipeline.ts`               | Output modifiers and formatting               |
+| Should   | `src/validation-schemas/master-dataset.ts` | MasterDataset schema                          |
 
-### For Context Assembly Specifically
+### For DataAPIDesignSessionSupport Implementation
 
-| File                                           | Why                                   |
-| ---------------------------------------------- | ------------------------------------- |
-| `src/generators/pipeline/transform-dataset.ts` | Relationship and arch index building  |
-| `src/validation-schemas/extracted-pattern.ts`  | Pattern fields available for assembly |
+| File                                                                      | Why                                                  |
+| ------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `delivery-process/specs/data-api-session-support.feature`                 | Spec with 4 deliverables, 4 scenarios                |
+| `delivery-process/stubs/DataAPIDesignSessionSupport/scope-validator.ts`   | Types + function signatures from design              |
+| `delivery-process/stubs/DataAPIDesignSessionSupport/handoff-generator.ts` | Types + function signatures from design              |
+| `delivery-process/decisions/pdr-002-session-workflow-commands.feature`    | 7 design decisions (DD-1 through DD-7)               |
+| `src/api/context-assembler.ts`                                            | Reusable helpers: `requirePattern()`, `resolveFsm()` |
+| `src/api/context-formatter.ts`                                            | `=== MARKERS ===` formatting conventions             |
+| `src/validation/dod-validator.ts`                                         | `isDeliverableComplete()` for handoff logic          |
 
 ---
 
@@ -418,22 +428,82 @@ All new tests must be `.feature` files with step definitions. No `.test.ts` file
 
 ### Design Session Start
 
-- [ ] Read this context document
-- [ ] Read the target spec file
-- [ ] Read V1 CLI (`src/cli/process-api.ts`)
-- [ ] Read ProcessStateAPI (`src/api/process-state.ts`)
-- [ ] Read relevant MasterDataset types
+- [ ] Run API commands FIRST for context gathering, BEFORE launching explore agents:
+  ```bash
+  pnpm process:query -- context <SpecName> --session design
+  pnpm process:query -- dep-tree <SpecName>
+  pnpm process:query -- overview
+  pnpm process:query -- stubs <SpecName>
+  pnpm process:query -- arch neighborhood <DependencyPattern>
+  pnpm process:query -- list --status completed --names-only
+  ```
+- [ ] Only use explore agents for comprehension questions (implementation patterns,
+      formatting conventions, type definitions) that the API doesn't cover
+- [ ] Read the target spec file (for scenario text and acceptance criteria)
 - [ ] Create stubs in `delivery-process/stubs/{spec-name}/`
 - [ ] Document decisions as PDR features if architecturally significant
 - [ ] Do NOT transition spec status or write implementation code
+- [ ] At session end, note an effectiveness log: which API commands used, where
+      explore agents were still needed, any missing information in command output
 
 ### Implementation Session Start
 
-- [ ] Read this context document
-- [ ] Read the target spec file (requirements + deliverables)
+- [ ] Run API commands for context:
+  ```bash
+  pnpm process:query -- context <SpecName> --session implement
+  pnpm process:query -- dep-tree <SpecName>
+  pnpm process:query -- stubs <SpecName>
+  ```
 - [ ] Read design session stubs (if created)
 - [ ] Transition spec to `@libar-docs-status:active` BEFORE writing code
 - [ ] For each deliverable: implement, test, update status
 - [ ] Transition to `@libar-docs-status:completed` only when ALL done
 - [ ] Run `pnpm docs:all` to regenerate
 - [ ] Run `pnpm lint && pnpm test` to verify
+
+### Validated Design Session Prompt Template
+
+```markdown
+## Design Session: <SpecName>
+
+Design session for the next spec: **<SpecName>** (Phase X, N deliverables,
+M subcommands: `cmd1`, `cmd2`).
+
+Dependencies are done: <DepA> + <DepB> both completed.
+
+### Session rules
+
+- This is a design session — no implementation code, no FSM transitions.
+- Record decisions as `.feature` files in `delivery-process/decisions/`.
+- Code stubs go in `delivery-process/stubs/<SpecName>/`.
+- Make breaking changes freely — nothing is released.
+
+### Process API commands
+
+Run these FIRST for context gathering, BEFORE launching explore agents:
+
+    pnpm process:query -- context <SpecName> --session design
+    pnpm process:query -- dep-tree <SpecName>
+    pnpm process:query -- overview
+    pnpm process:query -- stubs <SpecName>
+    pnpm process:query -- arch neighborhood <DependencyPattern>
+    pnpm process:query -- list --status completed --names-only
+
+Only use explore agents for comprehension questions (implementation patterns,
+formatting conventions, type definitions) that the API doesn't cover.
+
+### Effectiveness log
+
+At session end, note:
+
+1. Which API commands you used and what they provided
+2. Where you still needed explore agents or file reads
+3. Any missing information in command output
+
+### Key context
+
+@process-api-integration-assessment.md
+@docs/INDEX.md
+@docs/METHODOLOGY.md
+@docs/SESSION-GUIDES.md
+```
