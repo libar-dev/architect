@@ -11,6 +11,7 @@ import {
   formatHandoff,
   type HandoffDocument,
 } from '../../../../src/api/handoff-generator.js';
+import { QueryApiError } from '../../../../src/api/types.js';
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
 import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
 import { createProcessStateAPI } from '../../../../src/api/process-state.js';
@@ -29,6 +30,7 @@ interface HandoffTestState {
   dataset: MasterDataset | null;
   doc: HandoffDocument | null;
   formattedOutput: string;
+  thrownError: unknown;
 }
 
 let state: HandoffTestState | null = null;
@@ -39,6 +41,7 @@ function initState(): HandoffTestState {
     dataset: null,
     doc: null,
     formattedOutput: '',
+    thrownError: null,
   };
 }
 
@@ -97,6 +100,15 @@ describeFeature(feature, ({ Rule }) => {
         const completedSection = state!.doc!.sections.find((s) => s.title === 'COMPLETED');
         expect(completedSection).toBeDefined();
         expect(completedSection!.items).toHaveLength(2);
+      });
+
+      And('the handoff lists in-progress deliverables', () => {
+        const inProgressSection = state!.doc!.sections.find((s) => s.title === 'IN PROGRESS');
+        expect(inProgressSection).toBeDefined();
+        // D3 has 'in-progress' status — should appear here
+        // D4 has 'planned' status — excluded by isStatusPending
+        expect(inProgressSection!.items).toHaveLength(1);
+        expect(inProgressSection!.items[0]).toContain('D3');
       });
 
       And('the handoff lists remaining deliverables as next priorities', () => {
@@ -175,6 +187,56 @@ describeFeature(feature, ({ Rule }) => {
       });
     });
 
+    RuleScenario('Completed pattern infers review session type', ({ Given, When, Then }) => {
+      Given('a completed pattern', () => {
+        state = initState();
+      });
+
+      When('generating a handoff document without explicit session type', () => {
+        const focal = createTestPattern({
+          name: 'CompletedPattern',
+          status: 'completed',
+          filePath: 'specs/completed-pattern.feature',
+        });
+
+        const { api, dataset } = buildApiAndDataset([focal]);
+        state!.api = api;
+        state!.dataset = dataset;
+        state!.doc = generateHandoff(api, dataset, {
+          patternName: 'CompletedPattern',
+        });
+      });
+
+      Then('the inferred session type is review', () => {
+        expect(state!.doc!.sessionType).toBe('review');
+      });
+    });
+
+    RuleScenario('Deferred pattern infers design session type', ({ Given, When, Then }) => {
+      Given('a deferred pattern', () => {
+        state = initState();
+      });
+
+      When('generating a handoff document without explicit session type', () => {
+        const focal = createTestPattern({
+          name: 'DeferredPattern',
+          status: 'deferred',
+          filePath: 'specs/deferred-pattern.feature',
+        });
+
+        const { api, dataset } = buildApiAndDataset([focal]);
+        state!.api = api;
+        state!.dataset = dataset;
+        state!.doc = generateHandoff(api, dataset, {
+          patternName: 'DeferredPattern',
+        });
+      });
+
+      Then('the inferred session type is design', () => {
+        expect(state!.doc!.sessionType).toBe('design');
+      });
+    });
+
     RuleScenario('Files modified section included when provided', ({ Given, When, Then }) => {
       Given('an active pattern with completed and remaining deliverables', () => {
         state = initState();
@@ -241,6 +303,31 @@ describeFeature(feature, ({ Rule }) => {
         expect(blockersSection!.items.length).toBeGreaterThan(0);
         expect(blockersSection!.items[0]).not.toBe('None');
         expect(blockersSection!.items[0]).toContain('IncompleteDep');
+      });
+    });
+
+    RuleScenario('Pattern not found throws error', ({ Given, When, Then }) => {
+      Given('no patterns in the dataset', () => {
+        state = initState();
+        const { api, dataset } = buildApiAndDataset([]);
+        state.api = api;
+        state.dataset = dataset;
+      });
+
+      When('generating a handoff for a nonexistent pattern', () => {
+        try {
+          generateHandoff(state!.api!, state!.dataset!, {
+            patternName: 'NonexistentPattern',
+          });
+        } catch (err: unknown) {
+          state!.thrownError = err;
+        }
+      });
+
+      Then('a PATTERN_NOT_FOUND error is thrown', () => {
+        expect(state!.thrownError).toBeInstanceOf(QueryApiError);
+        const error = state!.thrownError as QueryApiError;
+        expect(error.code).toBe('PATTERN_NOT_FOUND');
       });
     });
   });

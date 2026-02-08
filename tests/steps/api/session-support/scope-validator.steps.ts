@@ -11,6 +11,7 @@ import {
   formatScopeValidation,
   type ScopeValidationResult,
 } from '../../../../src/api/scope-validator.js';
+import { QueryApiError } from '../../../../src/api/types.js';
 import { createTestPattern } from '../../../fixtures/pattern-factories.js';
 import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
 import { createProcessStateAPI } from '../../../../src/api/process-state.js';
@@ -29,6 +30,7 @@ interface ScopeValidatorTestState {
   dataset: MasterDataset | null;
   result: ScopeValidationResult | null;
   formattedOutput: string;
+  thrownError: unknown;
 }
 
 let state: ScopeValidatorTestState | null = null;
@@ -39,6 +41,7 @@ function initState(): ScopeValidatorTestState {
     dataset: null,
     result: null,
     formattedOutput: '',
+    thrownError: null,
   };
 }
 
@@ -258,6 +261,69 @@ describeFeature(feature, ({ Rule }) => {
         expect(delCheck!.severity).toBe('BLOCKED');
       });
     });
+
+    RuleScenario('Strict mode promotes WARN to BLOCKED', ({ Given, When, Then, And }) => {
+      Given('a pattern with warnings but no blockers', () => {
+        state = initState();
+      });
+
+      When('validating scope with strict mode', () => {
+        // Pattern with deliverables but no PDR refs and no executable specs → 2 WARNs
+        const focal = createTestPattern({
+          name: 'WarnPattern',
+          status: 'roadmap',
+          filePath: 'specs/warn.feature',
+          deliverables: [{ name: 'D1', status: 'planned', tests: 0, location: 'src/a.ts' }],
+        });
+
+        const { api, dataset } = buildApiAndDataset([focal]);
+        state!.api = api;
+        state!.dataset = dataset;
+        state!.result = validateScope(api, dataset, {
+          patternName: 'WarnPattern',
+          scopeType: 'implement',
+          baseDir: '/test',
+          strict: true,
+        });
+      });
+
+      Then('the verdict is "blocked"', () => {
+        expect(state!.result!.verdict).toBe('blocked');
+      });
+
+      And('warnings are promoted to BLOCKED severity', () => {
+        const warnChecks = state!.result!.checks.filter((c) => c.severity === 'WARN');
+        expect(warnChecks).toHaveLength(0);
+        const blockedChecks = state!.result!.checks.filter((c) => c.severity === 'BLOCKED');
+        expect(blockedChecks.length).toBeGreaterThan(0);
+      });
+    });
+
+    RuleScenario('Pattern not found throws error', ({ Given, When, Then }) => {
+      Given('no patterns in the dataset', () => {
+        state = initState();
+        const { api, dataset } = buildApiAndDataset([]);
+        state.api = api;
+        state.dataset = dataset;
+      });
+
+      When('validating scope for a nonexistent pattern', () => {
+        try {
+          validateScope(state!.api!, state!.dataset!, {
+            patternName: 'NonExistent',
+            scopeType: 'implement',
+            baseDir: '/test',
+          });
+        } catch (err) {
+          state!.thrownError = err;
+        }
+      });
+
+      Then('a PATTERN_NOT_FOUND error is thrown', () => {
+        expect(state!.thrownError).toBeInstanceOf(QueryApiError);
+        expect((state!.thrownError as QueryApiError).code).toBe('PATTERN_NOT_FOUND');
+      });
+    });
   });
 
   // ===========================================================================
@@ -291,6 +357,50 @@ describeFeature(feature, ({ Rule }) => {
         expect(state!.result!.verdict).toBe('ready');
       });
     });
+
+    RuleScenario(
+      'Design session with dependencies lacking stubs produces WARN',
+      ({ Given, When, Then, And }) => {
+        Given('a pattern with dependencies that have no stubs', () => {
+          state = initState();
+        });
+
+        When('validating scope for design session', () => {
+          const dep = createTestPattern({
+            name: 'DepWithoutStubs',
+            status: 'completed',
+            filePath: 'specs/dep.feature',
+          });
+          const focal = createTestPattern({
+            name: 'DesignTarget',
+            status: 'roadmap',
+            filePath: 'specs/design-target.feature',
+            dependsOn: ['DepWithoutStubs'],
+          });
+
+          const { api, dataset } = buildApiAndDataset([focal, dep]);
+          state!.api = api;
+          state!.dataset = dataset;
+          state!.result = validateScope(api, dataset, {
+            patternName: 'DesignTarget',
+            scopeType: 'design',
+            baseDir: '/test',
+          });
+        });
+
+        Then('the stubs check shows WARN', () => {
+          const stubsCheck = state!.result!.checks.find((c) => c.id === 'stubs-from-deps-exist');
+          expect(stubsCheck).toBeDefined();
+          expect(stubsCheck!.severity).toBe('WARN');
+        });
+
+        And('the blocker names include the dependency without stubs', () => {
+          const stubsCheck = state!.result!.checks.find((c) => c.id === 'stubs-from-deps-exist');
+          expect(stubsCheck!.blockerNames).toBeDefined();
+          expect(stubsCheck!.blockerNames).toContain('DepWithoutStubs');
+        });
+      }
+    );
   });
 
   // ===========================================================================
@@ -336,5 +446,84 @@ describeFeature(feature, ({ Rule }) => {
         expect(state!.formattedOutput).toContain('=== VERDICT ===');
       });
     });
+
+    RuleScenario('Formatter shows warnings verdict text', ({ Given, When, Then }) => {
+      Given('a scope validation result with warnings but no blockers', () => {
+        state = initState();
+        state.result = {
+          pattern: 'WarnPattern',
+          scopeType: 'implement',
+          checks: [
+            {
+              id: 'dependencies-completed',
+              label: 'Dependencies completed',
+              severity: 'PASS',
+              detail: '2/2 completed',
+            },
+            {
+              id: 'design-decisions-recorded',
+              label: 'Design decisions recorded',
+              severity: 'WARN',
+              detail: 'No PDR references found in stubs',
+            },
+          ],
+          verdict: 'warnings',
+          blockerCount: 0,
+          warnCount: 1,
+        };
+      });
+
+      When('formatting the scope validation result', () => {
+        state!.formattedOutput = formatScopeValidation(state!.result!);
+      });
+
+      Then('the output contains READY with warning count', () => {
+        expect(state!.formattedOutput).toContain('READY (with 1 warning(s))');
+      });
+    });
+
+    RuleScenario(
+      'Formatter shows blocker details for blocked verdict',
+      ({ Given, When, Then, And }) => {
+        Given('a scope validation result with blockers', () => {
+          state = initState();
+          state.result = {
+            pattern: 'BlockedPattern',
+            scopeType: 'implement',
+            checks: [
+              {
+                id: 'dependencies-completed',
+                label: 'Dependencies completed',
+                severity: 'BLOCKED',
+                detail: '0/2 completed',
+                blockerNames: ['DepA (roadmap)', 'DepB (active)'],
+              },
+              {
+                id: 'fsm-allows-transition',
+                label: 'FSM allows transition',
+                severity: 'PASS',
+                detail: 'roadmap → active is valid',
+              },
+            ],
+            verdict: 'blocked',
+            blockerCount: 1,
+            warnCount: 0,
+          };
+        });
+
+        When('formatting the scope validation result', () => {
+          state!.formattedOutput = formatScopeValidation(state!.result!);
+        });
+
+        Then('the output contains BLOCKED in the verdict section', () => {
+          expect(state!.formattedOutput).toContain('BLOCKED:');
+        });
+
+        And('the output lists each blocker with its detail', () => {
+          expect(state!.formattedOutput).toContain('Dependencies completed');
+          expect(state!.formattedOutput).toContain('Blockers: DepA (roadmap), DepB (active)');
+        });
+      }
+    );
   });
 });

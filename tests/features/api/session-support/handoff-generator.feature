@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:HandoffGeneratorTests
-@libar-docs-status:active
+@libar-docs-status:completed
 Feature: Handoff Generator - Session-End State Summary
 
   **Problem:**
@@ -20,6 +20,7 @@ Feature: Handoff Generator - Session-End State Summary
       When generating a handoff document
       Then the handoff shows the session summary header
       And the handoff lists completed deliverables
+      And the handoff lists in-progress deliverables
       And the handoff lists remaining deliverables as next priorities
 
     @acceptance-criteria @happy-path
@@ -37,6 +38,18 @@ Feature: Handoff Generator - Session-End State Summary
       Then the inferred session type is design
 
     @acceptance-criteria @edge-case
+    Scenario: Completed pattern infers review session type
+      Given a completed pattern
+      When generating a handoff document without explicit session type
+      Then the inferred session type is review
+
+    @acceptance-criteria @edge-case
+    Scenario: Deferred pattern infers design session type
+      Given a deferred pattern
+      When generating a handoff document without explicit session type
+      Then the inferred session type is design
+
+    @acceptance-criteria @edge-case
     Scenario: Files modified section included when provided
       Given an active pattern with completed and remaining deliverables
       When generating a handoff with modified files
@@ -47,6 +60,12 @@ Feature: Handoff Generator - Session-End State Summary
       Given a pattern with an incomplete dependency
       When generating a handoff document
       Then the handoff shows the incomplete dependency as a blocker
+
+    @acceptance-criteria @error-handling
+    Scenario: Pattern not found throws error
+      Given no patterns in the dataset
+      When generating a handoff for a nonexistent pattern
+      Then a PATTERN_NOT_FOUND error is thrown
 
   Rule: Formatter produces structured text output
 

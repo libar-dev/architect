@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ScopeValidatorTests
-@libar-docs-status:active
+@libar-docs-status:completed
 Feature: Scope Validator - Pre-flight Session Readiness Checks
 
   **Problem:**
@@ -47,6 +47,19 @@ Feature: Scope Validator - Pre-flight Session Readiness Checks
       When validating scope for implement session
       Then the deliverables check shows BLOCKED
 
+    @acceptance-criteria @edge-case
+    Scenario: Strict mode promotes WARN to BLOCKED
+      Given a pattern with warnings but no blockers
+      When validating scope with strict mode
+      Then the verdict is "blocked"
+      And warnings are promoted to BLOCKED severity
+
+    @acceptance-criteria @error-handling
+    Scenario: Pattern not found throws error
+      Given no patterns in the dataset
+      When validating scope for a nonexistent pattern
+      Then a PATTERN_NOT_FOUND error is thrown
+
   Rule: Design scope validation checks dependency stubs
 
     @acceptance-criteria @happy-path
@@ -54,6 +67,13 @@ Feature: Scope Validator - Pre-flight Session Readiness Checks
       Given a pattern with no dependencies
       When validating scope for design session
       Then the verdict is "ready"
+
+    @acceptance-criteria @edge-case
+    Scenario: Design session with dependencies lacking stubs produces WARN
+      Given a pattern with dependencies that have no stubs
+      When validating scope for design session
+      Then the stubs check shows WARN
+      And the blocker names include the dependency without stubs
 
   Rule: Formatter produces structured text output
 
@@ -64,3 +84,16 @@ Feature: Scope Validator - Pre-flight Session Readiness Checks
       Then the output contains the scope validation header
       And the output contains the checklist marker
       And the output contains the verdict marker
+
+    @acceptance-criteria @edge-case
+    Scenario: Formatter shows warnings verdict text
+      Given a scope validation result with warnings but no blockers
+      When formatting the scope validation result
+      Then the output contains READY with warning count
+
+    @acceptance-criteria @edge-case
+    Scenario: Formatter shows blocker details for blocked verdict
+      Given a scope validation result with blockers
+      When formatting the scope validation result
+      Then the output contains BLOCKED in the verdict section
+      And the output lists each blocker with its detail
