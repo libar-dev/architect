@@ -34,6 +34,8 @@ export {
   PENDING_PATTERNS,
   isStatusComplete,
   isStatusPending,
+  isStatusInProgress,
+  getDeliverableStatusEmoji,
 } from './types.js';
 
 // DoD Validator

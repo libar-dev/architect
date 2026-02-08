@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, isStatusComplete, isStatusPending, WithTagRegistry
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, isStatusComplete, isStatusPending, isStatusInProgress, getDeliverableStatusEmoji, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -247,4 +247,36 @@ export function isStatusPending(status: string): boolean {
     }
   }
   return false;
+}
+
+/**
+ * Check whether a status string indicates in-progress/active work.
+ *
+ * Canonical helper using IN_PROGRESS_PATTERNS. Use this instead of
+ * hardcoding status strings like 'in-progress', 'wip', 'started'.
+ */
+export function isStatusInProgress(status: string): boolean {
+  const normalized = status.toLowerCase().trim();
+  for (const pattern of IN_PROGRESS_PATTERNS) {
+    if (normalized === pattern.toLowerCase() || normalized.includes(pattern.toLowerCase())) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Get the appropriate emoji for a deliverable status string.
+ *
+ * Uses canonical status helpers to map freeform deliverable statuses
+ * to a three-state emoji: ✅ (complete), 🚧 (in-progress), 📋 (pending/other).
+ *
+ * Note: This is for deliverable statuses (freeform strings like 'Done', 'wip'),
+ * NOT for FSM pattern statuses (roadmap/active/completed/deferred) — use
+ * getStatusEmoji() from renderable/utils.ts for those.
+ */
+export function getDeliverableStatusEmoji(status: string): string {
+  if (isStatusComplete(status)) return '✅';
+  if (isStatusInProgress(status)) return '🚧';
+  return '📋';
 }

@@ -45,6 +45,7 @@ import {
   document,
 } from '../schema.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
+import { getDeliverableStatusEmoji } from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -1084,8 +1085,7 @@ function buildActivePhases(
       const allDeliverables = activeInPhase.flatMap((p) => p.deliverables ?? []);
       if (allDeliverables.length > 0) {
         const deliverableItems = allDeliverables.map((d) => {
-          const statusEmoji =
-            d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+          const statusEmoji = getDeliverableStatusEmoji(d.status);
           return `${statusEmoji} ${d.name}`;
         });
         sections.push(heading(4, 'Deliverables'), list(deliverableItems));
@@ -1270,7 +1270,7 @@ function buildCurrentWorkPatternDetail(
   // Deliverables (if configured)
   if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
     const deliverableItems = pattern.deliverables.map((d) => {
-      const statusEmoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+      const statusEmoji = getDeliverableStatusEmoji(d.status);
       const statusText = d.status ? ` (${d.status})` : '';
       return `${statusEmoji} ${d.name}${statusText}`;
     });

@@ -52,6 +52,7 @@ import {
   document,
 } from '../schema.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
+import { getDeliverableStatusEmoji } from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -485,8 +486,7 @@ function buildPatternChangesList(
 
       if (deliverables.length > 0) {
         const deliverableItems = deliverables.map((d) => {
-          const statusEmoji =
-            d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+          const statusEmoji = getDeliverableStatusEmoji(d.status);
           const release = d.release ? ` (${d.release})` : '';
           return `${statusEmoji} ${d.name}${release}`;
         });

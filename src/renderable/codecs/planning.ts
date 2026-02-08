@@ -36,6 +36,7 @@ import {
 } from '../schema.js';
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
 import { getStatusEmoji, getDisplayName } from '../utils.js';
+import { isStatusComplete, getDeliverableStatusEmoji } from '../../validation/types.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
 import { groupBy } from '../../utils/index.js';
 import {
@@ -349,7 +350,7 @@ function buildPhaseChecklist(
     const dodItems: string[] = ['**Deliverables:**'];
     if (pattern.deliverables && pattern.deliverables.length > 0) {
       for (const d of pattern.deliverables) {
-        const status = d.status === 'complete' ? '✅' : '- [ ]';
+        const status = isStatusComplete(d.status) ? '✅' : '- [ ]';
         dodItems.push(`${status} ${d.name}`);
       }
     } else {
@@ -467,7 +468,7 @@ function buildPhasePlan(
   // Deliverables
   if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
     const items = pattern.deliverables.map((d) => {
-      const emoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+      const emoji = getDeliverableStatusEmoji(d.status);
       return `${emoji} ${d.name}`;
     });
     sections.push(heading(4, 'Deliverables'), list(items));
