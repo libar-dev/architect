@@ -293,7 +293,7 @@ export function extractDescription(text: string): string {
   if (!text) return '';
 
   const problemMatch = /\*\*Problem:\*\*\s*([\s\S]+?)(?=\*\*Solution:\*\*|$)/.exec(text);
-  const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
+  const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\n\s*\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
 
   if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
     const problem = extractFirstSentence(problemMatch[1].trim());
