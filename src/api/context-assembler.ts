@@ -22,7 +22,7 @@
 import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
-import type { ProcessStatusValue } from '../taxonomy/index.js';
+import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../taxonomy/index.js';
 import type { NeighborEntry } from './types.js';
 import { QueryApiError } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
@@ -42,7 +42,7 @@ export type SessionType = 'planning' | 'design' | 'implement';
 
 const VALID_SESSION_TYPES: readonly string[] = ['planning', 'design', 'implement'];
 
-const VALID_STATUSES: ReadonlySet<string> = new Set(['roadmap', 'active', 'completed', 'deferred']);
+const VALID_STATUSES: ReadonlySet<string> = new Set<string>(PROCESS_STATUS_VALUES);
 
 export function isValidSessionType(value: string): value is SessionType {
   return VALID_SESSION_TYPES.includes(value);

@@ -26,7 +26,7 @@ import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/inde
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
 import { normalizeStatus } from '../taxonomy/index.js';
 import type { DoDValidationResult, DoDValidationSummary } from './types.js';
-import { COMPLETION_PATTERNS } from './types.js';
+import { isStatusComplete } from './types.js';
 
 /**
  * Check if a deliverable status indicates completion
@@ -47,15 +47,7 @@ import { COMPLETION_PATTERNS } from './types.js';
  * ```
  */
 export function isDeliverableComplete(deliverable: Deliverable): boolean {
-  const status = deliverable.status.toLowerCase().trim();
-
-  for (const pattern of COMPLETION_PATTERNS) {
-    if (status === pattern.toLowerCase() || status.includes(pattern.toLowerCase())) {
-      return true;
-    }
-  }
-
-  return false;
+  return isStatusComplete(deliverable.status);
 }
 
 /**

@@ -303,7 +303,7 @@ Subcommands:
   files <pattern> [--related]                             File reading list (text)
   dep-tree <pattern> [--depth N]                          Dependency tree (text)
   overview                                                Executive project summary (text)
-  scope-validate <pat> [implement|design] [--type ...]   Pre-flight readiness check (text)
+  scope-validate <pat> [implement|design] [--type ...] [--strict]  Pre-flight readiness (text)
   handoff --pattern <pat> [--git] [--session ...]        Session-end handoff summary (text)
   stubs [pattern]           List design stubs with implementation status
   stubs --unresolved        Show only stubs with missing target files
@@ -1067,6 +1067,7 @@ function handleScopeValidate(ctx: RouteContext): string {
   // Parse pattern name (positional, first non-flag arg)
   let patternName: string | undefined;
   let scopeType: ScopeType = 'implement';
+  let strict = false;
 
   for (let i = 0; i < ctx.subArgs.length; i++) {
     const arg = ctx.subArgs[i];
@@ -1081,6 +1082,9 @@ function handleScopeValidate(ctx: RouteContext): string {
         );
       }
       i++;
+    } else if (arg === '--strict') {
+      // DD-4: promotes WARN → BLOCKED (consistent with lint-process --strict)
+      strict = true;
     } else if (arg !== undefined && !arg.startsWith('-')) {
       if (patternName === undefined) {
         patternName = arg;
@@ -1094,7 +1098,7 @@ function handleScopeValidate(ctx: RouteContext): string {
   if (patternName === undefined) {
     throw new QueryApiError(
       'INVALID_ARGUMENT',
-      'Usage: process-api scope-validate <pattern> [implement|design] [--type implement|design]'
+      'Usage: process-api scope-validate <pattern> [implement|design] [--type implement|design] [--strict]'
     );
   }
 
@@ -1102,10 +1106,12 @@ function handleScopeValidate(ctx: RouteContext): string {
     patternName,
     scopeType,
     baseDir: ctx.baseDir,
+    strict,
   });
   return formatScopeValidation(result);
 }
 
+// 'review' is handoff-specific — not a global session type (parsed locally, not by top-level --session)
 const VALID_HANDOFF_SESSION_TYPES: ReadonlySet<string> = new Set([
   'planning',
   'design',
@@ -1147,6 +1153,7 @@ function handleHandoff(ctx: RouteContext): string {
     sessionType = ctx.sessionType;
   }
 
+  // Pattern name uses --pattern flag (not positional) to avoid ambiguity with --git and --session
   if (patternName === undefined) {
     throw new QueryApiError(
       'INVALID_ARGUMENT',

@@ -1,7 +1,7 @@
 /**
  * @libar-docs
  * @libar-docs-pattern HandoffGeneratorImpl
- * @libar-docs-status active
+ * @libar-docs-status completed
  * @libar-docs-implements DataAPIDesignSessionSupport
  * @libar-docs-uses ProcessStateAPI, MasterDataset, ContextFormatterImpl
  * @libar-docs-used-by ProcessAPICLIImpl
@@ -22,7 +22,7 @@ import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
-import { isDeliverableComplete } from './context-formatter.js';
+import { isStatusComplete, isStatusPending } from '../validation/types.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -75,7 +75,7 @@ function inferSessionType(status: string | undefined): HandoffSessionType {
 
 export function generateHandoff(
   api: ProcessStateAPI,
-  _dataset: MasterDataset,
+  _dataset: MasterDataset, // _dataset reserved for future use per design stub
   options: HandoffOptions
 ): HandoffDocument {
   const { patternName, modifiedFiles } = options;
@@ -92,14 +92,11 @@ export function generateHandoff(
 
   // Deliverables split
   const deliverables = api.getPatternDeliverables(patternName);
-  const completed = deliverables.filter((d) => isDeliverableComplete(d.status));
+  const completed = deliverables.filter((d) => isStatusComplete(d.status));
   const inProgress = deliverables.filter(
-    (d) =>
-      !isDeliverableComplete(d.status) &&
-      d.status.toLowerCase() !== 'planned' &&
-      d.status.toLowerCase() !== 'pending'
+    (d) => !isStatusComplete(d.status) && !isStatusPending(d.status)
   );
-  const remaining = deliverables.filter((d) => !isDeliverableComplete(d.status));
+  const remaining = deliverables.filter((d) => !isStatusComplete(d.status));
 
   // Completed deliverables
   if (completed.length > 0) {
@@ -163,7 +160,7 @@ export function generateHandoff(
   if (remaining.length > 0) {
     sections.push({
       title: 'NEXT SESSION',
-      items: remaining.map((d, i) => `${String(i + 1)}. ${d.name} (${d.location})`),
+      items: remaining.map((d, i) => `${i + 1}. ${d.name} (${d.location})`),
     });
   }
 

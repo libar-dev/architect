@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, WithTagRegistry
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, isStatusComplete, isStatusPending, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -212,3 +212,39 @@ export const PENDING_PATTERNS = [
   '⬜',
   '❌',
 ] as const;
+
+// ============================================================================
+// Status Matching Helpers (canonical — use these instead of hardcoding)
+// ============================================================================
+
+/**
+ * Check whether a status string indicates completion.
+ *
+ * Canonical helper using COMPLETION_PATTERNS. Use this instead of
+ * hardcoding status strings like 'Complete', 'Done', '✓'.
+ */
+export function isStatusComplete(status: string): boolean {
+  const normalized = status.toLowerCase().trim();
+  for (const pattern of COMPLETION_PATTERNS) {
+    if (normalized === pattern.toLowerCase() || normalized.includes(pattern.toLowerCase())) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check whether a status string indicates pending/not-started.
+ *
+ * Canonical helper using PENDING_PATTERNS. Use this instead of
+ * hardcoding status strings like 'planned', 'pending', 'todo'.
+ */
+export function isStatusPending(status: string): boolean {
+  const normalized = status.toLowerCase().trim();
+  for (const pattern of PENDING_PATTERNS) {
+    if (normalized === pattern.toLowerCase() || normalized.includes(pattern.toLowerCase())) {
+      return true;
+    }
+  }
+  return false;
+}

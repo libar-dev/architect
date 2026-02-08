@@ -1,7 +1,7 @@
 /**
  * @libar-docs
  * @libar-docs-pattern ScopeValidatorImpl
- * @libar-docs-status active
+ * @libar-docs-status completed
  * @libar-docs-implements DataAPIDesignSessionSupport
  * @libar-docs-uses ProcessStateAPI, MasterDataset, StubResolverImpl
  * @libar-docs-used-by ProcessAPICLIImpl
@@ -22,6 +22,7 @@ import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
 import { findStubPatterns, resolveStubs, extractDecisionItems } from './stub-resolver.js';
+import { PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,6 +52,8 @@ export interface ScopeValidationOptions {
   readonly patternName: string;
   readonly scopeType: ScopeType;
   readonly baseDir: string;
+  /** When true, WARN checks are promoted to BLOCKED (DD-4, matches lint-process --strict). */
+  readonly strict?: boolean;
 }
 
 export interface ScopeValidationResult {
@@ -66,7 +69,7 @@ export interface ScopeValidationResult {
 // Valid statuses for FSM transition checks
 // ---------------------------------------------------------------------------
 
-const VALID_STATUSES: ReadonlySet<string> = new Set(['roadmap', 'active', 'completed', 'deferred']);
+const VALID_STATUSES: ReadonlySet<string> = new Set<string>(PROCESS_STATUS_VALUES);
 
 // ---------------------------------------------------------------------------
 // Main Entry Point
@@ -77,24 +80,30 @@ export function validateScope(
   dataset: MasterDataset,
   options: ScopeValidationOptions
 ): ScopeValidationResult {
-  const { patternName, scopeType, baseDir } = options;
+  const { patternName, scopeType, baseDir, strict } = options;
 
   const pattern = api.getPattern(patternName);
   if (pattern === undefined) {
     throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
   }
 
-  const checks: ValidationCheck[] = [];
+  const rawChecks: ValidationCheck[] = [];
 
   if (scopeType === 'implement') {
-    checks.push(checkDependenciesCompleted(api, patternName));
-    checks.push(checkDeliverablesDefinied(api, patternName));
-    checks.push(checkFsmAllowsTransition(api, patternName));
-    checks.push(checkDesignDecisionsRecorded(dataset, patternName));
-    checks.push(checkExecutableSpecsSet(api, patternName));
+    rawChecks.push(checkDependenciesCompleted(api, patternName));
+    rawChecks.push(checkDeliverablesDefined(api, patternName));
+    rawChecks.push(checkFsmAllowsTransition(api, patternName));
+    rawChecks.push(checkDesignDecisionsRecorded(dataset, patternName));
+    rawChecks.push(checkExecutableSpecsSet(api, patternName));
   } else {
-    checks.push(checkStubsFromDepsExist(dataset, patternName, baseDir));
+    rawChecks.push(checkStubsFromDepsExist(dataset, patternName, baseDir));
   }
+
+  // DD-4: --strict promotes WARN → BLOCKED
+  const checks: readonly ValidationCheck[] =
+    strict === true
+      ? rawChecks.map((c) => (c.severity === 'WARN' ? { ...c, severity: 'BLOCKED' as const } : c))
+      : rawChecks;
 
   const blockerCount = checks.filter((c) => c.severity === 'BLOCKED').length;
   const warnCount = checks.filter((c) => c.severity === 'WARN').length;
@@ -142,11 +151,11 @@ export function formatScopeValidation(result: ScopeValidationResult): string {
       .filter((c) => c.severity === 'BLOCKED')
       .map((c) => `- ${c.label}: ${c.detail}`);
     verdictText =
-      `BLOCKED: ${String(result.blockerCount)} blocker(s) prevent ${result.scopeType} session` +
+      `BLOCKED: ${result.blockerCount} blocker(s) prevent ${result.scopeType} session` +
       '\n' +
       blockerDetails.join('\n');
   } else if (result.verdict === 'warnings') {
-    verdictText = `READY (with ${String(result.warnCount)} warning(s)): ${result.scopeType} session can proceed`;
+    verdictText = `READY (with ${result.warnCount} warning(s)): ${result.scopeType} session can proceed`;
   } else {
     verdictText = `READY: All checks passed for ${result.scopeType} session`;
   }
@@ -189,7 +198,7 @@ export function checkDependenciesCompleted(
       id: 'dependencies-completed',
       label: 'Dependencies completed',
       severity: 'PASS',
-      detail: `${String(dependsOn.length)}/${String(dependsOn.length)} completed`,
+      detail: `${dependsOn.length}/${dependsOn.length} completed`,
     };
   }
 
@@ -197,12 +206,12 @@ export function checkDependenciesCompleted(
     id: 'dependencies-completed',
     label: 'Dependencies completed',
     severity: 'BLOCKED',
-    detail: `${String(dependsOn.length - blockers.length)}/${String(dependsOn.length)} completed`,
+    detail: `${dependsOn.length - blockers.length}/${dependsOn.length} completed`,
     blockerNames: blockers,
   };
 }
 
-export function checkDeliverablesDefinied(
+export function checkDeliverablesDefined(
   api: ProcessStateAPI,
   patternName: string
 ): ValidationCheck {
@@ -213,7 +222,7 @@ export function checkDeliverablesDefinied(
       id: 'deliverables-defined',
       label: 'Deliverables defined',
       severity: 'PASS',
-      detail: `${String(deliverables.length)} deliverable(s) found`,
+      detail: `${deliverables.length} deliverable(s) found`,
     };
   }
 
@@ -287,7 +296,7 @@ export function checkDesignDecisionsRecorded(
       id: 'design-decisions-recorded',
       label: 'Design decisions recorded',
       severity: 'PASS',
-      detail: `${String(totalDecisions)} decision(s) found in ${String(patternStubs.length)} stub(s)`,
+      detail: `${totalDecisions} decision(s) found in ${patternStubs.length} stub(s)`,
     };
   }
 
@@ -372,7 +381,7 @@ export function checkStubsFromDepsExist(
       id: 'stubs-from-deps-exist',
       label: 'Stubs from dependencies exist',
       severity: 'PASS',
-      detail: `All ${String(dependsOn.length)} dependencies have stubs`,
+      detail: `All ${dependsOn.length} dependencies have stubs`,
     };
   }
 
@@ -380,7 +389,7 @@ export function checkStubsFromDepsExist(
     id: 'stubs-from-deps-exist',
     label: 'Stubs from dependencies exist',
     severity: 'WARN',
-    detail: `${String(depsWithoutStubs.length)}/${String(dependsOn.length)} dependencies lack stubs`,
+    detail: `${depsWithoutStubs.length}/${dependsOn.length} dependencies lack stubs`,
     blockerNames: depsWithoutStubs,
   };
 }

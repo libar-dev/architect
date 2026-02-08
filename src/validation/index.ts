@@ -32,6 +32,8 @@ export {
   COMPLETION_PATTERNS,
   IN_PROGRESS_PATTERNS,
   PENDING_PATTERNS,
+  isStatusComplete,
+  isStatusPending,
 } from './types.js';
 
 // DoD Validator

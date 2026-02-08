@@ -203,7 +203,7 @@ export function checkDependenciesCompleted(
  * PASS: At least one deliverable exists.
  * BLOCKED: No deliverables found (empty Background table or missing).
  */
-export function checkDeliverablesDefinied(
+export function checkDeliverablesDefined(
   _api: unknown,
   _patternName: string
 ): ValidationCheck {
