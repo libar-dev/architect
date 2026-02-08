@@ -33,6 +33,7 @@ import { scanGherkinFiles } from '../../scanner/gherkin-scanner.js';
 import { extractDeliverables } from '../../extractor/dual-source-extractor.js';
 import { getProtectionLevel, type ProtectionLevel } from '../../validation/fsm/index.js';
 import {
+  DEFAULT_STATUS,
   PROCESS_STATUS_VALUES,
   normalizeStatus,
   type ProcessStatusValue,
@@ -188,7 +189,7 @@ function extractStatusFromTags(tags: readonly string[]): ProcessStatusValue {
     }
   }
   // Default to roadmap if no status found
-  return 'roadmap';
+  return DEFAULT_STATUS;
 }
 
 /**

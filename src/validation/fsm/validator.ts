@@ -31,11 +31,7 @@ import {
   getTransitionErrorMessage,
 } from './transitions.js';
 import { isTerminalState, getProtectionLevel, type ProtectionLevel } from './states.js';
-
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 
 /**
  * Result of validating a status value

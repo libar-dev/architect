@@ -43,6 +43,7 @@ import {
   type CrossValidationError,
   type ValidationSummary,
 } from '../validation-schemas/index.js';
+import { DEFAULT_STATUS } from '../taxonomy/status-values.js';
 
 // Re-export types for convenience
 export type { ProcessMetadata, Deliverable, CrossValidationError, ValidationSummary };
@@ -110,7 +111,7 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
   const pattern = patternTag.replace('pattern:', '');
   const phaseStr = phaseTag.replace('phase:', '');
   const phase = parseInt(phaseStr, 10);
-  const status = statusTag?.replace('status:', '') ?? 'roadmap';
+  const status = statusTag?.replace('status:', '') ?? DEFAULT_STATUS;
 
   // Extract optional tags
   const quarterTag = tags.find((t) => t.startsWith('quarter:'));

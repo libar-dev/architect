@@ -32,11 +32,7 @@
 
 import type { ProcessStatusValue } from '../../taxonomy/index.js';
 import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
-
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 
 /**
  * Options for transition functions that generate messages

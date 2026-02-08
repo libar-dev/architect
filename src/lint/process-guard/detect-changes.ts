@@ -42,6 +42,7 @@ import type {
   StatusTagLocation,
 } from './types.js';
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
+import { DEFAULT_STATUS } from '../../taxonomy/status-values.js';
 import type { WithTagRegistry } from '../../validation/types.js';
 
 /**
@@ -470,13 +471,13 @@ function detectStatusTransitions(
     let fromStatus: ProcessStatusValue;
 
     if (state.removedTag === null) {
-      // New file defaults from 'roadmap'
-      fromStatus = 'roadmap';
+      // New file defaults from DEFAULT_STATUS
+      fromStatus = DEFAULT_STATUS;
     } else {
       // state.removedTag is guaranteed to exist here
       const fromMatch = statusPattern.exec(state.removedTag.rawLine);
       const fromStatusRaw = fromMatch?.[1]?.toLowerCase();
-      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : 'roadmap';
+      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : DEFAULT_STATUS;
     }
 
     // Skip if no actual change

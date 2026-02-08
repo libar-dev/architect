@@ -54,11 +54,7 @@ import type {
   ProcessGuardRule,
 } from './types.js';
 import { isInSessionScope, isSessionExcluded } from './derive-state.js';
-
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 
 // =============================================================================
 // Decider - Main Entry Point
