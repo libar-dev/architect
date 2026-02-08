@@ -31,6 +31,7 @@
  */
 
 import type { ExtractedPattern } from '../types/index.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 
 // Import Zod schemas and inferred types (schema-first pattern)
 import {
@@ -496,7 +497,7 @@ export function validateDualSource(results: DualSourceResults): ValidationSummar
   // Warnings: Orphaned stubs (code without feature)
   for (const pattern of results.codeOnly) {
     if (pattern.status === 'roadmap') {
-      const name = pattern.patternName ?? pattern.name;
+      const name = getPatternName(pattern);
       warnings.push(`Roadmap pattern "${name}" has code stub but no feature file`);
     }
   }

@@ -55,6 +55,7 @@ import {
   document,
 } from '../schema.js';
 import { getDisplayName, getStatusEmoji } from '../utils.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 
@@ -309,7 +310,7 @@ function buildComponentDiagram(
 
   // First pass: collect all node IDs
   for (const pattern of archIndex.all) {
-    const name = pattern.patternName ?? pattern.name;
+    const name = getPatternName(pattern);
     const nodeId = sanitizeNodeId(name);
     nodeIds.set(name, nodeId);
   }
@@ -330,7 +331,7 @@ function buildComponentDiagram(
     lines.push(`    subgraph ${sanitizeNodeId(context)}["${contextLabel}"]`);
 
     for (const pattern of patterns) {
-      const name = pattern.patternName ?? pattern.name;
+      const name = getPatternName(pattern);
       const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
       const roleLabel = pattern.archRole ? `[${pattern.archRole}]` : '';
       lines.push(`        ${nodeId}["${name}${roleLabel}"]`);
@@ -343,7 +344,7 @@ function buildComponentDiagram(
   if (sharedPatterns.length > 0) {
     lines.push(`    subgraph shared["Shared Infrastructure"]`);
     for (const pattern of sharedPatterns) {
-      const name = pattern.patternName ?? pattern.name;
+      const name = getPatternName(pattern);
       const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
       const roleLabel = pattern.archRole ? `[${pattern.archRole}]` : '';
       lines.push(`        ${nodeId}["${name}${roleLabel}"]`);
@@ -354,7 +355,7 @@ function buildComponentDiagram(
   // Second pass: add relationships from relationshipIndex
   const relationships = dataset.relationshipIndex ?? {};
   for (const pattern of archIndex.all) {
-    const name = pattern.patternName ?? pattern.name;
+    const name = getPatternName(pattern);
     const sourceId = nodeIds.get(name);
     if (!sourceId) continue;
 
@@ -414,7 +415,7 @@ function buildLayeredDiagram(
 
   // Collect all node IDs first
   for (const pattern of archIndex.all) {
-    const name = pattern.patternName ?? pattern.name;
+    const name = getPatternName(pattern);
     const nodeId = sanitizeNodeId(name);
     nodeIds.set(name, nodeId);
   }
@@ -432,7 +433,7 @@ function buildLayeredDiagram(
     lines.push(`    subgraph ${layer}["${layerLabel}"]`);
 
     for (const pattern of patterns) {
-      const name = pattern.patternName ?? pattern.name;
+      const name = getPatternName(pattern);
       const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
       const contextLabel = pattern.archContext ? ` (${pattern.archContext})` : '';
       lines.push(`        ${nodeId}["${name}${contextLabel}"]`);
@@ -446,7 +447,7 @@ function buildLayeredDiagram(
   if (unlayered.length > 0) {
     lines.push(`    subgraph other["Other"]`);
     for (const pattern of unlayered) {
-      const name = pattern.patternName ?? pattern.name;
+      const name = getPatternName(pattern);
       const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
       lines.push(`        ${nodeId}["${name}"]`);
     }
@@ -456,7 +457,7 @@ function buildLayeredDiagram(
   // Add relationships
   const relationships = dataset.relationshipIndex ?? {};
   for (const pattern of archIndex.all) {
-    const name = pattern.patternName ?? pattern.name;
+    const name = getPatternName(pattern);
     const sourceId = nodeIds.get(name);
     if (!sourceId) continue;
 
@@ -521,8 +522,8 @@ function buildInventorySection(archIndex: NonNullable<MasterDataset['archIndex']
     const roleB = b.archRole ?? '';
     if (roleA !== roleB) return roleA.localeCompare(roleB);
 
-    const nameA = a.patternName ?? a.name;
-    const nameB = b.patternName ?? b.name;
+    const nameA = getPatternName(a);
+    const nameB = getPatternName(b);
     return nameA.localeCompare(nameB);
   });
 

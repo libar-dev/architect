@@ -26,6 +26,7 @@ import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from '../api/types.js';
 import type { QueryResult } from '../api/types.js';
 import { summarizePatterns, SUMMARY_FIELDS, deriveSource } from '../api/summarize.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -178,7 +179,7 @@ export function applyOutputPipeline(input: PipelineInput, modifiers: OutputModif
   }
 
   if (modifiers.namesOnly) {
-    return patterns.map((p) => p.patternName ?? p.name);
+    return patterns.map((p) => getPatternName(p));
   }
 
   if (modifiers.full) {

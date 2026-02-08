@@ -57,7 +57,12 @@ import { createSuccess, createError, QueryApiError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
-import { allPatternNames, suggestPattern, firstImplements } from '../api/pattern-helpers.js';
+import {
+  allPatternNames,
+  suggestPattern,
+  firstImplements,
+  getPatternName,
+} from '../api/pattern-helpers.js';
 import {
   findStubPatterns,
   resolveStubs,
@@ -897,12 +902,12 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
     const implName = firstImplements(s);
     return (
       implName?.toLowerCase() === patternName.toLowerCase() ||
-      (s.patternName ?? s.name).toLowerCase() === patternName.toLowerCase()
+      getPatternName(s).toLowerCase() === patternName.toLowerCase()
     );
   });
 
   if (patternStubs.length === 0) {
-    const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
+    const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? getPatternName(s)))];
     const hint = suggestPattern(patternName, stubNames);
     throw new QueryApiError(
       'STUB_NOT_FOUND',
@@ -912,7 +917,7 @@ function handleDecisions(dataset: RuntimeMasterDataset, subArgs: string[]): unkn
 
   // Extract decisions from each stub's description
   const decisions = patternStubs.map((stub) => ({
-    stub: stub.patternName ?? stub.name,
+    stub: getPatternName(stub),
     file: stub.source.file,
     since: stub.since,
     decisions: extractDecisionItems(stub.directive.description),

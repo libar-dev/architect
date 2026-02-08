@@ -65,6 +65,7 @@ import {
 } from '../utils.js';
 import { toKebabCase } from '../../utils/index.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers
@@ -552,7 +553,7 @@ function buildSinglePatternDocument(
   }
 
   // Implementations (files that implement this pattern via @libar-docs-implements)
-  const patternKey = pattern.patternName ?? pattern.name;
+  const patternKey = getPatternName(pattern);
   const rel = dataset.relationshipIndex?.[patternKey];
   if (rel?.implementedBy && rel.implementedBy.length > 0) {
     sections.push(heading(2, 'Implementations'));

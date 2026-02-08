@@ -22,6 +22,7 @@
 
 import { z } from 'zod';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
+import { getPatternName } from './pattern-helpers.js';
 
 // ---------------------------------------------------------------------------
 // Schema
@@ -84,7 +85,7 @@ export function deriveSource(filePath: string): 'typescript' | 'gherkin' {
  */
 export function summarizePattern(pattern: ExtractedPattern): PatternSummary {
   return {
-    patternName: pattern.patternName ?? pattern.name,
+    patternName: getPatternName(pattern),
     category: pattern.category,
     file: pattern.source.file,
     source: deriveSource(pattern.source.file),

@@ -36,6 +36,7 @@ import {
 } from '../schema.js';
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
 import { getStatusEmoji, getDisplayName } from '../utils.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 import { isStatusComplete, getDeliverableStatusEmoji } from '../../validation/types.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
 import { groupBy } from '../../utils/index.js';
@@ -251,7 +252,7 @@ function buildPlanningChecklistDocument(
   options: Required<PlanningChecklistCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
-  const completedNames = new Set(dataset.byStatus.completed.map((p) => p.patternName ?? p.name));
+  const completedNames = new Set(dataset.byStatus.completed.map((p) => getPatternName(p)));
 
   // Collect phases for checklists
   const phasesToCheck: ExtractedPattern[] = [];
@@ -508,7 +509,7 @@ function buildSessionFindingsDocument(
   }> = [];
 
   for (const pattern of dataset.byStatus.completed) {
-    const sourceName = pattern.patternName ?? pattern.name;
+    const sourceName = getPatternName(pattern);
     const sourcePhase = pattern.phase;
 
     // Extract gaps from pattern metadata if available

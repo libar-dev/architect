@@ -50,6 +50,7 @@ import {
   type GherkinPatternValidationError,
 } from '../types/errors.js';
 import { generatePatternId } from '../utils/index.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 
 // =============================================================================
 // Constants
@@ -738,7 +739,7 @@ export function computeHierarchyChildren(
     if (pattern.parent) {
       const children = parentToChildren.get(pattern.parent) ?? [];
       // Use patternName if available, otherwise fall back to name
-      const childName = pattern.patternName ?? pattern.name;
+      const childName = getPatternName(pattern);
       children.push(childName);
       parentToChildren.set(pattern.parent, children);
     }
@@ -747,7 +748,7 @@ export function computeHierarchyChildren(
   // Apply children arrays to patterns
   // No re-validation needed - input is already validated and we're only adding children: string[]
   return patterns.map((pattern) => {
-    const patternName = pattern.patternName ?? pattern.name;
+    const patternName = getPatternName(pattern);
     const children = parentToChildren.get(patternName);
 
     if (children && children.length > 0) {

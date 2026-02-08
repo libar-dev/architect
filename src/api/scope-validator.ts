@@ -20,7 +20,7 @@
 import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from './types.js';
-import { getPatternName } from './pattern-helpers.js';
+import { getPatternName, findPatternByName, firstImplements } from './pattern-helpers.js';
 import { findStubPatterns, resolveStubs, extractDecisionItems } from './stub-resolver.js';
 import { PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
 import { normalizeStatus } from '../taxonomy/normalized-status.js';
@@ -282,7 +282,7 @@ export function checkDesignDecisionsRecorded(
   const lowerName = patternName.toLowerCase();
 
   const patternStubs = stubs.filter((s) => {
-    const implName = s.implementsPatterns?.[0];
+    const implName = firstImplements(s);
     return implName?.toLowerCase() === lowerName;
   });
 
@@ -341,9 +341,7 @@ export function checkStubsFromDepsExist(
   patternName: string,
   baseDir: string
 ): ValidationCheck {
-  const pattern = dataset.patterns.find(
-    (p) => getPatternName(p).toLowerCase() === patternName.toLowerCase()
-  );
+  const pattern = findPatternByName(dataset.patterns, patternName);
   const dependsOn = pattern?.dependsOn ?? [];
 
   if (dependsOn.length === 0) {
@@ -361,7 +359,7 @@ export function checkStubsFromDepsExist(
   for (const depName of dependsOn) {
     const lowerDep = depName.toLowerCase();
     const depStubs = allStubs.filter((s) => {
-      const implName = s.implementsPatterns?.[0];
+      const implName = firstImplements(s);
       return implName?.toLowerCase() === lowerDep;
     });
 
