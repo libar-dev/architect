@@ -269,7 +269,7 @@ export function normalizeLineEndings(text: string): string {
  * @param text - Input text
  * @returns First sentence, or full trimmed text if no sentence boundary found
  */
-export function extractFirstSentence(text: string): string {
+export function extractFirstSentenceRaw(text: string): string {
   if (!text) return '';
   const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
   const match = sentenceEndPattern.exec(text);
@@ -296,10 +296,10 @@ export function extractDescription(text: string): string {
   const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\n\s*\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
 
   if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
-    const problem = extractFirstSentence(problemMatch[1].trim());
-    const solution = extractFirstSentence(solutionMatch[1].trim());
+    const problem = extractFirstSentenceRaw(problemMatch[1].trim());
+    const solution = extractFirstSentenceRaw(solutionMatch[1].trim());
     return `Problem: ${problem} Solution: ${solution}`;
   }
 
-  return extractFirstSentence(text);
+  return extractFirstSentenceRaw(text);
 }
