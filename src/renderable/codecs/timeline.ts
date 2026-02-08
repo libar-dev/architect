@@ -45,7 +45,7 @@ import {
   document,
 } from '../schema.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
-import { getDeliverableStatusEmoji } from '../../validation/types.js';
+import { getDeliverableStatusEmoji, getPhaseStatusEmoji } from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -370,7 +370,7 @@ function buildPhaseSection(phase: PhaseGroup): SectionBlock[] {
   const isComplete = counts.total > 0 && counts.completed === counts.total;
 
   // Phase header with progress
-  const statusEmoji = isComplete ? '✅' : counts.active > 0 ? '🚧' : '📋';
+  const statusEmoji = getPhaseStatusEmoji(isComplete, counts.active > 0);
   sections.push(heading(3, `${statusEmoji} ${displayName}`));
   sections.push(paragraph(`${progressBar} ${progress}% complete`));
 
@@ -445,7 +445,7 @@ function buildPhaseNavigationTable(
     const displayName = phaseName ?? `Phase ${phaseNumber}`;
     const progress = completionPercentage(counts);
     const isComplete = counts.total > 0 && counts.completed === counts.total;
-    const statusEmoji = isComplete ? '✅' : counts.active > 0 ? '🚧' : '📋';
+    const statusEmoji = getPhaseStatusEmoji(isComplete, counts.active > 0);
     const slug = getPhaseSlug(phaseNumber, phaseName);
 
     // Link to detail file if generating detail files, otherwise just display name

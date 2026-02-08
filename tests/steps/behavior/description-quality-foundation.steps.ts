@@ -9,11 +9,8 @@
  */
 import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
-import {
-  getDisplayName,
-  formatBusinessValue,
-  extractFirstSentence,
-} from '../../../src/renderable/utils.js';
+import { getDisplayName, formatBusinessValue } from '../../../src/renderable/utils.js';
+import { extractFirstSentenceRaw as extractFirstSentence } from '../../../src/utils/string-utils.js';
 import { inferBehaviorFilePath } from '../../../src/extractor/gherkin-extractor.js';
 import { TraceabilityCodec } from '../../../src/renderable/codecs/reporting.js';
 import { RemainingWorkCodec } from '../../../src/renderable/codecs/session.js';

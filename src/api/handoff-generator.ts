@@ -24,6 +24,7 @@ import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
 import { isStatusComplete, isStatusPending } from '../validation/types.js';
 import { normalizeStatus } from '../taxonomy/normalized-status.js';
+import { DEFAULT_STATUS } from '../taxonomy/status-values.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -56,15 +57,12 @@ export interface HandoffDocument {
 // ---------------------------------------------------------------------------
 
 function inferSessionType(status: string | undefined): HandoffSessionType {
-  switch (status) {
+  const normalized = normalizeStatus(status ?? DEFAULT_STATUS);
+  switch (normalized) {
     case 'active':
       return 'implement';
-    case 'roadmap':
-      return 'design';
     case 'completed':
       return 'review';
-    case 'deferred':
-      return 'design';
     default:
       return 'design';
   }

@@ -36,6 +36,7 @@ export {
   isStatusPending,
   isStatusInProgress,
   getDeliverableStatusEmoji,
+  getPhaseStatusEmoji,
 } from './types.js';
 
 // DoD Validator

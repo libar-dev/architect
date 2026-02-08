@@ -497,7 +497,7 @@ export function validateDualSource(results: DualSourceResults): ValidationSummar
 
   // Warnings: Orphaned stubs (code without feature)
   for (const pattern of results.codeOnly) {
-    if (pattern.status === 'roadmap') {
+    if (pattern.status === DEFAULT_STATUS) {
       const name = getPatternName(pattern);
       warnings.push(`Roadmap pattern "${name}" has code stub but no feature file`);
     }
@@ -505,7 +505,7 @@ export function validateDualSource(results: DualSourceResults): ValidationSummar
 
   // Warnings: Features without code stubs
   for (const metadata of results.featureOnly) {
-    if (metadata.status === 'roadmap') {
+    if (metadata.status === DEFAULT_STATUS) {
       warnings.push(`Feature "${metadata.pattern}" (phase ${metadata.phase}) has no code stub`);
     }
   }

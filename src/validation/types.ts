@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, isStatusComplete, isStatusPending, isStatusInProgress, getDeliverableStatusEmoji, WithTagRegistry
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, isStatusComplete, isStatusPending, isStatusInProgress, getDeliverableStatusEmoji, getPhaseStatusEmoji, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -278,5 +278,18 @@ export function isStatusInProgress(status: string): boolean {
 export function getDeliverableStatusEmoji(status: string): string {
   if (isStatusComplete(status)) return '✅';
   if (isStatusInProgress(status)) return '🚧';
+  return '📋';
+}
+
+/**
+ * Get status emoji for phase-level aggregates.
+ *
+ * @param allComplete - Whether all patterns in the phase are complete
+ * @param anyActive - Whether any patterns in the phase are active/in-progress
+ * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
+ */
+export function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string {
+  if (allComplete) return '✅';
+  if (anyActive) return '🚧';
   return '📋';
 }

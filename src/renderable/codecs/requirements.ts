@@ -54,6 +54,7 @@ import {
   formatBusinessValue,
 } from '../utils.js';
 import { toKebabCase, groupBy } from '../../utils/index.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 import {
   type BaseCodecOptions,
   type NormalizedStatusFilter,
@@ -329,7 +330,7 @@ function buildByProductArea(
         : null;
       const label = businessValue ? `${emoji} ${name} - ${businessValue}` : `${emoji} ${name}`;
       if (options.generateDetailFiles) {
-        const slug = requirementToSlug(p.patternName ?? name, p.phase);
+        const slug = requirementToSlug(getPatternName(p), p.phase);
         return `[${label}](requirements/${slug}.md)`;
       }
       return label;
@@ -428,7 +429,7 @@ function buildByPhase(
         : null;
       const label = businessValue ? `${emoji} ${name} - ${businessValue}` : `${emoji} ${name}`;
       if (options.generateDetailFiles) {
-        const slug = requirementToSlug(p.patternName ?? name, p.phase);
+        const slug = requirementToSlug(getPatternName(p), p.phase);
         return `[${label}](requirements/${slug}.md)`;
       }
       return label;
@@ -500,8 +501,7 @@ function buildRequirementsDetailFiles(
   const files: Record<string, RenderableDocument> = {};
 
   for (const pattern of patterns) {
-    const name = getDisplayName(pattern);
-    const slug = requirementToSlug(pattern.patternName ?? name, pattern.phase);
+    const slug = requirementToSlug(getPatternName(pattern), pattern.phase);
     files[`requirements/${slug}.md`] = buildSingleRequirementDocument(pattern, options, dataset);
   }
 
@@ -576,7 +576,7 @@ function buildSingleRequirementDocument(
   }
 
   // Implementations (files that implement this pattern via @libar-docs-implements)
-  const patternKey = pattern.patternName ?? name;
+  const patternKey = getPatternName(pattern);
   const rel = dataset.relationshipIndex?.[patternKey];
   if (rel?.implementedBy && rel.implementedBy.length > 0) {
     sections.push(heading(2, 'Implementations'));

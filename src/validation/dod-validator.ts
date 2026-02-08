@@ -24,7 +24,6 @@
 
 import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
-import { normalizeStatus } from '../taxonomy/index.js';
 import type { DoDValidationResult, DoDValidationSummary } from './types.js';
 import { isStatusComplete } from './types.js';
 
@@ -166,8 +165,7 @@ export function validateDoD(
     if (!metadata) continue;
 
     // Only validate completed phases (or phases matching filter)
-    const status = normalizeStatus(metadata.status);
-    const isCompleted = status === 'completed';
+    const isCompleted = isStatusComplete(metadata.status);
 
     // If phase filter specified, validate those specific phases
     // Otherwise, only validate completed phases

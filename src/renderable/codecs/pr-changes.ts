@@ -52,7 +52,11 @@ import {
   document,
 } from '../schema.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
-import { getDeliverableStatusEmoji } from '../../validation/types.js';
+import {
+  getDeliverableStatusEmoji,
+  isStatusComplete,
+  isStatusInProgress,
+} from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -231,16 +235,14 @@ function filterPatternsByPrScope(
 
   // No filters = return all active/completed patterns
   if (!hasFileFilter && !hasReleaseFilter) {
-    return patterns.filter((p) => {
-      const status = normalizeStatus(p.status);
-      return status === 'active' || status === 'completed';
-    });
+    return patterns.filter(
+      (p) => isStatusComplete(p.status ?? '') || isStatusInProgress(p.status ?? '')
+    );
   }
 
   return patterns.filter((pattern) => {
     // Check status first - only active or completed patterns
-    const status = normalizeStatus(pattern.status);
-    if (status !== 'active' && status !== 'completed') {
+    if (!isStatusComplete(pattern.status ?? '') && !isStatusInProgress(pattern.status ?? '')) {
       return false;
     }
 
@@ -321,8 +323,8 @@ function buildPrSummary(
   patterns: ExtractedPattern[],
   options: Required<PrChangesCodecOptions>
 ): SectionBlock[] {
-  const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
-  const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+  const completed = patterns.filter((p) => isStatusComplete(p.status ?? ''));
+  const active = patterns.filter((p) => isStatusInProgress(p.status ?? ''));
 
   const rows: string[][] = [
     ['Patterns in PR', String(patterns.length)],
@@ -524,12 +526,12 @@ function buildReviewChecklist(patterns: ExtractedPattern[]): SectionBlock[] {
   checklistItems.push('- [ ] Documentation updated if needed');
 
   // Pattern-specific items
-  const hasCompletedPatterns = patterns.some((p) => normalizeStatus(p.status) === 'completed');
+  const hasCompletedPatterns = patterns.some((p) => isStatusComplete(p.status ?? ''));
   if (hasCompletedPatterns) {
     checklistItems.push('- [ ] Completed patterns verified working');
   }
 
-  const hasActivePatterns = patterns.some((p) => normalizeStatus(p.status) === 'active');
+  const hasActivePatterns = patterns.some((p) => isStatusInProgress(p.status ?? ''));
   if (hasActivePatterns) {
     checklistItems.push('- [ ] Active work is in a consistent state');
   }

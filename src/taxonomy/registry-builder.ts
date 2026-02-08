@@ -33,6 +33,7 @@ import {
 import { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS } from './hierarchy-levels.js';
 import { RISK_LEVELS } from './risk-levels.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
+import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.js';
 
 /**
  * TagRegistry interface (matches schema from validation-schemas/tag-registry.ts)
@@ -486,7 +487,7 @@ export function buildRegistry(): TagRegistry {
     ],
 
     formatOptions: [...GLOBAL_FORMAT_OPTIONS],
-    tagPrefix: '@libar-docs-',
-    fileOptInTag: '@libar-docs',
+    tagPrefix: DEFAULT_TAG_PREFIX,
+    fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
   };
 }

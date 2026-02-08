@@ -25,6 +25,7 @@ export {
   ACCEPTED_STATUS_VALUES,
   DEFAULT_STATUS,
   PROCESS_STATUS_VALUES,
+  VALID_PROCESS_STATUS_SET,
   type AcceptedStatusValue,
   type ProcessStatusValue,
 } from './status-values.js';

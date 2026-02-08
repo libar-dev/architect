@@ -49,6 +49,7 @@ import {
   formatAntiPatternReport,
   toValidationIssues,
   DEFAULT_THRESHOLDS,
+  isStatusComplete,
 } from '../validation/index.js';
 
 /**
@@ -450,8 +451,7 @@ export function validatePatterns(
 
   // Check deliverables for completed patterns
   for (const gherkinPattern of gherkinPatterns) {
-    const status = normalizeStatus(gherkinPattern.status ?? '');
-    if (status === 'completed') {
+    if (isStatusComplete(gherkinPattern.status ?? '')) {
       if (gherkinPattern.deliverables.length === 0) {
         issues.push({
           severity: 'warning',

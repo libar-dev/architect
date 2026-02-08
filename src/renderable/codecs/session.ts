@@ -48,6 +48,7 @@ import {
   document,
 } from '../schema.js';
 import { normalizeStatus } from '../../taxonomy/index.js';
+import { getPhaseStatusEmoji, isStatusInProgress } from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -523,7 +524,7 @@ function buildSessionPhaseNavigation(
       const progress = completionPercentage(counts);
       const remaining = counts.total - counts.completed;
       const slug = getSessionPhaseSlug(phaseNumber, phaseName);
-      const statusEmoji = counts.active > 0 ? '🚧' : '📋';
+      const statusEmoji = getPhaseStatusEmoji(false, counts.active > 0);
 
       // Link to detail file only if generating detail files
       const nameCell = options.generateDetailFiles
@@ -923,7 +924,7 @@ function buildRemainingPhaseNavigation(
       const remaining = counts.total - counts.completed;
       const progress = completionPercentage(counts);
       const slug = getRemainingPhaseSlug(phaseNumber, phaseName);
-      const statusEmoji = counts.active > 0 ? '🚧' : '📋';
+      const statusEmoji = getPhaseStatusEmoji(false, counts.active > 0);
 
       // Link to detail file only if generating detail files
       const nameCell = options.generateDetailFiles
@@ -943,10 +944,8 @@ function buildRemainingPhaseNavigation(
   const backlogPatterns = incomplete.filter((p) => !patternsWithPhase.has(p.id));
 
   if (backlogPatterns.length > 0) {
-    const backlogActive = backlogPatterns.filter(
-      (p) => normalizeStatus(p.status) === 'active'
-    ).length;
-    const statusEmoji = backlogActive > 0 ? '🚧' : '📋';
+    const backlogActive = backlogPatterns.filter((p) => isStatusInProgress(p.status ?? '')).length;
+    const statusEmoji = getPhaseStatusEmoji(false, backlogActive > 0);
     rows.push([
       `${statusEmoji} Backlog (No Phase)`,
       String(backlogPatterns.length),

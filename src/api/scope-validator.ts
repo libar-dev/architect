@@ -22,7 +22,7 @@ import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from './types.js';
 import { getPatternName, findPatternByName, firstImplements } from './pattern-helpers.js';
 import { findStubPatterns, resolveStubs, extractDecisionItems } from './stub-resolver.js';
-import { PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
+import { VALID_PROCESS_STATUS_SET } from '../taxonomy/index.js';
 import { normalizeStatus } from '../taxonomy/normalized-status.js';
 
 // ---------------------------------------------------------------------------
@@ -70,7 +70,7 @@ export interface ScopeValidationResult {
 // Valid statuses for FSM transition checks
 // ---------------------------------------------------------------------------
 
-const VALID_STATUSES: ReadonlySet<string> = new Set<string>(PROCESS_STATUS_VALUES);
+const VALID_STATUSES = VALID_PROCESS_STATUS_SET;
 
 // ---------------------------------------------------------------------------
 // Main Entry Point

@@ -377,7 +377,7 @@ function buildCategorySections(
       const emoji = getStatusEmoji(p.status);
       const name = getDisplayName(p);
       if (options.generateDetailFiles) {
-        const slug = patternToSlug(p.patternName ?? name);
+        const slug = patternToSlug(getPatternName(p));
         return `[${emoji} ${name}](patterns/${slug}.md)`;
       }
       return `${emoji} ${name}`;
@@ -484,8 +484,7 @@ function buildIndividualPatternFiles(dataset: MasterDataset): Record<string, Ren
   const files: Record<string, RenderableDocument> = {};
 
   for (const pattern of dataset.patterns) {
-    const displayName = getDisplayName(pattern);
-    const slug = patternToSlug(pattern.patternName ?? displayName);
+    const slug = patternToSlug(getPatternName(pattern));
     files[`patterns/${slug}.md`] = buildSinglePatternDocument(pattern, dataset);
   }
 
