@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:DataAPIContextAssembly
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Fix-deliverable-gate-description-preservation-tag-parsing
 @libar-docs-phase:25b
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:3d

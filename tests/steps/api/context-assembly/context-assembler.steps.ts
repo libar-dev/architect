@@ -489,6 +489,47 @@ describeFeature(feature, ({ Rule }) => {
         );
       }
     );
+
+    RuleScenario('Solution text with inline bold is not truncated', ({ Given, When, Then }) => {
+      Given(
+        'a pattern {string} with Solution containing inline bold',
+        (_ctx: unknown, name: string) => {
+          state = initState();
+          const base = createTestPattern({
+            name,
+            status: 'roadmap',
+            phase: 22,
+            filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
+          });
+          state.patterns.push({
+            ...base,
+            directive: {
+              ...base.directive,
+              description:
+                '**Problem:** Orders fail silently during checkout.\n' +
+                '**Solution:** Implement saga pattern with **Pre-flight check:** readiness verification.',
+            },
+          } as ExtractedPattern);
+          buildDatasetAndApi(state.patterns);
+        }
+      );
+
+      When(
+        'I assemble context for {string} with session {string}',
+        (_ctx: unknown, name: string, session: string) => {
+          state!.bundle = assembleContext(state!.dataset!, state!.api!, {
+            patterns: [name],
+            sessionType: session as SessionType,
+            baseDir: process.cwd(),
+          });
+        }
+      );
+
+      Then('the metadata summary contains {string}', (_ctx: unknown, expected: string) => {
+        const summary = state!.bundle!.metadata[0]?.summary ?? '';
+        expect(summary).toContain(expected);
+      });
+    });
   });
 
   // ===========================================================================

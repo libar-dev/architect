@@ -69,6 +69,12 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       When I assemble context for "OrderSaga" with session "design"
       Then the metadata summary contains "Problem:" and "Solution:"
 
+    @edge-case
+    Scenario: Solution text with inline bold is not truncated
+      Given a pattern "SagaPattern" with Solution containing inline bold
+      When I assemble context for "SagaPattern" with session "design"
+      Then the metadata summary contains "Implement saga pattern"
+
   Rule: buildDepTree walks dependency chains with cycle detection
 
     @acceptance-criteria @happy-path
