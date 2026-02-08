@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIDesignSessionSupport
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:25c
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:1d
@@ -40,10 +40,10 @@ Feature: Data API Design Session Support - Automated Session Workflows
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Scope validation logic | planned | src/api/scope-validator.ts | Yes | unit |
-      | scope-validate subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | Handoff document generator | planned | src/api/handoff-generator.ts | Yes | unit |
-      | handoff subcommand | planned | src/cli/process-api.ts | Yes | integration |
+      | Scope validation logic | Complete | src/api/scope-validator.ts | Yes | unit |
+      | scope-validate subcommand | Complete | src/cli/process-api.ts | Yes | integration |
+      | Handoff document generator | Complete | src/api/handoff-generator.ts | Yes | unit |
+      | handoff subcommand | Complete | src/cli/process-api.ts | Yes | integration |
 
   # ============================================================================
   # RULE 1: Scope Validation

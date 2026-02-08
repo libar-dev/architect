@@ -14,21 +14,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
-- **Output Pipeline Impl**: Post-processing pipeline that transforms raw API results into shaped CLI output.
-- **Lint Process CLI**: Validates git changes against delivery process rules.
 - **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **Process State Types**: :MasterDataset Type definitions for the ProcessStateAPI query interface.
 - **Pattern Summarizer Impl**: Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries.
 - **Stub Resolver Impl**: Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine...
+- **Scope Validator Impl**: Pure function composition over ProcessStateAPI and MasterDataset.
 - **Process State API**: TypeScript interface for querying delivery process state.
 - **Pattern Helpers**: Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name...
 - **API Module**: Central export for the Process State API, providing a TypeScript interface for querying delivery process state.
+- **Handoff Generator Impl**: Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset.
 - **Fuzzy Matcher Impl**: Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >...
 - **Coverage Analyzer Impl**: Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset.
 - **Context Formatter Impl**: First plain-text formatter in the codebase.
 - **Context Assembler Impl**: Pure function composition over MasterDataset.
 - **Arch Queries Impl**: Pure functions over MasterDataset for deep architecture exploration.
+- **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
+- **Output Pipeline Impl**: Post-processing pipeline that transforms raw API results into shaped CLI output.
+- **Lint Process CLI**: Validates git changes against delivery process rules.
 - **FSM Validator**: :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return...
 - **FSM Transitions**: :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ...
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
@@ -90,14 +92,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hierarchy Levels**: Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units...
 - **Format Types**: Defines how tag values are parsed and validated.
 - **Category Definitions**: Categories are used to classify patterns and organize documentation.
+- **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
+- **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
+- **Lint Engine**: Orchestrates lint rule execution against parsed directives.
 - **Renderable Utils**: Utility functions for document codecs.
 - **Renderable Document**: Universal intermediate format for all generated documentation.
 - **Universal Renderer**: Converts RenderableDocument to Markdown.
 - **Renderable Document Model(RDM)**: Unified document generation using codecs and a universal renderer.
 - **Document Generator**: Simplified document generation using codecs.
-- **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
-- **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
-- **Lint Engine**: Orchestrates lint rule execution against parsed directives.
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -139,11 +141,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Business Rules Codec**: Transforms MasterDataset into a RenderableDocument for business rules output.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
+- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
-- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
-- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
 - **PDR 001 Self Documentation**
 - **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
@@ -156,6 +158,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
 - **Doc Generation Proof Of Concept**: Status: SUPERSEDED - This POC has been implemented.
 - **Data API Stub Integration**: Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file...
+- **Data API Design Session Support**: Starting a design or implementation session requires manually compiling elaborate context prompts.
 - **Data API Output Shaping**: The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
 - **Data API Context Assembly**: Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context...
 - **Data API Architecture Queries**: The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed...

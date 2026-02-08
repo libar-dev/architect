@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 98/154 (64%)
+**Patterns:** [█████████████░░░░░░░] 99/156 (63%)
 
 **Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 154 |
-| Completed | 98 |
-| Active | 26 |
-| Planned | 30 |
+| Total Patterns | 156 |
+| Completed | 99 |
+| Active | 28 |
+| Planned | 29 |
 
 ---
 
@@ -27,7 +27,7 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 0/2 | 0% |
-| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 4/9 | 44% |
+| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/9 | 56% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
@@ -75,7 +75,7 @@
 
 ### 📋 DataAPIStubIntegration
 
-[███████░░░░░░░░] 4/9 44% complete
+[████████░░░░░░░] 5/9 56% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -83,7 +83,7 @@
 | ✅ Data API Architecture Queries | completed | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
 | 📋 Data API CLI Ergonomics | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
 | ✅ Data API Context Assembly | completed | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
-| 📋 Data API Design Session Support | planned | Starting a design or implementation session requires manually compiling elaborate context prompts. |
+| ✅ Data API Design Session Support | completed | Starting a design or implementation session requires manually compiling elaborate context prompts. |
 | ✅ Data API Output Shaping | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
 | 📋 Data API Platform Integration | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |

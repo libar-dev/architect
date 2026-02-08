@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 105 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 107 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 105 |
+| Total Components | 107 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -28,9 +28,11 @@ graph TB
         ProcessStateTypes["ProcessStateTypes"]
         PatternSummarizerImpl["PatternSummarizerImpl[service]"]
         StubResolverImpl["StubResolverImpl"]
+        ScopeValidatorImpl["ScopeValidatorImpl[service]"]
         ProcessStateAPI["ProcessStateAPI[service]"]
         PatternHelpers["PatternHelpers"]
         APIModule["APIModule"]
+        HandoffGeneratorImpl["HandoffGeneratorImpl[service]"]
         FuzzyMatcherImpl["FuzzyMatcherImpl[service]"]
         CoverageAnalyzerImpl["CoverageAnalyzerImpl[service]"]
         ContextFormatterImpl["ContextFormatterImpl[service]"]
@@ -159,26 +161,26 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
+        WorkflowLoader["WorkflowLoader"]
+        ConfigurationTypes["ConfigurationTypes"]
+        RegexBuilders["RegexBuilders"]
+        ConfigurationPresets["ConfigurationPresets"]
+        ConfigurationDefaults["ConfigurationDefaults"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
-        WorkflowLoader["WorkflowLoader"]
-        ConfigurationTypes["ConfigurationTypes"]
-        RegexBuilders["RegexBuilders"]
-        ConfigurationPresets["ConfigurationPresets"]
-        ConfigurationDefaults["ConfigurationDefaults"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -221,15 +223,6 @@ graph TB
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -239,6 +232,15 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
@@ -255,8 +257,14 @@ graph TB
     TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
+    ScopeValidatorImpl --> ProcessStateAPI
+    ScopeValidatorImpl --> MasterDataset
+    ScopeValidatorImpl --> StubResolverImpl
     ProcessStateAPI --> MasterDataset
     ProcessStateAPI --> FSMValidator
+    HandoffGeneratorImpl --> ProcessStateAPI
+    HandoffGeneratorImpl --> MasterDataset
+    HandoffGeneratorImpl --> ContextFormatterImpl
     CoverageAnalyzerImpl --> Pattern_Scanner
     CoverageAnalyzerImpl --> MasterDataset
     ContextFormatterImpl --> ContextAssemblerImpl
@@ -303,8 +311,10 @@ All components with architecture annotations:
 | 🚧 Context Formatter Impl | api | service | application | src/api/context-formatter.ts |
 | 🚧 Coverage Analyzer Impl | api | service | application | src/api/coverage-analyzer.ts |
 | 🚧 Fuzzy Matcher Impl | api | service | application | src/api/fuzzy-match.ts |
+| 🚧 Handoff Generator Impl | api | service | application | src/api/handoff-generator.ts |
 | 🚧 Pattern Summarizer Impl | api | service | application | src/api/summarize.ts |
 | 🚧 Process State API | api | service | application | src/api/process-state.ts |
+| 🚧 Scope Validator Impl | api | service | application | src/api/scope-validator.ts |
 | 🚧 Output Pipeline Impl | cli | service | application | src/cli/output-pipeline.ts |
 | 🚧 Process API CLI Impl | cli | service | application | src/cli/process-api.ts |
 | ✅ Config Loader | config | infrastructure | infrastructure | src/config/config-loader.ts |

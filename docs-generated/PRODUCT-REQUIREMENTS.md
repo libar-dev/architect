@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [███████░░░░░░░░░░░░░] 13/40 (33%)
+**Overall:** [███████░░░░░░░░░░░░░] 14/40 (35%)
 
 | Metric | Value |
 | --- | --- |
 | Total Features | 40 |
-| Completed | 13 |
+| Completed | 14 |
 | Active | 2 |
-| Planned | 25 |
+| Planned | 24 |
 | Product Areas | 2 |
 | User Roles | 1 |
 
@@ -24,10 +24,11 @@
 
 ### DeliveryProcess
 
-12/39 complete (31%)
+13/39 complete (33%)
 
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
 - [✅ Data API Context Assembly - replace explore agents with one command](requirements/phase-25-data-api-context-assembly.md)
+- [✅ Data API Design Session Support - automate session context compilation](requirements/phase-25-data-api-design-session-support.md)
 - [✅ Data API Output Shaping - compact output for ai agents](requirements/phase-25-data-api-output-shaping.md)
 - [✅ Data API Stub Integration - unlock design session stub metadata](requirements/phase-25-data-api-stub-integration.md)
 - [✅ Doc Generation Proof Of Concept - eliminates manual documentation maintenance](requirements/phase-27-doc-generation-proof-of-concept.md)
@@ -48,7 +49,6 @@
 - [📋 Codec Behavior Testing - ensure all document codecs produce correct output](requirements/phase-102-codec-behavior-testing.md)
 - [📋 Cross Source Validation - detect inconsistencies between typescript and gherkin sources](requirements/phase-100-cross-source-validation.md)
 - [📋 Data API CLI Ergonomics - fast interactive cli for repeated queries](requirements/phase-25-data-apicli-ergonomics.md)
-- [📋 Data API Design Session Support - automate session context compilation](requirements/phase-25-data-api-design-session-support.md)
 - [📋 Data API Platform Integration - native claude code integration and monorepo support](requirements/phase-25-data-api-platform-integration.md)
 - [📋 Data API Relationship Graph - deep dependency analysis and health checks](requirements/phase-25-data-api-relationship-graph.md)
 - [📋 DoD Validation - enable machine checkable phase completion](requirements/phase-100-do-d-validation.md)
@@ -93,6 +93,7 @@
 | --- | --- | --- | --- |
 | ✅ Data API Architecture Queries | DeliveryProcess | - | completed |
 | ✅ Data API Context Assembly | DeliveryProcess | - | completed |
+| ✅ Data API Design Session Support | DeliveryProcess | - | completed |
 | ✅ Data API Output Shaping | DeliveryProcess | - | completed |
 | ✅ Data API Stub Integration | DeliveryProcess | - | completed |
 | ✅ Doc Generation Proof Of Concept | DeliveryProcess | - | completed |
@@ -114,7 +115,6 @@
 | 📋 Codec Behavior Testing | DeliveryProcess | - | planned |
 | 📋 Cross Source Validation | DeliveryProcess | - | planned |
 | 📋 Data API CLI Ergonomics | DeliveryProcess | - | planned |
-| 📋 Data API Design Session Support | DeliveryProcess | - | planned |
 | 📋 Data API Platform Integration | DeliveryProcess | - | planned |
 | 📋 Data API Relationship Graph | DeliveryProcess | - | planned |
 | 📋 DoD Validation | DeliveryProcess | - | planned |

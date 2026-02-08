@@ -97,6 +97,13 @@ import {
   buildSourceInventory,
 } from '../api/arch-queries.js';
 import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.js';
+import { validateScope, formatScopeValidation, type ScopeType } from '../api/scope-validator.js';
+import {
+  generateHandoff,
+  formatHandoff,
+  type HandoffSessionType,
+} from '../api/handoff-generator.js';
+import { execSync } from 'child_process';
 
 // =============================================================================
 // CLI Config
@@ -296,6 +303,8 @@ Subcommands:
   files <pattern> [--related]                             File reading list (text)
   dep-tree <pattern> [--depth N]                          Dependency tree (text)
   overview                                                Executive project summary (text)
+  scope-validate <pat> [implement|design] [--type ...]   Pre-flight readiness check (text)
+  handoff --pattern <pat> [--git] [--session ...]        Session-end handoff summary (text)
   stubs [pattern]           List design stubs with implementation status
   stubs --unresolved        Show only stubs with missing target files
   decisions <pattern>       Show AD-N design decisions from stub descriptions
@@ -1049,6 +1058,134 @@ function handleOverviewCmd(ctx: RouteContext): string {
 }
 
 // =============================================================================
+// Session Workflow Handlers (text output — ADR-008)
+// =============================================================================
+
+const VALID_SCOPE_TYPES: ReadonlySet<string> = new Set(['implement', 'design']);
+
+function handleScopeValidate(ctx: RouteContext): string {
+  // Parse pattern name (positional, first non-flag arg)
+  let patternName: string | undefined;
+  let scopeType: ScopeType = 'implement';
+
+  for (let i = 0; i < ctx.subArgs.length; i++) {
+    const arg = ctx.subArgs[i];
+    if (arg === '--type') {
+      const val = ctx.subArgs[i + 1];
+      if (val !== undefined && VALID_SCOPE_TYPES.has(val)) {
+        scopeType = val as ScopeType;
+      } else {
+        throw new QueryApiError(
+          'INVALID_ARGUMENT',
+          `--type must be "implement" or "design", got: "${val ?? ''}"`
+        );
+      }
+      i++;
+    } else if (arg !== undefined && !arg.startsWith('-')) {
+      if (patternName === undefined) {
+        patternName = arg;
+      } else if (VALID_SCOPE_TYPES.has(arg)) {
+        // DD-6: positional scope type also accepted
+        scopeType = arg as ScopeType;
+      }
+    }
+  }
+
+  if (patternName === undefined) {
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      'Usage: process-api scope-validate <pattern> [implement|design] [--type implement|design]'
+    );
+  }
+
+  const result = validateScope(ctx.api, ctx.dataset, {
+    patternName,
+    scopeType,
+    baseDir: ctx.baseDir,
+  });
+  return formatScopeValidation(result);
+}
+
+const VALID_HANDOFF_SESSION_TYPES: ReadonlySet<string> = new Set([
+  'planning',
+  'design',
+  'implement',
+  'review',
+]);
+
+function handleHandoff(ctx: RouteContext): string {
+  let patternName: string | undefined;
+  let sessionType: HandoffSessionType | undefined;
+  let useGit = false;
+
+  for (let i = 0; i < ctx.subArgs.length; i++) {
+    const arg = ctx.subArgs[i];
+    if (arg === '--pattern') {
+      patternName = ctx.subArgs[i + 1];
+      if (patternName === undefined) {
+        throw new QueryApiError('INVALID_ARGUMENT', '--pattern requires a value');
+      }
+      i++;
+    } else if (arg === '--session') {
+      const val = ctx.subArgs[i + 1];
+      if (val !== undefined && VALID_HANDOFF_SESSION_TYPES.has(val)) {
+        sessionType = val as HandoffSessionType;
+      } else {
+        throw new QueryApiError(
+          'INVALID_ARGUMENT',
+          `--session must be "planning", "design", "implement", or "review", got: "${val ?? ''}"`
+        );
+      }
+      i++;
+    } else if (arg === '--git') {
+      useGit = true;
+    }
+  }
+
+  // Also accept from top-level parsed --session
+  if (sessionType === undefined && ctx.sessionType !== null) {
+    sessionType = ctx.sessionType;
+  }
+
+  if (patternName === undefined) {
+    throw new QueryApiError(
+      'INVALID_ARGUMENT',
+      'Usage: process-api handoff --pattern <name> [--git] [--session planning|design|implement|review]'
+    );
+  }
+
+  // DD-2: git integration is opt-in — CLI handler owns the shell call
+  let modifiedFiles: readonly string[] | undefined;
+  if (useGit) {
+    try {
+      const output = execSync('git diff --name-only HEAD', { encoding: 'utf-8' });
+      modifiedFiles = output
+        .trim()
+        .split('\n')
+        .filter((line) => line.length > 0);
+    } catch {
+      // git not available or not a git repo — silently omit
+      modifiedFiles = undefined;
+    }
+  }
+
+  const options: {
+    patternName: string;
+    sessionType?: HandoffSessionType;
+    modifiedFiles?: readonly string[];
+  } = { patternName };
+  if (sessionType !== undefined) {
+    options.sessionType = sessionType;
+  }
+  if (modifiedFiles !== undefined) {
+    options.modifiedFiles = modifiedFiles;
+  }
+
+  const doc = generateHandoff(ctx.api, ctx.dataset, options);
+  return formatHandoff(doc);
+}
+
+// =============================================================================
 // Subcommand Router
 // =============================================================================
 
@@ -1065,6 +1202,12 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
 
     case 'overview':
       return handleOverviewCmd(ctx);
+
+    case 'scope-validate':
+      return handleScopeValidate(ctx);
+
+    case 'handoff':
+      return handleHandoff(ctx);
 
     case 'status':
       return handleStatus(ctx.api);
@@ -1135,7 +1278,7 @@ async function routeSubcommand(ctx: RouteContext): Promise<unknown> {
     default:
       throw new QueryApiError(
         'UNKNOWN_METHOD',
-        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`
+        `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, scope-validate, handoff, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`
       );
   }
 }

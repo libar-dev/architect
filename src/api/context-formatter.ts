@@ -211,8 +211,14 @@ export function formatOverview(overview: OverviewSummary): string {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const COMPLETE_STATUSES = new Set(['done', 'complete', 'completed', '✅', 'x']);
+export const COMPLETE_STATUSES: ReadonlySet<string> = new Set([
+  'done',
+  'complete',
+  'completed',
+  '✅',
+  'x',
+]);
 
-function isDeliverableComplete(status: string): boolean {
+export function isDeliverableComplete(status: string): boolean {
   return COMPLETE_STATUSES.has(status.toLowerCase());
 }

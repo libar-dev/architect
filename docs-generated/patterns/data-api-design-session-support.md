@@ -1,4 +1,4 @@
-# 📋 Data API Design Session Support
+# ✅ Data API Design Session Support
 
 **Purpose:** Detailed documentation for the Data API Design Session Support pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | completed |
 | Category | DDD |
 | Phase | 25 |
 
@@ -53,6 +53,8 @@ Files that implement this pattern:
 
 - [`handoff-generator.ts`](../../delivery-process/stubs/DataAPIDesignSessionSupport/handoff-generator.ts) - ## HandoffGenerator — Session-End State Summary
 - [`scope-validator.ts`](../../delivery-process/stubs/DataAPIDesignSessionSupport/scope-validator.ts) - ## ScopeValidator — Pre-flight Session Readiness Checker
+- [`handoff-generator.ts`](../../src/api/handoff-generator.ts) - ## HandoffGenerator — Session-End State Summary
+- [`scope-validator.ts`](../../src/api/scope-validator.ts) - ## ScopeValidator — Pre-flight Session Readiness Checker
 
 ## Acceptance Criteria
 
