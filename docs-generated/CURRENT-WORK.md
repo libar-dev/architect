@@ -7,15 +7,55 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 75/108 (69%)
+**Overall Progress:** [█████████████░░░░░░░] 98/154 (64%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 108 |
-| Completed | 75 |
-| Active | 13 |
-| Planned | 20 |
-| Active Phases | 0 |
+| Total Patterns | 154 |
+| Completed | 98 |
+| Active | 26 |
+| Planned | 30 |
+| Active Phases | 2 |
+
+---
+
+## Active Phases
+
+### 🚧 ProcessStateAPIRelationshipQueries
+
+[░░░░░░░░░░░░░░░] 0/2 0% complete (0 done, 2 active)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 Process State API CLI | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 🚧 Process State API Relationship Queries | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
+
+#### Deliverables
+
+- 📋 Implementation relationship queries
+- 📋 Inheritance hierarchy queries
+- 📋 ProcessStateAPI type extensions
+- 📋 Relationship query step definitions
+- 📋 process:query CLI command
+- 📋 CLI argument parser
+- 📋 JSON output formatter
+- 📋 Text output formatter
+- 📋 Root package.json script
+- 📋 CLAUDE.md documentation update
+
+[View ProcessStateAPIRelationshipQueries details →](current/phase-24-process-state-api-relationship-queries.md)
+
+---
+
+### 🚧 SourceMapper
+
+[███████████░░░░] 3/4 75% complete (3 done, 1 active)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 File Cache | Simple Map-based cache for file contents during a single generation run. |
+
+[View SourceMapper details →](current/phase-27-source-mapper.md)
 
 ---
 
@@ -23,18 +63,31 @@
 
 | Pattern | Phase | Effort | Description |
 | --- | --- | --- | --- |
+| 🚧 Process State API CLI | Phase 24 | 2d | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 🚧 Process State API Relationship Queries | Phase 24 | 3d | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
+| 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
+| 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
+| 🚧 Context Assembler Impl | - | - | Pure function composition over MasterDataset. |
+| 🚧 Context Formatter Impl | - | - | First plain-text formatter in the codebase. |
+| 🚧 Coverage Analyzer Impl | - | - | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 🚧 Derive Process State | - | - | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
-| 🚧 Detect Changes | - | - | :DeriveProcessState Detects changes from git diff including: - Modified, added, deleted files - Status transitions... |
+| 🚧 Detect Changes | - | - | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 FSM Module | - | - | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
 | 🚧 FSM States | - | - | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | - | - | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | - | - | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
-| 🚧 Lint Process CLI | - | - | :ProcessGuardModule Validates git changes against delivery process rules. |
+| 🚧 Fuzzy Matcher Impl | - | - | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
+| 🚧 Lint Process CLI | - | - | Validates git changes against delivery process rules. |
+| 🚧 Output Pipeline Impl | - | - | Post-processing pipeline that transforms raw API results into shaped CLI output. |
+| 🚧 Pattern Helpers | - | - | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
+| 🚧 Pattern Summarizer Impl | - | - | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
+| 🚧 Process API CLI Impl | - | - | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | - | - | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | - | - | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | - | - | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
-| 🚧 Process State API | - | - | :FSMValidator TypeScript interface for querying delivery process state. |
+| 🚧 Process State API | - | - | TypeScript interface for querying delivery process state. |
 | 🚧 Process State Types | - | - | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
+| 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 
 ---
