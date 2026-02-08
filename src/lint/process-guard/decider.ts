@@ -36,7 +36,11 @@
  * 4. **Session Scope** - Modifications outside session scope warn
  */
 
-import { validateTransition, getValidTransitionsFrom } from '../../validation/fsm/index.js';
+import {
+  validateTransition,
+  getValidTransitionsFrom,
+  isTerminalState,
+} from '../../validation/fsm/index.js';
 import type { TagRegistry } from '../../validation-schemas/tag-registry.js';
 import type {
   ProcessState,
@@ -182,8 +186,9 @@ function checkProtectionLevel(
 
     // Check hard protection (completed)
     if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
-      // Exempt files transitioning TO completed — this is a completion, not a post-completion edit
-      if (changes.statusTransitions.get(file)?.to === 'completed') {
+      // Exempt files transitioning TO a terminal state — this is a completion, not a post-completion edit
+      const transition = changes.statusTransitions.get(file);
+      if (transition !== undefined && isTerminalState(transition.to)) {
         continue;
       }
       violations.push(

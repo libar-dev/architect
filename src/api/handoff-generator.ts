@@ -23,6 +23,7 @@ import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
 import { isStatusComplete, isStatusPending } from '../validation/types.js';
+import { normalizeStatus } from '../taxonomy/normalized-status.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -146,7 +147,7 @@ export function generateHandoff(
   if (deps !== undefined) {
     for (const depName of deps.dependsOn) {
       const depPattern = api.getPattern(depName);
-      if (depPattern !== undefined && depPattern.status !== 'completed') {
+      if (depPattern !== undefined && normalizeStatus(depPattern.status) !== 'completed') {
         incompleteDeps.push(`${depName} (${depPattern.status ?? 'unknown'})`);
       }
     }

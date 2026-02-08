@@ -23,6 +23,7 @@ import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import { PROCESS_STATUS_VALUES, type ProcessStatusValue } from '../taxonomy/index.js';
+import { normalizeStatus } from '../taxonomy/normalized-status.js';
 import type { NeighborEntry } from './types.js';
 import { QueryApiError } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
@@ -599,7 +600,7 @@ export function buildFileReadingList(
     for (const depName of rels.dependsOn) {
       const depPattern = findPatternByNameFromList(dataset.patterns, depName);
       if (depPattern === undefined) continue;
-      if (depPattern.status === 'completed') {
+      if (normalizeStatus(depPattern.status) === 'completed') {
         completedDeps.push(depPattern.source.file);
         // Include implementation files for completed dependencies
         const depRels = getRelationships(dataset, depName);
@@ -671,14 +672,14 @@ export function buildOverview(dataset: MasterDataset): OverviewSummary {
   // Blocking: patterns with incomplete dependencies
   const blocking: BlockingEntry[] = [];
   for (const pattern of dataset.patterns) {
-    if (pattern.status === 'completed') continue;
+    if (normalizeStatus(pattern.status) === 'completed') continue;
     const name = getPatternName(pattern);
     const rels = getRelationships(dataset, name);
     if (rels === undefined) continue;
 
     const incompleteDeps = rels.dependsOn.filter((depName) => {
       const depPattern = findPatternByNameFromList(dataset.patterns, depName);
-      return depPattern !== undefined && depPattern.status !== 'completed';
+      return depPattern !== undefined && normalizeStatus(depPattern.status) !== 'completed';
     });
 
     if (incompleteDeps.length > 0) {

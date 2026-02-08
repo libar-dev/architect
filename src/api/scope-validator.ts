@@ -23,6 +23,7 @@ import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
 import { findStubPatterns, resolveStubs, extractDecisionItems } from './stub-resolver.js';
 import { PROCESS_STATUS_VALUES } from '../taxonomy/index.js';
+import { normalizeStatus } from '../taxonomy/normalized-status.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -188,7 +189,7 @@ export function checkDependenciesCompleted(
   for (const depName of dependsOn) {
     const depPattern = api.getPattern(depName);
     const status = depPattern?.status ?? 'unknown';
-    if (status !== 'completed') {
+    if (normalizeStatus(depPattern?.status) !== 'completed') {
       blockers.push(`${depName} (${status})`);
     }
   }
