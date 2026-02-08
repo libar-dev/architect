@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DataAPIDesignSessionSupport
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:25c
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:1d
