@@ -691,6 +691,50 @@ PENDING_PATTERNS = [
 
 ```typescript
 /**
+ * Check whether a status string indicates completion.
+ *
+ * Canonical helper using COMPLETION_PATTERNS. Use this instead of
+ * hardcoding status strings like 'Complete', 'Done', '✓'.
+ */
+function isStatusComplete(status: string): boolean;
+```
+
+```typescript
+/**
+ * Check whether a status string indicates pending/not-started.
+ *
+ * Canonical helper using PENDING_PATTERNS. Use this instead of
+ * hardcoding status strings like 'planned', 'pending', 'todo'.
+ */
+function isStatusPending(status: string): boolean;
+```
+
+```typescript
+/**
+ * Check whether a status string indicates in-progress/active work.
+ *
+ * Canonical helper using IN_PROGRESS_PATTERNS. Use this instead of
+ * hardcoding status strings like 'in-progress', 'wip', 'started'.
+ */
+function isStatusInProgress(status: string): boolean;
+```
+
+```typescript
+/**
+ * Get the appropriate emoji for a deliverable status string.
+ *
+ * Uses canonical status helpers to map freeform deliverable statuses
+ * to a three-state emoji: ✅ (complete), 🚧 (in-progress), 📋 (pending/other).
+ *
+ * Note: This is for deliverable statuses (freeform strings like 'Done', 'wip'),
+ * NOT for FSM pattern statuses (roadmap/active/completed/deferred) — use
+ * getStatusEmoji() from renderable/utils.ts for those.
+ */
+function getDeliverableStatusEmoji(status: string): string;
+```
+
+```typescript
+/**
  * Base interface for options that accept a TagRegistry for prefix-aware behavior.
  *
  * Many validation functions need to be aware of the configured tag prefix

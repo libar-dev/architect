@@ -80,6 +80,10 @@
 - `COMPLETION_PATTERNS` - const
 - `IN_PROGRESS_PATTERNS` - const
 - `PENDING_PATTERNS` - const
+- `isStatusComplete` - function
+- `isStatusPending` - function
+- `isStatusInProgress` - function
+- `getDeliverableStatusEmoji` - function
 - `WithTagRegistry` - interface
 
 ### validate-patterns Flags

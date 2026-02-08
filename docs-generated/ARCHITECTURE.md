@@ -167,8 +167,6 @@ graph TB
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
@@ -181,6 +179,8 @@ graph TB
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -192,6 +192,13 @@ graph TB
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
         FSMModule["FSMModule"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -204,13 +211,6 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
-        PipelineModule["PipelineModule"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
@@ -275,7 +275,6 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
-    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
@@ -283,6 +282,7 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    ArchitectureCodec --> MasterDataset
 ```
 
 ---
@@ -311,10 +311,10 @@ All components with architecture annotations:
 | 🚧 Context Formatter Impl | api | service | application | src/api/context-formatter.ts |
 | 🚧 Coverage Analyzer Impl | api | service | application | src/api/coverage-analyzer.ts |
 | 🚧 Fuzzy Matcher Impl | api | service | application | src/api/fuzzy-match.ts |
-| 🚧 Handoff Generator Impl | api | service | application | src/api/handoff-generator.ts |
+| ✅ Handoff Generator Impl | api | service | application | src/api/handoff-generator.ts |
 | 🚧 Pattern Summarizer Impl | api | service | application | src/api/summarize.ts |
 | 🚧 Process State API | api | service | application | src/api/process-state.ts |
-| 🚧 Scope Validator Impl | api | service | application | src/api/scope-validator.ts |
+| ✅ Scope Validator Impl | api | service | application | src/api/scope-validator.ts |
 | 🚧 Output Pipeline Impl | cli | service | application | src/cli/output-pipeline.ts |
 | 🚧 Process API CLI Impl | cli | service | application | src/cli/process-api.ts |
 | ✅ Config Loader | config | infrastructure | infrastructure | src/config/config-loader.ts |

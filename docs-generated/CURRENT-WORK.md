@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [█████████████░░░░░░░] 99/156 (63%)
+**Overall Progress:** [█████████████░░░░░░░] 101/156 (65%)
 
 | Metric | Value |
 | --- | --- |
 | Total Patterns | 156 |
-| Completed | 99 |
-| Active | 28 |
+| Completed | 101 |
+| Active | 26 |
 | Planned | 29 |
 | Active Phases | 2 |
 
@@ -34,14 +34,14 @@
 
 - 📋 Implementation relationship queries
 - 📋 Inheritance hierarchy queries
-- 📋 ProcessStateAPI type extensions
+- ✅ ProcessStateAPI type extensions
 - 📋 Relationship query step definitions
-- 📋 process:query CLI command
-- 📋 CLI argument parser
-- 📋 JSON output formatter
+- ✅ process:query CLI command
+- ✅ CLI argument parser
+- ✅ JSON output formatter
 - 📋 Text output formatter
-- 📋 Root package.json script
-- 📋 CLAUDE.md documentation update
+- ✅ Root package.json script
+- ✅ CLAUDE.md documentation update
 
 [View ProcessStateAPIRelationshipQueries details →](current/phase-24-process-state-api-relationship-queries.md)
 
@@ -78,7 +78,6 @@
 | 🚧 FSM Transitions | - | - | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | - | - | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
 | 🚧 Fuzzy Matcher Impl | - | - | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
-| 🚧 Handoff Generator Impl | - | - | Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset. |
 | 🚧 Lint Process CLI | - | - | Validates git changes against delivery process rules. |
 | 🚧 Output Pipeline Impl | - | - | Post-processing pipeline that transforms raw API results into shaped CLI output. |
 | 🚧 Pattern Helpers | - | - | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
@@ -89,7 +88,6 @@
 | 🚧 Process Guard Types | - | - | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
 | 🚧 Process State API | - | - | TypeScript interface for querying delivery process state. |
 | 🚧 Process State Types | - | - | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
-| 🚧 Scope Validator Impl | - | - | Pure function composition over ProcessStateAPI and MasterDataset. |
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 
 ---

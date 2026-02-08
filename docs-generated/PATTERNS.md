@@ -7,12 +7,12 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 99/156 (63% complete)
+**Overall:** [█████████████░░░░░░░] 101/156 (65% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 99 |
-| 🚧 Active | 28 |
+| ✅ Completed | 101 |
+| 🚧 Active | 26 |
 | 📋 Planned | 29 |
 | **Total** | 156 |
 
@@ -92,6 +92,7 @@
 | ✅ Gherkin Extractor | Extractor | completed | Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation. |
 | ✅ Gherkin Rules Support | DDD | completed | Feature files were limited to flat scenario lists. |
 | ✅ Gherkin Scanner | Scanner | completed | Scans .feature files for pattern metadata encoded in Gherkin tags. |
+| ✅ Handoff Generator Impl | Pattern | completed | Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset. |
 | ✅ Hierarchy Levels | Core | completed | Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units... |
 | ✅ Layer Inference | Extractor | completed | Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns. |
 | ✅ Layer Types | Core | completed | Inferred from feature file directory paths: - timeline: Process/workflow features (delivery-process) - domain:... |
@@ -121,6 +122,7 @@
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
 | ✅ Rich Content Helpers | Core | completed | Shared helper functions for rendering Gherkin rich content in document codecs. |
 | ✅ Risk Levels | Core | completed | Three-tier risk classification for roadmap planning. |
+| ✅ Scope Validator Impl | Pattern | completed | Pure function composition over ProcessStateAPI and MasterDataset. |
 | ✅ Session Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session... |
 | ✅ Shape Extraction | DDD | completed | Documentation comments duplicate type definitions that exist in the same file. |
 | ✅ Shape Extractor | Pattern | completed | Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for... |
@@ -158,7 +160,6 @@
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
 | 🚧 Fuzzy Matcher Impl | Core | active | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
-| 🚧 Handoff Generator Impl | Pattern | active | Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset. |
 | 🚧 Lint Process CLI | Cli | active | Validates git changes against delivery process rules. |
 | 🚧 Output Pipeline Impl | Core | active | Post-processing pipeline that transforms raw API results into shaped CLI output. |
 | 🚧 Pattern Helpers | Pattern | active | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
@@ -171,7 +172,6 @@
 | 🚧 Process State API CLI | DDD | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
-| 🚧 Scope Validator Impl | Pattern | active | Pure function composition over ProcessStateAPI and MasterDataset. |
 | 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
@@ -440,18 +440,18 @@
 
 ### Pattern
 
-2/11 complete (18%)
+4/11 complete (36%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
+- [✅ Handoff Generator Impl](patterns/handoff-generator-impl.md)
+- [✅ Scope Validator Impl](patterns/scope-validator-impl.md)
 - [✅ Shape Extractor](patterns/shape-extractor.md)
 - [🚧 Arch Queries Impl](patterns/arch-queries-impl.md)
 - [🚧 Context Assembler Impl](patterns/context-assembler-impl.md)
 - [🚧 Context Formatter Impl](patterns/context-formatter-impl.md)
 - [🚧 Coverage Analyzer Impl](patterns/coverage-analyzer-impl.md)
 - [🚧 File Cache](patterns/file-cache.md)
-- [🚧 Handoff Generator Impl](patterns/handoff-generator-impl.md)
 - [🚧 Pattern Helpers](patterns/pattern-helpers.md)
-- [🚧 Scope Validator Impl](patterns/scope-validator-impl.md)
 - [🚧 Stub Resolver Impl](patterns/stub-resolver-impl.md)
 
 ---
@@ -546,16 +546,6 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -567,6 +557,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -645,9 +645,6 @@ graph TD
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    PatternsCodec ..-> PatternRelationshipModel
-    ArchitectureCodec --> MasterDataset
-    ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
@@ -658,6 +655,9 @@ graph TD
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    PatternsCodec ..-> PatternRelationshipModel
+    ArchitectureCodec --> MasterDataset
+    ArchitectureCodec --> ArchIndex
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction

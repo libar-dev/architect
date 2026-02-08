@@ -1,6 +1,6 @@
 # Reimplementation Drift: Root Cause Analysis and Inventory
 
-> **Status:** Analysis complete. Fixes are incremental — each category can be addressed independently.
+> **Status:** All categories fixed. P0 in commit `3fb1fac`, P1-P3 in commits `8542680`–`1096cae` (2026-02-08).
 
 ## The Root Issue
 
@@ -34,7 +34,7 @@ AI agents implement from the immediate context (function signature, variable typ
 
 ## Drift Inventory
 
-### Category 1: Deliverable Status Emoji Rendering (5 sites, REAL BUGS)
+### Category 1: Deliverable Status Emoji Rendering (5 sites, REAL BUGS) — FIXED in `3fb1fac`
 
 These codec files check `d.status === 'complete'` with exact string matching, bypassing `isStatusComplete()` which supports 12 patterns (including `Done`, `Completed`, `finished`, `yes`, `✓`, `✔`, `✅`, `☑`).
 
@@ -52,7 +52,7 @@ These codec files check `d.status === 'complete'` with exact string matching, by
 
 ---
 
-### Category 2: Inline `getPatternName()` (~40 sites, DRY violations)
+### Category 2: Inline `getPatternName()` (~40 sites, DRY violations) — FIXED in `c178a82`
 
 The canonical `getPatternName(p)` in `src/api/pattern-helpers.ts` returns `p.patternName ?? p.name`. Approximately 40 call sites across 12 files reimplement this inline instead of importing the helper.
 
@@ -76,7 +76,7 @@ The canonical `getPatternName(p)` in `src/api/pattern-helpers.ts` returns `p.pat
 
 ---
 
-### Category 3: Hardcoded FSM Pattern Status Comparisons (10 sites, DRY violations)
+### Category 3: Hardcoded FSM Pattern Status Comparisons (10 sites, DRY violations) — FIXED in `8542680`
 
 These compare `pattern.status` directly against raw FSM values (`'completed'`, `'active'`, `'roadmap'`) instead of using canonical helpers or `normalizeStatus()`.
 
@@ -98,7 +98,7 @@ These compare `pattern.status` directly against raw FSM values (`'completed'`, `
 
 ---
 
-### Category 4: `DEFAULT_STATUS` Not Used (3 sites, DRY violations)
+### Category 4: `DEFAULT_STATUS` Not Used (3 sites, DRY violations) — FIXED in `1096cae`
 
 The canonical `DEFAULT_STATUS = 'roadmap'` lives in `src/taxonomy/status-values.ts`. Three files hardcode `'roadmap'` as the default instead.
 
@@ -110,7 +110,7 @@ The canonical `DEFAULT_STATUS = 'roadmap'` lives in `src/taxonomy/status-values.
 
 ---
 
-### Category 5: `DEFAULT_TAG_PREFIX` Hardcoded (3 sites, DRY violations)
+### Category 5: `DEFAULT_TAG_PREFIX` Hardcoded (3 sites, DRY violations) — FIXED in `1096cae`
 
 The canonical `DEFAULT_TAG_PREFIX = '@libar-docs-'` is exported from `src/config/defaults.ts`. Three FSM/lint modules define their own copy:
 
@@ -122,7 +122,7 @@ The canonical `DEFAULT_TAG_PREFIX = '@libar-docs-'` is exported from `src/config
 
 ---
 
-### Category 6: Deliverable Extraction Reimplemented in Process Guard (1 site, MEDIUM-HIGH risk)
+### Category 6: Deliverable Extraction Reimplemented in Process Guard (1 site, MEDIUM-HIGH risk) — FIXED in `8542680`
 
 `src/lint/process-guard/derive-state.ts:197-221` reimplements deliverable extraction differently from the canonical `extractDeliverables()` in `src/extractor/dual-source-extractor.ts`.
 
@@ -137,7 +137,7 @@ The canonical `DEFAULT_TAG_PREFIX = '@libar-docs-'` is exported from `src/config
 
 ---
 
-### Category 7: Two `extractFirstSentence` Functions (MEDIUM risk)
+### Category 7: Two `extractFirstSentence` Functions (MEDIUM risk) — FIXED in `8d13587`
 
 Two functions with the same name exist in different files with different behavior:
 
@@ -151,7 +151,7 @@ Additionally, `src/renderable/codecs/helpers.ts:654` re-exports the `string-util
 
 ---
 
-### Category 8: Legacy Status Values in Lint Error Messages (LOW risk)
+### Category 8: Legacy Status Values in Lint Error Messages (LOW risk) — FIXED in `1096cae`
 
 `src/lint/rules.ts:177-183` hardcodes legacy status aliases (`implemented`, `partial`, `in-progress`, `planned`) alongside `PROCESS_STATUS_VALUES`. These should be derived from `STATUS_NORMALIZATION_MAP` keys in `src/taxonomy/normalized-status.ts`. The validation behavior is correct — only the error message would be incomplete if new aliases are added.
 
@@ -159,16 +159,16 @@ Additionally, `src/renderable/codecs/helpers.ts:654` re-exports the `string-util
 
 ## Priority Summary
 
-| Priority | Category                                   | Sites | Risk                                    | Fix Complexity                     |
-| -------- | ------------------------------------------ | ----- | --------------------------------------- | ---------------------------------- |
-| **P0**   | 1. Deliverable status emoji                | 5     | Bug — wrong emoji for valid statuses    | Low — helper + 5 call sites        |
-| **P1**   | 6. Deliverable extraction in process guard | 1     | Bug risk — case-sensitive column lookup | Medium — refactor to use canonical |
-| **P1**   | 3. Raw FSM status comparisons              | 5     | DRY — fragile if normalization changes  | Low — add normalizeStatus calls    |
-| **P2**   | 2. Inline getPatternName                   | ~40   | DRY — silent if helper changes          | High — 40 sites across 12 files    |
-| **P2**   | 7. Dual extractFirstSentence               | 2     | DRY — different behavior, same name     | Medium — rename or unify           |
-| **P3**   | 4. DEFAULT_STATUS hardcoded                | 3     | DRY — fragile if default changes        | Low — import swap                  |
-| **P3**   | 5. DEFAULT_TAG_PREFIX hardcoded            | 3     | DRY — fragile if prefix changes         | Low — import swap                  |
-| **P3**   | 8. Legacy status in lint messages          | 1     | DRY — error message only                | Low                                |
+| Priority | Category                                   | Sites | Risk            | Fix Complexity                                             |
+| -------- | ------------------------------------------ | ----- | --------------- | ---------------------------------------------------------- |
+| **P0**   | 1. Deliverable status emoji                | 5     | FIXED `3fb1fac` | `getDeliverableStatusEmoji()` helper                       |
+| **P1**   | 6. Deliverable extraction in process guard | 1     | FIXED `8542680` | Reuse canonical `extractDeliverables()`                    |
+| **P1**   | 3. Raw FSM status comparisons              | 7     | FIXED `8542680` | `normalizeStatus()` + `isTerminalState()`                  |
+| **P2**   | 2. Inline getPatternName                   | 43    | FIXED `c178a82` | 13 files, also `firstImplements()` + `findPatternByName()` |
+| **P2**   | 7. Dual extractFirstSentence               | 2     | FIXED `8d13587` | Renamed to `extractFirstSentenceRaw`                       |
+| **P3**   | 4. DEFAULT_STATUS hardcoded                | 4     | FIXED `1096cae` | Import from `taxonomy/status-values`                       |
+| **P3**   | 5. DEFAULT_TAG_PREFIX hardcoded            | 3     | FIXED `1096cae` | Import from `config/defaults`                              |
+| **P3**   | 8. Legacy status in lint messages          | 1     | FIXED `1096cae` | Derive from `STATUS_NORMALIZATION_MAP` keys                |
 
 ---
 
