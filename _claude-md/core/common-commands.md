@@ -24,9 +24,8 @@ pnpm validate:all       # All validations including anti-patterns
 pnpm docs:patterns      # Generate pattern docs
 pnpm docs:all           # Generate all doc types (patterns, roadmap, remaining, changelog)
 
-# Process API queries (JSON output, pipeable to jq)
-pnpm process:query -- status                              # Delivery status counts
-pnpm process:query -- query <method> [args]               # Any ProcessStateAPI method
-pnpm process:query -- pattern <name>                      # Full pattern detail
-pnpm process:query -- arch context <name>                 # Architecture by bounded context
+# Data API (see "Data API CLI" section for full reference)
+pnpm process:query -- --help                              # All subcommands and options
+pnpm process:query -- context <pattern> --session design  # Session context bundle
+pnpm process:query -- overview                            # Project health summary
 ```

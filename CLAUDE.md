@@ -118,65 +118,78 @@ pnpm validate:all       # All validations including anti-patterns
 pnpm docs:patterns      # Generate pattern docs
 pnpm docs:all           # Generate all doc types (patterns, roadmap, remaining, changelog)
 
-# Process API queries (JSON output, pipeable to jq)
-pnpm process:query -- status                              # Delivery status counts
-pnpm process:query -- query <method> [args]               # Any ProcessStateAPI method
-pnpm process:query -- pattern <name>                      # Full pattern detail
-pnpm process:query -- arch context <name>                 # Architecture by bounded context
+# Data API (see "Data API CLI" section for full reference)
+pnpm process:query -- --help                              # All subcommands and options
+pnpm process:query -- context <pattern> --session design  # Session context bundle
+pnpm process:query -- overview                            # Project health summary
 ```
 
 ---
 
-## Process API CLI
+## Data API CLI
 
-### Process API CLI
+### Data API CLI
 
-Query delivery process state directly from the terminal instead of reading generated markdown. Returns JSON, pipeable to `jq`.
+Query delivery process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
-**Prefer the CLI over reading `PATTERNS.md` or `ROADMAP.md`** — targeted queries use 5-10x less context than reading full documents.
+Run `pnpm process:query -- --help` for the full command reference with all options.
 
-#### Subcommands
+#### Context Gathering (Text Output — Use First in Sessions)
+
+| Command                                                       | What It Provides                                         |
+| ------------------------------------------------------------- | -------------------------------------------------------- |
+| `pnpm process:query -- context <pattern> --session design`    | Pattern metadata, description, stubs, deps, deliverables |
+| `pnpm process:query -- context <pattern> --session implement` | Deliverables, FSM state, test files                      |
+| `pnpm process:query -- dep-tree <pattern>`                    | Dependency chain with status                             |
+| `pnpm process:query -- overview`                              | Progress, active phases, blocking chains                 |
+| `pnpm process:query -- files <pattern> --related`             | File reading list with implementation paths              |
+
+#### Pattern Discovery (JSON Output)
+
+| Command                                       | What It Provides                                     |
+| --------------------------------------------- | ---------------------------------------------------- |
+| `pnpm process:query -- list --status roadmap` | All patterns with given status                       |
+| `pnpm process:query -- search <query>`        | Fuzzy name search                                    |
+| `pnpm process:query -- pattern <name>`        | Full detail for one pattern (~3KB)                   |
+| `pnpm process:query -- stubs <pattern>`       | Design stubs with target paths and resolution status |
+| `pnpm process:query -- decisions <pattern>`   | AD-N design decisions from stub descriptions         |
+| `pnpm process:query -- status`                | Status counts and completion percentage              |
+
+#### Architecture Queries (JSON Output)
+
+| Command                                             | What It Provides                                         |
+| --------------------------------------------------- | -------------------------------------------------------- |
+| `pnpm process:query -- arch neighborhood <pattern>` | uses/usedBy/dependsOn/enables/sameContext                |
+| `pnpm process:query -- arch compare <ctx1> <ctx2>`  | Cross-context shared deps and integration points         |
+| `pnpm process:query -- arch coverage`               | Annotation completeness (files with/without @libar-docs) |
+| `pnpm process:query -- tags`                        | Tag usage report (counts per tag and value)              |
+| `pnpm process:query -- sources`                     | File inventory by type (TS, Gherkin, Stubs)              |
+| `pnpm process:query -- unannotated`                 | TypeScript files missing @libar-docs annotations         |
+
+#### Output Modifiers (Composable with Any List Query)
+
+| Modifier                     | Effect                                    |
+| ---------------------------- | ----------------------------------------- |
+| `--names-only`               | Return pattern name strings only          |
+| `--count`                    | Return integer count                      |
+| `--fields name,status,phase` | Return only specified fields              |
+| `--full`                     | Bypass summarization, return raw patterns |
+
+#### List Filters
 
 ```bash
-# Delivery status overview
-pnpm process:query -- status
-
-# Execute any ProcessStateAPI method by name
-pnpm process:query -- query getCurrentWork
-pnpm process:query -- query getPatternsByCategory projection
-pnpm process:query -- query getPatternsByPhase 18
-pnpm process:query -- query isValidTransition roadmap active
-
-# Full detail for one pattern (metadata + deliverables + dependencies + relationships)
-pnpm process:query -- pattern OrderFulfillmentSaga
-
-# Architecture queries (bounded contexts, layers, roles, dependency graphs)
-pnpm process:query -- arch roles
-pnpm process:query -- arch context scanner
-pnpm process:query -- arch layer domain
-pnpm process:query -- arch graph ProcessStateAPI
+pnpm process:query -- list --status completed --names-only
+pnpm process:query -- list --phase 25 --count
+pnpm process:query -- list --category core --source gherkin
 ```
-
-#### Session Workflows
-
-| Session Start Task       | Command                                                        |
-| ------------------------ | -------------------------------------------------------------- |
-| Quick status check       | `pnpm process:query -- status`                                 |
-| Find active work         | `pnpm process:query -- query getCurrentWork`                   |
-| Check roadmap items      | `pnpm process:query -- query getRoadmapItems`                  |
-| Validate a transition    | `pnpm process:query -- query isValidTransition roadmap active` |
-| Get pattern dependencies | `pnpm process:query -- query getPatternRelationships <name>`   |
-| Explore architecture     | `pnpm process:query -- arch context <name>`                    |
 
 #### Clean JSON Piping
 
-`pnpm` outputs a banner line to stdout (`> @libar-dev/...`). For clean JSON piping to `jq`, use `npx tsx` directly:
+`pnpm` outputs a banner line to stdout. For clean JSON piping to `jq`, use `npx tsx` directly:
 
 ```bash
-npx tsx src/cli/process-api.ts -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' query getPatternsByCategory projection | jq '.[].patternName'
+npx tsx src/cli/process-api.ts -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' list --status completed | jq '.[].patternName'
 ```
-
-See `docs/PROCESS-API.md` for the complete 27-method API reference.
 
 ---
 
@@ -527,6 +540,17 @@ Starting from pattern brief?
 | New patterns/capabilities  | Bug fix             |
 | Cross-context coordination | Clear requirements  |
 
+**Context Gathering (BEFORE explore agents):**
+
+```bash
+pnpm process:query -- context <SpecName> --session design
+pnpm process:query -- dep-tree <SpecName>
+pnpm process:query -- stubs <SpecName>
+pnpm process:query -- overview
+```
+
+Only use explore agents for comprehension questions (implementation patterns, formatting conventions) that the API doesn't cover.
+
 **Code Stub Pattern** — stubs go in `delivery-process/stubs/{pattern-name}/`:
 
 ```typescript
@@ -553,6 +577,14 @@ Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues.
 ### Implementation Session
 
 **Goal:** Write code. The roadmap spec is the source of truth.
+
+**Context Gathering (BEFORE writing code):**
+
+```bash
+pnpm process:query -- context <SpecName> --session implement
+pnpm process:query -- dep-tree <SpecName>
+pnpm process:query -- stubs <SpecName>
+```
 
 **Execution Order (CRITICAL):**
 
@@ -775,16 +807,18 @@ Feature: Process Guard Linter
 | `@acceptance-criteria` | Required for DoD validation |
 | `@integration`         | Cross-component behavior    |
 
-#### Rule Block Structure
+#### Rule Block Structure (Mandatory)
 
-For business constraints, use `Rule:` blocks with structured annotations:
+Every feature file MUST use `Rule:` blocks with structured descriptions:
 
 ```gherkin
 Rule: Reservations prevent race conditions
 
-  **Invariant:** Only one reservation can exist for a key.
-  **Rationale:** Check-then-create has TOCTOU vulnerabilities.
-  **Verified by:** @happy-path, @edge-case scenarios below.
+  **Invariant:** Only one reservation can exist for a given key at a time.
+
+  **Rationale:** Check-then-create patterns have TOCTOU vulnerabilities.
+
+  **Verified by:** Concurrent reservations, Expired reservation cleanup
 
   @acceptance-criteria @happy-path
   Scenario: Concurrent reservations are prevented
@@ -793,7 +827,13 @@ Rule: Reservations prevent race conditions
     Then the reservation fails with "already reserved"
 ```
 
-### Feature File Rich Content
+| Element            | Purpose                                 | Extracted By             |
+| ------------------ | --------------------------------------- | ------------------------ |
+| `**Invariant:**`   | Business constraint (what must be true) | Business Rules generator |
+| `**Rationale:**`   | Business justification (why it exists)  | Business Rules generator |
+| `**Verified by:**` | Comma-separated scenario names          | Traceability generator   |
+
+### Feature File Rich Content Guidelines
 
 Feature files serve dual purposes: **executable specs** and **documentation source**. Content in the Feature description section appears in generated docs.
 
@@ -813,7 +853,49 @@ Rule: Reservations use atomic claim
   See `src/reservations/reserve.ts` for API.
 ```
 
-Code stubs are annotated TypeScript files with `throw new Error("not yet implemented")`.
+Code stubs live in `delivery-process/stubs/{pattern-name}/` — annotated TypeScript with `throw new Error("not yet implemented")`.
+
+#### Rule Block Structure (Mandatory)
+
+Every feature file MUST use `Rule:` blocks with structured descriptions:
+
+```gherkin
+Rule: Reservations prevent race conditions
+
+  **Invariant:** Only one reservation can exist for a given key at a time.
+
+  **Rationale:** Check-then-create patterns have TOCTOU vulnerabilities.
+
+  **Verified by:** Concurrent reservations, Expired reservation cleanup
+
+  @acceptance-criteria @happy-path
+  Scenario: Concurrent reservations
+    ...
+```
+
+| Element            | Purpose                                 | Extracted By             |
+| ------------------ | --------------------------------------- | ------------------------ |
+| `**Invariant:**`   | Business constraint (what must be true) | Business Rules generator |
+| `**Rationale:**`   | Business justification (why it exists)  | Business Rules generator |
+| `**Verified by:**` | Comma-separated scenario names          | Traceability generator   |
+
+#### Feature Description Structure
+
+Choose headers that fit your pattern (flexible, not rigid):
+
+| Structure        | Headers                                    | Best For                  |
+| ---------------- | ------------------------------------------ | ------------------------- |
+| Problem/Solution | `**Problem:**`, `**Solution:**`            | Pain point to fix         |
+| Value-First      | `**Business Value:**`, `**How It Works:**` | TDD-style, Gherkin spirit |
+| Context/Approach | `**Context:**`, `**Approach:**`            | Technical patterns        |
+
+Always include a benefits table:
+
+```gherkin
+**Business Value:**
+| Benefit | Impact |
+| ... | ... |
+```
 
 #### Valid Rich Content
 
@@ -828,11 +910,47 @@ Code stubs are annotated TypeScript files with `throw new Error("not yet impleme
 
 #### Forbidden in Feature Descriptions
 
-| Forbidden           | Why                        | Alternative                   |
-| ------------------- | -------------------------- | ----------------------------- |
-| Code fences ` ``` ` | Not Gherkin syntax         | Use DocStrings with lang hint |
-| `@prefix` in text   | Interpreted as Gherkin tag | Remove `@` or escape          |
-| Nested DocStrings   | Gherkin parser error       | Reference code stub file      |
+| Forbidden           | Why                             | Alternative                      |
+| ------------------- | ------------------------------- | -------------------------------- |
+| Code fences ` ``` ` | Not Gherkin syntax              | Use DocStrings with lang hint    |
+| `@prefix` in text   | Interpreted as Gherkin tag      | Remove `@` or use `libar-dev`    |
+| Nested DocStrings   | Gherkin parser error            | Reference code stub file         |
+| `#` at line start   | Gherkin comment — kills parsing | Remove, use `//`, or step DocStr |
+
+#### Description `"""` Blocks vs Step DocStrings (CRITICAL)
+
+**`"""` inside Feature/Rule descriptions is plain text, NOT a DocString.** Only `"""` as step arguments (Given/When/Then) creates real DocStrings. This means description content between `"""` is subject to Gherkin parser rules — including `#` = comment.
+
+**Symptom:** `expected: #EOF, #BackgroundLine... got 'some-content'`
+
+```gherkin
+Rule: My Rule
+
+    """bash
+    # This breaks! Parser sees Gherkin comment, terminates description
+    generate-docs --output docs
+    """
+```
+
+**Workarounds:**
+
+| Approach                    | When to Use                        |
+| --------------------------- | ---------------------------------- |
+| Remove `#` lines            | Simple cases                       |
+| Use `//` for comments       | When comment syntax doesn't matter |
+| Move to step DocString      | When you need code with `#`        |
+| Reference stub file instead | Complex examples (preferred)       |
+
+**Safe pattern — step DocString (content is real DocString, `#` is safe):**
+
+```gherkin
+  Scenario: Example usage
+    Given the following script:
+      """bash
+      # This is safe — real DocString, not description text
+      generate-docs --output docs
+      """
+```
 
 #### Tag Value Constraints
 

@@ -47,6 +47,13 @@
 - Depends on: DataAPIContextAssembly
 - Depends on: DataAPIStubIntegration
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`handoff-generator.ts`](../../delivery-process/stubs/DataAPIDesignSessionSupport/handoff-generator.ts) - ## HandoffGenerator — Session-End State Summary
+- [`scope-validator.ts`](../../delivery-process/stubs/DataAPIDesignSessionSupport/scope-validator.ts) - ## ScopeValidator — Pre-flight Session Readiness Checker
+
 ## Acceptance Criteria
 
 **All scope validation checks pass**

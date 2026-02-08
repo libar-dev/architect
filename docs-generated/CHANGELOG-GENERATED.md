@@ -86,6 +86,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Hierarchy Levels**: Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units...
 - **Format Types**: Defines how tag values are parsed and validated.
 - **Category Definitions**: Categories are used to classify patterns and organize documentation.
+- **Pattern Scanner**: Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in.
+- **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
+- **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
+- **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with...
 - **Renderable Utils**: Utility functions for document codecs.
 - **Renderable Document**: Universal intermediate format for all generated documentation.
 - **Universal Renderer**: Converts RenderableDocument to Markdown.
@@ -94,10 +98,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Lint Rules**: Defines lint rules that check @libar-docs-* directives for completeness and quality.
 - **Lint Module**: Provides lint rules and engine for pattern annotation quality checking.
 - **Lint Engine**: Orchestrates lint rule execution against parsed directives.
-- **Pattern Scanner**: Discovers TypeScript files matching glob patterns and filters to only those with `@libar-docs` opt-in.
-- **Gherkin Scanner**: Scans .feature files for pattern metadata encoded in Gherkin tags.
-- **Gherkin AST Parser**: Parses Gherkin feature files using @cucumber/gherkin and extracts structured data including feature metadata, tags,...
-- **TypeScript AST Parser**: Parses TypeScript source files using @typescript-eslint/typescript-estree to extract @libar-docs-* directives with...
 - **Warning Collector**: Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation.
 - **Generator Types**: Minimal interface for pluggable generators that produce documentation from patterns.
 - **Source Mapping Validator**: Performs pre-flight checks on source mapping tables before extraction begins.
@@ -139,11 +139,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Business Rules Codec**: Transforms MasterDataset into a RenderableDocument for business rules output.
 - **Architecture Codec**: Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source...
 - **Adr Document Codec**: Transforms MasterDataset into RenderableDocument for Architecture Decision Records.
+- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
+- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Built In Generators**: Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture.
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
-- **Transform Dataset**: Transforms raw extracted patterns into a MasterDataset with all pre-computed views.
-- **Pipeline Module**: Barrel export for the unified transformation pipeline components.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
 - **PDR 001 Self Documentation**
 - **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...

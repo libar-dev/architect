@@ -159,21 +159,21 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
+        LintModule["LintModule"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
-        LintModule["LintModule"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
@@ -215,21 +215,21 @@ graph TB
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes

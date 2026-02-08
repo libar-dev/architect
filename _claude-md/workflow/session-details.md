@@ -20,6 +20,17 @@
 | New patterns/capabilities  | Bug fix             |
 | Cross-context coordination | Clear requirements  |
 
+**Context Gathering (BEFORE explore agents):**
+
+```bash
+pnpm process:query -- context <SpecName> --session design
+pnpm process:query -- dep-tree <SpecName>
+pnpm process:query -- stubs <SpecName>
+pnpm process:query -- overview
+```
+
+Only use explore agents for comprehension questions (implementation patterns, formatting conventions) that the API doesn't cover.
+
 **Code Stub Pattern** — stubs go in `delivery-process/stubs/{pattern-name}/`:
 
 ```typescript
@@ -46,6 +57,14 @@ Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues.
 ### Implementation Session
 
 **Goal:** Write code. The roadmap spec is the source of truth.
+
+**Context Gathering (BEFORE writing code):**
+
+```bash
+pnpm process:query -- context <SpecName> --session implement
+pnpm process:query -- dep-tree <SpecName>
+pnpm process:query -- stubs <SpecName>
+```
 
 **Execution Order (CRITICAL):**
 

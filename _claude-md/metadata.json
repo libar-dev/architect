@@ -28,13 +28,13 @@
       ]
     },
     {
-      "title": "Process API CLI",
+      "title": "Data API CLI",
       "tags": ["core"],
       "subsections": [
         {
-          "path": "api/process-api-cli.md",
+          "path": "api/data-api-cli.md",
           "tags": ["core"],
-          "description": "CLI query interface for delivery process state"
+          "description": "Data API CLI for querying delivery process state"
         }
       ]
     },

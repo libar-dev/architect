@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [█████████████░░░░░░░] 98/152 (64%)
+**Overall Progress:** [█████████████░░░░░░░] 98/154 (64%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 26 |
-| 📋 Planned | 28 |
-| **Total Remaining** | 54 |
+| 📋 Planned | 30 |
+| **Total Remaining** | 56 |
 
 ---
 
@@ -32,7 +32,7 @@
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 26 | 23 | 0% |
+| 🚧 Backlog (No Phase) | 28 | 23 | 0% |
 
 ---
 
@@ -41,7 +41,7 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 26 |
-| ✅ Ready to Start | 27 |
+| ✅ Ready to Start | 29 |
 | ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
@@ -71,6 +71,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Data API Design Session Support (Phase 25) - 1d
 - 📋 Data API Platform Integration (Phase 25) - 3d
 
-Showing 5 of 27 actionable items.
+Showing 5 of 29 actionable items.
 
 ---
