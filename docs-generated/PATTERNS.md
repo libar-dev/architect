@@ -500,6 +500,19 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
+    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
+    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
+    ScopeValidator___Pre_flight_Session_Readiness_Checker ..-> DataAPIDesignSessionSupport
+    HandoffGenerator___Session_End_State_Summary --> ProcessStateAPI
+    HandoffGenerator___Session_End_State_Summary --> MasterDataset
+    HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
+    HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -554,6 +567,18 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -580,18 +605,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -623,31 +636,18 @@ graph TD
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
     ArchQueriesImpl ..-> DataAPIArchitectureQueries
-    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
-    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
-    ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
-    ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
-    ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
-    ScopeValidator___Pre_flight_Session_Readiness_Checker ..-> DataAPIDesignSessionSupport
-    HandoffGenerator___Session_End_State_Summary --> ProcessStateAPI
-    HandoffGenerator___Session_End_State_Summary --> MasterDataset
-    HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
-    HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
-    PatternsCodec ..-> PatternRelationshipModel
-    ArchitectureCodec --> MasterDataset
-    ArchitectureCodec --> ArchIndex
     ProcessGuardTypes ..-> ProcessGuardLinter
     ProcessGuardModule ..-> ProcessGuardLinter
     DetectChanges --> DeriveProcessState
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
+    PatternsCodec ..-> PatternRelationshipModel
+    ArchitectureCodec --> MasterDataset
+    ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry

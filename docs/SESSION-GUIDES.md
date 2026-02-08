@@ -130,6 +130,10 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
   Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues. They are scanned by the documentation pipeline via `-i 'delivery-process/stubs/**/*.ts'`.
 
+- [ ] **Verify stub identifier spelling** — Check all exported function/type/interface names for typos before committing stubs
+
+- [ ] **List canonical helpers in `@<prefix>-uses`** — If the function does status matching, reference `COMPLETION_PATTERNS`, `PENDING_PATTERNS`, or `isStatusComplete`/`isStatusPending`
+
 ### Do NOT
 
 - Create markdown design documents (use decision specs instead)
@@ -177,7 +181,10 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
      | Core types | completed | src/types.ts | Yes | unit |
      ```
 
-4. **Transition to completed** (only when ALL done):
+4. **Verify all design decisions addressed:**
+   - [ ] Run `pnpm process:query -- decisions <SpecName>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
+
+5. **Transition to completed** (only when ALL done):
 
    ```gherkin
    @<prefix>-status:completed
@@ -185,7 +192,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
    > Protection: `completed` = hard-locked (requires `@<prefix>-unlock-reason` to modify)
 
-5. **Regenerate docs:**
+6. **Regenerate docs:**
    ```bash
    npx generate-docs -g patterns,roadmap -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
    ```

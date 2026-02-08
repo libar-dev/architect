@@ -28,6 +28,18 @@ The project has strict linting rules. Save time by coding defensively.
 | Unused variables: `(_ctx, count, text)` throws lint errors if `count` isn't used | Prefix **immediately**: `(_ctx, _count, text)`                                    |
 | Type safety: `ListItem` is an object, not a string. `item + '\n'` throws errors  | Check types before concatenation: `(typeof item === 'string' ? item : item.text)` |
 
+### Canonical Status Helpers (CRITICAL)
+
+Before implementing any status-checking or completion-matching logic, use existing canonical helpers from `src/validation/types.ts`:
+
+| Helper                     | Pattern Set                     | Use Case                                    |
+| -------------------------- | ------------------------------- | ------------------------------------------- |
+| `isStatusComplete(status)` | `COMPLETION_PATTERNS` (12 pat)  | Check if deliverable is done                |
+| `isStatusPending(status)`  | `PENDING_PATTERNS` (8 pat)      | Check if deliverable not started            |
+| `isDeliverableComplete(d)` | Delegates to `isStatusComplete` | DoD validation (takes `Deliverable` object) |
+
+**NEVER** hardcode status strings like `'planned'`, `'pending'`, `'Complete'`. Always use canonical helpers — hardcoded matching diverges when new patterns are added.
+
 ### Efficient Debugging Strategy
 
 - **Don't** try to debug by running the full test suite repeatedly.

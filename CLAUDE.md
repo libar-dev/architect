@@ -466,6 +466,18 @@ The project has strict linting rules. Save time by coding defensively.
 | Unused variables: `(_ctx, count, text)` throws lint errors if `count` isn't used | Prefix **immediately**: `(_ctx, _count, text)`                                    |
 | Type safety: `ListItem` is an object, not a string. `item + '\n'` throws errors  | Check types before concatenation: `(typeof item === 'string' ? item : item.text)` |
 
+### Canonical Status Helpers (CRITICAL)
+
+Before implementing any status-checking or completion-matching logic, use existing canonical helpers from `src/validation/types.ts`:
+
+| Helper                     | Pattern Set                     | Use Case                                    |
+| -------------------------- | ------------------------------- | ------------------------------------------- |
+| `isStatusComplete(status)` | `COMPLETION_PATTERNS` (12 pat)  | Check if deliverable is done                |
+| `isStatusPending(status)`  | `PENDING_PATTERNS` (8 pat)      | Check if deliverable not started            |
+| `isDeliverableComplete(d)` | Delegates to `isStatusComplete` | DoD validation (takes `Deliverable` object) |
+
+**NEVER** hardcode status strings like `'planned'`, `'pending'`, `'Complete'`. Always use canonical helpers — hardcoded matching diverges when new patterns are added.
+
 ### Efficient Debugging Strategy
 
 - **Don't** try to debug by running the full test suite repeatedly.
@@ -574,6 +586,11 @@ export function myFunction(args: MyArgs): Promise<MyResult> {
 
 Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues.
 
+**Design Session Quality Checks:**
+
+- [ ] **Verify stub identifier spelling** — Check all exported function/type/interface names in stubs for typos before committing
+- [ ] **List canonical helpers in `@libar-docs-uses`** — If the function does status matching, reference `COMPLETION_PATTERNS`, `PENDING_PATTERNS`, or `isStatusComplete`/`isStatusPending`
+
 ### Implementation Session
 
 **Goal:** Write code. The roadmap spec is the source of truth.
@@ -591,8 +608,9 @@ pnpm process:query -- stubs <SpecName>
 1. **Transition to `active` FIRST** — before any code changes
 2. **Create executable spec stubs** — if `@libar-docs-executable-specs` present
 3. **For each deliverable:** implement, test, update status to `completed`
-4. **Transition to `completed`** — only when ALL deliverables done
-5. **Regenerate docs:** `pnpm docs:all`
+4. **Verify all design decisions addressed** — Run `pnpm process:query -- decisions <pattern>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
+5. **Transition to `completed`** — only when ALL deliverables done
+6. **Regenerate docs:** `pnpm docs:all`
 
 | Do NOT                                | Why                                     |
 | ------------------------------------- | --------------------------------------- |
