@@ -50,7 +50,7 @@ Feature: MVP Workflow Implementation
         | status    |
         | roadmap   |
         | active    |
-        | complete |
+        | completed |
         | deferred  |
 
   Rule: Generators map statuses to documents

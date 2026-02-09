@@ -1,4 +1,4 @@
-# 🚧 Process State API CLI
+# ✅ Process State API CLI
 
 **Purpose:** Detailed requirements for the Process State API CLI feature
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | active |
+| Status | completed |
 | Product Area | DeliveryProcess |
 | Business Value | direct api queries for planning |
 | Phase | 24 |

@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIArchitectureQueries
  * @libar-docs-uses Pattern Scanner, MasterDataset
@@ -101,7 +102,7 @@ export async function analyzeCoverage(
   _baseDir: string,
   _registry: unknown
 ): Promise<CoverageReport> {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }
 
 /**
@@ -122,7 +123,7 @@ export async function findUnannotatedFiles(
   _registry: unknown,
   _pathFilter?: string
 ): Promise<readonly string[]> {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }
 
 /**
@@ -144,5 +145,5 @@ export function findUnusedTaxonomy(
   _dataset: unknown,
   _registry: unknown
 ): UnusedTaxonomyReport {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }

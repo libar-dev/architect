@@ -256,7 +256,7 @@ Feature: Data API Context Assembly - One-Command Session Context
     aggregate results. Implementation readiness checks for specific patterns
     live in DataAPIDesignSessionSupport's `scope-validate` command.
 
-    **Overview output:**
+    **Overview output** (uses normalizeStatus display aliases: planned = roadmap + deferred):
     | Section | Content |
     | Progress | N patterns (X completed, Y active, Z planned) = P% |
     | Active phases | Currently in-progress phases with pattern counts |

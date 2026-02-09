@@ -207,7 +207,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
 
           Examples:
             | status    | protection |
-            | complete | hard       |
+            | completed | hard       |
             | active    | scope      |
             | roadmap   | none       |
         """

@@ -195,6 +195,7 @@ _Verified by: List all tags with usage counts, Source file inventory, Tags listi
 
 Files that implement this pattern:
 
+- [`arch-queries.ts`](../../delivery-process/stubs/data-api-architecture-queries/arch-queries.ts) - ## ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context
 - [`coverage-analyzer.ts`](../../delivery-process/stubs/data-api-architecture-queries/coverage-analyzer.ts) - ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection
 - [`arch-queries.ts`](../../src/api/arch-queries.ts) - ## ArchQueries — Neighborhood, Comparison, Tags, Sources
 - [`coverage-analyzer.ts`](../../src/api/coverage-analyzer.ts) - ## CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection

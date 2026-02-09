@@ -162,7 +162,7 @@ Scenario Outline: Protection level from status
 
   Examples:
     | status    | protection |
-    | complete | hard       |
+    | completed | hard       |
     | active    | scope      |
     | roadmap   | none       |
 ```

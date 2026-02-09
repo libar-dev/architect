@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIContextAssembly
  * @libar-docs-uses ProcessStateAPI, MasterDataset, PatternSummarizer
@@ -325,7 +326,7 @@ export function assembleContext(
   _dataset: unknown,
   _options: ContextOptions
 ): ContextBundle {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }
 
 /**
@@ -342,7 +343,7 @@ export function buildDepTree(
   _dataset: unknown,
   _options: DepTreeOptions
 ): DepTreeNode {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }
 
 /**
@@ -361,7 +362,7 @@ export function buildFileReadingList(
   _pattern: string,
   _includeRelated: boolean
 ): FileReadingList {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }
 
 /**
@@ -376,5 +377,5 @@ export function buildFileReadingList(
 export function buildOverview(
   _dataset: unknown
 ): OverviewSummary {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }

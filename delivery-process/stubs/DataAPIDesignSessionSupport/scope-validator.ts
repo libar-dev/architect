@@ -104,6 +104,8 @@ export interface ScopeValidationOptions {
   readonly scopeType: ScopeType;
   /** Base directory for resolving stub file paths. */
   readonly baseDir: string;
+  /** When true, WARN checks are promoted to BLOCKED (DD-4, matches lint-process --strict). */
+  readonly strict?: boolean;
 }
 
 /**

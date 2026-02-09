@@ -74,7 +74,7 @@ Feature: Process Guard Linter
         | roadmap   | none       | Fully editable                       |
         | deferred  | none       | Fully editable                       |
         | active    | scope      | Errors on new deliverables           |
-        | complete | hard       | Requires @libar-docs-unlock-reason   |
+        | completed | hard       | Requires @libar-docs-unlock-reason   |
 
     @acceptance-criteria
     Scenario: Completed file modification without unlock fails
@@ -162,7 +162,7 @@ Feature: Process Guard Linter
         | from     | to        |
         | roadmap  | active    |
         | roadmap  | deferred  |
-        | active   | complete |
+        | active   | completed |
         | active   | roadmap   |
         | deferred | roadmap   |
         | roadmap  | roadmap   |
@@ -176,12 +176,12 @@ Feature: Process Guard Linter
 
       Examples:
         | from      | to        |
-        | roadmap   | complete |
+        | roadmap   | completed |
         | deferred  | active    |
-        | deferred  | complete |
-        | complete | active    |
-        | complete | roadmap   |
-        | complete | deferred  |
+        | deferred  | completed |
+        | completed | active    |
+        | completed | roadmap   |
+        | completed | deferred  |
 
   # ============================================================================
   # DELIVERABLE INTEGRITY

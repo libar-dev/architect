@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-uses ProcessStateAPI
@@ -37,7 +38,7 @@ import { z } from 'zod';
  */
 export const PatternSummarySchema = z.object({
   patternName: z.string(),
-  status: z.string().optional(),
+  status: z.enum(['roadmap', 'active', 'completed', 'deferred']).optional(),
   category: z.string(),
   phase: z.number().int().optional(),
   file: z.string(),
@@ -61,7 +62,7 @@ export type PatternSummary = z.infer<typeof PatternSummarySchema>;
  * @returns Compact PatternSummary (~100 bytes JSON)
  */
 export function summarizePattern(_pattern: unknown): PatternSummary {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
 
 /**
@@ -73,5 +74,5 @@ export function summarizePattern(_pattern: unknown): PatternSummary {
  * @returns Array of PatternSummary objects
  */
 export function summarizePatterns(_patterns: readonly unknown[]): readonly PatternSummary[] {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
