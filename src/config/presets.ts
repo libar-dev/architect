@@ -30,6 +30,7 @@
 import type { DeliveryProcessConfig } from './types.js';
 import { CATEGORIES, type CategoryDefinition } from '../taxonomy/categories.js';
 import { buildRegistry } from '../taxonomy/registry-builder.js';
+import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from './defaults.js';
 
 /**
  * Generic preset for non-DDD projects.
@@ -99,8 +100,8 @@ export const GENERIC_PRESET = {
  * ```
  */
 export const LIBAR_GENERIC_PRESET = {
-  tagPrefix: '@libar-docs-',
-  fileOptInTag: '@libar-docs',
+  tagPrefix: DEFAULT_TAG_PREFIX,
+  fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
   categories: [
     {
       tag: 'core',
@@ -143,8 +144,8 @@ export const LIBAR_GENERIC_PRESET = {
  * ```
  */
 export const DDD_ES_CQRS_PRESET = {
-  tagPrefix: '@libar-docs-',
-  fileOptInTag: '@libar-docs',
+  tagPrefix: DEFAULT_TAG_PREFIX,
+  fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
   categories: CATEGORIES,
   metadataTags: buildRegistry().metadataTags,
 } as const satisfies DeliveryProcessConfig;

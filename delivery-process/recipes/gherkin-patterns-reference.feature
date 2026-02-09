@@ -45,9 +45,9 @@ Feature: Gherkin Patterns Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Gherkin patterns reference feature file | Complete | delivery-process/recipes/gherkin-patterns-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/GHERKINPATTERNSREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/gherkin/gherkinpatternsreference.md |
+      | Gherkin patterns reference feature file | complete | delivery-process/recipes/gherkin-patterns-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/GHERKINPATTERNSREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/gherkin/gherkinpatternsreference.md |
 
   Rule: Roadmap Spec Structure
 

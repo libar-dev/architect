@@ -75,7 +75,7 @@ function getCachedRegex(pattern, flags) {
  * ```
  */
 function extractSingleValue(commentText, fullTag) {
-    const regex = getCachedRegex(`${escapeRegex(fullTag)}\\s+(.+?)(?:\\n|\\*|$)`);
+    const regex = getCachedRegex(`(?:^|\\n)\\s*\\*?\\s*${escapeRegex(fullTag)}\\s+(.+?)(?:\\n|\\*|$)`);
     const match = regex.exec(commentText);
     return match?.[1]?.trim();
 }
@@ -472,6 +472,9 @@ function parseDirective(commentText, loc, filePath, registry) {
     const archRole = metadataResults.get('arch-role');
     const archContext = metadataResults.get('arch-context');
     const archLayer = metadataResults.get('arch-layer');
+    // Design session stub metadata tags
+    const target = metadataResults.get('target');
+    const since = metadataResults.get('since');
     // Shape extraction tags
     const extractShapes = metadataResults.get('extract-shapes');
     // Extract "### When to Use" section or "**When to use:**" inline format
@@ -544,6 +547,9 @@ function parseDirective(commentText, loc, filePath, registry) {
         // Cross-reference and API navigation fields (PatternRelationshipModel enhancement)
         ...(seeAlso && seeAlso.length > 0 && { seeAlso }),
         ...(apiRef && apiRef.length > 0 && { apiRef }),
+        // Design session stub metadata fields
+        ...(target && { target }),
+        ...(since && { since }),
         // Architecture diagram generation fields
         ...(archRole && { archRole }),
         ...(archContext && { archContext }),

@@ -28,6 +28,17 @@
       ]
     },
     {
+      "title": "Data API CLI",
+      "tags": ["core"],
+      "subsections": [
+        {
+          "path": "api/data-api-cli.md",
+          "tags": ["core"],
+          "description": "Data API CLI for querying delivery process state"
+        }
+      ]
+    },
+    {
       "title": "Architecture",
       "tags": ["core"],
       "subsections": [

@@ -4,6 +4,7 @@
  * @libar-docs-pattern SourceMapper
  * @libar-docs-status completed
  * @libar-docs-phase 27
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer infrastructure
  * @libar-docs-depends-on DecisionDocCodec,ShapeExtractor,GherkinASTParser

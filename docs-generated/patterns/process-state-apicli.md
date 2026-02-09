@@ -1,4 +1,4 @@
-# 📋 Process State API CLI
+# 🚧 Process State API CLI
 
 **Purpose:** Detailed documentation for the Process State API CLI pattern
 
@@ -8,9 +8,9 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | active |
 | Category | DDD |
-| Phase | 99 |
+| Phase | 24 |
 
 ## Description
 
@@ -38,6 +38,12 @@
   | Real-time accuracy | Queries source directly, no stale documentation |
   | Session efficiency | "What's next?" answered in 100ms vs 10s regeneration |
   | Completes API promise | Makes CLAUDE.md documentation accurate |
+
+## Implementations
+
+Files that implement this pattern:
+
+- [`process-api.ts`](../../src/cli/process-api.ts) - ## process-api - CLI Query Interface to ProcessStateAPI
 
 ## Acceptance Criteria
 

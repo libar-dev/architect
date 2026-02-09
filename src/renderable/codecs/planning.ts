@@ -36,7 +36,12 @@ import {
 } from '../schema.js';
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
 import { getStatusEmoji, getDisplayName } from '../utils.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
+import {
+  getDeliverableStatusEmoji,
+  isDeliverableStatusComplete,
+} from '../../taxonomy/deliverable-status.js';
+import { normalizeStatus, isPatternPlanned } from '../../taxonomy/index.js';
 import { groupBy } from '../../utils/index.js';
 import {
   type BaseCodecOptions,
@@ -250,7 +255,7 @@ function buildPlanningChecklistDocument(
   options: Required<PlanningChecklistCodecOptions>
 ): RenderableDocument {
   const sections: SectionBlock[] = [];
-  const completedNames = new Set(dataset.byStatus.completed.map((p) => p.patternName ?? p.name));
+  const completedNames = new Set(dataset.byStatus.completed.map((p) => getPatternName(p)));
 
   // Collect phases for checklists
   const phasesToCheck: ExtractedPattern[] = [];
@@ -292,10 +297,7 @@ function buildPlanningChecklistDocument(
       [
         ['Phases to Plan', String(phasesToCheck.length)],
         ['Active', String(dataset.byStatus.active.filter((p) => phasesToCheck.includes(p)).length)],
-        [
-          'Next Actionable',
-          String(phasesToCheck.filter((p) => normalizeStatus(p.status) === 'planned').length),
-        ],
+        ['Next Actionable', String(phasesToCheck.filter((p) => isPatternPlanned(p.status)).length)],
       ]
     ),
     separator()
@@ -349,7 +351,7 @@ function buildPhaseChecklist(
     const dodItems: string[] = ['**Deliverables:**'];
     if (pattern.deliverables && pattern.deliverables.length > 0) {
       for (const d of pattern.deliverables) {
-        const status = d.status === 'complete' ? '✅' : '- [ ]';
+        const status = isDeliverableStatusComplete(d.status) ? '✅' : '- [ ]';
         dodItems.push(`${status} ${d.name}`);
       }
     } else {
@@ -467,7 +469,7 @@ function buildPhasePlan(
   // Deliverables
   if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
     const items = pattern.deliverables.map((d) => {
-      const emoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+      const emoji = getDeliverableStatusEmoji(d.status);
       return `${emoji} ${d.name}`;
     });
     sections.push(heading(4, 'Deliverables'), list(items));
@@ -507,7 +509,7 @@ function buildSessionFindingsDocument(
   }> = [];
 
   for (const pattern of dataset.byStatus.completed) {
-    const sourceName = pattern.patternName ?? pattern.name;
+    const sourceName = getPatternName(pattern);
     const sourcePhase = pattern.phase;
 
     // Extract gaps from pattern metadata if available

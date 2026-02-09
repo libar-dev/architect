@@ -32,12 +32,12 @@ Feature: Generator Infrastructure Testing
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Test Type | Location |
-      | orchestrator.feature | planned | Yes | integration | tests/features/generators/orchestrator.feature |
-      | registry.feature | planned | Yes | unit | tests/features/generators/registry.feature |
-      | codec-based.feature | planned | Yes | unit | tests/features/generators/codec-based.feature |
-      | orchestrator.steps.ts | planned | Yes | - | tests/steps/generators/orchestrator.steps.ts |
-      | registry.steps.ts | planned | Yes | - | tests/steps/generators/registry.steps.ts |
-      | codec-based.steps.ts | planned | Yes | - | tests/steps/generators/codec-based.steps.ts |
+      | orchestrator.feature | pending | Yes | integration | tests/features/generators/orchestrator.feature |
+      | registry.feature | pending | Yes | unit | tests/features/generators/registry.feature |
+      | codec-based.feature | pending | Yes | unit | tests/features/generators/codec-based.feature |
+      | orchestrator.steps.ts | pending | Yes | - | tests/steps/generators/orchestrator.steps.ts |
+      | registry.steps.ts | pending | Yes | - | tests/steps/generators/registry.steps.ts |
+      | codec-based.steps.ts | pending | Yes | - | tests/steps/generators/codec-based.steps.ts |
 
   # ============================================================================
   # RULE 1: Generator Orchestrator

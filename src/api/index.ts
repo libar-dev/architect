@@ -48,14 +48,104 @@ export type {
   PhaseProgress,
   PhaseGroup,
   PatternDependencies,
+  PatternRelationships,
   PatternDeliverable,
   QuarterGroup,
   TransitionCheck,
   ProtectionInfo,
 } from './types.js';
 
-export { createSuccess, createError } from './types.js';
+export { createSuccess, createError, QueryApiError } from './types.js';
+export type { NeighborEntry } from './types.js';
 
 // Process State API
 export type { ProcessStateAPI } from './process-state.js';
 export { createProcessStateAPI } from './process-state.js';
+
+// Pattern Summarization
+export type { PatternSummary } from './summarize.js';
+export {
+  PatternSummarySchema,
+  SUMMARY_FIELDS,
+  summarizePattern,
+  summarizePatterns,
+} from './summarize.js';
+
+// Fuzzy Matching
+export type { FuzzyMatch } from './fuzzy-match.js';
+export { fuzzyMatchPatterns, findBestMatch } from './fuzzy-match.js';
+
+// Pattern Helpers
+export {
+  getPatternName,
+  findPatternByName,
+  getRelationships,
+  allPatternNames,
+  suggestPattern,
+  firstImplements,
+} from './pattern-helpers.js';
+
+// Stub Resolution
+export type { StubResolution, StubSummary, DecisionItem, PdrReference } from './stub-resolver.js';
+export {
+  findStubPatterns,
+  resolveStubs,
+  groupStubsByPattern,
+  extractDecisionItems,
+  findPdrReferences,
+} from './stub-resolver.js';
+
+// Context Assembly
+export type {
+  SessionType,
+  ContextOptions,
+  DepTreeOptions,
+  PatternContextMeta,
+  StubRef,
+  DepEntry,
+  DeliverableEntry,
+  FsmContext,
+  ContextBundle,
+  DepTreeNode,
+  FileReadingList,
+  ProgressSummary,
+  ActivePhaseSummary,
+  BlockingEntry,
+  OverviewSummary,
+} from './context-assembler.js';
+export {
+  isValidSessionType,
+  assembleContext,
+  buildDepTree,
+  buildFileReadingList,
+  buildOverview,
+} from './context-assembler.js';
+
+// Context Formatting
+export {
+  formatContextBundle,
+  formatDepTree,
+  formatFileReadingList,
+  formatOverview,
+} from './context-formatter.js';
+
+// Architecture Queries
+export type {
+  NeighborhoodResult,
+  ContextComparison,
+  TagUsageReport,
+  SourceInventory,
+} from './arch-queries.js';
+export {
+  computeNeighborhood,
+  compareContexts,
+  aggregateTagUsage,
+  buildSourceInventory,
+} from './arch-queries.js';
+
+// Coverage Analysis
+export type { CoverageReport } from './coverage-analyzer.js';
+export { analyzeCoverage, findUnannotatedFiles, findUnusedTaxonomy } from './coverage-analyzer.js';
+
+// Pattern Summarization (extended)
+export { deriveSource } from './summarize.js';

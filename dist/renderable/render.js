@@ -3,6 +3,9 @@
  * @libar-docs-core
  * @libar-docs-pattern UniversalRenderer
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context renderer
+ * @libar-docs-arch-layer application
  *
  * ## Universal Renderer
  *

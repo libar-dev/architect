@@ -5,6 +5,9 @@
  * @libar-docs-status active
  * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-depends-on:PDR005MvpWorkflow
+ * @libar-docs-arch-role decider
+ * @libar-docs-arch-context validation
+ * @libar-docs-arch-layer application
  *
  * ## FSM Validator - Pure Validation Functions
  *
@@ -28,11 +31,7 @@ import {
   getTransitionErrorMessage,
 } from './transitions.js';
 import { isTerminalState, getProtectionLevel, type ProtectionLevel } from './states.js';
-
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 
 /**
  * Result of validating a status value

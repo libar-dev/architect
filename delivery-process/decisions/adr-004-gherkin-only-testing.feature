@@ -43,8 +43,8 @@ Feature: ADR-004 - Gherkin-Only Testing Policy
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location | Release |
-      | Policy definition in CLAUDE.md | Complete | No | CLAUDE.md | v0.3.0 |
-      | Test migration manifest | Pending | No | docs/test-migration-manifest.md | v0.3.2 |
+      | Policy definition in CLAUDE.md | complete | No | CLAUDE.md | v0.3.0 |
+      | Test migration manifest | pending | No | docs/test-migration-manifest.md | v0.3.2 |
 
   @acceptance-criteria
   Scenario: Gherkin-only policy enforced

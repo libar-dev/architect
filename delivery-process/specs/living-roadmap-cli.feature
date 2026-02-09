@@ -30,12 +30,12 @@ Feature: Living Roadmap CLI - Interactive Queries Over Reality
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | roadmap:next CLI command | Pending | Yes | src/cli/ |
-      | roadmap:blocked CLI command | Pending | Yes | src/cli/ |
-      | roadmap:path-to CLI command | Pending | Yes | src/cli/ |
-      | roadmap:status CLI command | Pending | Yes | src/cli/ |
-      | Dependency graph analyzer | Pending | Yes | src/analyzers/ |
-      | Critical path calculator | Pending | Yes | src/analyzers/ |
+      | roadmap:next CLI command | pending | Yes | src/cli/ |
+      | roadmap:blocked CLI command | pending | Yes | src/cli/ |
+      | roadmap:path-to CLI command | pending | Yes | src/cli/ |
+      | roadmap:status CLI command | pending | Yes | src/cli/ |
+      | Dependency graph analyzer | pending | Yes | src/analyzers/ |
+      | Critical path calculator | pending | Yes | src/analyzers/ |
 
   @acceptance-criteria
   Scenario: Query next actionable phase

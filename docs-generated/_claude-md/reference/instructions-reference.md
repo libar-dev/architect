@@ -262,3 +262,15 @@
 | Problem/Solution | Problem and Solution | Pain point to fix |
 | Value-First | Business Value and How It Works | TDD-style specs |
 | Context/Approach | Context and Approach | Technical patterns |
+
+### Related Documentation
+
+**Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| TAXONOMY-REFERENCE.md | Reference | Tag definitions, categories, status values |
+| CONFIGURATION-REFERENCE.md | Reference | Preset system and tag prefix configuration |
+| PROCESS-GUARD-REFERENCE.md | Reference | FSM workflow validation rules |
+| SESSION-GUIDES-REFERENCE.md | Reference | Session workflows using annotations |
+| GHERKIN-PATTERNS-REFERENCE.md | Reference | Feature file structure and patterns |

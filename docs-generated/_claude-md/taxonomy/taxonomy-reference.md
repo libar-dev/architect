@@ -48,6 +48,7 @@
 - `ACCEPTED_STATUS_VALUES` - const
 - `AcceptedStatusValue` - type
 - `DEFAULT_STATUS` - const
+- `VALID_PROCESS_STATUS_SET` - const
 
 ### Status Values (from this decision (rule: status values))
 

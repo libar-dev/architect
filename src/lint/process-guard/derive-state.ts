@@ -30,8 +30,10 @@ import { glob } from 'glob';
 import type { Result } from '../../types/index.js';
 import { Result as R } from '../../types/index.js';
 import { scanGherkinFiles } from '../../scanner/gherkin-scanner.js';
+import { extractDeliverables } from '../../extractor/dual-source-extractor.js';
 import { getProtectionLevel, type ProtectionLevel } from '../../validation/fsm/index.js';
 import {
+  DEFAULT_STATUS,
   PROCESS_STATUS_VALUES,
   normalizeStatus,
   type ProcessStatusValue,
@@ -142,8 +144,8 @@ async function deriveFileStates(
     const normalizedStatusValue = normalizeStatus(status);
     const protection = getProtectionLevel(status);
 
-    // Extract deliverables from background
-    const deliverables = extractDeliverablesFromBackground(file.background);
+    // Extract deliverables from background (canonical extractor with case-insensitive headers)
+    const deliverables = extractDeliverables(file).map((d) => d.name);
 
     // Check for unlock reason
     const unlockInfo = extractUnlockReason(file.feature.tags);
@@ -187,37 +189,7 @@ function extractStatusFromTags(tags: readonly string[]): ProcessStatusValue {
     }
   }
   // Default to roadmap if no status found
-  return 'roadmap';
-}
-
-/**
- * Extract deliverable names from background data table.
- * Uses unknown type to handle exactOptionalPropertyTypes compatibility.
- */
-function extractDeliverablesFromBackground(background: unknown): readonly string[] {
-  if (background === null || background === undefined || typeof background !== 'object') return [];
-
-  const bg = background as {
-    steps?: ReadonlyArray<{ dataTable?: { rows?: ReadonlyArray<Record<string, string>> } }>;
-  };
-  if (bg.steps === undefined) return [];
-
-  const deliverables: string[] = [];
-
-  for (const step of bg.steps) {
-    const rows = step.dataTable?.rows;
-    if (rows) {
-      for (const row of rows) {
-        // Look for "Deliverable" column
-        const deliverable = row['Deliverable'] ?? row['deliverable'];
-        if (deliverable) {
-          deliverables.push(deliverable);
-        }
-      }
-    }
-  }
-
-  return deliverables;
+  return DEFAULT_STATUS;
 }
 
 /**

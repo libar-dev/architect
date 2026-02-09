@@ -42,6 +42,7 @@ import type {
   StatusTagLocation,
 } from './types.js';
 import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
+import { DEFAULT_STATUS } from '../../taxonomy/status-values.js';
 import type { WithTagRegistry } from '../../validation/types.js';
 
 /**
@@ -470,13 +471,13 @@ function detectStatusTransitions(
     let fromStatus: ProcessStatusValue;
 
     if (state.removedTag === null) {
-      // New file defaults from 'roadmap'
-      fromStatus = 'roadmap';
+      // New file defaults from DEFAULT_STATUS
+      fromStatus = DEFAULT_STATUS;
     } else {
       // state.removedTag is guaranteed to exist here
       const fromMatch = statusPattern.exec(state.removedTag.rawLine);
       const fromStatusRaw = fromMatch?.[1]?.toLowerCase();
-      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : 'roadmap';
+      fromStatus = fromStatusRaw ? (fromStatusRaw as ProcessStatusValue) : DEFAULT_STATUS;
     }
 
     // Skip if no actual change
@@ -505,7 +506,10 @@ function detectStatusTransitions(
 /**
  * Detect deliverable changes from diff content.
  *
- * Looks for changes in DataTable rows containing "Deliverable" column.
+ * Only matches table rows that appear within a deliverable table context,
+ * identified by a preceding header row containing both "Deliverable" and "Status".
+ * This prevents false positives from Examples tables, DocString-embedded tables,
+ * and other non-deliverable table content.
  *
  * @internal Exported for testing purposes only.
  */
@@ -515,6 +519,7 @@ export function detectDeliverableChanges(
 ): Array<[string, DeliverableChange]> {
   const changes: Array<[string, DeliverableChange]> = [];
   let currentFile = '';
+  let inDeliverableTable = false;
 
   // Regex for DataTable row with Deliverable column
   // Matches: | Deliverable Name | Status | ... |
@@ -527,17 +532,46 @@ export function detectDeliverableChanges(
     if (line.startsWith('diff --git')) {
       const match = /diff --git a\/(.+) b\/(.+)/.exec(line);
       currentFile = match?.[2] ?? '';
+      inDeliverableTable = false;
       if (currentFile && !fileChanges.has(currentFile)) {
         fileChanges.set(currentFile, { added: [], removed: [], modified: [] });
       }
       continue;
     }
 
+    // Reset deliverable table context at hunk boundaries
+    if (line.startsWith('@@')) {
+      inDeliverableTable = false;
+      continue;
+    }
+
     // Skip if not a relevant file
     if (!currentFile || !files.includes(currentFile)) continue;
 
-    // Skip header rows (first row in DataTable)
-    if (line.includes('Deliverable') && line.includes('Status')) continue;
+    // Strip diff prefix (+/-/space) to get raw content
+    const content = line.startsWith('+') || line.startsWith('-') ? line.substring(1) : line;
+
+    // Detect deliverable table header — sets context for subsequent rows
+    if (content.includes('Deliverable') && content.includes('Status') && content.includes('|')) {
+      inDeliverableTable = true;
+      continue;
+    }
+
+    // Exit deliverable table context on non-table or blank lines
+    if (inDeliverableTable) {
+      const trimmed = content.trim();
+      if (trimmed !== '' && !trimmed.startsWith('|')) {
+        inDeliverableTable = false;
+        continue;
+      }
+      if (trimmed === '') {
+        inDeliverableTable = false;
+        continue;
+      }
+    }
+
+    // Only process rows within a deliverable table
+    if (!inDeliverableTable) continue;
 
     // Look for added deliverables
     if (line.startsWith('+') && line.includes('|')) {

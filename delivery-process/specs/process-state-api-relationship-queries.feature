@@ -1,7 +1,8 @@
 @libar-docs
 @libar-docs-pattern:ProcessStateAPIRelationshipQueries
-@libar-docs-status:roadmap
-@libar-docs-phase:99
+@libar-docs-status:active
+@libar-docs-unlock-reason:Relationships-available-via-getPatternRelationships-superseded-by-DataAPIRelationshipGraph
+@libar-docs-phase:24
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:3d
 Feature: ProcessStateAPI Relationship Queries
@@ -25,10 +26,10 @@ Feature: ProcessStateAPI Relationship Queries
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Implementation relationship queries | planned | src/api/process-state.ts | Yes | unit |
-      | Inheritance hierarchy queries | planned | src/api/process-state.ts | Yes | unit |
-      | ProcessStateAPI type extensions | planned | src/api/types.ts | Yes | unit |
-      | Relationship query step definitions | planned | tests/steps/api/process-state-api.steps.ts | Yes | unit |
+      | Implementation relationship queries | superseded | src/api/process-state.ts | No | N/A |
+      | Inheritance hierarchy queries | superseded | src/api/process-state.ts | No | N/A |
+      | ProcessStateAPI type extensions | complete | src/api/types.ts | Yes | unit |
+      | Relationship query step definitions | superseded | N/A | No | N/A |
 
   # ═══════════════════════════════════════════════════════════════════════════════
   # RULE 1: Implementation Relationship Queries

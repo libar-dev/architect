@@ -73,7 +73,7 @@ function createGherkinPatternFile(patternName: string, phase: number, status: st
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Test deliverable | Done | Yes | src/test.ts |
+      | Test deliverable | complete | 1 | src/test.ts |
 
 `
       : '';

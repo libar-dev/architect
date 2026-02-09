@@ -33,9 +33,9 @@ import { type HierarchyLevel as TaxonomyHierarchyLevel, type ProcessStatusValue,
  * @see delivery-process/src/taxonomy/status-values.ts
  */
 export declare const ProcessStatusSchema: z.ZodEnum<{
-    completed: "completed";
-    active: "active";
     roadmap: "roadmap";
+    active: "active";
+    completed: "completed";
     deferred: "deferred";
 }>;
 export type ProcessStatus = ProcessStatusValue;
@@ -79,9 +79,9 @@ export declare const ProcessMetadataSchema: z.ZodObject<{
     pattern: z.ZodString;
     phase: z.ZodNumber;
     status: z.ZodEnum<{
-        completed: "completed";
-        active: "active";
         roadmap: "roadmap";
+        active: "active";
+        completed: "completed";
         deferred: "deferred";
     }>;
     level: z.ZodDefault<z.ZodEnum<{
@@ -121,7 +121,14 @@ export type ProcessMetadata = z.infer<typeof ProcessMetadataSchema>;
  */
 export declare const DeliverableSchema: z.ZodObject<{
     name: z.ZodString;
-    status: z.ZodString;
+    status: z.ZodEnum<{
+        deferred: "deferred";
+        complete: "complete";
+        "in-progress": "in-progress";
+        pending: "pending";
+        superseded: "superseded";
+        "n/a": "n/a";
+    }>;
     tests: z.ZodNumber;
     location: z.ZodString;
     finding: z.ZodOptional<z.ZodString>;

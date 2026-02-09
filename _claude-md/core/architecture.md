@@ -19,17 +19,18 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 
 ### Module Structure
 
-| Module            | Purpose                                                   |
-| ----------------- | --------------------------------------------------------- |
-| `src/config/`     | Configuration factory, presets (generic, ddd-es-cqrs)     |
-| `src/taxonomy/`   | Tag definitions - categories, status values, format types |
-| `src/scanner/`    | TypeScript and Gherkin file scanning                      |
-| `src/extractor/`  | Pattern extraction from AST/Gherkin                       |
-| `src/generators/` | Document generators and orchestrator                      |
-| `src/renderable/` | Markdown codec system                                     |
-| `src/validation/` | FSM validation, DoD checks, anti-patterns                 |
-| `src/lint/`       | Pattern linting and process guard                         |
-| `src/api/`        | Process State API for programmatic access                 |
+| Module                    | Purpose                                                          |
+| ------------------------- | ---------------------------------------------------------------- |
+| `src/config/`             | Configuration factory, presets (generic, ddd-es-cqrs)            |
+| `src/taxonomy/`           | Tag definitions - categories, status values, format types        |
+| `src/scanner/`            | TypeScript and Gherkin file scanning                             |
+| `src/extractor/`          | Pattern extraction from AST/Gherkin                              |
+| `src/generators/`         | Document generators and orchestrator                             |
+| `src/renderable/`         | Markdown codec system                                            |
+| `src/validation/`         | FSM validation, DoD checks, anti-patterns                        |
+| `src/lint/`               | Pattern linting and process guard                                |
+| `src/api/`                | Process State API for programmatic access                        |
+| `delivery-process/stubs/` | Design session code stubs (outside src/ for TS/ESLint isolation) |
 
 ### Three Presets
 

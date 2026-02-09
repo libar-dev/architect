@@ -3,6 +3,7 @@
  * @libar-docs-validation
  * @libar-docs-pattern DoDValidator
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context validation
  * @libar-docs-arch-layer application
  * @libar-docs-uses DoDValidationTypes, GherkinTypes, DualSourceExtractor
@@ -25,20 +26,10 @@ import type { DoDValidationResult, DoDValidationSummary } from './types.js';
 /**
  * Check if a deliverable status indicates completion
  *
- * Matches various completion patterns including text ("Complete", "Done")
- * and symbols (✓, ✅, ☑).
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
  *
  * @param deliverable - The deliverable to check
  * @returns True if the deliverable is complete
- *
- * @example
- * ```typescript
- * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
- * // => true
- *
- * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
- * // => false
- * ```
  */
 export declare function isDeliverableComplete(deliverable: Deliverable): boolean;
 /**

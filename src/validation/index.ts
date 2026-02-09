@@ -26,13 +26,7 @@ export type {
   WithTagRegistry,
 } from './types.js';
 
-export {
-  AntiPatternThresholdsSchema,
-  DEFAULT_THRESHOLDS,
-  COMPLETION_PATTERNS,
-  IN_PROGRESS_PATTERNS,
-  PENDING_PATTERNS,
-} from './types.js';
+export { AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, getPhaseStatusEmoji } from './types.js';
 
 // DoD Validator
 export {

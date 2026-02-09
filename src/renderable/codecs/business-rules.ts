@@ -2,7 +2,7 @@
  * @libar-docs
  * @libar-docs-core
  * @libar-docs-pattern BusinessRulesCodec
- * @libar-docs-status roadmap
+ * @libar-docs-status completed
  *
  * ## Business Rules Document Codec
  *

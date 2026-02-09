@@ -104,6 +104,7 @@ type FormatType = (typeof FORMAT_TYPES)[number];
  * @libar-docs-pattern CategoryDefinitions
  * @libar-docs-status completed
  * @libar-docs-core
+ * @libar-docs-arch-role read-model
  * @libar-docs-arch-context taxonomy
  * @libar-docs-arch-layer domain
  * @libar-docs-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
@@ -165,7 +166,7 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
  * @libar-docs-pattern StatusValues
  * @libar-docs-status completed
  * @libar-docs-core
- * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS
+ * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS, VALID_PROCESS_STATUS_SET
  *
  * ## Process Workflow Status Values
  *
@@ -217,6 +218,13 @@ type AcceptedStatusValue = (typeof ACCEPTED_STATUS_VALUES)[number];
  * Default status for new items
  */
 const DEFAULT_STATUS: ProcessStatusValue;
+```
+
+```typescript
+/**
+ * Pre-built set of valid process statuses for O(1) membership checks.
+ */
+const VALID_PROCESS_STATUS_SET: ReadonlySet<string>;
 ```
 
 ### Status Values (from this decision (rule: status values))
@@ -541,6 +549,7 @@ function buildRegistry(): TagRegistry;
  * - traceability: Two-tier spec architecture links
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
+ * - stub: Design session stub metadata
  */
 METADATA_TAGS_BY_GROUP = {
   core: ['pattern', 'status', 'core', 'usecase', 'brief'] as const,
@@ -580,6 +589,7 @@ METADATA_TAGS_BY_GROUP = {
   traceability: ['executable-specs', 'roadmap-spec'] as const,
   architecture: ['arch-role', 'arch-context', 'arch-layer'] as const,
   extraction: ['extract-shapes'] as const,
+  stub: ['target', 'since'] as const,
 } as const
 ```
 

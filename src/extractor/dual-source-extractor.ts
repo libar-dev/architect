@@ -5,6 +5,9 @@
  * @libar-docs-status completed
  * @libar-docs-uses DocExtractor, GherkinExtractor, GherkinScanner
  * @libar-docs-used-by Orchestrator
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context extractor
+ * @libar-docs-arch-layer application
  *
  * ## DualSourceExtractor - Compose Pattern Data from Code + Features
  *
@@ -28,6 +31,7 @@
  */
 
 import type { ExtractedPattern } from '../types/index.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 
 // Import Zod schemas and inferred types (schema-first pattern)
 import {
@@ -39,6 +43,7 @@ import {
   type CrossValidationError,
   type ValidationSummary,
 } from '../validation-schemas/index.js';
+import { DEFAULT_STATUS } from '../taxonomy/status-values.js';
 
 // Re-export types for convenience
 export type { ProcessMetadata, Deliverable, CrossValidationError, ValidationSummary };
@@ -106,7 +111,7 @@ export function extractProcessMetadata(feature: ScannedGherkinFile): ProcessMeta
   const pattern = patternTag.replace('pattern:', '');
   const phaseStr = phaseTag.replace('phase:', '');
   const phase = parseInt(phaseStr, 10);
-  const status = statusTag?.replace('status:', '') ?? 'roadmap';
+  const status = statusTag?.replace('status:', '') ?? DEFAULT_STATUS;
 
   // Extract optional tags
   const quarterTag = tags.find((t) => t.startsWith('quarter:'));
@@ -268,7 +273,8 @@ export function extractDeliverables(feature: ScannedGherkinFile): readonly Deliv
     // Parse each row with schema validation
     for (const row of rows) {
       const name = row[deliverableHeader]?.trim() ?? '';
-      const status = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+      const rawStatus = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+      const status = rawStatus.toLowerCase();
       const testsValue = testsHeader ? (row[testsHeader]?.trim() ?? '0') : '0';
       const location = locationHeader ? (row[locationHeader]?.trim() ?? '') : '';
       const findingRaw = findingHeader ? row[findingHeader]?.trim() : undefined;
@@ -492,15 +498,15 @@ export function validateDualSource(results: DualSourceResults): ValidationSummar
 
   // Warnings: Orphaned stubs (code without feature)
   for (const pattern of results.codeOnly) {
-    if (pattern.status === 'roadmap') {
-      const name = pattern.patternName ?? pattern.name;
+    if (pattern.status === DEFAULT_STATUS) {
+      const name = getPatternName(pattern);
       warnings.push(`Roadmap pattern "${name}" has code stub but no feature file`);
     }
   }
 
   // Warnings: Features without code stubs
   for (const metadata of results.featureOnly) {
-    if (metadata.status === 'roadmap') {
+    if (metadata.status === DEFAULT_STATUS) {
       warnings.push(`Feature "${metadata.pattern}" (phase ${metadata.phase}) has no code stub`);
     }
   }

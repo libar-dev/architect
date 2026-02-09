@@ -164,26 +164,6 @@ export function stripMarkdown(text) {
         .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1'); // Links
 }
 /**
- * Extract first sentence from description
- */
-export function extractFirstSentence(description, maxLength = 120) {
-    if (!description)
-        return '';
-    const withoutHeaders = description.replace(/^#+\s*[^\n]+\n*/gm, '');
-    const lines = withoutHeaders.split('\n').filter((l) => l.trim());
-    const firstLine = lines[0]?.trim() ?? '';
-    // Find sentence-ending punctuation followed by space + capital or end of string
-    const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
-    const match = sentenceEndPattern.exec(firstLine);
-    if (match) {
-        return firstLine.slice(0, match.index + 1);
-    }
-    if (/[.!?]$/.test(firstLine)) {
-        return firstLine;
-    }
-    return firstLine.slice(0, maxLength);
-}
-/**
  * Extract summary for pattern (first complete sentence, truncated if needed)
  *
  * Combines multiple lines to find a complete sentence, respecting max length.

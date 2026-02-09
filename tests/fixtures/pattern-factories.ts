@@ -6,6 +6,7 @@
  */
 
 import type { ExtractedPattern, DocDirective, ExportInfo } from '../../src/types/index.js';
+import type { DeliverableStatus } from '../../src/taxonomy/index.js';
 import {
   asPatternId,
   asCategoryName,
@@ -25,9 +26,9 @@ import {
  */
 export interface TestDeliverable {
   name: string;
-  status: string;
+  status: DeliverableStatus;
   tests: number;
-  location?: string;
+  location: string;
   finding?: string;
   /** Release version this deliverable belongs to (e.g., "v0.2.0") */
   release?: string;
@@ -108,6 +109,19 @@ export interface TestPatternOptions {
   discoveredRisks?: string[];
   /** Business value statement (default: none) */
   businessValue?: string;
+  /** Target implementation path for stub files (default: none) */
+  targetPath?: string;
+  /** Design session that created this pattern (default: none) */
+  since?: string;
+  /** Related patterns for cross-reference (default: none) */
+  seeAlso?: string[];
+  // Architecture fields
+  /** Architecture role (default: none) */
+  archRole?: string;
+  /** Architecture bounded context (default: none) */
+  archContext?: string;
+  /** Architecture layer (default: none) */
+  archLayer?: string;
 }
 
 /**
@@ -192,6 +206,14 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     discoveredLearnings,
     discoveredRisks,
     businessValue,
+    // Stub metadata
+    targetPath,
+    since,
+    seeAlso,
+    // Architecture fields
+    archRole,
+    archContext,
+    archLayer,
   } = options;
 
   const directive: DocDirective = {
@@ -207,6 +229,9 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(whenToUse && whenToUse.length > 0 ? { whenToUse } : {}),
     ...(dependsOn && dependsOn.length > 0 ? { dependsOn } : {}),
     ...(enables && enables.length > 0 ? { enables } : {}),
+    ...(targetPath ? { target: targetPath } : {}),
+    ...(since ? { since } : {}),
+    ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
   };
 
   return {
@@ -255,6 +280,14 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(discoveredLearnings && discoveredLearnings.length > 0 ? { discoveredLearnings } : {}),
     ...(discoveredRisks && discoveredRisks.length > 0 ? { discoveredRisks } : {}),
     ...(businessValue ? { businessValue } : {}),
+    // Stub metadata
+    ...(targetPath ? { targetPath } : {}),
+    ...(since ? { since } : {}),
+    ...(seeAlso && seeAlso.length > 0 ? { seeAlso } : {}),
+    // Architecture fields
+    ...(archRole ? { archRole } : {}),
+    ...(archContext ? { archContext } : {}),
+    ...(archLayer ? { archLayer } : {}),
   };
 }
 
@@ -504,8 +537,8 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       effort: '2w',
       team: 'platform',
       deliverables: [
-        { name: 'Decider interface', status: 'Complete', tests: 1, location: 'src/decider/' },
-        { name: 'FSM module', status: 'Complete', tests: 1, location: 'src/fsm/' },
+        { name: 'Decider interface', status: 'complete', tests: 1, location: 'src/decider/' },
+        { name: 'FSM module', status: 'complete', tests: 1, location: 'src/fsm/' },
       ],
     }),
     createTestPattern({
@@ -518,7 +551,7 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       quarter: 'Q1-2026',
       effort: '1w',
       team: 'platform',
-      deliverables: [{ name: 'CMS types', status: 'Complete', tests: 1, location: 'src/cms/' }],
+      deliverables: [{ name: 'CMS types', status: 'complete', tests: 1, location: 'src/cms/' }],
     }),
     createTestPattern({
       id: 'pattern-71a10003',

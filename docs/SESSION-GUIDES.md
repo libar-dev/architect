@@ -15,12 +15,12 @@ Starting from pattern brief?
                         → No  → Planning
 ```
 
-| Session           | Input               | Output                    | FSM Change                 |
-| ----------------- | ------------------- | ------------------------- | -------------------------- |
-| Planning          | Pattern brief       | Roadmap spec (`.feature`) | Creates `roadmap`          |
-| Design            | Complex requirement | Design doc + code stubs   | None                       |
-| Implementation    | Roadmap spec        | Code + tests              | `roadmap→active→completed` |
-| Planning + Design | Pattern brief       | Spec + stubs              | Creates `roadmap`          |
+| Session           | Input               | Output                      | FSM Change                 |
+| ----------------- | ------------------- | --------------------------- | -------------------------- |
+| Planning          | Pattern brief       | Roadmap spec (`.feature`)   | Creates `roadmap`          |
+| Design            | Complex requirement | Decision specs + code stubs | None                       |
+| Implementation    | Roadmap spec        | Code + tests                | `roadmap→active→completed` |
+| Planning + Design | Pattern brief       | Spec + stubs                | Creates `roadmap`          |
 
 ---
 
@@ -97,21 +97,27 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 ### Checklist
 
-- [ ] **Create design doc** at `{plans-directory}/designs/draft/DESIGN-{name}.md`
+- [ ] **Record decisions** as PDR `.feature` files in `delivery-process/decisions/`
 
 - [ ] **Document options** — At least 2-3 approaches with pros/cons
 
 - [ ] **Get approval** — User must approve recommended approach
 
-- [ ] **Create code stubs** with interfaces:
+- [ ] **Create code stubs** in `delivery-process/stubs/{pattern-name}/`:
 
   ```typescript
+  // delivery-process/stubs/{pattern-name}/my-function.ts
   /**
    * @<prefix>
    * @<prefix>-status roadmap
+   * @<prefix>-implements MyPattern
    * @<prefix>-uses Workpool, EventStore
    *
    * ## My Pattern - Description
+   *
+   * Target: src/path/to/final/location.ts
+   * See: PDR-001 (Design Decision)
+   * Since: DS-1
    */
   export interface MyResult {
     id: string;
@@ -122,10 +128,15 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
   }
   ```
 
-- [ ] **Move to approved** after user approval: `designs/draft/` → `designs/approved/`
+  Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues. They are scanned by the documentation pipeline via `-i 'delivery-process/stubs/**/*.ts'`.
+
+- [ ] **Verify stub identifier spelling** — Check all exported function/type/interface names for typos before committing stubs
+
+- [ ] **List canonical helpers in `@<prefix>-uses`** — If the function does status matching, reference `isDeliverableStatusComplete`/`isDeliverableStatusPending` from `taxonomy/deliverable-status.ts`
 
 ### Do NOT
 
+- Create markdown design documents (use decision specs instead)
 - Create implementation plans
 - Transition spec to `active`
 - Write full implementations (stubs only)
@@ -139,7 +150,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 ### Pre-flight
 
 - [ ] Roadmap spec exists with `@<prefix>-status:roadmap`
-- [ ] Design doc approved (if needed)
+- [ ] Decision specs approved (if needed)
 - [ ] Implementation plan exists (for multi-session work)
 
 ### Execution Checklist
@@ -170,7 +181,10 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
      | Core types | completed | src/types.ts | Yes | unit |
      ```
 
-4. **Transition to completed** (only when ALL done):
+4. **Verify all design decisions addressed:**
+   - [ ] Run `pnpm process:query -- decisions <SpecName>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
+
+5. **Transition to completed** (only when ALL done):
 
    ```gherkin
    @<prefix>-status:completed
@@ -178,7 +192,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
    > Protection: `completed` = hard-locked (requires `@<prefix>-unlock-reason` to modify)
 
-5. **Regenerate docs:**
+6. **Regenerate docs:**
    ```bash
    npx generate-docs -g patterns,roadmap -i "src/**/*.ts" --features "specs/**/*.feature" -o docs -f
    ```

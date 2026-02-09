@@ -193,6 +193,28 @@ Feature: Transform Dataset Pipeline
       | dependsOn | Infrastructure |
       | enables   | Extension      |
 
+  @happy-path @relationships
+  Scenario: Reverse lookup computes enables from dependsOn
+    Given a pattern "Infra" with no relationships
+    And a pattern "App" that depends on "Infra"
+    When transforming to MasterDataset
+    Then the relationship index for "Infra" enables contains "App"
+
+  @happy-path @relationships
+  Scenario: Reverse lookup computes usedBy from uses
+    Given a pattern "Lib" with no relationships
+    And a pattern "Consumer" that uses "Lib"
+    When transforming to MasterDataset
+    Then the relationship index for "Lib" usedBy contains "Consumer"
+
+  @happy-path @relationships
+  Scenario: Reverse lookup merges with explicit annotations without duplicates
+    Given a pattern "Base" that enables "Feature" explicitly
+    And a pattern "Feature" that depends on "Base"
+    When transforming to MasterDataset
+    Then the relationship index for "Base" enables contains "Feature"
+    And the relationship index for "Base" enables has exactly 1 entry
+
   # ═══════════════════════════════════════════════════════════════════════════
   # Completion Percentage Function
   # ═══════════════════════════════════════════════════════════════════════════

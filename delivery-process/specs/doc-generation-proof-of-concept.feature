@@ -290,7 +290,7 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
     | Error messages | Code patterns | Message text change |
     | Code examples | Decision DocStrings | Example needs update |
 
-  Rule: Consequences - Design stubs live in specs, not src
+  Rule: Consequences - Design stubs live in stubs, not src
 
     **The Problem:**
 
@@ -320,17 +320,16 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
     **The Solution:**
 
-    Design stubs live in `specs/examples/` or `specs/stubs/`:
+    Design stubs live in `delivery-process/stubs/`:
 
     | Location | Content | When Moved to src/ |
-    | specs/stubs/*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
-    | specs/examples/*.ts | Code examples for documentation | Never (stays as reference) |
+    | delivery-process/stubs/{pattern}/*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
     | src/**/*.ts | Production code only | Already there |
 
     **Design Stub Pattern:**
 
     """typescript
-    // specs/stubs/shape-extractor.ts
+    // delivery-process/stubs/shape-extractor/shape-extractor.ts
     /**
      * @libar-docs
      * @libar-docs-pattern ShapeExtractorStub
@@ -366,7 +365,7 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
 
     **Workflow:**
 
-    1. **Design session:** Create stub in `specs/stubs/pattern-name.ts`
+    1. **Design session:** Create stub in `delivery-process/stubs/{pattern-name}/`
     2. **Iterate:** Refine API shapes, add JSDoc, test with docs generation
     3. **Implementation session:** Move/copy to `src/`, implement real logic
     4. **Stub becomes example:** Original stub stays as reference (optional)
@@ -429,15 +428,15 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Decision extraction codec | Done | renderable/codecs/decision-doc.ts |
-      | Source mapping parser | Done | generators/source-mapper.ts |
-      | DocString extraction enhancement | Done | renderable/codecs/decision-doc.ts |
-      | doc-from-decision generator | Done | generators/built-in/decision-doc-generator.ts |
-      | Design stub directory structure | N/A | stubs transformed to implementations |
-      | Shape extraction annotations | Done | src/lint/process-guard/types.ts, decider.ts |
-      | POC self-documentation (compact) | Done | _claude-md/generated/doc-generation-proof-of-concept.md |
-      | POC self-documentation (detailed) | Done | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md |
-      | ProcessGuard ADR decision doc | Done | decisions/adr-006-process-guard.feature |
+      | Decision extraction codec | complete | renderable/codecs/decision-doc.ts |
+      | Source mapping parser | complete | generators/source-mapper.ts |
+      | DocString extraction enhancement | complete | renderable/codecs/decision-doc.ts |
+      | doc-from-decision generator | complete | generators/built-in/decision-doc-generator.ts |
+      | Design stub directory structure | n/a | stubs transformed to implementations |
+      | Shape extraction annotations | complete | src/lint/process-guard/types.ts, decider.ts |
+      | POC self-documentation (compact) | complete | _claude-md/generated/doc-generation-proof-of-concept.md |
+      | POC self-documentation (detailed) | complete | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md |
+      | ProcessGuard ADR decision doc | complete | decisions/adr-006-process-guard.feature |
 
   @acceptance-criteria @happy-path
   Scenario: Decision Rule descriptions become documentation sections

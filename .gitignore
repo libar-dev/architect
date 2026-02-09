@@ -24,6 +24,11 @@ docs/test-progressive/
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
 
+# Ephemeral files
+_ideation/
+_pr-review/
+_working-docs/
+
 # Logs
 *.log
 npm-debug.log*

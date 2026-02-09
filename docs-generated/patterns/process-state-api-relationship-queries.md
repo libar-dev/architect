@@ -1,4 +1,4 @@
-# 📋 Process State API Relationship Queries
+# 🚧 Process State API Relationship Queries
 
 **Purpose:** Detailed documentation for the Process State API Relationship Queries pattern
 
@@ -8,9 +8,9 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | active |
 | Category | DDD |
-| Phase | 99 |
+| Phase | 24 |
 
 ## Description
 

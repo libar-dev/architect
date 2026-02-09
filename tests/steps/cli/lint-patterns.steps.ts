@@ -73,7 +73,7 @@ function createMissingPatternNameFile(): string {
  *
  * ## Some Pattern
  *
- * Missing @libar-docs-pattern tag.
+ * This pattern is missing its explicit name tag.
  */
 export interface MissingName {
   id: string;

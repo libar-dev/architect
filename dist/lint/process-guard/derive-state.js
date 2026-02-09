@@ -28,8 +28,9 @@ import * as path from 'path';
 import { glob } from 'glob';
 import { Result as R } from '../../types/index.js';
 import { scanGherkinFiles } from '../../scanner/gherkin-scanner.js';
+import { extractDeliverables } from '../../extractor/dual-source-extractor.js';
 import { getProtectionLevel } from '../../validation/fsm/index.js';
-import { PROCESS_STATUS_VALUES, normalizeStatus, } from '../../taxonomy/index.js';
+import { DEFAULT_STATUS, PROCESS_STATUS_VALUES, normalizeStatus, } from '../../taxonomy/index.js';
 /** Default spec patterns - generic defaults that work for package-level usage */
 const DEFAULT_SPEC_PATTERNS = [
     'delivery-process/**/*.feature',
@@ -102,8 +103,8 @@ async function deriveFileStates(baseDir, patterns) {
         const status = extractStatusFromTags(file.feature.tags);
         const normalizedStatusValue = normalizeStatus(status);
         const protection = getProtectionLevel(status);
-        // Extract deliverables from background
-        const deliverables = extractDeliverablesFromBackground(file.background);
+        // Extract deliverables from background (canonical extractor with case-insensitive headers)
+        const deliverables = extractDeliverables(file).map((d) => d.name);
         // Check for unlock reason
         const unlockInfo = extractUnlockReason(file.feature.tags);
         // Build file state (handle exactOptionalPropertyTypes)
@@ -141,32 +142,7 @@ function extractStatusFromTags(tags) {
         }
     }
     // Default to roadmap if no status found
-    return 'roadmap';
-}
-/**
- * Extract deliverable names from background data table.
- * Uses unknown type to handle exactOptionalPropertyTypes compatibility.
- */
-function extractDeliverablesFromBackground(background) {
-    if (background === null || background === undefined || typeof background !== 'object')
-        return [];
-    const bg = background;
-    if (bg.steps === undefined)
-        return [];
-    const deliverables = [];
-    for (const step of bg.steps) {
-        const rows = step.dataTable?.rows;
-        if (rows) {
-            for (const row of rows) {
-                // Look for "Deliverable" column
-                const deliverable = row['Deliverable'] ?? row['deliverable'];
-                if (deliverable) {
-                    deliverables.push(deliverable);
-                }
-            }
-        }
-    }
-    return deliverables;
+    return DEFAULT_STATUS;
 }
 /**
  * Extract unlock reason from tags.

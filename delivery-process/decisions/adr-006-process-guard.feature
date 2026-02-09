@@ -61,9 +61,9 @@ Feature: ADR-006 - Process Guard Validation System
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Process Guard decision document | Complete | delivery-process/decisions/adr-006-process-guard.feature |
-      | Generated compact docs | Pending | _claude-md/validation/process-guard.md |
-      | Generated detailed docs | Pending | docs/PROCESS-GUARD.md |
+      | Process Guard decision document | complete | delivery-process/decisions/adr-006-process-guard.feature |
+      | Generated compact docs | pending | _claude-md/validation/process-guard.md |
+      | Generated detailed docs | pending | docs/PROCESS-GUARD.md |
 
   Rule: Context - Why Process Guard Exists
 

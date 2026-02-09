@@ -1,7 +1,8 @@
 @libar-docs
 @libar-docs-pattern:ProcessStateAPICLI
-@libar-docs-status:roadmap
-@libar-docs-phase:99
+@libar-docs-status:active
+@libar-docs-unlock-reason:Core-CLI-delivered-via-subcommand-design-superseded-by-DataAPI-specs
+@libar-docs-phase:24
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:2d
 @libar-docs-priority:high
@@ -37,12 +38,12 @@ Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | process:query CLI command | planned | src/cli/query-state.ts | Yes | unit |
-      | CLI argument parser | planned | src/cli/query-state.ts | Yes | unit |
-      | JSON output formatter | planned | src/cli/formatters/json.ts | Yes | unit |
-      | Text output formatter | planned | src/cli/formatters/text.ts | Yes | unit |
-      | Root package.json script | planned | package.json | No | N/A |
-      | CLAUDE.md documentation update | planned | CLAUDE.md | No | N/A |
+      | process:query CLI command | complete | src/cli/process-api.ts | Yes | integration |
+      | CLI argument parser | complete | src/cli/process-api.ts | Yes | integration |
+      | JSON output formatter | complete | src/cli/process-api.ts | Yes | integration |
+      | Text output formatter | deferred | N/A | No | N/A |
+      | Root package.json script | complete | package.json | No | N/A |
+      | CLAUDE.md documentation update | complete | CLAUDE.md | No | N/A |
 
   # ═══════════════════════════════════════════════════════════════════════════════
   # RULE 1: Status Queries

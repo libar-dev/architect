@@ -76,7 +76,10 @@ export declare function detectFileChanges(baseDir: string, files: readonly strin
 /**
  * Detect deliverable changes from diff content.
  *
- * Looks for changes in DataTable rows containing "Deliverable" column.
+ * Only matches table rows that appear within a deliverable table context,
+ * identified by a preceding header row containing both "Deliverable" and "Status".
+ * This prevents false positives from Examples tables, DocString-embedded tables,
+ * and other non-deliverable table content.
  *
  * @internal Exported for testing purposes only.
  */

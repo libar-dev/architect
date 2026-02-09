@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 93/131 (71%)
+**Overall Progress:** [█████████████░░░░░░░] 101/157 (64%)
 
 | Status | Count |
 | --- | --- |
-| 🚧 Active | 13 |
-| 📋 Planned | 25 |
-| **Total Remaining** | 38 |
+| 🚧 Active | 27 |
+| 📋 Planned | 29 |
+| **Total Remaining** | 56 |
 
 ---
 
@@ -23,14 +23,16 @@
 | --- | --- | --- | --- |
 | 📋 [TraceabilityGenerator](remaining/phase-18-traceability-generator.md) | 1 | 0 | 0% |
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
-| 📋 [ClaudeModuleGeneration](remaining/phase-25-claude-module-generation.md) | 1 | 0 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 5 | 0 | 44% |
+| 🚧 [ProcessStateAPIRelationshipQueries](remaining/phase-24-process-state-api-relationship-queries.md) | 2 | 2 | 0% |
+| 📋 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 4 | 0 | 56% |
+| 🚧 [SourceMapper](remaining/phase-27-source-mapper.md) | 1 | 1 | 75% |
+| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 3 | 0 | 57% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 15 | 13 | 0% |
+| 🚧 Backlog (No Phase) | 29 | 24 | 0% |
 
 ---
 
@@ -38,22 +40,22 @@
 
 | Priority | Count |
 | --- | --- |
-| 🚧 In Progress | 13 |
-| ✅ Ready to Start | 24 |
+| 🚧 In Progress | 27 |
+| ✅ Ready to Start | 28 |
 | ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
 
 - Traceability Generator (Phase 18)
 - Architecture Diagram Generation (Phase 23)
+- Data API CLI Ergonomics (Phase 25)
+- Data API Platform Integration (Phase 25)
+- Data API Relationship Graph (Phase 25)
 - Prd Implementation Section (Phase 99)
-- Process State API CLI (Phase 99)
-- Process State API Relationship Queries (Phase 99)
 - Status Aware Eslint Suppression (Phase 99)
 - Streaming Git Diff (Phase 99)
 - Architecture Delta (Phase 100)
 - Business Rules Generator (Phase 100)
-- Cross Source Validation (Phase 100)
 
 See phase detail files for full list.
 
@@ -65,10 +67,10 @@ Items ready to start (no blocking dependencies):
 
 - 📋 Traceability Generator (Phase 18) - 2d
 - 📋 Architecture Diagram Generation (Phase 23) - 1w
-- 📋 Prd Implementation Section (Phase 99) - 3d
-- 📋 Process State API CLI (Phase 99) - 2d
-- 📋 Process State API Relationship Queries (Phase 99) - 3d
+- 📋 Data API CLI Ergonomics (Phase 25) - 2d
+- 📋 Data API Platform Integration (Phase 25) - 3d
+- 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 24 actionable items.
+Showing 5 of 28 actionable items.
 
 ---

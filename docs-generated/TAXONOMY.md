@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **42 metadata tags** | **3 aggregation tags**
+**3 categories** | **44 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@libar-docs-` prefix with `@libar-docs` file opt-in.
 
 | Component | Count | Description |
 | --- | --- | --- |
 | Categories | 3 | Pattern classification by domain |
-| Metadata Tags | 42 | Pattern enrichment and relationships |
+| Metadata Tags | 44 | Pattern enrichment and relationships |
 | Aggregation Tags | 3 | Document routing |
 
 ---
@@ -108,6 +108,8 @@ Tags for enriching patterns with additional metadata.
 | `executable-specs` | csv | Links roadmap spec to package executable spec locations (PDR-007) | No | `@libar-docs-executable-specs platform-decider/tests/features/behavior` |
 | `roadmap-spec` | value | Links package spec back to roadmap pattern for traceability (PDR-007) | No | `@libar-docs-roadmap-spec DeciderPattern` |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
+| `target` | value | Target implementation path for stub files | No | `@libar-docs-target src/api/stub-resolver.ts` |
+| `since` | value | Design session that created this pattern | No | `@libar-docs-since DS-A` |
 
 [Full metadata tag reference](taxonomy/metadata-tags.md)
 

@@ -41,9 +41,9 @@ Feature: Publishing Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Publishing reference feature file | Complete | delivery-process/recipes/publishing-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/PUBLISHINGREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/publishing/publishingreference.md |
+      | Publishing reference feature file | complete | delivery-process/recipes/publishing-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/PUBLISHINGREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/publishing/publishingreference.md |
 
   Rule: Prerequisites
 

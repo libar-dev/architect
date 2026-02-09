@@ -225,6 +225,9 @@ export function buildPattern(
       directive.seeAlso.length > 0 && { seeAlso: directive.seeAlso }),
     ...(directive.apiRef !== undefined &&
       directive.apiRef.length > 0 && { apiRef: directive.apiRef }),
+    // Design session stub metadata fields
+    ...(directive.target !== undefined && { targetPath: directive.target }),
+    ...(directive.since !== undefined && { since: directive.since }),
     // Architecture diagram generation fields
     ...(directive.archRole !== undefined && { archRole: directive.archRole }),
     ...(directive.archContext !== undefined && { archContext: directive.archContext }),

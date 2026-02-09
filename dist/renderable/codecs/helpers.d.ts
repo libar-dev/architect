@@ -359,22 +359,7 @@ export interface BusinessRuleAnnotations {
  * ```
  */
 export declare function truncateText(text: string, maxLength: number): string;
-/**
- * Extract the first sentence from text.
- *
- * Looks for sentence-ending punctuation (. ! ?) followed by whitespace or end.
- * Useful for creating compact summaries of longer descriptions.
- *
- * @param text - The text to extract from
- * @returns First sentence, or full text if no sentence boundary found
- *
- * @example
- * ```typescript
- * extractFirstSentence("Events are immutable. This ensures audit integrity.");
- * // Returns: "Events are immutable."
- * ```
- */
-export declare function extractFirstSentence(text: string): string;
+export { extractFirstSentenceRaw as extractFirstSentence } from '../../utils/string-utils.js';
 /**
  * Parse structured annotations from a business rule description.
  *

@@ -33,20 +33,20 @@ Feature: Codec Behavior Testing
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Test Type | Location |
-      | RoadmapDocumentCodec tests | planned | Yes | unit | tests/features/renderable/roadmap-codec.feature |
-      | CompletedMilestonesCodec tests | planned | Yes | unit | tests/features/renderable/milestones-codec.feature |
-      | CurrentWorkCodec tests | planned | Yes | unit | tests/features/renderable/current-work-codec.feature |
-      | RequirementsDocumentCodec tests | planned | Yes | unit | tests/features/renderable/requirements-codec.feature |
-      | SessionContextCodec tests | planned | Yes | unit | tests/features/renderable/session-context-codec.feature |
-      | RemainingWorkCodec tests | planned | Yes | unit | tests/features/renderable/remaining-work-codec.feature |
-      | PrChangesCodec tests | planned | Yes | unit | tests/features/renderable/pr-changes-codec.feature |
-      | AdrDocumentCodec tests | planned | Yes | unit | tests/features/renderable/adr-codec.feature |
-      | PlanningChecklistCodec tests | planned | Yes | unit | tests/features/renderable/planning-checklist-codec.feature |
-      | SessionPlanCodec tests | planned | Yes | unit | tests/features/renderable/session-plan-codec.feature |
-      | SessionFindingsCodec tests | planned | Yes | unit | tests/features/renderable/session-findings-codec.feature |
-      | ChangelogCodec tests | planned | Yes | unit | tests/features/renderable/changelog-codec.feature |
-      | TraceabilityCodec tests | planned | Yes | unit | tests/features/renderable/traceability-codec.feature |
-      | OverviewCodec tests | planned | Yes | unit | tests/features/renderable/overview-codec.feature |
+      | RoadmapDocumentCodec tests | pending | Yes | unit | tests/features/renderable/roadmap-codec.feature |
+      | CompletedMilestonesCodec tests | pending | Yes | unit | tests/features/renderable/milestones-codec.feature |
+      | CurrentWorkCodec tests | pending | Yes | unit | tests/features/renderable/current-work-codec.feature |
+      | RequirementsDocumentCodec tests | pending | Yes | unit | tests/features/renderable/requirements-codec.feature |
+      | SessionContextCodec tests | pending | Yes | unit | tests/features/renderable/session-context-codec.feature |
+      | RemainingWorkCodec tests | pending | Yes | unit | tests/features/renderable/remaining-work-codec.feature |
+      | PrChangesCodec tests | pending | Yes | unit | tests/features/renderable/pr-changes-codec.feature |
+      | AdrDocumentCodec tests | pending | Yes | unit | tests/features/renderable/adr-codec.feature |
+      | PlanningChecklistCodec tests | pending | Yes | unit | tests/features/renderable/planning-checklist-codec.feature |
+      | SessionPlanCodec tests | pending | Yes | unit | tests/features/renderable/session-plan-codec.feature |
+      | SessionFindingsCodec tests | pending | Yes | unit | tests/features/renderable/session-findings-codec.feature |
+      | ChangelogCodec tests | pending | Yes | unit | tests/features/renderable/changelog-codec.feature |
+      | TraceabilityCodec tests | pending | Yes | unit | tests/features/renderable/traceability-codec.feature |
+      | OverviewCodec tests | pending | Yes | unit | tests/features/renderable/overview-codec.feature |
 
   # ============================================================================
   # RULE 1: Timeline Codecs

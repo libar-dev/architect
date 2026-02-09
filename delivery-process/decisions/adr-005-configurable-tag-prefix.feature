@@ -34,10 +34,10 @@ Feature: ADR-005 - Configurable Tag Prefix
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | tagPrefix option in factory | Complete | Yes | src/config/factory.ts |
-      | fileOptInTag option in factory | Complete | Yes | src/config/factory.ts |
-      | Generic preset | Complete | Yes | src/config/presets.ts |
-      | DDD-ES-CQRS preset | Complete | Yes | src/config/presets.ts |
+      | tagPrefix option in factory | complete | Yes | src/config/factory.ts |
+      | fileOptInTag option in factory | complete | Yes | src/config/factory.ts |
+      | Generic preset | complete | Yes | src/config/presets.ts |
+      | DDD-ES-CQRS preset | complete | Yes | src/config/presets.ts |
 
   @acceptance-criteria
   Scenario: Custom tag prefix is respected by scanner

@@ -1,4 +1,6 @@
-For Claude Code sessions, use ProcessStateAPI instead of reading generated documentation:
+**Preferred: Use the CLI** (`pnpm process:query`) for shell-based queries — see the "Data API CLI" section in CLAUDE.md. The programmatic API below is for TypeScript code that needs direct access.
+
+For programmatic usage, create a ProcessStateAPI instance from a MasterDataset:
 
 ```typescript
 import {

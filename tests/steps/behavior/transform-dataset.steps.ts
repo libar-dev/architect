@@ -524,6 +524,100 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
   });
 
   // ===========================================================================
+  // Reverse Lookup: enables from dependsOn
+  // ===========================================================================
+
+  Scenario('Reverse lookup computes enables from dependsOn', ({ Given, And, When, Then }) => {
+    Given('a pattern {string} with no relationships', (_ctx: unknown, name: string) => {
+      addPattern({ name, patternName: name });
+    });
+
+    And(
+      'a pattern {string} that depends on {string}',
+      (_ctx: unknown, name: string, dep: string) => {
+        addPattern({ name, patternName: name, dependsOn: [dep] });
+      }
+    );
+
+    When('transforming to MasterDataset', () => {
+      state!.dataset = transformToMasterDataset(createRawDataset());
+    });
+
+    Then(
+      'the relationship index for {string} enables contains {string}',
+      (_ctx: unknown, name: string, enabled: string) => {
+        expect(state!.dataset!.relationshipIndex[name]?.enables).toContain(enabled);
+      }
+    );
+  });
+
+  // ===========================================================================
+  // Reverse Lookup: usedBy from uses
+  // ===========================================================================
+
+  Scenario('Reverse lookup computes usedBy from uses', ({ Given, And, When, Then }) => {
+    Given('a pattern {string} with no relationships', (_ctx: unknown, name: string) => {
+      addPattern({ name, patternName: name });
+    });
+
+    And('a pattern {string} that uses {string}', (_ctx: unknown, name: string, target: string) => {
+      addPattern({ name, patternName: name, uses: [target] });
+    });
+
+    When('transforming to MasterDataset', () => {
+      state!.dataset = transformToMasterDataset(createRawDataset());
+    });
+
+    Then(
+      'the relationship index for {string} usedBy contains {string}',
+      (_ctx: unknown, name: string, user: string) => {
+        expect(state!.dataset!.relationshipIndex[name]?.usedBy).toContain(user);
+      }
+    );
+  });
+
+  // ===========================================================================
+  // Reverse Lookup: merges with explicit annotations without duplicates
+  // ===========================================================================
+
+  Scenario(
+    'Reverse lookup merges with explicit annotations without duplicates',
+    ({ Given, And, When, Then }) => {
+      Given(
+        'a pattern {string} that enables {string} explicitly',
+        (_ctx: unknown, name: string, target: string) => {
+          addPattern({ name, patternName: name, enables: [target] });
+        }
+      );
+
+      And(
+        'a pattern {string} that depends on {string}',
+        (_ctx: unknown, name: string, dep: string) => {
+          addPattern({ name, patternName: name, dependsOn: [dep] });
+        }
+      );
+
+      When('transforming to MasterDataset', () => {
+        state!.dataset = transformToMasterDataset(createRawDataset());
+      });
+
+      Then(
+        'the relationship index for {string} enables contains {string}',
+        (_ctx: unknown, name: string, enabled: string) => {
+          expect(state!.dataset!.relationshipIndex[name]?.enables).toContain(enabled);
+        }
+      );
+
+      And(
+        'the relationship index for {string} enables has exactly {int} entry',
+        (_ctx: unknown, name: string, count: number) => {
+          expect(state!.dataset!.relationshipIndex[name]?.enables).toHaveLength(count);
+        }
+      );
+    }
+  );
+
+  // ===========================================================================
   // Completion Percentage Function
   // ===========================================================================
 

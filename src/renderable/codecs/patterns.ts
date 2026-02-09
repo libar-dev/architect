@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern PatternsCodec
  * @libar-docs-status completed
+ * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
  * @libar-docs-implements PatternRelationshipModel
@@ -64,6 +65,7 @@ import {
 } from '../utils.js';
 import { toKebabCase } from '../../utils/index.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers
@@ -375,7 +377,7 @@ function buildCategorySections(
       const emoji = getStatusEmoji(p.status);
       const name = getDisplayName(p);
       if (options.generateDetailFiles) {
-        const slug = patternToSlug(p.patternName ?? name);
+        const slug = patternToSlug(getPatternName(p));
         return `[${emoji} ${name}](patterns/${slug}.md)`;
       }
       return `${emoji} ${name}`;
@@ -482,8 +484,7 @@ function buildIndividualPatternFiles(dataset: MasterDataset): Record<string, Ren
   const files: Record<string, RenderableDocument> = {};
 
   for (const pattern of dataset.patterns) {
-    const displayName = getDisplayName(pattern);
-    const slug = patternToSlug(pattern.patternName ?? displayName);
+    const slug = patternToSlug(getPatternName(pattern));
     files[`patterns/${slug}.md`] = buildSinglePatternDocument(pattern, dataset);
   }
 
@@ -551,7 +552,7 @@ function buildSinglePatternDocument(
   }
 
   // Implementations (files that implement this pattern via @libar-docs-implements)
-  const patternKey = pattern.patternName ?? pattern.name;
+  const patternKey = getPatternName(pattern);
   const rel = dataset.relationshipIndex?.[patternKey];
   if (rel?.implementedBy && rel.implementedBy.length > 0) {
     sections.push(heading(2, 'Implementations'));

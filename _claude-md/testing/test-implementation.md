@@ -28,6 +28,21 @@ The project has strict linting rules. Save time by coding defensively.
 | Unused variables: `(_ctx, count, text)` throws lint errors if `count` isn't used | Prefix **immediately**: `(_ctx, _count, text)`                                    |
 | Type safety: `ListItem` is an object, not a string. `item + '\n'` throws errors  | Check types before concatenation: `(typeof item === 'string' ? item : item.text)` |
 
+### Deliverable Status Taxonomy (CRITICAL)
+
+Deliverable status is enforced by `z.enum()` at schema level. The 6 canonical values are defined in `src/taxonomy/deliverable-status.ts`:
+
+| Value         | Meaning             | Helper                            |
+| ------------- | ------------------- | --------------------------------- |
+| `complete`    | Work is done        | `isDeliverableStatusComplete()`   |
+| `in-progress` | Work is ongoing     | `isDeliverableStatusInProgress()` |
+| `pending`     | Work hasn't started | `isDeliverableStatusPending()`    |
+| `deferred`    | Work postponed      |                                   |
+| `superseded`  | Replaced by another |                                   |
+| `n/a`         | Not applicable      |                                   |
+
+**NEVER** use freeform status strings. The Zod schema rejects non-canonical values at parse time.
+
 ### Efficient Debugging Strategy
 
 - **Don't** try to debug by running the full test suite repeatedly.

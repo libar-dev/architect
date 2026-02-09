@@ -6,6 +6,9 @@
  * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes
  * @libar-docs-used-by GherkinScanner
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context scanner
+ * @libar-docs-arch-layer infrastructure
  *
  * ## GherkinASTParser - Parse Feature Files Using Cucumber Gherkin
  *
@@ -540,6 +543,9 @@ export function extractPatternTags(tags: readonly string[]): {
   readonly adrCategory?: string;
   readonly adrSupersedes?: string;
   readonly adrSupersededBy?: string;
+  // Design session stub metadata
+  readonly target?: string;
+  readonly since?: string;
 } {
   const metadata: {
     pattern?: string;
@@ -580,6 +586,9 @@ export function extractPatternTags(tags: readonly string[]): {
     adrCategory?: string;
     adrSupersedes?: string;
     adrSupersededBy?: string;
+    // Design session stub metadata
+    target?: string;
+    since?: string;
   } = {};
 
   for (const tag of tags) {
@@ -766,6 +775,14 @@ export function extractPatternTags(tags: readonly string[]): {
     // @libar-docs-adr-superseded-by:005 or @adr-superseded-by:005
     else if (normalized.startsWith('adr-superseded-by:')) {
       metadata.adrSupersededBy = normalized.substring(18).padStart(3, '0');
+    }
+    // @libar-docs-target:src/api/stub-resolver.ts
+    else if (normalized.startsWith('target:')) {
+      metadata.target = normalized.substring(7);
+    }
+    // @libar-docs-since:DS-A
+    else if (normalized.startsWith('since:')) {
+      metadata.since = normalized.substring(6);
     }
     // Category tags: @ddd, @core, @event-sourcing, etc.
     // These don't have a colon, so treat them as category tags

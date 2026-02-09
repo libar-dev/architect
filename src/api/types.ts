@@ -16,7 +16,7 @@
  * - Use QueryResult<T> for typed response handling
  */
 
-import type { ProcessStatusValue } from '../taxonomy/index.js';
+import type { DeliverableStatus, ProcessStatusValue } from '../taxonomy/index.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ImplementationRef } from '../validation-schemas/master-dataset.js';
 
@@ -40,12 +40,18 @@ export interface QuerySuccess<T> {
  * Error codes for query failures
  */
 export type QueryErrorCode =
+  | 'INVALID_ARGUMENT'
   | 'INVALID_STATUS'
   | 'INVALID_TRANSITION'
   | 'PATTERN_NOT_FOUND'
   | 'PHASE_NOT_FOUND'
   | 'QUARTER_NOT_FOUND'
-  | 'CATEGORY_NOT_FOUND';
+  | 'CATEGORY_NOT_FOUND'
+  | 'CONTEXT_NOT_FOUND'
+  | 'STUB_NOT_FOUND'
+  | 'PDR_NOT_FOUND'
+  | 'CONTEXT_ASSEMBLY_ERROR'
+  | 'UNKNOWN_METHOD';
 
 /**
  * Failed query response
@@ -169,8 +175,8 @@ export interface PatternRelationships {
 export interface PatternDeliverable {
   /** Deliverable name/description */
   name: string;
-  /** Status emoji or text */
-  status: string;
+  /** Canonical deliverable status */
+  status: DeliverableStatus;
   /** Number of tests */
   tests: number;
   /** Implementation location */
@@ -221,6 +227,22 @@ export interface ProtectionInfo {
 }
 
 // =============================================================================
+// Architecture Query Types
+// =============================================================================
+
+/**
+ * Entry for a neighboring pattern with architecture metadata.
+ * Shared between ContextAssembler and ArchQueries.
+ */
+export interface NeighborEntry {
+  readonly name: string;
+  readonly status: string | undefined;
+  readonly archRole: string | undefined;
+  readonly archContext: string | undefined;
+  readonly file: string | undefined;
+}
+
+// =============================================================================
 // Helper Type for Creating Responses
 // =============================================================================
 
@@ -247,4 +269,18 @@ export function createError(code: QueryErrorCode, message: string): QueryError {
     error: message,
     code,
   };
+}
+
+/**
+ * Structured error for API and CLI domain errors.
+ * Caught at the CLI boundary and converted to QueryError envelope.
+ */
+export class QueryApiError extends Error {
+  readonly code: QueryErrorCode;
+
+  constructor(code: QueryErrorCode, message: string) {
+    super(message);
+    this.name = 'QueryApiError';
+    this.code = code;
+  }
 }

@@ -24,9 +24,9 @@ Feature: Release Association Rules Validation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Spec compliance validator | Pending | Yes | @libar-dev/delivery-process/src/lint/rules/ |
-      | TypeScript phase file validator | Pending | Yes | @libar-dev/delivery-process/src/lint/rules/ |
-      | Release version format validator | Pending | Yes | @libar-dev/delivery-process/src/validation/ |
+      | Spec compliance validator | pending | Yes | @libar-dev/delivery-process/src/lint/rules/ |
+      | TypeScript phase file validator | pending | Yes | @libar-dev/delivery-process/src/lint/rules/ |
+      | Release version format validator | pending | Yes | @libar-dev/delivery-process/src/validation/ |
 
   Rule: Spec files must not contain release columns
 

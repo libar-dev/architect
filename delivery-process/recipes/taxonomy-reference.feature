@@ -46,10 +46,10 @@ Feature: Taxonomy Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Taxonomy reference feature file | Complete | delivery-process/recipes/taxonomy-reference.feature |
-      | Source annotations added | Complete | src/taxonomy/*.ts |
-      | Generated detailed docs | Pending | docs-generated/docs/TAXONOMYREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/taxonomy/taxonomyreference.md |
+      | Taxonomy reference feature file | complete | delivery-process/recipes/taxonomy-reference.feature |
+      | Source annotations added | complete | src/taxonomy/*.ts |
+      | Generated detailed docs | pending | docs-generated/docs/TAXONOMYREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/taxonomy/taxonomyreference.md |
 
   Rule: Concept
 

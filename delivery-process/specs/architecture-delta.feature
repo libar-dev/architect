@@ -30,10 +30,10 @@ Feature: Architecture Delta Generation - ADRs as Release Notes
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Release boundary detector (git tags) | Pending | Yes | src/analyzers/ |
-      | Pattern diff analyzer | Pending | Yes | src/analyzers/ |
-      | Architecture delta section renderer | Pending | Yes | src/generators/sections/ |
-      | arch-delta generator config | Pending | No | src/generators/built-in/ |
+      | Release boundary detector (git tags) | pending | Yes | src/analyzers/ |
+      | Pattern diff analyzer | pending | Yes | src/analyzers/ |
+      | Architecture delta section renderer | pending | Yes | src/generators/sections/ |
+      | arch-delta generator config | pending | No | src/generators/built-in/ |
 
   @acceptance-criteria
   Scenario: Generate delta between releases

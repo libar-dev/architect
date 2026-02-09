@@ -4,6 +4,9 @@
  * @libar-docs-pattern RenderableDocument
  * @libar-docs-status completed
  * @libar-docs-extract-shapes RenderableDocument, SectionBlock, HeadingBlock, TableBlock, ListBlock, CodeBlock, MermaidBlock, CollapsibleBlock
+ * @libar-docs-arch-role read-model
+ * @libar-docs-arch-context renderer
+ * @libar-docs-arch-layer domain
  *
  * ## RenderableDocument Schema
  *

@@ -238,6 +238,14 @@ export const DocDirectiveSchema = z
     /** Priority level for process workflow (from @libar-docs-priority tag) */
     priority: z.string().optional(),
 
+    // Design session stub metadata (from @libar-docs-target, @libar-docs-since tags)
+
+    /** Target implementation path for stub files (from @libar-docs-target tag) */
+    target: z.string().optional(),
+
+    /** Design session that created this pattern (from @libar-docs-since tag) */
+    since: z.string().optional(),
+
     // Architecture diagram generation fields (from @libar-docs-arch-* tags)
 
     /** Architectural role for diagram generation (from @libar-docs-arch-role tag) */

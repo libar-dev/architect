@@ -210,3 +210,13 @@
     npm cache clean --force
     npm view @libar-dev/delivery-process
     """
+
+### Related Documentation
+
+**Context:** Related documentation for package publishing.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| CONFIGURATION-REFERENCE.md | Reference | Package configuration and presets |
+| INSTRUCTIONS-REFERENCE.md | Reference | Annotation tags for release notes |
+| PROCESS-GUARD-REFERENCE.md | Reference | Pre-commit hooks validation |

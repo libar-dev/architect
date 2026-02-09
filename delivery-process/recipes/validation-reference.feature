@@ -43,13 +43,13 @@ Feature: Validation Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Validation reference feature file | Complete | delivery-process/recipes/validation-reference.feature |
-      | Source annotations for lint/rules.ts | Complete | src/lint/rules.ts |
-      | Source annotations for validation types | Complete | src/validation/types.ts |
-      | Source annotations for anti-patterns | Complete | src/validation/anti-patterns.ts |
-      | Source annotations for dod-validator | Complete | src/validation/dod-validator.ts |
-      | Generated detailed docs | Pending | docs-generated/docs/VALIDATION-REFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/validation/validation-reference.md |
+      | Validation reference feature file | complete | delivery-process/recipes/validation-reference.feature |
+      | Source annotations for lint/rules.ts | complete | src/lint/rules.ts |
+      | Source annotations for validation types | complete | src/validation/types.ts |
+      | Source annotations for anti-patterns | complete | src/validation/anti-patterns.ts |
+      | Source annotations for dod-validator | complete | src/validation/dod-validator.ts |
+      | Generated detailed docs | pending | docs-generated/docs/VALIDATION-REFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/validation/validation-reference.md |
 
   Rule: Command Decision Tree
 

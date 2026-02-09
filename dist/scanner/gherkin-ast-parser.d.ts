@@ -6,6 +6,9 @@
  * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes
  * @libar-docs-used-by GherkinScanner
+ * @libar-docs-arch-role infrastructure
+ * @libar-docs-arch-context scanner
+ * @libar-docs-arch-layer infrastructure
  *
  * ## GherkinASTParser - Parse Feature Files Using Cucumber Gherkin
  *
@@ -137,5 +140,7 @@ export declare function extractPatternTags(tags: readonly string[]): {
     readonly adrCategory?: string;
     readonly adrSupersedes?: string;
     readonly adrSupersededBy?: string;
+    readonly target?: string;
+    readonly since?: string;
 };
 //# sourceMappingURL=gherkin-ast-parser.d.ts.map

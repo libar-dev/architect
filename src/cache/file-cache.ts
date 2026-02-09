@@ -3,6 +3,7 @@
  * @libar-docs-pattern FileCache
  * @libar-docs-status active
  * @libar-docs-phase 27
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer infrastructure
  *

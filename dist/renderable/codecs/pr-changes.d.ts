@@ -133,6 +133,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             workflow: z.ZodOptional<z.ZodString>;
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
+            target: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
@@ -214,6 +216,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extendsPattern: z.ZodOptional<z.ZodString>;
+        targetPath: z.ZodOptional<z.ZodString>;
+        since: z.ZodOptional<z.ZodString>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -225,7 +229,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         businessValue: z.ZodOptional<z.ZodString>;
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
-            status: z.ZodString;
+            status: z.ZodEnum<{
+                deferred: "deferred";
+                complete: "complete";
+                "in-progress": "in-progress";
+                pending: "pending";
+                superseded: "superseded";
+                "n/a": "n/a";
+            }>;
             tests: z.ZodNumber;
             location: z.ZodString;
             finding: z.ZodOptional<z.ZodString>;
@@ -248,10 +259,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
             deprecated: "deprecated";
-            superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -381,6 +392,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -462,6 +475,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -473,7 +488,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -496,10 +518,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -592,6 +614,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -673,6 +697,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -684,7 +710,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -707,10 +740,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -803,6 +836,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -884,6 +919,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -895,7 +932,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -918,10 +962,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1018,6 +1062,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -1099,6 +1145,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1110,7 +1158,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -1133,10 +1188,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1236,6 +1291,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             workflow: z.ZodOptional<z.ZodString>;
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
+            target: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
@@ -1317,6 +1374,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extendsPattern: z.ZodOptional<z.ZodString>;
+        targetPath: z.ZodOptional<z.ZodString>;
+        since: z.ZodOptional<z.ZodString>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -1328,7 +1387,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         businessValue: z.ZodOptional<z.ZodString>;
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
-            status: z.ZodString;
+            status: z.ZodEnum<{
+                deferred: "deferred";
+                complete: "complete";
+                "in-progress": "in-progress";
+                pending: "pending";
+                superseded: "superseded";
+                "n/a": "n/a";
+            }>;
             tests: z.ZodNumber;
             location: z.ZodString;
             finding: z.ZodOptional<z.ZodString>;
@@ -1351,10 +1417,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
             deprecated: "deprecated";
-            superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1447,6 +1513,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             workflow: z.ZodOptional<z.ZodString>;
             risk: z.ZodOptional<z.ZodString>;
             priority: z.ZodOptional<z.ZodString>;
+            target: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
@@ -1528,6 +1596,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extendsPattern: z.ZodOptional<z.ZodString>;
+        targetPath: z.ZodOptional<z.ZodString>;
+        since: z.ZodOptional<z.ZodString>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -1539,7 +1609,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         businessValue: z.ZodOptional<z.ZodString>;
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
-            status: z.ZodString;
+            status: z.ZodEnum<{
+                deferred: "deferred";
+                complete: "complete";
+                "in-progress": "in-progress";
+                pending: "pending";
+                superseded: "superseded";
+                "n/a": "n/a";
+            }>;
             tests: z.ZodNumber;
             location: z.ZodString;
             finding: z.ZodOptional<z.ZodString>;
@@ -1562,10 +1639,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
             deprecated: "deprecated";
-            superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1659,6 +1736,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -1740,6 +1819,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1751,7 +1832,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -1774,10 +1862,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1870,6 +1958,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -1951,6 +2041,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1962,7 +2054,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -1985,10 +2084,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2081,6 +2180,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2162,6 +2263,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2173,7 +2276,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2196,10 +2306,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2292,6 +2402,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2373,6 +2485,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2384,7 +2498,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2407,10 +2528,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2529,6 +2650,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2610,6 +2733,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2621,7 +2746,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2644,10 +2776,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2740,6 +2872,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -2821,6 +2955,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2832,7 +2968,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2855,10 +2998,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2951,6 +3094,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -3032,6 +3177,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -3043,7 +3190,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -3066,10 +3220,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3162,6 +3316,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
                 workflow: z.ZodOptional<z.ZodString>;
                 risk: z.ZodOptional<z.ZodString>;
                 priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
@@ -3243,6 +3399,8 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -3254,7 +3412,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -3277,10 +3442,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;

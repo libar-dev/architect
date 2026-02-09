@@ -92,13 +92,17 @@
 | Stage | Input | Output | FSM State |
 | --- | --- | --- | --- |
 | Ideation | Pattern brief | Roadmap spec (.feature) | roadmap |
-| Design | Complex requirement | Design document | roadmap |
+| Design | Complex requirement | Decision specs + code stubs | roadmap |
 | Planning | Roadmap spec | Implementation plan | roadmap |
 | Coding | Implementation plan | Code + tests | roadmap to active to completed |
 
 ### Skip Conditions
 
-**Context:** Not all stages are required for every task.
+**Invariant:** Stages may only be skipped when conditions below are met.
+    **Rationale:** Prevents accidental omissions while allowing efficiency for simple tasks.
+    **Verified by:** @acceptance-criteria Scenario: Reference generates Methodology documentation
+
+    **Context:** Not all stages are required for every task.
 
     **Decision:** When to skip stages:
 

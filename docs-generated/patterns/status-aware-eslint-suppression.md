@@ -103,7 +103,7 @@ export interface CMSState {
 | roadmap | none |
 | deferred | none |
 | active | scope |
-| completed | hard |
+| complete | hard |
 
 **Processor filters messages in postprocess**
 
@@ -146,7 +146,7 @@ export interface CMSState {
 | --- | --- |
 | src/dcb/execute.ts | roadmap |
 | src/dcb/types.ts | roadmap |
-| src/cms/dual-write.ts | completed |
+| src/cms/dual-write.ts | complete |
 
 **JSON output mode for programmatic consumption**
 
@@ -170,8 +170,8 @@ export interface CMSState {
 
 | File |
 | --- |
-| src/roadmap-stubs/reservation-pattern.ts |
-| src/api-stubs/durability-types.ts |
+| delivery-process/stubs/reservation-pattern/reservation-pattern.ts |
+| delivery-process/stubs/durability-types/durability-types.ts |
 
 **Default configuration relaxes no-unused-vars**
 
@@ -210,7 +210,7 @@ statusAwareProcessor({
     | roadmap | none | Relaxed (warn, ignore args) |
     | deferred | none | Relaxed (warn, ignore args) |
     | active | scope | Strict (error) |
-    | completed | hard | Strict (error) |
+    | complete | hard | Strict (error) |
     | (no status) | N/A | Strict (error) |
 
     **Verified by:** Roadmap file has relaxed rules, Completed file has strict rules, No status file has strict rules
@@ -295,8 +295,7 @@ _Verified by: CLI generates ESLint ignore file list, JSON output mode for progra
 // eslint.config.js - directory-based exclusions pattern
     {
       files: [
-        "**/src/roadmap-stubs/**",
-        "**/src/api-stubs/**",
+        "**/delivery-process/stubs/**",
         // ... patterns for roadmap/deferred files
       ],
       rules: {

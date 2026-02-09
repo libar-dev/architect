@@ -47,9 +47,9 @@ Feature: Configuration Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Configuration reference feature file | Complete | delivery-process/recipes/configuration-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/CONFIGURATIONREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/config/configurationreference.md |
+      | Configuration reference feature file | complete | delivery-process/recipes/configuration-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/CONFIGURATIONREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/config/configurationreference.md |
 
   Rule: Preset Quick Reference
 

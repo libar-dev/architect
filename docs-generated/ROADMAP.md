@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 93/131 (71%)
+**Patterns:** [█████████████░░░░░░░] 101/157 (64%)
 
-**Phases:** 3/12 complete
+**Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 131 |
-| Completed | 93 |
-| Active | 13 |
-| Planned | 25 |
+| Total Patterns | 157 |
+| Completed | 101 |
+| Active | 27 |
+| Planned | 29 |
 
 ---
 
@@ -26,11 +26,12 @@
 | --- | --- | --- |
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
-| 📋 [ClaudeModuleGeneration](phases/phase-25-claude-module-generation.md) | 0/1 | 0% |
+| 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 0/2 | 0% |
+| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/9 | 56% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
-| ✅ [SourceMapper](phases/phase-27-source-mapper.md) | 3/3 | 100% |
+| 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
@@ -61,13 +62,32 @@
 
 ---
 
-### 📋 ClaudeModuleGeneration
+### 🚧 ProcessStateAPIRelationshipQueries
 
-[░░░░░░░░░░░░░░░] 0/1 0% complete
+[░░░░░░░░░░░░░░░] 0/2 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 🚧 Process State API CLI | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 🚧 Process State API Relationship Queries | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
+
+---
+
+### 📋 DataAPIStubIntegration
+
+[████████░░░░░░░] 5/9 56% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | 📋 Claude Module Generation | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
+| ✅ Data API Architecture Queries | completed | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
+| 📋 Data API CLI Ergonomics | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
+| ✅ Data API Context Assembly | completed | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
+| ✅ Data API Design Session Support | completed | Starting a design or implementation session requires manually compiling elaborate context prompts. |
+| ✅ Data API Output Shaping | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
+| 📋 Data API Platform Integration | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
+| 📋 Data API Relationship Graph | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
+| ✅ Data API Stub Integration | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 
 ---
 
@@ -82,14 +102,15 @@
 
 ---
 
-### ✅ SourceMapper
+### 🚧 SourceMapper
 
-[███████████████] 3/3 100% complete
+[███████████░░░░] 3/4 75% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Doc Generation Proof Of Concept | completed | Status: SUPERSEDED - This POC has been implemented. |
+| 🚧 File Cache | active | Simple Map-based cache for file contents during a single generation run. |
 | ✅ Source Mapper | completed | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |
 
 ---
@@ -109,7 +130,7 @@
 
 ### 📋 TypeScriptTaxonomyImplementation
 
-[███████░░░░░░░░] 4/9 44% complete
+[█████████░░░░░░] 4/7 57% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -117,8 +138,6 @@
 | ✅ Pattern Relationship Model | completed | Problem: The delivery process lacks a comprehensive relationship model between artifacts. |
 | 📋 Prd Implementation Section | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | ✅ Process Guard Linter | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
-| 📋 Process State API CLI | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
-| 📋 Process State API Relationship Queries | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
 | ✅ TypeScript Taxonomy Implementation | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |

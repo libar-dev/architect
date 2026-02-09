@@ -34,6 +34,7 @@
 
 import type { ExtractedPattern, TagRegistry } from '../../validation-schemas/index.js';
 import { ExtractedPatternSchema } from '../../validation-schemas/index.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 import type { LoadedWorkflow } from '../../config/workflow-loader.js';
 import type {
   StatusGroups,
@@ -320,7 +321,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // Build a set of all pattern names for reference checking
   const allPatternNames = new Set<string>();
   for (const pattern of patterns) {
-    const key = pattern.patternName ?? pattern.name;
+    const key = getPatternName(pattern);
     allPatternNames.add(key);
   }
 
@@ -328,7 +329,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     // Validate against schema
     const parseResult = ExtractedPatternSchema.safeParse(pattern);
     if (!parseResult.success) {
-      const patternId = pattern.patternName ?? pattern.name;
+      const patternId = getPatternName(pattern);
       const issues = parseResult.error.issues.map(
         (issue) => `${issue.path.join('.')}: ${issue.message}`
       );
@@ -422,7 +423,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
     }
 
     // ─── Relationship index ────────────────────────────────────────────────
-    const patternKey = pattern.patternName ?? pattern.name;
+    const patternKey = getPatternName(pattern);
     relationshipIndex[patternKey] = {
       uses: [...(pattern.uses ?? [])],
       usedBy: [...(pattern.usedBy ?? [])],
@@ -472,12 +473,12 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Second pass: compute reverse lookups (implementedBy, extendedBy)
+  // Second pass: compute reverse lookups (implementedBy, extendedBy, enables, usedBy)
   // ─────────────────────────────────────────────────────────────────────────
 
   // We iterate over patterns again to have access to source.file for implementedBy
   for (const pattern of patterns) {
-    const patternKey = pattern.patternName ?? pattern.name;
+    const patternKey = getPatternName(pattern);
     const entry = relationshipIndex[patternKey];
     if (!entry) continue;
 
@@ -514,13 +515,31 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
         target.extendedBy.push(patternKey);
       }
     }
+
+    // Build enables reverse lookup (dependsOn -> enables)
+    for (const dep of entry.dependsOn) {
+      const target = relationshipIndex[dep];
+      if (target && !target.enables.includes(patternKey)) {
+        target.enables.push(patternKey);
+      }
+    }
+
+    // Build usedBy reverse lookup (uses -> usedBy)
+    for (const used of entry.uses) {
+      const target = relationshipIndex[used];
+      if (target && !target.usedBy.includes(patternKey)) {
+        target.usedBy.push(patternKey);
+      }
+    }
   }
 
-  // Sort implementedBy alphabetically by file path for consistent output
+  // Sort reverse-computed arrays for consistent output
   for (const entry of Object.values(relationshipIndex)) {
     entry.implementedBy.sort((a: ImplementationRef, b: ImplementationRef) =>
       a.file.localeCompare(b.file)
     );
+    entry.enables.sort((a, b) => a.localeCompare(b));
+    entry.usedBy.sort((a, b) => a.localeCompare(b));
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -528,7 +547,7 @@ export function transformToMasterDatasetWithValidation(raw: RawDataset): Transfo
   // ─────────────────────────────────────────────────────────────────────────
 
   for (const pattern of patterns) {
-    const patternKey = pattern.patternName ?? pattern.name;
+    const patternKey = getPatternName(pattern);
 
     // Check 'uses' references
     for (const ref of pattern.uses ?? []) {

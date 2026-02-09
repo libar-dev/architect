@@ -77,9 +77,7 @@
 - `DEFAULT_THRESHOLDS` - const
 - `DoDValidationResult` - interface
 - `DoDValidationSummary` - interface
-- `COMPLETION_PATTERNS` - const
-- `IN_PROGRESS_PATTERNS` - const
-- `PENDING_PATTERNS` - const
+- `getPhaseStatusEmoji` - function
 - `WithTagRegistry` - interface
 
 ### validate-patterns Flags

@@ -4,6 +4,7 @@
  * @libar-docs-pattern ContentDeduplicator
  * @libar-docs-status completed
  * @libar-docs-phase 28
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer infrastructure
  *

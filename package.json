@@ -62,7 +62,8 @@
     "lint-patterns": "./dist/cli/lint-patterns.js",
     "lint-process": "./dist/cli/lint-process.js",
     "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
-    "validate-patterns": "./dist/cli/validate-patterns.js"
+    "validate-patterns": "./dist/cli/validate-patterns.js",
+    "process-api": "./dist/cli/process-api.js"
   },
   "scripts": {
     "build": "tsc",
@@ -75,21 +76,27 @@
     "lint:fix": "eslint src tests --fix",
     "lint:process": "tsx src/cli/lint-process.ts --staged",
     "lint:process:all": "tsx src/cli/lint-process.ts --all",
-    "lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts'",
-    "validate:patterns": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature'",
-    "validate:dod": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature' --dod",
-    "validate:anti-patterns": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature' --anti-patterns",
-    "validate:all": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -F 'delivery-process/specs/*.feature' --dod --anti-patterns",
-    "docs:patterns": "tsx src/cli/generate-docs.ts -g patterns -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
-    "docs:roadmap": "tsx src/cli/generate-docs.ts -g roadmap -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
-    "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
-    "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
-    "docs:architecture": "tsx src/cli/generate-docs.ts -g architecture -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' -o docs-generated -f",
-    "docs:decisions": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
-    "docs:technical": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' --features 'delivery-process/recipes/*.feature' -o docs-generated -f",
-    "docs:taxonomy": "tsx src/cli/generate-docs.ts -g taxonomy -i 'src/**/*.ts' -o docs-generated -f",
-    "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules -i 'src/**/*.ts' -o docs-generated -f",
-    "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:technical && pnpm docs:taxonomy && pnpm docs:validation",
+    "lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts' --input 'delivery-process/stubs/**/*.ts'",
+    "validate:patterns": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -F 'delivery-process/specs/*.feature'",
+    "validate:dod": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -F 'delivery-process/specs/*.feature' --dod",
+    "validate:anti-patterns": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -F 'delivery-process/specs/*.feature' --anti-patterns",
+    "validate:all": "tsx src/cli/validate-patterns.ts -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -F 'delivery-process/specs/*.feature' --dod --anti-patterns",
+    "docs:patterns": "tsx src/cli/generate-docs.ts -g patterns -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:roadmap": "tsx src/cli/generate-docs.ts -g roadmap -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
+    "docs:architecture": "tsx src/cli/generate-docs.ts -g architecture -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' -o docs-generated -f",
+    "docs:decisions": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/decisions/*.feature' -o docs-generated -f",
+    "docs:technical": "tsx src/cli/generate-docs.ts -g doc-from-decision -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/recipes/*.feature' -o docs-generated -f",
+    "docs:taxonomy": "tsx src/cli/generate-docs.ts -g taxonomy -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -o docs-generated -f",
+    "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' -o docs-generated -f",
+    "docs:requirements": "tsx src/cli/generate-docs.ts -g requirements -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:current": "tsx src/cli/generate-docs.ts -g current -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:milestones": "tsx src/cli/generate-docs.ts -g milestones -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:business-rules": "tsx src/cli/generate-docs.ts -g business-rules -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature' -o docs-generated -f",
+    "docs:all": "pnpm docs:patterns && pnpm docs:roadmap && pnpm docs:remaining && pnpm docs:changelog && pnpm docs:architecture && pnpm docs:decisions && pnpm docs:technical && pnpm docs:taxonomy && pnpm docs:validation && pnpm docs:requirements && pnpm docs:current && pnpm docs:milestones && pnpm docs:business-rules",
+    "process:query": "tsx src/cli/process-api.ts -i 'src/**/*.ts' -i 'delivery-process/stubs/**/*.ts' --features 'delivery-process/specs/*.feature' --features 'delivery-process/releases/*.feature'",
+    "process:q": "tsx src/cli/process-api.ts",
     "docs:tag-taxonomy": "tsx src/cli/generate-tag-taxonomy.ts --output delivery-process/tag-taxonomy.md --overwrite",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"*.{json,md,yml}\"",
@@ -160,9 +167,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263",
     "@cucumber/gherkin": "^29.0.0",
     "@cucumber/messages": "^25.0.1",
+    "@libar-dev/modular-claude-md": "github:libar-dev/modular-claude-md#3a37c573ae8611f1e0e92c00f565bb0ab45e1263",
     "@typescript-eslint/typescript-estree": "^8.18.0",
     "glob": "^10.3.10",
     "zod": "^4.1.11"
@@ -170,6 +177,7 @@
   "devDependencies": {
     "@amiceli/vitest-cucumber": "^5.2.1",
     "@types/node": "20.10.0",
+    "beautiful-mermaid": "^0.1.3",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
@@ -197,7 +205,7 @@
     "tag": "pre"
   },
   "lint-staged": {
-    "*.ts": [
+    "{src,tests}/**/*.ts": [
       "eslint --fix",
       "prettier --write"
     ],

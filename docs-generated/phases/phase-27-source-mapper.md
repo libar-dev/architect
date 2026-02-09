@@ -6,14 +6,37 @@
 
 ## Summary
 
-**Progress:** [████████████████████] 3/3 (100%)
+**Progress:** [███████████████░░░░░] 3/4 (75%)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 3 |
-| 🚧 Active | 0 |
+| 🚧 Active | 1 |
 | 📋 Planned | 0 |
-| **Total** | 3 |
+| **Total** | 4 |
+
+---
+
+## 🚧 Active Patterns
+
+### 🚧 File Cache
+
+| Property | Value |
+| --- | --- |
+| Status | active |
+
+## File Cache - Request-Scoped Content Caching
+
+Simple Map-based cache for file contents during a single generation run.
+Avoids repeated disk reads for files accessed multiple times during
+extraction and deduplication phases.
+
+### Design Rationale
+
+- **Request-scoped**: Created fresh per orchestrator run, naturally cleared when done
+- **No eviction needed**: Generation runs are bounded in duration and file count
+- **Thread-safe**: Single-threaded Node.js, no locking required
+- **Stats tracking**: Optional hit/miss tracking for performance analysis
 
 ---
 
@@ -411,7 +434,7 @@ import {
     | Error messages | Code patterns | Message text change |
     | Code examples | Decision DocStrings | Example needs update |
 
-**Consequences - Design stubs live in specs, not src**
+**Consequences - Design stubs live in stubs, not src**
 
 **The Problem:**
 
@@ -442,17 +465,16 @@ import {
 
 **The Solution:**
 
-    Design stubs live in `specs/examples/` or `specs/stubs/`:
+    Design stubs live in `delivery-process/stubs/`:
 
     | Location | Content | When Moved to src/ |
-    | specs/stubs/*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
-    | specs/examples/*.ts | Code examples for documentation | Never (stays as reference) |
+    | delivery-process/stubs/{pattern}/*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
     | src/**/*.ts | Production code only | Already there |
 
     **Design Stub Pattern:**
 
 ```typescript
-// specs/stubs/shape-extractor.ts
+// delivery-process/stubs/shape-extractor/shape-extractor.ts
     /**
      * @libar-docs
      * @libar-docs-pattern ShapeExtractorStub
@@ -488,7 +510,7 @@ import {
 
     **Workflow:**
 
-    1. **Design session:** Create stub in `specs/stubs/pattern-name.ts`
+    1. **Design session:** Create stub in `delivery-process/stubs/{pattern-name}/`
     2. **Iterate:** Refine API shapes, add JSDoc, test with docs generation
     3. **Implementation session:** Move/copy to `src/`, implement real logic
     4. **Stub becomes example:** Original stub stays as reference (optional)

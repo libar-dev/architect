@@ -3,6 +3,9 @@
  * @libar-docs-core
  * @libar-docs-pattern DocumentGenerator
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context renderer
+ * @libar-docs-arch-layer application
  *
  * ## Document Generation
  *
@@ -202,70 +205,48 @@ export const CodecRegistry = {
     },
 };
 // ═══════════════════════════════════════════════════════════════════════════
-// Codec Map (for backward compatibility)
-// ═══════════════════════════════════════════════════════════════════════════
-/**
- * Map document types to their default codecs (no options)
- * @deprecated Use CodecRegistry.get() instead
- */
-const CODEC_MAP = {
-    patterns: PatternsDocumentCodec,
-    roadmap: RoadmapDocumentCodec,
-    milestones: CompletedMilestonesCodec,
-    current: CurrentWorkCodec,
-    requirements: RequirementsDocumentCodec,
-    session: SessionContextCodec,
-    remaining: RemainingWorkCodec,
-    'pr-changes': PrChangesCodec,
-    adrs: AdrDocumentCodec,
-    'planning-checklist': PlanningChecklistCodec,
-    'session-plan': SessionPlanCodec,
-    'session-findings': SessionFindingsCodec,
-    changelog: ChangelogCodec,
-    traceability: TraceabilityCodec,
-    overview: OverviewCodec,
-    'business-rules': BusinessRulesCodec,
-    architecture: ArchitectureDocumentCodec,
-    taxonomy: TaxonomyDocumentCodec,
-    'validation-rules': ValidationRulesCodec,
-};
-/**
- * Map document types to their factory functions.
- * Used when options are provided to create a codec with custom configuration.
- * @deprecated Use CodecRegistry.getFactory() instead
- */
-const CODEC_FACTORY_MAP = {
-    patterns: createPatternsCodec,
-    roadmap: createRoadmapCodec,
-    milestones: createMilestonesCodec,
-    current: createCurrentWorkCodec,
-    requirements: createRequirementsCodec,
-    session: createSessionContextCodec,
-    remaining: createRemainingWorkCodec,
-    'pr-changes': createPrChangesCodec,
-    adrs: createAdrCodec,
-    'planning-checklist': createPlanningChecklistCodec,
-    'session-plan': createSessionPlanCodec,
-    'session-findings': createSessionFindingsCodec,
-    changelog: createChangelogCodec,
-    traceability: createTraceabilityCodec,
-    overview: createOverviewCodec,
-    'business-rules': createBusinessRulesCodec,
-    architecture: createArchitectureCodec,
-    taxonomy: createTaxonomyCodec,
-    'validation-rules': createValidationRulesCodec,
-};
-// ═══════════════════════════════════════════════════════════════════════════
 // Registry Initialization
 // ═══════════════════════════════════════════════════════════════════════════
-// Initialize the registry with all codecs and factories on module load
-// This ensures backward compatibility while enabling the new registry pattern
-for (const [type, codec] of Object.entries(CODEC_MAP)) {
-    CodecRegistry.register(type, codec);
-}
-for (const [type, factory] of Object.entries(CODEC_FACTORY_MAP)) {
-    CodecRegistry.registerFactory(type, factory);
-}
+// Register all default codecs
+CodecRegistry.register('patterns', PatternsDocumentCodec);
+CodecRegistry.register('roadmap', RoadmapDocumentCodec);
+CodecRegistry.register('milestones', CompletedMilestonesCodec);
+CodecRegistry.register('current', CurrentWorkCodec);
+CodecRegistry.register('requirements', RequirementsDocumentCodec);
+CodecRegistry.register('session', SessionContextCodec);
+CodecRegistry.register('remaining', RemainingWorkCodec);
+CodecRegistry.register('pr-changes', PrChangesCodec);
+CodecRegistry.register('adrs', AdrDocumentCodec);
+CodecRegistry.register('planning-checklist', PlanningChecklistCodec);
+CodecRegistry.register('session-plan', SessionPlanCodec);
+CodecRegistry.register('session-findings', SessionFindingsCodec);
+CodecRegistry.register('changelog', ChangelogCodec);
+CodecRegistry.register('traceability', TraceabilityCodec);
+CodecRegistry.register('overview', OverviewCodec);
+CodecRegistry.register('business-rules', BusinessRulesCodec);
+CodecRegistry.register('architecture', ArchitectureDocumentCodec);
+CodecRegistry.register('taxonomy', TaxonomyDocumentCodec);
+CodecRegistry.register('validation-rules', ValidationRulesCodec);
+// Register all factory functions (used when codec options are provided)
+CodecRegistry.registerFactory('patterns', createPatternsCodec);
+CodecRegistry.registerFactory('roadmap', createRoadmapCodec);
+CodecRegistry.registerFactory('milestones', createMilestonesCodec);
+CodecRegistry.registerFactory('current', createCurrentWorkCodec);
+CodecRegistry.registerFactory('requirements', createRequirementsCodec);
+CodecRegistry.registerFactory('session', createSessionContextCodec);
+CodecRegistry.registerFactory('remaining', createRemainingWorkCodec);
+CodecRegistry.registerFactory('pr-changes', createPrChangesCodec);
+CodecRegistry.registerFactory('adrs', createAdrCodec);
+CodecRegistry.registerFactory('planning-checklist', createPlanningChecklistCodec);
+CodecRegistry.registerFactory('session-plan', createSessionPlanCodec);
+CodecRegistry.registerFactory('session-findings', createSessionFindingsCodec);
+CodecRegistry.registerFactory('changelog', createChangelogCodec);
+CodecRegistry.registerFactory('traceability', createTraceabilityCodec);
+CodecRegistry.registerFactory('overview', createOverviewCodec);
+CodecRegistry.registerFactory('business-rules', createBusinessRulesCodec);
+CodecRegistry.registerFactory('architecture', createArchitectureCodec);
+CodecRegistry.registerFactory('taxonomy', createTaxonomyCodec);
+CodecRegistry.registerFactory('validation-rules', createValidationRulesCodec);
 // ═══════════════════════════════════════════════════════════════════════════
 // Generation Functions
 // ═══════════════════════════════════════════════════════════════════════════
@@ -299,12 +280,19 @@ export function generateDocumentSafe(type, dataset, options) {
     const typeOptions = options?.[type];
     // Use factory function if options provided, otherwise use default codec
     let codec;
-    if (typeOptions) {
-        const factory = CODEC_FACTORY_MAP[type];
-        codec = factory(typeOptions);
+    if (typeOptions !== undefined) {
+        const factory = CodecRegistry.getFactory(type);
+        if (factory !== undefined) {
+            codec = factory(typeOptions);
+        }
     }
-    else {
-        codec = CODEC_MAP[type];
+    codec ??= CodecRegistry.get(type);
+    if (codec === undefined) {
+        return Result.err({
+            documentType: type,
+            message: `No codec registered for document type: ${type}`,
+            phase: 'decode',
+        });
     }
     // Decode: MasterDataset → RenderableDocument (with error handling)
     let doc;
@@ -365,16 +353,16 @@ export function generateDocument(type, dataset, options) {
     // Get options for this specific document type
     const typeOptions = options?.[type];
     // Use factory function if options provided, otherwise use default codec
-    // Note: We cast to the common factory signature because TypeScript can't correlate
-    // CODEC_FACTORY_MAP[type] with CodecOptions[type] at compile time. This is type-safe
-    // because all options extend BaseCodecOptions and all factories return DocumentCodec.
     let codec;
-    if (typeOptions) {
-        const factory = CODEC_FACTORY_MAP[type];
-        codec = factory(typeOptions);
+    if (typeOptions !== undefined) {
+        const factory = CodecRegistry.getFactory(type);
+        if (factory !== undefined) {
+            codec = factory(typeOptions);
+        }
     }
-    else {
-        codec = CODEC_MAP[type];
+    codec ??= CodecRegistry.get(type);
+    if (codec === undefined) {
+        throw new Error(`No codec registered for document type: ${type}`);
     }
     // Decode: MasterDataset → RenderableDocument
     const doc = codec.decode(dataset);

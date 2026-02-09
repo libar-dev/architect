@@ -43,9 +43,9 @@ Feature: Session Guides Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Session guides reference feature file | Complete | delivery-process/recipes/session-guides-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/SESSIONGUIDESREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/sessions/sessionguidesreference.md |
+      | Session guides reference feature file | complete | delivery-process/recipes/session-guides-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/SESSIONGUIDESREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/sessions/sessionguidesreference.md |
 
   Rule: Session Decision Tree
 
@@ -67,7 +67,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 | Session | Input | Output | FSM Change |
 | --- | --- | --- | --- |
 | Planning | Pattern brief | Roadmap spec (.feature) | Creates roadmap |
-| Design | Complex requirement | Design doc + code stubs | None |
+| Design | Complex requirement | Decision specs + code stubs | None |
 | Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
 | Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
 
@@ -117,15 +117,13 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 
     **Checklist:**
 
-    1. Create design doc at plans/designs/draft/DESIGN-name.md
+    1. Record architectural decisions as PDR .feature files in delivery-process/decisions/
 
-    2. Document options (at least 2-3 approaches with pros/cons)
+    2. Document options (at least 2-3 approaches with pros/cons in Rule blocks)
 
     3. Get approval (user must approve recommended approach)
 
-    4. Create code stubs with interfaces (throw new Error pattern)
-
-    5. Move to approved after user approval (designs/draft to designs/approved)
+    4. Create code stubs in delivery-process/stubs/{pattern-name}/ with at-prefix-implements and Target: annotations
 
     **Code Stub Pattern:**
 
@@ -133,9 +131,12 @@ Feature: Session Guides Reference - Auto-Generated Documentation
     /**
      * at-prefix
      * at-prefix-status roadmap
-     * at-prefix-uses Workpool, EventStore
+     * at-prefix-implements MyPattern
      *
      * MyPattern - Description
+     *
+     * Target: src/path/to/final/location.ts
+     * See: PDR-001 (Design Decision)
      */
     export interface MyResult {
       id: string;
@@ -150,6 +151,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 
 | Forbidden Action | Rationale |
 | --- | --- |
+| Create markdown design documents | Decision specs provide better traceability with structured tags |
 | Create implementation plans | Design focuses on architecture |
 | Transition spec to active | Requires implementation session |
 | Write full implementations | Stubs only |
@@ -163,7 +165,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 | Requirement | Why |
 | --- | --- |
 | Roadmap spec exists with at-prefix-status:roadmap | Cannot implement without spec |
-| Design doc approved (if needed) | Complex decisions need approval |
+| Decision specs approved (if needed) | Complex decisions need approval |
 | Implementation plan exists (for multi-session work) | Prevents scope drift |
 
     **Execution Checklist (CRITICAL - Order Matters):**
@@ -394,6 +396,7 @@ Feature: Session Guides Reference - Auto-Generated Documentation
 
 | Mistake | Why It Is Wrong | Correct Approach |
 | --- | --- | --- |
+| Creating markdown design documents | Decision specs provide better traceability | Record decisions as PDR .feature files in delivery-process/decisions/ |
 | Creating implementation plans | Design focuses on architecture | Document options and decisions only |
 | Transitioning spec to active | Requires implementation session | Keep status as roadmap |
 | Writing full implementations | Design creates stubs only | Use throw new Error pattern |

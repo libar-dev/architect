@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern TagRegistryBuilder
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context taxonomy
  * @libar-docs-arch-layer domain
  * @libar-docs-implements TypeScriptTaxonomyImplementation
@@ -24,6 +25,7 @@ import { ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, GLOBAL_FORMAT_OP
 import { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS } from './hierarchy-levels.js';
 import { RISK_LEVELS } from './risk-levels.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
+import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.js';
 /**
  * Metadata tags organized by functional group.
  * Used for documentation generation to create organized sections.
@@ -38,6 +40,7 @@ import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
  * - traceability: Two-tier spec architecture links
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
+ * - stub: Design session stub metadata
  */
 export const METADATA_TAGS_BY_GROUP = {
     core: ['pattern', 'status', 'core', 'usecase', 'brief'],
@@ -77,6 +80,7 @@ export const METADATA_TAGS_BY_GROUP = {
     traceability: ['executable-specs', 'roadmap-spec'],
     architecture: ['arch-role', 'arch-context', 'arch-layer'],
     extraction: ['extract-shapes'],
+    stub: ['target', 'since'],
 };
 /**
  * Build the complete tag registry from TypeScript constants
@@ -356,6 +360,7 @@ export function buildRegistry() {
                     'repository',
                     'decider',
                     'read-model',
+                    'service',
                 ],
                 example: '@libar-docs-arch-role projection',
             },
@@ -371,6 +376,19 @@ export function buildRegistry() {
                 purpose: 'Architectural layer for layered diagrams',
                 values: ['domain', 'application', 'infrastructure'],
                 example: '@libar-docs-arch-layer application',
+            },
+            // Design session stub metadata tags (DataAPIStubIntegration Phase B)
+            {
+                tag: 'target',
+                format: 'value',
+                purpose: 'Target implementation path for stub files',
+                example: '@libar-docs-target src/api/stub-resolver.ts',
+            },
+            {
+                tag: 'since',
+                format: 'value',
+                purpose: 'Design session that created this pattern',
+                example: '@libar-docs-since DS-A',
             },
         ],
         aggregationTags: [
@@ -391,8 +409,8 @@ export function buildRegistry() {
             },
         ],
         formatOptions: [...GLOBAL_FORMAT_OPTIONS],
-        tagPrefix: '@libar-docs-',
-        fileOptInTag: '@libar-docs',
+        tagPrefix: DEFAULT_TAG_PREFIX,
+        fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
     };
 }
 //# sourceMappingURL=registry-builder.js.map

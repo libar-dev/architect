@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 93/131 (71% complete)
+**Overall:** [█████████████░░░░░░░] 101/157 (64% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 93 |
-| 🚧 Active | 13 |
-| 📋 Planned | 25 |
-| **Total** | 131 |
+| ✅ Completed | 101 |
+| 🚧 Active | 27 |
+| 📋 Planned | 29 |
+| **Total** | 157 |
 
 ---
 
@@ -22,8 +22,8 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (61)
-- [DDD](#ddd) (26)
+- [Core](#core) (66)
+- [DDD](#ddd) (34)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
@@ -35,8 +35,9 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
-- [Pattern](#pattern) (2)
+- [Pattern](#pattern) (11)
 - [Scanner](#scanner) (2)
+- [Status](#status) (4)
 - [Validation](#validation) (11)
 
 ---
@@ -49,6 +50,7 @@
 | ✅ Anti Pattern Detector | Validation | completed | Detects violations of the dual-source documentation architecture and process hygiene issues that lead to... |
 | ✅ Architecture Codec | Core | completed | Transforms MasterDataset into a RenderableDocument containing architecture diagrams (Mermaid) generated from source... |
 | ✅ Built In Generators | Generator | completed | Registers all codec-based generators on import using the RDM (RenderableDocument Model) architecture. |
+| ✅ Business Rules Codec | Core | completed | Transforms MasterDataset into a RenderableDocument for business rules output. |
 | ✅ Category Definitions | Core | completed | Categories are used to classify patterns and organize documentation. |
 | ✅ CLI Error Handler | Cli | completed | Provides type-safe error handling for all CLI commands using the DocError discriminated union pattern. |
 | ✅ CLI Version Helper | Cli | completed | Reads package version from package.json for CLI --version flag. |
@@ -62,6 +64,11 @@
 | ✅ Configuration Presets | Core | completed | Predefined configuration presets for common use cases. |
 | ✅ Configuration Types | Core | completed | Type definitions for the delivery process configuration system. |
 | ✅ Content Deduplicator | Core | completed | Identifies and merges duplicate sections extracted from multiple sources. |
+| ✅ Data API Architecture Queries | DDD | completed | The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed... |
+| ✅ Data API Context Assembly | DDD | completed | Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context... |
+| ✅ Data API Design Session Support | DDD | completed | Starting a design or implementation session requires manually compiling elaborate context prompts. |
+| ✅ Data API Output Shaping | DDD | completed | The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`. |
+| ✅ Data API Stub Integration | DDD | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
 | ✅ Decision Doc Codec | Core | completed | Parses decision documents (ADR/PDR in .feature format) and extracts content for documentation generation. |
 | ✅ Decision Doc Generator | Core | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Delivery Process Factory | Core | completed | Main factory function for creating configured delivery process instances. |
@@ -85,6 +92,7 @@
 | ✅ Gherkin Extractor | Extractor | completed | Transforms scanned Gherkin feature files into ExtractedPattern objects for inclusion in generated documentation. |
 | ✅ Gherkin Rules Support | DDD | completed | Feature files were limited to flat scenario lists. |
 | ✅ Gherkin Scanner | Scanner | completed | Scans .feature files for pattern metadata encoded in Gherkin tags. |
+| ✅ Handoff Generator Impl | Pattern | completed | Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset. |
 | ✅ Hierarchy Levels | Core | completed | Three-level hierarchy for organizing work: - epic: Multi-quarter strategic initiatives - phase: Standard work units... |
 | ✅ Layer Inference | Extractor | completed | Infers feature file layer (timeline, domain, integration, e2e, component) from directory path patterns. |
 | ✅ Layer Types | Core | completed | Inferred from feature file directory paths: - timeline: Process/workflow features (delivery-process) - domain:... |
@@ -114,6 +122,7 @@
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
 | ✅ Rich Content Helpers | Core | completed | Shared helper functions for rendering Gherkin rich content in document codecs. |
 | ✅ Risk Levels | Core | completed | Three-tier risk classification for roadmap planning. |
+| ✅ Scope Validator Impl | Pattern | completed | Pure function composition over ProcessStateAPI and MasterDataset. |
 | ✅ Session Codec | Core | completed | Transforms MasterDataset into RenderableDocuments for session/planning outputs: - SESSION-CONTEXT.md (current session... |
 | ✅ Shape Extraction | DDD | completed | Documentation comments duplicate type definitions that exist in the same file. |
 | ✅ Shape Extractor | Pattern | completed | Extracts TypeScript type definitions (interfaces, type aliases, enums, function signatures) from source files for... |
@@ -139,40 +148,58 @@
 | ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact... |
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
+| 🚧 Arch Queries Impl | Pattern | active | Pure functions over MasterDataset for deep architecture exploration. |
+| 🚧 Context Assembler Impl | Pattern | active | Pure function composition over MasterDataset. |
+| 🚧 Context Formatter Impl | Pattern | active | First plain-text formatter in the codebase. |
+| 🚧 Coverage Analyzer Impl | Pattern | active | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
+| 🚧 Deliverable Status Taxonomy | Core | active | Canonical status values for deliverables in Gherkin Background tables. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
+| 🚧 File Cache | Pattern | active | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 FSM Module | Validation | active | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
 | 🚧 FSM States | Extract | active | :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -... |
 | 🚧 FSM Transitions | Validation | active | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | Validation | active | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
+| 🚧 Fuzzy Matcher Impl | Core | active | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
 | 🚧 Lint Process CLI | Cli | active | Validates git changes against delivery process rules. |
+| 🚧 Output Pipeline Impl | Core | active | Post-processing pipeline that transforms raw API results into shaped CLI output. |
+| 🚧 Pattern Helpers | Pattern | active | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
+| 🚧 Pattern Summarizer Impl | Core | active | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
+| 🚧 Process API CLI Impl | Core | active | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
 | 🚧 Process State API | Core | active | TypeScript interface for querying delivery process state. |
+| 🚧 Process State API CLI | DDD | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
+| 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
-| 📋 Business Rules Codec | Core | planned | Transforms MasterDataset into a RenderableDocument for business rules output. |
 | 📋 Business Rules Generator | DDD | planned | Business Value: Enable stakeholders to understand domain constraints without reading implementation details or full... |
 | 📋 Claude Module Generation | DDD | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
 | 📋 Cli Behavior Testing | DDD | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
 | 📋 Codec Behavior Testing | DDD | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
+| 📋 CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection | Status | planned | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
+| 📋 Data API CLI Ergonomics | DDD | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
+| 📋 Data API Platform Integration | DDD | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
+| 📋 Data API Relationship Graph | DDD | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
 | 📋 Generator Infrastructure Testing | DDD | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
+| 📋 HandoffGenerator — Session-End State Summary | Status | planned | Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset. |
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
-| 📋 Process State API CLI | DDD | planned | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
-| 📋 Process State API Relationship Queries | DDD | planned | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
+| 📋 ScopeValidator — Pre-flight Session Readiness Checker | Status | planned | Pure function composition over ProcessStateAPI and MasterDataset. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
+| 📋 StubResolver — Design Stub Discovery and Resolution | Status | planned | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | ⏸️ Tag Taxonomy CLI | Cli | planned | by the codec-based TaxonomyCodec which: - Fits the MasterDataset pipeline architecture - Provides progressive... |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
@@ -202,10 +229,11 @@
 
 ### Core
 
-57/61 complete (93%)
+58/66 complete (88%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
+- [✅ Business Rules Codec](patterns/business-rules-codec.md)
 - [✅ Category Definitions](patterns/category-definitions.md)
 - [✅ Codec Based Generator](patterns/codec-based-generator.md)
 - [✅ Codec Base Options](patterns/codec-base-options.md)
@@ -262,16 +290,25 @@
 - [✅ Validation Rules Codec](patterns/validation-rules-codec.md)
 - [✅ Warning Collector](patterns/warning-collector.md)
 - [🚧 API Module](patterns/api-module.md)
+- [🚧 Deliverable Status Taxonomy](patterns/deliverable-status-taxonomy.md)
+- [🚧 Fuzzy Matcher Impl](patterns/fuzzy-matcher-impl.md)
+- [🚧 Output Pipeline Impl](patterns/output-pipeline-impl.md)
+- [🚧 Pattern Summarizer Impl](patterns/pattern-summarizer-impl.md)
+- [🚧 Process API CLI Impl](patterns/process-apicli-impl.md)
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
-- [📋 Business Rules Codec](patterns/business-rules-codec.md)
 
 ---
 
 ### DDD
 
-9/26 complete (35%)
+14/34 complete (41%)
 
+- [✅ Data API Architecture Queries](patterns/data-api-architecture-queries.md)
+- [✅ Data API Context Assembly](patterns/data-api-context-assembly.md)
+- [✅ Data API Design Session Support](patterns/data-api-design-session-support.md)
+- [✅ Data API Output Shaping](patterns/data-api-output-shaping.md)
+- [✅ Data API Stub Integration](patterns/data-api-stub-integration.md)
 - [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support](patterns/gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
@@ -281,17 +318,20 @@
 - [✅ Shape Extraction](patterns/shape-extraction.md)
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
 - [✅ Universal Doc Generator Robustness](patterns/universal-doc-generator-robustness.md)
+- [🚧 Process State API CLI](patterns/process-state-apicli.md)
+- [🚧 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
 - [📋 Claude Module Generation](patterns/claude-module-generation.md)
 - [📋 Cli Behavior Testing](patterns/cli-behavior-testing.md)
 - [📋 Codec Behavior Testing](patterns/codec-behavior-testing.md)
 - [📋 Cross Source Validation](patterns/cross-source-validation.md)
+- [📋 Data API CLI Ergonomics](patterns/data-apicli-ergonomics.md)
+- [📋 Data API Platform Integration](patterns/data-api-platform-integration.md)
+- [📋 Data API Relationship Graph](patterns/data-api-relationship-graph.md)
 - [📋 Generator Infrastructure Testing](patterns/generator-infrastructure-testing.md)
 - [📋 Phase Numbering Conventions](patterns/phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](patterns/prd-implementation-section.md)
-- [📋 Process State API CLI](patterns/process-state-apicli.md)
-- [📋 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
@@ -402,10 +442,19 @@
 
 ### Pattern
 
-2/2 complete (100%)
+4/11 complete (36%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
+- [✅ Handoff Generator Impl](patterns/handoff-generator-impl.md)
+- [✅ Scope Validator Impl](patterns/scope-validator-impl.md)
 - [✅ Shape Extractor](patterns/shape-extractor.md)
+- [🚧 Arch Queries Impl](patterns/arch-queries-impl.md)
+- [🚧 Context Assembler Impl](patterns/context-assembler-impl.md)
+- [🚧 Context Formatter Impl](patterns/context-formatter-impl.md)
+- [🚧 Coverage Analyzer Impl](patterns/coverage-analyzer-impl.md)
+- [🚧 File Cache](patterns/file-cache.md)
+- [🚧 Pattern Helpers](patterns/pattern-helpers.md)
+- [🚧 Stub Resolver Impl](patterns/stub-resolver-impl.md)
 
 ---
 
@@ -415,6 +464,17 @@
 
 - [✅ Gherkin AST Parser](patterns/gherkin-ast-parser.md)
 - [✅ Gherkin Scanner](patterns/gherkin-scanner.md)
+
+---
+
+### Status
+
+0/4 complete (0%)
+
+- [📋 CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection](patterns/coverage-analyzer-annotation-coverage-and-taxonomy-gap-detection.md)
+- [📋 HandoffGenerator — Session-End State Summary](patterns/handoff-generator-session-end-state-summary.md)
+- [📋 ScopeValidator — Pre-flight Session Readiness Checker](patterns/scope-validator-pre-flight-session-readiness-checker.md)
+- [📋 StubResolver — Design Stub Discovery and Resolution](patterns/stub-resolver-design-stub-discovery-and-resolution.md)
 
 ---
 
@@ -442,6 +502,19 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
+    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
+    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
+    ScopeValidator___Pre_flight_Session_Readiness_Checker ..-> DataAPIDesignSessionSupport
+    HandoffGenerator___Session_End_State_Summary --> ProcessStateAPI
+    HandoffGenerator___Session_End_State_Summary --> MasterDataset
+    HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
+    HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -459,7 +532,6 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -475,6 +547,7 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -496,23 +569,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> ConfigLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
-    ProcessStateAPI --> MasterDataset
-    ProcessStateAPI --> FSMValidator
-    ProcessStateAPI ..-> PhaseStateMachineValidation
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -525,6 +581,63 @@ graph TD
     DeliveryProcessFactory --> TagRegistry
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> Doc_Extractor
+    ProcessAPICLIImpl --> Gherkin_Scanner
+    ProcessAPICLIImpl --> Gherkin_Extractor
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    ProcessAPICLIImpl ..-> ProcessStateAPICLI
+    OutputPipelineImpl --> PatternSummarizerImpl
+    OutputPipelineImpl ..-> DataAPIOutputShaping
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
+    PatternSummarizerImpl --> ProcessStateAPI
+    PatternSummarizerImpl ..-> DataAPIOutputShaping
+    StubResolverImpl --> ProcessStateAPI
+    StubResolverImpl ..-> DataAPIStubIntegration
+    ScopeValidatorImpl --> ProcessStateAPI
+    ScopeValidatorImpl --> MasterDataset
+    ScopeValidatorImpl --> StubResolverImpl
+    ScopeValidatorImpl ..-> DataAPIDesignSessionSupport
+    ProcessStateAPI --> MasterDataset
+    ProcessStateAPI --> FSMValidator
+    ProcessStateAPI ..-> PhaseStateMachineValidation
+    PatternHelpers ..-> DataAPIOutputShaping
+    HandoffGeneratorImpl --> ProcessStateAPI
+    HandoffGeneratorImpl --> MasterDataset
+    HandoffGeneratorImpl --> ContextFormatterImpl
+    HandoffGeneratorImpl ..-> DataAPIDesignSessionSupport
+    FuzzyMatcherImpl ..-> DataAPIOutputShaping
+    CoverageAnalyzerImpl --> Pattern_Scanner
+    CoverageAnalyzerImpl --> MasterDataset
+    CoverageAnalyzerImpl ..-> DataAPIArchitectureQueries
+    ContextFormatterImpl --> ContextAssemblerImpl
+    ContextFormatterImpl ..-> DataAPIContextAssembly
+    ContextAssemblerImpl --> ProcessStateAPI
+    ContextAssemblerImpl --> MasterDataset
+    ContextAssemblerImpl --> PatternSummarizerImpl
+    ContextAssemblerImpl --> FuzzyMatcherImpl
+    ContextAssemblerImpl --> StubResolverImpl
+    ContextAssemblerImpl ..-> DataAPIContextAssembly
+    ArchQueriesImpl --> ProcessStateAPI
+    ArchQueriesImpl --> MasterDataset
+    ArchQueriesImpl ..-> DataAPIArchitectureQueries
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -550,6 +663,11 @@ graph TD
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     DocGenerationProofOfConcept -.-> ShapeExtraction
+    DataAPIDesignSessionSupport -.-> DataAPIContextAssembly
+    DataAPIDesignSessionSupport -.-> DataAPIStubIntegration
+    DataAPIContextAssembly -.-> DataAPIOutputShaping
+    DataAPIContextAssembly -.-> DataAPIStubIntegration
+    DataAPIArchitectureQueries -.-> DataAPIOutputShaping
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
 ```
 

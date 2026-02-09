@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, WithTagRegistry
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, getPhaseStatusEmoji, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -126,21 +126,11 @@ export interface DoDValidationSummary {
     readonly failedPhases: number;
 }
 /**
- * Completion status detection patterns
+ * Get status emoji for phase-level aggregates.
  *
- * Various ways to indicate a deliverable is complete.
+ * @param allComplete - Whether all patterns in the phase are complete
+ * @param anyActive - Whether any patterns in the phase are active/in-progress
+ * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
  */
-export declare const COMPLETION_PATTERNS: readonly ["complete", "completed", "done", "finished", "yes", "✓", "✔", "✅", "☑", "✓", "✔", "☑"];
-/**
- * In-progress status detection patterns
- *
- * Status values that indicate work is ongoing.
- */
-export declare const IN_PROGRESS_PATTERNS: readonly ["in-progress", "in progress", "active", "wip", "partial", "started", "🔄", "⏳", "🚧"];
-/**
- * Pending status detection patterns
- *
- * Status values that indicate work hasn't started.
- */
-export declare const PENDING_PATTERNS: readonly ["pending", "todo", "planned", "not started", "no", "⏹", "⬜", "❌"];
+export declare function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string;
 //# sourceMappingURL=types.d.ts.map

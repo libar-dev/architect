@@ -163,6 +163,10 @@ export const ExtractedPatternSchema = z
     implementsPatterns: z.array(z.string()).readonly().optional(),
     /** Pattern this extends (generalization relationship from @libar-docs-extends) */
     extendsPattern: z.string().optional(),
+    /** Target implementation path for stub files (from @libar-docs-target tag) */
+    targetPath: z.string().optional(),
+    /** Design session that created this pattern (from @libar-docs-since tag) */
+    since: z.string().optional(),
     /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
     seeAlso: z.array(z.string()).readonly().optional(),
     /** File paths to implementation APIs (from @libar-docs-api-ref tag) */

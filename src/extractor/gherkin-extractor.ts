@@ -6,6 +6,9 @@
  * @libar-docs-implements GherkinRulesSupport
  * @libar-docs-uses GherkinTypes, GherkinASTParser
  * @libar-docs-used-by DualSourceExtractor, Orchestrator
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context extractor
+ * @libar-docs-arch-layer application
  *
  * ## GherkinExtractor - Convert Feature Files to Pattern Documentation
  *
@@ -47,6 +50,7 @@ import {
   type GherkinPatternValidationError,
 } from '../types/errors.js';
 import { generatePatternId } from '../utils/index.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 
 // =============================================================================
 // Constants
@@ -286,6 +290,9 @@ export function extractPatternsFromGherkin(
     // UML-inspired relationship fields (PatternRelationshipModel)
     assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
     assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
+    // Design session stub metadata
+    assignIfDefined(rawPattern, 'targetPath', metadata.target);
+    assignIfDefined(rawPattern, 'since', metadata.since);
     assignIfDefined(rawPattern, 'quarter', metadata.quarter);
     assignIfDefined(rawPattern, 'completed', metadata.completed);
     assignIfDefined(rawPattern, 'effort', metadata.effort);
@@ -580,6 +587,9 @@ export async function extractPatternsFromGherkinAsync(
     // UML-inspired relationship fields (PatternRelationshipModel)
     assignIfNonEmpty(rawPattern, 'implementsPatterns', metadata.implementsPatterns);
     assignIfDefined(rawPattern, 'extendsPattern', metadata.extendsPattern);
+    // Design session stub metadata
+    assignIfDefined(rawPattern, 'targetPath', metadata.target);
+    assignIfDefined(rawPattern, 'since', metadata.since);
     assignIfDefined(rawPattern, 'quarter', metadata.quarter);
     assignIfDefined(rawPattern, 'completed', metadata.completed);
     assignIfDefined(rawPattern, 'effort', metadata.effort);
@@ -729,7 +739,7 @@ export function computeHierarchyChildren(
     if (pattern.parent) {
       const children = parentToChildren.get(pattern.parent) ?? [];
       // Use patternName if available, otherwise fall back to name
-      const childName = pattern.patternName ?? pattern.name;
+      const childName = getPatternName(pattern);
       children.push(childName);
       parentToChildren.set(pattern.parent, children);
     }
@@ -738,7 +748,7 @@ export function computeHierarchyChildren(
   // Apply children arrays to patterns
   // No re-validation needed - input is already validated and we're only adding children: string[]
   return patterns.map((pattern) => {
-    const patternName = pattern.patternName ?? pattern.name;
+    const patternName = getPatternName(pattern);
     const children = parentToChildren.get(patternName);
 
     if (children && children.length > 0) {

@@ -6,6 +6,9 @@
  * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-depends-on:PDR005MvpWorkflow
  * @libar-docs-extract-shapes VALID_TRANSITIONS, isValidTransition, getValidTransitionsFrom, getTransitionErrorMessage
+ * @libar-docs-arch-role read-model
+ * @libar-docs-arch-context validation
+ * @libar-docs-arch-layer domain
  *
  * ## FSM Transitions - Valid State Transition Matrix
  *
@@ -26,10 +29,7 @@
  * - Use `isValidTransition()` to validate proposed status changes
  * - Use `getValidTransitionsFrom()` to show available options
  */
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 /**
  * Valid FSM transitions matrix
  *

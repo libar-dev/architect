@@ -3,7 +3,7 @@
  * @libar-docs-pattern StatusValues
  * @libar-docs-status completed
  * @libar-docs-core
- * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS
+ * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS, VALID_PROCESS_STATUS_SET
  *
  * ## Process Workflow Status Values
  *
@@ -41,3 +41,8 @@ export type ProcessStatusValue = (typeof PROCESS_STATUS_VALUES)[number];
  * Default status for new items
  */
 export const DEFAULT_STATUS: ProcessStatusValue = 'roadmap';
+
+/**
+ * Pre-built set of valid process statuses for O(1) membership checks.
+ */
+export const VALID_PROCESS_STATUS_SET: ReadonlySet<string> = new Set<string>(PROCESS_STATUS_VALUES);

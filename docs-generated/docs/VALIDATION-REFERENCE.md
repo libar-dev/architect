@@ -391,20 +391,10 @@ function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<
 /**
  * Check if a deliverable status indicates completion
  *
- * Matches various completion patterns including text ("Complete", "Done")
- * and symbols (✓, ✅, ☑).
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
  *
  * @param deliverable - The deliverable to check
  * @returns True if the deliverable is complete
- *
- * @example
- * ```typescript
- * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
- * // => true
- *
- * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
- * // => false
- * ```
  */
 function isDeliverableComplete(deliverable: Deliverable): boolean;
 ```
@@ -627,66 +617,13 @@ interface DoDValidationSummary {
 
 ```typescript
 /**
- * Completion status detection patterns
+ * Get status emoji for phase-level aggregates.
  *
- * Various ways to indicate a deliverable is complete.
+ * @param allComplete - Whether all patterns in the phase are complete
+ * @param anyActive - Whether any patterns in the phase are active/in-progress
+ * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
  */
-COMPLETION_PATTERNS = [
-  // Text patterns (case-insensitive)
-  'complete',
-  'completed',
-  'done',
-  'finished',
-  'yes',
-  // Emoji/symbol patterns
-  '✓',
-  '✔',
-  '✅',
-  '☑',
-  // Checkmark unicode variants
-  '\u2713', // ✓
-  '\u2714', // ✔
-  '\u2611', // ☑
-] as const
-```
-
-```typescript
-/**
- * In-progress status detection patterns
- *
- * Status values that indicate work is ongoing.
- */
-IN_PROGRESS_PATTERNS = [
-  'in-progress',
-  'in progress',
-  'active',
-  'wip',
-  'partial',
-  'started',
-  // Emoji patterns
-  '🔄',
-  '⏳',
-  '🚧',
-] as const
-```
-
-```typescript
-/**
- * Pending status detection patterns
- *
- * Status values that indicate work hasn't started.
- */
-PENDING_PATTERNS = [
-  'pending',
-  'todo',
-  'planned',
-  'not started',
-  'no',
-  // Emoji patterns
-  '⏹',
-  '⬜',
-  '❌',
-] as const
+function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string;
 ```
 
 ```typescript

@@ -6,6 +6,9 @@
  * @libar-docs-status active
  * @libar-docs-implements PhaseStateMachineValidation
  * @libar-docs-depends-on:PDR005MvpWorkflow
+ * @libar-docs-arch-role read-model
+ * @libar-docs-arch-context validation
+ * @libar-docs-arch-layer domain
  *
  * ## FSM States - Process Status States and Protection Levels
  *

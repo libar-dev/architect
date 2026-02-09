@@ -3,6 +3,7 @@
  * @libar-docs-validation
  * @libar-docs-pattern DoDValidator
  * @libar-docs-status completed
+ * @libar-docs-arch-role service
  * @libar-docs-arch-context validation
  * @libar-docs-arch-layer application
  * @libar-docs-uses DoDValidationTypes, GherkinTypes, DualSourceExtractor
@@ -23,38 +24,19 @@
 
 import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
-import { normalizeStatus } from '../taxonomy/index.js';
 import type { DoDValidationResult, DoDValidationSummary } from './types.js';
-import { COMPLETION_PATTERNS } from './types.js';
+import { isDeliverableStatusComplete, isPatternComplete } from '../taxonomy/index.js';
 
 /**
  * Check if a deliverable status indicates completion
  *
- * Matches various completion patterns including text ("Complete", "Done")
- * and symbols (✓, ✅, ☑).
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
  *
  * @param deliverable - The deliverable to check
  * @returns True if the deliverable is complete
- *
- * @example
- * ```typescript
- * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
- * // => true
- *
- * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
- * // => false
- * ```
  */
 export function isDeliverableComplete(deliverable: Deliverable): boolean {
-  const status = deliverable.status.toLowerCase().trim();
-
-  for (const pattern of COMPLETION_PATTERNS) {
-    if (status === pattern.toLowerCase() || status.includes(pattern.toLowerCase())) {
-      return true;
-    }
-  }
-
-  return false;
+  return isDeliverableStatusComplete(deliverable.status);
 }
 
 /**
@@ -173,8 +155,7 @@ export function validateDoD(
     if (!metadata) continue;
 
     // Only validate completed phases (or phases matching filter)
-    const status = normalizeStatus(metadata.status);
-    const isCompleted = status === 'completed';
+    const isCompleted = isPatternComplete(metadata.status);
 
     // If phase filter specified, validate those specific phases
     // Otherwise, only validate completed phases
