@@ -176,8 +176,6 @@ graph TB
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
@@ -190,6 +188,8 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -230,10 +230,6 @@ graph TB
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -257,6 +253,10 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI

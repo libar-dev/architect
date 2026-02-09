@@ -542,12 +542,12 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -558,6 +558,29 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    ShapeExtractor --> typescript_estree
+    ShapeExtractor ..-> ShapeExtraction
+    GherkinExtractor --> GherkinTypes
+    GherkinExtractor --> GherkinASTParser
+    GherkinExtractor ..-> GherkinRulesSupport
+    DualSourceExtractor --> DocExtractor
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    Document_Extractor --> Tag_Registry
+    Document_Extractor --> Zod
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -584,29 +607,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    ShapeExtractor --> typescript_estree
-    ShapeExtractor ..-> ShapeExtraction
-    GherkinExtractor --> GherkinTypes
-    GherkinExtractor --> GherkinASTParser
-    GherkinExtractor ..-> GherkinRulesSupport
-    DualSourceExtractor --> DocExtractor
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    Document_Extractor --> Tag_Registry
-    Document_Extractor --> Zod
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
