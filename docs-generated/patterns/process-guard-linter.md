@@ -149,8 +149,8 @@ Files that implement this pattern:
 
 | Deliverable | Status |
 | --- | --- |
-| Task A | Done |
-| Task B | Pending |
+| Task A | complete |
+| Task B | pending |
 
 **Updating deliverable status in active spec passes**
 
@@ -161,7 +161,7 @@ Files that implement this pattern:
 
 | Deliverable | Status |
 | --- | --- |
-| Task A | Pending |
+| Task A | pending |
 
 **Removing deliverable from active spec warns**
 

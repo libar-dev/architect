@@ -198,12 +198,12 @@ _Verified by: PR changes filters to git diff base, PR changes filters to explici
 
 ## Deliverables
 
-- orchestrator.feature (planned)
-- registry.feature (planned)
-- codec-based.feature (planned)
-- orchestrator.steps.ts (planned)
-- registry.steps.ts (planned)
-- codec-based.steps.ts (planned)
+- orchestrator.feature (pending)
+- registry.feature (pending)
+- codec-based.feature (pending)
+- orchestrator.steps.ts (pending)
+- registry.steps.ts (pending)
+- codec-based.steps.ts (pending)
 
 ---
 

@@ -67,12 +67,12 @@
 
 ## Deliverables
 
-- roadmap:next CLI command (Pending)
-- roadmap:blocked CLI command (Pending)
-- roadmap:path-to CLI command (Pending)
-- roadmap:status CLI command (Pending)
-- Dependency graph analyzer (Pending)
-- Critical path calculator (Pending)
+- roadmap:next CLI command (pending)
+- roadmap:blocked CLI command (pending)
+- roadmap:path-to CLI command (pending)
+- roadmap:status CLI command (pending)
+- Dependency graph analyzer (pending)
+- Critical path calculator (pending)
 
 ---
 

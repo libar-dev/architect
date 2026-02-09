@@ -58,4 +58,39 @@ export declare const STATUS_NORMALIZATION_MAP: Readonly<Record<string, Normalize
  * ```
  */
 export declare function normalizeStatus(status: string | undefined): NormalizedStatus;
+/**
+ * Check if a pattern's FSM status normalizes to "completed"
+ *
+ * Use this for **pattern-level** status checks (FSM-governed, 4 values).
+ * For **deliverable-level** status checks (canonical enum: complete/in-progress/pending/
+ * deferred/superseded/n/a), use `isDeliverableStatusComplete()` from
+ * `taxonomy/deliverable-status.ts` instead.
+ *
+ * @param status - Raw pattern status from ExtractedPattern.status
+ * @returns True if the pattern is completed
+ */
+export declare function isPatternComplete(status: string | undefined): boolean;
+/**
+ * Check if a pattern's FSM status normalizes to "active"
+ *
+ * Use this for **pattern-level** status checks (FSM-governed, 4 values).
+ * For **deliverable-level** status checks (canonical enum),
+ * use `isDeliverableStatusInProgress()` from `taxonomy/deliverable-status.ts` instead.
+ *
+ * @param status - Raw pattern status from ExtractedPattern.status
+ * @returns True if the pattern is active
+ */
+export declare function isPatternActive(status: string | undefined): boolean;
+/**
+ * Check if a pattern's FSM status normalizes to "planned"
+ *
+ * Includes both "roadmap" and "deferred" FSM states, as well as
+ * undefined/unknown statuses. Use this for **pattern-level** status checks.
+ * For **deliverable-level** status checks, use `isDeliverableStatusPending()` from
+ * `taxonomy/deliverable-status.ts` instead.
+ *
+ * @param status - Raw pattern status from ExtractedPattern.status
+ * @returns True if the pattern is planned (roadmap, deferred, or unknown)
+ */
+export declare function isPatternPlanned(status: string | undefined): boolean;
 //# sourceMappingURL=normalized-status.d.ts.map

@@ -288,14 +288,14 @@ _Verified by: Config file provides default input paths, Fuzzy pattern name sugge
 
 ## Deliverables
 
-- summarizePattern() projection (completed)
-- Output modifier pipeline (completed)
-- QueryResult envelope wiring (completed)
-- list subcommand (completed)
-- search subcommand (completed)
-- Fuzzy pattern matching (completed)
-- Config file default resolution (completed)
-- pnpm banner fix (completed)
+- summarizePattern() projection (complete)
+- Output modifier pipeline (complete)
+- QueryResult envelope wiring (complete)
+- list subcommand (complete)
+- search subcommand (complete)
+- Fuzzy pattern matching (complete)
+- Config file default resolution (complete)
+- pnpm banner fix (complete)
 
 ## Implementations
 

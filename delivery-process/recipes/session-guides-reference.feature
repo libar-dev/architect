@@ -43,9 +43,9 @@ Feature: Session Guides Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Session guides reference feature file | Complete | delivery-process/recipes/session-guides-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/SESSIONGUIDESREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/sessions/sessionguidesreference.md |
+      | Session guides reference feature file | complete | delivery-process/recipes/session-guides-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/SESSIONGUIDESREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/sessions/sessionguidesreference.md |
 
   Rule: Session Decision Tree
 

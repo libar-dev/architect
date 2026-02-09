@@ -41,13 +41,13 @@ Feature: Data API Context Assembly - One-Command Session Context
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | ContextBundle type | Done | src/api/context-assembler.ts | Yes | unit |
-      | Context assembler | Done | src/api/context-assembler.ts | Yes | unit |
-      | context subcommand | Done | src/cli/process-api.ts | Yes | integration |
-      | files subcommand | Done | src/cli/process-api.ts | Yes | integration |
-      | dep-tree subcommand | Done | src/cli/process-api.ts | Yes | integration |
-      | overview subcommand | Done | src/cli/process-api.ts | Yes | integration |
-      | Context text renderer | Done | src/api/context-formatter.ts | Yes | unit |
+      | ContextBundle type | complete | src/api/context-assembler.ts | Yes | unit |
+      | Context assembler | complete | src/api/context-assembler.ts | Yes | unit |
+      | context subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | files subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | dep-tree subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | overview subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | Context text renderer | complete | src/api/context-formatter.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Single Pattern Context

@@ -44,9 +44,9 @@ Feature: Process Guard Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Process Guard reference feature file | Complete | delivery-process/recipes/process-guard-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/PROCESSGUARDREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/validation/processguardreference.md |
+      | Process Guard reference feature file | complete | delivery-process/recipes/process-guard-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/PROCESSGUARDREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/validation/processguardreference.md |
 
   Rule: FSM Diagram
 

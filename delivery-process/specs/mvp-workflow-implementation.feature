@@ -24,13 +24,13 @@ Feature: MVP Workflow Implementation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Taxonomy module as single source of truth | ✅ | src/taxonomy/status-values.ts |
-      | Update DefaultPatternStatusSchema | ✅ | src/validation-schemas/doc-directive.ts |
-      | Update ProcessMetadataSchema status | ✅ | src/validation-schemas/dual-source.ts |
-      | Update generator status mapping | ✅ | src/renderable/codecs/ |
-      | Fix type errors from status change | ✅ | src/ (typecheck passes) |
-      | Run pnpm typecheck | ✅ | 0 errors |
-      | Run pnpm test | ✅ | 1972 tests pass |
+      | Taxonomy module as single source of truth | complete | src/taxonomy/status-values.ts |
+      | Update DefaultPatternStatusSchema | complete | src/validation-schemas/doc-directive.ts |
+      | Update ProcessMetadataSchema status | complete | src/validation-schemas/dual-source.ts |
+      | Update generator status mapping | complete | src/renderable/codecs/ |
+      | Fix type errors from status change | complete | src/ (typecheck passes) |
+      | Run pnpm typecheck | complete | 0 errors |
+      | Run pnpm test | complete | 1972 tests pass |
 
   Rule: PDR-005 status values are recognized
 
@@ -50,7 +50,7 @@ Feature: MVP Workflow Implementation
         | status    |
         | roadmap   |
         | active    |
-        | completed |
+        | complete |
         | deferred  |
 
   Rule: Generators map statuses to documents

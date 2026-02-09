@@ -49,9 +49,9 @@
 
 ## Deliverables
 
-- Coverage matrix section (Pending)
-- Orphaned scenarios detector (Pending)
-- Pattern gap reporter (Pending)
+- Coverage matrix section (pending)
+- Orphaned scenarios detector (pending)
+- Pattern gap reporter (pending)
 
 ---
 

@@ -282,12 +282,12 @@ _Verified by: Help output shows all flags, Help shows examples_
 
 ## Deliverables
 
-- process:query CLI command (completed)
-- CLI argument parser (completed)
-- JSON output formatter (completed)
+- process:query CLI command (complete)
+- CLI argument parser (complete)
+- JSON output formatter (complete)
 - Text output formatter (deferred)
-- Root package.json script (completed)
-- CLAUDE.md documentation update (completed)
+- Root package.json script (complete)
+- CLAUDE.md documentation update (complete)
 
 ## Implementations
 

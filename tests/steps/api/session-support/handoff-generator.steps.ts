@@ -75,10 +75,10 @@ describeFeature(feature, ({ Rule }) => {
           status: 'active',
           filePath: 'specs/active-pattern.feature',
           deliverables: [
-            { name: 'D1', status: 'Complete', tests: 3, location: 'src/d1.ts' },
-            { name: 'D2', status: 'Complete', tests: 2, location: 'src/d2.ts' },
+            { name: 'D1', status: 'complete', tests: 3, location: 'src/d1.ts' },
+            { name: 'D2', status: 'complete', tests: 2, location: 'src/d2.ts' },
             { name: 'D3', status: 'in-progress', tests: 1, location: 'src/d3.ts' },
-            { name: 'D4', status: 'planned', tests: 0, location: 'src/d4.ts' },
+            { name: 'D4', status: 'pending', tests: 0, location: 'src/d4.ts' },
           ],
         });
 
@@ -106,7 +106,7 @@ describeFeature(feature, ({ Rule }) => {
         const inProgressSection = state!.doc!.sections.find((s) => s.title === 'IN PROGRESS');
         expect(inProgressSection).toBeDefined();
         // D3 has 'in-progress' status — should appear here
-        // D4 has 'planned' status — excluded by isStatusPending
+        // D4 has 'pending' status — excluded by isStatusPending
         expect(inProgressSection!.items).toHaveLength(1);
         expect(inProgressSection!.items[0]).toContain('D3');
       });
@@ -128,7 +128,7 @@ describeFeature(feature, ({ Rule }) => {
           name: 'DiscoveryPattern',
           status: 'active',
           filePath: 'specs/discovery.feature',
-          deliverables: [{ name: 'D1', status: 'Complete', tests: 1, location: 'src/d1.ts' }],
+          deliverables: [{ name: 'D1', status: 'complete', tests: 1, location: 'src/d1.ts' }],
           discoveredGaps: ['Missing validation for edge case'],
           discoveredImprovements: ['Could cache dependency lookups'],
           discoveredLearnings: ['FSM transitions require explicit ordering'],
@@ -248,8 +248,8 @@ describeFeature(feature, ({ Rule }) => {
           status: 'active',
           filePath: 'specs/active-pattern.feature',
           deliverables: [
-            { name: 'D1', status: 'Complete', tests: 1, location: 'src/d1.ts' },
-            { name: 'D2', status: 'planned', tests: 0, location: 'src/d2.ts' },
+            { name: 'D1', status: 'complete', tests: 1, location: 'src/d1.ts' },
+            { name: 'D2', status: 'pending', tests: 0, location: 'src/d2.ts' },
           ],
         });
 
@@ -286,7 +286,7 @@ describeFeature(feature, ({ Rule }) => {
           status: 'active',
           filePath: 'specs/blocked.feature',
           dependsOn: ['IncompleteDep'],
-          deliverables: [{ name: 'D1', status: 'planned', tests: 0, location: 'src/d1.ts' }],
+          deliverables: [{ name: 'D1', status: 'pending', tests: 0, location: 'src/d1.ts' }],
         });
 
         const { api, dataset } = buildApiAndDataset([focal, dep]);

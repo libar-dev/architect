@@ -50,9 +50,9 @@
 
 ## Deliverables
 
-- Effort variance section renderer (Pending)
-- Workflow distribution analyzer (Pending)
-- effort-analysis generator config (Pending)
+- Effort variance section renderer (pending)
+- Workflow distribution analyzer (pending)
+- effort-analysis generator config (pending)
 
 ---
 

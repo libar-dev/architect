@@ -154,7 +154,7 @@ Process Guard implements 7 validation rules:
 | roadmap | none | Fully editable |
 | deferred | none | Fully editable |
 | active | scope | Errors on new deliverables |
-| completed | hard | Requires @libar-docs-unlock-reason |
+| complete | hard | Requires @libar-docs-unlock-reason |
 
 ### Valid Transitions
 
@@ -162,19 +162,19 @@ Process Guard implements 7 validation rules:
 | --- | --- |
 | roadmap | active |
 | roadmap | deferred |
-| active | completed |
+| active | complete |
 | active | roadmap |
 | deferred | roadmap |
 | roadmap | roadmap |
 
 | from | to |
 | --- | --- |
-| roadmap | completed |
+| roadmap | complete |
 | deferred | active |
-| deferred | completed |
-| completed | active |
-| completed | roadmap |
-| completed | deferred |
+| deferred | complete |
+| complete | active |
+| complete | roadmap |
+| complete | deferred |
 
 ### API Types
 

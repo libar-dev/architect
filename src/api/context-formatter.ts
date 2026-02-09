@@ -23,7 +23,7 @@ import type {
   FileReadingList,
   OverviewSummary,
 } from './context-assembler.js';
-import { isStatusComplete } from '../validation/types.js';
+import { isDeliverableStatusComplete } from '../taxonomy/deliverable-status.js';
 
 // ---------------------------------------------------------------------------
 // Bundle Formatter
@@ -97,7 +97,7 @@ export function formatContextBundle(bundle: ContextBundle): string {
   // Deliverables
   if (bundle.deliverables.length > 0) {
     const lines = bundle.deliverables.map((d) => {
-      const checkbox = isStatusComplete(d.status) ? '[x]' : '[ ]';
+      const checkbox = isDeliverableStatusComplete(d.status) ? '[x]' : '[ ]';
       return `${checkbox} ${d.name} (${d.location})`;
     });
     sections.push('=== DELIVERABLES ===\n' + lines.join('\n'));

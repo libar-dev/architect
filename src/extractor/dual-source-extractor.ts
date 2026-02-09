@@ -273,7 +273,8 @@ export function extractDeliverables(feature: ScannedGherkinFile): readonly Deliv
     // Parse each row with schema validation
     for (const row of rows) {
       const name = row[deliverableHeader]?.trim() ?? '';
-      const status = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+      const rawStatus = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+      const status = rawStatus.toLowerCase();
       const testsValue = testsHeader ? (row[testsHeader]?.trim() ?? '0') : '0';
       const location = locationHeader ? (row[locationHeader]?.trim() ?? '') : '';
       const findingRaw = findingHeader ? row[findingHeader]?.trim() : undefined;

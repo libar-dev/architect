@@ -18,12 +18,14 @@
  * The assembler does NOT format output. It produces structured data that
  * the ContextFormatter renders as plain text (see ADR-008).
  */
+import { VALID_PROCESS_STATUS_SET, } from '../taxonomy/index.js';
+import { isPatternComplete } from '../taxonomy/normalized-status.js';
 import { QueryApiError } from './types.js';
 import { findBestMatch } from './fuzzy-match.js';
-import { extractFirstSentence } from '../utils/string-utils.js';
+import { extractDescription } from '../utils/string-utils.js';
 import { getPatternName, findPatternByName as findPatternByNameFromList, getRelationships, allPatternNames, } from './pattern-helpers.js';
 const VALID_SESSION_TYPES = ['planning', 'design', 'implement'];
-const VALID_STATUSES = new Set(['roadmap', 'active', 'completed', 'deferred']);
+const VALID_STATUSES = VALID_PROCESS_STATUS_SET;
 export function isValidSessionType(value) {
     return VALID_SESSION_TYPES.includes(value);
 }
@@ -58,7 +60,7 @@ function buildMetadata(pattern) {
         phase: pattern.phase,
         category: pattern.category,
         file: pattern.source.file,
-        summary: extractFirstSentence(pattern.directive.description),
+        summary: extractDescription(pattern.directive.description),
     };
 }
 function resolveStubRefs(dataset, patternName) {
@@ -191,9 +193,12 @@ export function assembleContext(dataset, api, options) {
                 }
             }
         }
-        // Deliverables, FSM, and test files (implement only)
-        if (sessionType === 'implement') {
+        // Deliverables (design + implement)
+        if (sessionType === 'design' || sessionType === 'implement') {
             allDeliverables.push(...resolveDeliverables(api, name));
+        }
+        // FSM and test files (implement only)
+        if (sessionType === 'implement') {
             fsm = resolveFsm(api, pattern.status);
             allTestFiles.push(...resolveTestFiles(pattern));
         }
@@ -354,7 +359,7 @@ export function buildFileReadingList(dataset, patternName, includeRelated) {
             const depPattern = findPatternByNameFromList(dataset.patterns, depName);
             if (depPattern === undefined)
                 continue;
-            if (depPattern.status === 'completed') {
+            if (isPatternComplete(depPattern.status)) {
                 completedDeps.push(depPattern.source.file);
                 // Include implementation files for completed dependencies
                 const depRels = getRelationships(dataset, depName);
@@ -420,7 +425,7 @@ export function buildOverview(dataset) {
     // Blocking: patterns with incomplete dependencies
     const blocking = [];
     for (const pattern of dataset.patterns) {
-        if (pattern.status === 'completed')
+        if (isPatternComplete(pattern.status))
             continue;
         const name = getPatternName(pattern);
         const rels = getRelationships(dataset, name);
@@ -428,7 +433,7 @@ export function buildOverview(dataset) {
             continue;
         const incompleteDeps = rels.dependsOn.filter((depName) => {
             const depPattern = findPatternByNameFromList(dataset.patterns, depName);
-            return depPattern !== undefined && depPattern.status !== 'completed';
+            return depPattern !== undefined && !isPatternComplete(depPattern.status);
         });
         if (incompleteDeps.length > 0) {
             blocking.push({

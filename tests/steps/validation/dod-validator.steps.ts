@@ -14,6 +14,7 @@ import type {
   GherkinScenario,
 } from '../../../src/validation-schemas/index.js';
 import type { DoDValidationResult, DoDValidationSummary } from '../../../src/validation/types.js';
+import type { DeliverableStatus } from '../../../src/taxonomy/index.js';
 import {
   isDeliverableComplete,
   hasAcceptanceCriteria,
@@ -70,7 +71,7 @@ function resetState(): void {
 // Helper Functions
 // =============================================================================
 
-function createDeliverable(name: string, status: string): Deliverable {
+function createDeliverable(name: string, status: DeliverableStatus): Deliverable {
   return {
     name,
     status,
@@ -162,17 +163,17 @@ function createFeatureWithScenarios(scenarios: GherkinScenario[]): ScannedGherki
 
 describeFeature(feature, ({ Rule }) => {
   // ===========================================================================
-  // Rule: Deliverables can be marked complete in various formats
+  // Rule: Deliverable completion uses canonical status taxonomy
   // ===========================================================================
 
-  Rule('Deliverables can be marked complete in various formats', ({ RuleScenarioOutline }) => {
-    RuleScenarioOutline(
-      'Text-based completion statuses are detected',
-      ({ Given, When, Then }, variables: { status: string }) => {
+  Rule(
+    'Deliverable completion uses canonical status taxonomy',
+    ({ RuleScenario, RuleScenarioOutline }) => {
+      RuleScenario('Complete status is detected as complete', ({ Given, When, Then }) => {
         resetState();
 
-        Given('a deliverable with status {string}', () => {
-          state.deliverable = createDeliverable('Test Deliverable', variables.status);
+        Given('a deliverable with status {string}', (_ctx: unknown, status: string) => {
+          state.deliverable = createDeliverable('Test Deliverable', status as DeliverableStatus);
         });
 
         When('checking if deliverable is complete', () => {
@@ -182,47 +183,31 @@ describeFeature(feature, ({ Rule }) => {
         Then('the deliverable is considered complete', () => {
           expect(state.isComplete).toBe(true);
         });
-      }
-    );
+      });
 
-    RuleScenarioOutline(
-      'Symbol-based completion statuses are detected',
-      ({ Given, When, Then }, variables: { status: string }) => {
-        resetState();
+      RuleScenarioOutline(
+        'Non-complete canonical statuses are correctly identified',
+        ({ Given, When, Then }, variables: { status: string }) => {
+          resetState();
 
-        Given('a deliverable with status {string}', () => {
-          state.deliverable = createDeliverable('Test Deliverable', variables.status);
-        });
+          Given('a deliverable with status {string}', () => {
+            state.deliverable = createDeliverable(
+              'Test Deliverable',
+              variables.status as DeliverableStatus
+            );
+          });
 
-        When('checking if deliverable is complete', () => {
-          state.isComplete = isDeliverableComplete(state.deliverable!);
-        });
+          When('checking if deliverable is complete', () => {
+            state.isComplete = isDeliverableComplete(state.deliverable!);
+          });
 
-        Then('the deliverable is considered complete', () => {
-          expect(state.isComplete).toBe(true);
-        });
-      }
-    );
-
-    RuleScenarioOutline(
-      'Incomplete statuses are correctly identified',
-      ({ Given, When, Then }, variables: { status: string }) => {
-        resetState();
-
-        Given('a deliverable with status {string}', () => {
-          state.deliverable = createDeliverable('Test Deliverable', variables.status);
-        });
-
-        When('checking if deliverable is complete', () => {
-          state.isComplete = isDeliverableComplete(state.deliverable!);
-        });
-
-        Then('the deliverable is NOT considered complete', () => {
-          expect(state.isComplete).toBe(false);
-        });
-      }
-    );
-  });
+          Then('the deliverable is NOT considered complete', () => {
+            expect(state.isComplete).toBe(false);
+          });
+        }
+      );
+    }
+  );
 
   // ===========================================================================
   // Rule: Acceptance criteria must be tagged with @acceptance-criteria
@@ -568,8 +553,8 @@ describeFeature(feature, ({ Rule }) => {
           state.features = dataTable.map((row) => {
             const deliverables =
               row.deliverables_complete === 'true'
-                ? [createDeliverable('Deliverable 1', 'Complete')]
-                : [createDeliverable('Deliverable 1', 'Pending')];
+                ? [createDeliverable('Deliverable 1', 'complete')]
+                : [createDeliverable('Deliverable 1', 'pending')];
             const scenarios =
               row.has_ac === 'true'
                 ? [createScenario('AC Test', ['acceptance-criteria'])]
@@ -619,8 +604,8 @@ describeFeature(feature, ({ Rule }) => {
           state.features = dataTable.map((row) => {
             const deliverables =
               row.deliverables_complete === 'true'
-                ? [createDeliverable('Deliverable 1', 'Complete')]
-                : [createDeliverable('Deliverable 1', 'Pending')];
+                ? [createDeliverable('Deliverable 1', 'complete')]
+                : [createDeliverable('Deliverable 1', 'pending')];
             const scenarios =
               row.has_ac === 'true'
                 ? [createScenario('AC Test', ['acceptance-criteria'])]
@@ -670,8 +655,8 @@ describeFeature(feature, ({ Rule }) => {
           state.features = dataTable.map((row) => {
             const deliverables =
               row.deliverables_complete === 'true'
-                ? [createDeliverable('Deliverable 1', 'Complete')]
-                : [createDeliverable('Deliverable 1', 'Pending')];
+                ? [createDeliverable('Deliverable 1', 'complete')]
+                : [createDeliverable('Deliverable 1', 'pending')];
             const scenarios =
               row.has_ac === 'true'
                 ? [createScenario('AC Test', ['acceptance-criteria'])]
@@ -717,8 +702,8 @@ describeFeature(feature, ({ Rule }) => {
           state.features = dataTable.map((row) => {
             const deliverables =
               row.deliverables_complete === 'true'
-                ? [createDeliverable('Deliverable 1', 'Complete')]
-                : [createDeliverable('Deliverable 1', 'Pending')];
+                ? [createDeliverable('Deliverable 1', 'complete')]
+                : [createDeliverable('Deliverable 1', 'pending')];
             const scenarios =
               row.has_ac === 'true'
                 ? [createScenario('AC Test', ['acceptance-criteria'])]
@@ -799,7 +784,7 @@ describeFeature(feature, ({ Rule }) => {
           resetState(); // Reset state at start of scenario
           const results: DoDValidationResult[] = dataTable.map((row) => {
             const deliverables = Array.from({ length: parseInt(row.deliverable_count) }, (_, i) =>
-              createDeliverable(`Deliverable ${i + 1}`, 'Complete')
+              createDeliverable(`Deliverable ${i + 1}`, 'complete')
             );
             return {
               patternName: row.pattern,
@@ -854,8 +839,8 @@ describeFeature(feature, ({ Rule }) => {
             patternName: row.pattern,
             phase: parseInt(row.phase),
             isDoDMet: false,
-            deliverables: [createDeliverable('Deliverable 1', 'Pending')],
-            incompleteDeliverables: [createDeliverable('Deliverable 1', 'Pending')],
+            deliverables: [createDeliverable('Deliverable 1', 'pending')],
+            incompleteDeliverables: [createDeliverable('Deliverable 1', 'pending')],
             missingAcceptanceCriteria: row.message.includes('acceptance-criteria'),
             messages: [row.message],
           }));

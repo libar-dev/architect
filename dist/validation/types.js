@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, WithTagRegistry
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, getPhaseStatusEmoji, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -40,58 +40,17 @@ export const DEFAULT_THRESHOLDS = {
     magicCommentThreshold: 5,
 };
 /**
- * Completion status detection patterns
+ * Get status emoji for phase-level aggregates.
  *
- * Various ways to indicate a deliverable is complete.
+ * @param allComplete - Whether all patterns in the phase are complete
+ * @param anyActive - Whether any patterns in the phase are active/in-progress
+ * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
  */
-export const COMPLETION_PATTERNS = [
-    // Text patterns (case-insensitive)
-    'complete',
-    'completed',
-    'done',
-    'finished',
-    'yes',
-    // Emoji/symbol patterns
-    '✓',
-    '✔',
-    '✅',
-    '☑',
-    // Checkmark unicode variants
-    '\u2713', // ✓
-    '\u2714', // ✔
-    '\u2611', // ☑
-];
-/**
- * In-progress status detection patterns
- *
- * Status values that indicate work is ongoing.
- */
-export const IN_PROGRESS_PATTERNS = [
-    'in-progress',
-    'in progress',
-    'active',
-    'wip',
-    'partial',
-    'started',
-    // Emoji patterns
-    '🔄',
-    '⏳',
-    '🚧',
-];
-/**
- * Pending status detection patterns
- *
- * Status values that indicate work hasn't started.
- */
-export const PENDING_PATTERNS = [
-    'pending',
-    'todo',
-    'planned',
-    'not started',
-    'no',
-    // Emoji patterns
-    '⏹',
-    '⬜',
-    '❌',
-];
+export function getPhaseStatusEmoji(allComplete, anyActive) {
+    if (allComplete)
+        return '✅';
+    if (anyActive)
+        return '🚧';
+    return '📋';
+}
 //# sourceMappingURL=types.js.map

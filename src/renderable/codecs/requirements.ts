@@ -568,7 +568,7 @@ function buildSingleRequirementDocument(
   // Deliverables
   if (pattern.deliverables && pattern.deliverables.length > 0) {
     const deliverableItems = pattern.deliverables.map((d) => {
-      const status = d.status ? ` (${d.status})` : '';
+      const status = ` (${d.status})`;
       return `${d.name}${status}`;
     });
 

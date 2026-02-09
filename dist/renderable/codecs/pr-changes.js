@@ -37,7 +37,8 @@
 import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
 import { heading, paragraph, separator, table, list, document, } from '../schema.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
+import { normalizeStatus, isPatternComplete, isPatternActive } from '../../taxonomy/index.js';
+import { getDeliverableStatusEmoji } from '../../taxonomy/deliverable-status.js';
 import { getStatusEmoji, getDisplayName, extractSummary, formatBusinessValue, sortByPhaseAndName, } from '../utils.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 /**
@@ -154,15 +155,11 @@ function filterPatternsByPrScope(patterns, options) {
     const hasReleaseFilter = releaseFilter.length > 0;
     // No filters = return all active/completed patterns
     if (!hasFileFilter && !hasReleaseFilter) {
-        return patterns.filter((p) => {
-            const status = normalizeStatus(p.status);
-            return status === 'active' || status === 'completed';
-        });
+        return patterns.filter((p) => isPatternComplete(p.status) || isPatternActive(p.status));
     }
     return patterns.filter((pattern) => {
         // Check status first - only active or completed patterns
-        const status = normalizeStatus(pattern.status);
-        if (status !== 'active' && status !== 'completed') {
+        if (!isPatternComplete(pattern.status) && !isPatternActive(pattern.status)) {
             return false;
         }
         // File match: pattern's source file is in changed files
@@ -219,8 +216,8 @@ function buildDetailLevelDescription(options) {
  * Build PR summary section
  */
 function buildPrSummary(patterns, options) {
-    const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
-    const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+    const completed = patterns.filter((p) => isPatternComplete(p.status));
+    const active = patterns.filter((p) => isPatternActive(p.status));
     const rows = [
         ['Patterns in PR', String(patterns.length)],
         ['Completed', String(completed.length)],
@@ -337,7 +334,7 @@ function buildPatternChangesList(patterns, options) {
             }
             if (deliverables.length > 0) {
                 const deliverableItems = deliverables.map((d) => {
-                    const statusEmoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+                    const statusEmoji = getDeliverableStatusEmoji(d.status);
                     const release = d.release ? ` (${d.release})` : '';
                     return `${statusEmoji} ${d.name}${release}`;
                 });
@@ -365,11 +362,11 @@ function buildReviewChecklist(patterns) {
     checklistItems.push('- [ ] Tests added/updated for changes');
     checklistItems.push('- [ ] Documentation updated if needed');
     // Pattern-specific items
-    const hasCompletedPatterns = patterns.some((p) => normalizeStatus(p.status) === 'completed');
+    const hasCompletedPatterns = patterns.some((p) => isPatternComplete(p.status));
     if (hasCompletedPatterns) {
         checklistItems.push('- [ ] Completed patterns verified working');
     }
-    const hasActivePatterns = patterns.some((p) => normalizeStatus(p.status) === 'active');
+    const hasActivePatterns = patterns.some((p) => isPatternActive(p.status));
     if (hasActivePatterns) {
         checklistItems.push('- [ ] Active work is in a consistent state');
     }

@@ -105,11 +105,7 @@ export const invalidStatus = {
         const normalizedStatus = STATUS_NORMALIZATION_MAP[directive.status.toLowerCase()];
         if (!normalizedStatus) {
             const validValues = [
-                ...PROCESS_STATUS_VALUES,
-                'implemented',
-                'partial',
-                'in-progress',
-                'planned',
+                ...new Set([...PROCESS_STATUS_VALUES, ...Object.keys(STATUS_NORMALIZATION_MAP)]),
             ];
             return violation('invalid-status', 'error', `Invalid status '${directive.status}'. Valid values: ${validValues.join(', ')}.`, file, line);
         }

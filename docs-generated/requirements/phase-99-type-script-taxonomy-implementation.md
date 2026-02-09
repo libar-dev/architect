@@ -138,12 +138,12 @@ As a delivery-process developer
 
 ## Deliverables
 
-- Status values constants (done)
-- Format types constants (done)
-- Category definitions (done)
-- Metadata tag definitions (done)
-- Registry builder (done)
-- Updated Zod schemas (done)
+- Status values constants (complete)
+- Format types constants (complete)
+- Category definitions (complete)
+- Metadata tag definitions (complete)
+- Registry builder (complete)
+- Updated Zod schemas (complete)
 
 ## Implementations
 

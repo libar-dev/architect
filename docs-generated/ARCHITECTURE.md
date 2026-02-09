@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 107 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 108 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 107 |
+| Total Components | 108 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -130,9 +130,14 @@ graph TB
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
+        DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinitions["CategoryDefinitions[read-model]"]
     end
     subgraph validation["Validation BC"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -141,16 +146,14 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator[service]"]
-        AntiPatternDetector["AntiPatternDetector[service]"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -159,14 +162,15 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
         LayerTypes["LayerTypes"]
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
+        DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
@@ -179,8 +183,6 @@ graph TB
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -192,13 +194,6 @@ graph TB
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
         FSMModule["FSMModule"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
-        PipelineModule["PipelineModule"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -211,12 +206,19 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
-    ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    ExtractedPatternSchema --> DocDirectiveSchema
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
@@ -275,6 +277,7 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
+    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
@@ -282,7 +285,6 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    ArchitectureCodec --> MasterDataset
 ```
 
 ---
@@ -362,6 +364,7 @@ All components with architecture annotations:
 | ✅ Configuration Defaults | - | - | - | src/config/defaults.ts |
 | ✅ Configuration Presets | - | - | - | src/config/presets.ts |
 | ✅ Configuration Types | - | - | - | src/config/types.ts |
+| 🚧 Deliverable Status Taxonomy | - | - | - | src/taxonomy/deliverable-status.ts |
 | 🚧 Derive Process State | - | - | - | src/lint/process-guard/derive-state.ts |
 | 🚧 Detect Changes | - | - | - | src/lint/process-guard/detect-changes.ts |
 | ✅ Doc Directive Schema | - | - | - | src/validation-schemas/doc-directive.ts |

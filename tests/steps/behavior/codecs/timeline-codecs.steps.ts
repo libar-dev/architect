@@ -222,8 +222,8 @@ function createDatasetWithDeliverables(): MasterDataset {
       status: 'active',
       phase: 1,
       deliverables: [
-        { name: 'Component A', status: 'Complete', tests: 1, location: 'src/componentA/' },
-        { name: 'Component B', status: 'In Progress', tests: 0, location: 'src/componentB/' },
+        { name: 'Component A', status: 'complete', tests: 1, location: 'src/componentA/' },
+        { name: 'Component B', status: 'in-progress', tests: 0, location: 'src/componentB/' },
       ],
     }),
   ];

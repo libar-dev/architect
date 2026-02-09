@@ -142,12 +142,12 @@ _Verified by: Detect dangling references, Detect orphan patterns, Show blocking 
 
 ## Deliverables
 
-- Graph traversal engine (planned)
-- graph subcommand (planned)
-- Impact analysis (planned)
-- Path finding algorithm (planned)
-- Dangling reference detector (planned)
-- Orphan pattern detector (planned)
+- Graph traversal engine (pending)
+- graph subcommand (pending)
+- Impact analysis (pending)
+- Path finding algorithm (pending)
+- Dangling reference detector (pending)
+- Orphan pattern detector (pending)
 
 ---
 

@@ -30,6 +30,7 @@ import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js'
 import { normalizeStatus } from '../../taxonomy/index.js';
 import { getStatusEmoji, getDisplayName, computeStatusCounts, completionPercentage, renderProgressBar, sortByStatusAndName, formatBusinessValue, } from '../utils.js';
 import { toKebabCase, groupBy } from '../../utils/index.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers
@@ -210,7 +211,7 @@ function buildByProductArea(patterns, options) {
                 : null;
             const label = businessValue ? `${emoji} ${name} - ${businessValue}` : `${emoji} ${name}`;
             if (options.generateDetailFiles) {
-                const slug = requirementToSlug(p.patternName ?? name, p.phase);
+                const slug = requirementToSlug(getPatternName(p), p.phase);
                 return `[${label}](requirements/${slug}.md)`;
             }
             return label;
@@ -275,7 +276,7 @@ function buildByPhase(patterns, options) {
                 : null;
             const label = businessValue ? `${emoji} ${name} - ${businessValue}` : `${emoji} ${name}`;
             if (options.generateDetailFiles) {
-                const slug = requirementToSlug(p.patternName ?? name, p.phase);
+                const slug = requirementToSlug(getPatternName(p), p.phase);
                 return `[${label}](requirements/${slug}.md)`;
             }
             return label;
@@ -333,8 +334,7 @@ export function requirementToSlug(patternName, phase) {
 function buildRequirementsDetailFiles(patterns, options, dataset) {
     const files = {};
     for (const pattern of patterns) {
-        const name = getDisplayName(pattern);
-        const slug = requirementToSlug(pattern.patternName ?? name, pattern.phase);
+        const slug = requirementToSlug(getPatternName(pattern), pattern.phase);
         files[`requirements/${slug}.md`] = buildSingleRequirementDocument(pattern, options, dataset);
     }
     return files;
@@ -384,13 +384,13 @@ function buildSingleRequirementDocument(pattern, options, dataset) {
     // Deliverables
     if (pattern.deliverables && pattern.deliverables.length > 0) {
         const deliverableItems = pattern.deliverables.map((d) => {
-            const status = d.status ? ` (${d.status})` : '';
+            const status = ` (${d.status})`;
             return `${d.name}${status}`;
         });
         sections.push(heading(2, 'Deliverables'), list(deliverableItems));
     }
     // Implementations (files that implement this pattern via @libar-docs-implements)
-    const patternKey = pattern.patternName ?? name;
+    const patternKey = getPatternName(pattern);
     const rel = dataset.relationshipIndex?.[patternKey];
     if (rel?.implementedBy && rel.implementedBy.length > 0) {
         sections.push(heading(2, 'Implementations'));

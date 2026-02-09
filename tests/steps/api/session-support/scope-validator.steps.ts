@@ -94,9 +94,9 @@ describeFeature(feature, ({ Rule }) => {
           filePath: 'specs/my-pattern.feature',
           dependsOn: ['DepA', 'DepB'],
           deliverables: [
-            { name: 'D1', status: 'planned', tests: 0, location: 'src/a.ts' },
-            { name: 'D2', status: 'planned', tests: 0, location: 'src/b.ts' },
-            { name: 'D3', status: 'planned', tests: 0, location: 'src/c.ts' },
+            { name: 'D1', status: 'pending', tests: 0, location: 'src/a.ts' },
+            { name: 'D2', status: 'pending', tests: 0, location: 'src/b.ts' },
+            { name: 'D3', status: 'pending', tests: 0, location: 'src/c.ts' },
           ],
           behaviorFile: 'tests/features/my-pattern.feature',
         });
@@ -138,7 +138,7 @@ describeFeature(feature, ({ Rule }) => {
           status: 'roadmap',
           filePath: 'specs/blocked.feature',
           dependsOn: ['DepA'],
-          deliverables: [{ name: 'D1', status: 'planned', tests: 0, location: 'src/a.ts' }],
+          deliverables: [{ name: 'D1', status: 'pending', tests: 0, location: 'src/a.ts' }],
         });
 
         const { api, dataset } = buildApiAndDataset([focal, depA]);
@@ -174,7 +174,7 @@ describeFeature(feature, ({ Rule }) => {
             name: 'CompletedPattern',
             status: 'completed',
             filePath: 'specs/completed.feature',
-            deliverables: [{ name: 'D1', status: 'Complete', tests: 1, location: 'src/a.ts' }],
+            deliverables: [{ name: 'D1', status: 'complete', tests: 1, location: 'src/a.ts' }],
           });
 
           const { api, dataset } = buildApiAndDataset([focal]);
@@ -209,7 +209,7 @@ describeFeature(feature, ({ Rule }) => {
           name: 'NoPdrPattern',
           status: 'roadmap',
           filePath: 'specs/no-pdr.feature',
-          deliverables: [{ name: 'D1', status: 'planned', tests: 0, location: 'src/a.ts' }],
+          deliverables: [{ name: 'D1', status: 'pending', tests: 0, location: 'src/a.ts' }],
         });
 
         const { api, dataset } = buildApiAndDataset([focal]);
@@ -273,7 +273,7 @@ describeFeature(feature, ({ Rule }) => {
           name: 'WarnPattern',
           status: 'roadmap',
           filePath: 'specs/warn.feature',
-          deliverables: [{ name: 'D1', status: 'planned', tests: 0, location: 'src/a.ts' }],
+          deliverables: [{ name: 'D1', status: 'pending', tests: 0, location: 'src/a.ts' }],
         });
 
         const { api, dataset } = buildApiAndDataset([focal]);

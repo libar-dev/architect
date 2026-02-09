@@ -16,7 +16,7 @@
  * - Use QueryResult<T> for typed response handling
  */
 
-import type { ProcessStatusValue } from '../taxonomy/index.js';
+import type { DeliverableStatus, ProcessStatusValue } from '../taxonomy/index.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
 import type { ImplementationRef } from '../validation-schemas/master-dataset.js';
 
@@ -175,8 +175,8 @@ export interface PatternRelationships {
 export interface PatternDeliverable {
   /** Deliverable name/description */
   name: string;
-  /** Status emoji or text */
-  status: string;
+  /** Canonical deliverable status */
+  status: DeliverableStatus;
   /** Number of tests */
   tests: number;
   /** Implementation location */

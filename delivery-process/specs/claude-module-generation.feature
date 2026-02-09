@@ -41,17 +41,17 @@ Feature: CLAUDE.md Module Generation from Source Annotations
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | claude-module tag definition | planned | taxonomy/registry-builder.ts | Yes | unit |
-      | claude-section tag definition | planned | taxonomy/registry-builder.ts | Yes | unit |
-      | claude-tags tag definition | planned | taxonomy/registry-builder.ts | Yes | unit |
-      | DocDirective schema fields | planned | validation-schemas/doc-directive.ts | Yes | unit |
-      | ExtractedPattern schema fields | planned | validation-schemas/extracted-pattern.ts | Yes | unit |
-      | Gherkin parser tag extraction | planned | extractor/gherkin-extractor.ts | Yes | unit |
-      | ClaudeModuleCodec | planned | renderable/codecs/claude-module.ts | Yes | unit |
-      | Claude module generator | planned | generators/built-in/claude-module-generator.ts | Yes | unit |
-      | Generator registry integration | planned | generators/built-in/codec-generators.ts | Yes | unit |
-      | Process Guard annotated example | planned | tests/features/validation/process-guard.feature | No | - |
-      | Example generated module | planned | _example-output/process-guard.md | No | - |
+      | claude-module tag definition | pending | taxonomy/registry-builder.ts | Yes | unit |
+      | claude-section tag definition | pending | taxonomy/registry-builder.ts | Yes | unit |
+      | claude-tags tag definition | pending | taxonomy/registry-builder.ts | Yes | unit |
+      | DocDirective schema fields | pending | validation-schemas/doc-directive.ts | Yes | unit |
+      | ExtractedPattern schema fields | pending | validation-schemas/extracted-pattern.ts | Yes | unit |
+      | Gherkin parser tag extraction | pending | extractor/gherkin-extractor.ts | Yes | unit |
+      | ClaudeModuleCodec | pending | renderable/codecs/claude-module.ts | Yes | unit |
+      | Claude module generator | pending | generators/built-in/claude-module-generator.ts | Yes | unit |
+      | Generator registry integration | pending | generators/built-in/codec-generators.ts | Yes | unit |
+      | Process Guard annotated example | pending | tests/features/validation/process-guard.feature | No | - |
+      | Example generated module | pending | _example-output/process-guard.md | No | - |
 
   # ============================================================================
   # RULE 1: Claude Module Tags in Registry
@@ -207,7 +207,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
 
           Examples:
             | status    | protection |
-            | completed | hard       |
+            | complete | hard       |
             | active    | scope      |
             | roadmap   | none       |
         """
@@ -251,7 +251,7 @@ Feature: CLAUDE.md Module Generation from Source Annotations
         """
         | From | To | Valid |
         | roadmap | active | Yes |
-        | roadmap | completed | No |
+        | roadmap | complete | No |
         """
       When generating the claude module
       Then the table should appear in output unchanged

@@ -35,12 +35,9 @@
  * 3. **Scope Creep** - Active specs cannot add new deliverables
  * 4. **Session Scope** - Modifications outside session scope warn
  */
-import { validateTransition, getValidTransitionsFrom } from '../../validation/fsm/index.js';
+import { validateTransition, getValidTransitionsFrom, isTerminalState, } from '../../validation/fsm/index.js';
 import { isInSessionScope, isSessionExcluded } from './derive-state.js';
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 // =============================================================================
 // Decider - Main Entry Point
 // =============================================================================
@@ -153,8 +150,9 @@ function checkProtectionLevel(state, changes, registry) {
             continue;
         // Check hard protection (completed)
         if (fileState.protection === 'hard' && !fileState.hasUnlockReason) {
-            // Exempt files transitioning TO completed — this is a completion, not a post-completion edit
-            if (changes.statusTransitions.get(file)?.to === 'completed') {
+            // Exempt files transitioning TO a terminal state — this is a completion, not a post-completion edit
+            const transition = changes.statusTransitions.get(file);
+            if (transition !== undefined && isTerminalState(transition.to)) {
                 continue;
             }
             violations.push(createViolation('completed-protection', 'error', `Cannot modify completed spec '${file}' without unlock reason`, file, `Add ${tagPrefix}unlock-reason:'your reason' to proceed`));

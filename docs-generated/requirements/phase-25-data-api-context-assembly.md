@@ -270,13 +270,13 @@ _Verified by: Executive overview, Overview with empty pipeline returns zero-stat
 
 ## Deliverables
 
-- ContextBundle type (Done)
-- Context assembler (Done)
-- context subcommand (Done)
-- files subcommand (Done)
-- dep-tree subcommand (Done)
-- overview subcommand (Done)
-- Context text renderer (Done)
+- ContextBundle type (complete)
+- Context assembler (complete)
+- context subcommand (complete)
+- files subcommand (complete)
+- dep-tree subcommand (complete)
+- overview subcommand (complete)
+- Context text renderer (complete)
 
 ## Implementations
 

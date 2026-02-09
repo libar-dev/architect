@@ -76,3 +76,15 @@ Feature: Deliverable Change Detection from Git Diff
       Then the deliverable "Existing feature" is in the "modified" list
       And the deliverable "New feature" is in the "added" list
       And the deliverable "Old feature" is in the "removed" list
+
+  # ==========================================================================
+  # Non-Deliverable Table Filtering
+  # ==========================================================================
+
+  Rule: Non-deliverable tables are ignored
+
+    @edge-case
+    Scenario: Changes in Examples tables are not detected as deliverable changes
+      Given a git diff with changes only in an Examples table
+      When detecting deliverable changes
+      Then no deliverables are detected

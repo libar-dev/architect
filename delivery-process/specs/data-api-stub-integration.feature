@@ -43,13 +43,13 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Scan path configuration (pre-existing) | completed | package.json | No | N/A |
-      | libar-docs-target taxonomy tag | completed | src/taxonomy/registry-builder.ts | Yes | unit |
-      | libar-docs-since taxonomy tag | completed | src/taxonomy/registry-builder.ts | Yes | unit |
-      | stubs subcommand | completed | src/cli/process-api.ts | Yes | integration |
-      | decisions subcommand | completed | src/cli/process-api.ts | Yes | integration |
-      | pdr subcommand | completed | src/cli/process-api.ts | Yes | integration |
-      | Stub-to-implementation resolver | completed | src/api/stub-resolver.ts | Yes | unit |
+      | Scan path configuration (pre-existing) | complete | package.json | No | N/A |
+      | libar-docs-target taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
+      | libar-docs-since taxonomy tag | complete | src/taxonomy/registry-builder.ts | Yes | unit |
+      | stubs subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | decisions subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | pdr subcommand | complete | src/cli/process-api.ts | Yes | integration |
+      | Stub-to-implementation resolver | complete | src/api/stub-resolver.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Stub Annotation for Pipeline Visibility

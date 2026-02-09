@@ -36,14 +36,14 @@ Feature: Gherkin Rules and Custom Content Support
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | GherkinRuleSchema | Complete | No | validation-schemas/feature.ts |
-      | Rule parsing in AST parser | Complete | No | scanner/gherkin-ast-parser.ts |
-      | Rules passthrough in scanner | Complete | No | scanner/gherkin-scanner.ts |
-      | Rules field in ExtractedPattern | Complete | No | validation-schemas/extracted-pattern.ts |
-      | Rules mapping in extractor | Complete | No | extractor/gherkin-extractor.ts |
-      | Business Rules rendering | Complete | No | generators/sections/prd-features.ts |
-      | DataTable rendering in acceptance criteria | Complete | No | generators/sections/prd-features.ts |
-      | DocString rendering in acceptance criteria | Complete | No | generators/sections/prd-features.ts |
+      | GherkinRuleSchema | complete | No | validation-schemas/feature.ts |
+      | Rule parsing in AST parser | complete | No | scanner/gherkin-ast-parser.ts |
+      | Rules passthrough in scanner | complete | No | scanner/gherkin-scanner.ts |
+      | Rules field in ExtractedPattern | complete | No | validation-schemas/extracted-pattern.ts |
+      | Rules mapping in extractor | complete | No | extractor/gherkin-extractor.ts |
+      | Business Rules rendering | complete | No | generators/sections/prd-features.ts |
+      | DataTable rendering in acceptance criteria | complete | No | generators/sections/prd-features.ts |
+      | DocString rendering in acceptance criteria | complete | No | generators/sections/prd-features.ts |
 
   Rule: Rules flow through the entire pipeline without data loss
 

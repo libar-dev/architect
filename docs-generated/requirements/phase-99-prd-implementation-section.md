@@ -127,8 +127,8 @@ _Verified by: Section omitted when no implementations exist_
 
 ## Deliverables
 
-- Implementation collector (planned)
-- PRD section renderer (planned)
+- Implementation collector (pending)
+- PRD section renderer (pending)
 
 ---
 

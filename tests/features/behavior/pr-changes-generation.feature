@@ -121,9 +121,9 @@ Feature: PR Changes Generation
   Scenario: Deliverables shown inline with patterns
     Given completed phase 23 with deliverables:
       | Name                   | Status   | Tests | Location              |
-      | Fix parseArgs bug      | Complete | 1     | src/cli/generate.ts   |
-      | Add --version flag     | Complete | 1     | src/cli/*.ts          |
-      | Update README language | Complete | 0     | README.md             |
+      | Fix parseArgs bug      | complete | 1     | src/cli/generate.ts   |
+      | Add --version flag     | complete | 1     | src/cli/*.ts          |
+      | Update README language | complete | 0     | README.md             |
     When generating PR changes with releaseFilter "v0.2.0"
     Then the output should contain "Deliverables:"
     And the output should contain "Fix parseArgs bug"
@@ -134,8 +134,8 @@ Feature: PR Changes Generation
   Scenario: Deliverables show release tags
     Given completed phase 23 with deliverables:
       | Name          | Status      | Tests | Location    |
-      | Completed One | Complete    | 1     | src/one.ts  |
-      | Completed Two | Complete    | 1     | src/two.ts  |
+      | Completed One | complete    | 1     | src/one.ts  |
+      | Completed Two | complete    | 1     | src/two.ts  |
     When generating PR changes with releaseFilter "v0.2.0"
     Then the output should contain "(v0.2.0)"
 
@@ -147,7 +147,7 @@ Feature: PR Changes Generation
   Scenario: Review checklist includes standard code quality items
     Given completed phase 23 with deliverables:
       | Name           | Status   | Tests | Location    |
-      | Main Feature   | Complete | 1     | src/main.ts |
+      | Main Feature   | complete | 1     | src/main.ts |
     When generating PR changes with releaseFilter "v0.2.0"
     Then the output should contain "## Review Checklist"
     And the output should contain "- [ ] Code follows project conventions"
@@ -158,7 +158,7 @@ Feature: PR Changes Generation
   Scenario: Review checklist includes completed pattern verification
     Given completed phase 23 with deliverables:
       | Name           | Status   | Tests | Location    |
-      | Main Feature   | Complete | 1     | src/main.ts |
+      | Main Feature   | complete | 1     | src/main.ts |
     When generating PR changes with releaseFilter "v0.2.0"
     Then the output should contain "## Review Checklist"
     And the output should contain "- [ ] Completed patterns verified working"
@@ -274,9 +274,9 @@ Feature: PR Changes Generation
   Scenario: Mixed releases within single phase shows only matching deliverables
     Given a phase with mixed-release deliverables:
       | Phase | Name     | Deliverable | Status   | Tests | Location   | Release |
-      | 42    | Mixed PR | Feature A   | Complete | 1     | src/a.ts   | v0.1.0  |
-      | 42    | Mixed PR | Feature B   | Complete | 1     | src/b.ts   | v0.2.0  |
-      | 42    | Mixed PR | Feature C   | Complete | 1     | src/c.ts   | v0.2.0  |
+      | 42    | Mixed PR | Feature A   | complete | 1     | src/a.ts   | v0.1.0  |
+      | 42    | Mixed PR | Feature B   | complete | 1     | src/b.ts   | v0.2.0  |
+      | 42    | Mixed PR | Feature C   | complete | 1     | src/c.ts   | v0.2.0  |
     When generating PR changes with releaseFilter "v0.2.0"
     Then the output should contain "Feature B"
     And the output should contain "Feature C"

@@ -149,7 +149,7 @@ function setupCompletedPhasesWithReleases(dataTable: DataTableRow[]): void {
     const deliverables = [
       {
         name: `${name} Deliverable`,
-        status: 'Complete',
+        status: 'complete',
         tests: 1,
         location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
         release: row.Release ?? undefined,
@@ -174,7 +174,7 @@ function setupMixedStatusPhases(dataTable: DataTableRow[]): void {
     const deliverables = [
       {
         name: `${name} Deliverable`,
-        status: 'Complete',
+        status: 'complete',
         tests: 1,
         location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
         release: row.Release ?? undefined,
@@ -200,7 +200,7 @@ function setupCompletedPhasesWithUnreleasedMix(dataTable: DataTableRow[]): void 
     const deliverables = [
       {
         name: `${name} Deliverable`,
-        status: 'Complete',
+        status: 'complete',
         tests: 1,
         location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
         release,
@@ -365,7 +365,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         const deliverableCount = parseInt(row.Deliverables ?? '1', 10);
         const deliverables = Array.from({ length: deliverableCount }, (_, i) => ({
           name: `${name} Deliverable ${i + 1}`,
-          status: 'Complete',
+          status: 'complete',
           tests: 1,
           location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/item${i + 1}/`,
           release: row.Release ?? undefined,
@@ -399,7 +399,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         const deliverableCount = parseInt(row.Deliverables ?? '1', 10);
         const deliverables = Array.from({ length: deliverableCount }, (_, i) => ({
           name: `${name} Deliverable ${i + 1}`,
-          status: 'Complete',
+          status: 'complete',
           tests: 1,
           location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/item${i + 1}/`,
           release: row.Release ?? undefined,
@@ -434,7 +434,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
       state = initState();
       const deliverables = dataTable.map((row) => ({
         name: row.Name ?? 'Unnamed',
-        status: row.Status ?? 'Complete',
+        status: row.Status ?? 'complete',
         tests: parseInt(row.Tests ?? '0', 10),
         location: row.Location ?? 'src/',
         release: 'v0.2.0',
@@ -471,7 +471,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
       state = initState();
       const deliverables = dataTable.map((row) => ({
         name: row.Name ?? 'Unnamed',
-        status: row.Status ?? 'Complete',
+        status: row.Status ?? 'complete',
         tests: parseInt(row.Tests ?? '0', 10),
         location: row.Location ?? 'src/',
         release: 'v0.2.0',
@@ -507,7 +507,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         state = initState();
         const deliverables = dataTable.map((row) => ({
           name: row.Name ?? 'Unnamed',
-          status: row.Status ?? 'Complete',
+          status: row.Status ?? 'complete',
           tests: parseInt(row.Tests ?? '0', 10),
           location: row.Location ?? 'src/',
           release: 'v0.2.0',
@@ -551,7 +551,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         state = initState();
         const deliverables = dataTable.map((row) => ({
           name: row.Name ?? 'Unnamed',
-          status: row.Status ?? 'Complete',
+          status: row.Status ?? 'complete',
           tests: parseInt(row.Tests ?? '0', 10),
           location: row.Location ?? 'src/',
           release: 'v0.2.0',
@@ -597,7 +597,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
           const deliverables = [
             {
               name: `${name} Deliverable`,
-              status: 'Complete',
+              status: 'complete',
               tests: 1,
               location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
               release: row.Release ?? undefined,
@@ -640,7 +640,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
           const deliverables = [
             {
               name: `${name} Deliverable`,
-              status: 'Complete',
+              status: 'complete',
               tests: 1,
               location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
               release: row.Release ?? undefined,
@@ -687,7 +687,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
             const deliverables = [
               {
                 name: `${name} Deliverable`,
-                status: 'Complete',
+                status: 'complete',
                 tests: 1,
                 location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
                 release: row.Release ?? undefined,
@@ -731,7 +731,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         const deliverables = [
           {
             name: `${name} Deliverable`,
-            status: 'Complete',
+            status: 'complete',
             tests: 1,
             location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
             release: row.Release ?? undefined,
@@ -793,7 +793,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
           const deliverables = [
             {
               name: `${name} Deliverable`,
-              status: 'Complete',
+              status: 'complete',
               tests: 1,
               location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
               release: row.Release ?? undefined,
@@ -840,7 +840,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
           deliverables: [
             {
               name: 'Other Deliverable',
-              status: 'Complete',
+              status: 'complete',
               tests: 1,
               location: 'src/other/',
               release: 'v0.1.0',
@@ -874,7 +874,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
             deliverables: [
               {
                 name: 'Hidden',
-                status: 'Complete',
+                status: 'complete',
                 tests: 0,
                 location: 'src/',
                 release: row.Release ?? 'v0.2.0',
@@ -904,7 +904,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         const deliverables = [
           {
             name: `${name} Deliverable`,
-            status: 'Complete',
+            status: 'complete',
             tests: 1,
             location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
             release: row.Release ?? undefined,
@@ -961,7 +961,7 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
             const phase = parseInt(phaseStr, 10);
             const deliverables = data.rows.map((row) => ({
               name: row.Deliverable ?? 'Unnamed Deliverable',
-              status: row.Status ?? 'Complete',
+              status: row.Status ?? 'complete',
               tests: parseInt(row.Tests ?? '1', 10),
               location: row.Location ?? 'src/',
               release: row.Release ?? undefined,

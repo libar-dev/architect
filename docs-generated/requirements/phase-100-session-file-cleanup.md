@@ -84,10 +84,10 @@ _Verified by: Permission error during cleanup, Missing sessions directory_
 
 ## Deliverables
 
-- Cleanup trigger integration (Pending)
-- File pattern matching (Pending)
-- Error handling (Pending)
-- Cleanup logging (Pending)
+- Cleanup trigger integration (pending)
+- File pattern matching (pending)
+- Error handling (pending)
+- Cleanup logging (pending)
 
 ---
 

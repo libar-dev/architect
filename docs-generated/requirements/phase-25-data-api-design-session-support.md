@@ -137,10 +137,10 @@ _Verified by: Generate handoff for in-progress pattern, Handoff captures discove
 
 ## Deliverables
 
-- Scope validation logic (Complete)
-- scope-validate subcommand (Complete)
-- Handoff document generator (Complete)
-- handoff subcommand (Complete)
+- Scope validation logic (complete)
+- scope-validate subcommand (complete)
+- Handoff document generator (complete)
+- handoff subcommand (complete)
 
 ## Implementations
 

@@ -6,9 +6,9 @@ Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | arch neighborhood unit tests | planned | tests/steps/api/architecture-queries/ | Yes | unit |
-      | arch compare unit tests | planned | tests/steps/api/architecture-queries/ | Yes | unit |
-      | tags and sources unit tests | planned | tests/steps/api/architecture-queries/ | Yes | unit |
+      | arch neighborhood unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
+      | arch compare unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
+      | tags and sources unit tests | pending | tests/steps/api/architecture-queries/ | Yes | unit |
 
   Rule: Neighborhood and comparison views
 

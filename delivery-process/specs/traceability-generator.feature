@@ -25,10 +25,10 @@ Feature: Traceability Generator - Map Rules to Scenarios
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Traceability extractor | planned | @libar-dev/delivery-process/src/generators/traceability/ | Yes | unit |
-      | Traceability matrix renderer | planned | @libar-dev/delivery-process/src/generators/traceability/ | Yes | unit |
-      | CLI integration | planned | @libar-dev/delivery-process/src/cli/generate-docs.ts | Yes | unit |
-      | docs:traceability script | planned | package.json | No | - |
+      | Traceability extractor | pending | @libar-dev/delivery-process/src/generators/traceability/ | Yes | unit |
+      | Traceability matrix renderer | pending | @libar-dev/delivery-process/src/generators/traceability/ | Yes | unit |
+      | CLI integration | pending | @libar-dev/delivery-process/src/cli/generate-docs.ts | Yes | unit |
+      | docs:traceability script | pending | package.json | No | - |
 
   # ===========================================================================
   # RULE 1: Parse Verified by annotations

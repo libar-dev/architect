@@ -45,8 +45,9 @@
  * }
  * ```
  */
+import { isPatternComplete, isPatternActive, isPatternPlanned, } from '../taxonomy/normalized-status.js';
 import { validateTransition, getProtectionSummary, isValidTransition, getValidTransitionsFrom, } from '../validation/fsm/index.js';
-import { getPatternName } from './pattern-helpers.js';
+import { findPatternByName } from './pattern-helpers.js';
 // =============================================================================
 // Process State API Implementation
 // =============================================================================
@@ -161,8 +162,7 @@ export function createProcessStateAPI(dataset) {
         // Pattern Queries
         // ─────────────────────────────────────────────────────────────────────
         getPattern(name) {
-            const lowerName = name.toLowerCase();
-            return dataset.patterns.find((p) => getPatternName(p).toLowerCase() === lowerName);
+            return findPatternByName(dataset.patterns, name);
         },
         getPatternDependencies(name) {
             const entry = relationshipIndex[name];
@@ -268,10 +268,9 @@ export function createProcessStateAPI(dataset) {
             return Object.entries(dataset.byQuarter)
                 .map(([quarter, patterns]) => {
                 const counts = {
-                    completed: patterns.filter((p) => p.status === 'completed').length,
-                    active: patterns.filter((p) => p.status === 'active').length,
-                    planned: patterns.filter((p) => p.status === 'roadmap' || p.status === 'deferred')
-                        .length,
+                    completed: patterns.filter((p) => isPatternComplete(p.status)).length,
+                    active: patterns.filter((p) => isPatternActive(p.status)).length,
+                    planned: patterns.filter((p) => isPatternPlanned(p.status)).length,
                     total: patterns.length,
                 };
                 return { quarter, patterns, counts };

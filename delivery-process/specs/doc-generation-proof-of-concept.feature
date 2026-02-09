@@ -428,15 +428,15 @@ Feature: ADR-021 - Documentation Generation from Annotated Sources
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Decision extraction codec | Done | renderable/codecs/decision-doc.ts |
-      | Source mapping parser | Done | generators/source-mapper.ts |
-      | DocString extraction enhancement | Done | renderable/codecs/decision-doc.ts |
-      | doc-from-decision generator | Done | generators/built-in/decision-doc-generator.ts |
-      | Design stub directory structure | N/A | stubs transformed to implementations |
-      | Shape extraction annotations | Done | src/lint/process-guard/types.ts, decider.ts |
-      | POC self-documentation (compact) | Done | _claude-md/generated/doc-generation-proof-of-concept.md |
-      | POC self-documentation (detailed) | Done | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md |
-      | ProcessGuard ADR decision doc | Done | decisions/adr-006-process-guard.feature |
+      | Decision extraction codec | complete | renderable/codecs/decision-doc.ts |
+      | Source mapping parser | complete | generators/source-mapper.ts |
+      | DocString extraction enhancement | complete | renderable/codecs/decision-doc.ts |
+      | doc-from-decision generator | complete | generators/built-in/decision-doc-generator.ts |
+      | Design stub directory structure | n/a | stubs transformed to implementations |
+      | Shape extraction annotations | complete | src/lint/process-guard/types.ts, decider.ts |
+      | POC self-documentation (compact) | complete | _claude-md/generated/doc-generation-proof-of-concept.md |
+      | POC self-documentation (detailed) | complete | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md |
+      | ProcessGuard ADR decision doc | complete | decisions/adr-006-process-guard.feature |
 
   @acceptance-criteria @happy-path
   Scenario: Decision Rule descriptions become documentation sections

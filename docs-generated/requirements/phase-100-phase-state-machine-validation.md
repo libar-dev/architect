@@ -81,11 +81,11 @@ _Verified by: Completed status requires completion date, Completed phases should
 
 ## Deliverables
 
-- FSM states and protection levels (✅)
-- FSM transition matrix and validator (✅)
-- Pure validation functions (✅)
-- Status validation lint rule (✅)
-- ProcessStateAPI for programmatic queries (✅)
+- FSM states and protection levels (complete)
+- FSM transition matrix and validator (complete)
+- Pure validation functions (complete)
+- Status validation lint rule (complete)
+- ProcessStateAPI for programmatic queries (complete)
 
 ## Implementations
 

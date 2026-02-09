@@ -140,12 +140,12 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 
 ## Deliverables
 
-- MasterDataset cache with mtime invalidation (planned)
-- REPL mode handler (planned)
-- FSM short-circuit for static queries (planned)
-- Per-subcommand help system (planned)
-- Dry-run mode (planned)
-- Validation summary in metadata (planned)
+- MasterDataset cache with mtime invalidation (pending)
+- REPL mode handler (pending)
+- FSM short-circuit for static queries (pending)
+- Per-subcommand help system (pending)
+- Dry-run mode (pending)
+- Validation summary in metadata (pending)
 
 ---
 

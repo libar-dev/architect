@@ -32,12 +32,12 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | ESLint processor plugin | planned | @libar-dev/delivery-process/src/eslint/processor.ts | Yes | unit |
-      | Status-to-config mapper | planned | @libar-dev/delivery-process/src/eslint/status-config.ts | Yes | unit |
-      | ESLint plugin entry point | planned | @libar-dev/delivery-process/src/eslint/index.ts | Yes | unit |
-      | CLI command for ignore list | planned | @libar-dev/delivery-process/src/cli/eslint-ignores.ts | Yes | unit |
-      | Root eslint.config.js update | planned | eslint.config.js | No | - |
-      | Directory exclusion removal | planned | eslint.config.js (lines 30-57) | No | - |
+      | ESLint processor plugin | pending | @libar-dev/delivery-process/src/eslint/processor.ts | Yes | unit |
+      | Status-to-config mapper | pending | @libar-dev/delivery-process/src/eslint/status-config.ts | Yes | unit |
+      | ESLint plugin entry point | pending | @libar-dev/delivery-process/src/eslint/index.ts | Yes | unit |
+      | CLI command for ignore list | pending | @libar-dev/delivery-process/src/cli/eslint-ignores.ts | Yes | unit |
+      | Root eslint.config.js update | pending | eslint.config.js | No | - |
+      | Directory exclusion removal | pending | eslint.config.js (lines 30-57) | No | - |
 
   # ===========================================================================
   # RULE 1: Status determines lint rule relaxation
@@ -56,7 +56,7 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
     | roadmap | none | Relaxed (warn, ignore args) |
     | deferred | none | Relaxed (warn, ignore args) |
     | active | scope | Strict (error) |
-    | completed | hard | Strict (error) |
+    | complete | hard | Strict (error) |
     | (no status) | N/A | Strict (error) |
 
     **Verified by:** Roadmap file has relaxed rules, Completed file has strict rules, No status file has strict rules
@@ -154,7 +154,7 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
         | roadmap | none |
         | deferred | none |
         | active | scope |
-        | completed | hard |
+        | complete | hard |
       When ESLint processor maps each status
       Then all mappings match Process Guard behavior
 
@@ -220,7 +220,7 @@ Feature: Status-Aware ESLint Suppression - Annotation-Driven Lint Rule Relaxatio
         | File | Status |
         | src/dcb/execute.ts | roadmap |
         | src/dcb/types.ts | roadmap |
-        | src/cms/dual-write.ts | completed |
+        | src/cms/dual-write.ts | complete |
       When running "pnpm lint:process --eslint-ignores"
       Then output includes "src/dcb/execute.ts"
       And output includes "src/dcb/types.ts"

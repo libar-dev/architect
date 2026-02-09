@@ -315,15 +315,15 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 
 ## Deliverables
 
-- Implements tag in taxonomy registry (completed)
-- Extends tag in taxonomy registry (completed)
-- DocDirective schema update (completed)
-- ExtractedPattern schema update (completed)
-- RelationshipEntry schema update (completed)
-- Relationship index enhancement (completed)
-- Mermaid graph enhancement (completed)
-- Pattern detail implementations section (completed)
-- Linter rules for relationship validation (completed)
+- Implements tag in taxonomy registry (complete)
+- Extends tag in taxonomy registry (complete)
+- DocDirective schema update (complete)
+- ExtractedPattern schema update (complete)
+- RelationshipEntry schema update (complete)
+- Relationship index enhancement (complete)
+- Mermaid graph enhancement (complete)
+- Pattern detail implementations section (complete)
+- Linter rules for relationship validation (complete)
 
 ## Implementations
 

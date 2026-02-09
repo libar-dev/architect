@@ -78,9 +78,9 @@ _Verified by: Valid release version formats_
 
 ## Deliverables
 
-- Spec compliance validator (Pending)
-- TypeScript phase file validator (Pending)
-- Release version format validator (Pending)
+- Spec compliance validator (pending)
+- TypeScript phase file validator (pending)
+- Release version format validator (pending)
 
 ---
 

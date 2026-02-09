@@ -20,7 +20,7 @@
  * - When performing cross-validation between code and feature files
  */
 import { z } from 'zod';
-import { HIERARCHY_LEVELS, PROCESS_STATUS_VALUES, RISK_LEVELS, } from '../taxonomy/index.js';
+import { DELIVERABLE_STATUS_VALUES, HIERARCHY_LEVELS, PROCESS_STATUS_VALUES, RISK_LEVELS, } from '../taxonomy/index.js';
 /**
  * Process status values from Gherkin @libar-docs-status tag
  *
@@ -111,8 +111,8 @@ export const DeliverableSchema = z
     .object({
     /** Deliverable name/description */
     name: z.string().min(1),
-    /** Status emoji or text */
-    status: z.string(),
+    /** Canonical deliverable status (validated against DELIVERABLE_STATUS_VALUES) */
+    status: z.enum(DELIVERABLE_STATUS_VALUES),
     /** Number of tests */
     tests: z.number().int().nonnegative(),
     /** Implementation location */

@@ -229,7 +229,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         businessValue: z.ZodOptional<z.ZodString>;
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
-            status: z.ZodString;
+            status: z.ZodEnum<{
+                deferred: "deferred";
+                complete: "complete";
+                "in-progress": "in-progress";
+                pending: "pending";
+                superseded: "superseded";
+                "n/a": "n/a";
+            }>;
             tests: z.ZodNumber;
             location: z.ZodString;
             finding: z.ZodOptional<z.ZodString>;
@@ -252,10 +259,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
             deprecated: "deprecated";
-            superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -481,7 +488,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -504,10 +518,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -696,7 +710,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -719,10 +740,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -911,7 +932,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -934,10 +962,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1130,7 +1158,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -1153,10 +1188,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1352,7 +1387,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         businessValue: z.ZodOptional<z.ZodString>;
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
-            status: z.ZodString;
+            status: z.ZodEnum<{
+                deferred: "deferred";
+                complete: "complete";
+                "in-progress": "in-progress";
+                pending: "pending";
+                superseded: "superseded";
+                "n/a": "n/a";
+            }>;
             tests: z.ZodNumber;
             location: z.ZodString;
             finding: z.ZodOptional<z.ZodString>;
@@ -1375,10 +1417,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
             deprecated: "deprecated";
-            superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1567,7 +1609,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         businessValue: z.ZodOptional<z.ZodString>;
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
-            status: z.ZodString;
+            status: z.ZodEnum<{
+                deferred: "deferred";
+                complete: "complete";
+                "in-progress": "in-progress";
+                pending: "pending";
+                superseded: "superseded";
+                "n/a": "n/a";
+            }>;
             tests: z.ZodNumber;
             location: z.ZodString;
             finding: z.ZodOptional<z.ZodString>;
@@ -1590,10 +1639,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
             deprecated: "deprecated";
-            superseded: "superseded";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1783,7 +1832,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -1806,10 +1862,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1998,7 +2054,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2021,10 +2084,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2213,7 +2276,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2236,10 +2306,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2428,7 +2498,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2451,10 +2528,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2669,7 +2746,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2692,10 +2776,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2884,7 +2968,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -2907,10 +2998,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3099,7 +3190,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -3122,10 +3220,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3314,7 +3412,14 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             businessValue: z.ZodOptional<z.ZodString>;
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
-                status: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
                 tests: z.ZodNumber;
                 location: z.ZodString;
                 finding: z.ZodOptional<z.ZodString>;
@@ -3337,10 +3442,10 @@ export declare const PrChangesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
                 deprecated: "deprecated";
-                superseded: "superseded";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;

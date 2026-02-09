@@ -20,6 +20,7 @@
  */
 import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
+import { type DeliverableStatus } from '../taxonomy/index.js';
 import type { NeighborEntry } from './types.js';
 export type SessionType = 'planning' | 'design' | 'implement';
 export declare function isValidSessionType(value: string): value is SessionType;
@@ -54,7 +55,7 @@ export interface DepEntry {
 }
 export interface DeliverableEntry {
     readonly name: string;
-    readonly status: string;
+    readonly status: DeliverableStatus;
     readonly location: string;
 }
 export interface FsmContext {

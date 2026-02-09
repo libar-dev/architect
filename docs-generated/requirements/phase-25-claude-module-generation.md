@@ -162,7 +162,7 @@ Scenario Outline: Protection level from status
 
   Examples:
     | status    | protection |
-    | completed | hard       |
+    | complete | hard       |
     | active    | scope      |
     | roadmap   | none       |
 ```
@@ -190,7 +190,7 @@ Scenario Outline: Protection level from status
 ```markdown
 | From | To | Valid |
 | roadmap | active | Yes |
-| roadmap | completed | No |
+| roadmap | complete | No |
 ```
 
 **Code blocks in descriptions are preserved**
@@ -395,17 +395,17 @@ _Verified by: Detailed mode includes scenario descriptions, Summary mode produce
 
 ## Deliverables
 
-- claude-module tag definition (planned)
-- claude-section tag definition (planned)
-- claude-tags tag definition (planned)
-- DocDirective schema fields (planned)
-- ExtractedPattern schema fields (planned)
-- Gherkin parser tag extraction (planned)
-- ClaudeModuleCodec (planned)
-- Claude module generator (planned)
-- Generator registry integration (planned)
-- Process Guard annotated example (planned)
-- Example generated module (planned)
+- claude-module tag definition (pending)
+- claude-section tag definition (pending)
+- claude-tags tag definition (pending)
+- DocDirective schema fields (pending)
+- ExtractedPattern schema fields (pending)
+- Gherkin parser tag extraction (pending)
+- ClaudeModuleCodec (pending)
+- Claude module generator (pending)
+- Generator registry integration (pending)
+- Process Guard annotated example (pending)
+- Example generated module (pending)
 
 ---
 

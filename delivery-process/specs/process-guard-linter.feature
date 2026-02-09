@@ -44,14 +44,14 @@ Feature: Process Guard Linter
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | State derivation from annotations | Complete | src/lint/process-guard/derive-state.ts |
-      | Git diff change detection | Complete | src/lint/process-guard/detect-changes.ts |
-      | Process Decider (pure validation) | Complete | src/lint/process-guard/decider.ts |
-      | Protection level rules | Complete | src/lint/process-guard/decider.ts |
-      | Session scope validation | Complete | src/lint/process-guard/decider.ts |
-      | Taxonomy stability validation | Complete | src/lint/process-guard/decider.ts |
-      | CLI integration (lint-process.ts) | Complete | src/cli/lint-process.ts |
-      | Pre-commit hook integration | Complete | .husky/pre-commit |
+      | State derivation from annotations | complete | src/lint/process-guard/derive-state.ts |
+      | Git diff change detection | complete | src/lint/process-guard/detect-changes.ts |
+      | Process Decider (pure validation) | complete | src/lint/process-guard/decider.ts |
+      | Protection level rules | complete | src/lint/process-guard/decider.ts |
+      | Session scope validation | complete | src/lint/process-guard/decider.ts |
+      | Taxonomy stability validation | complete | src/lint/process-guard/decider.ts |
+      | CLI integration (lint-process.ts) | complete | src/cli/lint-process.ts |
+      | Pre-commit hook integration | complete | .husky/pre-commit |
 
   # ============================================================================
   # PROTECTION LEVELS
@@ -74,7 +74,7 @@ Feature: Process Guard Linter
         | roadmap   | none       | Fully editable                       |
         | deferred  | none       | Fully editable                       |
         | active    | scope      | Errors on new deliverables           |
-        | completed | hard       | Requires @libar-docs-unlock-reason   |
+        | complete | hard       | Requires @libar-docs-unlock-reason   |
 
     @acceptance-criteria
     Scenario: Completed file modification without unlock fails
@@ -162,7 +162,7 @@ Feature: Process Guard Linter
         | from     | to        |
         | roadmap  | active    |
         | roadmap  | deferred  |
-        | active   | completed |
+        | active   | complete |
         | active   | roadmap   |
         | deferred | roadmap   |
         | roadmap  | roadmap   |
@@ -176,12 +176,12 @@ Feature: Process Guard Linter
 
       Examples:
         | from      | to        |
-        | roadmap   | completed |
+        | roadmap   | complete |
         | deferred  | active    |
-        | deferred  | completed |
-        | completed | active    |
-        | completed | roadmap   |
-        | completed | deferred  |
+        | deferred  | complete |
+        | complete | active    |
+        | complete | roadmap   |
+        | complete | deferred  |
 
   # ============================================================================
   # DELIVERABLE INTEGRITY
@@ -197,8 +197,8 @@ Feature: Process Guard Linter
       Given a spec with @libar-docs-status:active
       And existing deliverables:
         | Deliverable | Status |
-        | Task A      | Done   |
-        | Task B      | Pending |
+        | Task A      | complete |
+        | Task B      | pending |
       When adding new deliverable "Task C"
       Then linting fails with "scope-creep" violation
       And message is "Cannot add deliverables to active spec"
@@ -209,7 +209,7 @@ Feature: Process Guard Linter
       Given a spec with @libar-docs-status:active
       And existing deliverables:
         | Deliverable | Status |
-        | Task A      | Pending |
+        | Task A      | pending |
       When changing Task A status to "Done"
       Then linting passes
 

@@ -37,9 +37,9 @@ Feature: ADR-001 - Problem/Solution Feature Description Structure
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location | Release |
-      | Problem/Solution structure definition | Complete | No | CLAUDE.md | v0.3.0 |
-      | Apply to error-handling.feature | Complete | No | tests/features/behavior/error-handling.feature | v0.3.0 |
-      | Apply to session-handoffs.feature | Complete | No | tests/features/behavior/session-handoffs.feature | v0.3.0 |
+      | Problem/Solution structure definition | complete | No | CLAUDE.md | v0.3.0 |
+      | Apply to error-handling.feature | complete | No | tests/features/behavior/error-handling.feature | v0.3.0 |
+      | Apply to session-handoffs.feature | complete | No | tests/features/behavior/session-handoffs.feature | v0.3.0 |
 
   @acceptance-criteria
   Scenario: Feature descriptions have required sections

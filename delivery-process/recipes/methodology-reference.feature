@@ -44,9 +44,9 @@ Feature: Methodology Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Methodology reference feature file | Complete | delivery-process/recipes/methodology-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/METHODOLOGY-REFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/methodology/methodology-reference.md |
+      | Methodology reference feature file | complete | delivery-process/recipes/methodology-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/METHODOLOGY-REFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/methodology/methodology-reference.md |
 
   Rule: Core Thesis
 

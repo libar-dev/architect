@@ -23,51 +23,27 @@ Feature: Definition of Done (DoD) Validation
   # Deliverable Completion Detection
   # ==========================================================================
 
-  Rule: Deliverables can be marked complete in various formats
+  Rule: Deliverable completion uses canonical status taxonomy
 
     @happy-path
-    Scenario Outline: Text-based completion statuses are detected
-      Given a deliverable with status "<status>"
+    Scenario: Complete status is detected as complete
+      Given a deliverable with status "complete"
       When checking if deliverable is complete
       Then the deliverable is considered complete
-
-      Examples:
-        | status    |
-        | Complete  |
-        | complete  |
-        | COMPLETE  |
-        | Completed |
-        | Done      |
-        | Finished  |
-        | Yes       |
-
-    @happy-path
-    Scenario Outline: Symbol-based completion statuses are detected
-      Given a deliverable with status "<status>"
-      When checking if deliverable is complete
-      Then the deliverable is considered complete
-
-      Examples:
-        | status |
-        | ✓      |
-        | ✔      |
-        | ✅     |
-        | ☑      |
 
     @edge-case
-    Scenario Outline: Incomplete statuses are correctly identified
+    Scenario Outline: Non-complete canonical statuses are correctly identified
       Given a deliverable with status "<status>"
       When checking if deliverable is complete
       Then the deliverable is NOT considered complete
 
       Examples:
         | status      |
-        | In Progress |
-        | Pending     |
-        | TODO        |
-        | Not Started |
-        | WIP         |
-        | ❌          |
+        | in-progress |
+        | pending     |
+        | deferred    |
+        | superseded  |
+        | n/a         |
 
   # ==========================================================================
   # Acceptance Criteria Detection
@@ -140,9 +116,9 @@ Feature: Definition of Done (DoD) Validation
       Given a feature for phase 15 pattern "FeatureX"
       And deliverables with statuses:
         | name           | status   |
-        | Implement API  | Complete |
-        | Write tests    | Done     |
-        | Documentation  | ✅       |
+        | Implement API  | complete |
+        | Write tests    | complete |
+        | Documentation  | complete |
       And a scenario with tags:
         | tag                 |
         | acceptance-criteria |
@@ -155,9 +131,9 @@ Feature: Definition of Done (DoD) Validation
       Given a feature for phase 15 pattern "FeatureX"
       And deliverables with statuses:
         | name           | status      |
-        | Implement API  | Complete    |
-        | Write tests    | In Progress |
-        | Documentation  | Pending     |
+        | Implement API  | complete    |
+        | Write tests    | in-progress |
+        | Documentation  | pending     |
       And a scenario with tags:
         | tag                 |
         | acceptance-criteria |
@@ -171,7 +147,7 @@ Feature: Definition of Done (DoD) Validation
       Given a feature for phase 15 pattern "FeatureX"
       And deliverables with statuses:
         | name          | status   |
-        | Implement API | Complete |
+        | Implement API | complete |
       And a scenario with tags:
         | tag        |
         | happy-path |

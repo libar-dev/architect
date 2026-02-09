@@ -76,9 +76,9 @@ export function normalizeStatus(status: string | undefined): NormalizedStatus {
  * Check if a pattern's FSM status normalizes to "completed"
  *
  * Use this for **pattern-level** status checks (FSM-governed, 4 values).
- * For **deliverable-level** status checks (freeform human strings like
- * "Done", "✅", "In Progress"), use `isStatusComplete()` from
- * `validation/types.ts` instead.
+ * For **deliverable-level** status checks (canonical enum: complete/in-progress/pending/
+ * deferred/superseded/n/a), use `isDeliverableStatusComplete()` from
+ * `taxonomy/deliverable-status.ts` instead.
  *
  * @param status - Raw pattern status from ExtractedPattern.status
  * @returns True if the pattern is completed
@@ -91,8 +91,8 @@ export function isPatternComplete(status: string | undefined): boolean {
  * Check if a pattern's FSM status normalizes to "active"
  *
  * Use this for **pattern-level** status checks (FSM-governed, 4 values).
- * For **deliverable-level** status checks (freeform human strings),
- * use `isStatusInProgress()` from `validation/types.ts` instead.
+ * For **deliverable-level** status checks (canonical enum),
+ * use `isDeliverableStatusInProgress()` from `taxonomy/deliverable-status.ts` instead.
  *
  * @param status - Raw pattern status from ExtractedPattern.status
  * @returns True if the pattern is active
@@ -106,8 +106,8 @@ export function isPatternActive(status: string | undefined): boolean {
  *
  * Includes both "roadmap" and "deferred" FSM states, as well as
  * undefined/unknown statuses. Use this for **pattern-level** status checks.
- * For **deliverable-level** status checks, use `isStatusPending()` from
- * `validation/types.ts` instead.
+ * For **deliverable-level** status checks, use `isDeliverableStatusPending()` from
+ * `taxonomy/deliverable-status.ts` instead.
  *
  * @param status - Raw pattern status from ExtractedPattern.status
  * @returns True if the pattern is planned (roadmap, deferred, or unknown)

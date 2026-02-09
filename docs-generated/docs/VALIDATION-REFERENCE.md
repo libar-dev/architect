@@ -391,20 +391,10 @@ function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<
 /**
  * Check if a deliverable status indicates completion
  *
- * Matches various completion patterns including text ("Complete", "Done")
- * and symbols (✓, ✅, ☑).
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
  *
  * @param deliverable - The deliverable to check
  * @returns True if the deliverable is complete
- *
- * @example
- * ```typescript
- * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
- * // => true
- *
- * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
- * // => false
- * ```
  */
 function isDeliverableComplete(deliverable: Deliverable): boolean;
 ```
@@ -627,110 +617,13 @@ interface DoDValidationSummary {
 
 ```typescript
 /**
- * Completion status detection patterns
+ * Get status emoji for phase-level aggregates.
  *
- * Various ways to indicate a deliverable is complete.
+ * @param allComplete - Whether all patterns in the phase are complete
+ * @param anyActive - Whether any patterns in the phase are active/in-progress
+ * @returns Status emoji: ✅ if all complete, 🚧 if any active, 📋 otherwise
  */
-COMPLETION_PATTERNS = [
-  // Text patterns (case-insensitive)
-  'complete',
-  'completed',
-  'done',
-  'finished',
-  'yes',
-  // Emoji/symbol patterns
-  '✓',
-  '✔',
-  '✅',
-  '☑',
-  // Checkmark unicode variants
-  '\u2713', // ✓
-  '\u2714', // ✔
-  '\u2611', // ☑
-] as const
-```
-
-```typescript
-/**
- * In-progress status detection patterns
- *
- * Status values that indicate work is ongoing.
- */
-IN_PROGRESS_PATTERNS = [
-  'in-progress',
-  'in progress',
-  'active',
-  'wip',
-  'partial',
-  'started',
-  // Emoji patterns
-  '🔄',
-  '⏳',
-  '🚧',
-] as const
-```
-
-```typescript
-/**
- * Pending status detection patterns
- *
- * Status values that indicate work hasn't started.
- */
-PENDING_PATTERNS = [
-  'pending',
-  'todo',
-  'planned',
-  'not started',
-  'no',
-  // Emoji patterns
-  '⏹',
-  '⬜',
-  '❌',
-] as const
-```
-
-```typescript
-/**
- * Check whether a status string indicates completion.
- *
- * Canonical helper using COMPLETION_PATTERNS. Use this instead of
- * hardcoding status strings like 'Complete', 'Done', '✓'.
- */
-function isStatusComplete(status: string): boolean;
-```
-
-```typescript
-/**
- * Check whether a status string indicates pending/not-started.
- *
- * Canonical helper using PENDING_PATTERNS. Use this instead of
- * hardcoding status strings like 'planned', 'pending', 'todo'.
- */
-function isStatusPending(status: string): boolean;
-```
-
-```typescript
-/**
- * Check whether a status string indicates in-progress/active work.
- *
- * Canonical helper using IN_PROGRESS_PATTERNS. Use this instead of
- * hardcoding status strings like 'in-progress', 'wip', 'started'.
- */
-function isStatusInProgress(status: string): boolean;
-```
-
-```typescript
-/**
- * Get the appropriate emoji for a deliverable status string.
- *
- * Uses canonical status helpers to map freeform deliverable statuses
- * to a three-state emoji: ✅ (complete), 🚧 (in-progress), 📋 (pending/other).
- *
- * Note: This is for deliverable statuses (freeform strings like 'Done', 'wip'),
- * NOT for FSM pattern statuses (roadmap/active/completed/deferred) — use
- * getStatusEmoji() from renderable/utils.ts for those.
- */
-function getDeliverableStatusEmoji(status: string): string;
+function getPhaseStatusEmoji(allComplete: boolean, anyActive: boolean): string;
 ```
 
 ```typescript

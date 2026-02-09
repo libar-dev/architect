@@ -178,10 +178,10 @@ _Verified by: Generates scenario verification links, Links include feature file 
 
 ## Deliverables
 
-- Business rules extractor (planned)
-- Business rules renderer (planned)
-- CLI integration (planned)
-- docs:business-rules script (planned)
+- Business rules extractor (pending)
+- Business rules renderer (pending)
+- CLI integration (pending)
+- docs:business-rules script (pending)
 
 ---
 

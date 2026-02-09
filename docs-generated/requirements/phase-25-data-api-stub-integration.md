@@ -200,13 +200,13 @@ _Verified by: Query design decisions for a pattern, Cross-reference a PDR number
 
 ## Deliverables
 
-- Scan path configuration (pre-existing) (completed)
-- libar-docs-target taxonomy tag (completed)
-- libar-docs-since taxonomy tag (completed)
-- stubs subcommand (completed)
-- decisions subcommand (completed)
-- pdr subcommand (completed)
-- Stub-to-implementation resolver (completed)
+- Scan path configuration (pre-existing) (complete)
+- libar-docs-target taxonomy tag (complete)
+- libar-docs-since taxonomy tag (complete)
+- stubs subcommand (complete)
+- decisions subcommand (complete)
+- pdr subcommand (complete)
+- Stub-to-implementation resolver (complete)
 
 ## Implementations
 

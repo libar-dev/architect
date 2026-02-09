@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [█████████████░░░░░░░] 101/156 (65%)
+**Overall Progress:** [█████████████░░░░░░░] 101/157 (64%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 156 |
+| Total Patterns | 157 |
 | Completed | 101 |
-| Active | 26 |
+| Active | 27 |
 | Planned | 29 |
 | Active Phases | 2 |
 
@@ -32,14 +32,14 @@
 
 #### Deliverables
 
-- 📋 Implementation relationship queries
-- 📋 Inheritance hierarchy queries
+- 🔄 Implementation relationship queries
+- 🔄 Inheritance hierarchy queries
 - ✅ ProcessStateAPI type extensions
-- 📋 Relationship query step definitions
+- 🔄 Relationship query step definitions
 - ✅ process:query CLI command
 - ✅ CLI argument parser
 - ✅ JSON output formatter
-- 📋 Text output formatter
+- ⏸️ Text output formatter
 - ✅ Root package.json script
 - ✅ CLAUDE.md documentation update
 
@@ -71,6 +71,7 @@
 | 🚧 Context Assembler Impl | - | - | Pure function composition over MasterDataset. |
 | 🚧 Context Formatter Impl | - | - | First plain-text formatter in the codebase. |
 | 🚧 Coverage Analyzer Impl | - | - | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
+| 🚧 Deliverable Status Taxonomy | - | - | Canonical status values for deliverables in Gherkin Background tables. |
 | 🚧 Derive Process State | - | - | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | - | - | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 FSM Module | - | - | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |

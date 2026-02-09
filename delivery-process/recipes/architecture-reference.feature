@@ -46,9 +46,9 @@ Feature: Architecture Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Architecture reference feature file | Complete | delivery-process/recipes/architecture-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/ARCHITECTURE-REFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/architecture/architecture-reference.md |
+      | Architecture reference feature file | complete | delivery-process/recipes/architecture-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/ARCHITECTURE-REFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/architecture/architecture-reference.md |
 
   Rule: Design Principles
 

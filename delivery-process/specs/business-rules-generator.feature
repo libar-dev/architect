@@ -25,10 +25,10 @@ Feature: Business Rules Generator - Extract Invariants and Rationale from Featur
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Business rules extractor | planned | @libar-dev/delivery-process/src/generators/business-rules/ | Yes | unit |
-      | Business rules renderer | planned | @libar-dev/delivery-process/src/generators/business-rules/ | Yes | unit |
-      | CLI integration | planned | @libar-dev/delivery-process/src/cli/generate-docs.ts | Yes | unit |
-      | docs:business-rules script | planned | package.json | No | - |
+      | Business rules extractor | pending | @libar-dev/delivery-process/src/generators/business-rules/ | Yes | unit |
+      | Business rules renderer | pending | @libar-dev/delivery-process/src/generators/business-rules/ | Yes | unit |
+      | CLI integration | pending | @libar-dev/delivery-process/src/cli/generate-docs.ts | Yes | unit |
+      | docs:business-rules script | pending | package.json | No | - |
 
   # ===========================================================================
   # RULE 1: Extract Rule blocks with structured content

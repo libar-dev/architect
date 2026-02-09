@@ -6,6 +6,7 @@
  */
 
 import type { ExtractedPattern, DocDirective, ExportInfo } from '../../src/types/index.js';
+import type { DeliverableStatus } from '../../src/taxonomy/index.js';
 import {
   asPatternId,
   asCategoryName,
@@ -25,7 +26,7 @@ import {
  */
 export interface TestDeliverable {
   name: string;
-  status: string;
+  status: DeliverableStatus;
   tests: number;
   location: string;
   finding?: string;
@@ -536,8 +537,8 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       effort: '2w',
       team: 'platform',
       deliverables: [
-        { name: 'Decider interface', status: 'Complete', tests: 1, location: 'src/decider/' },
-        { name: 'FSM module', status: 'Complete', tests: 1, location: 'src/fsm/' },
+        { name: 'Decider interface', status: 'complete', tests: 1, location: 'src/decider/' },
+        { name: 'FSM module', status: 'complete', tests: 1, location: 'src/fsm/' },
       ],
     }),
     createTestPattern({
@@ -550,7 +551,7 @@ export function createTimelinePatterns(): ExtractedPattern[] {
       quarter: 'Q1-2026',
       effort: '1w',
       team: 'platform',
-      deliverables: [{ name: 'CMS types', status: 'Complete', tests: 1, location: 'src/cms/' }],
+      deliverables: [{ name: 'CMS types', status: 'complete', tests: 1, location: 'src/cms/' }],
     }),
     createTestPattern({
       id: 'pattern-71a10003',

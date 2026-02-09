@@ -75,18 +75,18 @@ Feature: Dual-Source Extraction
     Scenario: Standard deliverables table extraction
       Given a feature with background deliverables:
         | Deliverable    | Status   | Tests | Location           |
-        | Implement API  | Complete | 5     | src/api/handler.ts |
-        | Write docs     | Done     | Yes   | docs/README.md     |
+        | Implement API  | complete | 5     | src/api/handler.ts |
+        | Write docs     | complete | Yes   | docs/README.md     |
       When extracting deliverables
       Then 2 deliverables are extracted
-      And deliverable "Implement API" has status "Complete"
+      And deliverable "Implement API" has status "complete"
       And deliverable "Implement API" has 5 tests
 
     @happy-path
     Scenario: Extended deliverables with Finding and Release
       Given a feature with background deliverables:
         | Deliverable | Status | Tests | Location | Finding  | Release |
-        | Fix bug     | Done   | 3     | src/fix  | CODE-001 | v0.2.0  |
+        | Fix bug     | complete | 3     | src/fix  | CODE-001 | v0.2.0  |
       When extracting deliverables
       Then deliverable "Fix bug" has finding "CODE-001"
       And deliverable "Fix bug" has release "v0.2.0"
@@ -101,10 +101,10 @@ Feature: Dual-Source Extraction
     Scenario: Tests column handles various formats
       Given a feature with background deliverables:
         | Deliverable | Status | Tests | Location |
-        | Test Yes    | Done   | Yes   | src/     |
-        | Test No     | Done   | No    | src/     |
-        | Test Number | Done   | 10    | src/     |
-        | Test Empty  | Done   |       | src/     |
+        | Test Yes    | complete | Yes   | src/     |
+        | Test No     | complete | No    | src/     |
+        | Test Number | complete | 10    | src/     |
+        | Test Empty  | complete |       | src/     |
       When extracting deliverables
       Then the test counts are correctly parsed
 

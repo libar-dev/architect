@@ -38,15 +38,15 @@ Feature: Step Definition Completion
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Test Type | Location |
-      | pr-changes-generation.steps.ts | planned | Yes | unit | tests/steps/behavior/pr-changes-generation.steps.ts |
-      | remaining-work-enhancement.steps.ts | planned | Yes | unit | tests/steps/behavior/remaining-work-enhancement.steps.ts |
-      | remaining-work-totals.steps.ts | planned | Yes | unit | tests/steps/behavior/remaining-work-totals.steps.ts |
-      | session-handoffs.steps.ts | planned | Yes | unit | tests/steps/behavior/session-handoffs.steps.ts |
-      | description-headers.steps.ts | planned | Yes | unit | tests/steps/behavior/description-headers.steps.ts |
-      | description-quality-foundation.steps.ts | planned | Yes | unit | tests/steps/behavior/description-quality-foundation.steps.ts |
-      | implementation-links.steps.ts | planned | Yes | unit | tests/steps/behavior/implementation-links.steps.ts |
-      | table-extraction.steps.ts | planned | Yes | unit | tests/steps/generators/table-extraction.steps.ts |
-      | docstring-mediatype.steps.ts | planned | Yes | unit | tests/steps/scanner/docstring-mediatype.steps.ts |
+      | pr-changes-generation.steps.ts | pending | Yes | unit | tests/steps/behavior/pr-changes-generation.steps.ts |
+      | remaining-work-enhancement.steps.ts | pending | Yes | unit | tests/steps/behavior/remaining-work-enhancement.steps.ts |
+      | remaining-work-totals.steps.ts | pending | Yes | unit | tests/steps/behavior/remaining-work-totals.steps.ts |
+      | session-handoffs.steps.ts | pending | Yes | unit | tests/steps/behavior/session-handoffs.steps.ts |
+      | description-headers.steps.ts | pending | Yes | unit | tests/steps/behavior/description-headers.steps.ts |
+      | description-quality-foundation.steps.ts | pending | Yes | unit | tests/steps/behavior/description-quality-foundation.steps.ts |
+      | implementation-links.steps.ts | pending | Yes | unit | tests/steps/behavior/implementation-links.steps.ts |
+      | table-extraction.steps.ts | pending | Yes | unit | tests/steps/generators/table-extraction.steps.ts |
+      | docstring-mediatype.steps.ts | pending | Yes | unit | tests/steps/scanner/docstring-mediatype.steps.ts |
 
   # ============================================================================
   # RULE 1: Generator Step Definitions (High Priority)

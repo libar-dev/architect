@@ -140,8 +140,8 @@
 
 | Deliverable | Status |
 | --- | --- |
-| Task A | Done |
-| Task B | Pending |
+| Task A | complete |
+| Task B | pending |
 
 **Updating deliverable status in active spec passes**
 
@@ -152,7 +152,7 @@
 
 | Deliverable | Status |
 | --- | --- |
-| Task A | Pending |
+| Task A | pending |
 
 **Removing deliverable from active spec warns**
 
@@ -277,14 +277,14 @@ _Verified by: Session-related tags are recognized, Protection-related tags are r
 
 ## Deliverables
 
-- State derivation from annotations (Complete)
-- Git diff change detection (Complete)
-- Process Decider (pure validation) (Complete)
-- Protection level rules (Complete)
-- Session scope validation (Complete)
-- Taxonomy stability validation (Complete)
-- CLI integration (lint-process.ts) (Complete)
-- Pre-commit hook integration (Complete)
+- State derivation from annotations (complete)
+- Git diff change detection (complete)
+- Process Decider (pure validation) (complete)
+- Protection level rules (complete)
+- Session scope validation (complete)
+- Taxonomy stability validation (complete)
+- CLI integration (lint-process.ts) (complete)
+- Pre-commit hook integration (complete)
 
 ## Implementations
 

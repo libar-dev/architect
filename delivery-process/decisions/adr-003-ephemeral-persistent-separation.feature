@@ -37,9 +37,9 @@ Feature: ADR-003 - Ephemeral vs Persistent Documentation Separation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location | Release |
-      | Create docs-living/working/ directory | Complete | No | docs-living/working/ | v0.3.0 |
-      | Move PR-CHANGES to working/ subfolder | Complete | No | src/generators/built-in/self-docs.ts | v0.3.0 |
-      | INDEX.md explaining file organization | Complete | No | docs-living/INDEX.md | v0.3.0 |
+      | Create docs-living/working/ directory | complete | No | docs-living/working/ | v0.3.0 |
+      | Move PR-CHANGES to working/ subfolder | complete | No | src/generators/built-in/self-docs.ts | v0.3.0 |
+      | INDEX.md explaining file organization | complete | No | docs-living/INDEX.md | v0.3.0 |
 
   @acceptance-criteria
   Scenario: PR-CHANGES generated to working/ subfolder

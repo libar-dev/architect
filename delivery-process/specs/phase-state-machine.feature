@@ -24,11 +24,11 @@ Feature: Phase State Machine Validation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | FSM states and protection levels | ✅ | 123 | @libar-dev/delivery-process/src/validation/fsm/states.ts |
-      | FSM transition matrix and validator | ✅ | 123 | @libar-dev/delivery-process/src/validation/fsm/transitions.ts |
-      | Pure validation functions | ✅ | 123 | @libar-dev/delivery-process/src/validation/fsm/validator.ts |
-      | Status validation lint rule | ✅ | 2190 | @libar-dev/delivery-process/src/lint/rules.ts |
-      | ProcessStateAPI for programmatic queries | ✅ | 95 | @libar-dev/delivery-process/src/api/process-state.ts |
+      | FSM states and protection levels | complete | 123 | @libar-dev/delivery-process/src/validation/fsm/states.ts |
+      | FSM transition matrix and validator | complete | 123 | @libar-dev/delivery-process/src/validation/fsm/transitions.ts |
+      | Pure validation functions | complete | 123 | @libar-dev/delivery-process/src/validation/fsm/validator.ts |
+      | Status validation lint rule | complete | 2190 | @libar-dev/delivery-process/src/lint/rules.ts |
+      | ProcessStateAPI for programmatic queries | complete | 95 | @libar-dev/delivery-process/src/api/process-state.ts |
 
   Rule: Valid status values are enforced
 
@@ -57,7 +57,7 @@ Feature: Phase State Machine Validation
         | roadmap  | active    |
         | roadmap  | deferred  |
         | roadmap  | roadmap   |
-        | active   | completed |
+        | active   | complete |
         | active   | roadmap   |
         | deferred | roadmap   |
 
@@ -70,8 +70,8 @@ Feature: Phase State Machine Validation
 
       Examples:
         | from      | to       |
-        | completed | active   |
-        | completed | roadmap  |
+        | complete | active   |
+        | complete | roadmap  |
         | roadmap   | completed|
 
   Rule: Terminal states require completion metadata

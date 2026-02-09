@@ -57,10 +57,10 @@
 
 ## Deliverables
 
-- validate:dod CLI command (Pending)
-- Deliverable status parser (Pending)
-- Acceptance criteria checker (Pending)
-- CI integration documentation (Pending)
+- validate:dod CLI command (pending)
+- Deliverable status parser (pending)
+- Acceptance criteria checker (pending)
+- CI integration documentation (pending)
 
 ---
 

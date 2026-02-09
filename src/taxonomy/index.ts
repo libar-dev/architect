@@ -30,6 +30,18 @@ export {
   type ProcessStatusValue,
 } from './status-values.js';
 
+// Deliverable status (6 canonical values for Background table Status column)
+export {
+  DEFAULT_DELIVERABLE_STATUS,
+  DELIVERABLE_STATUS_VALUES,
+  VALID_DELIVERABLE_STATUS_SET,
+  getDeliverableStatusEmoji,
+  isDeliverableStatusComplete,
+  isDeliverableStatusInProgress,
+  isDeliverableStatusPending,
+  type DeliverableStatus,
+} from './deliverable-status.js';
+
 // Normalized status (display buckets) and pattern-domain helpers
 export {
   normalizeStatus,

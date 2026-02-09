@@ -472,18 +472,18 @@ _Verified by: Generate command flow sequence diagram, Generate saga flow sequenc
 
 ## Deliverables
 
-- arch-role tag definition (implemented)
-- arch-context tag definition (implemented)
-- arch-layer tag definition (implemented)
-- DocDirective schema fields (implemented)
-- ExtractedPattern schema fields (implemented)
-- AST parser tag extraction (implemented)
-- MasterDataset archIndex (implemented)
-- ArchitectureCodec (component) (implemented)
-- ArchitectureCodec (layered) (implemented)
-- Architecture generator (planned)
-- Example app annotations (planned)
-- Sequence diagram support (planned)
+- arch-role tag definition (complete)
+- arch-context tag definition (complete)
+- arch-layer tag definition (complete)
+- DocDirective schema fields (complete)
+- ExtractedPattern schema fields (complete)
+- AST parser tag extraction (complete)
+- MasterDataset archIndex (complete)
+- ArchitectureCodec (component) (complete)
+- ArchitectureCodec (layered) (complete)
+- Architecture generator (pending)
+- Example app annotations (pending)
+- Sequence diagram support (pending)
 
 ---
 

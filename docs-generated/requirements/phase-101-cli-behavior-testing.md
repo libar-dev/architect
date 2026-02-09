@@ -169,12 +169,12 @@ _Verified by: File not found error includes path, Parse error includes line numb
 
 ## Deliverables
 
-- generate-docs CLI tests (planned)
-- lint-patterns CLI tests (planned)
-- lint-process CLI tests (planned)
-- validate-patterns CLI tests (planned)
-- generate-tag-taxonomy CLI tests (planned)
-- CLI test step definitions (planned)
+- generate-docs CLI tests (pending)
+- lint-patterns CLI tests (pending)
+- lint-process CLI tests (pending)
+- validate-patterns CLI tests (pending)
+- generate-tag-taxonomy CLI tests (pending)
+- CLI test step definitions (pending)
 
 ---
 

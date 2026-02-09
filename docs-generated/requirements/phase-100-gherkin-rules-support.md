@@ -122,14 +122,14 @@ _Verified by: Rule scenarios execute with vitest-cucumber_
 
 ## Deliverables
 
-- GherkinRuleSchema (Complete)
-- Rule parsing in AST parser (Complete)
-- Rules passthrough in scanner (Complete)
-- Rules field in ExtractedPattern (Complete)
-- Rules mapping in extractor (Complete)
-- Business Rules rendering (Complete)
-- DataTable rendering in acceptance criteria (Complete)
-- DocString rendering in acceptance criteria (Complete)
+- GherkinRuleSchema (complete)
+- Rule parsing in AST parser (complete)
+- Rules passthrough in scanner (complete)
+- Rules field in ExtractedPattern (complete)
+- Rules mapping in extractor (complete)
+- Business Rules rendering (complete)
+- DataTable rendering in acceptance criteria (complete)
+- DocString rendering in acceptance criteria (complete)
 
 ## Implementations
 

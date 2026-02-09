@@ -235,7 +235,7 @@ export interface CMSState {
 | roadmap | none |
 | deferred | none |
 | active | scope |
-| completed | hard |
+| complete | hard |
 
 **Processor filters messages in postprocess**
 
@@ -278,7 +278,7 @@ export interface CMSState {
 | --- | --- |
 | src/dcb/execute.ts | roadmap |
 | src/dcb/types.ts | roadmap |
-| src/cms/dual-write.ts | completed |
+| src/cms/dual-write.ts | complete |
 
 **JSON output mode for programmatic consumption**
 
@@ -342,7 +342,7 @@ statusAwareProcessor({
     | roadmap | none | Relaxed (warn, ignore args) |
     | deferred | none | Relaxed (warn, ignore args) |
     | active | scope | Strict (error) |
-    | completed | hard | Strict (error) |
+    | complete | hard | Strict (error) |
     | (no status) | N/A | Strict (error) |
 
     **Verified by:** Roadmap file has relaxed rules, Completed file has strict rules, No status file has strict rules
@@ -1074,8 +1074,8 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 
 | Deliverable | Status |
 | --- | --- |
-| Task A | Done |
-| Task B | Pending |
+| Task A | complete |
+| Task B | pending |
 
 **Updating deliverable status in active spec passes**
 
@@ -1086,7 +1086,7 @@ _Verified by: Missing relationship target detected, Pattern tag in implements fi
 
 | Deliverable | Status |
 | --- | --- |
-| Task A | Pending |
+| Task A | pending |
 
 **Removing deliverable from active spec warns**
 

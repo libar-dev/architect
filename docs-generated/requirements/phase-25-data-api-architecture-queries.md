@@ -184,12 +184,12 @@ _Verified by: List all tags with usage counts, Source file inventory, Tags listi
 
 ## Deliverables
 
-- arch neighborhood handler (Done)
-- arch compare handler (Done)
-- arch coverage analyzer (Done)
-- tags subcommand (Done)
-- sources subcommand (Done)
-- unannotated subcommand (Done)
+- arch neighborhood handler (complete)
+- arch compare handler (complete)
+- arch coverage analyzer (complete)
+- tags subcommand (complete)
+- sources subcommand (complete)
+- unannotated subcommand (complete)
 
 ## Implementations
 

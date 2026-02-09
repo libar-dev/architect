@@ -47,13 +47,16 @@ const TEST_FILE = 'specs/test.feature';
 
 /**
  * Create a git diff string for testing.
+ * Includes a deliverable table header as context so detectDeliverableChanges
+ * recognizes subsequent rows as deliverable data.
  */
 function createDiffHeader(file: string): string {
   return `diff --git a/${file} b/${file}
 index 1234567..abcdefg 100644
 --- a/${file}
 +++ b/${file}
-@@ -1,10 +1,10 @@`;
+@@ -1,10 +1,10 @@
+       | Deliverable | Status | Location | Tests | Test Type |`;
 }
 
 /**
@@ -101,8 +104,8 @@ describeFeature(feature, ({ Background, Rule }) => {
           () => {
             state!.files = [TEST_FILE];
             state!.diff = `${createDiffHeader(TEST_FILE)}
--${createDeliverableRow('Type definitions', 'planned')}
-+${createDeliverableRow('Type definitions', 'completed')}`;
+-${createDeliverableRow('Type definitions', 'pending')}
++${createDeliverableRow('Type definitions', 'complete')}`;
           }
         );
 
@@ -136,10 +139,10 @@ describeFeature(feature, ({ Background, Rule }) => {
           () => {
             state!.files = [TEST_FILE];
             state!.diff = `${createDiffHeader(TEST_FILE)}
--${createDeliverableRow('Type definitions', 'planned')}
--${createDeliverableRow('Unit tests', 'planned')}
-+${createDeliverableRow('Type definitions', 'completed')}
-+${createDeliverableRow('Unit tests', 'completed')}`;
+-${createDeliverableRow('Type definitions', 'pending')}
+-${createDeliverableRow('Unit tests', 'pending')}
++${createDeliverableRow('Type definitions', 'complete')}
++${createDeliverableRow('Unit tests', 'complete')}`;
           }
         );
 
@@ -180,7 +183,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('a git diff with new deliverable "New feature" added', () => {
         state!.files = [TEST_FILE];
         state!.diff = `${createDiffHeader(TEST_FILE)}
-+${createDeliverableRow('New feature', 'planned')}`;
++${createDeliverableRow('New feature', 'pending')}`;
       });
 
       When('detecting deliverable changes', () => {
@@ -214,7 +217,7 @@ describeFeature(feature, ({ Background, Rule }) => {
       Given('a git diff with deliverable "Deprecated feature" removed', () => {
         state!.files = [TEST_FILE];
         state!.diff = `${createDiffHeader(TEST_FILE)}
--${createDeliverableRow('Deprecated feature', 'completed')}`;
+-${createDeliverableRow('Deprecated feature', 'complete')}`;
       });
 
       When('detecting deliverable changes', () => {
@@ -258,12 +261,12 @@ describeFeature(feature, ({ Background, Rule }) => {
             for (const row of table) {
               if (row.change_type === 'status_change') {
                 // Status change: appears in both removed and added
-                removedLines += `-${createDeliverableRow(row.deliverable, 'planned')}\n`;
-                addedLines += `+${createDeliverableRow(row.deliverable, 'completed')}\n`;
+                removedLines += `-${createDeliverableRow(row.deliverable, 'pending')}\n`;
+                addedLines += `+${createDeliverableRow(row.deliverable, 'complete')}\n`;
               } else if (row.change_type === 'added') {
-                addedLines += `+${createDeliverableRow(row.deliverable, 'planned')}\n`;
+                addedLines += `+${createDeliverableRow(row.deliverable, 'pending')}\n`;
               } else if (row.change_type === 'removed') {
-                removedLines += `-${createDeliverableRow(row.deliverable, 'completed')}\n`;
+                removedLines += `-${createDeliverableRow(row.deliverable, 'complete')}\n`;
               }
             }
 
@@ -290,6 +293,40 @@ ${removedLines}${addedLines}`;
         And('the deliverable "Old feature" is in the "removed" list', () => {
           const result = getResult();
           expect(result!.removed).toContain('Old feature');
+        });
+      }
+    );
+  });
+
+  // ===========================================================================
+  // Non-Deliverable Table Filtering Rule
+  // ===========================================================================
+
+  Rule('Non-deliverable tables are ignored', ({ RuleScenario }) => {
+    RuleScenario(
+      'Changes in Examples tables are not detected as deliverable changes',
+      ({ Given, When, Then }) => {
+        Given('a git diff with changes only in an Examples table', () => {
+          state!.files = [TEST_FILE];
+          // Simulates a diff where only Examples table rows change (no deliverable header)
+          state!.diff = `diff --git a/${TEST_FILE} b/${TEST_FILE}
+index 1234567..abcdefg 100644
+--- a/${TEST_FILE}
++++ b/${TEST_FILE}
+@@ -70,4 +70,4 @@
+       Examples:
+         | from      | to        |
+-        | completed | hard      |
++        | complete  | hard      |`;
+        });
+
+        When('detecting deliverable changes', () => {
+          state!.result = detectDeliverableChanges(state!.diff, state!.files);
+        });
+
+        Then('no deliverables are detected', () => {
+          const result = getResult();
+          expect(result).toBeUndefined();
         });
       }
     );

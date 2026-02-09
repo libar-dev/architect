@@ -19,8 +19,9 @@
  * const registry = buildRegistry();
  * ```
  */
-export { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS, PROCESS_STATUS_VALUES, type AcceptedStatusValue, type ProcessStatusValue, } from './status-values.js';
-export { normalizeStatus, NORMALIZED_STATUS_VALUES, STATUS_NORMALIZATION_MAP, type NormalizedStatus, } from './normalized-status.js';
+export { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS, PROCESS_STATUS_VALUES, VALID_PROCESS_STATUS_SET, type AcceptedStatusValue, type ProcessStatusValue, } from './status-values.js';
+export { DEFAULT_DELIVERABLE_STATUS, DELIVERABLE_STATUS_VALUES, VALID_DELIVERABLE_STATUS_SET, getDeliverableStatusEmoji, isDeliverableStatusComplete, isDeliverableStatusInProgress, isDeliverableStatusPending, type DeliverableStatus, } from './deliverable-status.js';
+export { normalizeStatus, isPatternComplete, isPatternActive, isPatternPlanned, NORMALIZED_STATUS_VALUES, STATUS_NORMALIZATION_MAP, type NormalizedStatus, } from './normalized-status.js';
 export { FORMAT_TYPES, type FormatType } from './format-types.js';
 export { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS, type HierarchyLevel, } from './hierarchy-levels.js';
 export { RISK_LEVELS, type RiskLevel } from './risk-levels.js';

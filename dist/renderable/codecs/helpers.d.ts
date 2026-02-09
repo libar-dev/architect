@@ -359,7 +359,7 @@ export interface BusinessRuleAnnotations {
  * ```
  */
 export declare function truncateText(text: string, maxLength: number): string;
-export { extractFirstSentence } from '../../utils/string-utils.js';
+export { extractFirstSentenceRaw as extractFirstSentence } from '../../utils/string-utils.js';
 /**
  * Parse structured annotations from a business rule description.
  *

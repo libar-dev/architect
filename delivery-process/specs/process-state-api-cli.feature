@@ -38,12 +38,12 @@ Feature: ProcessStateAPI CLI - Direct Queries for Planning Sessions
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | process:query CLI command | completed | src/cli/process-api.ts | Yes | integration |
-      | CLI argument parser | completed | src/cli/process-api.ts | Yes | integration |
-      | JSON output formatter | completed | src/cli/process-api.ts | Yes | integration |
+      | process:query CLI command | complete | src/cli/process-api.ts | Yes | integration |
+      | CLI argument parser | complete | src/cli/process-api.ts | Yes | integration |
+      | JSON output formatter | complete | src/cli/process-api.ts | Yes | integration |
       | Text output formatter | deferred | N/A | No | N/A |
-      | Root package.json script | completed | package.json | No | N/A |
-      | CLAUDE.md documentation update | completed | CLAUDE.md | No | N/A |
+      | Root package.json script | complete | package.json | No | N/A |
+      | CLAUDE.md documentation update | complete | CLAUDE.md | No | N/A |
 
   # ═══════════════════════════════════════════════════════════════════════════════
   # RULE 1: Status Queries

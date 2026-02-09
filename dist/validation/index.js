@@ -15,7 +15,7 @@
  * - Import validation functions for CLI integration
  * - Import types for extending validation rules
  */
-export { AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, } from './types.js';
+export { AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, getPhaseStatusEmoji } from './types.js';
 // DoD Validator
 export { isDeliverableComplete, hasAcceptanceCriteria, extractAcceptanceCriteriaScenarios, validateDoDForPhase, validateDoD, formatDoDSummary, } from './dod-validator.js';
 // Anti-Pattern Detector

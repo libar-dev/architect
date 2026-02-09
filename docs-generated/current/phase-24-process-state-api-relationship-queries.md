@@ -53,12 +53,12 @@
 
 #### Deliverables
 
-- ✅ process:query CLI command (completed)
-- ✅ CLI argument parser (completed)
-- ✅ JSON output formatter (completed)
-- 📋 Text output formatter (deferred)
-- ✅ Root package.json script (completed)
-- ✅ CLAUDE.md documentation update (completed)
+- ✅ process:query CLI command (complete)
+- ✅ CLI argument parser (complete)
+- ✅ JSON output formatter (complete)
+- ⏸️ Text output formatter (deferred)
+- ✅ Root package.json script (complete)
+- ✅ CLAUDE.md documentation update (complete)
 
 #### Acceptance Criteria
 
@@ -326,10 +326,10 @@ _Verified by: Help output shows all flags, Help shows examples_
 
 #### Deliverables
 
-- 📋 Implementation relationship queries (superseded)
-- 📋 Inheritance hierarchy queries (superseded)
-- ✅ ProcessStateAPI type extensions (completed)
-- 📋 Relationship query step definitions (superseded)
+- 🔄 Implementation relationship queries (superseded)
+- 🔄 Inheritance hierarchy queries (superseded)
+- ✅ ProcessStateAPI type extensions (complete)
+- 🔄 Relationship query step definitions (superseded)
 
 #### Acceptance Criteria
 

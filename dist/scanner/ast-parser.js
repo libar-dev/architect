@@ -75,7 +75,7 @@ function getCachedRegex(pattern, flags) {
  * ```
  */
 function extractSingleValue(commentText, fullTag) {
-    const regex = getCachedRegex(`${escapeRegex(fullTag)}\\s+(.+?)(?:\\n|\\*|$)`);
+    const regex = getCachedRegex(`(?:^|\\n)\\s*\\*?\\s*${escapeRegex(fullTag)}\\s+(.+?)(?:\\n|\\*|$)`);
     const match = regex.exec(commentText);
     return match?.[1]?.trim();
 }

@@ -470,14 +470,6 @@ export function validatePatterns(
               pattern: gherkinPattern.name,
             });
           }
-          if (!d.status || d.status.trim() === '') {
-            issues.push({
-              severity: 'warning',
-              message: `Deliverable "${d.name}" in "${gherkinPattern.name}" missing status`,
-              source: 'gherkin',
-              pattern: gherkinPattern.name,
-            });
-          }
         }
       }
     }

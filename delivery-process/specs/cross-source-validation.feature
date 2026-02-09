@@ -24,10 +24,10 @@ Feature: Cross-Source Validation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Pattern name matcher | Pending | Yes | @libar-dev/delivery-process/src/validation/ |
-      | Spec reference validator | Pending | Yes | @libar-dev/delivery-process/src/validation/ |
-      | Circular dependency detector | Pending | Yes | @libar-dev/delivery-process/src/validation/ |
-      | Orphan detector | Pending | Yes | @libar-dev/delivery-process/src/validation/ |
+      | Pattern name matcher | pending | Yes | @libar-dev/delivery-process/src/validation/ |
+      | Spec reference validator | pending | Yes | @libar-dev/delivery-process/src/validation/ |
+      | Circular dependency detector | pending | Yes | @libar-dev/delivery-process/src/validation/ |
+      | Orphan detector | pending | Yes | @libar-dev/delivery-process/src/validation/ |
 
   Rule: Pattern names must be consistent across sources
 

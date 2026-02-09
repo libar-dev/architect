@@ -50,7 +50,8 @@ import {
   isPatternActive,
   isPatternPlanned,
 } from '../../taxonomy/index.js';
-import { getDeliverableStatusEmoji, getPhaseStatusEmoji } from '../../validation/types.js';
+import { getDeliverableStatusEmoji } from '../../taxonomy/deliverable-status.js';
+import { getPhaseStatusEmoji } from '../../validation/types.js';
 import {
   getStatusEmoji,
   getDisplayName,
@@ -1276,7 +1277,7 @@ function buildCurrentWorkPatternDetail(
   if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
     const deliverableItems = pattern.deliverables.map((d) => {
       const statusEmoji = getDeliverableStatusEmoji(d.status);
-      const statusText = d.status ? ` (${d.status})` : '';
+      const statusText = ` (${d.status})`;
       return `${statusEmoji} ${d.name}${statusText}`;
     });
 

@@ -39,6 +39,7 @@ import { normalizeStatus } from '../../taxonomy/index.js';
 import { getStatusEmoji, getDisplayName, formatCategoryName, extractSummary, computeStatusCounts, completionPercentage, renderProgressBar, sortByStatusAndName, stripLeadingHeaders, } from '../utils.js';
 import { toKebabCase } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 // ═══════════════════════════════════════════════════════════════════════════
 // Path Normalization Helpers
 // ═══════════════════════════════════════════════════════════════════════════
@@ -268,7 +269,7 @@ function buildCategorySections(dataset, options) {
             const emoji = getStatusEmoji(p.status);
             const name = getDisplayName(p);
             if (options.generateDetailFiles) {
-                const slug = patternToSlug(p.patternName ?? name);
+                const slug = patternToSlug(getPatternName(p));
                 return `[${emoji} ${name}](patterns/${slug}.md)`;
             }
             return `${emoji} ${name}`;
@@ -358,8 +359,7 @@ function patternToSlug(patternName) {
 function buildIndividualPatternFiles(dataset) {
     const files = {};
     for (const pattern of dataset.patterns) {
-        const displayName = getDisplayName(pattern);
-        const slug = patternToSlug(pattern.patternName ?? displayName);
+        const slug = patternToSlug(getPatternName(pattern));
         files[`patterns/${slug}.md`] = buildSinglePatternDocument(pattern, dataset);
     }
     return files;
@@ -412,7 +412,7 @@ function buildSinglePatternDocument(pattern, dataset) {
         }
     }
     // Implementations (files that implement this pattern via @libar-docs-implements)
-    const patternKey = pattern.patternName ?? pattern.name;
+    const patternKey = getPatternName(pattern);
     const rel = dataset.relationshipIndex?.[patternKey];
     if (rel?.implementedBy && rel.implementedBy.length > 0) {
         sections.push(heading(2, 'Implementations'));

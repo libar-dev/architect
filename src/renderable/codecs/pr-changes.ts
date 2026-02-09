@@ -52,7 +52,7 @@ import {
   document,
 } from '../schema.js';
 import { normalizeStatus, isPatternComplete, isPatternActive } from '../../taxonomy/index.js';
-import { getDeliverableStatusEmoji } from '../../validation/types.js';
+import { getDeliverableStatusEmoji } from '../../taxonomy/deliverable-status.js';
 import {
   getStatusEmoji,
   getDisplayName,

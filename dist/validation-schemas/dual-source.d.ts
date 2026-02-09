@@ -121,7 +121,14 @@ export type ProcessMetadata = z.infer<typeof ProcessMetadataSchema>;
  */
 export declare const DeliverableSchema: z.ZodObject<{
     name: z.ZodString;
-    status: z.ZodString;
+    status: z.ZodEnum<{
+        deferred: "deferred";
+        complete: "complete";
+        "in-progress": "in-progress";
+        pending: "pending";
+        superseded: "superseded";
+        "n/a": "n/a";
+    }>;
     tests: z.ZodNumber;
     location: z.ZodString;
     finding: z.ZodOptional<z.ZodString>;

@@ -201,7 +201,7 @@ _Verified by: Check traceability status for well-linked pattern, Detect broken t
 
 - Implementation relationship queries (superseded)
 - Inheritance hierarchy queries (superseded)
-- ProcessStateAPI type extensions (completed)
+- ProcessStateAPI type extensions (complete)
 - Relationship query step definitions (superseded)
 
 ---

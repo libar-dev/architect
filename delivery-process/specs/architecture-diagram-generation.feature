@@ -28,18 +28,18 @@ Feature: Architecture Diagram Generation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | arch-role tag definition | implemented | taxonomy/registry-builder.ts | Yes | unit |
-      | arch-context tag definition | implemented | taxonomy/registry-builder.ts | Yes | unit |
-      | arch-layer tag definition | implemented | taxonomy/registry-builder.ts | Yes | unit |
-      | DocDirective schema fields | implemented | validation-schemas/doc-directive.ts | Yes | unit |
-      | ExtractedPattern schema fields | implemented | validation-schemas/extracted-pattern.ts | Yes | unit |
-      | AST parser tag extraction | implemented | scanner/ast-parser.ts | Yes | unit |
-      | MasterDataset archIndex | implemented | generators/pipeline/transform-dataset.ts | Yes | unit |
-      | ArchitectureCodec (component) | implemented | renderable/codecs/architecture.ts | Yes | unit |
-      | ArchitectureCodec (layered) | implemented | renderable/codecs/architecture.ts | Yes | unit |
-      | Architecture generator | planned | generators/built-in/architecture.ts | Yes | unit |
-      | Example app annotations | planned | examples/sample-project/src/ | No | - |
-      | Sequence diagram support | planned | renderable/codecs/architecture.ts | Yes | unit |
+      | arch-role tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | arch-context tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | arch-layer tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | DocDirective schema fields | complete | validation-schemas/doc-directive.ts | Yes | unit |
+      | ExtractedPattern schema fields | complete | validation-schemas/extracted-pattern.ts | Yes | unit |
+      | AST parser tag extraction | complete | scanner/ast-parser.ts | Yes | unit |
+      | MasterDataset archIndex | complete | generators/pipeline/transform-dataset.ts | Yes | unit |
+      | ArchitectureCodec (component) | complete | renderable/codecs/architecture.ts | Yes | unit |
+      | ArchitectureCodec (layered) | complete | renderable/codecs/architecture.ts | Yes | unit |
+      | Architecture generator | pending | generators/built-in/architecture.ts | Yes | unit |
+      | Example app annotations | pending | examples/sample-project/src/ | No | - |
+      | Sequence diagram support | pending | renderable/codecs/architecture.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Architecture Tags in Registry

@@ -47,10 +47,10 @@ Feature: Instructions Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Instructions reference feature file | Complete | delivery-process/recipes/instructions-reference.feature |
-      | Source annotations added | Complete | src/taxonomy/*.ts, src/cli/*.ts |
-      | Generated detailed docs | Pending | docs-generated/docs/INSTRUCTIONSREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/reference/instructionsreference.md |
+      | Instructions reference feature file | complete | delivery-process/recipes/instructions-reference.feature |
+      | Source annotations added | complete | src/taxonomy/*.ts, src/cli/*.ts |
+      | Generated detailed docs | pending | docs-generated/docs/INSTRUCTIONSREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/reference/instructionsreference.md |
 
   Rule: Quick Tag Reference
 

@@ -28,7 +28,7 @@ Feature: ProcessStateAPI Relationship Queries
       | Deliverable | Status | Location | Tests | Test Type |
       | Implementation relationship queries | superseded | src/api/process-state.ts | No | N/A |
       | Inheritance hierarchy queries | superseded | src/api/process-state.ts | No | N/A |
-      | ProcessStateAPI type extensions | completed | src/api/types.ts | Yes | unit |
+      | ProcessStateAPI type extensions | complete | src/api/types.ts | Yes | unit |
       | Relationship query step definitions | superseded | N/A | No | N/A |
 
   # ═══════════════════════════════════════════════════════════════════════════════

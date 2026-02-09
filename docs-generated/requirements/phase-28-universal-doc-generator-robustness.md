@@ -210,11 +210,11 @@ _Verified by: Warnings are collected during extraction, Multiple warnings from d
 
 ## Deliverables
 
-- Content Deduplication (Complete)
-- Source Mapping Validator (Complete)
-- Warning Collector (Complete)
-- Migrate console.warn calls (Complete)
-- Integration tests (Complete)
+- Content Deduplication (complete)
+- Source Mapping Validator (complete)
+- Warning Collector (complete)
+- Migrate console.warn calls (complete)
+- Integration tests (complete)
 
 ---
 

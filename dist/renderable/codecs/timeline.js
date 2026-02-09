@@ -27,7 +27,9 @@
 import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
 import { heading, paragraph, separator, table, list, collapsible, linkOut, document, } from '../schema.js';
-import { normalizeStatus } from '../../taxonomy/index.js';
+import { normalizeStatus, isPatternComplete, isPatternActive, isPatternPlanned, } from '../../taxonomy/index.js';
+import { getDeliverableStatusEmoji } from '../../taxonomy/deliverable-status.js';
+import { getPhaseStatusEmoji } from '../../validation/types.js';
 import { getStatusEmoji, getDisplayName, extractSummary, completionPercentage, renderProgressBar, sortByPhaseAndName, formatBusinessValue, } from '../utils.js';
 import { toKebabCase, groupBy } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
@@ -241,7 +243,7 @@ function buildPhaseSection(phase) {
     const progressBar = renderProgressBar(counts.completed, counts.total, 15);
     const isComplete = counts.total > 0 && counts.completed === counts.total;
     // Phase header with progress
-    const statusEmoji = isComplete ? '✅' : counts.active > 0 ? '🚧' : '📋';
+    const statusEmoji = getPhaseStatusEmoji(isComplete, counts.active > 0);
     sections.push(heading(3, `${statusEmoji} ${displayName}`));
     sections.push(paragraph(`${progressBar} ${progress}% complete`));
     // Pattern table for this phase
@@ -271,7 +273,7 @@ function buildQuarterlyTimeline(dataset) {
     const currentQuarter = `Q${Math.ceil((now.getMonth() + 1) / 3)}-${now.getFullYear()}`;
     const rows = quarters.map((quarter) => {
         const patterns = dataset.byQuarter[quarter] ?? [];
-        const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed').length;
+        const completed = patterns.filter((p) => isPatternComplete(p.status)).length;
         const isCurrent = quarter === currentQuarter;
         const marker = isCurrent ? ' ← Current' : '';
         return [quarter + marker, String(patterns.length), String(completed)];
@@ -297,7 +299,7 @@ function buildPhaseNavigationTable(dataset, options) {
         const displayName = phaseName ?? `Phase ${phaseNumber}`;
         const progress = completionPercentage(counts);
         const isComplete = counts.total > 0 && counts.completed === counts.total;
-        const statusEmoji = isComplete ? '✅' : counts.active > 0 ? '🚧' : '📋';
+        const statusEmoji = getPhaseStatusEmoji(isComplete, counts.active > 0);
         const slug = getPhaseSlug(phaseNumber, phaseName);
         // Link to detail file if generating detail files, otherwise just display name
         const nameCell = options.generateDetailFiles
@@ -362,9 +364,9 @@ function buildPhaseDetailDocument(phase, _options) {
         ['**Total**', String(counts.total)],
     ]), separator());
     // Patterns by status
-    const completed = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
-    const active = patterns.filter((p) => normalizeStatus(p.status) === 'active');
-    const planned = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
+    const completed = patterns.filter((p) => isPatternComplete(p.status));
+    const active = patterns.filter((p) => isPatternActive(p.status));
+    const planned = patterns.filter((p) => isPatternPlanned(p.status));
     if (active.length > 0) {
         sections.push(heading(2, '🚧 Active Patterns'));
         sections.push(...buildPatternDetailList(active));
@@ -706,7 +708,7 @@ function buildActivePhases(dataset, options) {
         const { phaseNumber, phaseName, patterns, counts } = phase;
         const displayName = phaseName ?? `Phase ${phaseNumber}`;
         // Only show active patterns in this phase
-        const activeInPhase = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+        const activeInPhase = patterns.filter((p) => isPatternActive(p.status));
         const progress = completionPercentage(counts);
         const progressBar = renderProgressBar(counts.completed, counts.total, 15);
         sections.push(heading(3, `🚧 ${displayName}`));
@@ -728,7 +730,7 @@ function buildActivePhases(dataset, options) {
             const allDeliverables = activeInPhase.flatMap((p) => p.deliverables ?? []);
             if (allDeliverables.length > 0) {
                 const deliverableItems = allDeliverables.map((d) => {
-                    const statusEmoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
+                    const statusEmoji = getDeliverableStatusEmoji(d.status);
                     return `${statusEmoji} ${d.name}`;
                 });
                 sections.push(heading(4, 'Deliverables'), list(deliverableItems));
@@ -793,7 +795,7 @@ function buildCurrentPhaseDetailDocument(phase, _dataset, options) {
         ['**Total**', String(counts.total)],
     ]), separator());
     // Active patterns detail
-    const activePatterns = patterns.filter((p) => normalizeStatus(p.status) === 'active');
+    const activePatterns = patterns.filter((p) => isPatternActive(p.status));
     if (activePatterns.length > 0) {
         sections.push(heading(2, '🚧 Active Work'));
         for (const pattern of sortByPhaseAndName([...activePatterns])) {
@@ -801,7 +803,7 @@ function buildCurrentPhaseDetailDocument(phase, _dataset, options) {
         }
     }
     // Recently completed in this phase
-    const completedPatterns = patterns.filter((p) => normalizeStatus(p.status) === 'completed');
+    const completedPatterns = patterns.filter((p) => isPatternComplete(p.status));
     if (completedPatterns.length > 0) {
         sections.push(heading(2, '✅ Recently Completed'));
         const rows = sortByPhaseAndName([...completedPatterns]).map((p) => {
@@ -813,7 +815,7 @@ function buildCurrentPhaseDetailDocument(phase, _dataset, options) {
         sections.push(separator());
     }
     // Upcoming in this phase
-    const plannedPatterns = patterns.filter((p) => normalizeStatus(p.status) === 'planned');
+    const plannedPatterns = patterns.filter((p) => isPatternPlanned(p.status));
     if (plannedPatterns.length > 0) {
         const plannedContent = [];
         const rows = sortByPhaseAndName([...plannedPatterns]).map((p) => {
@@ -860,8 +862,8 @@ function buildCurrentWorkPatternDetail(pattern, options) {
     // Deliverables (if configured)
     if (options.includeDeliverables && pattern.deliverables && pattern.deliverables.length > 0) {
         const deliverableItems = pattern.deliverables.map((d) => {
-            const statusEmoji = d.status === 'complete' ? '✅' : d.status === 'in-progress' ? '🚧' : '📋';
-            const statusText = d.status ? ` (${d.status})` : '';
+            const statusEmoji = getDeliverableStatusEmoji(d.status);
+            const statusText = ` (${d.status})`;
             return `${statusEmoji} ${d.name}${statusText}`;
         });
         sections.push(heading(4, 'Deliverables'), list(deliverableItems));

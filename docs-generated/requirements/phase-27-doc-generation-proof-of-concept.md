@@ -493,15 +493,15 @@ _Verified by: Decision Rule descriptions become documentation sections, Decision
 
 ## Deliverables
 
-- Decision extraction codec (Done)
-- Source mapping parser (Done)
-- DocString extraction enhancement (Done)
-- doc-from-decision generator (Done)
-- Design stub directory structure (N/A)
-- Shape extraction annotations (Done)
-- POC self-documentation (compact) (Done)
-- POC self-documentation (detailed) (Done)
-- ProcessGuard ADR decision doc (Done)
+- Decision extraction codec (complete)
+- Source mapping parser (complete)
+- DocString extraction enhancement (complete)
+- doc-from-decision generator (complete)
+- Design stub directory structure (n/a)
+- Shape extraction annotations (complete)
+- POC self-documentation (compact) (complete)
+- POC self-documentation (detailed) (complete)
+- ProcessGuard ADR decision doc (complete)
 
 ---
 

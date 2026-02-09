@@ -32,6 +32,7 @@
  * - **Workflow integration**: Uses workflow config for phase names
  */
 import { ExtractedPatternSchema } from '../../validation-schemas/index.js';
+import { getPatternName } from '../../api/pattern-helpers.js';
 import { normalizeStatus, ACCEPTED_STATUS_VALUES } from '../../taxonomy/index.js';
 /**
  * Infer bounded context from file path using configured rules.
@@ -176,14 +177,14 @@ export function transformToMasterDatasetWithValidation(raw) {
     // Build a set of all pattern names for reference checking
     const allPatternNames = new Set();
     for (const pattern of patterns) {
-        const key = pattern.patternName ?? pattern.name;
+        const key = getPatternName(pattern);
         allPatternNames.add(key);
     }
     for (const pattern of patterns) {
         // Validate against schema
         const parseResult = ExtractedPatternSchema.safeParse(pattern);
         if (!parseResult.success) {
-            const patternId = pattern.patternName ?? pattern.name;
+            const patternId = getPatternName(pattern);
             const issues = parseResult.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`);
             malformedPatterns.push({ patternId, issues });
         }
@@ -259,7 +260,7 @@ export function transformToMasterDatasetWithValidation(raw) {
             bySource.prd.push(p);
         }
         // ─── Relationship index ────────────────────────────────────────────────
-        const patternKey = pattern.patternName ?? pattern.name;
+        const patternKey = getPatternName(pattern);
         relationshipIndex[patternKey] = {
             uses: [...(pattern.uses ?? [])],
             usedBy: [...(pattern.usedBy ?? [])],
@@ -305,7 +306,7 @@ export function transformToMasterDatasetWithValidation(raw) {
     // ─────────────────────────────────────────────────────────────────────────
     // We iterate over patterns again to have access to source.file for implementedBy
     for (const pattern of patterns) {
-        const patternKey = pattern.patternName ?? pattern.name;
+        const patternKey = getPatternName(pattern);
         const entry = relationshipIndex[patternKey];
         if (!entry)
             continue;
@@ -362,7 +363,7 @@ export function transformToMasterDatasetWithValidation(raw) {
     // Third pass: detect dangling references in relationship fields
     // ─────────────────────────────────────────────────────────────────────────
     for (const pattern of patterns) {
-        const patternKey = pattern.patternName ?? pattern.name;
+        const patternKey = getPatternName(pattern);
         // Check 'uses' references
         for (const ref of pattern.uses ?? []) {
             if (!allPatternNames.has(ref)) {

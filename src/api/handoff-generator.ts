@@ -22,7 +22,10 @@ import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import { QueryApiError } from './types.js';
 import { getPatternName } from './pattern-helpers.js';
-import { isStatusComplete, isStatusPending } from '../validation/types.js';
+import {
+  isDeliverableStatusComplete,
+  isDeliverableStatusPending,
+} from '../taxonomy/deliverable-status.js';
 import { normalizeStatus, isPatternComplete } from '../taxonomy/normalized-status.js';
 import { DEFAULT_STATUS } from '../taxonomy/status-values.js';
 
@@ -91,11 +94,11 @@ export function generateHandoff(
 
   // Deliverables split
   const deliverables = api.getPatternDeliverables(patternName);
-  const completed = deliverables.filter((d) => isStatusComplete(d.status));
+  const completed = deliverables.filter((d) => isDeliverableStatusComplete(d.status));
   const inProgress = deliverables.filter(
-    (d) => !isStatusComplete(d.status) && !isStatusPending(d.status)
+    (d) => !isDeliverableStatusComplete(d.status) && !isDeliverableStatusPending(d.status)
   );
-  const remaining = deliverables.filter((d) => !isStatusComplete(d.status));
+  const remaining = deliverables.filter((d) => !isDeliverableStatusComplete(d.status));
 
   // Completed deliverables
   if (completed.length > 0) {

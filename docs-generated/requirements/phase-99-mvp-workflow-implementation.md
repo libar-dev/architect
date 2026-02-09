@@ -70,13 +70,13 @@ _Verified by: Roadmap and deferred appear in ROADMAP.md, Active appears in CURRE
 
 ## Deliverables
 
-- Taxonomy module as single source of truth (✅)
-- Update DefaultPatternStatusSchema (✅)
-- Update ProcessMetadataSchema status (✅)
-- Update generator status mapping (✅)
-- Fix type errors from status change (✅)
-- Run pnpm typecheck (✅)
-- Run pnpm test (✅)
+- Taxonomy module as single source of truth (complete)
+- Update DefaultPatternStatusSchema (complete)
+- Update ProcessMetadataSchema status (complete)
+- Update generator status mapping (complete)
+- Fix type errors from status change (complete)
+- Run pnpm typecheck (complete)
+- Run pnpm test (complete)
 
 ## Implementations
 

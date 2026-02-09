@@ -103,11 +103,11 @@ _Verified by: Git command failure returns Result error, Malformed diff lines are
 
 ## Deliverables
 
-- Streaming git execution utility (Planned)
-- Line-by-line diff parser (Planned)
-- Async detectBranchChanges (Planned)
-- Async detectStagedChanges (Planned)
-- Integration with existing CLI (Planned)
+- Streaming git execution utility (pending)
+- Line-by-line diff parser (pending)
+- Async detectBranchChanges (pending)
+- Async detectStagedChanges (pending)
+- Integration with existing CLI (pending)
 
 ---
 

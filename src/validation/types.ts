@@ -4,7 +4,7 @@
  * @libar-docs-pattern DoDValidationTypes
  * @libar-docs-status completed
  * @libar-docs-used-by DoDValidator, AntiPatternDetector
- * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, COMPLETION_PATTERNS, IN_PROGRESS_PATTERNS, PENDING_PATTERNS, isStatusComplete, isStatusPending, isStatusInProgress, getDeliverableStatusEmoji, getPhaseStatusEmoji, WithTagRegistry
+ * @libar-docs-extract-shapes AntiPatternId, AntiPatternViolation, AntiPatternThresholds, AntiPatternThresholdsSchema, DEFAULT_THRESHOLDS, DoDValidationResult, DoDValidationSummary, getPhaseStatusEmoji, WithTagRegistry
  *
  * ## DoDValidationTypes - Type Definitions for DoD Validation
  *
@@ -153,132 +153,6 @@ export interface DoDValidationSummary {
   readonly passedPhases: number;
   /** Phases that failed DoD */
   readonly failedPhases: number;
-}
-
-/**
- * Completion status detection patterns
- *
- * Various ways to indicate a deliverable is complete.
- */
-export const COMPLETION_PATTERNS = [
-  // Text patterns (case-insensitive)
-  'complete',
-  'completed',
-  'done',
-  'finished',
-  'yes',
-  // Emoji/symbol patterns
-  '✓',
-  '✔',
-  '✅',
-  '☑',
-  // Checkmark unicode variants
-  '\u2713', // ✓
-  '\u2714', // ✔
-  '\u2611', // ☑
-] as const;
-
-/**
- * In-progress status detection patterns
- *
- * Status values that indicate work is ongoing.
- */
-export const IN_PROGRESS_PATTERNS = [
-  'in-progress',
-  'in progress',
-  'active',
-  'wip',
-  'partial',
-  'started',
-  // Emoji patterns
-  '🔄',
-  '⏳',
-  '🚧',
-] as const;
-
-/**
- * Pending status detection patterns
- *
- * Status values that indicate work hasn't started.
- */
-export const PENDING_PATTERNS = [
-  'pending',
-  'todo',
-  'planned',
-  'not started',
-  'no',
-  // Emoji patterns
-  '⏹',
-  '⬜',
-  '❌',
-] as const;
-
-// ============================================================================
-// Status Matching Helpers (canonical — use these instead of hardcoding)
-// ============================================================================
-
-/**
- * Check whether a status string indicates completion.
- *
- * Canonical helper using COMPLETION_PATTERNS. Use this instead of
- * hardcoding status strings like 'Complete', 'Done', '✓'.
- */
-export function isStatusComplete(status: string): boolean {
-  const normalized = status.toLowerCase().trim();
-  for (const pattern of COMPLETION_PATTERNS) {
-    if (normalized === pattern.toLowerCase() || normalized.includes(pattern.toLowerCase())) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Check whether a status string indicates pending/not-started.
- *
- * Canonical helper using PENDING_PATTERNS. Use this instead of
- * hardcoding status strings like 'planned', 'pending', 'todo'.
- */
-export function isStatusPending(status: string): boolean {
-  const normalized = status.toLowerCase().trim();
-  for (const pattern of PENDING_PATTERNS) {
-    if (normalized === pattern.toLowerCase() || normalized.includes(pattern.toLowerCase())) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Check whether a status string indicates in-progress/active work.
- *
- * Canonical helper using IN_PROGRESS_PATTERNS. Use this instead of
- * hardcoding status strings like 'in-progress', 'wip', 'started'.
- */
-export function isStatusInProgress(status: string): boolean {
-  const normalized = status.toLowerCase().trim();
-  for (const pattern of IN_PROGRESS_PATTERNS) {
-    if (normalized === pattern.toLowerCase() || normalized.includes(pattern.toLowerCase())) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * Get the appropriate emoji for a deliverable status string.
- *
- * Uses canonical status helpers to map freeform deliverable statuses
- * to a three-state emoji: ✅ (complete), 🚧 (in-progress), 📋 (pending/other).
- *
- * Note: This is for deliverable statuses (freeform strings like 'Done', 'wip'),
- * NOT for FSM pattern statuses (roadmap/active/completed/deferred) — use
- * getStatusEmoji() from renderable/utils.ts for those.
- */
-export function getDeliverableStatusEmoji(status: string): string {
-  if (isStatusComplete(status)) return '✅';
-  if (isStatusInProgress(status)) return '🚧';
-  return '📋';
 }
 
 /**

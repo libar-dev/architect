@@ -16,6 +16,7 @@
  * Context bundles are rendered as compact structured text with === section
  * markers for easy AI parsing (see ADR-008).
  */
+import { isDeliverableStatusComplete } from '../taxonomy/deliverable-status.js';
 // ---------------------------------------------------------------------------
 // Bundle Formatter
 // ---------------------------------------------------------------------------
@@ -77,7 +78,7 @@ export function formatContextBundle(bundle) {
     // Deliverables
     if (bundle.deliverables.length > 0) {
         const lines = bundle.deliverables.map((d) => {
-            const checkbox = isDeliverableComplete(d.status) ? '[x]' : '[ ]';
+            const checkbox = isDeliverableStatusComplete(d.status) ? '[x]' : '[ ]';
             return `${checkbox} ${d.name} (${d.location})`;
         });
         sections.push('=== DELIVERABLES ===\n' + lines.join('\n'));
@@ -163,8 +164,4 @@ export function formatOverview(overview) {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-const COMPLETE_STATUSES = new Set(['done', 'complete', 'completed', '✅', 'x']);
-function isDeliverableComplete(status) {
-    return COMPLETE_STATUSES.has(status.toLowerCase());
-}
 //# sourceMappingURL=context-formatter.js.map

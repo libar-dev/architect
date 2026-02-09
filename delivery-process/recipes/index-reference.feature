@@ -41,9 +41,9 @@ Feature: Index Reference - Auto-Generated Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Index reference feature file | Complete | delivery-process/recipes/index-reference.feature |
-      | Generated detailed docs | Pending | docs-generated/docs/INDEXREFERENCE.md |
-      | Generated compact docs | Pending | docs-generated/_claude-md/index/indexreference.md |
+      | Index reference feature file | complete | delivery-process/recipes/index-reference.feature |
+      | Generated detailed docs | pending | docs-generated/docs/INDEXREFERENCE.md |
+      | Generated compact docs | pending | docs-generated/_claude-md/index/indexreference.md |
 
   Rule: Package Metadata
 

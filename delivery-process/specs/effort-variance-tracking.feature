@@ -28,9 +28,9 @@ Feature: Effort Variance Tracking - Improve Estimates Over Time
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Effort variance section renderer | Pending | Yes | src/generators/sections/ |
-      | Workflow distribution analyzer | Pending | Yes | src/analyzers/ |
-      | effort-analysis generator config | Pending | No | src/generators/built-in/ |
+      | Effort variance section renderer | pending | Yes | src/generators/sections/ |
+      | Workflow distribution analyzer | pending | Yes | src/analyzers/ |
+      | effort-analysis generator config | pending | No | src/generators/built-in/ |
 
   @acceptance-criteria
   Scenario: Generate phase variance report

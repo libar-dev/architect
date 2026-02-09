@@ -33,6 +33,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { createJsonOutputCodec, RegistryMetadataOutputSchema, } from '../validation-schemas/index.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 import { loadConfig, formatConfigError } from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { scanPatterns } from '../scanner/index.js';
@@ -476,9 +477,9 @@ export async function generateDocumentation(options) {
 export function mergePatterns(tsPatterns, gherkinPatterns) {
     // Check for conflicts (same pattern name in both sources)
     const conflicts = [];
-    const tsPatternNames = new Set(tsPatterns.map((p) => p.patternName ?? p.name));
+    const tsPatternNames = new Set(tsPatterns.map((p) => getPatternName(p)));
     for (const gherkinPattern of gherkinPatterns) {
-        const patternName = gherkinPattern.patternName ?? gherkinPattern.name;
+        const patternName = getPatternName(gherkinPattern);
         if (tsPatternNames.has(patternName)) {
             conflicts.push(patternName);
         }

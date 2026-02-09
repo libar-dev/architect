@@ -28,17 +28,20 @@ The project has strict linting rules. Save time by coding defensively.
 | Unused variables: `(_ctx, count, text)` throws lint errors if `count` isn't used | Prefix **immediately**: `(_ctx, _count, text)`                                    |
 | Type safety: `ListItem` is an object, not a string. `item + '\n'` throws errors  | Check types before concatenation: `(typeof item === 'string' ? item : item.text)` |
 
-### Canonical Status Helpers (CRITICAL)
+### Deliverable Status Taxonomy (CRITICAL)
 
-Before implementing any status-checking or completion-matching logic, use existing canonical helpers from `src/validation/types.ts`:
+Deliverable status is enforced by `z.enum()` at schema level. The 6 canonical values are defined in `src/taxonomy/deliverable-status.ts`:
 
-| Helper                     | Pattern Set                     | Use Case                                    |
-| -------------------------- | ------------------------------- | ------------------------------------------- |
-| `isStatusComplete(status)` | `COMPLETION_PATTERNS` (12 pat)  | Check if deliverable is done                |
-| `isStatusPending(status)`  | `PENDING_PATTERNS` (8 pat)      | Check if deliverable not started            |
-| `isDeliverableComplete(d)` | Delegates to `isStatusComplete` | DoD validation (takes `Deliverable` object) |
+| Value         | Meaning             | Helper                            |
+| ------------- | ------------------- | --------------------------------- |
+| `complete`    | Work is done        | `isDeliverableStatusComplete()`   |
+| `in-progress` | Work is ongoing     | `isDeliverableStatusInProgress()` |
+| `pending`     | Work hasn't started | `isDeliverableStatusPending()`    |
+| `deferred`    | Work postponed      |                                   |
+| `superseded`  | Replaced by another |                                   |
+| `n/a`         | Not applicable      |                                   |
 
-**NEVER** hardcode status strings like `'planned'`, `'pending'`, `'Complete'`. Always use canonical helpers — hardcoded matching diverges when new patterns are added.
+**NEVER** use freeform status strings. The Zod schema rejects non-canonical values at parse time.
 
 ### Efficient Debugging Strategy
 

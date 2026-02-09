@@ -23,9 +23,9 @@ Feature: Phase Numbering Conventions and Validation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Phase number validator | Pending | Yes | @libar-dev/delivery-process/src/validation/ |
-      | Duplicate detection | Pending | Yes | @libar-dev/delivery-process/src/lint/rules/ |
-      | Next phase suggester | Pending | Yes | @libar-dev/delivery-process/src/cli/ |
+      | Phase number validator | pending | Yes | @libar-dev/delivery-process/src/validation/ |
+      | Duplicate detection | pending | Yes | @libar-dev/delivery-process/src/lint/rules/ |
+      | Next phase suggester | pending | Yes | @libar-dev/delivery-process/src/cli/ |
 
   Rule: Phase numbers must be unique within a release
 

@@ -20,6 +20,7 @@
  * and PatternSummary is inferred from it.
  */
 import { z } from 'zod';
+import { getPatternName } from './pattern-helpers.js';
 // ---------------------------------------------------------------------------
 // Schema
 // ---------------------------------------------------------------------------
@@ -74,7 +75,7 @@ export function deriveSource(filePath) {
  */
 export function summarizePattern(pattern) {
     return {
-        patternName: pattern.patternName ?? pattern.name,
+        patternName: getPatternName(pattern),
         category: pattern.category,
         file: pattern.source.file,
         source: deriveSource(pattern.source.file),

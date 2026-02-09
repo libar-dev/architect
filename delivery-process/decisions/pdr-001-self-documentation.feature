@@ -137,11 +137,11 @@ Feature: PDR-001 - Self-Documentation Process
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Roadmap specs directory | Complete | delivery-process/specs/ |
-      | Releases directory | Complete | delivery-process/releases/ |
-      | Decisions directory | Complete | delivery-process/decisions/ |
-      | docs:* scripts | Complete | package.json |
-      | docs-generated output | Complete | docs-generated/ |
+      | Roadmap specs directory | complete | delivery-process/specs/ |
+      | Releases directory | complete | delivery-process/releases/ |
+      | Decisions directory | complete | delivery-process/decisions/ |
+      | docs:* scripts | complete | package.json |
+      | docs-generated output | complete | docs-generated/ |
 
   @acceptance-criteria
   Scenario: Package can generate its own documentation

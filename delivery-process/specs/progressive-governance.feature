@@ -32,9 +32,9 @@ Feature: Progressive Governance - Opt-in Richness Where It Matters
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Risk filter for generators | Pending | Yes | src/generators/ |
-      | Risk-based validation rules | Pending | Yes | src/lint/ |
-      | Risk summary section renderer | Pending | Yes | src/generators/sections/ |
+      | Risk filter for generators | pending | Yes | src/generators/ |
+      | Risk-based validation rules | pending | Yes | src/lint/ |
+      | Risk summary section renderer | pending | Yes | src/generators/sections/ |
 
   @acceptance-criteria
   Scenario: Filter roadmap by risk level

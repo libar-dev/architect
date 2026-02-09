@@ -23,8 +23,8 @@ Feature: Test Content Blocks
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Demo item 1 | Pending | No | demo/location1.ts |
-      | Demo item 2 | Complete | Yes | demo/location2.ts |
+      | Demo item 1 | pending | No | demo/location1.ts |
+      | Demo item 2 | complete | Yes | demo/location2.ts |
 
   Rule: Business rules appear as a separate section
 

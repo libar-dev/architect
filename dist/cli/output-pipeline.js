@@ -22,6 +22,7 @@
  */
 import { QueryApiError } from '../api/types.js';
 import { summarizePatterns, SUMMARY_FIELDS, deriveSource } from '../api/summarize.js';
+import { getPatternName } from '../api/pattern-helpers.js';
 export const DEFAULT_OUTPUT_MODIFIERS = {
     namesOnly: false,
     count: false,
@@ -101,7 +102,7 @@ export function applyOutputPipeline(input, modifiers) {
         return patterns.length;
     }
     if (modifiers.namesOnly) {
-        return patterns.map((p) => p.patternName ?? p.name);
+        return patterns.map((p) => getPatternName(p));
     }
     if (modifiers.full) {
         return patterns;

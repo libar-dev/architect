@@ -22,34 +22,17 @@
  * - Manual DoD checks during code review
  */
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
-import { normalizeStatus } from '../taxonomy/index.js';
-import { COMPLETION_PATTERNS } from './types.js';
+import { isDeliverableStatusComplete, isPatternComplete } from '../taxonomy/index.js';
 /**
  * Check if a deliverable status indicates completion
  *
- * Matches various completion patterns including text ("Complete", "Done")
- * and symbols (✓, ✅, ☑).
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
  *
  * @param deliverable - The deliverable to check
  * @returns True if the deliverable is complete
- *
- * @example
- * ```typescript
- * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
- * // => true
- *
- * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
- * // => false
- * ```
  */
 export function isDeliverableComplete(deliverable) {
-    const status = deliverable.status.toLowerCase().trim();
-    for (const pattern of COMPLETION_PATTERNS) {
-        if (status === pattern.toLowerCase() || status.includes(pattern.toLowerCase())) {
-            return true;
-        }
-    }
-    return false;
+    return isDeliverableStatusComplete(deliverable.status);
 }
 /**
  * Check if a feature has @acceptance-criteria scenarios
@@ -147,8 +130,7 @@ export function validateDoD(features, phaseFilter = []) {
         if (!metadata)
             continue;
         // Only validate completed phases (or phases matching filter)
-        const status = normalizeStatus(metadata.status);
-        const isCompleted = status === 'completed';
+        const isCompleted = isPatternComplete(metadata.status);
         // If phase filter specified, validate those specific phases
         // Otherwise, only validate completed phases
         const shouldValidate = shouldFilterPhases ? phaseFilter.includes(metadata.phase) : isCompleted;

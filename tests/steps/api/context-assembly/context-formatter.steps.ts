@@ -81,8 +81,8 @@ function createDesignBundle(): ContextBundle {
     consumers: [],
     architectureNeighbors: [],
     deliverables: [
-      { name: 'API design', status: 'Pending', location: 'src/api/design.ts' },
-      { name: 'Interface stubs', status: 'Done', location: 'src/api/stubs.ts' },
+      { name: 'API design', status: 'pending', location: 'src/api/design.ts' },
+      { name: 'Interface stubs', status: 'complete', location: 'src/api/stubs.ts' },
     ],
     fsm: undefined,
     testFiles: [],
@@ -108,8 +108,8 @@ function createImplementBundle(): ContextBundle {
     consumers: [],
     architectureNeighbors: [],
     deliverables: [
-      { name: 'Core types', status: 'Done', location: 'src/types.ts' },
-      { name: 'Validation logic', status: 'Pending', location: 'src/validate.ts' },
+      { name: 'Core types', status: 'complete', location: 'src/types.ts' },
+      { name: 'Validation logic', status: 'pending', location: 'src/validate.ts' },
     ],
     fsm: {
       currentStatus: 'active',

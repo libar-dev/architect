@@ -28,10 +28,10 @@ Feature: DoD Validation CLI - Machine-Checkable Definition of Done
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | validate:dod CLI command | Pending | Yes | src/cli/ |
-      | Deliverable status parser | Pending | Yes | src/extractor/ |
-      | Acceptance criteria checker | Pending | Yes | src/validation/ |
-      | CI integration documentation | Pending | No | README.md |
+      | validate:dod CLI command | pending | Yes | src/cli/ |
+      | Deliverable status parser | pending | Yes | src/extractor/ |
+      | Acceptance criteria checker | pending | Yes | src/validation/ |
+      | CI integration documentation | pending | No | README.md |
 
   @acceptance-criteria
   Scenario: Validate DoD for completed phase

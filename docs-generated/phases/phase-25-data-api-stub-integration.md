@@ -178,7 +178,7 @@ Scenario Outline: Protection level from status
 
   Examples:
     | status    | protection |
-    | completed | hard       |
+    | complete | hard       |
     | active    | scope      |
     | roadmap   | none       |
 ```
@@ -206,7 +206,7 @@ Scenario Outline: Protection level from status
 ```markdown
 | From | To | Valid |
 | roadmap | active | Yes |
-| roadmap | completed | No |
+| roadmap | complete | No |
 ```
 
 **Code blocks in descriptions are preserved**

@@ -593,15 +593,15 @@ _Verified by: Grouped rendering for compact output, Separate rendering for detai
 
 ## Deliverables
 
-- extract-shapes tag definition (Done)
-- AST shape extractor (Done)
-- Interface extraction (Done)
-- Type alias extraction (Done)
-- Enum extraction (Done)
-- Function signature extraction (Done)
-- ExtractedPattern schema extension (Done)
-- Shape rendering in codecs (Done)
-- Shape extraction behavior test (Done)
+- extract-shapes tag definition (complete)
+- AST shape extractor (complete)
+- Interface extraction (complete)
+- Type alias extraction (complete)
+- Enum extraction (complete)
+- Function signature extraction (complete)
+- ExtractedPattern schema extension (complete)
+- Shape rendering in codecs (complete)
+- Shape extraction behavior test (complete)
 
 ## Implementations
 

@@ -25,10 +25,7 @@
 import { PROCESS_STATUS_VALUES } from '../../taxonomy/index.js';
 import { VALID_TRANSITIONS, getValidTransitionsFrom, getTransitionErrorMessage, } from './transitions.js';
 import { isTerminalState, getProtectionLevel } from './states.js';
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 /**
  * Check if a string is a valid ProcessStatusValue
  */

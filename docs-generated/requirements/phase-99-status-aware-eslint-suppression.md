@@ -103,7 +103,7 @@ export interface CMSState {
 | roadmap | none |
 | deferred | none |
 | active | scope |
-| completed | hard |
+| complete | hard |
 
 **Processor filters messages in postprocess**
 
@@ -146,7 +146,7 @@ export interface CMSState {
 | --- | --- |
 | src/dcb/execute.ts | roadmap |
 | src/dcb/types.ts | roadmap |
-| src/cms/dual-write.ts | completed |
+| src/cms/dual-write.ts | complete |
 
 **JSON output mode for programmatic consumption**
 
@@ -210,7 +210,7 @@ statusAwareProcessor({
     | roadmap | none | Relaxed (warn, ignore args) |
     | deferred | none | Relaxed (warn, ignore args) |
     | active | scope | Strict (error) |
-    | completed | hard | Strict (error) |
+    | complete | hard | Strict (error) |
     | (no status) | N/A | Strict (error) |
 
     **Verified by:** Roadmap file has relaxed rules, Completed file has strict rules, No status file has strict rules
@@ -336,12 +336,12 @@ _Verified by: Default configuration relaxes no-unused-vars, Custom rules can be 
 
 ## Deliverables
 
-- ESLint processor plugin (planned)
-- Status-to-config mapper (planned)
-- ESLint plugin entry point (planned)
-- CLI command for ignore list (planned)
-- Root eslint.config.js update (planned)
-- Directory exclusion removal (planned)
+- ESLint processor plugin (pending)
+- Status-to-config mapper (pending)
+- ESLint plugin entry point (pending)
+- CLI command for ignore list (pending)
+- Root eslint.config.js update (pending)
+- Directory exclusion removal (pending)
 
 ---
 

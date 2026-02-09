@@ -29,8 +29,10 @@
  * - **Cross-Validation**: Pattern name + phase must match across sources
  * - **Deliverables**: Parsed from Gherkin Background tables in features
  */
+import { getPatternName } from '../api/pattern-helpers.js';
 // Import Zod schemas and inferred types (schema-first pattern)
 import { ProcessMetadataSchema, DeliverableSchema, } from '../validation-schemas/index.js';
+import { DEFAULT_STATUS } from '../taxonomy/status-values.js';
 /**
  * Extract process metadata from Gherkin feature tags
  *
@@ -53,7 +55,7 @@ export function extractProcessMetadata(feature) {
     const pattern = patternTag.replace('pattern:', '');
     const phaseStr = phaseTag.replace('phase:', '');
     const phase = parseInt(phaseStr, 10);
-    const status = statusTag?.replace('status:', '') ?? 'roadmap';
+    const status = statusTag?.replace('status:', '') ?? DEFAULT_STATUS;
     // Extract optional tags
     const quarterTag = tags.find((t) => t.startsWith('quarter:'));
     const effortTag = tags.find((t) => t.startsWith('effort:'));
@@ -194,7 +196,8 @@ export function extractDeliverables(feature) {
         // Parse each row with schema validation
         for (const row of rows) {
             const name = row[deliverableHeader]?.trim() ?? '';
-            const status = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+            const rawStatus = statusHeader ? (row[statusHeader]?.trim() ?? '') : '';
+            const status = rawStatus.toLowerCase();
             const testsValue = testsHeader ? (row[testsHeader]?.trim() ?? '0') : '0';
             const location = locationHeader ? (row[locationHeader]?.trim() ?? '') : '';
             const findingRaw = findingHeader ? row[findingHeader]?.trim() : undefined;
@@ -384,14 +387,14 @@ export function validateDualSource(results) {
     }
     // Warnings: Orphaned stubs (code without feature)
     for (const pattern of results.codeOnly) {
-        if (pattern.status === 'roadmap') {
-            const name = pattern.patternName ?? pattern.name;
+        if (pattern.status === DEFAULT_STATUS) {
+            const name = getPatternName(pattern);
             warnings.push(`Roadmap pattern "${name}" has code stub but no feature file`);
         }
     }
     // Warnings: Features without code stubs
     for (const metadata of results.featureOnly) {
-        if (metadata.status === 'roadmap') {
+        if (metadata.status === DEFAULT_STATUS) {
             warnings.push(`Feature "${metadata.pattern}" (phase ${metadata.phase}) has no code stub`);
         }
     }

@@ -40,12 +40,12 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Graph traversal engine | planned | src/api/graph-traversal.ts | Yes | unit |
-      | graph subcommand | planned | src/cli/process-api.ts | Yes | integration |
-      | Impact analysis | planned | src/api/graph-traversal.ts | Yes | unit |
-      | Path finding algorithm | planned | src/api/graph-traversal.ts | Yes | unit |
-      | Dangling reference detector | planned | src/api/graph-health.ts | Yes | unit |
-      | Orphan pattern detector | planned | src/api/graph-health.ts | Yes | unit |
+      | Graph traversal engine | pending | src/api/graph-traversal.ts | Yes | unit |
+      | graph subcommand | pending | src/cli/process-api.ts | Yes | integration |
+      | Impact analysis | pending | src/api/graph-traversal.ts | Yes | unit |
+      | Path finding algorithm | pending | src/api/graph-traversal.ts | Yes | unit |
+      | Dangling reference detector | pending | src/api/graph-health.ts | Yes | unit |
+      | Orphan pattern detector | pending | src/api/graph-health.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Graph Traversal

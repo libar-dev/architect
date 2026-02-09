@@ -30,12 +30,12 @@ Feature: CLI Behavior Testing
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Test Type | Location |
-      | generate-docs CLI tests | planned | Yes | integration | tests/features/cli/generate-docs.feature |
-      | lint-patterns CLI tests | planned | Yes | integration | tests/features/cli/lint-patterns.feature |
-      | lint-process CLI tests | planned | Yes | integration | tests/features/cli/lint-process.feature |
-      | validate-patterns CLI tests | planned | Yes | integration | tests/features/cli/validate-patterns.feature |
-      | generate-tag-taxonomy CLI tests | planned | Yes | unit | tests/features/cli/generate-tag-taxonomy.feature |
-      | CLI test step definitions | planned | Yes | - | tests/steps/cli/ |
+      | generate-docs CLI tests | pending | Yes | integration | tests/features/cli/generate-docs.feature |
+      | lint-patterns CLI tests | pending | Yes | integration | tests/features/cli/lint-patterns.feature |
+      | lint-process CLI tests | pending | Yes | integration | tests/features/cli/lint-process.feature |
+      | validate-patterns CLI tests | pending | Yes | integration | tests/features/cli/validate-patterns.feature |
+      | generate-tag-taxonomy CLI tests | pending | Yes | unit | tests/features/cli/generate-tag-taxonomy.feature |
+      | CLI test step definitions | pending | Yes | - | tests/steps/cli/ |
 
   # ============================================================================
   # RULE 1: generate-docs CLI

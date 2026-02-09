@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:TypeScriptTaxonomyImplementation
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
 @libar-docs-phase:99
 @libar-docs-release:v1.0.0
 @libar-docs-effort:4h
@@ -19,17 +20,17 @@ Feature: TypeScript Taxonomy Implementation
   Background: Definition of Done
     Given the following deliverables are complete:
       | Deliverable               | Status | Location                               |
-      | Status values constants   | done   | src/taxonomy/status-values.ts          |
-      | Format types constants    | done   | src/taxonomy/format-types.ts           |
-      | Category definitions      | done   | src/taxonomy/categories.ts             |
-      | Metadata tag definitions  | done   | src/taxonomy/registry-builder.ts       |
-      | Registry builder          | done   | src/taxonomy/registry-builder.ts       |
-      | Updated Zod schemas       | done   | src/validation-schemas/tag-registry.ts |
+      | Status values constants   | complete | src/taxonomy/status-values.ts          |
+      | Format types constants    | complete | src/taxonomy/format-types.ts           |
+      | Category definitions      | complete | src/taxonomy/categories.ts             |
+      | Metadata tag definitions  | complete | src/taxonomy/registry-builder.ts       |
+      | Registry builder          | complete | src/taxonomy/registry-builder.ts       |
+      | Updated Zod schemas       | complete | src/validation-schemas/tag-registry.ts |
     And the following acceptance criteria are verified:
       | Scenario                              | Status |
-      | Constants provide compile-time safety | done   |
-      | Zod schemas use TypeScript constants  | done   |
-      | Existing consumers work unchanged     | done   |
+      | Constants provide compile-time safety | complete |
+      | Zod schemas use TypeScript constants  | complete |
+      | Existing consumers work unchanged     | complete |
 
   # ─────────────────────────────────────────────────────────────────────────────
   # Status Values

@@ -185,15 +185,15 @@ _Verified by: table-extraction.steps.ts tests stripMarkdownTables, docstring-med
 
 ## Deliverables
 
-- pr-changes-generation.steps.ts (planned)
-- remaining-work-enhancement.steps.ts (planned)
-- remaining-work-totals.steps.ts (planned)
-- session-handoffs.steps.ts (planned)
-- description-headers.steps.ts (planned)
-- description-quality-foundation.steps.ts (planned)
-- implementation-links.steps.ts (planned)
-- table-extraction.steps.ts (planned)
-- docstring-mediatype.steps.ts (planned)
+- pr-changes-generation.steps.ts (pending)
+- remaining-work-enhancement.steps.ts (pending)
+- remaining-work-totals.steps.ts (pending)
+- session-handoffs.steps.ts (pending)
+- description-headers.steps.ts (pending)
+- description-quality-foundation.steps.ts (pending)
+- implementation-links.steps.ts (pending)
+- table-extraction.steps.ts (pending)
+- docstring-mediatype.steps.ts (pending)
 
 ---
 

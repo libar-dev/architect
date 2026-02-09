@@ -246,7 +246,7 @@ export function normalizeLineEndings(text) {
  * @param text - Input text
  * @returns First sentence, or full trimmed text if no sentence boundary found
  */
-export function extractFirstSentence(text) {
+export function extractFirstSentenceRaw(text) {
     if (!text)
         return '';
     const sentenceEndPattern = /[.!?](?=\s+[A-Z]|\s*$)/;
@@ -255,5 +255,27 @@ export function extractFirstSentence(text) {
         return text.slice(0, match.index + 1).trim();
     }
     return text.trim();
+}
+/**
+ * Extract a compact description preserving Problem/Solution structure.
+ *
+ * If the text uses `**Problem:**` / `**Solution:**` markers, extracts the
+ * first sentence from each section and combines them. Otherwise falls back
+ * to extractFirstSentence() behavior.
+ *
+ * @param text - Description text, possibly with Problem/Solution structure
+ * @returns Compact description preserving both halves if structured
+ */
+export function extractDescription(text) {
+    if (!text)
+        return '';
+    const problemMatch = /\*\*Problem:\*\*\s*([\s\S]+?)(?=\*\*Solution:\*\*|$)/.exec(text);
+    const solutionMatch = /\*\*Solution:\*\*\s*([\s\S]+?)(?=\n\s*\*\*[A-Z]|\n\n\s*\n|$)/.exec(text);
+    if (problemMatch?.[1] !== undefined && solutionMatch?.[1] !== undefined) {
+        const problem = extractFirstSentenceRaw(problemMatch[1].trim());
+        const solution = extractFirstSentenceRaw(solutionMatch[1].trim());
+        return `Problem: ${problem} Solution: ${solution}`;
+    }
+    return extractFirstSentenceRaw(text);
 }
 //# sourceMappingURL=string-utils.js.map

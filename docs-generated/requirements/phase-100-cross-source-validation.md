@@ -89,10 +89,10 @@ _Verified by: Dependency references non-existent pattern, All dependencies resol
 
 ## Deliverables
 
-- Pattern name matcher (Pending)
-- Spec reference validator (Pending)
-- Circular dependency detector (Pending)
-- Orphan detector (Pending)
+- Pattern name matcher (pending)
+- Spec reference validator (pending)
+- Circular dependency detector (pending)
+- Orphan detector (pending)
 
 ---
 

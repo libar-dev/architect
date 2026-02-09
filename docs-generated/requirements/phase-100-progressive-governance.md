@@ -60,9 +60,9 @@
 
 ## Deliverables
 
-- Risk filter for generators (Pending)
-- Risk-based validation rules (Pending)
-- Risk summary section renderer (Pending)
+- Risk filter for generators (pending)
+- Risk-based validation rules (pending)
+- Risk summary section renderer (pending)
 
 ---
 

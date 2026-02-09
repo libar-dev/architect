@@ -22,7 +22,11 @@
 import type { ProcessStateAPI } from './process-state.js';
 import type { MasterDataset } from '../validation-schemas/master-dataset.js';
 import type { ExtractedPattern } from '../validation-schemas/extracted-pattern.js';
-import { VALID_PROCESS_STATUS_SET, type ProcessStatusValue } from '../taxonomy/index.js';
+import {
+  VALID_PROCESS_STATUS_SET,
+  type DeliverableStatus,
+  type ProcessStatusValue,
+} from '../taxonomy/index.js';
 import { isPatternComplete } from '../taxonomy/normalized-status.js';
 import type { NeighborEntry } from './types.js';
 import { QueryApiError } from './types.js';
@@ -93,7 +97,7 @@ export interface DepEntry {
 
 export interface DeliverableEntry {
   readonly name: string;
-  readonly status: string;
+  readonly status: DeliverableStatus;
   readonly location: string;
 }
 

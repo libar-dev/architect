@@ -25,6 +25,7 @@ import { ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, GLOBAL_FORMAT_OP
 import { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS } from './hierarchy-levels.js';
 import { RISK_LEVELS } from './risk-levels.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
+import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.js';
 /**
  * Metadata tags organized by functional group.
  * Used for documentation generation to create organized sections.
@@ -408,8 +409,8 @@ export function buildRegistry() {
             },
         ],
         formatOptions: [...GLOBAL_FORMAT_OPTIONS],
-        tagPrefix: '@libar-docs-',
-        fileOptInTag: '@libar-docs',
+        tagPrefix: DEFAULT_TAG_PREFIX,
+        fileOptInTag: DEFAULT_FILE_OPT_IN_TAG,
     };
 }
 //# sourceMappingURL=registry-builder.js.map

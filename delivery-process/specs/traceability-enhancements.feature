@@ -28,9 +28,9 @@ Feature: Traceability Enhancements - Requirements ↔ Tests Loop
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Coverage matrix section | Pending | Yes | src/generators/sections/ |
-      | Orphaned scenarios detector | Pending | Yes | src/analyzers/ |
-      | Pattern gap reporter | Pending | Yes | src/analyzers/ |
+      | Coverage matrix section | pending | Yes | src/generators/sections/ |
+      | Orphaned scenarios detector | pending | Yes | src/analyzers/ |
+      | Pattern gap reporter | pending | Yes | src/analyzers/ |
 
   @acceptance-criteria
   Scenario: Show pattern coverage matrix

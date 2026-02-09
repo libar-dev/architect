@@ -91,8 +91,13 @@ describeFeature(feature, ({ Rule }) => {
               phase,
               filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
               deliverables: [
-                { name: 'API design', status: 'Pending', tests: 0, location: 'src/api/design.ts' },
-                { name: 'Interface stubs', status: 'Done', tests: 1, location: 'src/api/stubs.ts' },
+                { name: 'API design', status: 'pending', tests: 0, location: 'src/api/design.ts' },
+                {
+                  name: 'Interface stubs',
+                  status: 'complete',
+                  tests: 1,
+                  location: 'src/api/stubs.ts',
+                },
               ],
             });
             // Manually add arch fields (not in TestPatternOptions)
@@ -283,8 +288,8 @@ describeFeature(feature, ({ Rule }) => {
                 phase,
                 filePath: `delivery-process/specs/${name.toLowerCase()}.feature`,
                 deliverables: [
-                  { name: 'Core types', status: 'Done', tests: 1, location: 'src/types.ts' },
-                  { name: 'Validation', status: 'Pending', tests: 0, location: 'src/validate.ts' },
+                  { name: 'Core types', status: 'complete', tests: 1, location: 'src/types.ts' },
+                  { name: 'Validation', status: 'pending', tests: 0, location: 'src/validate.ts' },
                 ],
               })
             );

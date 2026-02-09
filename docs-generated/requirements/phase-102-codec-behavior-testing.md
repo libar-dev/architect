@@ -181,20 +181,20 @@ _Verified by: PlanningChecklistCodec includes deliverables, SessionFindingsCodec
 
 ## Deliverables
 
-- RoadmapDocumentCodec tests (planned)
-- CompletedMilestonesCodec tests (planned)
-- CurrentWorkCodec tests (planned)
-- RequirementsDocumentCodec tests (planned)
-- SessionContextCodec tests (planned)
-- RemainingWorkCodec tests (planned)
-- PrChangesCodec tests (planned)
-- AdrDocumentCodec tests (planned)
-- PlanningChecklistCodec tests (planned)
-- SessionPlanCodec tests (planned)
-- SessionFindingsCodec tests (planned)
-- ChangelogCodec tests (planned)
-- TraceabilityCodec tests (planned)
-- OverviewCodec tests (planned)
+- RoadmapDocumentCodec tests (pending)
+- CompletedMilestonesCodec tests (pending)
+- CurrentWorkCodec tests (pending)
+- RequirementsDocumentCodec tests (pending)
+- SessionContextCodec tests (pending)
+- RemainingWorkCodec tests (pending)
+- PrChangesCodec tests (pending)
+- AdrDocumentCodec tests (pending)
+- PlanningChecklistCodec tests (pending)
+- SessionPlanCodec tests (pending)
+- SessionFindingsCodec tests (pending)
+- ChangelogCodec tests (pending)
+- TraceabilityCodec tests (pending)
+- OverviewCodec tests (pending)
 
 ---
 

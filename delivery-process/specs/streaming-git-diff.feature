@@ -39,11 +39,11 @@ Feature: Streaming Git Diff for Process Guard
   Background: Deliverables
     Given the following deliverables:
       | Deliverable                          | Status  | Location                                    |
-      | Streaming git execution utility      | Planned | src/lint/process-guard/git-stream.ts        |
-      | Line-by-line diff parser             | Planned | src/lint/process-guard/diff-parser.ts       |
-      | Async detectBranchChanges            | Planned | src/lint/process-guard/detect-changes.ts    |
-      | Async detectStagedChanges            | Planned | src/lint/process-guard/detect-changes.ts    |
-      | Integration with existing CLI        | Planned | src/cli/lint-process.ts                     |
+      | Streaming git execution utility      | pending | src/lint/process-guard/git-stream.ts        |
+      | Line-by-line diff parser             | pending | src/lint/process-guard/diff-parser.ts       |
+      | Async detectBranchChanges            | pending | src/lint/process-guard/detect-changes.ts    |
+      | Async detectStagedChanges            | pending | src/lint/process-guard/detect-changes.ts    |
+      | Integration with existing CLI        | pending | src/cli/lint-process.ts                     |
 
   # ============================================================================
   # STREAMING EXECUTION

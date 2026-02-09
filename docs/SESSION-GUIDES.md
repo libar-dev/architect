@@ -132,7 +132,7 @@ See [`tests/features/validation/fsm-validator.feature`](../tests/features/valida
 
 - [ ] **Verify stub identifier spelling** — Check all exported function/type/interface names for typos before committing stubs
 
-- [ ] **List canonical helpers in `@<prefix>-uses`** — If the function does status matching, reference `COMPLETION_PATTERNS`, `PENDING_PATTERNS`, or `isStatusComplete`/`isStatusPending`
+- [ ] **List canonical helpers in `@<prefix>-uses`** — If the function does status matching, reference `isDeliverableStatusComplete`/`isDeliverableStatusPending` from `taxonomy/deliverable-status.ts`
 
 ### Do NOT
 

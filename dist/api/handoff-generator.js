@@ -1,0 +1,137 @@
+/**
+ * @libar-docs
+ * @libar-docs-pattern HandoffGeneratorImpl
+ * @libar-docs-status completed
+ * @libar-docs-implements DataAPIDesignSessionSupport
+ * @libar-docs-uses ProcessStateAPI, MasterDataset, ContextFormatterImpl
+ * @libar-docs-used-by ProcessAPICLIImpl
+ * @libar-docs-target src/api/handoff-generator.ts
+ * @libar-docs-arch-role service
+ * @libar-docs-arch-context api
+ * @libar-docs-arch-layer application
+ *
+ * ## HandoffGenerator — Session-End State Summary
+ *
+ * Pure function that assembles a handoff document from ProcessStateAPI
+ * and MasterDataset. Captures everything the next session needs to
+ * continue work without context loss.
+ */
+import { QueryApiError } from './types.js';
+import { getPatternName } from './pattern-helpers.js';
+import { isDeliverableStatusComplete, isDeliverableStatusPending, } from '../taxonomy/deliverable-status.js';
+import { normalizeStatus, isPatternComplete } from '../taxonomy/normalized-status.js';
+import { DEFAULT_STATUS } from '../taxonomy/status-values.js';
+// ---------------------------------------------------------------------------
+// Session Type Inference (DD-3)
+// ---------------------------------------------------------------------------
+function inferSessionType(status) {
+    const normalized = normalizeStatus(status ?? DEFAULT_STATUS);
+    switch (normalized) {
+        case 'active':
+            return 'implement';
+        case 'completed':
+            return 'review';
+        default:
+            return 'design';
+    }
+}
+// ---------------------------------------------------------------------------
+// Main Entry Point
+// ---------------------------------------------------------------------------
+export function generateHandoff(api, _dataset, // _dataset reserved for future use per design stub
+options) {
+    const { patternName, modifiedFiles } = options;
+    const pattern = api.getPattern(patternName);
+    if (pattern === undefined) {
+        throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
+    }
+    const resolvedName = getPatternName(pattern);
+    const sessionType = options.sessionType ?? inferSessionType(pattern.status);
+    const date = new Date().toISOString().slice(0, 10);
+    const sections = [];
+    // Deliverables split
+    const deliverables = api.getPatternDeliverables(patternName);
+    const completed = deliverables.filter((d) => isDeliverableStatusComplete(d.status));
+    const inProgress = deliverables.filter((d) => !isDeliverableStatusComplete(d.status) && !isDeliverableStatusPending(d.status));
+    const remaining = deliverables.filter((d) => !isDeliverableStatusComplete(d.status));
+    // Completed deliverables
+    if (completed.length > 0) {
+        sections.push({
+            title: 'COMPLETED',
+            items: completed.map((d) => `[x] ${d.name} (${d.location})`),
+        });
+    }
+    // In-progress deliverables
+    if (inProgress.length > 0) {
+        sections.push({
+            title: 'IN PROGRESS',
+            items: inProgress.map((d) => `[ ] ${d.name} (${d.location})`),
+        });
+    }
+    // Files modified (DD-2: only when modifiedFiles provided)
+    if (modifiedFiles !== undefined && modifiedFiles.length > 0) {
+        sections.push({
+            title: 'FILES MODIFIED',
+            items: modifiedFiles,
+        });
+    }
+    // Discovered items
+    const gaps = pattern.discoveredGaps ?? [];
+    const improvements = pattern.discoveredImprovements ?? [];
+    const learnings = pattern.discoveredLearnings ?? [];
+    if (gaps.length > 0 || improvements.length > 0 || learnings.length > 0) {
+        const items = [];
+        if (gaps.length > 0) {
+            items.push(`Gaps: ${gaps.join(', ')}`);
+        }
+        if (improvements.length > 0) {
+            items.push(`Improvements: ${improvements.join(', ')}`);
+        }
+        if (learnings.length > 0) {
+            items.push(`Learnings: ${learnings.join(', ')}`);
+        }
+        sections.push({ title: 'DISCOVERED', items });
+    }
+    // Blockers (incomplete dependencies)
+    const deps = api.getPatternDependencies(patternName);
+    const incompleteDeps = [];
+    if (deps !== undefined) {
+        for (const depName of deps.dependsOn) {
+            const depPattern = api.getPattern(depName);
+            if (depPattern !== undefined && !isPatternComplete(depPattern.status)) {
+                incompleteDeps.push(`${depName} (${depPattern.status ?? 'unknown'})`);
+            }
+        }
+    }
+    sections.push({
+        title: 'BLOCKERS',
+        items: incompleteDeps.length > 0 ? incompleteDeps : ['None'],
+    });
+    // Next session priorities (remaining deliverables in order)
+    if (remaining.length > 0) {
+        sections.push({
+            title: 'NEXT SESSION',
+            items: remaining.map((d, i) => `${i + 1}. ${d.name} (${d.location})`),
+        });
+    }
+    return {
+        pattern: resolvedName,
+        sessionType,
+        date,
+        status: pattern.status,
+        sections,
+    };
+}
+// ---------------------------------------------------------------------------
+// Text Formatter (co-located per PDR-002 DD-7)
+// ---------------------------------------------------------------------------
+export function formatHandoff(doc) {
+    const sections = [];
+    sections.push(`=== HANDOFF: ${doc.pattern} (${doc.sessionType}) ===\n` +
+        `Date: ${doc.date} | Status: ${doc.status ?? 'unknown'}`);
+    for (const section of doc.sections) {
+        sections.push(`=== ${section.title} ===\n` + section.items.join('\n'));
+    }
+    return sections.join('\n\n') + '\n';
+}
+//# sourceMappingURL=handoff-generator.js.map

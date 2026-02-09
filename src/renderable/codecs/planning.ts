@@ -37,7 +37,10 @@ import {
 import { renderScenarioContent, renderBusinessRulesSection } from './helpers.js';
 import { getStatusEmoji, getDisplayName } from '../utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
-import { isStatusComplete, getDeliverableStatusEmoji } from '../../validation/types.js';
+import {
+  getDeliverableStatusEmoji,
+  isDeliverableStatusComplete,
+} from '../../taxonomy/deliverable-status.js';
 import { normalizeStatus, isPatternPlanned } from '../../taxonomy/index.js';
 import { groupBy } from '../../utils/index.js';
 import {
@@ -348,7 +351,7 @@ function buildPhaseChecklist(
     const dodItems: string[] = ['**Deliverables:**'];
     if (pattern.deliverables && pattern.deliverables.length > 0) {
       for (const d of pattern.deliverables) {
-        const status = isStatusComplete(d.status) ? '✅' : '- [ ]';
+        const status = isDeliverableStatusComplete(d.status) ? '✅' : '- [ ]';
         dodItems.push(`${status} ${d.name}`);
       }
     } else {

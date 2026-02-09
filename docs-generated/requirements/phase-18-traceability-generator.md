@@ -179,10 +179,10 @@ _Verified by: Filters matrix by phase, Filters matrix by domain category_
 
 ## Deliverables
 
-- Traceability extractor (planned)
-- Traceability matrix renderer (planned)
-- CLI integration (planned)
-- docs:traceability script (planned)
+- Traceability extractor (pending)
+- Traceability matrix renderer (pending)
+- CLI integration (pending)
+- docs:traceability script (pending)
 
 ---
 

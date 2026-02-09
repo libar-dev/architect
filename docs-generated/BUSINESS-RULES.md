@@ -1322,14 +1322,14 @@ The following tags are defined in the TypeScript taxonomy to support process gua
 
 - **Invariant:** Files with `@libar-docs-status roadmap` or `deferred` have relaxed unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.
 
-- **Rationale:** Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked. | Status | Protection Level | unused-vars Behavior | | roadmap | none | Relaxed (warn, ignore args) | | deferred | none | Relaxed (warn, ignore args) | | active | scope | Strict (error) | | completed | hard | Strict (error) | | (no status) | N/A | Strict (error) |
+- **Rationale:** Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked. | Status | Protection Level | unused-vars Behavior | | roadmap | none | Relaxed (warn, ignore args) | | deferred | none | Relaxed (warn, ignore args) | | active | scope | Strict (error) | | complete | hard | Strict (error) | | (no status) | N/A | Strict (error) |
 
 | Status | Protection Level | unused-vars Behavior |
 | --- | --- | --- |
 | roadmap | none | Relaxed (warn, ignore args) |
 | deferred | none | Relaxed (warn, ignore args) |
 | active | scope | Strict (error) |
-| completed | hard | Strict (error) |
+| complete | hard | Strict (error) |
 | (no status) | N/A | Strict (error) |
 
 

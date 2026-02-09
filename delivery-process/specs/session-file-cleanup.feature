@@ -24,10 +24,10 @@ Feature: Session File Cleanup Behavior
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Tests | Location |
-      | Cleanup trigger integration | Pending | Yes | @libar-dev/delivery-process/src/generators/ |
-      | File pattern matching | Pending | Yes | @libar-dev/delivery-process/src/utils/ |
-      | Error handling | Pending | Yes | @libar-dev/delivery-process/src/utils/ |
-      | Cleanup logging | Pending | Yes | @libar-dev/delivery-process/src/utils/ |
+      | Cleanup trigger integration | pending | Yes | @libar-dev/delivery-process/src/generators/ |
+      | File pattern matching | pending | Yes | @libar-dev/delivery-process/src/utils/ |
+      | Error handling | pending | Yes | @libar-dev/delivery-process/src/utils/ |
+      | Cleanup logging | pending | Yes | @libar-dev/delivery-process/src/utils/ |
 
   Rule: Cleanup triggers during session-context generation
 

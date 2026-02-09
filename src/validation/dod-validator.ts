@@ -25,29 +25,18 @@
 import type { Deliverable, ScannedGherkinFile } from '../validation-schemas/index.js';
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
 import type { DoDValidationResult, DoDValidationSummary } from './types.js';
-import { isStatusComplete } from './types.js';
-import { isPatternComplete } from '../taxonomy/normalized-status.js';
+import { isDeliverableStatusComplete, isPatternComplete } from '../taxonomy/index.js';
 
 /**
  * Check if a deliverable status indicates completion
  *
- * Matches various completion patterns including text ("Complete", "Done")
- * and symbols (✓, ✅, ☑).
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
  *
  * @param deliverable - The deliverable to check
  * @returns True if the deliverable is complete
- *
- * @example
- * ```typescript
- * isDeliverableComplete({ name: "Feature X", status: "Complete", tests: 5, location: "src/" })
- * // => true
- *
- * isDeliverableComplete({ name: "Feature Y", status: "In Progress", tests: 0, location: "src/" })
- * // => false
- * ```
  */
 export function isDeliverableComplete(deliverable: Deliverable): boolean {
-  return isStatusComplete(deliverable.status);
+  return isDeliverableStatusComplete(deliverable.status);
 }
 
 /**

@@ -49,13 +49,16 @@ import { createSuccess, createError, QueryApiError } from '../api/types.js';
 import { handleCliError } from './error-handler.js';
 import { printVersionAndExit } from './version.js';
 import { fuzzyMatchPatterns } from '../api/fuzzy-match.js';
-import { allPatternNames, suggestPattern, firstImplements } from '../api/pattern-helpers.js';
+import { allPatternNames, suggestPattern, firstImplements, getPatternName, } from '../api/pattern-helpers.js';
 import { findStubPatterns, resolveStubs, groupStubsByPattern, extractDecisionItems, findPdrReferences, } from '../api/stub-resolver.js';
 import { applyOutputPipeline, applyListFilters, validateModifiers, formatOutput, PATTERN_ARRAY_METHODS, DEFAULT_OUTPUT_MODIFIERS, } from './output-pipeline.js';
 import { assembleContext, buildDepTree, buildFileReadingList, buildOverview, isValidSessionType, } from '../api/context-assembler.js';
 import { formatContextBundle, formatDepTree, formatFileReadingList, formatOverview, } from '../api/context-formatter.js';
 import { computeNeighborhood, compareContexts, aggregateTagUsage, buildSourceInventory, } from '../api/arch-queries.js';
 import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.js';
+import { validateScope, formatScopeValidation } from '../api/scope-validator.js';
+import { generateHandoff, formatHandoff, } from '../api/handoff-generator.js';
+import { execSync } from 'child_process';
 // =============================================================================
 // Argument Parsing
 // =============================================================================
@@ -219,6 +222,8 @@ Subcommands:
   files <pattern> [--related]                             File reading list (text)
   dep-tree <pattern> [--depth N]                          Dependency tree (text)
   overview                                                Executive project summary (text)
+  scope-validate <pat> [implement|design] [--type ...] [--strict]  Pre-flight readiness (text)
+  handoff --pattern <pat> [--git] [--session ...]        Session-end handoff summary (text)
   stubs [pattern]           List design stubs with implementation status
   stubs --unresolved        Show only stubs with missing target files
   decisions <pattern>       Show AD-N design decisions from stub descriptions
@@ -701,16 +706,16 @@ function handleDecisions(dataset, subArgs) {
     const patternStubs = stubs.filter((s) => {
         const implName = firstImplements(s);
         return (implName?.toLowerCase() === patternName.toLowerCase() ||
-            (s.patternName ?? s.name).toLowerCase() === patternName.toLowerCase());
+            getPatternName(s).toLowerCase() === patternName.toLowerCase());
     });
     if (patternStubs.length === 0) {
-        const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? s.patternName ?? s.name))];
+        const stubNames = [...new Set(stubs.map((s) => firstImplements(s) ?? getPatternName(s)))];
         const hint = suggestPattern(patternName, stubNames);
         throw new QueryApiError('STUB_NOT_FOUND', `No decisions found for pattern: "${patternName}".${hint}`);
     }
     // Extract decisions from each stub's description
     const decisions = patternStubs.map((stub) => ({
-        stub: stub.patternName ?? stub.name,
+        stub: getPatternName(stub),
         file: stub.source.file,
         since: stub.since,
         decisions: extractDecisionItems(stub.directive.description),
@@ -811,6 +816,119 @@ function handleOverviewCmd(ctx) {
     return formatOverview(overview);
 }
 // =============================================================================
+// Session Workflow Handlers (text output — ADR-008)
+// =============================================================================
+const VALID_SCOPE_TYPES = new Set(['implement', 'design']);
+function handleScopeValidate(ctx) {
+    // Parse pattern name (positional, first non-flag arg)
+    let patternName;
+    let scopeType = 'implement';
+    let strict = false;
+    for (let i = 0; i < ctx.subArgs.length; i++) {
+        const arg = ctx.subArgs[i];
+        if (arg === '--type') {
+            const val = ctx.subArgs[i + 1];
+            if (val !== undefined && VALID_SCOPE_TYPES.has(val)) {
+                scopeType = val;
+            }
+            else {
+                throw new QueryApiError('INVALID_ARGUMENT', `--type must be "implement" or "design", got: "${val ?? ''}"`);
+            }
+            i++;
+        }
+        else if (arg === '--strict') {
+            // DD-4: promotes WARN → BLOCKED (consistent with lint-process --strict)
+            strict = true;
+        }
+        else if (arg !== undefined && !arg.startsWith('-')) {
+            if (patternName === undefined) {
+                patternName = arg;
+            }
+            else if (VALID_SCOPE_TYPES.has(arg)) {
+                // DD-6: positional scope type also accepted
+                scopeType = arg;
+            }
+        }
+    }
+    if (patternName === undefined) {
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api scope-validate <pattern> [implement|design] [--type implement|design] [--strict]');
+    }
+    const result = validateScope(ctx.api, ctx.dataset, {
+        patternName,
+        scopeType,
+        baseDir: ctx.baseDir,
+        strict,
+    });
+    return formatScopeValidation(result);
+}
+// 'review' is handoff-specific — not a global session type (parsed locally, not by top-level --session)
+const VALID_HANDOFF_SESSION_TYPES = new Set([
+    'planning',
+    'design',
+    'implement',
+    'review',
+]);
+function handleHandoff(ctx) {
+    let patternName;
+    let sessionType;
+    let useGit = false;
+    for (let i = 0; i < ctx.subArgs.length; i++) {
+        const arg = ctx.subArgs[i];
+        if (arg === '--pattern') {
+            patternName = ctx.subArgs[i + 1];
+            if (patternName === undefined) {
+                throw new QueryApiError('INVALID_ARGUMENT', '--pattern requires a value');
+            }
+            i++;
+        }
+        else if (arg === '--session') {
+            const val = ctx.subArgs[i + 1];
+            if (val !== undefined && VALID_HANDOFF_SESSION_TYPES.has(val)) {
+                sessionType = val;
+            }
+            else {
+                throw new QueryApiError('INVALID_ARGUMENT', `--session must be "planning", "design", "implement", or "review", got: "${val ?? ''}"`);
+            }
+            i++;
+        }
+        else if (arg === '--git') {
+            useGit = true;
+        }
+    }
+    // Also accept from top-level parsed --session
+    if (sessionType === undefined && ctx.sessionType !== null) {
+        sessionType = ctx.sessionType;
+    }
+    // Pattern name uses --pattern flag (not positional) to avoid ambiguity with --git and --session
+    if (patternName === undefined) {
+        throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api handoff --pattern <name> [--git] [--session planning|design|implement|review]');
+    }
+    // DD-2: git integration is opt-in — CLI handler owns the shell call
+    let modifiedFiles;
+    if (useGit) {
+        try {
+            const output = execSync('git diff --name-only HEAD', { encoding: 'utf-8' });
+            modifiedFiles = output
+                .trim()
+                .split('\n')
+                .filter((line) => line.length > 0);
+        }
+        catch {
+            // git not available or not a git repo — silently omit
+            modifiedFiles = undefined;
+        }
+    }
+    const options = { patternName };
+    if (sessionType !== undefined) {
+        options.sessionType = sessionType;
+    }
+    if (modifiedFiles !== undefined) {
+        options.modifiedFiles = modifiedFiles;
+    }
+    const doc = generateHandoff(ctx.api, ctx.dataset, options);
+    return formatHandoff(doc);
+}
+// =============================================================================
 // Subcommand Router
 // =============================================================================
 async function routeSubcommand(ctx) {
@@ -823,6 +941,10 @@ async function routeSubcommand(ctx) {
             return handleDepTreeCmd(ctx);
         case 'overview':
             return handleOverviewCmd(ctx);
+        case 'scope-validate':
+            return handleScopeValidate(ctx);
+        case 'handoff':
+            return handleHandoff(ctx);
         case 'status':
             return handleStatus(ctx.api);
         case 'query': {
@@ -871,7 +993,7 @@ async function routeSubcommand(ctx) {
             }
         }
         default:
-            throw new QueryApiError('UNKNOWN_METHOD', `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`);
+            throw new QueryApiError('UNKNOWN_METHOD', `Unknown subcommand: ${ctx.subcommand}\nAvailable: context, files, dep-tree, overview, scope-validate, handoff, status, query, pattern, list, search, arch, stubs, decisions, pdr, tags, sources, unannotated`);
     }
 }
 // =============================================================================

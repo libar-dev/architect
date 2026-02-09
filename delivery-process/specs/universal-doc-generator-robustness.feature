@@ -101,11 +101,11 @@ Feature: Universal Document Generator - Robustness Foundation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Content Deduplication | Complete | src/generators/content-deduplicator.ts |
-      | Source Mapping Validator | Complete | src/generators/source-mapping-validator.ts |
-      | Warning Collector | Complete | src/generators/warning-collector.ts |
-      | Migrate console.warn calls | Complete | src/generators/source-mapper.ts |
-      | Integration tests | Complete | tests/features/doc-generation/robustness-integration.feature |
+      | Content Deduplication | complete | src/generators/content-deduplicator.ts |
+      | Source Mapping Validator | complete | src/generators/source-mapping-validator.ts |
+      | Warning Collector | complete | src/generators/warning-collector.ts |
+      | Migrate console.warn calls | complete | src/generators/source-mapper.ts |
+      | Integration tests | complete | tests/features/doc-generation/robustness-integration.feature |
 
   # ============================================================================
   # SCENARIOS: Content Deduplication

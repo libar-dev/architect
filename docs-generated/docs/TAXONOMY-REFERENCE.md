@@ -166,7 +166,7 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[]
  * @libar-docs-pattern StatusValues
  * @libar-docs-status completed
  * @libar-docs-core
- * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS
+ * @libar-docs-extract-shapes PROCESS_STATUS_VALUES, ProcessStatusValue, ACCEPTED_STATUS_VALUES, AcceptedStatusValue, DEFAULT_STATUS, VALID_PROCESS_STATUS_SET
  *
  * ## Process Workflow Status Values
  *
@@ -218,6 +218,13 @@ type AcceptedStatusValue = (typeof ACCEPTED_STATUS_VALUES)[number];
  * Default status for new items
  */
 const DEFAULT_STATUS: ProcessStatusValue;
+```
+
+```typescript
+/**
+ * Pre-built set of valid process statuses for O(1) membership checks.
+ */
+const VALID_PROCESS_STATUS_SET: ReadonlySet<string>;
 ```
 
 ### Status Values (from this decision (rule: status values))

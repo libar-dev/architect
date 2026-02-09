@@ -60,10 +60,10 @@
 
 ## Deliverables
 
-- Release boundary detector (git tags) (Pending)
-- Pattern diff analyzer (Pending)
-- Architecture delta section renderer (Pending)
-- arch-delta generator config (Pending)
+- Release boundary detector (git tags) (pending)
+- Pattern diff analyzer (pending)
+- Architecture delta section renderer (pending)
+- arch-delta generator config (pending)
 
 ---
 

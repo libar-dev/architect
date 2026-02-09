@@ -78,9 +78,9 @@ _Verified by: Suggest next phase number_
 
 ## Deliverables
 
-- Phase number validator (Pending)
-- Duplicate detection (Pending)
-- Next phase suggester (Pending)
+- Phase number validator (pending)
+- Duplicate detection (pending)
+- Next phase suggester (pending)
 
 ---
 

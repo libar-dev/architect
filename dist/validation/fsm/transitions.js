@@ -29,10 +29,7 @@
  * - Use `isValidTransition()` to validate proposed status changes
  * - Use `getValidTransitionsFrom()` to show available options
  */
-/**
- * Default tag prefix for error messages when no registry is provided.
- */
-const DEFAULT_TAG_PREFIX = '@libar-docs-';
+import { DEFAULT_TAG_PREFIX } from '../../config/defaults.js';
 /**
  * Valid FSM transitions matrix
  *

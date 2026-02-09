@@ -26,8 +26,8 @@ Feature: PRD Implementation Section
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Implementation collector | planned | delivery-process/src/generators/ | Yes | unit |
-      | PRD section renderer | planned | delivery-process/src/renderable/ | Yes | unit |
+      | Implementation collector | pending | delivery-process/src/generators/ | Yes | unit |
+      | PRD section renderer | pending | delivery-process/src/renderable/ | Yes | unit |
 
   # ============================================================================
   # RULE 1: Implementation Discovery via Relationship Index

@@ -74,10 +74,6 @@ export declare function stripLeadingHeaders(text: string): string;
  */
 export declare function stripMarkdown(text: string): string;
 /**
- * Extract first sentence from description
- */
-export declare function extractFirstSentence(description: string, maxLength?: number): string;
-/**
  * Extract summary for pattern (first complete sentence, truncated if needed)
  *
  * Combines multiple lines to find a complete sentence, respecting max length.

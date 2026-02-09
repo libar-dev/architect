@@ -34,14 +34,14 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | MCP server entry point | planned | src/mcp/server.ts | Yes | integration |
-      | MCP tool definitions | planned | src/mcp/tools.ts | Yes | unit |
-      | MCP session state management | planned | src/mcp/session.ts | Yes | unit |
-      | CLAUDE.md context layer generator | planned | src/generators/claude-md-generator.ts | Yes | unit |
-      | Cross-package dependency analyzer | planned | src/api/cross-package.ts | Yes | unit |
-      | Package-scoped filter flag | planned | src/cli/process-api.ts | Yes | integration |
-      | Multi-package config support | planned | src/config/multi-package.ts | Yes | unit |
-      | Per-package coverage report | planned | src/api/coverage-analyzer.ts | Yes | unit |
+      | MCP server entry point | pending | src/mcp/server.ts | Yes | integration |
+      | MCP tool definitions | pending | src/mcp/tools.ts | Yes | unit |
+      | MCP session state management | pending | src/mcp/session.ts | Yes | unit |
+      | CLAUDE.md context layer generator | pending | src/generators/claude-md-generator.ts | Yes | unit |
+      | Cross-package dependency analyzer | pending | src/api/cross-package.ts | Yes | unit |
+      | Package-scoped filter flag | pending | src/cli/process-api.ts | Yes | integration |
+      | Multi-package config support | pending | src/config/multi-package.ts | Yes | unit |
+      | Per-package coverage report | pending | src/api/coverage-analyzer.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: MCP Server Mode

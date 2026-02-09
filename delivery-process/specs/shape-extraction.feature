@@ -76,15 +76,15 @@ Feature: TypeScript Shape Extraction for Documentation
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | extract-shapes tag definition | Done | taxonomy/registry-builder.ts | Yes | unit |
-      | AST shape extractor | Done | extractor/shape-extractor.ts | Yes | unit |
-      | Interface extraction | Done | extractor/shape-extractor.ts | Yes | unit |
-      | Type alias extraction | Done | extractor/shape-extractor.ts | Yes | unit |
-      | Enum extraction | Done | extractor/shape-extractor.ts | Yes | unit |
-      | Function signature extraction | Done | extractor/shape-extractor.ts | Yes | unit |
-      | ExtractedPattern schema extension | Done | validation-schemas/extracted-pattern.ts | Yes | unit |
-      | Shape rendering in codecs | Done | renderable/codecs/*.ts | Yes | unit |
-      | Shape extraction behavior test | Done | tests/features/extraction/shape-extraction.feature | Yes | behavior |
+      | extract-shapes tag definition | complete | taxonomy/registry-builder.ts | Yes | unit |
+      | AST shape extractor | complete | extractor/shape-extractor.ts | Yes | unit |
+      | Interface extraction | complete | extractor/shape-extractor.ts | Yes | unit |
+      | Type alias extraction | complete | extractor/shape-extractor.ts | Yes | unit |
+      | Enum extraction | complete | extractor/shape-extractor.ts | Yes | unit |
+      | Function signature extraction | complete | extractor/shape-extractor.ts | Yes | unit |
+      | ExtractedPattern schema extension | complete | validation-schemas/extracted-pattern.ts | Yes | unit |
+      | Shape rendering in codecs | complete | renderable/codecs/*.ts | Yes | unit |
+      | Shape extraction behavior test | complete | tests/features/extraction/shape-extraction.feature | Yes | behavior |
 
   # ============================================================================
   # RULE 1: Tag Definition

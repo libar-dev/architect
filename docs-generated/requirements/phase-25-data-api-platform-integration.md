@@ -173,14 +173,14 @@ _Verified by: Pre-commit validates annotation consistency, Watch mode re-generat
 
 ## Deliverables
 
-- MCP server entry point (planned)
-- MCP tool definitions (planned)
-- MCP session state management (planned)
-- CLAUDE.md context layer generator (planned)
-- Cross-package dependency analyzer (planned)
-- Package-scoped filter flag (planned)
-- Multi-package config support (planned)
-- Per-package coverage report (planned)
+- MCP server entry point (pending)
+- MCP tool definitions (pending)
+- MCP session state management (pending)
+- CLAUDE.md context layer generator (pending)
+- Cross-package dependency analyzer (pending)
+- Package-scoped filter flag (pending)
+- Multi-package config support (pending)
+- Per-package coverage report (pending)
 
 ---
 

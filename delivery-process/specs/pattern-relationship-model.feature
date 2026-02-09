@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:PatternRelationshipModel
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
 @libar-docs-phase:99
 @libar-docs-release:v1.0.0
 @libar-docs-effort:2w
@@ -36,15 +37,15 @@ Feature: Pattern Relationship Model
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location | Tests | Test Type |
-      | Implements tag in taxonomy registry | completed | src/taxonomy/registry-builder.ts | Yes | unit |
-      | Extends tag in taxonomy registry | completed | src/taxonomy/registry-builder.ts | Yes | unit |
-      | DocDirective schema update | completed | src/validation-schemas/doc-directive.ts | Yes | unit |
-      | ExtractedPattern schema update | completed | src/validation-schemas/extracted-pattern.ts | Yes | unit |
-      | RelationshipEntry schema update | completed | src/validation-schemas/master-dataset.ts | Yes | unit |
-      | Relationship index enhancement | completed | src/generators/pipeline/transform-dataset.ts | Yes | unit |
-      | Mermaid graph enhancement | completed | src/renderable/codecs/patterns.ts | Yes | unit |
-      | Pattern detail implementations section | completed | src/renderable/codecs/patterns.ts | Yes | unit |
-      | Linter rules for relationship validation | completed | src/lint/rules.ts | Yes | unit |
+      | Implements tag in taxonomy registry | complete | src/taxonomy/registry-builder.ts | Yes | unit |
+      | Extends tag in taxonomy registry | complete | src/taxonomy/registry-builder.ts | Yes | unit |
+      | DocDirective schema update | complete | src/validation-schemas/doc-directive.ts | Yes | unit |
+      | ExtractedPattern schema update | complete | src/validation-schemas/extracted-pattern.ts | Yes | unit |
+      | RelationshipEntry schema update | complete | src/validation-schemas/master-dataset.ts | Yes | unit |
+      | Relationship index enhancement | complete | src/generators/pipeline/transform-dataset.ts | Yes | unit |
+      | Mermaid graph enhancement | complete | src/renderable/codecs/patterns.ts | Yes | unit |
+      | Pattern detail implementations section | complete | src/renderable/codecs/patterns.ts | Yes | unit |
+      | Linter rules for relationship validation | complete | src/lint/rules.ts | Yes | unit |
 
   # ============================================================================
   # RULE 1: Realization Relationship (implements)
