@@ -192,7 +192,7 @@ Scenario Outline: Protection level from status
 
   Examples:
     | status    | protection |
-    | complete | hard       |
+    | completed | hard       |
     | active    | scope      |
     | roadmap   | none       |
 ```
@@ -601,6 +601,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - Then the response contains active patterns in summary format
 - And the response includes metadata (pattern count, cache status)
 
+**MCP tool invocation with invalid parameters returns error**
+
+- Given the MCP server is running with loaded dataset
+- When Claude Code invokes a tool with invalid parameters
+- Then the response contains a structured error with code and message
+- And the MCP server remains operational for subsequent requests
+
 **Generate CLAUDE.md context layer for bounded context**
 
 - Given annotated patterns in the "orders" bounded context
@@ -616,6 +623,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - Then the CLAUDE.md section shows the updated status
 - And the session workflow section reflects the new state
 
+**Context layer for bounded context with no annotations**
+
+- Given a bounded context directory with no @libar-docs annotations
+- When running "process-api generate-context-layer --context empty-context"
+- Then the output indicates no patterns found in the context
+- And the CLAUDE.md section contains a placeholder with discovery guidance
+
 **Cross-package dependency view**
 
 - Given patterns across "platform-core" and "platform-bc" packages
@@ -630,6 +644,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - Then only patterns from "platform-core" are returned
 - And the package filter composes with other filters
 
+**Query for non-existent package returns empty result**
+
+- Given patterns from "platform-core" and "platform-bc" packages
+- When running "process-api list --package non-existent-package"
+- Then the output is an empty result set
+- And no error is raised
+
 **Pre-commit validates annotation consistency**
 
 - Given a staged file adds a uses tag referencing "NonExistentPattern"
@@ -643,6 +664,13 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 - When a source file is modified
 - Then the architecture docs are regenerated automatically
 - And only affected doc sections are updated
+
+**Pre-commit on clean commit with no annotation changes**
+
+- Given staged files contain no @libar-docs annotations
+- When the pre-commit hook runs
+- Then validation passes without errors
+- And no annotation warnings are emitted
 
 #### Business Rules
 
@@ -672,7 +700,7 @@ _Verified by: Per-subcommand help output, Dry-run shows pipeline scope, Validati
 
     **Verified by:** MCP server starts, MCP tool invocation, Auto-refresh on change
 
-_Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation returns structured result_
+_Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation returns structured result, MCP tool invocation with invalid parameters returns error_
 
 **Process state can be auto-generated as CLAUDE.md context sections**
 
@@ -687,7 +715,7 @@ _Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation retu
 
     **Verified by:** Generate context layer, Context layer is up-to-date
 
-_Verified by: Generate CLAUDE.md context layer for bounded context, Context layer reflects current process state_
+_Verified by: Generate CLAUDE.md context layer for bounded context, Context layer reflects current process state, Context layer for bounded context with no annotations_
 
 **Cross-package views show dependencies spanning multiple packages**
 
@@ -702,7 +730,7 @@ _Verified by: Generate CLAUDE.md context layer for bounded context, Context laye
 
     **Verified by:** Cross-package dependency view, Package-scoped filtering
 
-_Verified by: Cross-package dependency view, Package-scoped query filtering_
+_Verified by: Cross-package dependency view, Package-scoped query filtering, Query for non-existent package returns empty result_
 
 **Process validation integrates with git hooks and file watching**
 
@@ -716,7 +744,7 @@ _Verified by: Cross-package dependency view, Package-scoped query filtering_
 
     **Verified by:** Pre-commit annotation validation, Watch mode re-generation
 
-_Verified by: Pre-commit validates annotation consistency, Watch mode re-generates on file change_
+_Verified by: Pre-commit validates annotation consistency, Watch mode re-generates on file change, Pre-commit on clean commit with no annotation changes_
 
 ### 📋 Data API Relationship Graph
 
@@ -784,6 +812,19 @@ _Verified by: Pre-commit validates annotation consistency, Watch mode re-generat
 - When running "process-api graph impact LeafPattern"
 - Then the output indicates no downstream impact
 
+**Find path between connected patterns**
+
+- Given a chain: EventStore -> Saga -> Orchestrator -> Workflow
+- When running "process-api graph path EventStore Workflow"
+- Then the output shows the chain: EventStore -> Saga -> Orchestrator -> Workflow
+- And each hop shows the relationship type
+
+**No path between disconnected patterns**
+
+- Given "PatternA" and "PatternZ" with no connecting relationships
+- When running "process-api graph path PatternA PatternZ"
+- Then the output indicates no path exists between the patterns
+
 **Detect dangling references**
 
 - Given a pattern with uses "NonExistentPattern"
@@ -835,6 +876,21 @@ _Verified by: Recursive graph traversal, Bidirectional traversal with depth limi
     **Verified by:** Impact with transitive dependents, Impact with no dependents
 
 _Verified by: Impact analysis shows transitive dependents, Impact analysis for leaf pattern_
+
+**Path finding discovers relationship chains between two patterns**
+
+**Invariant:** Path finding returns the shortest chain of relationships
+    connecting two patterns, or indicates no path exists. Traversal considers
+    all relationship types (uses, usedBy, dependsOn, enables).
+
+    **Rationale:** Understanding how two seemingly unrelated patterns connect
+    helps agents assess indirect dependencies before making changes. When
+    pattern A and pattern D are connected through B and C, modifying A
+    requires understanding that chain.
+
+    **Verified by:** Path between connected patterns, No path between disconnected patterns
+
+_Verified by: Find path between connected patterns, No path between disconnected patterns_
 
 **Graph health commands detect broken references and isolated patterns**
 

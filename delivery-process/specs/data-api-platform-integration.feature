@@ -87,6 +87,13 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
       Then the response contains active patterns in summary format
       And the response includes metadata (pattern count, cache status)
 
+    @acceptance-criteria @edge-case
+    Scenario: MCP tool invocation with invalid parameters returns error
+      Given the MCP server is running with loaded dataset
+      When Claude Code invokes a tool with invalid parameters
+      Then the response contains a structured error with code and message
+      And the MCP server remains operational for subsequent requests
+
   # ============================================================================
   # RULE 2: CLAUDE.md Context Layer Generation
   # ============================================================================
@@ -119,6 +126,13 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
       Then the CLAUDE.md section shows the updated status
       And the session workflow section reflects the new state
 
+    @acceptance-criteria @edge-case
+    Scenario: Context layer for bounded context with no annotations
+      Given a bounded context directory with no @libar-docs annotations
+      When running "process-api generate-context-layer --context empty-context"
+      Then the output indicates no patterns found in the context
+      And the CLAUDE.md section contains a placeholder with discovery guidance
+
   # ============================================================================
   # RULE 3: Monorepo Cross-Package Queries
   # ============================================================================
@@ -150,6 +164,13 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
       Then only patterns from "platform-core" are returned
       And the package filter composes with other filters
 
+    @acceptance-criteria @edge-case
+    Scenario: Query for non-existent package returns empty result
+      Given patterns from "platform-core" and "platform-bc" packages
+      When running "process-api list --package non-existent-package"
+      Then the output is an empty result set
+      And no error is raised
+
   # ============================================================================
   # RULE 4: Git Hook and Watch Integration
   # ============================================================================
@@ -179,3 +200,10 @@ Feature: Data API Platform Integration - MCP Server and Monorepo Support
       When a source file is modified
       Then the architecture docs are regenerated automatically
       And only affected doc sections are updated
+
+    @acceptance-criteria @edge-case
+    Scenario: Pre-commit on clean commit with no annotation changes
+      Given staged files contain no @libar-docs annotations
+      When the pre-commit hook runs
+      Then validation passes without errors
+      And no annotation warnings are emitted

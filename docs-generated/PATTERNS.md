@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 101/157 (64% complete)
+**Overall:** [█████████████░░░░░░░] 102/163 (63% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 101 |
-| 🚧 Active | 27 |
-| 📋 Planned | 29 |
-| **Total** | 157 |
+| ✅ Completed | 102 |
+| 🚧 Active | 26 |
+| 📋 Planned | 35 |
+| **Total** | 163 |
 
 ---
 
@@ -37,7 +37,7 @@
 - [Opportunity 8](#opportunity-8) (1)
 - [Pattern](#pattern) (11)
 - [Scanner](#scanner) (2)
-- [Status](#status) (4)
+- [Status](#status) (10)
 - [Validation](#validation) (11)
 
 ---
@@ -113,6 +113,7 @@
 | ✅ Planning Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for planning outputs: - PLANNING-CHECKLIST.md (pre-planning... |
 | ✅ Pr Changes Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PR-scoped output. |
 | ✅ Process Guard Linter | DDD | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
+| ✅ Process State API CLI | DDD | completed | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | ✅ Public API | Core | completed | Main entry point for the @libar-dev/delivery-process package. |
 | ✅ Regex Builders | Core | completed | Type-safe regex factory functions for tag detection and normalization. |
 | ✅ Renderable Document | Core | completed | Universal intermediate format for all generated documentation. |
@@ -170,16 +171,18 @@
 | 🚧 Process Guard Module | Lint | active | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
 | 🚧 Process Guard Types | Lint | active | :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -... |
 | 🚧 Process State API | Core | active | TypeScript interface for querying delivery process state. |
-| 🚧 Process State API CLI | DDD | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
+| 📋 ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context | Status | planned | Extends the existing `arch` subcommand with deeper analysis and adds new top-level discovery commands (tags, sources). |
 | 📋 Business Rules Generator | DDD | planned | Business Value: Enable stakeholders to understand domain constraints without reading implementation details or full... |
 | 📋 Claude Module Generation | DDD | planned | Problem: CLAUDE.md modules are hand-written markdown files that drift from source code over time. |
 | 📋 Cli Behavior Testing | DDD | planned | All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns, generate-tag-taxonomy) have zero... |
 | 📋 Codec Behavior Testing | DDD | planned | Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs: - PatternsDocumentCodec (tested) -... |
+| 📋 ContextAssembler — Session-Oriented Context Bundle Builder | Status | planned | Pure function composition over MasterDataset. |
+| 📋 ContextFormatter — Plain Text Renderer for Context Bundles | Status | planned | First plain-text formatter in the codebase. |
 | 📋 CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection | Status | planned | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 📋 Cross Source Validation | DDD | planned | The delivery process uses dual sources (TypeScript phase files and Gherkin feature files) that must remain consistent. |
 | 📋 Data API CLI Ergonomics | DDD | planned | The process-api CLI runs the full pipeline (scan, extract, transform) on every invocation, taking 2-5 seconds. |
@@ -187,9 +190,12 @@
 | 📋 Data API Relationship Graph | DDD | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
 | 📋 DoD Validation | Opportunity 2 | planned | Phase completion is currently subjective ("done when we feel it"). |
 | 📋 Effort Variance Tracking | Opportunity 3 | planned | No systematic way to track planned vs actual effort. |
+| 📋 FuzzyMatcher — Pattern Name Fuzzy Search | Status | planned | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
 | 📋 Generator Infrastructure Testing | DDD | planned | Core generator infrastructure lacks behavior specs: - `src/generators/orchestrator.ts` (~420 lines) - Main entry... |
 | 📋 HandoffGenerator — Session-End State Summary | Status | planned | Pure function that assembles a handoff document from ProcessStateAPI and MasterDataset. |
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
+| 📋 OutputPipeline — CLI Output Shaping and Formatting | Status | planned | Post-processing pipeline that transforms raw API results into shaped CLI output. |
+| 📋 PatternSummarizer — Compact Pattern Projection | Status | planned | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
@@ -302,7 +308,7 @@
 
 ### DDD
 
-14/34 complete (41%)
+15/34 complete (44%)
 
 - [✅ Data API Architecture Queries](patterns/data-api-architecture-queries.md)
 - [✅ Data API Context Assembly](patterns/data-api-context-assembly.md)
@@ -315,10 +321,10 @@
 - [✅ Pattern Relationship Model](patterns/pattern-relationship-model.md)
 - [✅ Phase State Machine Validation](patterns/phase-state-machine-validation.md)
 - [✅ Process Guard Linter](patterns/process-guard-linter.md)
+- [✅ Process State API CLI](patterns/process-state-apicli.md)
 - [✅ Shape Extraction](patterns/shape-extraction.md)
 - [✅ TypeScript Taxonomy Implementation](patterns/type-script-taxonomy-implementation.md)
 - [✅ Universal Doc Generator Robustness](patterns/universal-doc-generator-robustness.md)
-- [🚧 Process State API CLI](patterns/process-state-apicli.md)
 - [🚧 Process State API Relationship Queries](patterns/process-state-api-relationship-queries.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
@@ -469,10 +475,16 @@
 
 ### Status
 
-0/4 complete (0%)
+0/10 complete (0%)
 
+- [📋 ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context](patterns/arch-queries-neighborhood-comparison-tags-sources-and-cli-context.md)
+- [📋 ContextAssembler — Session-Oriented Context Bundle Builder](patterns/context-assembler-session-oriented-context-bundle-builder.md)
+- [📋 ContextFormatter — Plain Text Renderer for Context Bundles](patterns/context-formatter-plain-text-renderer-for-context-bundles.md)
 - [📋 CoverageAnalyzer — Annotation Coverage and Taxonomy Gap Detection](patterns/coverage-analyzer-annotation-coverage-and-taxonomy-gap-detection.md)
+- [📋 FuzzyMatcher — Pattern Name Fuzzy Search](patterns/fuzzy-matcher-pattern-name-fuzzy-search.md)
 - [📋 HandoffGenerator — Session-End State Summary](patterns/handoff-generator-session-end-state-summary.md)
+- [📋 OutputPipeline — CLI Output Shaping and Formatting](patterns/output-pipeline-cli-output-shaping-and-formatting.md)
+- [📋 PatternSummarizer — Compact Pattern Projection](patterns/pattern-summarizer-compact-pattern-projection.md)
 - [📋 ScopeValidator — Pre-flight Session Readiness Checker](patterns/scope-validator-pre-flight-session-readiness-checker.md)
 - [📋 StubResolver — Design Stub Discovery and Resolution](patterns/stub-resolver-design-stub-discovery-and-resolution.md)
 
@@ -504,9 +516,24 @@ Pattern relationships and dependencies:
 graph TD
     StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
     StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    PatternSummarizer___Compact_Pattern_Projection --> ProcessStateAPI
+    PatternSummarizer___Compact_Pattern_Projection ..-> DataAPIOutputShaping
+    OutputPipeline___CLI_Output_Shaping_and_Formatting --> PatternSummarizer
+    OutputPipeline___CLI_Output_Shaping_and_Formatting ..-> DataAPIOutputShaping
+    FuzzyMatcher___Pattern_Name_Fuzzy_Search ..-> DataAPIOutputShaping
+    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles --> ContextAssembler
+    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles ..-> DataAPIContextAssembly
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> ProcessStateAPI
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> MasterDataset
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> PatternSummarizer
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
     CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
     CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
     CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
@@ -532,6 +559,12 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
+    LintRules ..-> PatternRelationshipModel
+    LintModule --> LintRules
+    LintModule --> LintEngine
+    LintEngine --> LintRules
+    LintEngine --> CodecUtils
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -542,12 +575,6 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
-    LintRules ..-> PatternRelationshipModel
-    LintModule --> LintRules
-    LintModule --> LintEngine
-    LintEngine --> LintRules
-    LintEngine --> CodecUtils
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser

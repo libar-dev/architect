@@ -258,7 +258,7 @@ _Verified by: Multi-pattern context merges dependencies, Multi-pattern context w
     aggregate results. Implementation readiness checks for specific patterns
     live in DataAPIDesignSessionSupport's `scope-validate` command.
 
-    **Overview output:**
+    **Overview output** (uses normalizeStatus display aliases: planned = roadmap + deferred):
     | Section | Content |
     | Progress | N patterns (X completed, Y active, Z planned) = P% |
     | Active phases | Currently in-progress phases with pattern counts |
@@ -282,6 +282,8 @@ _Verified by: Executive overview, Overview with empty pipeline returns zero-stat
 
 Files that implement this pattern:
 
+- [`context-assembler.ts`](../../delivery-process/stubs/data-api-context-assembly/context-assembler.ts) - ## ContextAssembler — Session-Oriented Context Bundle Builder
+- [`context-formatter.ts`](../../delivery-process/stubs/data-api-context-assembly/context-formatter.ts) - ## ContextFormatter — Plain Text Renderer for Context Bundles
 - [`context-assembler.ts`](../../src/api/context-assembler.ts) - ## ContextAssembler — Session-Oriented Context Bundle Builder
 - [`context-formatter.ts`](../../src/api/context-formatter.ts) - ## ContextFormatter — Plain Text Renderer for Context Bundles
 

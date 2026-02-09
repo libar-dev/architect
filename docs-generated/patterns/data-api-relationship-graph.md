@@ -72,6 +72,19 @@
 - When running "process-api graph impact LeafPattern"
 - Then the output indicates no downstream impact
 
+**Find path between connected patterns**
+
+- Given a chain: EventStore -> Saga -> Orchestrator -> Workflow
+- When running "process-api graph path EventStore Workflow"
+- Then the output shows the chain: EventStore -> Saga -> Orchestrator -> Workflow
+- And each hop shows the relationship type
+
+**No path between disconnected patterns**
+
+- Given "PatternA" and "PatternZ" with no connecting relationships
+- When running "process-api graph path PatternA PatternZ"
+- Then the output indicates no path exists between the patterns
+
 **Detect dangling references**
 
 - Given a pattern with uses "NonExistentPattern"
@@ -123,6 +136,21 @@ _Verified by: Recursive graph traversal, Bidirectional traversal with depth limi
     **Verified by:** Impact with transitive dependents, Impact with no dependents
 
 _Verified by: Impact analysis shows transitive dependents, Impact analysis for leaf pattern_
+
+**Path finding discovers relationship chains between two patterns**
+
+**Invariant:** Path finding returns the shortest chain of relationships
+    connecting two patterns, or indicates no path exists. Traversal considers
+    all relationship types (uses, usedBy, dependsOn, enables).
+
+    **Rationale:** Understanding how two seemingly unrelated patterns connect
+    helps agents assess indirect dependencies before making changes. When
+    pattern A and pattern D are connected through B and C, modifying A
+    requires understanding that chain.
+
+    **Verified by:** Path between connected patterns, No path between disconnected patterns
+
+_Verified by: Find path between connected patterns, No path between disconnected patterns_
 
 **Graph health commands detect broken references and isolated patterns**
 

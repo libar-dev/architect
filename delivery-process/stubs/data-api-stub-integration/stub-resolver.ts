@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIStubIntegration
  * @libar-docs-uses ProcessStateAPI
@@ -73,7 +74,7 @@ export interface StubSummary {
  * @returns Array of patterns identified as stubs
  */
 export function findStubPatterns(_dataset: unknown): readonly unknown[] {
-  throw new Error('DataAPIStubIntegration not yet implemented — roadmap pattern');
+  throw new Error('DataAPIStubIntegration not yet implemented - roadmap pattern');
 }
 
 /**
@@ -95,7 +96,7 @@ export function resolveStubs(
   _baseDir: string,
   _fileExists?: (path: string) => boolean
 ): readonly StubResolution[] {
-  throw new Error('DataAPIStubIntegration not yet implemented — roadmap pattern');
+  throw new Error('DataAPIStubIntegration not yet implemented - roadmap pattern');
 }
 
 /**
@@ -110,7 +111,7 @@ export function resolveStubs(
 export function groupStubsByPattern(
   _resolutions: readonly StubResolution[]
 ): readonly StubSummary[] {
-  throw new Error('DataAPIStubIntegration not yet implemented — roadmap pattern');
+  throw new Error('DataAPIStubIntegration not yet implemented - roadmap pattern');
 }
 
 /**
@@ -126,7 +127,7 @@ export function groupStubsByPattern(
 export function extractDecisionItems(
   _description: string
 ): readonly { id: string; description: string; pdr: string | undefined }[] {
-  throw new Error('DataAPIStubIntegration not yet implemented — roadmap pattern');
+  throw new Error('DataAPIStubIntegration not yet implemented - roadmap pattern');
 }
 
 /**
@@ -142,6 +143,6 @@ export function extractDecisionItems(
 export function findPdrReferences(
   _patterns: readonly unknown[],
   _pdrNumber: string
-): readonly { pattern: string; source: 'description' | 'adr' | 'seeAlso' }[] {
-  throw new Error('DataAPIStubIntegration not yet implemented — roadmap pattern');
+): readonly { pattern: string; source: 'description' | 'seeAlso'; filePath: string }[] {
+  throw new Error('DataAPIStubIntegration not yet implemented - roadmap pattern');
 }

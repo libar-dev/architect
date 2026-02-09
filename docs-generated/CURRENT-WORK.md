@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall Progress:** [█████████████░░░░░░░] 101/157 (64%)
+**Overall Progress:** [█████████████░░░░░░░] 102/163 (63%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 157 |
-| Completed | 101 |
-| Active | 27 |
-| Planned | 29 |
+| Total Patterns | 163 |
+| Completed | 102 |
+| Active | 26 |
+| Planned | 35 |
 | Active Phases | 2 |
 
 ---
@@ -23,11 +23,10 @@
 
 ### 🚧 ProcessStateAPIRelationshipQueries
 
-[░░░░░░░░░░░░░░░] 0/2 0% complete (0 done, 2 active)
+[████████░░░░░░░] 1/2 50% complete (1 done, 1 active)
 
 | Pattern | Description |
 | --- | --- |
-| 🚧 Process State API CLI | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 🚧 Process State API Relationship Queries | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 
 #### Deliverables
@@ -36,12 +35,6 @@
 - 🔄 Inheritance hierarchy queries
 - ✅ ProcessStateAPI type extensions
 - 🔄 Relationship query step definitions
-- ✅ process:query CLI command
-- ✅ CLI argument parser
-- ✅ JSON output formatter
-- ⏸️ Text output formatter
-- ✅ Root package.json script
-- ✅ CLAUDE.md documentation update
 
 [View ProcessStateAPIRelationshipQueries details →](current/phase-24-process-state-api-relationship-queries.md)
 
@@ -63,7 +56,6 @@
 
 | Pattern | Phase | Effort | Description |
 | --- | --- | --- | --- |
-| 🚧 Process State API CLI | Phase 24 | 2d | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 🚧 Process State API Relationship Queries | Phase 24 | 3d | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |

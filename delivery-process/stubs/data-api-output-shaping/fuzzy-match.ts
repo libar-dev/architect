@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-used-by ProcessAPICLIImpl
@@ -60,7 +61,7 @@ export function fuzzyMatchPatterns(
   _patternNames: readonly string[],
   _maxResults?: number
 ): readonly FuzzyMatch[] {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
 
 /**
@@ -77,7 +78,7 @@ export function findBestMatch(
   _query: string,
   _patternNames: readonly string[]
 ): FuzzyMatch | undefined {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
 
 /**
@@ -91,5 +92,5 @@ export function findBestMatch(
  * @returns Edit distance (0 = identical)
  */
 export function levenshteinDistance(_a: string, _b: string): number {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }

@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIArchitectureQueries
  * @libar-docs-uses ProcessStateAPI, MasterDataset, Pattern Scanner
@@ -126,8 +127,8 @@ export interface IntegrationPoint {
   readonly fromContext: string;
   readonly to: string;
   readonly toContext: string;
-  /** Relationship type: 'uses', 'usedBy', 'dependsOn', 'enables'. */
-  readonly relationship: string;
+  /** Relationship type. */
+  readonly relationship: 'uses' | 'usedBy' | 'dependsOn' | 'enables';
 }
 
 /**
@@ -249,7 +250,7 @@ export function computeNeighborhood(
   _name: string,
   _dataset: unknown
 ): NeighborhoodResult | undefined {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }
 
 /**
@@ -271,7 +272,7 @@ export function compareContexts(
   _ctx2: string,
   _dataset: unknown
 ): ContextComparison | undefined {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }
 
 /**
@@ -291,7 +292,7 @@ export function compareContexts(
 export function aggregateTagUsage(
   _dataset: unknown
 ): TagUsageReport {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }
 
 /**
@@ -311,5 +312,5 @@ export function aggregateTagUsage(
 export function buildSourceInventory(
   _dataset: unknown
 ): SourceInventory {
-  throw new Error('DataAPIArchitectureQueries not yet implemented — roadmap pattern');
+  throw new Error('DataAPIArchitectureQueries not yet implemented - roadmap pattern');
 }

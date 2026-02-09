@@ -5,7 +5,7 @@
 @libar-docs-pattern:ADR004GherkinOnlyTesting
 @libar-docs-phase:43
 @libar-docs-status:completed
-@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
+@libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Process
 Feature: ADR-004 - Gherkin-Only Testing Policy
@@ -44,7 +44,7 @@ Feature: ADR-004 - Gherkin-Only Testing Policy
     Given the following deliverables:
       | Deliverable | Status | Tests | Location | Release |
       | Policy definition in CLAUDE.md | complete | No | CLAUDE.md | v0.3.0 |
-      | Test migration manifest | pending | No | docs/test-migration-manifest.md | v0.3.2 |
+      | Test migration manifest | superseded | No | docs/test-migration-manifest.md | v0.3.2 |
 
   @acceptance-criteria
   Scenario: Gherkin-only policy enforced

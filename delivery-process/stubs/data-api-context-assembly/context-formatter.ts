@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIContextAssembly
  * @libar-docs-uses ContextAssembler
@@ -72,7 +73,7 @@ import type {
  * @returns Formatted plain text string
  */
 export function formatContextBundle(_bundle: ContextBundle): string {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }
 
 // ---------------------------------------------------------------------------
@@ -96,7 +97,7 @@ export function formatContextBundle(_bundle: ContextBundle): string {
  * @returns Formatted tree as indented text
  */
 export function formatDepTree(_tree: DepTreeNode): string {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }
 
 // ---------------------------------------------------------------------------
@@ -125,7 +126,7 @@ export function formatDepTree(_tree: DepTreeNode): string {
  * @returns Formatted file list as plain text
  */
 export function formatFileReadingList(_list: FileReadingList): string {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }
 
 // ---------------------------------------------------------------------------
@@ -152,5 +153,5 @@ export function formatFileReadingList(_list: FileReadingList): string {
  * @returns Formatted overview as plain text
  */
 export function formatOverview(_overview: OverviewSummary): string {
-  throw new Error('DataAPIContextAssembly not yet implemented — roadmap pattern');
+  throw new Error('DataAPIContextAssembly not yet implemented - roadmap pattern');
 }

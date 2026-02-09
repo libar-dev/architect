@@ -137,8 +137,8 @@ _Verified by: All scope validation checks pass, Dependency blocker detected, FSM
     **Handoff output:**
     | Section | Source |
     | Session summary | Pattern name, session type, date |
-    | Completed | Deliverables with status "Complete" |
-    | In progress | Deliverables with status not "Complete" and not "planned" |
+    | Completed | Deliverables with status "complete" |
+    | In progress | Deliverables with status not "complete" and not "pending" |
     | Files modified | Git diff file list (if available) |
     | Discovered items | @discovered-gap, @discovered-improvement tags |
     | Blockers | Incomplete dependencies, open questions |

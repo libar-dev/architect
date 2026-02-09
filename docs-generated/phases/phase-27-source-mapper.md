@@ -503,10 +503,10 @@ import {
 
     | Benefit | How |
     | No ESLint exceptions | Stubs aren't in src/, no relaxation needed |
-    | Clear separation | specs/ = design, src/ = production |
+    | Clear separation | delivery-process/stubs/ = design, src/ = production |
     | Documentation source | Stubs with @extract-shapes generate API docs |
     | Safe iteration | Can refine stub APIs without breaking anything |
-    | Implementation signal | Moving from specs/ to src/ = implementation started |
+    | Implementation signal | Moving from delivery-process/stubs/ to src/ = implementation started |
 
     **Workflow:**
 

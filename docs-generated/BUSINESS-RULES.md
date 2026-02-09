@@ -5,7 +5,7 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 148 rules from 33 features across 1 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 149 rules from 33 features across 1 product areas.**
 
 ---
 
@@ -520,8 +520,8 @@
 | Section | Source |
 | --- | --- |
 | Session summary | Pattern name, session type, date |
-| Completed | Deliverables with status "Complete" |
-| In progress | Deliverables with status not "Complete" and not "planned" |
+| Completed | Deliverables with status "complete" |
+| In progress | Deliverables with status not "complete" and not "pending" |
 | Files modified | Git diff file list (if available) |
 | Discovered items | @discovered-gap, @discovered-improvement tags |
 | Blockers | Incomplete dependencies, open questions |
@@ -671,6 +671,14 @@
 - **Invariant:** Impact analysis answers "if I change X, what else is affected?" by walking `usedBy` + `enables` recursively.
 
 - **Rationale:** Before modifying a completed pattern (which requires unlock), understanding the blast radius prevents unintended breakage. Impact analysis is the reverse of dependency traversal -- it looks forward, not backward.
+
+
+
+#### Path finding discovers relationship chains between two patterns
+
+- **Invariant:** Path finding returns the shortest chain of relationships connecting two patterns, or indicates no path exists. Traversal considers all relationship types (uses, usedBy, dependsOn, enables).
+
+- **Rationale:** Understanding how two seemingly unrelated patterns connect helps agents assess indirect dependencies before making changes. When pattern A and pattern D are connected through B and C, modifying A requires understanding that chain.
 
 
 
@@ -998,10 +1006,10 @@ This POC demonstrates the doc-from-decision pattern by generating docs
 | Benefit | How |
 | --- | --- |
 | No ESLint exceptions | Stubs aren't in src/, no relaxation needed |
-| Clear separation | specs/ = design, src/ = production |
+| Clear separation | delivery-process/stubs/ = design, src/ = production |
 | Documentation source | Stubs with @extract-shapes generate API docs |
 | Safe iteration | Can refine stub APIs without breaking anything |
-| Implementation signal | Moving from specs/ to src/ = implementation started |
+| Implementation signal | Moving from delivery-process/stubs/ to src/ = implementation started |
 
 | Document | Decision Source |
 | --- | --- |

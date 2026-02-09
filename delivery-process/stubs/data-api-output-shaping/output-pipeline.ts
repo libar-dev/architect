@@ -1,4 +1,5 @@
 /**
+ * @libar-docs
  * @libar-docs-status roadmap
  * @libar-docs-implements DataAPIOutputShaping
  * @libar-docs-uses PatternSummarizer
@@ -131,7 +132,7 @@ export function applyOutputPipeline(
   _input: PipelineInput,
   _modifiers: OutputModifiers
 ): unknown {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
 
 /**
@@ -148,7 +149,7 @@ export function applyListFilters(
   _dataset: unknown,
   _filters: ListFilters
 ): readonly unknown[] {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
 
 /**
@@ -166,7 +167,7 @@ export function applyListFilters(
  * @returns Object with empty values removed
  */
 export function stripEmpty(_obj: unknown): unknown {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }
 
 /**
@@ -183,5 +184,5 @@ export function formatOutput(
   _envelope: unknown,
   _format: 'json' | 'compact'
 ): string {
-  throw new Error('DataAPIOutputShaping not yet implemented — roadmap pattern');
+  throw new Error('DataAPIOutputShaping not yet implemented - roadmap pattern');
 }

@@ -107,7 +107,37 @@ Feature: Data API Relationship Graph - Deep Dependency Analysis
       Then the output indicates no downstream impact
 
   # ============================================================================
-  # RULE 3: Graph Health Checks
+  # RULE 3: Path Finding
+  # ============================================================================
+
+  Rule: Path finding discovers relationship chains between two patterns
+
+    **Invariant:** Path finding returns the shortest chain of relationships
+    connecting two patterns, or indicates no path exists. Traversal considers
+    all relationship types (uses, usedBy, dependsOn, enables).
+
+    **Rationale:** Understanding how two seemingly unrelated patterns connect
+    helps agents assess indirect dependencies before making changes. When
+    pattern A and pattern D are connected through B and C, modifying A
+    requires understanding that chain.
+
+    **Verified by:** Path between connected patterns, No path between disconnected patterns
+
+    @acceptance-criteria @happy-path
+    Scenario: Find path between connected patterns
+      Given a chain: EventStore -> Saga -> Orchestrator -> Workflow
+      When running "process-api graph path EventStore Workflow"
+      Then the output shows the chain: EventStore -> Saga -> Orchestrator -> Workflow
+      And each hop shows the relationship type
+
+    @acceptance-criteria @edge-case
+    Scenario: No path between disconnected patterns
+      Given "PatternA" and "PatternZ" with no connecting relationships
+      When running "process-api graph path PatternA PatternZ"
+      Then the output indicates no path exists between the patterns
+
+  # ============================================================================
+  # RULE 4: Graph Health Checks
   # ============================================================================
 
   Rule: Graph health commands detect broken references and isolated patterns

@@ -52,7 +52,7 @@
  * See: PDR-002 (DD-1 through DD-7), DataAPIDesignSessionSupport spec Rule 2
  */
 
-import type { SessionType } from './context-assembler.js';
+import type { SessionType } from '../data-api-context-assembly/context-assembler.js';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -123,7 +123,7 @@ export function generateHandoff(
   _dataset: unknown,
   _options: HandoffOptions
 ): HandoffDocument {
-  throw new Error('DataAPIDesignSessionSupport not yet implemented — roadmap pattern');
+  throw new Error('DataAPIDesignSessionSupport not yet implemented - roadmap pattern');
 }
 
 // ---------------------------------------------------------------------------
@@ -165,5 +165,5 @@ export function generateHandoff(
  * @returns Formatted text string
  */
 export function formatHandoff(_doc: HandoffDocument): string {
-  throw new Error('DataAPIDesignSessionSupport not yet implemented — roadmap pattern');
+  throw new Error('DataAPIDesignSessionSupport not yet implemented - roadmap pattern');
 }

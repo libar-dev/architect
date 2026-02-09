@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [█████████████░░░░░░░] 101/157 (64%)
+**Patterns:** [█████████████░░░░░░░] 102/163 (63%)
 
 **Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 157 |
-| Completed | 101 |
-| Active | 27 |
-| Planned | 29 |
+| Total Patterns | 163 |
+| Completed | 102 |
+| Active | 26 |
+| Planned | 35 |
 
 ---
 
@@ -26,7 +26,7 @@
 | --- | --- | --- |
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
-| 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 0/2 | 0% |
+| 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 1/2 | 50% |
 | 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/9 | 56% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
@@ -64,11 +64,11 @@
 
 ### 🚧 ProcessStateAPIRelationshipQueries
 
-[░░░░░░░░░░░░░░░] 0/2 0% complete
+[████████░░░░░░░] 1/2 50% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 🚧 Process State API CLI | active | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
+| ✅ Process State API CLI | completed | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
 | 🚧 Process State API Relationship Queries | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 
 ---

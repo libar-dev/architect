@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall:** [███████░░░░░░░░░░░░░] 14/40 (35%)
+**Overall:** [████████░░░░░░░░░░░░] 15/40 (38%)
 
 | Metric | Value |
 | --- | --- |
 | Total Features | 40 |
-| Completed | 14 |
-| Active | 2 |
+| Completed | 15 |
+| Active | 1 |
 | Planned | 24 |
 | Product Areas | 2 |
 | User Roles | 1 |
@@ -24,7 +24,7 @@
 
 ### DeliveryProcess
 
-13/39 complete (33%)
+14/39 complete (36%)
 
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
 - [✅ Data API Context Assembly - replace explore agents with one command](requirements/phase-25-data-api-context-assembly.md)
@@ -37,9 +37,9 @@
 - [✅ Pattern Relationship Model](requirements/phase-99-pattern-relationship-model.md)
 - [✅ Phase State Machine Validation - ensure state machine rules are enforced programmatically](requirements/phase-100-phase-state-machine-validation.md)
 - [✅ Process Guard Linter - prevent accidental scope creep and locked file modifications](requirements/phase-99-process-guard-linter.md)
+- [✅ Process State API CLI - direct api queries for planning](requirements/phase-24-process-state-apicli.md)
 - [✅ Shape Extraction - eliminates type duplication in documentation](requirements/phase-26-shape-extraction.md)
 - [✅ Universal Doc Generator Robustness - enables monorepo scale doc generation](requirements/phase-28-universal-doc-generator-robustness.md)
-- [🚧 Process State API CLI - direct api queries for planning](requirements/phase-24-process-state-apicli.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
 - [📋 Architecture Delta - document release changes automatically](requirements/phase-100-architecture-delta.md)
 - [📋 Architecture Diagram Generation](requirements/phase-23-architecture-diagram-generation.md)
@@ -102,10 +102,10 @@
 | ✅ Pattern Relationship Model | DeliveryProcess | - | completed |
 | ✅ Phase State Machine Validation | DeliveryProcess | - | completed |
 | ✅ Process Guard Linter | DeliveryProcess | - | completed |
+| ✅ Process State API CLI | DeliveryProcess | - | completed |
 | ✅ Shape Extraction | DeliveryProcess | - | completed |
 | ✅ TypeScript Taxonomy Implementation | Taxonomy | Developer | completed |
 | ✅ Universal Doc Generator Robustness | DeliveryProcess | - | completed |
-| 🚧 Process State API CLI | DeliveryProcess | - | active |
 | 🚧 Process State API Relationship Queries | DeliveryProcess | - | active |
 | 📋 Architecture Delta | DeliveryProcess | - | planned |
 | 📋 Architecture Diagram Generation | DeliveryProcess | - | planned |

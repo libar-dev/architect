@@ -1,7 +1,8 @@
 @libar-docs
 @libar-docs-pattern:ProcessStateAPICLI
-@libar-docs-status:active
-@libar-docs-unlock-reason:Core-CLI-delivered-via-subcommand-design-superseded-by-DataAPI-specs
+@libar-docs-status:completed
+@libar-docs-completed:2026-02-09
+@libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
 @libar-docs-phase:24
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-effort:2d

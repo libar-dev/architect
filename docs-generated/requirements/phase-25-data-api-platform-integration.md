@@ -54,6 +54,13 @@
 - Then the response contains active patterns in summary format
 - And the response includes metadata (pattern count, cache status)
 
+**MCP tool invocation with invalid parameters returns error**
+
+- Given the MCP server is running with loaded dataset
+- When Claude Code invokes a tool with invalid parameters
+- Then the response contains a structured error with code and message
+- And the MCP server remains operational for subsequent requests
+
 **Generate CLAUDE.md context layer for bounded context**
 
 - Given annotated patterns in the "orders" bounded context
@@ -69,6 +76,13 @@
 - Then the CLAUDE.md section shows the updated status
 - And the session workflow section reflects the new state
 
+**Context layer for bounded context with no annotations**
+
+- Given a bounded context directory with no @libar-docs annotations
+- When running "process-api generate-context-layer --context empty-context"
+- Then the output indicates no patterns found in the context
+- And the CLAUDE.md section contains a placeholder with discovery guidance
+
 **Cross-package dependency view**
 
 - Given patterns across "platform-core" and "platform-bc" packages
@@ -83,6 +97,13 @@
 - Then only patterns from "platform-core" are returned
 - And the package filter composes with other filters
 
+**Query for non-existent package returns empty result**
+
+- Given patterns from "platform-core" and "platform-bc" packages
+- When running "process-api list --package non-existent-package"
+- Then the output is an empty result set
+- And no error is raised
+
 **Pre-commit validates annotation consistency**
 
 - Given a staged file adds a uses tag referencing "NonExistentPattern"
@@ -96,6 +117,13 @@
 - When a source file is modified
 - Then the architecture docs are regenerated automatically
 - And only affected doc sections are updated
+
+**Pre-commit on clean commit with no annotation changes**
+
+- Given staged files contain no @libar-docs annotations
+- When the pre-commit hook runs
+- Then validation passes without errors
+- And no annotation warnings are emitted
 
 ## Business Rules
 
@@ -125,7 +153,7 @@
 
     **Verified by:** MCP server starts, MCP tool invocation, Auto-refresh on change
 
-_Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation returns structured result_
+_Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation returns structured result, MCP tool invocation with invalid parameters returns error_
 
 **Process state can be auto-generated as CLAUDE.md context sections**
 
@@ -140,7 +168,7 @@ _Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation retu
 
     **Verified by:** Generate context layer, Context layer is up-to-date
 
-_Verified by: Generate CLAUDE.md context layer for bounded context, Context layer reflects current process state_
+_Verified by: Generate CLAUDE.md context layer for bounded context, Context layer reflects current process state, Context layer for bounded context with no annotations_
 
 **Cross-package views show dependencies spanning multiple packages**
 
@@ -155,7 +183,7 @@ _Verified by: Generate CLAUDE.md context layer for bounded context, Context laye
 
     **Verified by:** Cross-package dependency view, Package-scoped filtering
 
-_Verified by: Cross-package dependency view, Package-scoped query filtering_
+_Verified by: Cross-package dependency view, Package-scoped query filtering, Query for non-existent package returns empty result_
 
 **Process validation integrates with git hooks and file watching**
 
@@ -169,7 +197,7 @@ _Verified by: Cross-package dependency view, Package-scoped query filtering_
 
     **Verified by:** Pre-commit annotation validation, Watch mode re-generation
 
-_Verified by: Pre-commit validates annotation consistency, Watch mode re-generates on file change_
+_Verified by: Pre-commit validates annotation consistency, Watch mode re-generates on file change, Pre-commit on clean commit with no annotation changes_
 
 ## Deliverables
 
