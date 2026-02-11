@@ -24,7 +24,9 @@ export const REFERENCE_CONFIGS = [
         title: 'Process Guard Reference',
         conventionTags: ['fsm-rules'],
         shapeSources: ['src/lint/*.ts', 'src/validation/*.ts'],
-        behaviorTags: ['process-guard'],
+        behaviorCategories: ['process-guard'],
+        // Note: Process Guard and Validation Reference share claudeMdSection 'validation'
+        // — this is intentional as they use different filenames within the same directory.
         claudeMdSection: 'validation',
         docsFilename: 'PROCESS-GUARD-REFERENCE.md',
         claudeMdFilename: 'process-guard.md',
@@ -33,7 +35,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Session Guides Reference',
         conventionTags: ['session-workflow', 'fsm-rules'],
         shapeSources: [],
-        behaviorTags: ['session-guides'],
+        behaviorCategories: ['session-guides'],
         claudeMdSection: 'sessions',
         docsFilename: 'SESSION-GUIDES-REFERENCE.md',
         claudeMdFilename: 'session-guides.md',
@@ -42,7 +44,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Architecture Reference',
         conventionTags: ['pipeline-architecture', 'output-format'],
         shapeSources: ['src/generators/types.ts', 'src/generators/pipeline/*.ts'],
-        behaviorTags: ['architecture'],
+        behaviorCategories: ['architecture'],
         claudeMdSection: 'architecture',
         docsFilename: 'ARCHITECTURE-REFERENCE.md',
         claudeMdFilename: 'architecture.md',
@@ -51,7 +53,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Configuration Reference',
         conventionTags: ['config-presets', 'cli-patterns'],
         shapeSources: ['src/config/*.ts'],
-        behaviorTags: ['configuration'],
+        behaviorCategories: ['configuration'],
         claudeMdSection: 'config',
         docsFilename: 'CONFIGURATION-REFERENCE.md',
         claudeMdFilename: 'configuration.md',
@@ -60,7 +62,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Instructions Reference',
         conventionTags: ['annotation-system', 'pattern-naming', 'cli-patterns'],
         shapeSources: ['src/taxonomy/*.ts', 'src/cli/*.ts'],
-        behaviorTags: ['instructions'],
+        behaviorCategories: ['instructions'],
         claudeMdSection: 'reference',
         docsFilename: 'INSTRUCTIONS-REFERENCE.md',
         claudeMdFilename: 'instructions.md',
@@ -69,7 +71,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Methodology Reference',
         conventionTags: ['session-workflow', 'annotation-system'],
         shapeSources: [],
-        behaviorTags: ['methodology'],
+        behaviorCategories: ['methodology'],
         claudeMdSection: 'methodology',
         docsFilename: 'METHODOLOGY-REFERENCE.md',
         claudeMdFilename: 'methodology.md',
@@ -78,7 +80,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Gherkin Patterns Reference',
         conventionTags: ['testing-policy'],
         shapeSources: [],
-        behaviorTags: ['gherkin-patterns'],
+        behaviorCategories: ['gherkin-patterns'],
         claudeMdSection: 'gherkin',
         docsFilename: 'GHERKIN-PATTERNS-REFERENCE.md',
         claudeMdFilename: 'gherkin-patterns.md',
@@ -87,7 +89,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Taxonomy Reference',
         conventionTags: ['annotation-system'],
         shapeSources: ['src/taxonomy/*.ts'],
-        behaviorTags: ['taxonomy'],
+        behaviorCategories: ['taxonomy'],
         claudeMdSection: 'taxonomy',
         docsFilename: 'TAXONOMY-REFERENCE.md',
         claudeMdFilename: 'taxonomy.md',
@@ -96,7 +98,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Validation Reference',
         conventionTags: ['fsm-rules', 'testing-policy'],
         shapeSources: ['src/validation/*.ts'],
-        behaviorTags: ['validation'],
+        behaviorCategories: ['validation'],
         claudeMdSection: 'validation',
         docsFilename: 'VALIDATION-REFERENCE.md',
         claudeMdFilename: 'validation.md',
@@ -105,7 +107,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Publishing Reference',
         conventionTags: ['publishing'],
         shapeSources: [],
-        behaviorTags: ['publishing'],
+        behaviorCategories: ['publishing'],
         claudeMdSection: 'publishing',
         docsFilename: 'PUBLISHING-REFERENCE.md',
         claudeMdFilename: 'publishing.md',
@@ -114,7 +116,7 @@ export const REFERENCE_CONFIGS = [
         title: 'Index Reference',
         conventionTags: ['doc-generation'],
         shapeSources: [],
-        behaviorTags: ['index'],
+        behaviorCategories: ['index'],
         claudeMdSection: 'index',
         docsFilename: 'INDEX-REFERENCE.md',
         claudeMdFilename: 'index.md',
@@ -142,7 +144,13 @@ class ReferenceDocGenerator {
     }
     generate(_patterns, context) {
         if (!context.masterDataset) {
-            return Promise.resolve({ files: [] });
+            return Promise.resolve({
+                files: [],
+                errors: [{
+                        type: 'generator',
+                        message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
+                    }],
+            });
         }
         const codec = createReferenceCodec(this.config, {
             detailLevel: this.detailLevel,
@@ -178,7 +186,13 @@ class ReferenceDocsGenerator {
     description = 'All reference documents (11 detailed + 11 summary)';
     generate(_patterns, context) {
         if (!context.masterDataset) {
-            return Promise.resolve({ files: [] });
+            return Promise.resolve({
+                files: [],
+                errors: [{
+                        type: 'generator',
+                        message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
+                    }],
+            });
         }
         const files = [];
         for (const config of REFERENCE_CONFIGS) {

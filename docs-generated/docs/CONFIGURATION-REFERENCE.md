@@ -499,12 +499,6 @@ The handoff command accepts an optional --git flag. When present, the
 The handoff command infers session type from the pattern's current
     FSM status. An explicit --session flag overrides inference.
 
-| Status | Inferred Session |
-| --- | --- |
-| active | implement |
-| completed | review |
-| deferred | design |
-
 ---
 
 ## DD-4 - Severity levels match Process Guard model
@@ -513,11 +507,6 @@ Scope validation uses three severity levels. BLOCKED prevents session
     start. WARN indicates suboptimal readiness but does not block.
 
     The --strict flag (consistent with lint-process) promotes WARN to BLOCKED.
-
-| Severity | Meaning | Example |
-| --- | --- | --- |
-| BLOCKED | Hard prerequisite missing | Dependency not completed |
-| WARN | Recommendation not met | No PDR references found |
 
 ---
 

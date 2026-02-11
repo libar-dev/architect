@@ -28,15 +28,6 @@ Process Guard implements 7 validation rules:
     Pre-commit: `npx lint-process --staged`
     CI pipeline: `npx lint-process --all --strict`
 
-| Rule ID | Severity | What It Checks |
-| --- | --- | --- |
-| invalid-status-transition | error | Transitions must follow FSM |
-| scope-creep | error | Active specs cannot add deliverables |
-| session-excluded | error | Cannot modify excluded files |
-| missing-relationship-target | warning | Relationship target must exist |
-| session-scope | warning | File outside session scope |
-| deliverable-removed | warning | Deliverable was removed |
-
 ---
 
 ## Consequences - Trade-offs of This Approach

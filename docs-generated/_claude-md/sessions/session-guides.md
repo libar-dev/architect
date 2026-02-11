@@ -15,20 +15,9 @@
 
 ## DD-3 - Session type inferred from FSM status
 
-| Status | Inferred Session |
-| --- | --- |
-| active | implement |
-| completed | review |
-| deferred | design |
-
 ---
 
 ## DD-4 - Severity levels match Process Guard model
-
-| Severity | Meaning | Example |
-| --- | --- | --- |
-| BLOCKED | Hard prerequisite missing | Dependency not completed |
-| WARN | Recommendation not met | No PDR references found |
 
 ---
 
@@ -226,15 +215,6 @@
 ---
 
 ## Decision - How Process Guard Works
-
-| Rule ID | Severity | What It Checks |
-| --- | --- | --- |
-| invalid-status-transition | error | Transitions must follow FSM |
-| scope-creep | error | Active specs cannot add deliverables |
-| session-excluded | error | Cannot modify excluded files |
-| missing-relationship-target | warning | Relationship target must exist |
-| session-scope | warning | File outside session scope |
-| deliverable-removed | warning | Deliverable was removed |
 
 ---
 

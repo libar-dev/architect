@@ -99,3 +99,23 @@ Feature: Reference Document Codec
       When decoding at detail level "detailed"
       Then the document has a heading "FSM Transitions"
       And the document has a heading "Behavior Specifications"
+
+  Rule: Composition order follows AD-5: conventions then shapes then behaviors
+
+    @happy-path
+    Scenario: Convention headings appear before shapes before behaviors
+      Given a reference config with all three content sources
+      And a MasterDataset with convention, shape, and behavior data
+      When decoding at detail level "detailed"
+      Then the heading "FSM Transitions" appears before "API Types"
+      And the heading "API Types" appears before "Behavior Specifications"
+
+  Rule: Standard detail level includes narrative but omits rationale
+
+    @happy-path
+    Scenario: Standard level includes narrative but omits rationale
+      Given a reference config with convention tags "fsm-rules" and behavior tags ""
+      And a MasterDataset with a convention pattern with narrative and rationale
+      When decoding at detail level "standard"
+      Then the document contains narrative text
+      And the document does not contain text "Rationale"

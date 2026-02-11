@@ -30,12 +30,6 @@ The handoff command accepts an optional --git flag. When present, the
 The handoff command infers session type from the pattern's current
     FSM status. An explicit --session flag overrides inference.
 
-| Status | Inferred Session |
-| --- | --- |
-| active | implement |
-| completed | review |
-| deferred | design |
-
 ---
 
 ## DD-4 - Severity levels match Process Guard model
@@ -44,11 +38,6 @@ Scope validation uses three severity levels. BLOCKED prevents session
     start. WARN indicates suboptimal readiness but does not block.
 
     The --strict flag (consistent with lint-process) promotes WARN to BLOCKED.
-
-| Severity | Meaning | Example |
-| --- | --- | --- |
-| BLOCKED | Hard prerequisite missing | Dependency not completed |
-| WARN | Recommendation not met | No PDR references found |
 
 ---
 
@@ -450,15 +439,6 @@ Process Guard implements 7 validation rules:
 
     Pre-commit: `npx lint-process --staged`
     CI pipeline: `npx lint-process --all --strict`
-
-| Rule ID | Severity | What It Checks |
-| --- | --- | --- |
-| invalid-status-transition | error | Transitions must follow FSM |
-| scope-creep | error | Active specs cannot add deliverables |
-| session-excluded | error | Cannot modify excluded files |
-| missing-relationship-target | warning | Relationship target must exist |
-| session-scope | warning | File outside session scope |
-| deliverable-removed | warning | Deliverable was removed |
 
 ---
 

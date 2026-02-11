@@ -39,8 +39,8 @@ export interface ReferenceDocConfig {
      * Resolved via in-memory matching against pattern.source.file (AD-6).
      */
     readonly shapeSources: readonly string[];
-    /** Tags to filter behavior patterns from MasterDataset */
-    readonly behaviorTags: readonly string[];
+    /** Categories to filter behavior patterns from MasterDataset */
+    readonly behaviorCategories: readonly string[];
     /** Target _claude-md/ directory for summary output */
     readonly claudeMdSection: string;
     /** Output filename for detailed docs (in docs/) */

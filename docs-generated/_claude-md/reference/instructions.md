@@ -1025,20 +1025,9 @@
 
 ## DD-3 - Session type inferred from FSM status
 
-| Status | Inferred Session |
-| --- | --- |
-| active | implement |
-| completed | review |
-| deferred | design |
-
 ---
 
 ## DD-4 - Severity levels match Process Guard model
-
-| Severity | Meaning | Example |
-| --- | --- | --- |
-| BLOCKED | Hard prerequisite missing | Dependency not completed |
-| WARN | Recommendation not met | No PDR references found |
 
 ---
 

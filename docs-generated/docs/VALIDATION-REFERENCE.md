@@ -28,15 +28,6 @@ Process Guard implements 7 validation rules:
     Pre-commit: `npx lint-process --staged`
     CI pipeline: `npx lint-process --all --strict`
 
-| Rule ID | Severity | What It Checks |
-| --- | --- | --- |
-| invalid-status-transition | error | Transitions must follow FSM |
-| scope-creep | error | Active specs cannot add deliverables |
-| session-excluded | error | Cannot modify excluded files |
-| missing-relationship-target | warning | Relationship target must exist |
-| session-scope | warning | File outside session scope |
-| deliverable-removed | warning | Deliverable was removed |
-
 ---
 
 ## Consequences - Trade-offs of This Approach
@@ -1287,58 +1278,6 @@ function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<
 
 ## Behavior Specifications
 
-### WorkflowConfigSchema
-
-## WorkflowConfigSchema - Workflow Configuration Validation
-
-Zod schemas for validating workflow configuration files that define
-status models, phase definitions, and artifact mappings.
-
-### When to Use
-
-- When loading workflow configs from catalogue/workflows/
-- When validating custom workflow configurations
-- When creating new workflow definitions
-
-### ExtractedPatternSchema
-
-## ExtractedPatternSchema - Complete Pattern Validation
-
-Zod schema for validating complete extracted patterns with code,
-metadata, relationships, and source information.
-
-### When to Use
-
-- Use when validating extracted patterns from the extractor
-- Use when serializing/deserializing pattern data
-
-### DualSourceSchemas
-
-## DualSourceSchemas - Dual-Source Extraction Type Validation
-
-Zod schemas for dual-source extraction types.
-
-Following the project's schema-first pattern, all dual-source types
-are defined as Zod schemas with TypeScript types inferred from them.
-
-### When to Use
-
-- When validating process metadata from Gherkin feature tags
-- When validating deliverables from Background tables
-- When performing cross-validation between code and feature files
-
-### DocDirectiveSchema
-
-## DocDirectiveSchema - Parsed JSDoc Directive Validation
-
-Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
-Enforces tag format, position validity, and metadata extraction.
-
-### When to Use
-
-- Use when parsing JSDoc comments for @libar-docs-* tags
-- Use when validating directive structure at boundaries
-
 ### DoDValidationTypes
 
 ## DoDValidationTypes - Type Definitions for DoD Validation
@@ -1401,6 +1340,58 @@ process hygiene issues that lead to documentation drift.
 - Pre-commit validation to catch architecture violations early
 - CI pipeline to enforce documentation standards
 - Code review checklists for documentation quality
+
+### WorkflowConfigSchema
+
+## WorkflowConfigSchema - Workflow Configuration Validation
+
+Zod schemas for validating workflow configuration files that define
+status models, phase definitions, and artifact mappings.
+
+### When to Use
+
+- When loading workflow configs from catalogue/workflows/
+- When validating custom workflow configurations
+- When creating new workflow definitions
+
+### ExtractedPatternSchema
+
+## ExtractedPatternSchema - Complete Pattern Validation
+
+Zod schema for validating complete extracted patterns with code,
+metadata, relationships, and source information.
+
+### When to Use
+
+- Use when validating extracted patterns from the extractor
+- Use when serializing/deserializing pattern data
+
+### DualSourceSchemas
+
+## DualSourceSchemas - Dual-Source Extraction Type Validation
+
+Zod schemas for dual-source extraction types.
+
+Following the project's schema-first pattern, all dual-source types
+are defined as Zod schemas with TypeScript types inferred from them.
+
+### When to Use
+
+- When validating process metadata from Gherkin feature tags
+- When validating deliverables from Background tables
+- When performing cross-validation between code and feature files
+
+### DocDirectiveSchema
+
+## DocDirectiveSchema - Parsed JSDoc Directive Validation
+
+Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
+Enforces tag format, position validity, and metadata extraction.
+
+### When to Use
+
+- Use when parsing JSDoc comments for @libar-docs-* tags
+- Use when validating directive structure at boundaries
 
 ### FSMValidator
 

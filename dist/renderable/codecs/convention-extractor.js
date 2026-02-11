@@ -62,7 +62,13 @@ function parseTableLines(lines) {
     if (!headerLine)
         return null;
     const headers = parseRow(headerLine);
-    // Skip separator row (line[1])
+    const separatorLine = lines[1];
+    if (!separatorLine)
+        return null;
+    const separatorCells = separatorLine.split('|').slice(1, -1);
+    const isSeparator = separatorCells.every((cell) => /^[\s:-]+$/.test(cell));
+    if (!isSeparator)
+        return null;
     const rows = [];
     for (let i = 2; i < lines.length; i++) {
         const dataLine = lines[i];

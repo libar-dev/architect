@@ -41,12 +41,14 @@ let state: ReferenceCodecState | null = null;
 // Helpers
 // ============================================================================
 
-function makeConfig(conventionTags: string, behaviorTags: string): ReferenceDocConfig {
+function makeConfig(conventionTags: string, behaviorCategories: string): ReferenceDocConfig {
   return {
     title: 'Test Reference Document',
     conventionTags: conventionTags ? conventionTags.split(',').map((t) => t.trim()) : [],
     shapeSources: [],
-    behaviorTags: behaviorTags ? behaviorTags.split(',').map((t) => t.trim()) : [],
+    behaviorCategories: behaviorCategories
+      ? behaviorCategories.split(',').map((t) => t.trim())
+      : [],
     claudeMdSection: 'test',
     docsFilename: 'TEST-REFERENCE.md',
     claudeMdFilename: 'test.md',
@@ -387,7 +389,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
               title: 'Test Reference Document',
               conventionTags: [],
               shapeSources: shapeSources.split(',').map((s) => s.trim()),
-              behaviorTags: [],
+              behaviorCategories: [],
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -459,7 +461,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             title: 'Test Reference Document',
             conventionTags: [],
             shapeSources: shapeSources.split(',').map((s) => s.trim()),
-            behaviorTags: [],
+            behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -517,7 +519,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             title: 'Test Reference Document',
             conventionTags: [],
             shapeSources: shapeSources.split(',').map((s) => s.trim()),
-            behaviorTags: [],
+            behaviorCategories: [],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
             claudeMdFilename: 'test.md',
@@ -622,6 +624,160 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           const headings = findHeadings(state!.document!);
           const match = headings.some((h) => h.text.includes(headingText));
           expect(match).toBe(true);
+        });
+      }
+    );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Composition order follows AD-5
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule(
+    'Composition order follows AD-5: conventions then shapes then behaviors',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Convention headings appear before shapes before behaviors',
+        ({ Given, And, When, Then }) => {
+          Given('a reference config with all three content sources', () => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: ['fsm-rules'],
+              shapeSources: ['src/lint/*.ts'],
+              behaviorCategories: ['process-guard'],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          });
+
+          And('a MasterDataset with convention, shape, and behavior data', () => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'ConventionADR',
+                  convention: ['fsm-rules'],
+                  rules: [
+                    {
+                      name: 'FSM Transitions',
+                      description: '**Invariant:** Valid transitions only.',
+                      scenarioCount: 0,
+                      scenarioNames: [],
+                    },
+                  ],
+                }),
+                createTestPattern({
+                  name: 'ShapePattern',
+                  filePath: 'src/lint/rules.ts',
+                  extractedShapes: [
+                    {
+                      name: 'LintRule',
+                      kind: 'interface',
+                      sourceText: 'export interface LintRule { name: string; }',
+                      lineNumber: 1,
+                      exported: true,
+                    },
+                  ],
+                }),
+                createTestPattern({
+                  name: 'BehaviorSpec',
+                  category: 'process-guard',
+                  description: 'Process Guard validates workflow.',
+                }),
+              ],
+            });
+          });
+
+          When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+            const codec = createReferenceCodec(state!.config!, {
+              detailLevel: level as DetailLevel,
+            });
+            state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+          });
+
+          Then(
+            'the heading {string} appears before {string}',
+            (_ctx: unknown, first: string, second: string) => {
+              const headings = findHeadings(state!.document!);
+              const firstIndex = headings.findIndex((h) => h.text.includes(first));
+              const secondIndex = headings.findIndex((h) => h.text.includes(second));
+              expect(firstIndex).toBeGreaterThanOrEqual(0);
+              expect(secondIndex).toBeGreaterThanOrEqual(0);
+              expect(firstIndex).toBeLessThan(secondIndex);
+            }
+          );
+
+          And(
+            'the heading {string} appears before {string}',
+            (_ctx: unknown, first: string, second: string) => {
+              const headings = findHeadings(state!.document!);
+              const firstIndex = headings.findIndex((h) => h.text.includes(first));
+              const secondIndex = headings.findIndex((h) => h.text.includes(second));
+              expect(firstIndex).toBeGreaterThanOrEqual(0);
+              expect(secondIndex).toBeGreaterThanOrEqual(0);
+              expect(firstIndex).toBeLessThan(secondIndex);
+            }
+          );
+        }
+      );
+    }
+  );
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Standard detail level includes narrative but omits rationale
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Standard detail level includes narrative but omits rationale', ({ RuleScenario }) => {
+    RuleScenario(
+      'Standard level includes narrative but omits rationale',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And('a MasterDataset with a convention pattern with narrative and rationale', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'DetailPatternStandard',
+                convention: ['fsm-rules'],
+                rules: [
+                  {
+                    name: 'Standard Test Rule',
+                    description: [
+                      'This is the narrative content that explains details.',
+                      '',
+                      '**Invariant:** Must follow FSM.',
+                      '',
+                      '**Rationale:** Prevents corruption.',
+                    ].join('\n'),
+                    scenarioCount: 0,
+                    scenarioNames: [],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains narrative text', () => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain('narrative content that explains');
+        });
+
+        And('the document does not contain text {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).not.toContain(text);
         });
       }
     );

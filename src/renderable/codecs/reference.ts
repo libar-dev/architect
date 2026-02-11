@@ -73,8 +73,8 @@ export interface ReferenceDocConfig {
    */
   readonly shapeSources: readonly string[];
 
-  /** Tags to filter behavior patterns from MasterDataset */
-  readonly behaviorTags: readonly string[];
+  /** Categories to filter behavior patterns from MasterDataset */
+  readonly behaviorCategories: readonly string[];
 
   /** Target _claude-md/ directory for summary output */
   readonly claudeMdSection: string;
@@ -140,12 +140,24 @@ export function createReferenceCodec(
       }
 
       // 3. Behavior content from tagged patterns
-      if (config.behaviorTags.length > 0) {
-        sections.push(...buildBehaviorSections(dataset, config.behaviorTags, opts.detailLevel));
+      if (config.behaviorCategories.length > 0) {
+        sections.push(
+          ...buildBehaviorSections(dataset, config.behaviorCategories, opts.detailLevel)
+        );
       }
 
       if (sections.length === 0) {
-        sections.push(paragraph('No content found for the configured sources.'));
+        const diagnostics: string[] = [];
+        if (config.conventionTags.length > 0) {
+          diagnostics.push(`conventions [${config.conventionTags.join(', ')}]`);
+        }
+        if (config.shapeSources.length > 0) {
+          diagnostics.push(`shapes [${config.shapeSources.join(', ')}]`);
+        }
+        if (config.behaviorCategories.length > 0) {
+          diagnostics.push(`behaviors [${config.behaviorCategories.join(', ')}]`);
+        }
+        sections.push(paragraph(`No content found. Sources checked: ${diagnostics.join('; ')}.`));
       }
 
       return document(config.title, sections, {
@@ -211,13 +223,13 @@ function buildConventionSections(
  */
 function buildBehaviorSections(
   dataset: MasterDataset,
-  behaviorTags: readonly string[],
+  behaviorCategories: readonly string[],
   detailLevel: DetailLevel
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
-  // Filter patterns whose category matches any behaviorTag
-  const matchingPatterns = dataset.patterns.filter((p) => behaviorTags.includes(p.category));
+  // Filter patterns whose category matches any behaviorCategory
+  const matchingPatterns = dataset.patterns.filter((p) => behaviorCategories.includes(p.category));
 
   if (matchingPatterns.length === 0) return sections;
 
