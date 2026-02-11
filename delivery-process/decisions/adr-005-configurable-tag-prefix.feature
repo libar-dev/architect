@@ -375,7 +375,7 @@ Feature: ADR-005 - Configurable Tag Prefix
   Rule: Complete Category Reference
 
     **Context:** The ddd-es-cqrs preset includes all 21 categories. Simpler
-    presets use subsets (core, api, generator for libar-generic).
+    presets use subsets (core, api, infra for libar-generic).
 
     **All Categories:**
 
@@ -407,9 +407,9 @@ Feature: ADR-005 - Configurable Tag Prefix
 
 | Project Type | Recommended Preset | Categories Available |
 | --- | --- | --- |
-| Simple utility packages | libar-generic | core, api, generator |
+| Simple utility packages | libar-generic | core, api, infra |
 | DDD/Event Sourcing systems | ddd-es-cqrs | All 21 categories |
-| Generic projects | generic | core, api, generator |
+| Generic projects | generic | core, api, infra |
 
     **Usage:** Add category tags to patterns using the tag prefix:
 

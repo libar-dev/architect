@@ -4,7 +4,7 @@
 @libar-docs-adr-category:process
 @libar-docs-pattern:ADR010PatternNamingConventions
 @libar-docs-phase:99
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-product-area:Process
 @libar-docs-claude-md-section:reference
 @libar-docs-convention:pattern-naming,annotation-system

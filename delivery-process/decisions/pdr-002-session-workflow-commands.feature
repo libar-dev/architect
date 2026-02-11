@@ -152,6 +152,8 @@ Feature: PDR-002 - Session Workflow Commands Design Decisions
 
   Rule: Session Decision Tree
 
+    **Tag Notation:** In Rule descriptions below, "at-prefix" stands for the configured tag prefix (e.g., "@libar-docs-"), escaped to avoid Gherkin tag parsing.
+
     **Context:** Developers need to choose the correct session type based on their current situation.
 
     **Decision Tree (ASCII):**
@@ -404,10 +406,10 @@ Feature: PDR-002 - Session Workflow Commands Design Decisions
 
 | Situation | Solution | Example |
 | --- | --- | --- |
-| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Fix bug in completed spec | Add unlock-reason tag | at-prefix-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
-| Emergency hotfix | Combine unlock + ignore | @libar-docs-unlock-reason:'Hotfix' plus --ignore-session |
+| Emergency hotfix | Combine unlock + ignore | at-prefix-unlock-reason:'Hotfix' plus --ignore-session |
 
     **Unlock Reason Constraints:**
 
@@ -531,3 +533,7 @@ Feature: PDR-002 - Session Workflow Commands Design Decisions
     And escape hatches reference is included
     And common mistakes tables are included
     And discovery tags reference is included
+    And detailed docs are generated with design session checklist
+    And detailed docs are generated with planning-plus-design session checklist
+    And handoff documentation template is included
+    And related documentation mapping is included

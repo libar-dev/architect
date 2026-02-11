@@ -142,7 +142,7 @@ Feature: ADR-006 - Process Guard Validation System
 
   Rule: Rule Descriptions
 
-    Process Guard validates 6 rules (types extracted from TypeScript):
+    Process Guard validates 7 rules (types extracted from TypeScript):
 
 | Rule | Severity | Human Description |
 | --- | --- | --- |
@@ -150,6 +150,7 @@ Feature: ADR-006 - Process Guard Validation System
 | invalid-status-transition | error | Status transition must follow FSM |
 | scope-creep | error | Cannot add deliverables to active specs |
 | session-excluded | error | Cannot modify files excluded from session |
+| missing-relationship-target | warning | Relationship target pattern must exist |
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 
@@ -164,6 +165,7 @@ Feature: ADR-006 - Process Guard Validation System
 | completed-protection | error | Cannot modify completed spec without unlock reason | Add unlock-reason tag |
 | invalid-status-transition | error | Invalid status transition: roadmap to completed | Follow FSM path |
 | scope-creep | error | Cannot add deliverables to active spec | Remove deliverable or revert to roadmap |
+| missing-relationship-target | warning | Missing relationship target: "PatternX" referenced by "PatternY" | Add target pattern or remove relationship |
 | session-scope | warning | File not in active session scope | Add to scope or use --ignore-session |
 | session-excluded | error | File is explicitly excluded from session | Remove from exclusion or use --ignore-session |
 | deliverable-removed | warning | Deliverable removed: "Unit tests" | Informational only |

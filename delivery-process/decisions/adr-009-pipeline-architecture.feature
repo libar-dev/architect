@@ -51,7 +51,7 @@ Feature: ADR-009 - Four-Stage Pipeline Architecture
     | Single-Pass Transformation | All derived views computed in O(n) time, not redundant O(n) per section |
     | Codec-Based Rendering | Zod 4 codecs transform MasterDataset to RenderableDocument to Markdown |
     | Schema-First Validation | Zod schemas define types; runtime validation at all boundaries |
-    | Result Monad | Explicit error handling via Result T,E instead of exceptions |
+    | Result Monad | Explicit error handling via Result(T,E) instead of exceptions |
 
     **What This Means for Implementation:**
 

@@ -263,7 +263,7 @@ Feature: PDR-001 - Self-Documentation Process
 
     **Invariant:** Stages may only be skipped when conditions below are met.
     **Rationale:** Prevents accidental omissions while allowing efficiency for simple tasks.
-    **Verified by:** @acceptance-criteria Scenario: Reference generates Methodology documentation
+    **Verified by:** @acceptance-criteria Scenario: Package can generate its own documentation
 
     **Context:** Not all stages are required for every task.
 
@@ -538,45 +538,44 @@ Feature: PDR-001 - Self-Documentation Process
 
     **README.md Key Sections:**
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| The Problem / The Solution | 16-33 | Documentation drift, code as source of truth |
-| Built for AI-Assisted Dev | 36-57 | ProcessStateAPI typed queries |
-| How It Works | 60-111 | Annotation examples, dual-source |
-| Quick Start | 114-170 | Install, annotate, generate, lint |
-| CLI Commands | 173-183 | Command summary table |
-| FSM-Enforced Workflow | 187-217 | State diagram, protection levels |
+| Section Heading | Topics |
+| --- | --- |
+| The Problem / The Solution | Documentation drift, code as source of truth |
+| Built for AI-Assisted Development | ProcessStateAPI typed queries |
+| How It Works | Annotation examples, dual-source |
+| Quick Start | Install, annotate, generate, lint |
+| CLI Commands | Command summary table |
+| FSM-Enforced Workflow | State diagram, protection levels |
 
     **ARCHITECTURE.md Key Sections:**
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| Executive Summary | 28-66 | What it does, key principles, overview |
-| Four-Stage Pipeline | 140-245 | Scanner, Extractor, Transformer, Codec |
-| Unified Transformation | 248-362 | MasterDataset schema, single-pass |
-| Codec Architecture | 366-407 | Concepts, block vocabulary, factory |
-| Available Codecs | 410-607 | All 16 codecs with options tables |
-| Data Flow Diagrams | 823-980 | Pipeline flow, MasterDataset views |
+| Section Heading | Topics |
+| --- | --- |
+| Executive Summary | What it does, key principles, overview |
+| Four-Stage Pipeline | Scanner, Extractor, Transformer, Codec |
+| Unified Transformation Architecture | MasterDataset schema, single-pass |
+| Codec Architecture | Concepts, block vocabulary, factory |
+| Available Codecs | All 16 codecs with options tables |
+| Data Flow Diagrams | Pipeline flow, MasterDataset views |
 
     **SESSION-GUIDES.md Key Sections:**
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| Session Decision Tree | 7-24 | Which session type to use |
-| Planning Session | 27-83 | Create roadmap spec, checklist |
-| Design Session | 86-132 | When required, checklist, code stubs |
-| Implementation Session | 135-192 | Pre-flight, execution, FSM transitions |
-| Handoff Documentation | 277-313 | Template, discovery tags |
+| Section Heading | Topics |
+| --- | --- |
+| Session Decision Tree | Which session type to use |
+| Planning Session | Create roadmap spec, checklist |
+| Design Session | When required, checklist, code stubs |
+| Implementation Session | Pre-flight, execution, FSM transitions |
+| Handoff Documentation | Template, discovery tags |
 
     **PROCESS-GUARD.md Key Sections:**
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| Quick Reference | 9-37 | Protection levels, transitions, escapes |
-| Error completed-protection | 40-65 | Fix with unlock reason |
-| Error invalid-status-transition | 68-98 | Follow FSM path |
-| CLI Usage | 187-235 | Modes, options, exit codes |
-| Pre-commit Setup | 238-260 | Husky, package.json scripts |
+| Section Heading | Topics |
+| --- | --- |
+| Quick Reference | Protection levels, transitions, escapes |
+| Error Messages and Fixes | Fix with unlock reason, follow FSM path |
+| CLI Usage | Modes, options, exit codes |
+| Pre-commit Setup | Husky, package.json scripts |
 
   Rule: Dual-Source Architecture
 
