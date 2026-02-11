@@ -146,10 +146,12 @@ class ReferenceDocGenerator {
         if (!context.masterDataset) {
             return Promise.resolve({
                 files: [],
-                errors: [{
+                errors: [
+                    {
                         type: 'generator',
                         message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
-                    }],
+                    },
+                ],
             });
         }
         const codec = createReferenceCodec(this.config, {
@@ -188,10 +190,12 @@ class ReferenceDocsGenerator {
         if (!context.masterDataset) {
             return Promise.resolve({
                 files: [],
-                errors: [{
+                errors: [
+                    {
                         type: 'generator',
                         message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
-                    }],
+                    },
+                ],
             });
         }
         const files = [];
