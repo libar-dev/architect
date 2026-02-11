@@ -129,5 +129,8 @@ export {
   type WorkflowValue,
 } from './generator-options.js';
 
+// Convention values (reference document generation)
+export { CONVENTION_VALUES, type ConventionValue } from './conventions.js';
+
 // Registry builder
 export { buildRegistry, type TagRegistry } from './registry-builder.js';

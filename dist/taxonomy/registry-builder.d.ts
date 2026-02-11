@@ -84,6 +84,7 @@ export declare const METADATA_TAGS_BY_GROUP: {
     readonly architecture: readonly ["arch-role", "arch-context", "arch-layer"];
     readonly extraction: readonly ["extract-shapes"];
     readonly stub: readonly ["target", "since"];
+    readonly convention: readonly ["convention"];
 };
 /**
  * Build the complete tag registry from TypeScript constants

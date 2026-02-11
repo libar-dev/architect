@@ -167,6 +167,8 @@ export const ExtractedPatternSchema = z
     targetPath: z.string().optional(),
     /** Design session that created this pattern (from @libar-docs-since tag) */
     since: z.string().optional(),
+    /** Convention domains for reference document generation (from @libar-docs-convention CSV tag) */
+    convention: z.array(z.string()).readonly().optional(),
     /** Related patterns for cross-reference without dependency (from @libar-docs-see-also tag) */
     seeAlso: z.array(z.string()).readonly().optional(),
     /** File paths to implementation APIs (from @libar-docs-api-ref tag) */

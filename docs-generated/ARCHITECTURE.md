@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 108 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 110 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 108 |
+| Total Components | 110 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -78,6 +78,7 @@ graph TB
         FileCache["FileCache[infrastructure]"]
         TransformDataset["TransformDataset[service]"]
         PipelineModule["PipelineModule"]
+        ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         BuiltInGenerators["BuiltInGenerators"]
         DecisionDocGenerator["DecisionDocGenerator[service]"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
@@ -105,6 +106,7 @@ graph TB
         SessionCodec["SessionCodec[projection]"]
         RequirementsCodec["RequirementsCodec"]
         ReportingCodecs["ReportingCodecs"]
+        ReferenceDocumentCodec["ReferenceDocumentCodec"]
         PrChangesCodec["PrChangesCodec"]
         PlanningCodecs["PlanningCodecs"]
         PatternsCodec["PatternsCodec[projection]"]
@@ -169,7 +171,13 @@ graph TB
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
@@ -177,12 +185,6 @@ graph TB
         RegexBuilders["RegexBuilders"]
         ConfigurationPresets["ConfigurationPresets"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -194,25 +196,27 @@ graph TB
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
         FSMModule["FSMModule"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
-        PipelineModule["PipelineModule"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
         SharedCodecSchema["SharedCodecSchema"]
         RequirementsCodec["RequirementsCodec"]
         ReportingCodecs["ReportingCodecs"]
+        ReferenceDocumentCodec["ReferenceDocumentCodec"]
         PrChangesCodec["PrChangesCodec"]
         PlanningCodecs["PlanningCodecs"]
         DocumentCodecs["DocumentCodecs"]
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
+        ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
@@ -225,6 +229,11 @@ graph TB
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
@@ -238,11 +247,6 @@ graph TB
     DeliveryProcessFactory --> RegexBuilders
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
@@ -277,6 +281,7 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
+    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
@@ -284,7 +289,6 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    ArchitectureCodec --> MasterDataset
 ```
 
 ---
@@ -392,6 +396,8 @@ All components with architecture annotations:
 | 🚧 Process Guard Module | - | - | - | src/lint/process-guard/index.ts |
 | 🚧 Process Guard Types | - | - | - | src/lint/process-guard/types.ts |
 | 🚧 Process State Types | - | - | - | src/api/types.ts |
+| 🚧 Reference Document Codec | - | - | - | src/renderable/codecs/reference.ts |
+| 🚧 Reference Generator Registration | - | - | - | src/generators/built-in/reference-generators.ts |
 | ✅ Regex Builders | - | - | - | src/config/regex-builders.ts |
 | ✅ Renderable Document Model(RDM) | - | - | - | src/renderable/index.ts |
 | ✅ Renderable Utils | - | - | - | src/renderable/utils.ts |

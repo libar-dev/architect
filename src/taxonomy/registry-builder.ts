@@ -33,6 +33,7 @@ import {
 import { DEFAULT_HIERARCHY_LEVEL, HIERARCHY_LEVELS } from './hierarchy-levels.js';
 import { RISK_LEVELS } from './risk-levels.js';
 import { ACCEPTED_STATUS_VALUES, DEFAULT_STATUS } from './status-values.js';
+import { CONVENTION_VALUES } from './conventions.js';
 import { DEFAULT_TAG_PREFIX, DEFAULT_FILE_OPT_IN_TAG } from '../config/defaults.js';
 
 /**
@@ -154,6 +155,7 @@ export const METADATA_TAGS_BY_GROUP = {
   architecture: ['arch-role', 'arch-context', 'arch-layer'] as const,
   extraction: ['extract-shapes'] as const,
   stub: ['target', 'since'] as const,
+  convention: ['convention'] as const,
 } as const;
 
 /**
@@ -465,6 +467,14 @@ export function buildRegistry(): TagRegistry {
         format: 'value',
         purpose: 'Design session that created this pattern',
         example: '@libar-docs-since DS-A',
+      },
+      // Convention tags for reference document generation (CodecDrivenReferenceGeneration)
+      {
+        tag: 'convention',
+        format: 'csv',
+        purpose: 'Convention domains for reference document generation from decision records',
+        values: [...CONVENTION_VALUES],
+        example: '@libar-docs-convention fsm-rules, testing-policy',
       },
     ],
 

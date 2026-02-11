@@ -206,6 +206,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
         extendsPattern: z.ZodOptional<z.ZodString>;
         targetPath: z.ZodOptional<z.ZodString>;
         since: z.ZodOptional<z.ZodString>;
+        convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -465,6 +466,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -687,6 +689,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -909,6 +912,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1135,6 +1139,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -1364,6 +1369,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
         extendsPattern: z.ZodOptional<z.ZodString>;
         targetPath: z.ZodOptional<z.ZodString>;
         since: z.ZodOptional<z.ZodString>;
+        convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -1586,6 +1592,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
         extendsPattern: z.ZodOptional<z.ZodString>;
         targetPath: z.ZodOptional<z.ZodString>;
         since: z.ZodOptional<z.ZodString>;
+        convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         quarter: z.ZodOptional<z.ZodString>;
@@ -1809,6 +1816,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2031,6 +2039,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2253,6 +2262,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2475,6 +2485,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2723,6 +2734,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -2945,6 +2957,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -3167,6 +3180,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;
@@ -3389,6 +3403,7 @@ export declare const AdrDocumentCodec: z.ZodCodec<z.ZodObject<{
             extendsPattern: z.ZodOptional<z.ZodString>;
             targetPath: z.ZodOptional<z.ZodString>;
             since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             quarter: z.ZodOptional<z.ZodString>;

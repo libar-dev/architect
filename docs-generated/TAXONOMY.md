@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **44 metadata tags** | **3 aggregation tags**
+**3 categories** | **45 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@libar-docs-` prefix with `@libar-docs` file opt-in.
 
 | Component | Count | Description |
 | --- | --- | --- |
 | Categories | 3 | Pattern classification by domain |
-| Metadata Tags | 44 | Pattern enrichment and relationships |
+| Metadata Tags | 45 | Pattern enrichment and relationships |
 | Aggregation Tags | 3 | Document routing |
 
 ---
@@ -110,6 +110,7 @@ Tags for enriching patterns with additional metadata.
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
 | `target` | value | Target implementation path for stub files | No | `@libar-docs-target src/api/stub-resolver.ts` |
 | `since` | value | Design session that created this pattern | No | `@libar-docs-since DS-A` |
+| `convention` | csv | Convention domains for reference document generation from decision records | No | `@libar-docs-convention fsm-rules, testing-policy` |
 
 [Full metadata tag reference](taxonomy/metadata-tags.md)
 

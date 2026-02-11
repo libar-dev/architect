@@ -613,6 +613,14 @@ export function extractPatternTags(tags) {
         else if (normalized.startsWith('since:')) {
             metadata.since = normalized.substring(6);
         }
+        // @libar-docs-convention:fsm-rules,testing-policy (CSV format)
+        else if (normalized.startsWith('convention:')) {
+            metadata.convention = normalized
+                .substring(11)
+                .split(',')
+                .map((v) => v.trim())
+                .filter((v) => v.length > 0);
+        }
         // Category tags: @ddd, @core, @event-sourcing, etc.
         // These don't have a colon, so treat them as category tags
         // Skip "libar-docs" (the bare opt-in marker) - it's not a domain category

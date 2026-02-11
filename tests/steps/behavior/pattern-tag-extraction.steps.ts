@@ -375,4 +375,62 @@ describeFeature(feature, ({ Scenario, Background, BeforeEachScenario }) => {
       expect(state!.metadata.phase).toBeUndefined();
     });
   });
+
+  // ===========================================================================
+  // Convention Tag Extraction
+  // ===========================================================================
+
+  Scenario('Extract single convention tag', ({ Given, When, Then }) => {
+    Given('feature tags containing "convention:testing-policy"', () => {
+      state!.tags = ['convention:testing-policy'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata convention should contain "testing-policy"', () => {
+      expect(state!.metadata.convention).toContain('testing-policy');
+    });
+  });
+
+  Scenario('Extract CSV convention tags', ({ Given, When, Then, And }) => {
+    Given('feature tags containing "convention:fsm-rules,testing-policy"', () => {
+      state!.tags = ['convention:fsm-rules,testing-policy'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata convention should contain "fsm-rules"', () => {
+      expect(state!.metadata.convention).toContain('fsm-rules');
+    });
+
+    And('the metadata convention should contain "testing-policy"', () => {
+      expect(state!.metadata.convention).toContain('testing-policy');
+    });
+  });
+
+  Scenario('Convention tag trims whitespace in CSV values', ({ Given, When, Then, And }) => {
+    Given('feature tags containing "convention:fsm-rules, testing-policy , cli-patterns"', () => {
+      state!.tags = ['convention:fsm-rules, testing-policy , cli-patterns'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata convention should contain "fsm-rules"', () => {
+      expect(state!.metadata.convention).toContain('fsm-rules');
+    });
+
+    And('the metadata convention should contain "testing-policy"', () => {
+      expect(state!.metadata.convention).toContain('testing-policy');
+    });
+
+    And('the metadata convention should contain "cli-patterns"', () => {
+      expect(state!.metadata.convention).toContain('cli-patterns');
+    });
+  });
 });

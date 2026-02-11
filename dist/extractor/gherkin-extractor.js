@@ -255,6 +255,8 @@ export function extractPatternsFromGherkin(scannedFiles, config) {
         assignIfDefined(rawPattern, 'adrCategory', metadata.adrCategory);
         assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
         assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
+        // Convention tags for reference document generation
+        assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
         // NOTE: ADR content is now derived from Gherkin Rule: keywords
         // (Context, Decision, Consequences) instead of parsed markdown.
         // The rules array is populated below and rendered by the ADR codec.
@@ -504,6 +506,7 @@ export async function extractPatternsFromGherkinAsync(scannedFiles, config) {
         assignIfDefined(rawPattern, 'adrCategory', metadata.adrCategory);
         assignIfDefined(rawPattern, 'adrSupersedes', metadata.adrSupersedes);
         assignIfDefined(rawPattern, 'adrSupersededBy', metadata.adrSupersededBy);
+        assignIfNonEmpty(rawPattern, 'convention', metadata.convention);
         // NOTE: ADR content derived from Gherkin Rule: keywords, not parsed markdown
         assignIfNonEmpty(rawPattern, 'whenToUse', whenToUse);
         if (scenarios.length > 0) {

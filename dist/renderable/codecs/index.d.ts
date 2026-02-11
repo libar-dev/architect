@@ -37,4 +37,6 @@ export { ArchitectureDocumentCodec, createArchitectureCodec, type ArchitectureCo
 export { type SourceMappingEntry, type PartitionedDecisionRules, type ExtractedDocString, type DecisionDocContent, SELF_REFERENCE_MARKER, SELF_REFERENCE_RULE_PATTERN, SELF_REFERENCE_DOCSTRING_PATTERN, EXTRACTION_METHODS, partitionDecisionRules, extractDocStrings, extractDocStringsFromRules, parseSourceMappingTable, parseSourceMappingsFromRules, isSelfReference, parseSelfReference, findRuleByName, extractRuleContent, parseDecisionDocument, normalizeExtractionMethod, docStringsToCodeBlocks, } from './decision-doc.js';
 export { TaxonomyDocumentCodec, createTaxonomyCodec, type TaxonomyCodecOptions, DEFAULT_TAXONOMY_OPTIONS, } from './taxonomy.js';
 export { ValidationRulesCodec, createValidationRulesCodec, type ValidationRulesCodecOptions, DEFAULT_VALIDATION_RULES_OPTIONS, } from './validation-rules.js';
+export { extractConventions, type ConventionBundle, type ConventionRuleContent, type ConventionTable, } from './convention-extractor.js';
+export { createReferenceCodec, type ReferenceDocConfig, type ReferenceCodecOptions, } from './reference.js';
 //# sourceMappingURL=index.d.ts.map

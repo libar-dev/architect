@@ -5,6 +5,7 @@
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:architecture
 @libar-docs-depends-on:DataAPIContextAssembly,DataAPIArchitectureQueries
+@libar-docs-convention:output-format,cli-patterns
 Feature: ADR-008 Text Output Path for Context and Discovery Commands
 
   **Context:**

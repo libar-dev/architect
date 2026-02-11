@@ -145,3 +145,28 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
     Given feature tags containing "phase:invalid"
     When extracting pattern tags
     Then the metadata should not have phase
+
+  # ==========================================================================
+  # Convention Tag Extraction
+  # ==========================================================================
+
+  @happy-path @convention
+  Scenario: Extract single convention tag
+    Given feature tags containing "convention:testing-policy"
+    When extracting pattern tags
+    Then the metadata convention should contain "testing-policy"
+
+  @happy-path @convention @comma-separated
+  Scenario: Extract CSV convention tags
+    Given feature tags containing "convention:fsm-rules,testing-policy"
+    When extracting pattern tags
+    Then the metadata convention should contain "fsm-rules"
+    And the metadata convention should contain "testing-policy"
+
+  @edge-case @convention
+  Scenario: Convention tag trims whitespace in CSV values
+    Given feature tags containing "convention:fsm-rules, testing-policy , cli-patterns"
+    When extracting pattern tags
+    Then the metadata convention should contain "fsm-rules"
+    And the metadata convention should contain "testing-policy"
+    And the metadata convention should contain "cli-patterns"

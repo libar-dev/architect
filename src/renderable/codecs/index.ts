@@ -198,3 +198,18 @@ export {
   type ValidationRulesCodecOptions,
   DEFAULT_VALIDATION_RULES_OPTIONS,
 } from './validation-rules.js';
+
+// Convention Extractor
+export {
+  extractConventions,
+  type ConventionBundle,
+  type ConventionRuleContent,
+  type ConventionTable,
+} from './convention-extractor.js';
+
+// Reference Document Codec (parameterized factory)
+export {
+  createReferenceCodec,
+  type ReferenceDocConfig,
+  type ReferenceCodecOptions,
+} from './reference.js';
