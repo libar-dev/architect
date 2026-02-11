@@ -168,9 +168,7 @@ function buildShapeSections(shapes, detailLevel) {
             }
             sections.push(code(shape.sourceText, 'typescript'));
             // Property docs table for interfaces at detailed level
-            if (detailLevel === 'detailed' &&
-                shape.propertyDocs &&
-                shape.propertyDocs.length > 0) {
+            if (detailLevel === 'detailed' && shape.propertyDocs && shape.propertyDocs.length > 0) {
                 const propRows = shape.propertyDocs.map((p) => [p.name, p.jsDoc]);
                 sections.push(table(['Property', 'Description'], propRows));
             }
