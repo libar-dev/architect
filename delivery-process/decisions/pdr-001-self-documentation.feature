@@ -6,6 +6,7 @@
 @libar-docs-status:completed
 @libar-docs-unlock-reason:Add-relationship-workflow-and-architecture-decisions
 @libar-docs-product-area:DeliveryProcess
+@libar-docs-convention:doc-generation,annotation-system
 Feature: PDR-001 - Self-Documentation Process
 
   Rule: Context - Package needs its own delivery process configuration

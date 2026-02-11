@@ -7,6 +7,7 @@
 
 import type { ExtractedPattern, DocDirective, ExportInfo } from '../../src/types/index.js';
 import type { DeliverableStatus } from '../../src/taxonomy/index.js';
+import type { BusinessRule } from '../../src/validation-schemas/index.js';
 import {
   asPatternId,
   asCategoryName,
@@ -122,6 +123,10 @@ export interface TestPatternOptions {
   archContext?: string;
   /** Architecture layer (default: none) */
   archLayer?: string;
+  /** Convention domains for reference doc generation (default: none) */
+  convention?: string[];
+  /** Business rules from Gherkin Rule: blocks (default: none) */
+  rules?: BusinessRule[];
 }
 
 /**
@@ -214,6 +219,9 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     archRole,
     archContext,
     archLayer,
+    // Convention and rules fields
+    convention,
+    rules,
   } = options;
 
   const directive: DocDirective = {
@@ -288,6 +296,9 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(archRole ? { archRole } : {}),
     ...(archContext ? { archContext } : {}),
     ...(archLayer ? { archLayer } : {}),
+    // Convention and rules fields
+    ...(convention && convention.length > 0 ? { convention } : {}),
+    ...(rules && rules.length > 0 ? { rules } : {}),
   };
 }
 

@@ -8,6 +8,7 @@
 @libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Process
+@libar-docs-convention:testing-policy
 Feature: ADR-004 - Gherkin-Only Testing Policy
 
   **Context:**

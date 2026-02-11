@@ -6,6 +6,7 @@
 @libar-docs-status:roadmap
 @libar-docs-product-area:DeliveryProcess
 @libar-docs-depends-on:DataAPIDesignSessionSupport
+@libar-docs-convention:session-workflow,cli-patterns
 Feature: PDR-002 - Session Workflow Commands Design Decisions
 
   **Context:**

@@ -9,6 +9,7 @@
 @libar-docs-product-area:Validation
 @libar-docs-claude-md-section:validation
 @libar-docs-unlock-reason:Fix-Source-Mapping-self-references-for-doc-generation
+@libar-docs-convention:fsm-rules
 Feature: ADR-006 - Process Guard Validation System
 
   **Context:**

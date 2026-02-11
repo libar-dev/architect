@@ -7,6 +7,7 @@
 @libar-docs-status:completed
 @libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
 @libar-docs-product-area:DeliveryProcess
+@libar-docs-convention:config-presets,annotation-system
 Feature: ADR-005 - Configurable Tag Prefix
 
   **Context:**

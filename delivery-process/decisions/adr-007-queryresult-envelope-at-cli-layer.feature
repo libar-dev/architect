@@ -5,6 +5,7 @@
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:architecture
 @libar-docs-depends-on:DataAPIOutputShaping
+@libar-docs-convention:cli-patterns,output-format
 Feature: ADR-007 QueryResult Envelope at CLI Layer Only
 
   **Context:**

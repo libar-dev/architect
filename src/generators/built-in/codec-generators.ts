@@ -28,6 +28,7 @@
 import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
+import { registerReferenceGenerators } from './reference-generators.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec-Based Generators (RDM Architecture)
@@ -157,3 +158,14 @@ generatorRegistry.register(createCodecGenerator('validation-rules', 'validation-
  * Produces both compact (_claude-md/) and detailed (docs/) outputs.
  */
 generatorRegistry.register(createDecisionDocGenerator());
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Reference Document Generators (Convention-Based, Codec-Driven)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Reference Document Generators
+ * 11 configs × 2 detail levels = 22 generators.
+ * Each replaces one recipe .feature file.
+ */
+registerReferenceGenerators(generatorRegistry);

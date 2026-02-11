@@ -546,6 +546,8 @@ export function extractPatternTags(tags: readonly string[]): {
   // Design session stub metadata
   readonly target?: string;
   readonly since?: string;
+  // Convention tags for reference document generation
+  readonly convention?: readonly string[];
 } {
   const metadata: {
     pattern?: string;
@@ -589,6 +591,8 @@ export function extractPatternTags(tags: readonly string[]): {
     // Design session stub metadata
     target?: string;
     since?: string;
+    // Convention tags for reference document generation
+    convention?: string[];
   } = {};
 
   for (const tag of tags) {
@@ -783,6 +787,14 @@ export function extractPatternTags(tags: readonly string[]): {
     // @libar-docs-since:DS-A
     else if (normalized.startsWith('since:')) {
       metadata.since = normalized.substring(6);
+    }
+    // @libar-docs-convention:fsm-rules,testing-policy (CSV format)
+    else if (normalized.startsWith('convention:')) {
+      metadata.convention = normalized
+        .substring(11)
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
     }
     // Category tags: @ddd, @core, @event-sourcing, etc.
     // These don't have a colon, so treat them as category tags
