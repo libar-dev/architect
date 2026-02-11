@@ -480,9 +480,9 @@ Feature: ADR-005 - Configurable Tag Prefix
 
 | Preset | Categories | Tag Prefix | Use Case |
 | --- | --- | --- | --- |
-| libar-generic (default) | 3 | @libar-docs- | Simple projects (this package) |
-| ddd-es-cqrs | 21 | @libar-docs- | DDD/Event Sourcing architectures |
-| generic | 3 | @docs- | Simple projects with @docs- prefix |
+| libar-generic (default) | 3 | libar-docs- | Simple projects (this package) |
+| ddd-es-cqrs | 21 | libar-docs- | DDD/Event Sourcing architectures |
+| generic | 3 | docs- | Simple projects with docs- prefix |
 
     **Behavior:** The preset determines which categories are available.
     All presets share the same status values and format types.

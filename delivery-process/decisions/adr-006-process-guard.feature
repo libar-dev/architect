@@ -150,7 +150,7 @@ Feature: ADR-006 - Process Guard Validation System
 | invalid-status-transition | error | Status transition must follow FSM |
 | scope-creep | error | Cannot add deliverables to active specs |
 | session-excluded | error | Cannot modify files excluded from session |
-| missing-relationship-target | warning | Relationship target pattern must exist |
+| missing-relationship-target | warning | Relationship target must exist |
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 
@@ -186,6 +186,7 @@ Feature: ADR-006 - Process Guard Validation System
     3. **scope-creep**: Remove new deliverable OR revert status to `roadmap` temporarily
     4. **session-scope**: Add file to session scope OR use `--ignore-session` flag
     5. **session-excluded**: Remove from exclusion list OR use `--ignore-session` flag
+    6. **missing-relationship-target**: Add target pattern OR remove the relationship
 
     For detailed fix examples with code snippets, see [PROCESS-GUARD.md](/docs/PROCESS-GUARD.md).
 
@@ -214,6 +215,7 @@ Feature: ADR-006 - Process Guard Validation System
 | `--ignore-session` | Skip session scope validation |
 | `--show-state` | Debug: show derived process state |
 | `--format json` | Machine-readable JSON output |
+| `--file <path>` | Validate a specific file |
 
     **Integration:** See `.husky/pre-commit` for pre-commit hook setup and `package.json` scripts section for npm script configuration.
 

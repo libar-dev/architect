@@ -89,7 +89,7 @@ Feature: ADR-010 - Pattern Naming and Annotation Conventions
 
     **Context:** Category tags classify patterns by domain area.
 
-    The full category list (21 categories in ddd-es-cqrs preset) is extracted from
+    The full category list (ddd-es-cqrs preset) is extracted from
     `src/taxonomy/categories.ts`. Each category has: tag, domain, priority, description.
 
     **Simple Presets (generic, libar-generic):** Only core, api, infra categories.
@@ -99,7 +99,7 @@ Feature: ADR-010 - Pattern Naming and Annotation Conventions
   Rule: Metadata Tags
 
     **Context:** Metadata tags are extracted from `src/taxonomy/registry-builder.ts`.
-    The `METADATA_TAGS_BY_GROUP` constant organizes all 42 tags into functional groups:
+    The `METADATA_TAGS_BY_GROUP` constant organizes all tags into functional groups:
     core, relationship, process, prd, adr, hierarchy, traceability, architecture, extraction.
 
     Each tag definition includes: tag name, format, purpose, and example.

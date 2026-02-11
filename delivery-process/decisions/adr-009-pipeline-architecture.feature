@@ -268,6 +268,9 @@ Feature: ADR-009 - Four-Stage Pipeline Architecture
     | PrChangesCodec | working/PR-CHANGES.md | (none) |
     | TraceabilityCodec | TRACEABILITY.md | (none) |
     | OverviewCodec | OVERVIEW.md | (none) |
+    | PlanningChecklistCodec | PLANNING-CHECKLIST.md | (none) |
+    | SessionPlanCodec | SESSION-PLAN.md | (none) |
+    | SessionFindingsCodec | SESSION-FINDINGS.md | (none) |
 
     See src/renderable/generate.ts for the complete DOCUMENT_TYPES registry.
 
