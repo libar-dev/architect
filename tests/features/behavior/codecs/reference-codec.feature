@@ -65,6 +65,31 @@ Feature: Reference Document Codec
       When decoding at detail level "standard"
       Then the document has a heading "Behavior Specifications"
 
+  Rule: Shape sources are extracted from matching patterns
+
+    @happy-path
+    Scenario: Shapes appear when source file matches shapeSources glob
+      Given a reference config with shapeSources "src/lint/*.ts"
+      And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
+      When decoding at detail level "detailed"
+      Then the document has a heading "API Types"
+      And the document contains a code block with "typescript"
+
+    @happy-path
+    Scenario: Summary level shows shapes as a compact table
+      Given a reference config with shapeSources "src/lint/*.ts"
+      And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
+      When decoding at detail level "summary"
+      Then the document has a heading "API Types"
+      And the document has at least 1 table
+
+    @edge-case
+    Scenario: No shapes when source file does not match glob
+      Given a reference config with shapeSources "src/config/*.ts"
+      And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
+      When decoding at detail level "detailed"
+      Then the document does not have a heading "API Types"
+
   Rule: Convention and behavior content compose in a single document
 
     @happy-path

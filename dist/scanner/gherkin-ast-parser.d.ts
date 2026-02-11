@@ -142,5 +142,6 @@ export declare function extractPatternTags(tags: readonly string[]): {
     readonly adrSupersededBy?: string;
     readonly target?: string;
     readonly since?: string;
+    readonly convention?: readonly string[];
 };
 //# sourceMappingURL=gherkin-ast-parser.d.ts.map

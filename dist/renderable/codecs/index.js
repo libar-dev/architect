@@ -57,4 +57,8 @@ partitionDecisionRules, extractDocStrings, extractDocStringsFromRules, parseSour
 export { TaxonomyDocumentCodec, createTaxonomyCodec, DEFAULT_TAXONOMY_OPTIONS, } from './taxonomy.js';
 // Validation Rules (includes ValidationRulesCodecOptions)
 export { ValidationRulesCodec, createValidationRulesCodec, DEFAULT_VALIDATION_RULES_OPTIONS, } from './validation-rules.js';
+// Convention Extractor
+export { extractConventions, } from './convention-extractor.js';
+// Reference Document Codec (parameterized factory)
+export { createReferenceCodec, } from './reference.js';
 //# sourceMappingURL=index.js.map

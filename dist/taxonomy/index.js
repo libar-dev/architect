@@ -47,6 +47,8 @@ ADR_LIST_GROUP_BY, CONSTRAINTS_GROUP_BY, DELIVERABLES_GROUP_BY, PRD_FEATURES_GRO
 PR_CHANGES_SORT_BY, REMAINING_WORK_SORT_BY, 
 // Metadata tag enums
 ADR_LAYER_VALUES, ADR_STATUS_VALUES, ADR_THEME_VALUES, PRIORITY_VALUES, WORKFLOW_VALUES, } from './generator-options.js';
+// Convention values (reference document generation)
+export { CONVENTION_VALUES } from './conventions.js';
 // Registry builder
 export { buildRegistry } from './registry-builder.js';
 //# sourceMappingURL=index.js.map

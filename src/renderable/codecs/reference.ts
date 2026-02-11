@@ -7,8 +7,8 @@
  * ## Parameterized Reference Document Codec
  *
  * A single codec factory that creates reference document codecs from
- * configuration objects. Replaces 11 recipe .feature files with
- * TypeScript config.
+ * configuration objects. Convention content is sourced from
+ * decision records tagged with @libar-docs-convention.
  *
  * ### When to Use
  *
@@ -35,6 +35,7 @@ import {
   paragraph,
   separator,
   table,
+  code,
   document,
 } from '../schema.js';
 import {
@@ -46,6 +47,8 @@ import {
 } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { extractConventions, type ConventionBundle } from './convention-extractor.js';
+import { extractShapesFromDataset } from './shape-matcher.js';
+import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
 
 // ============================================================================
 // Configuration Types
@@ -54,8 +57,8 @@ import { extractConventions, type ConventionBundle } from './convention-extracto
 /**
  * Configuration for a reference document type.
  *
- * Each config object replaces one recipe .feature file.
- * The Source Mapping from the recipe becomes these fields.
+ * Each config object defines one reference document's composition.
+ * Convention tags, shape sources, and behavior tags control content assembly.
  */
 export interface ReferenceDocConfig {
   /** Document title (e.g., "Process Guard Reference") */
@@ -66,7 +69,7 @@ export interface ReferenceDocConfig {
 
   /**
    * Glob patterns for TypeScript shape extraction sources.
-   * Placeholder — requires SourceMapper integration.
+   * Resolved via in-memory matching against pattern.source.file (AD-6).
    */
   readonly shapeSources: readonly string[];
 
@@ -104,11 +107,12 @@ const DEFAULT_REFERENCE_OPTIONS: Required<ReferenceCodecOptions> = {
 /**
  * Creates a reference document codec from configuration.
  *
- * The codec composes a RenderableDocument from convention content
- * and behavior patterns. Shape extraction is a placeholder for
- * future SourceMapper integration.
+ * The codec composes a RenderableDocument from three sources:
+ * 1. Convention content from convention-tagged decision records
+ * 2. TypeScript shapes from patterns matching shapeSources globs
+ * 3. Behavior content from category-tagged patterns
  *
- * @param config - Reference document configuration (replaces recipe file)
+ * @param config - Reference document configuration
  * @param options - Codec options including DetailLevel
  */
 export function createReferenceCodec(
@@ -127,18 +131,21 @@ export function createReferenceCodec(
         sections.push(...buildConventionSections(conventions, opts.detailLevel));
       }
 
-      // 2. Behavior content from tagged patterns
+      // 2. Shape extraction from matching patterns (AD-6: in-memory glob matching)
+      if (config.shapeSources.length > 0) {
+        const shapes = extractShapesFromDataset(dataset, config.shapeSources);
+        if (shapes.length > 0) {
+          sections.push(...buildShapeSections(shapes, opts.detailLevel));
+        }
+      }
+
+      // 3. Behavior content from tagged patterns
       if (config.behaviorTags.length > 0) {
         sections.push(...buildBehaviorSections(dataset, config.behaviorTags, opts.detailLevel));
       }
 
-      // 3. Shape extraction placeholder (requires runtime file access)
-      // config.shapeSources will be used when SourceMapper integration is added
-
       if (sections.length === 0) {
-        sections.push(
-          paragraph('No content found for the configured convention tags and behavior tags.')
-        );
+        sections.push(paragraph('No content found for the configured sources.'));
       }
 
       return document(config.title, sections, {
@@ -229,6 +236,51 @@ function buildBehaviorSections(
         r.description ? r.description.substring(0, 120) : '',
       ]);
       sections.push(table(['Rule', 'Description'], ruleRows));
+    }
+  }
+
+  sections.push(separator());
+  return sections;
+}
+
+/**
+ * Build sections from extracted TypeScript shapes.
+ *
+ * Composition order follows AD-5: conventions → shapes → behaviors.
+ *
+ * Detail level controls:
+ * - summary: type name + kind table only (compact)
+ * - standard: names + source text code blocks
+ * - detailed: full source with JSDoc and property doc tables
+ */
+function buildShapeSections(
+  shapes: readonly ExtractedShape[],
+  detailLevel: DetailLevel
+): SectionBlock[] {
+  const sections: SectionBlock[] = [];
+
+  sections.push(heading(2, 'API Types'));
+
+  if (detailLevel === 'summary') {
+    // Summary: just a table of type names and kinds
+    const rows = shapes.map((s) => [s.name, s.kind]);
+    sections.push(table(['Type', 'Kind'], rows));
+  } else {
+    // Standard/Detailed: code blocks for each shape
+    for (const shape of shapes) {
+      sections.push(heading(3, `${shape.name} (${shape.kind})`));
+
+      if (shape.jsDoc && detailLevel === 'detailed') {
+        sections.push(paragraph(shape.jsDoc));
+      }
+
+      sections.push(code(shape.sourceText, 'typescript'));
+
+      // Property docs table for interfaces at detailed level
+      if (detailLevel === 'detailed' && shape.propertyDocs && shape.propertyDocs.length > 0) {
+        const propRows = shape.propertyDocs.map((p) => [p.name, p.jsDoc]);
+        sections.push(table(['Property', 'Description'], propRows));
+      }
     }
   }
 

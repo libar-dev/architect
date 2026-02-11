@@ -353,3 +353,155 @@ Validates git changes against delivery process rules.
     - Requires understanding of FSM states and transitions
     - Initial friction when modifying completed specs
     - Pre-commit hook adds a few seconds to commit time
+
+## FSM Diagram
+
+The FSM enforces valid state transitions. Protection levels and transitions
+    are defined in TypeScript (extracted via @extract-shapes).
+
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress (blocked)
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Terminal state
+        note right of active : Scope-locked
+```
+
+## Escape Hatches
+
+**Context:** Sometimes process rules need to be bypassed for legitimate reasons.
+
+    **Decision:** These escape hatches are available:
+
+| Situation | Solution | Example |
+| --- | --- | --- |
+| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
+| CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
+
+## Rule Descriptions
+
+Process Guard validates 6 rules (types extracted from TypeScript):
+
+| Rule | Severity | Human Description |
+| --- | --- | --- |
+| completed-protection | error | Cannot modify completed specs without unlock-reason |
+| invalid-status-transition | error | Status transition must follow FSM |
+| scope-creep | error | Cannot add deliverables to active specs |
+| session-excluded | error | Cannot modify files excluded from session |
+| session-scope | warning | File not in active session scope |
+| deliverable-removed | warning | Deliverable was removed (informational) |
+
+## CLI Usage
+
+Process Guard is invoked via the lint-process CLI command.
+    Configuration interface (`ProcessGuardCLIConfig`) is extracted from `src/cli/lint-process.ts`.
+
+    **CLI Commands:**
+
+| Command | Purpose |
+| --- | --- |
+| `lint-process --staged` | Pre-commit validation (default mode) |
+| `lint-process --all --strict` | CI pipeline with strict mode |
+| `lint-process --file specs/my-feature.feature` | Validate specific file |
+| `lint-process --staged --show-state` | Debug: show derived process state |
+| `lint-process --staged --ignore-session` | Override session scope checking |
+
+    **CLI Options:**
+
+| Option | Description |
+| --- | --- |
+| `--staged` | Validate staged files only (pre-commit) |
+| `--all` | Validate all tracked files (CI) |
+| `--strict` | Treat warnings as errors (exit 1) |
+| `--ignore-session` | Skip session scope validation |
+| `--show-state` | Debug: show derived process state |
+| `--format json` | Machine-readable JSON output |
+
+    **Integration:** See `.husky/pre-commit` for pre-commit hook setup and `package.json` scripts section for npm script configuration.
+
+## Programmatic API
+
+Process Guard can be used programmatically for custom integrations.
+
+    **Usage Example:**
+
+```typescript
+import {
+      deriveProcessState,
+      detectStagedChanges,
+      validateChanges,
+      hasErrors,
+      summarizeResult,
+    } from '@libar-dev/delivery-process/lint';
+
+    const state = (await deriveProcessState({ baseDir: '.' })).value;
+    const changes = detectStagedChanges('.').value;
+    const { result } = validateChanges({
+      state,
+      changes,
+      options: { strict: false, ignoreSession: false },
+    });
+
+    if (hasErrors(result)) {
+      console.log(summarizeResult(result));
+      for (const v of result.violations) {
+        console.log(`[${v.rule}] ${v.file}: ${v.message}`);
+      }
+      process.exit(1);
+    }
+```
+
+**API Functions:**
+
+| Category | Function | Description |
+| --- | --- | --- |
+| State | deriveProcessState(cfg) | Build state from file annotations |
+| Changes | detectStagedChanges(dir) | Parse staged git diff |
+| Changes | detectBranchChanges(dir) | Parse all changes vs main |
+| Changes | detectFileChanges(dir, f) | Parse specific files |
+| Validate | validateChanges(input) | Run all validation rules |
+| Results | hasErrors(result) | Check for blocking errors |
+| Results | hasWarnings(result) | Check for warnings |
+| Results | summarizeResult(result) | Human-readable summary |
+
+## Architecture
+
+Process Guard uses the Decider pattern for testable validation.
+
+    **Data Flow Diagram:**
+
+```mermaid
+flowchart LR
+        A[deriveProcessState] --> C[validateChanges]
+        B[detectChanges] --> C
+        C --> D[ValidationResult]
+
+        subgraph Pure Functions
+            C
+        end
+
+        subgraph I/O
+            A
+            B
+        end
+```
+
+**Principle:** State is derived from file annotations - there is no separate state file to maintain.
+
+## Related Documentation
+
+**Context:** Related documentation for deeper understanding.
+
+| Document | Relationship | Focus |
+| --- | --- | --- |
+| VALIDATION-REFERENCE.md | Sibling | DoD validation, anti-pattern detection |
+| SESSION-GUIDES-REFERENCE.md | Prerequisite | Planning/Implementation workflows that Process Guard enforces |
+| CONFIGURATION-REFERENCE.md | Reference | Presets and tag configuration |
+| METHODOLOGY-REFERENCE.md | Background | Code-first documentation philosophy |

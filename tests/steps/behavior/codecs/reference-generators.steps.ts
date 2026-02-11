@@ -64,15 +64,18 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   // ──────────────────────────────────────────────────────────────────────
 
   Rule('Registration produces the correct number of generators', ({ RuleScenario }) => {
-    RuleScenario('All 22 generators are registered from 11 configs', ({ When, Then }) => {
-      When('registering reference generators', () => {
-        registerReferenceGenerators(state!.registry);
-      });
+    RuleScenario(
+      'All 23 generators are registered from 11 configs plus meta-generator',
+      ({ When, Then }) => {
+        When('registering reference generators', () => {
+          registerReferenceGenerators(state!.registry);
+        });
 
-      Then('{int} generators are registered', (_ctx: unknown, count: number) => {
-        expect(state!.registry.available()).toHaveLength(count);
-      });
-    });
+        Then('{int} generators are registered', (_ctx: unknown, count: number) => {
+          expect(state!.registry.available()).toHaveLength(count);
+        });
+      }
+    );
   });
 
   // ──────────────────────────────────────────────────────────────────────

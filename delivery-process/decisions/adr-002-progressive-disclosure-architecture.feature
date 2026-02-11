@@ -5,7 +5,8 @@
 @libar-docs-pattern:ADR002ProgressiveDisclosureArchitecture
 @libar-docs-phase:43
 @libar-docs-status:completed
-@libar-docs-unlock-reason:Add-libar-docs-opt-in-marker
+@libar-docs-unlock-reason:Add-convention-tag-for-codec-reference-gen
+@libar-docs-convention:output-format,pipeline-architecture
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Generators
 Feature: ADR-002 - Progressive Disclosure Information Architecture

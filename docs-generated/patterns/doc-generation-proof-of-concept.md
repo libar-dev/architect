@@ -15,7 +15,7 @@
 ## Description
 
 **Status: SUPERSEDED** - This POC has been implemented. See:
-  - `delivery-process/recipes/` - 11 documentation recipes implementing this pattern
+  - Convention-tagged decision records (ADR/PDR) with @libar-docs-convention tags
   - `docs-generated/ANNOTATION-GUIDE.md` - Comprehensive guide for fixing generated docs
 
   This decision establishes the pattern for generating technical documentation
@@ -154,17 +154,17 @@
 
     | Gap | Impact | Solution |
     | Shape extraction from TypeScript | High | New @extract-shapes tag |
-    | Recipe for aggregation | Medium | Decision documents as recipes |
+    | Convention-tagged content | Medium | Decision records as convention sources |
     | Durable intro/context content | Medium | Decision Rule: Context sections |
 
-**Decision - Decisions own recipes and durable content, code owns details**
+**Decision - Decisions own convention content and durable context, code owns details**
 
 **The Pattern:**
 
     Documentation is generated from three source types with different durability:
 
     | Source Type | Durability | Content Ownership |
-    | Decision documents (ADR/PDR) | Permanent | Intro, context, rationale, recipes |
+    | Decision documents (ADR/PDR) | Permanent | Intro, context, rationale, conventions |
     | Behavior specs (.feature) | Permanent | Rules, examples, acceptance criteria |
     | Implementation code (.ts) | Compiled | API types, error messages, signatures |
 

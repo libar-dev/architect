@@ -6,7 +6,7 @@
 
 ## Metadata Tag Definitions
 
-44 metadata tags with full details.
+45 metadata tags with full details.
 
 | Tag | Format | Purpose | Required | Repeatable | Values | Default |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -54,6 +54,7 @@
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | No | domain, application, infrastructure | - |
 | `target` | value | Target implementation path for stub files | No | No | - | - |
 | `since` | value | Design session that created this pattern | No | No | - | - |
+| `convention` | csv | Convention domains for reference document generation from decision records | No | No | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation | - |
 
 ## Tag Details
 
@@ -509,6 +510,17 @@
 | Required | No |
 | Repeatable | No |
 | Example | `@libar-docs-since DS-A` |
+
+### `convention`
+
+| Property | Value |
+| --- | --- |
+| Format | csv |
+| Purpose | Convention domains for reference document generation from decision records |
+| Required | No |
+| Repeatable | No |
+| Valid Values | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation |
+| Example | `@libar-docs-convention fsm-rules, testing-policy` |
 
 ---
 

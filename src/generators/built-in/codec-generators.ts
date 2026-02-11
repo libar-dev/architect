@@ -166,6 +166,6 @@ generatorRegistry.register(createDecisionDocGenerator());
 /**
  * Reference Document Generators
  * 11 configs × 2 detail levels = 22 generators.
- * Each replaces one recipe .feature file.
+ * Each produces a detailed + summary reference document pair.
  */
 registerReferenceGenerators(generatorRegistry);

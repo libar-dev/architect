@@ -28,7 +28,7 @@ import {
 /**
  * All reference document configurations.
  *
- * Each entry replaces one recipe .feature file from delivery-process/recipes/.
+ * Each entry defines one reference document's convention sources and shape globs.
  */
 export const REFERENCE_CONFIGS: readonly ReferenceDocConfig[] = [
   {
@@ -188,13 +188,61 @@ function toGeneratorName(title: string): string {
 }
 
 /**
+ * Meta-generator that produces all 22 reference documents (11 detailed + 11 summary)
+ * from a single `-g reference-docs` invocation.
+ */
+class ReferenceDocsGenerator implements DocumentGenerator {
+  readonly name = 'reference-docs';
+  readonly description = 'All reference documents (11 detailed + 11 summary)';
+
+  generate(
+    _patterns: readonly ExtractedPattern[],
+    context: GeneratorContext
+  ): Promise<GeneratorOutput> {
+    if (!context.masterDataset) {
+      return Promise.resolve({ files: [] });
+    }
+
+    const files: Array<{ path: string; content: string }> = [];
+
+    for (const config of REFERENCE_CONFIGS) {
+      // Detailed output -> docs/{docsFilename}
+      const detailedCodec = createReferenceCodec(config, {
+        detailLevel: 'detailed',
+        generateDetailFiles: false,
+      });
+      const detailedDoc = detailedCodec.decode(context.masterDataset) as RenderableDocument;
+      files.push({ path: `docs/${config.docsFilename}`, content: renderToMarkdown(detailedDoc) });
+
+      // Summary output -> _claude-md/{section}/{filename}
+      const summaryCodec = createReferenceCodec(config, {
+        detailLevel: 'summary',
+        generateDetailFiles: false,
+      });
+      const summaryDoc = summaryCodec.decode(context.masterDataset) as RenderableDocument;
+      files.push({
+        path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
+        content: renderToMarkdown(summaryDoc),
+      });
+    }
+
+    return Promise.resolve({ files });
+  }
+}
+
+/**
  * Registers all reference generators in the GeneratorRegistry.
  *
- * Each config produces TWO generators:
- * 1. "{name}-reference" -> detailed output -> docs/{docsFilename}
- * 2. "{name}-reference-claude" -> summary output -> _claude-md/{section}/{filename}
+ * Registers:
+ * - "reference-docs" meta-generator (produces all 22 files at once)
+ * - 22 individual generators for selective invocation:
+ *   "{name}-reference" -> detailed, "{name}-reference-claude" -> summary
  */
 export function registerReferenceGenerators(registry: GeneratorRegistry): void {
+  // Meta-generator: single -g reference-docs produces all 22 files
+  registry.register(new ReferenceDocsGenerator());
+
+  // Individual generators: selective invocation per document
   for (const config of REFERENCE_CONFIGS) {
     const kebabName = toGeneratorName(config.title);
 

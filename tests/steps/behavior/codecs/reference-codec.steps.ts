@@ -17,6 +17,7 @@ import {
   findHeadings,
   findParagraphs,
   findTables,
+  findBlocksByType,
 } from '../../../support/helpers/document-assertions.js';
 
 // ============================================================================
@@ -369,6 +370,200 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
       }
     );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Shape sources are extracted from matching patterns
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Shape sources are extracted from matching patterns', ({ RuleScenario }) => {
+    RuleScenario(
+      'Shapes appear when source file matches shapeSources glob',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with shapeSources {string}',
+          (_ctx: unknown, shapeSources: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              behaviorTags: [],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And(
+          'a MasterDataset with a pattern at {string} with extracted shapes',
+          (_ctx: unknown, filePath: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'ShapePattern',
+                  filePath,
+                  extractedShapes: [
+                    {
+                      name: 'DeciderInput',
+                      kind: 'interface',
+                      sourceText:
+                        'export interface DeciderInput {\n  state: ProcessState;\n  changes: Change[];\n}',
+                      jsDoc: 'Input to the process guard decider function.',
+                      lineNumber: 10,
+                      exported: true,
+                      propertyDocs: [
+                        {
+                          name: 'state',
+                          jsDoc: 'Current process state derived from file annotations',
+                        },
+                        { name: 'changes', jsDoc: 'Staged or detected changes to validate' },
+                      ],
+                    },
+                  ],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text.includes(headingText));
+          expect(match).toBe(true);
+        });
+
+        And(
+          'the document contains a code block with {string}',
+          (_ctx: unknown, language: string) => {
+            const codeBlocks = findBlocksByType(state!.document!, 'code');
+            const match = codeBlocks.some((b) => b.language === language);
+            expect(match).toBe(true);
+          }
+        );
+      }
+    );
+
+    RuleScenario('Summary level shows shapes as a compact table', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with shapeSources {string}',
+        (_ctx: unknown, shapeSources: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            behaviorTags: [],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And(
+        'a MasterDataset with a pattern at {string} with extracted shapes',
+        (_ctx: unknown, filePath: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'ShapePattern',
+                filePath,
+                extractedShapes: [
+                  {
+                    name: 'DeciderInput',
+                    kind: 'interface',
+                    sourceText: 'export interface DeciderInput { state: ProcessState; }',
+                    lineNumber: 10,
+                    exported: true,
+                  },
+                ],
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
+        const headings = findHeadings(state!.document!);
+        const match = headings.some((h) => h.text.includes(headingText));
+        expect(match).toBe(true);
+      });
+
+      And('the document has at least {int} table', (_ctx: unknown, minCount: number) => {
+        const tables = findTables(state!.document!);
+        expect(tables.length).toBeGreaterThanOrEqual(minCount);
+      });
+    });
+
+    RuleScenario('No shapes when source file does not match glob', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with shapeSources {string}',
+        (_ctx: unknown, shapeSources: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            behaviorTags: [],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And(
+        'a MasterDataset with a pattern at {string} with extracted shapes',
+        (_ctx: unknown, filePath: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'ShapePattern',
+                filePath,
+                extractedShapes: [
+                  {
+                    name: 'Unrelated',
+                    kind: 'type',
+                    sourceText: 'export type Unrelated = string;',
+                    lineNumber: 1,
+                    exported: true,
+                  },
+                ],
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then(
+        'the document does not have a heading {string}',
+        (_ctx: unknown, headingText: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text.includes(headingText));
+          expect(match).toBe(false);
+        }
+      );
+    });
   });
 
   // ──────────────────────────────────────────────────────────────────────

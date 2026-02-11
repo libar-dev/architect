@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [█████████████░░░░░░░] 102/163 (63% complete)
+**Overall:** [████████████░░░░░░░░] 102/165 (62% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 102 |
-| 🚧 Active | 26 |
+| 🚧 Active | 28 |
 | 📋 Planned | 35 |
-| **Total** | 163 |
+| **Total** | 165 |
 
 ---
 
@@ -35,7 +35,7 @@
 - [Opportunity 5](#opportunity-5) (1)
 - [Opportunity 6](#opportunity-6) (1)
 - [Opportunity 8](#opportunity-8) (1)
-- [Pattern](#pattern) (11)
+- [Pattern](#pattern) (13)
 - [Scanner](#scanner) (2)
 - [Status](#status) (10)
 - [Validation](#validation) (11)
@@ -173,6 +173,8 @@
 | 🚧 Process State API | Core | active | TypeScript interface for querying delivery process state. |
 | 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
+| 🚧 Reference Document Codec | Pattern | active | A single codec factory that creates reference document codecs from configuration objects. |
+| 🚧 Reference Generator Registration | Pattern | active | Registers all 11 reference document generators. |
 | 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
@@ -448,7 +450,7 @@
 
 ### Pattern
 
-4/11 complete (36%)
+4/13 complete (31%)
 
 - [✅ Extracted Shape Schema](patterns/extracted-shape-schema.md)
 - [✅ Handoff Generator Impl](patterns/handoff-generator-impl.md)
@@ -460,6 +462,8 @@
 - [🚧 Coverage Analyzer Impl](patterns/coverage-analyzer-impl.md)
 - [🚧 File Cache](patterns/file-cache.md)
 - [🚧 Pattern Helpers](patterns/pattern-helpers.md)
+- [🚧 Reference Document Codec](patterns/reference-document-codec.md)
+- [🚧 Reference Generator Registration](patterns/reference-generator-registration.md)
 - [🚧 Stub Resolver Impl](patterns/stub-resolver-impl.md)
 
 ---
@@ -560,11 +564,6 @@ graph TD
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
     TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
-    LintRules ..-> PatternRelationshipModel
-    LintModule --> LintRules
-    LintModule --> LintEngine
-    LintEngine --> LintRules
-    LintEngine --> CodecUtils
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -575,16 +574,11 @@ graph TD
     TypeScript_AST_Parser --> TagRegistry
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    LintRules ..-> PatternRelationshipModel
+    LintModule --> LintRules
+    LintModule --> LintEngine
+    LintEngine --> LintRules
+    LintEngine --> CodecUtils
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -596,6 +590,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
@@ -668,6 +672,7 @@ graph TD
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
+    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
     PatternsCodec ..-> PatternRelationshipModel
     ArchitectureCodec --> MasterDataset
     ArchitectureCodec --> ArchIndex
@@ -683,6 +688,7 @@ graph TD
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
