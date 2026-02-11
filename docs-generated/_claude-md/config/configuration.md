@@ -63,30 +63,6 @@
 | File Opt-In | libar-docs |
 | Categories | 21 |
 
-| Category | Domain | Priority | Description |
-| --- | --- | --- | --- |
-| domain | Domain | 1 | Domain layer patterns |
-| ddd | DDD | 2 | Domain-Driven Design core |
-| bounded-context | Bounded Context | 3 | Context boundaries |
-| event-sourcing | Event Sourcing | 4 | Event sourcing patterns |
-| decider | Decider | 5 | Decision functions |
-| cqrs | CQRS | 6 | Command/Query separation |
-| saga | Saga | 7 | Process orchestration |
-| projection | Projection | 8 | Read model projections |
-| aggregate | Aggregate | 9 | Aggregate roots |
-| entity | Entity | 10 | Domain entities |
-| value-object | Value Object | 11 | Immutable values |
-| repository | Repository | 12 | Data access |
-| factory | Factory | 13 | Object creation |
-| service | Service | 14 | Domain services |
-| event | Event | 15 | Domain events |
-| command | Command | 16 | Command objects |
-| query | Query | 17 | Query objects |
-| integration | Integration | 18 | External integrations |
-| infrastructure | Infrastructure | 19 | Infrastructure layer |
-| application | Application | 20 | Application layer |
-| presentation | Presentation | 21 | Presentation layer |
-
 ---
 
 ## Hierarchical Configuration
@@ -211,9 +187,9 @@
 
 | Project Type | Recommended Preset | Categories Available |
 | --- | --- | --- |
-| Simple utility packages | libar-generic | core, api, generator |
+| Simple utility packages | libar-generic | core, api, infra |
 | DDD/Event Sourcing systems | ddd-es-cqrs | All 21 categories |
-| Generic projects | generic | core, api, generator |
+| Generic projects | generic | core, api, infra |
 
 ---
 
@@ -423,10 +399,10 @@
 
 | Situation | Solution | Example |
 | --- | --- | --- |
-| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Fix bug in completed spec | Add unlock-reason tag | at-prefix-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
-| Emergency hotfix | Combine unlock + ignore | @libar-docs-unlock-reason:'Hotfix' plus --ignore-session |
+| Emergency hotfix | Combine unlock + ignore | at-prefix-unlock-reason:'Hotfix' plus --ignore-session |
 
 ---
 

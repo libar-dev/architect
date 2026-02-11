@@ -228,7 +228,7 @@ Feature: ADR-010 - Pattern Naming and Annotation Conventions
     Use a Background section with a DataTable to define deliverables. The table
     must have columns: Deliverable, Status, Location.
 
-    **Rule Block Structure:**
+    **Rule Block Structure (for executable spec feature files):**
 
     | Component | Purpose |
     | --- | --- |

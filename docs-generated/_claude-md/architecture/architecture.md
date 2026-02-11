@@ -13,7 +13,7 @@
 | Single-Pass Transformation | All derived views computed in O(n) time, not redundant O(n) per section |
 | Codec-Based Rendering | Zod 4 codecs transform MasterDataset to RenderableDocument to Markdown |
 | Schema-First Validation | Zod schemas define types; runtime validation at all boundaries |
-| Result Monad | Explicit error handling via Result T,E instead of exceptions |
+| Result Monad | Explicit error handling via Result(T,E) instead of exceptions |
 
 | Aspect | Wrong Mental Model | Correct Mental Model |
 | --- | --- | --- |
@@ -78,11 +78,11 @@
 | tagRegistry | TagRegistry | Category and tag definitions |
 | byStatus | StatusGroups | Grouped by completed, active, planned |
 | byPhase | PhaseGroup[] | Grouped by phase with counts |
-| byQuarter | Record | Grouped by quarter (e.g., "Q4-2024") |
-| byCategory | Record | Grouped by category |
+| byQuarter | Record(string, ExtractedPattern[]) | Grouped by quarter (e.g., "Q4-2024") |
+| byCategory | Record(string, ExtractedPattern[]) | Grouped by category |
 | bySource | SourceViews | Grouped by typescript, gherkin, roadmap, prd |
 | counts | StatusCounts | Aggregate status counts |
-| relationshipIndex | Record | Dependency graph (uses, usedBy, dependsOn, enables) |
+| relationshipIndex | Record(string, RelationshipEntry) | Dependency graph (uses, usedBy, dependsOn, enables) |
 | archIndex | ArchIndex | Optional architecture index for diagrams |
 
 | View | Access Pattern | Use Case |
@@ -105,7 +105,7 @@
 | purpose | string (optional) | Description (rendered as blockquote) |
 | detailLevel | string (optional) | Detail level indicator |
 | sections | SectionBlock[] | Array of content blocks |
-| additionalFiles | Record | Progressive disclosure detail files |
+| additionalFiles | Record(string, RenderableDocument) | Progressive disclosure detail files |
 
 ---
 
@@ -165,7 +165,7 @@
 | Category | Codecs | Purpose |
 | --- | --- | --- |
 | Pattern-Focused | patterns, requirements, adrs | Pattern registries, requirements, decisions |
-| Timeline-Focused | roadmap, milestones, current, changelog | Roadmaps, history, active work, releases |
+| Timeline-Focused | roadmap, milestones, current, changelog, overview | Roadmaps, history, active work, releases, project overview |
 | Session-Focused | session, remaining, pr-changes, traceability | Session context, remaining work, PR changes |
 | Planning | planning-checklist, session-plan, session-findings | Planning checklists, session plans, findings |
 
@@ -288,7 +288,7 @@
 | Single-Pass Transformation | All derived views computed in O(n) time, not redundant O(n) per section |
 | Codec-Based Rendering | Zod 4 codecs transform MasterDataset to RenderableDocument to Markdown |
 | Schema-First Validation | Zod schemas define types; runtime validation at all boundaries |
-| Result Monad | Explicit error handling via Result T,E instead of exceptions |
+| Result Monad | Explicit error handling via Result(T,E) instead of exceptions |
 
 | Aspect | Wrong Mental Model | Correct Mental Model |
 | --- | --- | --- |
@@ -353,11 +353,11 @@
 | tagRegistry | TagRegistry | Category and tag definitions |
 | byStatus | StatusGroups | Grouped by completed, active, planned |
 | byPhase | PhaseGroup[] | Grouped by phase with counts |
-| byQuarter | Record | Grouped by quarter (e.g., "Q4-2024") |
-| byCategory | Record | Grouped by category |
+| byQuarter | Record(string, ExtractedPattern[]) | Grouped by quarter (e.g., "Q4-2024") |
+| byCategory | Record(string, ExtractedPattern[]) | Grouped by category |
 | bySource | SourceViews | Grouped by typescript, gherkin, roadmap, prd |
 | counts | StatusCounts | Aggregate status counts |
-| relationshipIndex | Record | Dependency graph (uses, usedBy, dependsOn, enables) |
+| relationshipIndex | Record(string, RelationshipEntry) | Dependency graph (uses, usedBy, dependsOn, enables) |
 | archIndex | ArchIndex | Optional architecture index for diagrams |
 
 | View | Access Pattern | Use Case |
@@ -380,7 +380,7 @@
 | purpose | string (optional) | Description (rendered as blockquote) |
 | detailLevel | string (optional) | Detail level indicator |
 | sections | SectionBlock[] | Array of content blocks |
-| additionalFiles | Record | Progressive disclosure detail files |
+| additionalFiles | Record(string, RenderableDocument) | Progressive disclosure detail files |
 
 ---
 
@@ -440,7 +440,7 @@
 | Category | Codecs | Purpose |
 | --- | --- | --- |
 | Pattern-Focused | patterns, requirements, adrs | Pattern registries, requirements, decisions |
-| Timeline-Focused | roadmap, milestones, current, changelog | Roadmaps, history, active work, releases |
+| Timeline-Focused | roadmap, milestones, current, changelog, overview | Roadmaps, history, active work, releases, project overview |
 | Session-Focused | session, remaining, pr-changes, traceability | Session context, remaining work, PR changes |
 | Planning | planning-checklist, session-plan, session-findings | Planning checklists, session plans, findings |
 

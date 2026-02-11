@@ -138,7 +138,7 @@ Feature: ADR-006 - Process Guard Validation System
 | --- | --- | --- |
 | Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
-| CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
+| CI warnings blocking pipeline | Omit --strict flag | lint-process --all (warnings won't fail) |
 
   Rule: Rule Descriptions
 

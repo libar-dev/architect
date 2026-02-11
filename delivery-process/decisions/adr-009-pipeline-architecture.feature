@@ -128,11 +128,11 @@ Feature: ADR-009 - Four-Stage Pipeline Architecture
     | tagRegistry | TagRegistry | Category and tag definitions |
     | byStatus | StatusGroups | Grouped by completed, active, planned |
     | byPhase | PhaseGroup[] | Grouped by phase with counts |
-    | byQuarter | Record | Grouped by quarter (e.g., "Q4-2024") |
-    | byCategory | Record | Grouped by category |
+    | byQuarter | Record(string, ExtractedPattern[]) | Grouped by quarter (e.g., "Q4-2024") |
+    | byCategory | Record(string, ExtractedPattern[]) | Grouped by category |
     | bySource | SourceViews | Grouped by typescript, gherkin, roadmap, prd |
     | counts | StatusCounts | Aggregate status counts |
-    | relationshipIndex | Record | Dependency graph (uses, usedBy, dependsOn, enables) |
+    | relationshipIndex | Record(string, RelationshipEntry) | Dependency graph (uses, usedBy, dependsOn, enables) |
     | archIndex | ArchIndex | Optional architecture index for diagrams |
 
     **Pre-computed Views (O(1) Access):**
@@ -161,7 +161,7 @@ Feature: ADR-009 - Four-Stage Pipeline Architecture
     | purpose | string (optional) | Description (rendered as blockquote) |
     | detailLevel | string (optional) | Detail level indicator |
     | sections | SectionBlock[] | Array of content blocks |
-    | additionalFiles | Record | Progressive disclosure detail files |
+    | additionalFiles | Record(string, RenderableDocument) | Progressive disclosure detail files |
 
     See src/renderable/schema.ts for block builders and type definitions.
 
@@ -248,7 +248,7 @@ Feature: ADR-009 - Four-Stage Pipeline Architecture
     | Category | Codecs | Purpose |
     | --- | --- | --- |
     | Pattern-Focused | patterns, requirements, adrs | Pattern registries, requirements, decisions |
-    | Timeline-Focused | roadmap, milestones, current, changelog | Roadmaps, history, active work, releases |
+    | Timeline-Focused | roadmap, milestones, current, changelog, overview | Roadmaps, history, active work, releases, project overview |
     | Session-Focused | session, remaining, pr-changes, traceability | Session context, remaining work, PR changes |
     | Planning | planning-checklist, session-plan, session-findings | Planning checklists, session plans, findings |
 

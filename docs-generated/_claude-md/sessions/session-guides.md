@@ -142,10 +142,10 @@
 
 | Situation | Solution | Example |
 | --- | --- | --- |
-| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Fix bug in completed spec | Add unlock-reason tag | at-prefix-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
-| Emergency hotfix | Combine unlock + ignore | @libar-docs-unlock-reason:'Hotfix' plus --ignore-session |
+| Emergency hotfix | Combine unlock + ignore | at-prefix-unlock-reason:'Hotfix' plus --ignore-session |
 
 ---
 
@@ -232,7 +232,7 @@
 | --- | --- | --- |
 | Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
-| CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
+| CI warnings blocking pipeline | Omit --strict flag | lint-process --all (warnings won't fail) |
 
 ---
 
@@ -244,6 +244,7 @@
 | invalid-status-transition | error | Status transition must follow FSM |
 | scope-creep | error | Cannot add deliverables to active specs |
 | session-excluded | error | Cannot modify files excluded from session |
+| missing-relationship-target | warning | Relationship target pattern must exist |
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 
@@ -256,6 +257,7 @@
 | completed-protection | error | Cannot modify completed spec without unlock reason | Add unlock-reason tag |
 | invalid-status-transition | error | Invalid status transition: roadmap to completed | Follow FSM path |
 | scope-creep | error | Cannot add deliverables to active spec | Remove deliverable or revert to roadmap |
+| missing-relationship-target | warning | Missing relationship target: "PatternX" referenced by "PatternY" | Add target pattern or remove relationship |
 | session-scope | warning | File not in active session scope | Add to scope or use --ignore-session |
 | session-excluded | error | File is explicitly excluded from session | Remove from exclusion or use --ignore-session |
 | deliverable-removed | warning | Deliverable removed: "Unit tests" | Informational only |

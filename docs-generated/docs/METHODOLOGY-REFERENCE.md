@@ -72,7 +72,9 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 
 ## Session Decision Tree
 
-**Context:** Developers need to choose the correct session type based on their current situation.
+**Tag Notation:** In Rule descriptions below, "at-prefix" stands for the configured tag prefix (e.g., "@libar-docs-"), escaped to avoid Gherkin tag parsing.
+
+    **Context:** Developers need to choose the correct session type based on their current situation.
 
     **Decision Tree (ASCII):**
 
@@ -319,10 +321,10 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 
 | Situation | Solution | Example |
 | --- | --- | --- |
-| Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
+| Fix bug in completed spec | Add unlock-reason tag | at-prefix-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
 | CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
-| Emergency hotfix | Combine unlock + ignore | @libar-docs-unlock-reason:'Hotfix' plus --ignore-session |
+| Emergency hotfix | Combine unlock + ignore | at-prefix-unlock-reason:'Hotfix' plus --ignore-session |
 
 ---
 
@@ -691,7 +693,7 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | Planning | Single-session work, clear scope |
 | Neither | Multi-session work, architectural decisions |
 
-**Verified by:** @acceptance-criteria Scenario: Reference generates Methodology documentation
+**Verified by:** @acceptance-criteria Scenario: Package can generate its own documentation
 
 ---
 
@@ -957,39 +959,38 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     **PROCESS-GUARD.md Key Sections:**
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| The Problem / The Solution | 16-33 | Documentation drift, code as source of truth |
-| Built for AI-Assisted Dev | 36-57 | ProcessStateAPI typed queries |
-| How It Works | 60-111 | Annotation examples, dual-source |
-| Quick Start | 114-170 | Install, annotate, generate, lint |
-| CLI Commands | 173-183 | Command summary table |
-| FSM-Enforced Workflow | 187-217 | State diagram, protection levels |
+| Section Heading | Topics |
+| --- | --- |
+| The Problem / The Solution | Documentation drift, code as source of truth |
+| Built for AI-Assisted Development | ProcessStateAPI typed queries |
+| How It Works | Annotation examples, dual-source |
+| Quick Start | Install, annotate, generate, lint |
+| CLI Commands | Command summary table |
+| FSM-Enforced Workflow | State diagram, protection levels |
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| Executive Summary | 28-66 | What it does, key principles, overview |
-| Four-Stage Pipeline | 140-245 | Scanner, Extractor, Transformer, Codec |
-| Unified Transformation | 248-362 | MasterDataset schema, single-pass |
-| Codec Architecture | 366-407 | Concepts, block vocabulary, factory |
-| Available Codecs | 410-607 | All 16 codecs with options tables |
-| Data Flow Diagrams | 823-980 | Pipeline flow, MasterDataset views |
+| Section Heading | Topics |
+| --- | --- |
+| Executive Summary | What it does, key principles, overview |
+| Four-Stage Pipeline | Scanner, Extractor, Transformer, Codec |
+| Unified Transformation Architecture | MasterDataset schema, single-pass |
+| Codec Architecture | Concepts, block vocabulary, factory |
+| Available Codecs | All 16 codecs with options tables |
+| Data Flow Diagrams | Pipeline flow, MasterDataset views |
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| Session Decision Tree | 7-24 | Which session type to use |
-| Planning Session | 27-83 | Create roadmap spec, checklist |
-| Design Session | 86-132 | When required, checklist, code stubs |
-| Implementation Session | 135-192 | Pre-flight, execution, FSM transitions |
-| Handoff Documentation | 277-313 | Template, discovery tags |
+| Section Heading | Topics |
+| --- | --- |
+| Session Decision Tree | Which session type to use |
+| Planning Session | Create roadmap spec, checklist |
+| Design Session | When required, checklist, code stubs |
+| Implementation Session | Pre-flight, execution, FSM transitions |
+| Handoff Documentation | Template, discovery tags |
 
-| Section | Lines | Topics |
-| --- | --- | --- |
-| Quick Reference | 9-37 | Protection levels, transitions, escapes |
-| Error completed-protection | 40-65 | Fix with unlock reason |
-| Error invalid-status-transition | 68-98 | Follow FSM path |
-| CLI Usage | 187-235 | Modes, options, exit codes |
-| Pre-commit Setup | 238-260 | Husky, package.json scripts |
+| Section Heading | Topics |
+| --- | --- |
+| Quick Reference | Protection levels, transitions, escapes |
+| Error Messages and Fixes | Fix with unlock reason, follow FSM path |
+| CLI Usage | Modes, options, exit codes |
+| Pre-commit Setup | Husky, package.json scripts |
 
 ---
 
@@ -1269,7 +1270,7 @@ Architecture diagram generation uses three tags to create Mermaid component diag
     Use a Background section with a DataTable to define deliverables. The table
     must have columns: Deliverable, Status, Location.
 
-    **Rule Block Structure:**
+    **Rule Block Structure (for executable spec feature files):**
 
     **Scenario Tags:**
 
@@ -1408,37 +1409,14 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     **Preset Properties:**
 
-    **DDD Category List:**
+    **DDD Categories:** See "Complete Category Reference" below for the full 21-category
+    list with priorities, descriptions, and aliases.
 
 | Property | Value |
 | --- | --- |
 | Tag Prefix | libar-docs- |
 | File Opt-In | libar-docs |
 | Categories | 21 |
-
-| Category | Domain | Priority | Description |
-| --- | --- | --- | --- |
-| domain | Domain | 1 | Domain layer patterns |
-| ddd | DDD | 2 | Domain-Driven Design core |
-| bounded-context | Bounded Context | 3 | Context boundaries |
-| event-sourcing | Event Sourcing | 4 | Event sourcing patterns |
-| decider | Decider | 5 | Decision functions |
-| cqrs | CQRS | 6 | Command/Query separation |
-| saga | Saga | 7 | Process orchestration |
-| projection | Projection | 8 | Read model projections |
-| aggregate | Aggregate | 9 | Aggregate roots |
-| entity | Entity | 10 | Domain entities |
-| value-object | Value Object | 11 | Immutable values |
-| repository | Repository | 12 | Data access |
-| factory | Factory | 13 | Object creation |
-| service | Service | 14 | Domain services |
-| event | Event | 15 | Domain events |
-| command | Command | 16 | Command objects |
-| query | Query | 17 | Query objects |
-| integration | Integration | 18 | External integrations |
-| infrastructure | Infrastructure | 19 | Infrastructure layer |
-| application | Application | 20 | Application layer |
-| presentation | Presentation | 21 | Presentation layer |
 
 ---
 
@@ -1598,7 +1576,7 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 ## Complete Category Reference
 
 **Context:** The ddd-es-cqrs preset includes all 21 categories. Simpler
-    presets use subsets (core, api, generator for libar-generic).
+    presets use subsets (core, api, infra for libar-generic).
 
     **All Categories:**
 
@@ -1632,9 +1610,9 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
 | Project Type | Recommended Preset | Categories Available |
 | --- | --- | --- |
-| Simple utility packages | libar-generic | core, api, generator |
+| Simple utility packages | libar-generic | core, api, infra |
 | DDD/Event Sourcing systems | ddd-es-cqrs | All 21 categories |
-| Generic projects | generic | core, api, generator |
+| Generic projects | generic | core, api, infra |
 
 ---
 

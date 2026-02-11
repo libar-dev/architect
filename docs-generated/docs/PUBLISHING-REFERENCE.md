@@ -39,7 +39,7 @@
 | 4. Build package | pnpm build | Clean compilation |
 | 5. Verify dist/ is current | git status | No uncommitted changes |
 | 6. Run dry-run | npm publish --dry-run --access public | Preview looks correct |
-| 7. Check version | cat package.json, grep version | Version is correct |
+| 7. Check version | grep version package.json | Version is correct |
 
 | Mistake | Prevention |
 | --- | --- |

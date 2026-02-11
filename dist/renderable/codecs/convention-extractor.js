@@ -92,7 +92,7 @@ function parseTableLines(lines) {
 /**
  * Extract structured convention content from a business rule.
  */
-function extractRuleContent(rule) {
+function extractConventionRuleContent(rule) {
     const annotations = parseBusinessRuleAnnotations(rule.description);
     const tables = extractTablesFromDescription(rule.description);
     return {
@@ -146,7 +146,7 @@ export function extractConventions(dataset, conventionTags) {
         if (matchingTags.length === 0)
             continue;
         // Extract rule content from this pattern's rules
-        const ruleContents = (pattern.rules ?? []).map(extractRuleContent);
+        const ruleContents = (pattern.rules ?? []).map(extractConventionRuleContent);
         // Add to each matching bundle
         for (const tag of matchingTags) {
             const bundle = bundles.get(tag);

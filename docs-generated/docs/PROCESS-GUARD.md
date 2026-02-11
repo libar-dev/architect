@@ -383,11 +383,11 @@ stateDiagram-v2
 | --- | --- | --- |
 | Fix bug in completed spec | Add unlock-reason tag | @libar-docs-unlock-reason:'Fix-typo' |
 | Modify outside session scope | Use --ignore-session flag | lint-process --staged --ignore-session |
-| CI treats warnings as errors | Use --strict flag | lint-process --all --strict |
+| CI warnings blocking pipeline | Omit --strict flag | lint-process --all (warnings won't fail) |
 
 ## Rule Descriptions
 
-Process Guard validates 6 rules (types extracted from TypeScript):
+Process Guard validates 7 rules (types extracted from TypeScript):
 
 | Rule | Severity | Human Description |
 | --- | --- | --- |
@@ -395,6 +395,7 @@ Process Guard validates 6 rules (types extracted from TypeScript):
 | invalid-status-transition | error | Status transition must follow FSM |
 | scope-creep | error | Cannot add deliverables to active specs |
 | session-excluded | error | Cannot modify files excluded from session |
+| missing-relationship-target | warning | Relationship target pattern must exist |
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 

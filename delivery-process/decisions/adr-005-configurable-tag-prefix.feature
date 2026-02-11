@@ -156,31 +156,8 @@ Feature: ADR-005 - Configurable Tag Prefix
 | File Opt-In | libar-docs |
 | Categories | 21 |
 
-    **DDD Category List:**
-
-| Category | Domain | Priority | Description |
-| --- | --- | --- | --- |
-| domain | Domain | 1 | Domain layer patterns |
-| ddd | DDD | 2 | Domain-Driven Design core |
-| bounded-context | Bounded Context | 3 | Context boundaries |
-| event-sourcing | Event Sourcing | 4 | Event sourcing patterns |
-| decider | Decider | 5 | Decision functions |
-| cqrs | CQRS | 6 | Command/Query separation |
-| saga | Saga | 7 | Process orchestration |
-| projection | Projection | 8 | Read model projections |
-| aggregate | Aggregate | 9 | Aggregate roots |
-| entity | Entity | 10 | Domain entities |
-| value-object | Value Object | 11 | Immutable values |
-| repository | Repository | 12 | Data access |
-| factory | Factory | 13 | Object creation |
-| service | Service | 14 | Domain services |
-| event | Event | 15 | Domain events |
-| command | Command | 16 | Command objects |
-| query | Query | 17 | Query objects |
-| integration | Integration | 18 | External integrations |
-| infrastructure | Infrastructure | 19 | Infrastructure layer |
-| application | Application | 20 | Application layer |
-| presentation | Presentation | 21 | Presentation layer |
+    **DDD Categories:** See "Complete Category Reference" below for the full 21-category
+    list with priorities, descriptions, and aliases.
 
   Rule: Hierarchical Configuration
 
@@ -417,7 +394,7 @@ Feature: ADR-005 - Configurable Tag Prefix
     // For libar-generic preset
     // @libar-docs-core      - marks as core utility
     // @libar-docs-api       - marks as public API
-    // @libar-docs-generator - marks as code generator
+    // @libar-docs-infra     - marks as infrastructure
     """
 
   Rule: Format Types
