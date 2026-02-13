@@ -29,7 +29,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 | `src/renderable/`         | Markdown codec system                                            |
 | `src/validation/`         | FSM validation, DoD checks, anti-patterns                        |
 | `src/lint/`               | Pattern linting and process guard                                |
-| `src/api/`                | Process State API for programmatic access                        |
+| `src/api/`                | Query layer powering the Data API CLI                            |
 | `delivery-process/stubs/` | Design session code stubs (outside src/ for TS/ESLint isolation) |
 
 ### Three Presets

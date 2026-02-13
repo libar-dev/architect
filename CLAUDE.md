@@ -134,31 +134,55 @@ Query delivery process state directly from the terminal. **Use this instead of r
 
 Run `pnpm process:query -- --help` for the full command reference with all options.
 
+#### Session Start Recipe
+
+1. `overview` first — 7-line executive summary (progress, active phases, blockers)
+2. `scope-validate <pattern> <session-type>` — pre-flight check before starting work
+3. `context <pattern> --session <type>` — curated context bundle for the session
+
 #### Context Gathering (Text Output — Use First in Sessions)
 
 | Command                                                       | What It Provides                                         |
 | ------------------------------------------------------------- | -------------------------------------------------------- |
 | `pnpm process:query -- context <pattern> --session design`    | Pattern metadata, description, stubs, deps, deliverables |
 | `pnpm process:query -- context <pattern> --session implement` | Deliverables, FSM state, test files                      |
-| `pnpm process:query -- dep-tree <pattern>`                    | Dependency chain with status                             |
+| `pnpm process:query -- context <pattern> --session planning`  | Minimal: pattern metadata and spec file only             |
+| `pnpm process:query -- dep-tree <pattern>`                    | Dependency chain with status (`--depth N` to limit)      |
 | `pnpm process:query -- overview`                              | Progress, active phases, blocking chains                 |
 | `pnpm process:query -- files <pattern> --related`             | File reading list with implementation paths              |
 
+#### Session Support (Text Output)
+
+| Command                                                    | What It Provides                                                |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| `pnpm process:query -- scope-validate <pattern> implement` | Pre-flight: PASS/BLOCKED/WARN checklist + READY/BLOCKED verdict |
+| `pnpm process:query -- scope-validate <pattern> design`    | Lighter design pre-flight (stubs from deps exist?)              |
+| `pnpm process:query -- handoff --pattern <pattern>`        | Session-end state: deliverables, blockers, date                 |
+
+`scope-validate` is the highest-impact command — prevents wasted sessions by catching FSM violations, missing dependencies, and missing prerequisites before you start coding.
+
 #### Pattern Discovery (JSON Output)
 
-| Command                                       | What It Provides                                     |
-| --------------------------------------------- | ---------------------------------------------------- |
-| `pnpm process:query -- list --status roadmap` | All patterns with given status                       |
-| `pnpm process:query -- search <query>`        | Fuzzy name search                                    |
-| `pnpm process:query -- pattern <name>`        | Full detail for one pattern (~3KB)                   |
-| `pnpm process:query -- stubs <pattern>`       | Design stubs with target paths and resolution status |
-| `pnpm process:query -- decisions <pattern>`   | AD-N design decisions from stub descriptions         |
-| `pnpm process:query -- status`                | Status counts and completion percentage              |
+| Command                                       | What It Provides                                                 |
+| --------------------------------------------- | ---------------------------------------------------------------- |
+| `pnpm process:query -- list --status roadmap` | All patterns with given status                                   |
+| `pnpm process:query -- search <query>`        | Fuzzy name search with match scores                              |
+| `pnpm process:query -- pattern <name>`        | Full detail for one pattern (large — use `context` for sessions) |
+| `pnpm process:query -- stubs <pattern>`       | Design stubs with target paths and resolution status             |
+| `pnpm process:query -- stubs --unresolved`    | Only stubs with missing target files                             |
+| `pnpm process:query -- decisions <pattern>`   | AD-N design decisions from stub descriptions                     |
+| `pnpm process:query -- pdr <number>`          | Cross-reference patterns mentioning a PDR number                 |
+| `pnpm process:query -- status`                | Status counts and completion percentage                          |
+
+**Warning:** `pattern <name>` returns ~66KB for completed patterns with scenarios. Use `context --session` for interactive sessions instead.
 
 #### Architecture Queries (JSON Output)
 
 | Command                                             | What It Provides                                         |
 | --------------------------------------------------- | -------------------------------------------------------- |
+| `pnpm process:query -- arch roles`                  | All arch-roles with pattern counts                       |
+| `pnpm process:query -- arch context [name]`         | All contexts, or patterns in a specific bounded context  |
+| `pnpm process:query -- arch layer [name]`           | All layers, or patterns in a specific architecture layer |
 | `pnpm process:query -- arch neighborhood <pattern>` | uses/usedBy/dependsOn/enables/sameContext                |
 | `pnpm process:query -- arch compare <ctx1> <ctx2>`  | Cross-context shared deps and integration points         |
 | `pnpm process:query -- arch coverage`               | Annotation completeness (files with/without @libar-docs) |
@@ -169,14 +193,34 @@ Run `pnpm process:query -- --help` for the full command reference with all optio
 | `pnpm process:query -- sources`                     | File inventory by type (TS, Gherkin, Stubs)              |
 | `pnpm process:query -- unannotated`                 | TypeScript files missing @libar-docs annotations         |
 
-#### Output Modifiers (Composable with Any List Query)
+#### Raw API Access
 
-| Modifier                     | Effect                                    |
-| ---------------------------- | ----------------------------------------- |
-| `--names-only`               | Return pattern name strings only          |
-| `--count`                    | Return integer count                      |
-| `--fields name,status,phase` | Return only specified fields              |
-| `--full`                     | Bypass summarization, return raw patterns |
+`query <method> [args...]` exposes any API method directly. Composes with output modifiers.
+
+```bash
+pnpm process:query -- query getStatusCounts            # {completed, active, planned, total}
+pnpm process:query -- query getCurrentWork --names-only # Active pattern names
+pnpm process:query -- query getCompletionPercentage    # Integer percentage
+pnpm process:query -- query getCategories              # All categories with counts
+```
+
+Run `pnpm process:query -- --help` to see the full list of available API methods.
+
+**Note:** Some methods return large unsummarized output (e.g., `getActivePhases` includes full nested patterns). Use `--names-only` or `--fields` to reduce output size.
+
+#### Output Modifiers (Composable with Any List/Query)
+
+Modifiers work regardless of position — before or after the subcommand.
+
+| Modifier                            | Effect                                     |
+| ----------------------------------- | ------------------------------------------ |
+| `--names-only`                      | Return pattern name strings only           |
+| `--count`                           | Return integer count                       |
+| `--fields patternName,status,phase` | Return only specified fields               |
+| `--full`                            | Bypass summarization, return raw patterns  |
+| `--format compact`                  | Single-line JSON (default: pretty-printed) |
+
+Valid fields for `--fields`: `patternName`, `status`, `category`, `phase`, `file`, `source`
 
 #### List Filters
 
@@ -184,6 +228,8 @@ Run `pnpm process:query -- --help` for the full command reference with all optio
 pnpm process:query -- list --status completed --names-only
 pnpm process:query -- list --phase 25 --count
 pnpm process:query -- list --category core --source gherkin
+pnpm process:query -- list --limit 5                    # First 5 results
+pnpm process:query -- list --offset 10 --limit 5        # Pagination
 ```
 
 #### Clean JSON Piping
@@ -229,7 +275,7 @@ CONFIG → SCANNER → EXTRACTOR → TRANSFORMER → CODEC
 | `src/renderable/`         | Markdown codec system                                            |
 | `src/validation/`         | FSM validation, DoD checks, anti-patterns                        |
 | `src/lint/`               | Pattern linting and process guard                                |
-| `src/api/`                | Process State API for programmatic access                        |
+| `src/api/`                | Query layer powering the Data API CLI                            |
 | `delivery-process/stubs/` | Design session code stubs (outside src/ for TS/ESLint isolation) |
 
 ### Three Presets
@@ -482,7 +528,7 @@ Deliverable status is enforced by `z.enum()` at schema level. The 6 canonical va
 | `superseded`  | Replaced by another |                                   |
 | `n/a`         | Not applicable      |                                   |
 
-**NEVER** use freeform status strings like `'Done'`, `'Complete'`, `'Planned'` in deliverable tables. The Zod schema rejects non-canonical values at parse time. Use `getDeliverableStatusEmoji()` from `src/taxonomy/deliverable-status.ts` for emoji rendering.
+**NEVER** use freeform status strings. The Zod schema rejects non-canonical values at parse time.
 
 ### Efficient Debugging Strategy
 
@@ -592,11 +638,6 @@ export function myFunction(args: MyArgs): Promise<MyResult> {
 
 Stubs live outside `src/` to avoid TypeScript compilation and ESLint issues.
 
-**Design Session Quality Checks:**
-
-- [ ] **Verify stub identifier spelling** — Check all exported function/type/interface names in stubs for typos before committing
-- [ ] **List canonical helpers in `@libar-docs-uses`** — If the function does status matching, reference `isDeliverableStatusComplete`/`isDeliverableStatusPending` from `src/taxonomy/deliverable-status.ts`
-
 ### Implementation Session
 
 **Goal:** Write code. The roadmap spec is the source of truth.
@@ -614,9 +655,8 @@ pnpm process:query -- stubs <SpecName>
 1. **Transition to `active` FIRST** — before any code changes
 2. **Create executable spec stubs** — if `@libar-docs-executable-specs` present
 3. **For each deliverable:** implement, test, update status to `completed`
-4. **Verify all design decisions addressed** — Run `pnpm process:query -- decisions <pattern>` and confirm each DD-N has a corresponding `// DD-N:` comment in the implementation
-5. **Transition to `completed`** — only when ALL deliverables done
-6. **Regenerate docs:** `pnpm docs:all`
+4. **Transition to `completed`** — only when ALL deliverables done
+5. **Regenerate docs:** `pnpm docs:all`
 
 | Do NOT                                | Why                                     |
 | ------------------------------------- | --------------------------------------- |

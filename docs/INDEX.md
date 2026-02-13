@@ -9,7 +9,7 @@
 | **Package**      | @libar-dev/delivery-process                                        |
 | **Version**      | 0.1.0-pre.0                                                        |
 | **Purpose**      | Source-first delivery process — code is the single source of truth |
-| **Key Features** | Living docs, FSM enforcement, AI-native ProcessStateAPI            |
+| **Key Features** | Living docs, FSM enforcement, AI-native Data API CLI               |
 | **Node.js**      | >= 18.0.0                                                          |
 | **License**      | MIT                                                                |
 
@@ -38,14 +38,14 @@
 
 ### For New Users
 
-1. **[README.md](../README.md)** — Installation, quick start, ProcessStateAPI overview
+1. **[README.md](../README.md)** — Installation, quick start, Data API CLI overview
 2. **[CONFIGURATION.md](./CONFIGURATION.md)** — Presets, tag prefixes, config files
 3. **[METHODOLOGY.md](./METHODOLOGY.md)** — Core thesis, dual-source architecture
 
 ### For Developers / AI
 
 4. **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Four-stage pipeline, codecs, MasterDataset
-5. **[PROCESS-API.md](./PROCESS-API.md)** — CLI query interface, ProcessStateAPI from terminal
+5. **[PROCESS-API.md](./PROCESS-API.md)** — Data API CLI query interface
 6. **[SESSION-GUIDES.md](./SESSION-GUIDES.md)** — Planning/Design/Implementation workflows
 7. **[GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md)** — Writing effective Gherkin specs
 8. **[INSTRUCTIONS.md](../INSTRUCTIONS.md)** — Complete tag and CLI reference
@@ -64,12 +64,12 @@
 | Section                    | Lines   | Key Topics                                    |
 | -------------------------- | ------- | --------------------------------------------- |
 | The Problem / The Solution | 16-33   | Documentation drift, code as source of truth  |
-| Built for AI-Assisted Dev  | 36-57   | ProcessStateAPI typed queries                 |
+| Built for AI-Assisted Dev  | 36-57   | Data API CLI typed queries                    |
 | How It Works               | 60-111  | Annotation examples, dual-source              |
 | Quick Start                | 114-170 | Install, annotate, generate, lint             |
 | CLI Commands               | 173-183 | Command summary table                         |
 | FSM-Enforced Workflow      | 187-217 | State diagram, protection levels              |
-| ProcessStateAPI            | 221-266 | Full API example, context cost comparison     |
+| Data API CLI               | 221-246 | CLI example, context cost comparison          |
 | Rich Relationship Model    | 269-291 | Dependency tags, Mermaid graph                |
 | How It Compares            | 294-309 | Comparison with Backstage, Confluence, etc.   |
 | Use Cases                  | 312-322 | Multi-phase roadmaps, AI sessions, validation |
@@ -273,31 +273,30 @@ roadmap ──→ active ──→ completed
 deferred ──→ roadmap
 ```
 
-### ProcessStateAPI
+### Data API CLI
 
-```typescript
-const api = createProcessStateAPI(dataset);
-api.getCurrentWork(); // What's active
-api.getRoadmapItems(); // What can be started
-api.isValidTransition('roadmap', 'active');
-api.getPattern('TransformDataset');
+```bash
+pnpm process:query -- query getCurrentWork       # What's active
+pnpm process:query -- query getRoadmapItems      # What can be started
+pnpm process:query -- query isValidTransition roadmap active
+pnpm process:query -- pattern TransformDataset
 ```
 
 ---
 
 ## Document Roles Summary
 
-| Document            | Audience    | Focus                                               |
-| ------------------- | ----------- | --------------------------------------------------- |
-| README.md           | Everyone    | Quick start, value proposition                      |
-| METHODOLOGY.md      | Everyone    | Why — core thesis, principles                       |
-| CONFIGURATION.md    | Users       | Setup — presets, tags, config                       |
-| ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas                     |
-| PROCESS-API.md      | AI/Devs     | CLI query interface — ProcessStateAPI from terminal |
-| SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage                         |
-| GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin                   |
-| PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules                      |
-| VALIDATION.md       | CI/CD       | Quality — automated checks                          |
-| INSTRUCTIONS.md     | Reference   | Lookup — tag and CLI reference                      |
-| TAXONOMY.md         | Reference   | Lookup — tag format definitions                     |
-| PUBLISHING.md       | Maintainers | Release — npm publishing                            |
+| Document            | Audience    | Focus                             |
+| ------------------- | ----------- | --------------------------------- |
+| README.md           | Everyone    | Quick start, value proposition    |
+| METHODOLOGY.md      | Everyone    | Why — core thesis, principles     |
+| CONFIGURATION.md    | Users       | Setup — presets, tags, config     |
+| ARCHITECTURE.md     | Developers  | How — pipeline, codecs, schemas   |
+| PROCESS-API.md      | AI/Devs     | Data API CLI query interface      |
+| SESSION-GUIDES.md   | AI/Devs     | Workflow — day-to-day usage       |
+| GHERKIN-PATTERNS.md | Writers     | Specs — writing effective Gherkin |
+| PROCESS-GUARD.md    | Team Leads  | Governance — enforcement rules    |
+| VALIDATION.md       | CI/CD       | Quality — automated checks        |
+| INSTRUCTIONS.md     | Reference   | Lookup — tag and CLI reference    |
+| TAXONOMY.md         | Reference   | Lookup — tag format definitions   |
+| PUBLISHING.md       | Maintainers | Release — npm publishing          |

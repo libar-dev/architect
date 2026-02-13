@@ -25,7 +25,7 @@ Event sourcing teaches us: **derive state, don't store it**. Apply this to docum
 
 - **Events** = Git commits (changes to annotated code)
 - **Projections** = Generated docs (PATTERNS.md, ROADMAP.md)
-- **Read Model** = ProcessStateAPI (typed queries)
+- **Read Model** = Data API CLI (typed queries)
 
 When you run `generate-docs`, you're rebuilding read models from the event stream. The source annotations are always authoritative.
 
@@ -225,10 +225,10 @@ This avoids `.skip()` (forbidden by test safety policy) while preserving plannin
 
 ## Related Documentation
 
-| Document                                     | Purpose                                         |
-| -------------------------------------------- | ----------------------------------------------- |
-| [README.md](../README.md)                    | Quick start, FSM diagram, ProcessStateAPI usage |
-| [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM validation rules, protection levels, CLI    |
-| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets, customization            |
-| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Writing effective specs                         |
-| [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | Complete tag reference                          |
+| Document                                     | Purpose                                      |
+| -------------------------------------------- | -------------------------------------------- |
+| [README.md](../README.md)                    | Quick start, FSM diagram, Data API CLI usage |
+| [PROCESS-GUARD.md](./PROCESS-GUARD.md)       | FSM validation rules, protection levels, CLI |
+| [CONFIGURATION.md](./CONFIGURATION.md)       | Tag prefixes, presets, customization         |
+| [GHERKIN-PATTERNS.md](./GHERKIN-PATTERNS.md) | Writing effective specs                      |
+| [INSTRUCTIONS.md](../INSTRUCTIONS.md)        | Complete tag reference                       |

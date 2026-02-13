@@ -6,16 +6,16 @@ The package uses a **modular CLAUDE.md system** via `@libar-dev/modular-claude-m
 
 #### Directory Structure
 
-| Directory                  | Purpose                                   |
-| -------------------------- | ----------------------------------------- |
-| `_claude-md/core/`         | Project overview, commands, architecture  |
-| `_claude-md/testing/`      | Gherkin policy, vitest-cucumber rules     |
-| `_claude-md/workflow/`     | Session workflows, FSM, handoff           |
-| `_claude-md/validation/`   | Process Guard, anti-patterns              |
-| `_claude-md/api/`          | Annotations, tag formats, ProcessStateAPI |
-| `_claude-md/authoring/`    | Gherkin patterns, feature file content    |
-| `_claude-md/meta/`         | Claude MD management, deps-packages       |
-| `_claude-md/metadata.json` | Central configuration                     |
+| Directory                  | Purpose                                  |
+| -------------------------- | ---------------------------------------- |
+| `_claude-md/core/`         | Project overview, commands, architecture |
+| `_claude-md/testing/`      | Gherkin policy, vitest-cucumber rules    |
+| `_claude-md/workflow/`     | Session workflows, FSM, handoff          |
+| `_claude-md/validation/`   | Process Guard, anti-patterns             |
+| `_claude-md/api/`          | Annotations, tag formats, relationships  |
+| `_claude-md/authoring/`    | Gherkin patterns, feature file content   |
+| `_claude-md/meta/`         | Claude MD management, deps-packages      |
+| `_claude-md/metadata.json` | Central configuration                    |
 
 #### Adding New Content
 

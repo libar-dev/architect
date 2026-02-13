@@ -16,10 +16,6 @@
       "types": "./dist/config/index.d.ts",
       "import": "./dist/config/index.js"
     },
-    "./api": {
-      "types": "./dist/api/index.d.ts",
-      "import": "./dist/api/index.js"
-    },
     "./lint": {
       "types": "./dist/lint/index.d.ts",
       "import": "./dist/lint/index.js"
