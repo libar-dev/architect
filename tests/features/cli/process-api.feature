@@ -324,6 +324,12 @@ Feature: process-api CLI
 
   Rule: Output modifiers work when placed after the subcommand
 
+    **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+
+    **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+    **Verified by:** Count modifier after list subcommand returns count, Names-only modifier after list subcommand returns names, Count modifier combined with list filter
+
     @happy-path
     Scenario: Count modifier after list subcommand returns count
       Given TypeScript files with pattern annotations
@@ -350,6 +356,12 @@ Feature: process-api CLI
   # ============================================================================
 
   Rule: CLI arch health subcommands detect graph quality issues
+
+    **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+
+    **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+    **Verified by:** Arch dangling returns broken references, Arch orphans returns isolated patterns, Arch blocking returns blocked patterns
 
     @happy-path
     Scenario: Arch dangling returns broken references

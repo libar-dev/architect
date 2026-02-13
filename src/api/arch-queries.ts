@@ -398,6 +398,7 @@ export function buildSourceInventory(dataset: MasterDataset): SourceInventory {
 export interface OrphanEntry {
   readonly pattern: string;
   readonly status: string | undefined;
+  /** Empty string if pattern metadata is unavailable. */
   readonly file: string;
 }
 

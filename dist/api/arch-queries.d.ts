@@ -80,6 +80,7 @@ export declare function buildSourceInventory(dataset: MasterDataset): SourceInve
 export interface OrphanEntry {
     readonly pattern: string;
     readonly status: string | undefined;
+    /** Empty string if pattern metadata is unavailable. */
     readonly file: string;
 }
 /**
