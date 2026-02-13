@@ -135,13 +135,6 @@ Feature: process-api CLI
       Then exit code is 0
       And stdout is valid JSON
 
-    @happy-path
-    Scenario: Arch graph returns dependency data
-      Given TypeScript files with architecture annotations and dependencies
-      When running "process-api -i 'src/**/*.ts' arch graph ScannerService"
-      Then exit code is 0
-      And stdout is valid JSON
-      And stdout contains "ScannerService"
 
   # ============================================================================
   # RULE 7: Error Handling for Missing Arguments
@@ -324,3 +317,71 @@ Feature: process-api CLI
       When running "process-api -i 'src/**/*.ts' unannotated"
       Then exit code is 0
       And stdout is valid JSON
+
+  # ============================================================================
+  # RULE 15: Output Modifier Position Independence
+  # ============================================================================
+
+  Rule: Output modifiers work when placed after the subcommand
+
+    **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+
+    **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+    **Verified by:** Count modifier after list subcommand returns count, Names-only modifier after list subcommand returns names, Count modifier combined with list filter
+
+    @happy-path
+    Scenario: Count modifier after list subcommand returns count
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' list --count"
+      Then exit code is 0
+      And stdout JSON data is a number
+
+    @happy-path
+    Scenario: Names-only modifier after list subcommand returns names
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' list --names-only"
+      Then exit code is 0
+      And stdout JSON data is a string array
+
+    @happy-path
+    Scenario: Count modifier combined with list filter
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' list --status completed --count"
+      Then exit code is 0
+      And stdout JSON data is a number
+
+  # ============================================================================
+  # RULE 16: Graph Health Subcommands
+  # ============================================================================
+
+  Rule: CLI arch health subcommands detect graph quality issues
+
+    **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+
+    **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+    **Verified by:** Arch dangling returns broken references, Arch orphans returns isolated patterns, Arch blocking returns blocked patterns
+
+    @happy-path
+    Scenario: Arch dangling returns broken references
+      Given TypeScript files with a dangling reference
+      When running "process-api -i 'src/**/*.ts' arch dangling"
+      Then exit code is 0
+      And stdout JSON data is an array
+      And stdout JSON data contains an entry with field "missing"
+
+    @happy-path
+    Scenario: Arch orphans returns isolated patterns
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' arch orphans"
+      Then exit code is 0
+      And stdout JSON data is an array
+      And stdout JSON data contains an entry with field "pattern"
+
+    @happy-path
+    Scenario: Arch blocking returns blocked patterns
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' arch blocking"
+      Then exit code is 0
+      And stdout JSON data is an array

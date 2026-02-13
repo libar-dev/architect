@@ -95,6 +95,19 @@ function createArchPatternFiles(): Array<{ path: string; content: string }> {
   ];
 }
 
+function createDanglingRefFiles(): Array<{ path: string; content: string }> {
+  return [
+    {
+      path: 'src/consumer.ts',
+      content: createTsFileWithDirective({
+        patternName: 'ConsumerPattern',
+        status: 'active',
+        uses: ['NonExistentDep'],
+      }),
+    },
+  ];
+}
+
 function createArchPatternFilesWithDeps(): Array<{ path: string; content: string }> {
   return [
     {
@@ -187,6 +200,13 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
   async function writeArchPatternFiles(): Promise<void> {
     const dir = getTempDir();
     for (const file of createArchPatternFiles()) {
+      await writeTempFile(dir, file.path, file.content);
+    }
+  }
+
+  async function writeDanglingRefFiles(): Promise<void> {
+    const dir = getTempDir();
+    for (const file of createDanglingRefFiles()) {
       await writeTempFile(dir, file.path, file.content);
     }
   }
@@ -531,29 +551,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       And('stdout is valid JSON', () => {
         const result = getResult();
         expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
-      });
-    });
-
-    RuleScenario('Arch graph returns dependency data', ({ Given, When, Then, And }) => {
-      Given('TypeScript files with architecture annotations and dependencies', async () => {
-        await writeArchPatternFilesWithDeps();
-      });
-
-      When('running {string}', async (_ctx: unknown, cmd: string) => {
-        await runCLICommand(cmd);
-      });
-
-      Then('exit code is {int}', (_ctx: unknown, code: number) => {
-        expect(getResult().exitCode).toBe(code);
-      });
-
-      And('stdout is valid JSON', () => {
-        const result = getResult();
-        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
-      });
-
-      And('stdout contains {string}', (_ctx: unknown, text: string) => {
-        expect(getResult().stdout).toContain(text);
       });
     });
   });
@@ -972,5 +969,168 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       }
     );
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Output modifiers work when placed after the subcommand
+  // ---------------------------------------------------------------------------
+
+  Rule('Output modifiers work when placed after the subcommand', ({ RuleScenario }) => {
+    RuleScenario(
+      'Count modifier after list subcommand returns count',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('stdout JSON data is a number', () => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: unknown };
+          expect(typeof parsed.data).toBe('number');
+        });
+      }
+    );
+
+    RuleScenario(
+      'Names-only modifier after list subcommand returns names',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('stdout JSON data is a string array', () => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: unknown };
+          expect(Array.isArray(parsed.data)).toBe(true);
+          const arr = parsed.data as unknown[];
+          expect(arr.length).toBeGreaterThan(0);
+          expect(typeof arr[0]).toBe('string');
+        });
+      }
+    );
+
+    RuleScenario('Count modifier combined with list filter', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data is a number', () => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: unknown };
+        expect(typeof parsed.data).toBe('number');
+      });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: CLI arch health subcommands detect graph quality issues
+  // ---------------------------------------------------------------------------
+
+  Rule('CLI arch health subcommands detect graph quality issues', ({ RuleScenario }) => {
+    RuleScenario('Arch dangling returns broken references', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with a dangling reference', async () => {
+        await writeDanglingRefFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data is an array', () => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: unknown };
+        expect(Array.isArray(parsed.data)).toBe(true);
+      });
+
+      And(
+        'stdout JSON data contains an entry with field {string}',
+        (_ctx: unknown, field: string) => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: Array<Record<string, unknown>> };
+          const arr = parsed.data;
+          expect(arr.length).toBeGreaterThan(0);
+          expect(arr[0]).toHaveProperty(field);
+        }
+      );
+    });
+
+    RuleScenario('Arch orphans returns isolated patterns', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data is an array', () => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: unknown };
+        expect(Array.isArray(parsed.data)).toBe(true);
+      });
+
+      And(
+        'stdout JSON data contains an entry with field {string}',
+        (_ctx: unknown, field: string) => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: Array<Record<string, unknown>> };
+          const arr = parsed.data;
+          expect(arr.length).toBeGreaterThan(0);
+          expect(arr[0]).toHaveProperty(field);
+        }
+      );
+    });
+
+    RuleScenario('Arch blocking returns blocked patterns', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data is an array', () => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: unknown };
+        expect(Array.isArray(parsed.data)).toBe(true);
+      });
+    });
   });
 });

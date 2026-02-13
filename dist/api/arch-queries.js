@@ -273,4 +273,36 @@ export function buildSourceInventory(dataset) {
     const totalFiles = types.reduce((sum, t) => sum + t.count, 0);
     return { types, totalFiles };
 }
+/**
+ * Find patterns with no relationships at all (isolated nodes in the graph).
+ *
+ * A pattern is an orphan if it has no uses, usedBy, dependsOn, enables,
+ * implementsPatterns, implementedBy, extendedBy, seeAlso, or extendsPattern.
+ */
+export function findOrphanPatterns(dataset) {
+    const index = dataset.relationshipIndex;
+    if (index === undefined)
+        return [];
+    const orphans = [];
+    for (const [name, rels] of Object.entries(index)) {
+        const hasAny = rels.uses.length > 0 ||
+            rels.usedBy.length > 0 ||
+            rels.dependsOn.length > 0 ||
+            rels.enables.length > 0 ||
+            rels.implementsPatterns.length > 0 ||
+            rels.implementedBy.length > 0 ||
+            rels.extendedBy.length > 0 ||
+            rels.seeAlso.length > 0 ||
+            rels.extendsPattern !== undefined;
+        if (!hasAny) {
+            const p = findPatternByName(dataset.patterns, name);
+            orphans.push({
+                pattern: name,
+                status: p?.status,
+                file: p?.source.file ?? '',
+            });
+        }
+    }
+    return orphans;
+}
 //# sourceMappingURL=arch-queries.js.map
