@@ -99,6 +99,35 @@ function parseArgs(argv = process.argv.slice(2)) {
             config.version = true;
             continue;
         }
+        // Handle output modifiers regardless of position (before or after subcommand)
+        if (arg === '--names-only') {
+            namesOnly = true;
+            continue;
+        }
+        if (arg === '--count') {
+            count = true;
+            continue;
+        }
+        if (arg === '--fields') {
+            if (!nextArg || nextArg.startsWith('-')) {
+                throw new Error(`${arg} requires a value (comma-separated field names)`);
+            }
+            fields = nextArg.split(',').map((f) => f.trim());
+            i++;
+            continue;
+        }
+        if (arg === '--full') {
+            full = true;
+            continue;
+        }
+        if (arg === '--format') {
+            if (nextArg !== 'json' && nextArg !== 'compact') {
+                throw new Error(`${arg} must be "json" or "compact"`);
+            }
+            config.format = nextArg;
+            i++;
+            continue;
+        }
         if (parsingFlags && arg?.startsWith('-') === true) {
             switch (arg) {
                 case '-i':
@@ -131,30 +160,6 @@ function parseArgs(argv = process.argv.slice(2)) {
                         throw new Error(`${arg} requires a value`);
                     }
                     config.workflowPath = nextArg;
-                    i++;
-                    break;
-                // Output modifiers
-                case '--names-only':
-                    namesOnly = true;
-                    break;
-                case '--count':
-                    count = true;
-                    break;
-                case '--fields':
-                    if (!nextArg || nextArg.startsWith('-')) {
-                        throw new Error(`${arg} requires a value (comma-separated field names)`);
-                    }
-                    fields = nextArg.split(',').map((f) => f.trim());
-                    i++;
-                    break;
-                case '--full':
-                    full = true;
-                    break;
-                case '--format':
-                    if (nextArg !== 'json' && nextArg !== 'compact') {
-                        throw new Error(`${arg} must be "json" or "compact"`);
-                    }
-                    config.format = nextArg;
                     i++;
                     break;
                 case '--session':
@@ -214,7 +219,6 @@ Subcommands:
   arch roles                List all arch-roles with counts
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
-  arch graph <pattern>      Dependency graph for pattern
   arch neighborhood <pat>   Uses, usedBy, same-context siblings for pattern
   arch compare <c1> <c2>    Compare two bounded contexts (shared deps, integration)
   arch coverage             Annotation coverage analysis across input files
@@ -613,18 +617,6 @@ async function handleArch(ctx) {
             const layerInput = { kind: 'patterns', data: layerPatterns };
             return applyOutputPipeline(layerInput, ctx.modifiers);
         }
-        case 'graph': {
-            const patternName = args[1];
-            if (!patternName) {
-                throw new QueryApiError('INVALID_ARGUMENT', 'Usage: process-api arch graph <pattern>');
-            }
-            const dependencies = ctx.api.getPatternDependencies(patternName);
-            const relationships = ctx.api.getPatternRelationships(patternName);
-            if (!dependencies && !relationships) {
-                throw new QueryApiError('PATTERN_NOT_FOUND', `Pattern not found: "${patternName}"`);
-            }
-            return { pattern: patternName, dependencies, relationships };
-        }
         case 'neighborhood': {
             const patternName = args[1];
             if (!patternName) {
@@ -658,7 +650,7 @@ async function handleArch(ctx) {
                 throw new QueryApiError('INVALID_ARGUMENT', `Coverage analysis failed: ${err instanceof Error ? err.message : String(err)}`);
             }
         default:
-            throw new QueryApiError('UNKNOWN_METHOD', `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], graph <pattern>, neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`);
+            throw new QueryApiError('UNKNOWN_METHOD', `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`);
     }
 }
 // =============================================================================

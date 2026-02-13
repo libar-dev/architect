@@ -533,29 +533,6 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
       });
     });
-
-    RuleScenario('Arch graph returns dependency data', ({ Given, When, Then, And }) => {
-      Given('TypeScript files with architecture annotations and dependencies', async () => {
-        await writeArchPatternFilesWithDeps();
-      });
-
-      When('running {string}', async (_ctx: unknown, cmd: string) => {
-        await runCLICommand(cmd);
-      });
-
-      Then('exit code is {int}', (_ctx: unknown, code: number) => {
-        expect(getResult().exitCode).toBe(code);
-      });
-
-      And('stdout is valid JSON', () => {
-        const result = getResult();
-        expect(() => JSON.parse(result.stdout) as unknown).not.toThrow();
-      });
-
-      And('stdout contains {string}', (_ctx: unknown, text: string) => {
-        expect(getResult().stdout).toContain(text);
-      });
-    });
   });
 
   // ---------------------------------------------------------------------------
@@ -972,5 +949,80 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         });
       }
     );
+  });
+
+  // ---------------------------------------------------------------------------
+  // Rule: Output modifiers work when placed after the subcommand
+  // ---------------------------------------------------------------------------
+
+  Rule('Output modifiers work when placed after the subcommand', ({ RuleScenario }) => {
+    RuleScenario(
+      'Count modifier after list subcommand returns count',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('stdout JSON data is a number', () => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: unknown };
+          expect(typeof parsed.data).toBe('number');
+        });
+      }
+    );
+
+    RuleScenario(
+      'Names-only modifier after list subcommand returns names',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript files with pattern annotations', async () => {
+          await writePatternFiles();
+        });
+
+        When('running {string}', async (_ctx: unknown, cmd: string) => {
+          await runCLICommand(cmd);
+        });
+
+        Then('exit code is {int}', (_ctx: unknown, code: number) => {
+          expect(getResult().exitCode).toBe(code);
+        });
+
+        And('stdout JSON data is a string array', () => {
+          const result = getResult();
+          const parsed = JSON.parse(result.stdout) as { data: unknown };
+          expect(Array.isArray(parsed.data)).toBe(true);
+          const arr = parsed.data as unknown[];
+          expect(arr.length).toBeGreaterThan(0);
+          expect(typeof arr[0]).toBe('string');
+        });
+      }
+    );
+
+    RuleScenario('Count modifier combined with list filter', ({ Given, When, Then, And }) => {
+      Given('TypeScript files with pattern annotations', async () => {
+        await writePatternFiles();
+      });
+
+      When('running {string}', async (_ctx: unknown, cmd: string) => {
+        await runCLICommand(cmd);
+      });
+
+      Then('exit code is {int}', (_ctx: unknown, code: number) => {
+        expect(getResult().exitCode).toBe(code);
+      });
+
+      And('stdout JSON data is a number', () => {
+        const result = getResult();
+        const parsed = JSON.parse(result.stdout) as { data: unknown };
+        expect(typeof parsed.data).toBe('number');
+      });
+    });
   });
 });

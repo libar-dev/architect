@@ -79,14 +79,13 @@ pnpm process:query -- pattern OrderFulfillmentSaga
 
 Architecture queries using `@libar-docs-arch-*` annotations.
 
-| Subcommand        | Description                        | Example                      |
-| ----------------- | ---------------------------------- | ---------------------------- |
-| `roles`           | All arch-roles with pattern counts | `arch roles`                 |
-| `context`         | All bounded contexts               | `arch context`               |
-| `context <name>`  | Patterns in one bounded context    | `arch context scanner`       |
-| `layer`           | All architecture layers            | `arch layer`                 |
-| `layer <name>`    | Patterns in one layer              | `arch layer domain`          |
-| `graph <pattern>` | Dependency graph for one pattern   | `arch graph ProcessStateAPI` |
+| Subcommand       | Description                        | Example                |
+| ---------------- | ---------------------------------- | ---------------------- |
+| `roles`          | All arch-roles with pattern counts | `arch roles`           |
+| `context`        | All bounded contexts               | `arch context`         |
+| `context <name>` | Patterns in one bounded context    | `arch context scanner` |
+| `layer`          | All architecture layers            | `arch layer`           |
+| `layer <name>`   | Patterns in one layer              | `arch layer domain`    |
 
 ---
 

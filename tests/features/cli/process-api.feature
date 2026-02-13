@@ -135,13 +135,6 @@ Feature: process-api CLI
       Then exit code is 0
       And stdout is valid JSON
 
-    @happy-path
-    Scenario: Arch graph returns dependency data
-      Given TypeScript files with architecture annotations and dependencies
-      When running "process-api -i 'src/**/*.ts' arch graph ScannerService"
-      Then exit code is 0
-      And stdout is valid JSON
-      And stdout contains "ScannerService"
 
   # ============================================================================
   # RULE 7: Error Handling for Missing Arguments
@@ -324,3 +317,30 @@ Feature: process-api CLI
       When running "process-api -i 'src/**/*.ts' unannotated"
       Then exit code is 0
       And stdout is valid JSON
+
+  # ============================================================================
+  # RULE 15: Output Modifier Position Independence
+  # ============================================================================
+
+  Rule: Output modifiers work when placed after the subcommand
+
+    @happy-path
+    Scenario: Count modifier after list subcommand returns count
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' list --count"
+      Then exit code is 0
+      And stdout JSON data is a number
+
+    @happy-path
+    Scenario: Names-only modifier after list subcommand returns names
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' list --names-only"
+      Then exit code is 0
+      And stdout JSON data is a string array
+
+    @happy-path
+    Scenario: Count modifier combined with list filter
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' list --status completed --count"
+      Then exit code is 0
+      And stdout JSON data is a number
