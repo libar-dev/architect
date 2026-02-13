@@ -344,3 +344,32 @@ Feature: process-api CLI
       When running "process-api -i 'src/**/*.ts' list --status completed --count"
       Then exit code is 0
       And stdout JSON data is a number
+
+  # ============================================================================
+  # RULE 16: Graph Health Subcommands
+  # ============================================================================
+
+  Rule: CLI arch health subcommands detect graph quality issues
+
+    @happy-path
+    Scenario: Arch dangling returns broken references
+      Given TypeScript files with a dangling reference
+      When running "process-api -i 'src/**/*.ts' arch dangling"
+      Then exit code is 0
+      And stdout JSON data is an array
+      And stdout JSON data contains an entry with field "missing"
+
+    @happy-path
+    Scenario: Arch orphans returns isolated patterns
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' arch orphans"
+      Then exit code is 0
+      And stdout JSON data is an array
+      And stdout JSON data contains an entry with field "pattern"
+
+    @happy-path
+    Scenario: Arch blocking returns blocked patterns
+      Given TypeScript files with pattern annotations
+      When running "process-api -i 'src/**/*.ts' arch blocking"
+      Then exit code is 0
+      And stdout JSON data is an array

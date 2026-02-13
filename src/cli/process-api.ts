@@ -47,7 +47,8 @@ import {
 } from '../extractor/gherkin-extractor.js';
 import { mergePatterns } from '../generators/orchestrator.js';
 import { loadDefaultWorkflow, loadWorkflowFromPath } from '../config/workflow-loader.js';
-import { transformToMasterDataset } from '../generators/pipeline/index.js';
+import { transformToMasterDatasetWithValidation } from '../generators/pipeline/index.js';
+import type { ValidationSummary } from '../generators/pipeline/transform-dataset.js';
 import { createProcessStateAPI } from '../api/process-state.js';
 import type { ProcessStateAPI } from '../api/process-state.js';
 import type { ExtractedPattern } from '../validation-schemas/index.js';
@@ -100,6 +101,7 @@ import {
   compareContexts,
   aggregateTagUsage,
   buildSourceInventory,
+  findOrphanPatterns,
 } from '../api/arch-queries.js';
 import { analyzeCoverage, findUnannotatedFiles } from '../api/coverage-analyzer.js';
 import { validateScope, formatScopeValidation, type ScopeType } from '../api/scope-validator.js';
@@ -304,6 +306,9 @@ Subcommands:
   arch neighborhood <pat>   Uses, usedBy, same-context siblings for pattern
   arch compare <c1> <c2>    Compare two bounded contexts (shared deps, integration)
   arch coverage             Annotation coverage analysis across input files
+  arch dangling             Broken references (pattern names that don't exist)
+  arch orphans              Patterns with no relationships (isolated)
+  arch blocking             Patterns blocked by incomplete dependencies
   context <pattern> [--session planning|design|implement]  Curated context bundle (text)
   files <pattern> [--related]                             File reading list (text)
   dep-tree <pattern> [--depth N]                          Dependency tree (text)
@@ -391,7 +396,12 @@ function applyConfigDefaults(config: ProcessAPICLIConfig): void {
 // Pipeline (Steps 1-8)
 // =============================================================================
 
-async function buildPipeline(config: ProcessAPICLIConfig): Promise<RuntimeMasterDataset> {
+interface PipelineResult {
+  readonly dataset: RuntimeMasterDataset;
+  readonly validation: ValidationSummary;
+}
+
+async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResult> {
   const baseDir = path.resolve(config.baseDir);
 
   // Step 1: Load configuration
@@ -459,15 +469,15 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<RuntimeMaster
     }
   }
 
-  // Step 8: Transform to MasterDataset
-  const masterDataset = transformToMasterDataset({
+  // Step 8: Transform to MasterDataset (with validation for graph health commands)
+  const { dataset: masterDataset, validation } = transformToMasterDatasetWithValidation({
     patterns: allPatterns,
     tagRegistry: registry,
     workflow,
     contextInferenceRules: DEFAULT_CONTEXT_INFERENCE_RULES,
   });
 
-  return masterDataset;
+  return { dataset: masterDataset, validation };
 }
 
 // =============================================================================
@@ -716,6 +726,12 @@ function handleSearch(api: ProcessStateAPI, subArgs: string[]): unknown {
 async function handleArch(ctx: RouteContext): Promise<unknown> {
   const args = ctx.subArgs;
   const subCmd = args[0];
+
+  // Graph health commands work on relationshipIndex/validation, not archIndex
+  if (subCmd === 'dangling') return ctx.validation.danglingReferences;
+  if (subCmd === 'orphans') return findOrphanPatterns(ctx.dataset);
+  if (subCmd === 'blocking') return buildOverview(ctx.dataset).blocking;
+
   const archIndex = ctx.dataset.archIndex;
 
   if (!archIndex || archIndex.all.length === 0) {
@@ -824,7 +840,7 @@ async function handleArch(ctx: RouteContext): Promise<unknown> {
     default:
       throw new QueryApiError(
         'UNKNOWN_METHOD',
-        `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], neighborhood <pattern>, compare <ctx1> <ctx2>, coverage`
+        `Unknown arch subcommand: ${subCmd ?? '(none)'}\nAvailable: roles, context [name], layer [name], neighborhood <pattern>, compare <ctx1> <ctx2>, coverage, dangling, orphans, blocking`
       );
   }
 }
@@ -946,6 +962,7 @@ function handlePdr(dataset: RuntimeMasterDataset, subArgs: string[]): unknown {
 interface RouteContext {
   api: ProcessStateAPI;
   dataset: RuntimeMasterDataset;
+  validation: ValidationSummary;
   subcommand: string;
   subArgs: string[];
   modifiers: OutputModifiers;
@@ -1315,7 +1332,7 @@ async function main(): Promise<void> {
   }
 
   // Build pipeline (steps 1-8)
-  const masterDataset = await buildPipeline(opts);
+  const { dataset: masterDataset, validation } = await buildPipeline(opts);
 
   // Create ProcessStateAPI
   const api = createProcessStateAPI(masterDataset);
@@ -1324,6 +1341,7 @@ async function main(): Promise<void> {
   const result = await routeSubcommand({
     api,
     dataset: masterDataset,
+    validation,
     subcommand: opts.subcommand,
     subArgs: opts.subArgs,
     modifiers: opts.modifiers,

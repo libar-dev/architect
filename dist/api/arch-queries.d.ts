@@ -77,4 +77,16 @@ export declare function computeNeighborhood(name: string, dataset: MasterDataset
 export declare function compareContexts(ctx1: string, ctx2: string, dataset: MasterDataset): ContextComparison | undefined;
 export declare function aggregateTagUsage(dataset: MasterDataset): TagUsageReport;
 export declare function buildSourceInventory(dataset: MasterDataset): SourceInventory;
+export interface OrphanEntry {
+    readonly pattern: string;
+    readonly status: string | undefined;
+    readonly file: string;
+}
+/**
+ * Find patterns with no relationships at all (isolated nodes in the graph).
+ *
+ * A pattern is an orphan if it has no uses, usedBy, dependsOn, enables,
+ * implementsPatterns, implementedBy, extendedBy, seeAlso, or extendsPattern.
+ */
+export declare function findOrphanPatterns(dataset: MasterDataset): readonly OrphanEntry[];
 //# sourceMappingURL=arch-queries.d.ts.map

@@ -162,6 +162,9 @@ Run `pnpm process:query -- --help` for the full command reference with all optio
 | `pnpm process:query -- arch neighborhood <pattern>` | uses/usedBy/dependsOn/enables/sameContext                |
 | `pnpm process:query -- arch compare <ctx1> <ctx2>`  | Cross-context shared deps and integration points         |
 | `pnpm process:query -- arch coverage`               | Annotation completeness (files with/without @libar-docs) |
+| `pnpm process:query -- arch dangling`               | Broken references (pattern names that don't exist)       |
+| `pnpm process:query -- arch orphans`                | Patterns with no relationships (isolated)                |
+| `pnpm process:query -- arch blocking`               | Patterns blocked by incomplete dependencies              |
 | `pnpm process:query -- tags`                        | Tag usage report (counts per tag and value)              |
 | `pnpm process:query -- sources`                     | File inventory by type (TS, Gherkin, Stubs)              |
 | `pnpm process:query -- unannotated`                 | TypeScript files missing @libar-docs annotations         |
