@@ -132,113 +132,33 @@ pnpm process:query -- overview                            # Project health summa
 
 Query delivery process state directly from the terminal. **Use this instead of reading generated markdown or launching explore agents** — targeted queries use 5-10x less context.
 
-Run `pnpm process:query -- --help` for the full command reference with all options.
+**Run `pnpm process:query -- --help` for the full command reference**, including workflow recipes, session types, architecture queries, output modifiers, and available API methods.
 
 #### Session Start Recipe
 
-1. `overview` first — 7-line executive summary (progress, active phases, blockers)
-2. `scope-validate <pattern> <session-type>` — pre-flight check before starting work
-3. `context <pattern> --session <type>` — curated context bundle for the session
+1. `pnpm process:query -- overview` — project health (progress, active phases, blockers)
+2. `pnpm process:query -- scope-validate <pattern> <session-type>` — pre-flight check (FSM, deps, prereqs)
+3. `pnpm process:query -- context <pattern> --session <type>` — curated context bundle
 
-#### Context Gathering (Text Output — Use First in Sessions)
+Session types: `planning` (minimal), `design` (full: stubs + deps + deliverables), `implement` (focused: deliverables + FSM + tests).
 
-| Command                                                       | What It Provides                                         |
-| ------------------------------------------------------------- | -------------------------------------------------------- |
-| `pnpm process:query -- context <pattern> --session design`    | Pattern metadata, description, stubs, deps, deliverables |
-| `pnpm process:query -- context <pattern> --session implement` | Deliverables, FSM state, test files                      |
-| `pnpm process:query -- context <pattern> --session planning`  | Minimal: pattern metadata and spec file only             |
-| `pnpm process:query -- dep-tree <pattern>`                    | Dependency chain with status (`--depth N` to limit)      |
-| `pnpm process:query -- overview`                              | Progress, active phases, blocking chains                 |
-| `pnpm process:query -- files <pattern> --related`             | File reading list with implementation paths              |
+#### Key Commands
 
-#### Session Support (Text Output)
+| Command                 | When to Use                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `scope-validate`        | **Highest impact** — prevents wasted sessions by catching violations before you start |
+| `context --session`     | Primary context gathering — replaces manual file reads                                |
+| `dep-tree <pattern>`    | Understand dependency chains before implementation                                    |
+| `list --status roadmap` | Find available patterns to work on                                                    |
+| `arch blocking`         | Find patterns stuck on incomplete dependencies                                        |
+| `stubs --unresolved`    | Find design stubs missing implementations                                             |
+| `handoff --pattern`     | Capture session-end state for multi-session work                                      |
 
-| Command                                                    | What It Provides                                                |
-| ---------------------------------------------------------- | --------------------------------------------------------------- |
-| `pnpm process:query -- scope-validate <pattern> implement` | Pre-flight: PASS/BLOCKED/WARN checklist + READY/BLOCKED verdict |
-| `pnpm process:query -- scope-validate <pattern> design`    | Lighter design pre-flight (stubs from deps exist?)              |
-| `pnpm process:query -- handoff --pattern <pattern>`        | Session-end state: deliverables, blockers, date                 |
+#### Tips
 
-`scope-validate` is the highest-impact command — prevents wasted sessions by catching FSM violations, missing dependencies, and missing prerequisites before you start coding.
-
-#### Pattern Discovery (JSON Output)
-
-| Command                                       | What It Provides                                                 |
-| --------------------------------------------- | ---------------------------------------------------------------- |
-| `pnpm process:query -- list --status roadmap` | All patterns with given status                                   |
-| `pnpm process:query -- search <query>`        | Fuzzy name search with match scores                              |
-| `pnpm process:query -- pattern <name>`        | Full detail for one pattern (large — use `context` for sessions) |
-| `pnpm process:query -- stubs <pattern>`       | Design stubs with target paths and resolution status             |
-| `pnpm process:query -- stubs --unresolved`    | Only stubs with missing target files                             |
-| `pnpm process:query -- decisions <pattern>`   | AD-N design decisions from stub descriptions                     |
-| `pnpm process:query -- pdr <number>`          | Cross-reference patterns mentioning a PDR number                 |
-| `pnpm process:query -- status`                | Status counts and completion percentage                          |
-
-**Warning:** `pattern <name>` returns ~66KB for completed patterns with scenarios. Use `context --session` for interactive sessions instead.
-
-#### Architecture Queries (JSON Output)
-
-| Command                                             | What It Provides                                         |
-| --------------------------------------------------- | -------------------------------------------------------- |
-| `pnpm process:query -- arch roles`                  | All arch-roles with pattern counts                       |
-| `pnpm process:query -- arch context [name]`         | All contexts, or patterns in a specific bounded context  |
-| `pnpm process:query -- arch layer [name]`           | All layers, or patterns in a specific architecture layer |
-| `pnpm process:query -- arch neighborhood <pattern>` | uses/usedBy/dependsOn/enables/sameContext                |
-| `pnpm process:query -- arch compare <ctx1> <ctx2>`  | Cross-context shared deps and integration points         |
-| `pnpm process:query -- arch coverage`               | Annotation completeness (files with/without @libar-docs) |
-| `pnpm process:query -- arch dangling`               | Broken references (pattern names that don't exist)       |
-| `pnpm process:query -- arch orphans`                | Patterns with no relationships (isolated)                |
-| `pnpm process:query -- arch blocking`               | Patterns blocked by incomplete dependencies              |
-| `pnpm process:query -- tags`                        | Tag usage report (counts per tag and value)              |
-| `pnpm process:query -- sources`                     | File inventory by type (TS, Gherkin, Stubs)              |
-| `pnpm process:query -- unannotated`                 | TypeScript files missing @libar-docs annotations         |
-
-#### Raw API Access
-
-`query <method> [args...]` exposes any API method directly. Composes with output modifiers.
-
-```bash
-pnpm process:query -- query getStatusCounts            # {completed, active, planned, total}
-pnpm process:query -- query getCurrentWork --names-only # Active pattern names
-pnpm process:query -- query getCompletionPercentage    # Integer percentage
-pnpm process:query -- query getCategories              # All categories with counts
-```
-
-Run `pnpm process:query -- --help` to see the full list of available API methods.
-
-**Note:** Some methods return large unsummarized output (e.g., `getActivePhases` includes full nested patterns). Use `--names-only` or `--fields` to reduce output size.
-
-#### Output Modifiers (Composable with Any List/Query)
-
-Modifiers work regardless of position — before or after the subcommand.
-
-| Modifier                            | Effect                                     |
-| ----------------------------------- | ------------------------------------------ |
-| `--names-only`                      | Return pattern name strings only           |
-| `--count`                           | Return integer count                       |
-| `--fields patternName,status,phase` | Return only specified fields               |
-| `--full`                            | Bypass summarization, return raw patterns  |
-| `--format compact`                  | Single-line JSON (default: pretty-printed) |
-
-Valid fields for `--fields`: `patternName`, `status`, `category`, `phase`, `file`, `source`
-
-#### List Filters
-
-```bash
-pnpm process:query -- list --status completed --names-only
-pnpm process:query -- list --phase 25 --count
-pnpm process:query -- list --category core --source gherkin
-pnpm process:query -- list --limit 5                    # First 5 results
-pnpm process:query -- list --offset 10 --limit 5        # Pagination
-```
-
-#### Clean JSON Piping
-
-`pnpm` outputs a banner line to stdout. For clean JSON piping to `jq`, use `npx tsx` directly:
-
-```bash
-npx tsx src/cli/process-api.ts -i 'src/**/*.ts' --features 'delivery-process/specs/*.feature' list --status completed | jq '.[].patternName'
-```
+- `pattern <name>` returns ~66KB for completed patterns — prefer `context --session` for interactive sessions.
+- Output modifiers (`--names-only`, `--count`, `--fields`) compose with any list/query command.
+- `pnpm` outputs a banner to stdout. For clean JSON piping, use `npx tsx src/cli/process-api.ts` directly.
 
 ---
 
@@ -734,17 +654,16 @@ For multi-session work, capture state at session boundaries:
 
 Process Guard validates delivery workflow changes at commit time using a Decider pattern.
 
-#### 7 Validation Rules
+#### 6 Validation Rules
 
-| Rule ID                       | Severity | Description                                         |
-| ----------------------------- | -------- | --------------------------------------------------- |
-| `completed-protection`        | error    | Completed specs require `@libar-docs-unlock-reason` |
-| `invalid-status-transition`   | error    | Must follow FSM path                                |
-| `scope-creep`                 | error    | Active specs cannot add new deliverables            |
-| `session-excluded`            | error    | Cannot modify explicitly excluded files             |
-| `missing-relationship-target` | warning  | Relationship target pattern must exist              |
-| `session-scope`               | warning  | File outside session scope                          |
-| `deliverable-removed`         | warning  | Deliverable was removed                             |
+| Rule ID                     | Severity | Description                                         |
+| --------------------------- | -------- | --------------------------------------------------- |
+| `completed-protection`      | error    | Completed specs require `@libar-docs-unlock-reason` |
+| `invalid-status-transition` | error    | Must follow FSM path                                |
+| `scope-creep`               | error    | Active specs cannot add new deliverables            |
+| `session-excluded`          | error    | Cannot modify explicitly excluded files             |
+| `session-scope`             | warning  | File outside session scope                          |
+| `deliverable-removed`       | warning  | Deliverable was removed                             |
 
 #### Protection Levels
 
