@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:SourceMerging
+@libar-docs-status:completed
+@libar-docs-product-area:Configuration
 @behavior @config
 Feature: Source Merging - Per-Generator Override Resolution
   mergeSourcesForGenerator computes effective sources for a specific

@@ -1,5 +1,5 @@
 @libar-docs
-@libar-docs-pdr:001
+@libar-docs-adr:001
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:process
 @libar-docs-pattern:PDR001SelfDocumentation

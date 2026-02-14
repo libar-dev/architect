@@ -1,5 +1,8 @@
+@libar-docs
 @behavior @convention-extractor
 @libar-docs-pattern:ConventionExtractorTesting
+@libar-docs-status:completed
+@libar-docs-implements:ReferenceDocShowcase
 @libar-docs-product-area:Codec
 Feature: Convention Extractor
 

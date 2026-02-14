@@ -37,6 +37,12 @@ const tableBlock = renderDataTable(step.dataTable);
 const codeBlock = renderDocString(step.docString, "markdown");
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`rich-content-helpers.feature`](../../tests/features/behavior/rich-content-helpers.feature) - As a document codec author
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

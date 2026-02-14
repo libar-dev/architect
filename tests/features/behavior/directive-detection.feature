@@ -1,6 +1,8 @@
-@behavior @directive-detection
+@libar-docs
 @libar-docs-pattern:DirectiveDetection
+@libar-docs-status:completed
 @libar-docs-product-area:Scanner
+@behavior @directive-detection
 Feature: Directive Detection
   Pure functions that detect @libar-docs directives in TypeScript source code.
   These functions enable quick file filtering before full AST parsing.

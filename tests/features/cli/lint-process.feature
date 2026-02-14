@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:LintProcessCli
+@libar-docs-status:completed
+@libar-docs-product-area:CLI
 @libar-docs-implements:CliBehaviorTesting
 @cli @lint-process
 Feature: lint-process CLI

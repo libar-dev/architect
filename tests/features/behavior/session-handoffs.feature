@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:SessionHandoffs
+@libar-docs-status:completed
+@libar-docs-product-area:Behavior
 @behavior @session-handoffs
 Feature: Session Handoffs and Multi-Developer Coordination
   The delivery process supports mid-phase handoffs between sessions and

@@ -1,6 +1,8 @@
-@behavior @configuration
+@libar-docs
 @libar-docs-pattern:ConfigurationAPI
+@libar-docs-status:completed
 @libar-docs-product-area:Configuration
+@behavior @configuration
 Feature: Configuration API for Open-Sourcing
   The createDeliveryProcess factory provides a type-safe way to configure
   the delivery process with custom tag prefixes and presets.

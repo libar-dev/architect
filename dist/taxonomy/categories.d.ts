@@ -14,6 +14,7 @@
  * Priority determines display order (lower = higher priority).
  * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
  */
+/** @libar-docs-shape reference-sample */
 export interface CategoryDefinition {
     /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */
     readonly tag: string;

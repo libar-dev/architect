@@ -1,6 +1,8 @@
+@libar-docs
 @libar-docs-implements:PhaseStateMachineValidation
 @behavior @fsm-validation
-@libar-docs-pattern:FSMValidator
+@libar-docs-pattern:FSMValidatorTesting
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
 Feature: Phase State Machine Validation
   Pure validation functions for the 4-state FSM defined in PDR-005.

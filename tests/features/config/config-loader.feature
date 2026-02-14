@@ -1,6 +1,9 @@
-@behavior @config
-@libar-docs-pattern:ConfigLoader
+@libar-docs
+@libar-docs-pattern:ConfigLoaderTesting
+@libar-docs-implements:ConfigLoader
+@libar-docs-status:completed
 @libar-docs-product-area:Configuration
+@behavior @config
 Feature: Config Loader - TypeScript Configuration Discovery
   The config loader discovers and loads `delivery-process.config.ts` files
   for hierarchical configuration, enabling package-level and repo-level

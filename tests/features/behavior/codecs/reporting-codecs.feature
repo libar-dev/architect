@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:ReportingCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Codec
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @reporting-codecs
-@libar-docs-pattern:ReportingCodecTesting
-@libar-docs-product-area:Codec
 Feature: Reporting Document Codecs
   The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
   transform MasterDataset into RenderableDocuments for reporting outputs.

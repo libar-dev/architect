@@ -181,6 +181,7 @@ export type CollapsibleBlock = {
 };
 export type LinkOutBlock = z.infer<typeof LinkOutBlockSchema>;
 
+/** @libar-docs-shape reference-sample */
 export type SectionBlock =
   | HeadingBlock
   | ParagraphBlock

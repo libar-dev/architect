@@ -36,6 +36,8 @@
  * - deferred: Work postponed
  * - superseded: Replaced by another deliverable
  * - n/a: Not applicable
+ *
+ * @libar-docs-shape reference-sample
  */
 export const DELIVERABLE_STATUS_VALUES = [
   'complete',

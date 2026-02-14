@@ -1,4 +1,4 @@
-# 🚧 Declaration Level Shape Tagging
+# ✅ Declaration Level Shape Tagging
 
 **Purpose:** Detailed documentation for the Declaration Level Shape Tagging pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | active |
+| Status | completed |
 | Category | DDD |
 | Phase | 31 |
 
@@ -159,6 +159,14 @@
 
 - Depends on: ShapeExtraction
 - Depends on: ReferenceDocShowcase
+
+## Implementations
+
+Files that implement this pattern:
+
+- [`shape-matcher.feature`](../../tests/features/behavior/codecs/shape-matcher.feature) - Matches file paths against glob patterns for TypeScript shape extraction.
+- [`shape-selector.feature`](../../tests/features/behavior/codecs/shape-selector.feature) - Tests the filterShapesBySelectors function that provides fine-grained
+- [`declaration-level-shape-tagging.feature`](../../tests/features/extractor/declaration-level-shape-tagging.feature) - Tests the discoverTaggedShapes function that scans TypeScript source
 
 ## Acceptance Criteria
 

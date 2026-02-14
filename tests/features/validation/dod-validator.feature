@@ -1,6 +1,8 @@
+@libar-docs
 @libar-docs-implements:DoDValidation
 @behavior @dod-validation
-@libar-docs-pattern:DoDValidator
+@libar-docs-pattern:DoDValidatorTesting
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
 Feature: Definition of Done (DoD) Validation
   Validates that completed phases meet Definition of Done criteria:

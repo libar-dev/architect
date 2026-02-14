@@ -5,7 +5,1364 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 166 rules from 37 features across 1 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 558 rules from 118 features across 15 product areas.**
+
+---
+
+## API / Uncategorized
+
+### ArchQueriesTest
+
+#### Neighborhood and comparison views
+
+
+
+#### Taxonomy discovery via tags and sources
+
+
+
+#### Coverage analysis reports annotation completeness
+
+
+
+*[arch-queries.feature](tests/features/api/architecture-queries/arch-queries.feature)*
+
+### ContextAssemblerTests
+
+*Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and*
+
+#### assembleContext produces session-tailored context bundles
+
+
+
+#### buildDepTree walks dependency chains with cycle detection
+
+
+
+#### buildOverview provides executive project summary
+
+
+
+#### buildFileReadingList returns paths by relevance
+
+
+
+*[context-assembler.feature](tests/features/api/context-assembly/context-assembler.feature)*
+
+### ContextFormatterTests
+
+*Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),*
+
+#### formatContextBundle renders section markers
+
+
+
+#### formatDepTree renders indented tree
+
+
+
+#### formatOverview renders progress summary
+
+
+
+#### formatFileReadingList renders categorized file paths
+
+
+
+*[context-formatter.feature](tests/features/api/context-assembly/context-formatter.feature)*
+
+### FuzzyMatchTests
+
+*Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.*
+
+#### Fuzzy matching uses tiered scoring
+
+
+
+#### findBestMatch returns single suggestion
+
+
+
+#### Levenshtein distance computation
+
+
+
+*[fuzzy-match.feature](tests/features/api/output-shaping/fuzzy-match.feature)*
+
+### HandoffGeneratorTests
+
+*Multi-session work loses critical state between sessions when handoff*
+
+#### Handoff generates compact session state summary
+
+
+
+#### Formatter produces structured text output
+
+
+
+*[handoff-generator.feature](tests/features/api/session-support/handoff-generator.feature)*
+
+### OutputPipelineTests
+
+*Validates the output pipeline transforms: summarization, modifiers,*
+
+#### Output modifiers apply with correct precedence
+
+
+
+#### Modifier conflicts are rejected
+
+
+
+#### List filters compose via AND logic
+
+
+
+#### Empty stripping removes noise
+
+
+
+*[output-pipeline.feature](tests/features/api/output-shaping/output-pipeline.feature)*
+
+### PatternSummarizeTests
+
+*Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to*
+
+#### summarizePattern projects to compact summary
+
+
+
+#### summarizePatterns batch processes arrays
+
+
+
+*[summarize.feature](tests/features/api/output-shaping/summarize.feature)*
+
+### ProcessStateAPITesting
+
+*- Markdown generation is not ideal for programmatic access*
+
+#### Status queries return correct patterns
+
+
+
+#### Phase queries return correct phase data
+
+
+
+#### FSM queries expose transition validation
+
+
+
+#### Pattern queries find and retrieve pattern data
+
+
+
+#### Timeline queries group patterns by time
+
+
+
+*[process-state-api.feature](tests/features/api/process-state-api.feature)*
+
+### ScopeValidatorTests
+
+*Starting an implementation or design session without checking prerequisites*
+
+#### Implementation scope validation checks all prerequisites
+
+
+
+#### Design scope validation checks dependency stubs
+
+
+
+#### Formatter produces structured text output
+
+
+
+*[scope-validator.feature](tests/features/api/session-support/scope-validator.feature)*
+
+### StubResolverTests
+
+*Design session stubs need structured discovery and resolution*
+
+#### Stubs are identified by path or target metadata
+
+
+
+#### Stubs are resolved against the filesystem
+
+
+
+#### Decision items are extracted from descriptions
+
+
+
+#### PDR references are found across patterns
+
+
+
+*[stub-resolver.feature](tests/features/api/stub-integration/stub-resolver.feature)*
+
+### StubTaxonomyTagTests
+
+*Stub metadata (target path, design session) was stored as plain text*
+
+#### Taxonomy tags are registered in the registry
+
+
+
+#### Tags are part of the stub metadata group
+
+
+
+*[taxonomy-tags.feature](tests/features/api/stub-integration/taxonomy-tags.feature)*
+
+---
+
+## Architecture / Uncategorized
+
+### ArchGeneratorRegistration
+
+*I want an architecture generator registered in the generator registry*
+
+#### Architecture generator is registered in the registry
+
+The architecture generator must be registered like other built-in
+    generators so it can be invoked via CLI.
+
+
+
+#### Architecture generator produces component diagram by default
+
+Running the architecture generator without options produces
+    a component diagram (bounded context view).
+
+
+
+#### Architecture generator supports diagram type options
+
+The generator accepts options to specify diagram type
+    (component or layered).
+
+
+
+#### Architecture generator supports context filtering
+
+The generator can filter to specific bounded contexts
+    for focused diagram output.
+
+
+
+*[generator-registration.feature](tests/features/behavior/architecture-diagrams/generator-registration.feature)*
+
+### ArchIndexDataset
+
+*As a documentation generator*
+
+#### archIndex groups patterns by arch-role
+
+The archIndex.byRole map groups patterns by their architectural role
+    (command-handler, projection, saga, etc.) for efficient lookup.
+
+
+
+#### archIndex groups patterns by arch-context
+
+The archIndex.byContext map groups patterns by bounded context
+    for subgraph rendering in component diagrams.
+
+
+
+#### archIndex groups patterns by arch-layer
+
+The archIndex.byLayer map groups patterns by architectural layer
+    (domain, application, infrastructure) for layered diagram rendering.
+
+
+
+#### archIndex.all contains all patterns with any arch tag
+
+The archIndex.all array contains all patterns that have at least
+    one arch tag (role, context, or layer).
+
+
+
+#### Patterns without arch tags are excluded from archIndex
+
+Patterns that have no arch-role, arch-context, or arch-layer are
+    not included in the archIndex at all.
+
+
+
+*[arch-index.feature](tests/features/behavior/architecture-diagrams/arch-index.feature)*
+
+### ArchTagExtraction
+
+*As a documentation generator*
+
+#### arch-role tag is defined in the registry
+
+Architecture roles classify components for diagram rendering.
+
+
+
+#### arch-context tag is defined in the registry
+
+Context tags group components into bounded context subgraphs.
+
+
+
+#### arch-layer tag is defined in the registry
+
+Layer tags enable layered architecture diagrams.
+
+
+
+#### AST parser extracts arch-role from TypeScript annotations
+
+The AST parser must extract arch-role alongside other pattern metadata.
+
+
+
+#### AST parser extracts arch-context from TypeScript annotations
+
+Context values are free-form strings naming the bounded context.
+
+
+
+#### AST parser extracts arch-layer from TypeScript annotations
+
+Layer tags classify components by architectural layer.
+
+
+
+#### AST parser handles multiple arch tags together
+
+Components often have role + context + layer together.
+
+
+
+#### Missing arch tags yield undefined values
+
+Components without arch tags should have undefined (not null or empty).
+
+
+
+*[arch-tag-extraction.feature](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)*
+
+### ComponentDiagramGeneration
+
+*As a documentation generator*
+
+#### Component diagrams group patterns by bounded context
+
+Patterns with arch-context are grouped into Mermaid subgraphs.
+
+
+
+#### Context-less patterns go to Shared Infrastructure
+
+Patterns without arch-context are grouped into a
+    "Shared Infrastructure" subgraph.
+
+
+
+#### Relationship types render with distinct arrow styles
+
+Arrow styles follow UML conventions:
+    - uses: solid arrow (-->)
+    - depends-on: dashed arrow (-.->)
+    - implements: dotted arrow (..->)
+    - extends: open arrow (-->>)
+
+
+
+#### Arrows only connect annotated components
+
+Relationships pointing to non-annotated patterns
+    are not rendered (target would not exist in diagram).
+
+
+
+#### Component diagram includes summary section
+
+The generated document starts with an overview section
+    showing component counts and bounded context statistics.
+
+
+
+#### Component diagram includes legend when enabled
+
+The legend explains arrow style meanings for readers.
+
+
+
+#### Component diagram includes inventory table when enabled
+
+The inventory lists all components with their metadata.
+
+
+
+#### Empty architecture data shows guidance message
+
+If no patterns have architecture annotations,
+    the document explains how to add them.
+
+
+
+*[component-diagram.feature](tests/features/behavior/architecture-diagrams/component-diagram.feature)*
+
+### LayeredDiagramGeneration
+
+*As a documentation generator*
+
+#### Layered diagrams group patterns by arch-layer
+
+Patterns with arch-layer are grouped into Mermaid subgraphs.
+
+
+
+#### Layer order is domain to infrastructure (top to bottom)
+
+The layer subgraphs are rendered in Clean Architecture order:
+    domain at top, then application, then infrastructure at bottom.
+
+
+
+#### Context labels included in layered diagram nodes
+
+Unlike component diagrams which group by context, layered diagrams
+    include the context as a label in each node name.
+
+
+
+#### Patterns without layer go to Other subgraph
+
+Patterns that have arch-role or arch-context but no arch-layer
+    are grouped into an "Other" subgraph.
+
+
+
+#### Layered diagram includes summary section
+
+The generated document starts with an overview section
+    specific to layered architecture visualization.
+
+
+
+*[layered-diagram.feature](tests/features/behavior/architecture-diagrams/layered-diagram.feature)*
+
+---
+
+## Behavior / Phase 44
+
+### KebabCaseSlugs
+
+*As a documentation generator*
+
+#### CamelCase names convert to kebab-case
+
+
+
+#### Edge cases are handled correctly
+
+
+
+#### Requirements include phase prefix
+
+
+
+#### Phase slugs use kebab-case for names
+
+
+
+*[kebab-case-slugs.feature](tests/features/behavior/kebab-case-slugs.feature)*
+
+### RichContentHelpersTesting
+
+*As a document codec author*
+
+#### DocString parsing handles edge cases
+
+
+
+#### DataTable rendering produces valid markdown
+
+
+
+#### Scenario content rendering respects options
+
+
+
+#### Business rule rendering handles descriptions
+
+
+
+#### DocString content is dedented when parsed
+
+
+
+*[rich-content-helpers.feature](tests/features/behavior/rich-content-helpers.feature)*
+
+---
+
+## Behavior / Uncategorized
+
+### DescriptionHeaderNormalization
+
+*Pattern descriptions should not create duplicate headers when rendered.*
+
+#### Leading headers are stripped from pattern descriptions
+
+
+
+#### Edge cases are handled correctly
+
+
+
+#### stripLeadingHeaders removes only leading headers
+
+
+
+*[description-headers.feature](tests/features/behavior/description-headers.feature)*
+
+### ExtractSummary
+
+*The extractSummary function transforms multi-line pattern descriptions into*
+
+#### Single-line descriptions are returned as-is when complete
+
+
+
+#### Multi-line descriptions are combined until sentence ending
+
+
+
+#### Long descriptions are truncated at sentence or word boundaries
+
+
+
+#### Tautological and header lines are skipped
+
+
+
+#### Edge cases are handled gracefully
+
+
+
+*[extract-summary.feature](tests/features/behavior/extract-summary.feature)*
+
+### ImplementationLinkPathNormalization
+
+*Links to implementation files in generated pattern documents should have*
+
+#### Repository prefixes are stripped from implementation paths
+
+
+
+#### All implementation links in a pattern are normalized
+
+
+
+#### normalizeImplPath strips known prefixes
+
+
+
+*[implementation-links.feature](tests/features/behavior/implementation-links.feature)*
+
+### RemainingWorkSummaryAccuracy
+
+*Summary totals in REMAINING-WORK.md must match the sum of phase table rows.*
+
+#### Summary totals equal sum of phase table rows
+
+
+
+#### Patterns without phases appear in Backlog row
+
+
+
+#### Patterns without patternName are counted using id
+
+
+
+#### All phases with incomplete patterns are shown
+
+
+
+*[remaining-work-totals.feature](tests/features/behavior/remaining-work-totals.feature)*
+
+---
+
+## CLI / Uncategorized
+
+### GenerateDocsCli
+
+*Command-line interface for generating documentation from annotated TypeScript.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input patterns
+
+
+
+#### CLI lists available generators
+
+
+
+#### CLI generates documentation from source files
+
+
+
+#### CLI rejects unknown options
+
+
+
+*[generate-docs.feature](tests/features/cli/generate-docs.feature)*
+
+### GenerateTagTaxonomyCli
+
+*Command-line interface for generating TAG_TAXONOMY.md from tag registry configuration.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI generates taxonomy at specified output path
+
+
+
+#### CLI respects overwrite flag for existing files
+
+
+
+#### Generated taxonomy contains expected sections
+
+
+
+#### CLI warns about unknown flags
+
+
+
+*[generate-tag-taxonomy.feature](tests/features/cli/generate-tag-taxonomy.feature)*
+
+### LintPatternsCli
+
+*Command-line interface for validating pattern annotation quality.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input patterns
+
+
+
+#### Lint passes for valid patterns
+
+
+
+#### Lint detects violations in incomplete patterns
+
+
+
+#### CLI supports multiple output formats
+
+
+
+#### Strict mode treats warnings as errors
+
+
+
+*[lint-patterns.feature](tests/features/cli/lint-patterns.feature)*
+
+### LintProcessCli
+
+*Command-line interface for validating changes against delivery process rules.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires git repository for validation
+
+
+
+#### CLI validates file mode input
+
+
+
+#### CLI handles no changes gracefully
+
+
+
+#### CLI supports multiple output formats
+
+
+
+#### CLI supports debug options
+
+
+
+#### CLI warns about unknown flags
+
+
+
+*[lint-process.feature](tests/features/cli/lint-process.feature)*
+
+### ProcessApiCli
+
+*Command-line interface for querying delivery process state via ProcessStateAPI.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input flag for subcommands
+
+
+
+#### CLI status subcommand shows delivery state
+
+
+
+#### CLI query subcommand executes API methods
+
+
+
+#### CLI pattern subcommand shows pattern detail
+
+
+
+#### CLI arch subcommand queries architecture
+
+
+
+#### CLI shows errors for missing subcommand arguments
+
+
+
+#### CLI handles argument edge cases
+
+
+
+#### CLI list subcommand filters patterns
+
+
+
+#### CLI search subcommand finds patterns by fuzzy match
+
+
+
+#### CLI context assembly subcommands return text output
+
+
+
+#### CLI tags and sources subcommands return JSON
+
+
+
+#### CLI extended arch subcommands query architecture relationships
+
+
+
+#### CLI unannotated subcommand finds files without annotations
+
+
+
+#### Output modifiers work when placed after the subcommand
+
+- **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+
+- **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+
+
+#### CLI arch health subcommands detect graph quality issues
+
+- **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+
+- **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+
+
+*[process-api.feature](tests/features/cli/process-api.feature)*
+
+### ValidatePatternsCli
+
+*Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input and feature patterns
+
+
+
+#### CLI validates patterns across TypeScript and Gherkin sources
+
+
+
+#### CLI supports multiple output formats
+
+
+
+#### Strict mode treats warnings as errors
+
+
+
+#### CLI warns about unknown flags
+
+
+
+*[validate-patterns.feature](tests/features/cli/validate-patterns.feature)*
+
+---
+
+## Codec / Uncategorized
+
+### CompositeCodecTesting
+
+*Assembles reference documents from multiple codec outputs by*
+
+#### CompositeCodec concatenates sections in codec array order
+
+- **Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
+
+
+
+#### Separators between codec outputs are configurable
+
+- **Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
+
+
+
+#### additionalFiles merge with last-wins semantics
+
+- **Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
+
+
+
+#### composeDocuments works at document level without codecs
+
+- **Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
+
+
+
+#### Empty codec outputs are handled gracefully
+
+- **Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
+
+
+
+*[composite-codec.feature](tests/features/behavior/codecs/composite-codec.feature)*
+
+### ConventionExtractorTesting
+
+*Extracts convention content from MasterDataset decision records*
+
+#### Empty and missing inputs produce empty results
+
+
+
+#### Convention bundles are extracted from matching patterns
+
+
+
+#### Structured content is extracted from rule descriptions
+
+
+
+#### Code examples in rule descriptions are preserved
+
+
+
+#### TypeScript JSDoc conventions are extracted alongside Gherkin
+
+
+
+*[convention-extractor.feature](tests/features/behavior/codecs/convention-extractor.feature)*
+
+### DedentHelper
+
+*- DocStrings in Gherkin files have consistent indentation for alignment*
+
+#### Tabs are normalized to spaces before dedent
+
+
+
+#### Empty lines are handled correctly
+
+
+
+#### Single line input is handled
+
+
+
+#### Unicode whitespace is handled
+
+
+
+#### Relative indentation is preserved
+
+
+
+*[dedent.feature](tests/features/behavior/codecs/dedent.feature)*
+
+### PlanningCodecTesting
+
+*- Need to generate planning checklists, session plans, and findings documents from patterns*
+
+#### PlanningChecklistCodec prepares for implementation sessions
+
+
+
+#### SessionPlanCodec generates implementation plans
+
+
+
+#### SessionFindingsCodec captures retrospective discoveries
+
+
+
+*[planning-codecs.feature](tests/features/behavior/codecs/planning-codecs.feature)*
+
+### PrChangesCodecTesting
+
+*- Need to generate PR-specific documentation from patterns*
+
+#### PrChangesCodec handles empty results gracefully
+
+
+
+#### PrChangesCodec generates summary with filter information
+
+
+
+#### PrChangesCodec groups changes by phase when sortBy is "phase"
+
+
+
+#### PrChangesCodec groups changes by priority when sortBy is "priority"
+
+
+
+#### PrChangesCodec shows flat list when sortBy is "workflow"
+
+
+
+#### PrChangesCodec renders pattern details with metadata and description
+
+
+
+#### PrChangesCodec renders deliverables when includeDeliverables is enabled
+
+
+
+#### PrChangesCodec renders acceptance criteria from scenarios
+
+
+
+#### PrChangesCodec renders business rules from Gherkin Rule keyword
+
+
+
+#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
+
+
+
+#### PrChangesCodec generates dependencies section when includeDependencies is enabled
+
+
+
+#### PrChangesCodec filters patterns by changedFiles
+
+
+
+#### PrChangesCodec filters patterns by releaseFilter
+
+
+
+#### PrChangesCodec uses OR logic for combined filters
+
+
+
+#### PrChangesCodec only includes active and completed patterns
+
+
+
+*[pr-changes-codec.feature](tests/features/behavior/codecs/pr-changes-codec.feature)*
+
+### ReferenceCodecTesting
+
+*Parameterized codec factory that creates reference document codecs*
+
+#### Empty datasets produce fallback content
+
+
+
+#### Convention content is rendered as sections
+
+
+
+#### Detail level controls output density
+
+
+
+#### Behavior sections are rendered from category-matching patterns
+
+
+
+#### Shape sources are extracted from matching patterns
+
+
+
+#### Convention and behavior content compose in a single document
+
+
+
+#### Composition order follows AD-5: conventions then shapes then behaviors
+
+
+
+#### Convention code examples render as mermaid blocks
+
+
+
+#### Scoped diagrams are generated from diagramScope config
+
+
+
+#### Multiple diagram scopes produce multiple mermaid blocks
+
+
+
+#### Standard detail level includes narrative but omits rationale
+
+
+
+#### Deep behavior rendering with structured annotations
+
+
+
+#### Shape JSDoc prose renders at standard and detailed levels
+
+
+
+#### Shape sections render param returns and throws documentation
+
+
+
+#### Diagram type controls Mermaid output format
+
+- **Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+
+- **Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
+
+
+
+#### Edge labels and custom node shapes enrich diagram readability
+
+- **Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+
+- **Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
+
+
+
+#### Collapsible blocks wrap behavior rules for progressive disclosure
+
+- **Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
+
+- **Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
+
+
+
+#### Link-out blocks provide source file cross-references
+
+- **Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
+
+- **Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
+
+
+
+*[reference-codec.feature](tests/features/behavior/codecs/reference-codec.feature)*
+
+### ReportingCodecTesting
+
+*- Need to generate changelog, traceability, and overview documents*
+
+#### ChangelogCodec follows Keep a Changelog format
+
+
+
+#### TraceabilityCodec maps timeline patterns to behavior tests
+
+
+
+#### OverviewCodec provides project architecture summary
+
+
+
+*[reporting-codecs.feature](tests/features/behavior/codecs/reporting-codecs.feature)*
+
+### RequirementsAdrCodecTesting
+
+*- Need to generate product requirements documents with flexible groupings*
+
+#### RequirementsDocumentCodec generates PRD-style documentation from patterns
+
+
+
+#### AdrDocumentCodec documents architecture decisions
+
+
+
+*[requirements-adr-codecs.feature](tests/features/behavior/codecs/requirements-adr-codecs.feature)*
+
+### SessionCodecTesting
+
+*- Need to generate session context and remaining work documents from patterns*
+
+#### SessionContextCodec provides working context for AI sessions
+
+
+
+#### RemainingWorkCodec aggregates incomplete work by phase
+
+
+
+*[session-codecs.feature](tests/features/behavior/codecs/session-codecs.feature)*
+
+### ShapeMatcherTesting
+
+*Matches file paths against glob patterns for TypeScript shape extraction.*
+
+#### Exact paths match without wildcards
+
+
+
+#### Single-level globs match one directory level
+
+
+
+#### Recursive globs match any depth
+
+
+
+#### Dataset shape extraction deduplicates by name
+
+
+
+*[shape-matcher.feature](tests/features/behavior/codecs/shape-matcher.feature)*
+
+### ShapeSelectorTesting
+
+*Tests the filterShapesBySelectors function that provides fine-grained*
+
+#### Reference doc configs select shapes via shapeSelectors
+
+- **Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
+
+
+
+*[shape-selector.feature](tests/features/behavior/codecs/shape-selector.feature)*
+
+### TimelineCodecTesting
+
+*- Need to generate roadmap, milestones, and current work documents from patterns*
+
+#### RoadmapDocumentCodec groups patterns by phase with progress tracking
+
+
+
+#### CompletedMilestonesCodec shows only completed patterns grouped by quarter
+
+
+
+#### CurrentWorkCodec shows only active patterns with deliverables
+
+
+
+*[timeline-codecs.feature](tests/features/behavior/codecs/timeline-codecs.feature)*
+
+---
+
+## Configuration / Uncategorized
+
+### ConfigLoaderTesting
+
+*- Different directories need different taxonomies*
+
+#### Config files are discovered by walking up directories
+
+
+
+#### Config discovery stops at repo root
+
+
+
+#### Config is loaded and validated
+
+
+
+#### Config errors are formatted for display
+
+
+
+*[config-loader.feature](tests/features/config/config-loader.feature)*
+
+### ConfigResolution
+
+*- Raw user config is partial with many optional fields*
+
+#### Default config provides sensible fallbacks
+
+
+
+#### Preset creates correct taxonomy instance
+
+
+
+#### Stubs are merged into typescript sources
+
+
+
+#### Output defaults are applied
+
+
+
+#### Generator defaults are applied
+
+
+
+#### Context inference rules are prepended
+
+
+
+#### Config path is carried from options
+
+
+
+*[config-resolution.feature](tests/features/config/config-resolution.feature)*
+
+### ConfigurationAPI
+
+*- Different projects need different tag prefixes*
+
+#### Factory creates configured instances with correct defaults
+
+
+
+#### Custom prefix configuration works correctly
+
+
+
+#### Preset categories replace base categories entirely
+
+
+
+#### Regex builders use configured prefix
+
+
+
+*[configuration-api.feature](tests/features/config/configuration-api.feature)*
+
+### DefineConfigTesting
+
+*- Users need type-safe config authoring without runtime overhead*
+
+#### defineConfig is an identity function
+
+
+
+#### Schema validates correct configurations
+
+
+
+#### Schema rejects invalid configurations
+
+
+
+#### Type guards distinguish config formats
+
+
+
+*[define-config.feature](tests/features/config/define-config.feature)*
+
+### PresetSystem
+
+*- New users need sensible defaults for their project type*
+
+#### Generic preset provides minimal taxonomy
+
+
+
+#### Libar generic preset provides minimal taxonomy with libar prefix
+
+
+
+#### DDD-ES-CQRS preset provides full taxonomy
+
+
+
+#### Presets can be accessed by name
+
+
+
+*[preset-system.feature](tests/features/config/preset-system.feature)*
+
+### ProjectConfigLoader
+
+*- Two config formats exist (new-style and legacy) that need unified loading*
+
+#### Missing config returns defaults
+
+
+
+#### New-style config is loaded and resolved
+
+
+
+#### Legacy config is loaded with backward compatibility
+
+
+
+#### Invalid configs produce clear errors
+
+
+
+*[project-config-loader.feature](tests/features/config/project-config-loader.feature)*
+
+### SourceMerging
+
+*- Different generators may need different feature or input sources*
+
+#### No override returns base unchanged
+
+
+
+#### Feature overrides control feature source selection
+
+
+
+#### TypeScript source overrides append additional input
+
+
+
+#### Combined overrides apply together
+
+
+
+#### Exclude is always inherited from base
+
+
+
+*[source-merging.feature](tests/features/config/source-merging.feature)*
 
 ---
 
@@ -729,6 +2086,26 @@
 
 
 *[data-api-stub-integration.feature](delivery-process/specs/data-api-stub-integration.feature)*
+
+### PatternHelpersTests
+
+#### getPatternName uses patternName tag when available
+
+
+
+#### findPatternByName performs case-insensitive matching
+
+
+
+#### getRelationships looks up with case-insensitive fallback
+
+
+
+#### suggestPattern provides fuzzy suggestions
+
+
+
+*[pattern-helpers.feature](tests/features/api/output-shaping/pattern-helpers.feature)*
 
 ---
 
@@ -1570,6 +2947,24 @@ The following tags are defined in the TypeScript taxonomy to support process gua
 
 *[streaming-git-diff.feature](delivery-process/specs/streaming-git-diff.feature)*
 
+### TestContentBlocks
+
+*This feature demonstrates what content blocks are captured and rendered*
+
+#### Business rules appear as a separate section
+
+Rule descriptions provide context for why this business rule exists.
+
+
+
+#### Multiple rules create multiple Business Rule entries
+
+Each Rule keyword creates a separate entry in the Business Rules section.
+
+
+
+*[test-content-blocks.feature](tests/features/poc/test-content-blocks.feature)*
+
 ---
 
 ## Delivery Process / Phase 100
@@ -1910,5 +3305,1027 @@ Test execution must work for scenarios inside Rule blocks.
 
 
 *[generator-infrastructure-testing.feature](delivery-process/specs/generator-infrastructure-testing.feature)*
+
+---
+
+## DocGeneration / Uncategorized
+
+### ContentDeduplication
+
+*Multiple sources may extract identical content, leading to*
+
+#### Duplicate detection uses content fingerprinting
+
+- **Invariant:** Content with identical normalized text must produce identical fingerprints.
+
+- **Rationale:** Fingerprinting enables efficient duplicate detection without full text comparison.
+
+
+
+#### Duplicates are merged based on source priority
+
+- **Invariant:** Higher-priority sources take precedence when merging duplicate content.
+
+- **Rationale:** TypeScript sources have richer JSDoc; feature files provide behavioral context.
+
+
+
+#### Section order is preserved after deduplication
+
+- **Invariant:** Section order matches the source mapping table order after deduplication.
+
+- **Rationale:** Predictable ordering ensures consistent documentation structure.
+
+
+
+#### Deduplicator integrates with source mapper pipeline
+
+- **Invariant:** Deduplication runs after extraction and before document assembly.
+
+- **Rationale:** All content must be extracted before duplicates can be identified.
+
+
+
+*[content-deduplication.feature](tests/features/doc-generation/content-deduplication.feature)*
+
+### DecisionDocCodecTesting
+
+*Validates the Decision Doc Codec that parses decision documents (ADR/PDR*
+
+#### Rule blocks are partitioned by semantic prefix
+
+Decision documents use Rule: blocks with semantic prefixes to organize
+    content into Context, Decision, and Consequences sections (standard ADR
+    format).
+
+
+
+#### DocStrings are extracted with language tags
+
+Decision documents contain code examples as Gherkin DocStrings.
+
+
+
+#### Source mapping tables are parsed from rule descriptions
+
+Decision documents define source mappings in markdown tables.
+
+
+
+#### Self-reference markers are correctly detected
+
+Source files can reference the current decision document using special
+    markers like "THIS DECISION", "THIS DECISION (Rule: X)", etc.
+
+
+
+#### Extraction methods are normalized to known types
+
+The extraction method column can be written in various formats.
+
+
+
+#### Complete decision documents are parsed with all content
+
+The parseDecisionDocument function extracts all content from an ADR/PDR.
+
+
+
+#### Rules can be found by name with partial matching
+
+Self-references may not have an exact rule name match.
+
+
+
+*[decision-doc-codec.feature](tests/features/doc-generation/decision-doc-codec.feature)*
+
+### DecisionDocGeneratorTesting
+
+*The Decision Doc Generator orchestrates the full documentation generation*
+
+#### Output paths are determined from pattern metadata
+
+The generator computes output paths based on pattern name and optional
+    section configuration.
+
+
+
+#### Compact output includes only essential content
+
+Summary/compact output is limited to ~50 lines and includes only
+    essential tables and type definitions for Claude context files.
+
+
+
+#### Detailed output includes full content
+
+Detailed output is ~300 lines and includes everything: JSDoc, examples,
+    full descriptions, and all extracted content.
+
+
+
+#### Multi-level generation produces both outputs
+
+The generator can produce both compact and detailed outputs in a single
+    pass for maximum utility.
+
+
+
+#### Generator is registered with the registry
+
+The generator is available in the registry under the name "doc-from-decision"
+    and can be invoked through the standard generator interface.
+
+
+
+#### Source mappings are executed during generation
+
+Decision documents with source mapping tables trigger content aggregation
+    from the referenced files during the generation process.
+
+
+
+*[decision-doc-generator.feature](tests/features/doc-generation/decision-doc-generator.feature)*
+
+### PocIntegration
+
+*End-to-end integration tests that exercise the full documentation generation*
+
+#### POC decision document is parsed correctly
+
+
+
+#### Self-references extract content from POC decision
+
+
+
+#### TypeScript shapes are extracted from real files
+
+
+
+#### Behavior spec content is extracted correctly
+
+
+
+#### JSDoc sections are extracted from CLI files
+
+
+
+#### All source mappings execute successfully
+
+
+
+#### Compact output generates correctly
+
+
+
+#### Detailed output generates correctly
+
+
+
+#### Generated output matches quality expectations
+
+
+
+*[poc-integration.feature](tests/features/doc-generation/poc-integration.feature)*
+
+### RobustnessIntegration
+
+*Document generation pipeline needs validation, deduplication, and*
+
+#### Validation runs before extraction in the pipeline
+
+- **Invariant:** Validation must complete and pass before extraction begins.
+
+- **Rationale:** Prevents wasted extraction work and provides clear fail-fast behavior.
+
+
+
+#### Deduplication runs after extraction before assembly
+
+- **Invariant:** Deduplication processes all extracted content before document assembly.
+
+- **Rationale:** All sources must be extracted to identify cross-source duplicates.
+
+
+
+#### Warnings from all stages are collected and reported
+
+- **Invariant:** Warnings from all pipeline stages are aggregated in the result.
+
+- **Rationale:** Users need visibility into non-fatal issues without blocking generation.
+
+
+
+#### Pipeline provides actionable error messages
+
+- **Invariant:** Error messages include context and fix suggestions.
+
+- **Rationale:** Users should fix issues in one iteration without guessing.
+
+
+
+#### Existing decision documents continue to work
+
+- **Invariant:** Valid existing decision documents generate without new errors.
+
+- **Rationale:** Robustness improvements must be backward compatible.
+
+
+
+*[robustness-integration.feature](tests/features/doc-generation/robustness-integration.feature)*
+
+### SourceMapperTesting
+
+*The Source Mapper aggregates content from multiple source files based on*
+
+#### Extraction methods dispatch to correct handlers
+
+The source mapper dispatches to different extraction functions based on
+    the extraction method specified in the source mapping table.
+
+
+
+#### Self-references extract from current decision document
+
+THIS DECISION markers extract content from the current decision document
+    rather than requiring a separate file path.
+
+
+
+#### Multiple sources are aggregated in mapping order
+
+Multiple source mappings result in content extraction from each file.
+
+
+
+#### Missing files produce warnings without failing
+
+A referenced source file that does not exist produces a warning,
+    but generation continues with available sources.
+
+
+
+#### Empty extraction results produce info warnings
+
+Extraction that succeeds but produces no content (e.g., no shapes found)
+    results in an informational warning being logged.
+
+
+
+#### Extraction methods are normalized for dispatch
+
+The extraction method column can be written in various formats
+    and is normalized before dispatch.
+
+
+
+*[source-mapper.feature](tests/features/doc-generation/source-mapper.feature)*
+
+### SourceMappingValidatorTesting
+
+*Source mappings reference files that may not exist, use invalid*
+
+#### Source files must exist and be readable
+
+- **Invariant:** All source file paths in mappings must resolve to existing, readable files.
+
+- **Rationale:** Prevents extraction failures and provides clear error messages upfront.
+
+
+
+#### Extraction methods must be valid and supported
+
+- **Invariant:** Extraction methods must match a known method from the supported set.
+
+- **Rationale:** Invalid methods cannot extract content; suggest valid alternatives.
+
+
+
+#### Extraction methods must be compatible with file types
+
+- **Invariant:** Method-file combinations must be compatible (e.g., TypeScript methods for .ts files).
+
+- **Rationale:** Incompatible combinations fail at extraction; catch early with clear guidance.
+
+
+
+#### Source mapping tables must have required columns
+
+- **Invariant:** Tables must contain Section, Source File, and Extraction Method columns.
+
+- **Rationale:** Missing columns prevent extraction; alternative column names are mapped.
+
+
+
+#### All validation errors are collected and returned together
+
+- **Invariant:** Validation collects all errors before returning, not just the first.
+
+- **Rationale:** Enables users to fix all issues in a single iteration.
+
+
+
+*[source-mapping-validator.feature](tests/features/doc-generation/source-mapping-validator.feature)*
+
+### TaxonomyCodecTesting
+
+*Validates the Taxonomy Codec that transforms MasterDataset into a*
+
+#### Document metadata is correctly set
+
+The taxonomy document has standard metadata fields for title, purpose,
+    and detail level that describe the generated content.
+
+
+
+#### Categories section is generated from TagRegistry
+
+The categories section lists all configured tag categories with their
+    domain, priority, and description in a sortable table.
+
+
+
+#### Metadata tags can be grouped by domain
+
+The groupByDomain option organizes metadata tags into subsections
+    by their semantic domain (Core, Relationship, Timeline, etc.).
+
+
+
+#### Tags are classified into domains by hardcoded mapping
+
+The domain classification is intentionally hardcoded for documentation
+    stability.
+
+
+
+#### Optional sections can be disabled via codec options
+
+The codec supports disabling format types, presets, and architecture
+    diagram sections for compact output generation.
+
+
+
+#### Detail files are generated for progressive disclosure
+
+The generateDetailFiles option creates additional files for
+    categories, metadata tags, and format types with detailed content.
+
+
+
+#### Format types are documented with descriptions and examples
+
+The Format Types section documents all supported tag value formats
+    with descriptions and examples for each type.
+
+
+
+*[taxonomy-codec.feature](tests/features/doc-generation/taxonomy-codec.feature)*
+
+### ValidationRulesCodecTesting
+
+*Validates the Validation Rules Codec that transforms MasterDataset into a*
+
+#### Document metadata is correctly set
+
+The validation rules document has standard metadata fields for title,
+    purpose, and detail level.
+
+
+
+#### All validation rules are documented in a table
+
+The rules table includes all 6 Process Guard validation rules with
+    their severity levels and descriptions.
+
+
+
+#### FSM state diagram is generated from transitions
+
+The Mermaid diagram shows all valid state transitions for the
+    Process Guard FSM.
+
+
+
+#### Protection level matrix shows status protections
+
+The protection matrix documents which statuses have which protection
+    levels (none, scope-locked, hard-locked).
+
+
+
+#### CLI usage is documented with options and exit codes
+
+The CLI section shows how to invoke the Process Guard linter
+    with various options.
+
+
+
+#### Escape hatches are documented for special cases
+
+The escape hatches section documents how to override Process Guard
+    validation for legitimate use cases.
+
+
+
+*[validation-rules-codec.feature](tests/features/doc-generation/validation-rules-codec.feature)*
+
+### WarningCollectorTesting
+
+*The warning collector provides a unified system for capturing, categorizing,*
+
+#### Warnings are captured with source context
+
+Each warning includes the source location, category, and message to
+    enable debugging and targeted fixes.
+
+
+
+#### Warnings are categorized for filtering and grouping
+
+Warning categories enable filtering by severity, source, or type
+    for different reporting needs.
+
+
+
+#### Warnings are aggregated across the pipeline
+
+The collector aggregates warnings from all pipeline stages, maintaining
+    insertion order and source attribution.
+
+
+
+#### Warnings integrate with the Result pattern
+
+The warning collector integrates with Result<T, E> to include warnings
+    in successful results, enabling callers to inspect non-fatal issues.
+
+
+
+#### Warnings can be formatted for different outputs
+
+The collector provides formatters for console output, JSON, and
+    markdown to support different reporting needs.
+
+
+
+#### Existing console.warn calls are migrated to collector
+
+All console.warn calls in the source mapper and related modules
+    are replaced with warning collector calls.
+
+
+
+*[warning-collector.feature](tests/features/doc-generation/warning-collector.feature)*
+
+---
+
+## Extractor / Uncategorized
+
+### DeclarationLevelShapeTaggingTesting
+
+*Tests the discoverTaggedShapes function that scans TypeScript source*
+
+#### Declarations opt in via libar-docs-shape tag
+
+- **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
+
+
+
+#### Discovery uses existing estree parser with JSDoc comment scanning
+
+- **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach.
+
+
+
+*[declaration-level-shape-tagging.feature](tests/features/extractor/declaration-level-shape-tagging.feature)*
+
+### DualSourceExtractorTesting
+
+*- Pattern data split across code stubs and feature files*
+
+#### Process metadata is extracted from feature tags
+
+
+
+#### Deliverables are extracted from Background tables
+
+
+
+#### Code and feature patterns are combined into dual-source patterns
+
+
+
+#### Dual-source results are validated for consistency
+
+
+
+*[dual-source-extraction.feature](tests/features/extractor/dual-source-extraction.feature)*
+
+### ExtractionPipelineEnhancementsTesting
+
+*Validates extraction pipeline capabilities for ReferenceDocShowcase:*
+
+#### Function signatures surface full parameter types in ExportInfo
+
+- **Invariant:** ExportInfo.signature shows full parameter types and return type instead of the placeholder value.
+
+
+
+#### Property-level JSDoc preserves full multi-line content
+
+- **Invariant:** Property-level JSDoc preserves full multi-line content without first-line truncation.
+
+
+
+#### Param returns and throws tags are extracted from function JSDoc
+
+- **Invariant:** JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape for function-kind shapes.
+
+
+
+#### Auto-shape discovery extracts all exported types via wildcard
+
+- **Invariant:** When extract-shapes tag value is the wildcard character, all exported declarations are extracted without listing names.
+
+
+
+*[extraction-pipeline-enhancements.feature](tests/features/extractor/extraction-pipeline-enhancements.feature)*
+
+### ShapeExtractionTesting
+
+*Validates the shape extraction system that extracts TypeScript type*
+
+#### extract-shapes tag exists in registry with CSV format
+
+
+
+#### Interfaces are extracted from TypeScript AST
+
+
+
+#### Property-level JSDoc is extracted for interface properties
+
+The extractor uses strict adjacency (gap = 1 line) to prevent
+    interface-level JSDoc from being misattributed to the first property.
+
+
+
+#### Type aliases are extracted from TypeScript AST
+
+
+
+#### Enums are extracted from TypeScript AST
+
+
+
+#### Function signatures are extracted with body omitted
+
+
+
+#### Multiple shapes are extracted in specified order
+
+
+
+#### Extracted shapes render as fenced code blocks
+
+
+
+#### Imported and re-exported shapes are tracked separately
+
+
+
+#### Const declarations are extracted from TypeScript AST
+
+
+
+#### Invalid TypeScript produces error result
+
+
+
+#### Non-exported shapes are extractable
+
+
+
+#### Shape rendering supports grouping options
+
+
+
+#### Large source files are rejected to prevent memory exhaustion
+
+
+
+*[shape-extraction.feature](tests/features/extractor/shape-extraction.feature)*
+
+---
+
+## Generator / Uncategorized
+
+### BusinessRulesDocumentCodec
+
+*Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.*
+
+#### Extracts Rule blocks with Invariant and Rationale
+
+
+
+#### Organizes rules by product area and phase
+
+
+
+#### Summary mode generates compact output
+
+
+
+#### Preserves code examples and tables in detailed mode
+
+
+
+#### Generates scenario traceability links
+
+
+
+*[business-rules-codec.feature](tests/features/generators/business-rules-codec.feature)*
+
+### CodecBasedGeneratorTesting
+
+*Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)*
+
+#### CodecBasedGenerator adapts codecs to generator interface
+
+
+
+*[codec-based.feature](tests/features/generators/codec-based.feature)*
+
+### DocumentationOrchestrator
+
+*Tests the orchestrator's pattern merging, conflict detection, and generator*
+
+#### Orchestrator coordinates full documentation generation pipeline
+
+
+
+*[orchestrator.feature](tests/features/generators/orchestrator.feature)*
+
+### GeneratorRegistryTesting
+
+*Tests the GeneratorRegistry registration, lookup, and listing capabilities.*
+
+#### Registry manages generator registration and retrieval
+
+
+
+*[registry.feature](tests/features/generators/registry.feature)*
+
+### PrChangesOptions
+
+*Tests the PrChangesCodec filtering capabilities for generating PR-scoped*
+
+#### Orchestrator supports PR changes generation options
+
+
+
+*[pr-changes-options.feature](tests/features/generators/pr-changes-options.feature)*
+
+### PrdImplementationSection
+
+*Tests the Implementations section rendering in pattern documents.*
+
+#### Implementation files appear in pattern docs via @libar-docs-implements
+
+
+
+#### Multiple implementations are listed alphabetically
+
+
+
+#### Patterns without implementations omit the section
+
+
+
+#### Implementation references use relative file links
+
+
+
+*[prd-implementation-section.feature](tests/features/generators/prd-implementation-section.feature)*
+
+### ReferenceGeneratorTesting
+
+*Registers all 13 reference document generators.*
+
+#### Registration produces the correct number of generators
+
+
+
+#### Generator naming follows kebab-case convention
+
+
+
+#### Generator execution produces markdown output
+
+
+
+*[reference-generators.feature](tests/features/behavior/codecs/reference-generators.feature)*
+
+### TableExtraction
+
+*Tables in business rule descriptions should appear exactly once in output.*
+
+#### Tables in rule descriptions render exactly once
+
+
+
+#### Multiple tables in description each render exactly once
+
+
+
+#### stripMarkdownTables removes table syntax from text
+
+
+
+*[table-extraction.feature](tests/features/generators/table-extraction.feature)*
+
+---
+
+## PatternRelationship / Uncategorized
+
+### MermaidRelationshipRendering
+
+*Tests for rendering all relationship types in Mermaid dependency graphs*
+
+#### Each relationship type has a distinct arrow style
+
+
+
+#### Pattern names are sanitized for Mermaid node IDs
+
+
+
+#### All relationship types appear in single graph
+
+
+
+*[mermaid-rendering.feature](tests/features/behavior/pattern-relationships/mermaid-rendering.feature)*
+
+---
+
+## Pipeline / Uncategorized
+
+### ContextInference
+
+*Patterns in standard directories (src/validation/, src/scanner/) should*
+
+#### matchPattern supports recursive wildcard **
+
+
+
+#### matchPattern supports single-level wildcard /*
+
+
+
+#### matchPattern supports prefix matching
+
+
+
+#### inferContext returns undefined when no rules match
+
+
+
+#### inferContext applies first matching rule
+
+
+
+#### Explicit archContext is not overridden
+
+
+
+#### Inference works independently of archLayer
+
+
+
+#### Default rules map standard directories
+
+
+
+*[context-inference.feature](tests/features/behavior/context-inference.feature)*
+
+---
+
+## POC / Uncategorized
+
+### RuleKeywordPoC
+
+*This feature tests whether vitest-cucumber supports the Rule keyword*
+
+#### Basic arithmetic operations work correctly
+
+The calculator should perform standard math operations
+    with correct results.
+
+
+
+#### Division has special constraints
+
+Division by zero must be handled gracefully to prevent
+    system errors.
+
+
+
+*[rule-keyword-poc.feature](tests/features/poc/rule-keyword-poc.feature)*
+
+---
+
+## Scanner / Uncategorized
+
+### DocStringMediaType
+
+*DocString language hints (mediaType) should be preserved through the parsing*
+
+#### Parser preserves DocString mediaType during extraction
+
+
+
+#### MediaType is used when rendering code blocks
+
+
+
+#### renderDocString handles both string and object formats
+
+
+
+*[docstring-mediatype.feature](tests/features/scanner/docstring-mediatype.feature)*
+
+---
+
+## Validation / Uncategorized
+
+### AntiPatternDetectorTesting
+
+*- Dependencies in features (should be code-only) cause drift*
+
+#### Process metadata should not appear in TypeScript code
+
+
+
+#### Generator hints should not appear in feature files
+
+
+
+#### Feature files should not have excessive scenarios
+
+
+
+#### Feature files should not exceed size thresholds
+
+
+
+#### All anti-patterns can be detected in one pass
+
+
+
+#### Violations can be formatted for console output
+
+
+
+*[anti-patterns.feature](tests/features/validation/anti-patterns.feature)*
+
+### DetectChangesTesting
+
+*Tests for the detectDeliverableChanges function that parses git diff output.*
+
+#### Status changes are detected as modifications not additions
+
+
+
+#### New deliverables are detected as additions
+
+
+
+#### Removed deliverables are detected as removals
+
+
+
+#### Mixed changes are correctly categorized
+
+
+
+#### Non-deliverable tables are ignored
+
+
+
+*[detect-changes.feature](tests/features/validation/detect-changes.feature)*
+
+### DoDValidatorTesting
+
+*- Phases marked "completed" without all deliverables done*
+
+#### Deliverable completion uses canonical status taxonomy
+
+
+
+#### Acceptance criteria must be tagged with @acceptance-criteria
+
+
+
+#### Acceptance criteria scenarios can be extracted by name
+
+
+
+#### DoD requires all deliverables complete and AC present
+
+
+
+#### DoD can be validated across multiple completed phases
+
+
+
+#### Summary can be formatted for console output
+
+
+
+*[dod-validator.feature](tests/features/validation/dod-validator.feature)*
+
+### FSMValidatorTesting
+
+*- Status values must conform to PDR-005 FSM states*
+
+#### Status values must be valid PDR-005 FSM states
+
+
+
+#### Status transitions must follow FSM rules
+
+
+
+#### Completed patterns should have proper metadata
+
+
+
+#### Protection levels match FSM state definitions
+
+
+
+#### Combined validation provides complete results
+
+
+
+*[fsm-validator.feature](tests/features/validation/fsm-validator.feature)*
+
+### ProcessGuard
+
+*- Completed specs modified without explicit unlock reason*
+
+#### Completed files require unlock-reason to modify
+
+
+
+#### Status transitions must follow PDR-005 FSM
+
+
+
+#### Active specs cannot add new deliverables
+
+
+
+#### Files outside active session scope trigger warnings
+
+
+
+#### Explicitly excluded files trigger errors
+
+
+
+#### Multiple rules validate independently
+
+
+
+*[process-guard.feature](tests/features/validation/process-guard.feature)*
+
+### StatusTransitionDetectionTesting
+
+*Tests for the detectStatusTransitions function that parses git diff output.*
+
+#### Status transitions are detected from file-level tags
+
+
+
+#### Status tags inside docstrings are ignored
+
+
+
+#### First valid status tag outside docstrings is used
+
+
+
+#### Line numbers are tracked from hunk headers
+
+
+
+#### Generated documentation directories are excluded
+
+
+
+*[status-transition-detection.feature](tests/features/validation/status-transition-detection.feature)*
 
 ---

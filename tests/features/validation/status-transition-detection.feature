@@ -1,4 +1,7 @@
-@behavior @status-transitions @libar-docs-pattern:DetectChanges
+@libar-docs
+@behavior @status-transitions @libar-docs-pattern:StatusTransitionDetectionTesting
+@libar-docs-implements:DetectChanges
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
 Feature: Status Transition Detection from Git Diff
   Tests for the detectStatusTransitions function that parses git diff output.

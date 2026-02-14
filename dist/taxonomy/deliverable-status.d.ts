@@ -35,6 +35,8 @@
  * - deferred: Work postponed
  * - superseded: Replaced by another deliverable
  * - n/a: Not applicable
+ *
+ * @libar-docs-shape reference-sample
  */
 export declare const DELIVERABLE_STATUS_VALUES: readonly ["complete", "in-progress", "pending", "deferred", "superseded", "n/a"];
 export type DeliverableStatus = (typeof DELIVERABLE_STATUS_VALUES)[number];

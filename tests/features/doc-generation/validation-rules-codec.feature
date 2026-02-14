@@ -1,4 +1,8 @@
 @libar-docs
+@libar-docs-pattern:ValidationRulesCodecTesting
+@libar-docs-implements:ValidationRulesCodec
+@libar-docs-status:completed
+@libar-docs-product-area:DocGeneration
 Feature: Validation Rules Document Codec
 
   Validates the Validation Rules Codec that transforms MasterDataset into a

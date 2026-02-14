@@ -54,6 +54,7 @@ Files that implement this pattern:
 - [`detect-changes.ts`](../../src/lint/process-guard/detect-changes.ts) - ## DetectChanges - Git Diff Change Detection
 - [`index.ts`](../../src/lint/process-guard/index.ts) - :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider
 - [`types.ts`](../../src/lint/process-guard/types.ts) - :FSMValidator
+- [`process-guard.feature`](../../tests/features/validation/process-guard.feature) - Pure validation functions for enforcing delivery process rules per PDR-005.
 
 ## Acceptance Criteria
 

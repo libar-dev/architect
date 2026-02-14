@@ -1,5 +1,8 @@
+@libar-docs
 @behavior @reference-generators
 @libar-docs-pattern:ReferenceGeneratorTesting
+@libar-docs-status:completed
+@libar-docs-implements:ReferenceDocShowcase
 @libar-docs-product-area:Generator
 Feature: Reference Document Generator Registration
 

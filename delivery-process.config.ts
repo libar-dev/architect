@@ -18,7 +18,9 @@ export default defineConfig({
     stubs: ['delivery-process/stubs/**/*.ts'],
     features: [
       'delivery-process/specs/*.feature',
+      'delivery-process/decisions/*.feature',
       'delivery-process/releases/*.feature',
+      'tests/features/**/*.feature',
     ],
   },
   output: {
@@ -30,9 +32,9 @@ export default defineConfig({
     {
       title: 'Reference Generation Sample',
       conventionTags: ['reference-sample', 'output-format'],
-      shapeSources: ['src/taxonomy/risk-levels.ts', 'src/renderable/schema.ts'],
+      shapeSources: [],
       shapeSelectors: [
-        { source: 'src/taxonomy/risk-levels.ts', names: ['RiskLevel', 'RISK_LEVELS'] },
+        { group: 'reference-sample' },
       ],
       behaviorCategories: ['infra'],
       diagramScopes: [
@@ -63,6 +65,9 @@ export default defineConfig({
     },
     'reference-docs': {
       additionalFeatures: ['delivery-process/decisions/*.feature'],
+    },
+    requirements: {
+      outputDirectory: 'docs-live',
     },
   },
 });

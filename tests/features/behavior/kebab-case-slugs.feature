@@ -1,7 +1,8 @@
 @libar-docs
-@libar-docs-pattern KebabCaseSlugs
-@libar-docs-status roadmap
-@libar-docs-phase 44
+@libar-docs-pattern:KebabCaseSlugs
+@libar-docs-status:roadmap
+@libar-docs-phase:44
+@libar-docs-product-area:Behavior
 
 Feature: Slug Generation for Progressive Disclosure
   As a documentation generator

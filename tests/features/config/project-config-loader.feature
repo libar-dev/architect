@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ProjectConfigLoader
+@libar-docs-status:completed
+@libar-docs-product-area:Configuration
 @behavior @config
 Feature: Project Config Loader - Unified Configuration Loading
   loadProjectConfig loads and resolves configuration from file,

@@ -85,10 +85,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -149,10 +149,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -179,9 +179,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -210,10 +210,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -240,9 +240,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -258,13 +258,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -325,8 +325,8 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -364,10 +364,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -428,10 +428,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -458,9 +458,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -489,10 +489,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -519,9 +519,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -537,13 +537,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -604,10 +604,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -668,10 +668,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -698,9 +698,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -729,10 +729,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -759,9 +759,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -777,13 +777,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -844,10 +844,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -908,10 +908,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -938,9 +938,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -969,10 +969,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -999,9 +999,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1017,13 +1017,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -1088,10 +1088,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1152,10 +1152,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1182,9 +1182,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1213,10 +1213,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -1243,9 +1243,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1261,13 +1261,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -1335,10 +1335,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1399,10 +1399,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1429,9 +1429,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1460,10 +1460,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1490,9 +1490,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1508,13 +1508,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1575,10 +1575,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1639,10 +1639,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1669,9 +1669,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1700,10 +1700,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1730,9 +1730,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1748,13 +1748,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1816,10 +1816,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1880,10 +1880,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1910,9 +1910,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1941,10 +1941,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -1971,9 +1971,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1989,13 +1989,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2056,10 +2056,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2120,10 +2120,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2150,9 +2150,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2181,10 +2181,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2211,9 +2211,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2229,13 +2229,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2296,10 +2296,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2360,10 +2360,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2390,9 +2390,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2421,10 +2421,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2451,9 +2451,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2469,13 +2469,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2536,10 +2536,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2600,10 +2600,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2630,9 +2630,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2661,10 +2661,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2691,9 +2691,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2709,13 +2709,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -2802,10 +2802,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2866,10 +2866,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2896,9 +2896,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2927,10 +2927,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -2957,9 +2957,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2975,13 +2975,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3042,10 +3042,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3106,10 +3106,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3136,9 +3136,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3167,10 +3167,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3197,9 +3197,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3215,13 +3215,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3282,10 +3282,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3346,10 +3346,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3376,9 +3376,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3407,10 +3407,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3437,9 +3437,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3455,13 +3455,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3522,10 +3522,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3586,10 +3586,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3616,9 +3616,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3647,10 +3647,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3677,9 +3677,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3695,13 +3695,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3762,10 +3762,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3826,10 +3826,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3856,9 +3856,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3887,10 +3887,10 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3917,9 +3917,9 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3935,13 +3935,13 @@ export declare const ChangelogCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4015,10 +4015,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4079,10 +4079,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4109,9 +4109,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -4140,10 +4140,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -4170,9 +4170,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4188,13 +4188,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -4255,8 +4255,8 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -4294,10 +4294,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4358,10 +4358,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4388,9 +4388,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -4419,10 +4419,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -4449,9 +4449,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4467,13 +4467,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4534,10 +4534,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4598,10 +4598,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4628,9 +4628,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -4659,10 +4659,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -4689,9 +4689,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4707,13 +4707,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4774,10 +4774,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4838,10 +4838,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4868,9 +4868,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -4899,10 +4899,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -4929,9 +4929,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4947,13 +4947,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5018,10 +5018,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5082,10 +5082,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5112,9 +5112,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -5143,10 +5143,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -5173,9 +5173,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5191,13 +5191,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5265,10 +5265,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5329,10 +5329,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5359,9 +5359,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -5390,10 +5390,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -5420,9 +5420,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5438,13 +5438,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -5505,10 +5505,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5569,10 +5569,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5599,9 +5599,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -5630,10 +5630,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -5660,9 +5660,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5678,13 +5678,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -5746,10 +5746,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5810,10 +5810,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5840,9 +5840,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -5871,10 +5871,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -5901,9 +5901,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5919,13 +5919,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5986,10 +5986,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6050,10 +6050,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6080,9 +6080,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -6111,10 +6111,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6141,9 +6141,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6159,13 +6159,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6226,10 +6226,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6290,10 +6290,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6320,9 +6320,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -6351,10 +6351,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6381,9 +6381,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6399,13 +6399,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6466,10 +6466,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6530,10 +6530,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6560,9 +6560,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -6591,10 +6591,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6621,9 +6621,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6639,13 +6639,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6732,10 +6732,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6796,10 +6796,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6826,9 +6826,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -6857,10 +6857,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6887,9 +6887,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6905,13 +6905,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6972,10 +6972,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7036,10 +7036,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7066,9 +7066,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -7097,10 +7097,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -7127,9 +7127,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -7145,13 +7145,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -7212,10 +7212,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7276,10 +7276,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7306,9 +7306,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -7337,10 +7337,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -7367,9 +7367,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -7385,13 +7385,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -7452,10 +7452,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7516,10 +7516,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7546,9 +7546,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -7577,10 +7577,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -7607,9 +7607,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -7625,13 +7625,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -7692,10 +7692,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7756,10 +7756,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7786,9 +7786,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -7817,10 +7817,10 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -7847,9 +7847,9 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -7865,13 +7865,13 @@ export declare const TraceabilityCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -7945,10 +7945,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8009,10 +8009,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8039,9 +8039,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -8070,10 +8070,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -8100,9 +8100,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -8118,13 +8118,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -8185,8 +8185,8 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -8224,10 +8224,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8288,10 +8288,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8318,9 +8318,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -8349,10 +8349,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -8379,9 +8379,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -8397,13 +8397,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -8464,10 +8464,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8528,10 +8528,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8558,9 +8558,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -8589,10 +8589,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -8619,9 +8619,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -8637,13 +8637,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -8704,10 +8704,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8768,10 +8768,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -8798,9 +8798,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -8829,10 +8829,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -8859,9 +8859,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -8877,13 +8877,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -8948,10 +8948,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9012,10 +9012,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9042,9 +9042,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -9073,10 +9073,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -9103,9 +9103,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -9121,13 +9121,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -9195,10 +9195,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9259,10 +9259,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9289,9 +9289,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -9320,10 +9320,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -9350,9 +9350,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -9368,13 +9368,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -9435,10 +9435,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9499,10 +9499,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            roadmap: "roadmap";
-            active: "active";
-            completed: "completed";
             deferred: "deferred";
+            completed: "completed";
+            active: "active";
+            roadmap: "roadmap";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9529,9 +9529,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
-                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -9560,10 +9560,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
-                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
+                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -9590,9 +9590,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
             superseded: "superseded";
+            deprecated: "deprecated";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -9608,13 +9608,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            "command-handler": "command-handler";
+            decider: "decider";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
+            "command-handler": "command-handler";
             repository: "repository";
-            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -9676,10 +9676,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9740,10 +9740,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9770,9 +9770,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -9801,10 +9801,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -9831,9 +9831,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -9849,13 +9849,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -9916,10 +9916,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -9980,10 +9980,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10010,9 +10010,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -10041,10 +10041,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -10071,9 +10071,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -10089,13 +10089,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -10156,10 +10156,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10220,10 +10220,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10250,9 +10250,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -10281,10 +10281,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -10311,9 +10311,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -10329,13 +10329,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -10396,10 +10396,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10460,10 +10460,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10490,9 +10490,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -10521,10 +10521,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -10551,9 +10551,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -10569,13 +10569,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -10662,10 +10662,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10726,10 +10726,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10756,9 +10756,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -10787,10 +10787,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -10817,9 +10817,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -10835,13 +10835,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -10902,10 +10902,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10966,10 +10966,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -10996,9 +10996,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -11027,10 +11027,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -11057,9 +11057,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -11075,13 +11075,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -11142,10 +11142,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -11206,10 +11206,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -11236,9 +11236,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -11267,10 +11267,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -11297,9 +11297,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -11315,13 +11315,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -11382,10 +11382,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -11446,10 +11446,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -11476,9 +11476,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -11507,10 +11507,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -11537,9 +11537,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -11555,13 +11555,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -11622,10 +11622,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    roadmap: "roadmap";
-                    active: "active";
-                    completed: "completed";
                     deferred: "deferred";
+                    completed: "completed";
+                    active: "active";
+                    roadmap: "roadmap";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -11686,10 +11686,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                roadmap: "roadmap";
-                active: "active";
-                completed: "completed";
                 deferred: "deferred";
+                completed: "completed";
+                active: "active";
+                roadmap: "roadmap";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -11716,9 +11716,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
+                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
-                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -11747,10 +11747,10 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
-                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
+                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -11777,9 +11777,9 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
                 superseded: "superseded";
+                deprecated: "deprecated";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -11795,13 +11795,13 @@ export declare const OverviewCodec: z.ZodCodec<z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                "command-handler": "command-handler";
+                decider: "decider";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
+                "command-handler": "command-handler";
                 repository: "repository";
-                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;

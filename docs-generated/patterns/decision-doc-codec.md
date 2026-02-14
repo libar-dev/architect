@@ -38,6 +38,12 @@ tables, self-reference markers, and rule block extraction.
 - `THIS DECISION (Rule: X)` - Extract specific Rule: block
 - `THIS DECISION (DocString)` - Extract fenced code blocks
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`decision-doc-codec.feature`](../../tests/features/doc-generation/decision-doc-codec.feature) - Validates the Decision Doc Codec that parses decision documents (ADR/PDR
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

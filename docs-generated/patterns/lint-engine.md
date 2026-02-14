@@ -23,6 +23,12 @@ collecting violations and computing summary statistics for CI enforcement.
 - Use when building CI pipelines for documentation standards
 - Use for formatting lint results (pretty or JSON output)
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`lint-engine.feature`](../../tests/features/lint/lint-engine.feature) - The lint engine orchestrates rule execution, aggregates violations,
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

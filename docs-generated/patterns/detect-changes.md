@@ -34,6 +34,13 @@ require recompilation, making runtime detection unnecessary.
 - When validating all changes against main branch
 - When detecting scope creep (new deliverables)
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`detect-changes.feature`](../../tests/features/validation/detect-changes.feature) - Tests for the detectDeliverableChanges function that parses git diff output.
+- [`status-transition-detection.feature`](../../tests/features/validation/status-transition-detection.feature) - Tests for the detectStatusTransitions function that parses git diff output.
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

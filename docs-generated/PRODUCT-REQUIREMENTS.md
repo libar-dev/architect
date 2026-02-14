@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall:** [████████░░░░░░░░░░░░] 17/44 (39%)
+**Overall:** [████████░░░░░░░░░░░░] 18/44 (41%)
 
 | Metric | Value |
 | --- | --- |
 | Total Features | 44 |
-| Completed | 17 |
-| Active | 3 |
+| Completed | 18 |
+| Active | 2 |
 | Planned | 24 |
 | Product Areas | 2 |
 | User Roles | 1 |
@@ -24,7 +24,7 @@
 
 ### DeliveryProcess
 
-16/43 complete (37%)
+17/43 complete (40%)
 
 - [✅ Codec Driven Reference Generation - eliminates per document recipe features with config driven generation](requirements/phase-27-codec-driven-reference-generation.md)
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
@@ -32,6 +32,7 @@
 - [✅ Data API Design Session Support - automate session context compilation](requirements/phase-25-data-api-design-session-support.md)
 - [✅ Data API Output Shaping - compact output for ai agents](requirements/phase-25-data-api-output-shaping.md)
 - [✅ Data API Stub Integration - unlock design session stub metadata](requirements/phase-25-data-api-stub-integration.md)
+- [✅ Declaration Level Shape Tagging - enables focused shape extraction without whole file dumping](requirements/phase-31-declaration-level-shape-tagging.md)
 - [✅ Doc Generation Proof Of Concept - eliminates manual documentation maintenance](requirements/phase-27-doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support - enable human readable documentation from feature files](requirements/phase-100-gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation - align package with pdr005 fsm](requirements/phase-99-mvp-workflow-implementation.md)
@@ -42,7 +43,6 @@
 - [✅ Scoped Architectural View - enables selective pattern composition with architecture diagrams](requirements/phase-28-scoped-architectural-view.md)
 - [✅ Shape Extraction - eliminates type duplication in documentation](requirements/phase-26-shape-extraction.md)
 - [✅ Universal Doc Generator Robustness - enables monorepo scale doc generation](requirements/phase-28-universal-doc-generator-robustness.md)
-- [🚧 Declaration Level Shape Tagging - enables focused shape extraction without whole file dumping](requirements/phase-31-declaration-level-shape-tagging.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
 - [🚧 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
 - [📋 Architecture Delta - document release changes automatically](requirements/phase-100-architecture-delta.md)
@@ -101,6 +101,7 @@
 | ✅ Data API Design Session Support | DeliveryProcess | - | completed |
 | ✅ Data API Output Shaping | DeliveryProcess | - | completed |
 | ✅ Data API Stub Integration | DeliveryProcess | - | completed |
+| ✅ Declaration Level Shape Tagging | DeliveryProcess | - | completed |
 | ✅ Doc Generation Proof Of Concept | DeliveryProcess | - | completed |
 | ✅ Gherkin Rules Support | DeliveryProcess | - | completed |
 | ✅ Mvp Workflow Implementation | DeliveryProcess | - | completed |
@@ -112,7 +113,6 @@
 | ✅ Shape Extraction | DeliveryProcess | - | completed |
 | ✅ TypeScript Taxonomy Implementation | Taxonomy | Developer | completed |
 | ✅ Universal Doc Generator Robustness | DeliveryProcess | - | completed |
-| 🚧 Declaration Level Shape Tagging | DeliveryProcess | - | active |
 | 🚧 Process State API Relationship Queries | DeliveryProcess | - | active |
 | 🚧 Reference Doc Showcase | DeliveryProcess | - | active |
 | 📋 Architecture Delta | DeliveryProcess | - | planned |

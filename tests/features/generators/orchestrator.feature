@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:DocumentationOrchestrator
+@libar-docs-status:completed
+@libar-docs-product-area:Generator
 @libar-docs-implements:GeneratorInfrastructureTesting
 Feature: Documentation Generation Orchestrator
 

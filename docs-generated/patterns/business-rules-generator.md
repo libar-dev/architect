@@ -30,6 +30,12 @@
   | Business alignment | Rationale explains why constraints exist |
   | Audit readiness | Traceability shows which tests verify each rule |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`business-rules-codec.feature`](../../tests/features/generators/business-rules-codec.feature) - Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
+
 ## Acceptance Criteria
 
 **Extracts annotated Rule with Invariant and Rationale**

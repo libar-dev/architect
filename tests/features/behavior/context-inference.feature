@@ -1,6 +1,8 @@
-@behavior @context-inference
+@libar-docs
 @libar-docs-pattern:ContextInference
+@libar-docs-status:completed
 @libar-docs-product-area:Pipeline
+@behavior @context-inference
 Feature: Context Auto-Inference from File Paths
 
   **Problem:**

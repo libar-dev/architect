@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:RequirementsAdrCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Codec
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @requirements-adr-codecs
-@libar-docs-pattern:RequirementsAdrCodecTesting
-@libar-docs-product-area:Codec
 Feature: Requirements and ADR Document Codecs
   The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
   into RenderableDocuments for PRD-style and architecture decision documentation.

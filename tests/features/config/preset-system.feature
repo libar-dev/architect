@@ -1,6 +1,8 @@
-@behavior @presets
+@libar-docs
 @libar-docs-pattern:PresetSystem
+@libar-docs-status:completed
 @libar-docs-product-area:Configuration
+@behavior @presets
 Feature: Preset System for Configuration
   Presets provide pre-configured taxonomies for different project types.
 

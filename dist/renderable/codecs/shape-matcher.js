@@ -6,6 +6,10 @@
  *
  * @see CodecDrivenReferenceGeneration AD-6: In-memory glob matching
  */
+/** Type guard: selector has source + names fields */
+function hasNames(selector) {
+    return 'names' in selector;
+}
 // ============================================================================
 // Glob Pattern Matching
 // ============================================================================
@@ -115,12 +119,12 @@ export function filterShapesBySelectors(dataset, selectors) {
         }
         else if ('source' in selector) {
             // Source-based selector: match by file path glob
-            const sourceSelector = selector;
-            const nameSet = sourceSelector.names !== undefined ? new Set(sourceSelector.names) : undefined;
+            const sourceGlob = String(selector.source);
+            const nameSet = hasNames(selector) ? new Set(selector.names) : undefined;
             for (const pattern of dataset.patterns) {
                 if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0)
                     continue;
-                if (!matchesShapePattern(pattern.source.file, sourceSelector.source))
+                if (!matchesShapePattern(pattern.source.file, sourceGlob))
                     continue;
                 for (const shape of pattern.extractedShapes) {
                     if (seenNames.has(shape.name))

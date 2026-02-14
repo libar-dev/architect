@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:PrChangesCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Codec
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @pr-changes-codec
-@libar-docs-pattern:PrChangesCodecTesting
-@libar-docs-product-area:Codec
 Feature: PR Changes Document Codec
   The PrChangesCodec transforms MasterDataset into RenderableDocument for
   PR-scoped documentation. It filters patterns by changed files and/or

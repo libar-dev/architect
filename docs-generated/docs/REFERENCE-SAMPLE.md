@@ -504,55 +504,102 @@ sequenceDiagram
 
 ## API Types
 
-### RISK_LEVELS (const)
+### normalizeStatus (function)
 
 /**
- * @libar-docs
- * @libar-docs-pattern RiskLevels
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes RISK_LEVELS, RiskLevel
+ * Normalize any status string to a display bucket
  *
- * ## Risk Levels for Planning and Assessment
+ * Maps status values to three canonical display states:
+ * - "completed": completed
+ * - "active": active
+ * - "planned": roadmap, deferred, planned, or any unknown value
  *
- * Three-tier risk classification for roadmap planning.
+ * Per PDR-005: deferred items are treated as planned (not actively worked on)
+ *
+ * @libar-docs-shape reference-sample
+ * @param status - Raw status from pattern (case-insensitive)
+ * @returns "completed" | "active" | "planned"
+ *
+ * @example
+ * ```typescript
+ * normalizeStatus("completed")   // → "completed"
+ * normalizeStatus("active")      // → "active"
+ * normalizeStatus("roadmap")     // → "planned"
+ * normalizeStatus("deferred")    // → "planned"
+ * normalizeStatus(undefined)     // → "planned"
+ * ```
  */
 
 ```typescript
-RISK_LEVELS = ['low', 'medium', 'high'] as const
+function normalizeStatus(status: string | undefined): NormalizedStatus;
 ```
 
-### RiskLevel (type)
+| Parameter | Type | Description |
+| --- | --- | --- |
+| status |  | Raw status from pattern (case-insensitive) |
+
+**Returns:** "completed" | "active" | "planned"
+
+### DELIVERABLE_STATUS_VALUES (const)
 
 /**
- * @libar-docs
- * @libar-docs-pattern RiskLevels
- * @libar-docs-status completed
- * @libar-docs-core
- * @libar-docs-extract-shapes RISK_LEVELS, RiskLevel
+ * Canonical deliverable status values
  *
- * ## Risk Levels for Planning and Assessment
+ * These are the ONLY accepted values for the Status column in
+ * Gherkin Background deliverable tables. Values are lowercased
+ * at extraction time before schema validation.
  *
- * Three-tier risk classification for roadmap planning.
+ * - complete: Work is done
+ * - in-progress: Work is ongoing
+ * - pending: Work hasn't started
+ * - deferred: Work postponed
+ * - superseded: Replaced by another deliverable
+ * - n/a: Not applicable
+ *
+ * @libar-docs-shape reference-sample
  */
 
 ```typescript
-type RiskLevel = (typeof RISK_LEVELS)[number];
+DELIVERABLE_STATUS_VALUES = [
+  'complete',
+  'in-progress',
+  'pending',
+  'deferred',
+  'superseded',
+  'n/a',
+] as const
 ```
 
-### RenderableDocument (type)
+### CategoryDefinition (interface)
+
+/** @libar-docs-shape reference-sample */
 
 ```typescript
-type RenderableDocument = {
-  title: string;
-  purpose?: string;
-  detailLevel?: string;
-  sections: SectionBlock[];
-  additionalFiles?: Record<string, RenderableDocument>;
-};
+interface CategoryDefinition {
+  /** Category tag name without prefix (e.g., "core", "api", "ddd", "saga") */
+  readonly tag: string;
+  /** Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") */
+  readonly domain: string;
+  /** Display order priority - lower values appear first in sorted output */
+  readonly priority: number;
+  /** Brief description of the category's purpose and typical patterns */
+  readonly description: string;
+  /** Alternative tag names that map to this category (e.g., "es" for "event-sourcing") */
+  readonly aliases: readonly string[];
+}
 ```
+
+| Property | Description |
+| --- | --- |
+| tag | Category tag name without prefix (e.g., "core", "api", "ddd", "saga") |
+| domain | Human-readable domain name for display (e.g., "Strategic DDD", "Event Sourcing") |
+| priority | Display order priority - lower values appear first in sorted output |
+| description | Brief description of the category's purpose and typical patterns |
+| aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
 
 ### SectionBlock (type)
+
+/** @libar-docs-shape reference-sample */
 
 ```typescript
 type SectionBlock =
@@ -565,46 +612,6 @@ type SectionBlock =
   | MermaidBlock
   | CollapsibleBlock
   | LinkOutBlock;
-```
-
-### HeadingBlock (type)
-
-```typescript
-type HeadingBlock = z.infer<typeof HeadingBlockSchema>;
-```
-
-### TableBlock (type)
-
-```typescript
-type TableBlock = z.infer<typeof TableBlockSchema>;
-```
-
-### ListBlock (type)
-
-```typescript
-type ListBlock = z.infer<typeof ListBlockSchema>;
-```
-
-### CodeBlock (type)
-
-```typescript
-type CodeBlock = z.infer<typeof CodeBlockSchema>;
-```
-
-### MermaidBlock (type)
-
-```typescript
-type MermaidBlock = z.infer<typeof MermaidBlockSchema>;
-```
-
-### CollapsibleBlock (type)
-
-```typescript
-type CollapsibleBlock = {
-  type: 'collapsible';
-  summary: string;
-  content: SectionBlock[];
-};
 ```
 
 ---

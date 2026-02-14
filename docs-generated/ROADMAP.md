@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [████████████░░░░░░░░] 104/176 (59%)
+**Patterns:** [██████████████░░░░░░] 196/281 (70%)
 
-**Phases:** 2/15 complete
+**Phases:** 3/16 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 176 |
-| Completed | 104 |
-| Active | 36 |
-| Planned | 36 |
+| Total Patterns | 281 |
+| Completed | 196 |
+| Active | 44 |
+| Planned | 41 |
 
 ---
 
@@ -27,13 +27,14 @@
 | 📋 [TraceabilityGenerator](phases/phase-18-traceability-generator.md) | 0/1 | 0% |
 | 📋 [ArchitectureDiagramGeneration](phases/phase-23-architecture-diagram-generation.md) | 0/1 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 1/2 | 50% |
-| 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/9 | 56% |
+| 🚧 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/10 | 50% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 4/5 | 80% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
 | 🚧 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
-| 🚧 [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 0/1 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
+| ✅ [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 1/1 | 100% |
+| 📋 [RichContentHelpersTesting](phases/phase-44-rich-content-helpers-testing.md) | 0/2 | 0% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/8 | 50% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
@@ -75,9 +76,9 @@
 
 ---
 
-### 📋 DataAPIStubIntegration
+### 🚧 DataAPIStubIntegration
 
-[████████░░░░░░░] 5/9 56% complete
+[████████░░░░░░░] 5/10 50% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -90,6 +91,7 @@
 | 📋 Data API Platform Integration | planned | The process-api CLI requires subprocess invocation for every query, adding shell overhead and preventing stateful... |
 | 📋 Data API Relationship Graph | planned | The current API provides flat relationship lookups (`getPatternDependencies`, `getPatternRelationships`) but no... |
 | ✅ Data API Stub Integration | completed | Design sessions produce code stubs in `delivery-process/stubs/` with rich metadata: `@target` (destination file... |
+| 🚧 Pattern Helpers Tests | active | - |
 
 ---
 
@@ -142,19 +144,30 @@
 
 ---
 
-### 🚧 DeclarationLevelShapeTagging
+### ✅ DeclarationLevelShapeTagging
 
-[░░░░░░░░░░░░░░░] 0/1 0% complete
+[███████████████] 1/1 100% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 🚧 Declaration Level Shape Tagging | active | The current shape extraction system operates at file granularity. |
+| ✅ Declaration Level Shape Tagging | completed | The current shape extraction system operates at file granularity. |
+
+---
+
+### 📋 RichContentHelpersTesting
+
+[░░░░░░░░░░░░░░░] 0/2 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Kebab Case Slugs | planned | As a documentation generator I need to generate readable, URL-safe slugs from pattern names So that generated file... |
+| 📋 Rich Content Helpers Testing | planned | As a document codec author I need helpers to render Gherkin rich content So that DataTables, DocStrings, and... |
 
 ---
 
 ### 📋 TypeScriptTaxonomyImplementation
 
-[█████████░░░░░░] 4/7 57% complete
+[████████░░░░░░░] 4/8 50% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -164,6 +177,7 @@
 | ✅ Process Guard Linter | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
+| 📋 Test Content Blocks | planned | This feature demonstrates what content blocks are captured and rendered by the PRD generator. |
 | ✅ TypeScript Taxonomy Implementation | completed | As a delivery-process developer I want taxonomy defined in TypeScript with Zod integration So that I get compile-time... |
 
 ---

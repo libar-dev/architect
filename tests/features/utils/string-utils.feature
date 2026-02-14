@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:StringUtils
+@libar-docs-status:completed
+@libar-docs-product-area:Utils
 @utils @strings
 Feature: String Utility Functions
   String utilities provide consistent text transformations across the codebase.

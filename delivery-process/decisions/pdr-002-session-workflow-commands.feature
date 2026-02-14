@@ -1,5 +1,5 @@
 @libar-docs
-@libar-docs-pdr:002
+@libar-docs-adr:002
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:architecture
 @libar-docs-pattern:PDR002SessionWorkflowCommands

@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 104/176 (59%)
+**Overall Progress:** [██████████████░░░░░░] 196/281 (70%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 176 |
-| Completed | 104 |
-| Active | 36 |
-| Planned | 36 |
+| Total Patterns | 281 |
+| Completed | 196 |
+| Active | 44 |
+| Planned | 41 |
 | Active Phases | 4 |
 
 ---
@@ -37,6 +37,18 @@
 - 🔄 Relationship query step definitions
 
 [View ProcessStateAPIRelationshipQueries details →](current/phase-24-process-state-api-relationship-queries.md)
+
+---
+
+### 🚧 DataAPIStubIntegration
+
+[████████░░░░░░░] 5/10 50% complete (5 done, 1 active, 4 planned)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 Pattern Helpers Tests | - |
+
+[View DataAPIStubIntegration details →](current/phase-25-data-api-stub-integration.md)
 
 ---
 
@@ -91,42 +103,23 @@
 
 ---
 
-### 🚧 DeclarationLevelShapeTagging
-
-[░░░░░░░░░░░░░░░] 0/1 0% complete (0 done, 1 active)
-
-| Pattern | Description |
-| --- | --- |
-| 🚧 Declaration Level Shape Tagging | The current shape extraction system operates at file granularity. |
-
-#### Deliverables
-
-- 📋 Registry entry for shape tag
-- 📋 Group field on ExtractedShapeSchema
-- 📋 discoverTaggedShapes function
-- 📋 Wire tagged discovery into doc extractor
-- 📋 ShapeSelector schema and shapeSelectors on ReferenceDocConfig
-- 📋 Selector-based filtering in shape matcher
-- 📋 Showcase config using declaration-level shapes
-
-[View DeclarationLevelShapeTagging details →](current/phase-31-declaration-level-shape-tagging.md)
-
----
-
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
 | --- | --- | --- | --- |
 | 🚧 Process State API Relationship Queries | Phase 24 | 3d | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
+| 🚧 Pattern Helpers Tests | Phase 25 | - | - |
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
-| 🚧 Declaration Level Shape Tagging | Phase 31 | 3d | The current shape extraction system operates at file granularity. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
+| 🚧 Arch Queries Test | - | - | - |
 | 🚧 Composite Codec | - | - | Assembles reference documents from multiple codec outputs by concatenating RenderableDocument sections. |
 | 🚧 Config Resolver | - | - | Resolves a raw `DeliveryProcessProjectConfig` into a fully-resolved `ResolvedConfig` with all defaults applied, stubs... |
 | 🚧 Context Assembler Impl | - | - | Pure function composition over MasterDataset. |
+| 🚧 Context Assembler Tests | - | - | Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and buildOverview() pure functions that operate... |
 | 🚧 Context Formatter Impl | - | - | First plain-text formatter in the codebase. |
+| 🚧 Context Formatter Tests | - | - | Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(), and formatOverview() plain text rendering... |
 | 🚧 Coverage Analyzer Impl | - | - | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 🚧 Define Config | - | - | Identity function for type-safe project configuration. |
 | 🚧 Deliverable Status Taxonomy | - | - | Canonical status values for deliverables in Gherkin Background tables. |
@@ -137,10 +130,13 @@
 | 🚧 FSM Transitions | - | - | :PDR005MvpWorkflow Defines valid transitions between FSM states per PDR-005: ``` roadmap ──→ active ──→ completed │  ... |
 | 🚧 FSM Validator | - | - | :PDR005MvpWorkflow Pure validation functions following the Decider pattern: - No I/O, no side effects - Return... |
 | 🚧 Fuzzy Matcher Impl | - | - | Provides fuzzy matching for pattern names with tiered scoring: exact (1.0) > prefix (0.9) > substring (0.7) >... |
+| 🚧 Fuzzy Match Tests | - | - | Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein. |
 | 🚧 Lint Process CLI | - | - | Validates git changes against delivery process rules. |
 | 🚧 Output Pipeline Impl | - | - | Post-processing pipeline that transforms raw API results into shaped CLI output. |
+| 🚧 Output Pipeline Tests | - | - | Validates the output pipeline transforms: summarization, modifiers, list filters, empty stripping, and format output. |
 | 🚧 Pattern Helpers | - | - | Common helper functions used by context-assembler, arch-queries, and other API modules that need pattern name... |
 | 🚧 Pattern Summarizer Impl | - | - | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
+| 🚧 Pattern Summarize Tests | - | - | Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to PatternSummary (~100 bytes) with the correct... |
 | 🚧 Process API CLI Impl | - | - | Exposes ProcessStateAPI methods as CLI subcommands with JSON output. |
 | 🚧 Process Guard Decider | - | - | :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules. |
 | 🚧 Process Guard Module | - | - | :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating... |
@@ -153,5 +149,7 @@
 | 🚧 Reference Generator Registration | - | - | Registers all reference document generators. |
 | 🚧 Source Merger | - | - | Computes effective sources for a specific generator by applying per-generator overrides to the base resolved sources. |
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
+| 🚧 Stub Resolver Tests | - | - | Design session stubs need structured discovery and resolution to determine which stubs have been implemented and... |
+| 🚧 Stub Taxonomy Tag Tests | - | - | Stub metadata (target path, design session) was stored as plain text in JSDoc descriptions, invisible to structured... |
 
 ---

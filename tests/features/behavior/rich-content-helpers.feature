@@ -1,7 +1,9 @@
 @libar-docs
-@libar-docs-pattern RichContentHelpers
-@libar-docs-status roadmap
-@libar-docs-phase 44
+@libar-docs-pattern:RichContentHelpersTesting
+@libar-docs-implements:RichContentHelpers
+@libar-docs-status:roadmap
+@libar-docs-phase:44
+@libar-docs-product-area:Behavior
 
 Feature: Rich Content Rendering Helpers
   As a document codec author

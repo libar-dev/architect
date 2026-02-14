@@ -35,6 +35,12 @@ Or use the default export for standard behavior:
 const doc = PatternsDocumentCodec.decode(dataset);
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`patterns-codec.feature`](../../tests/features/behavior/patterns-codec.feature) - The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

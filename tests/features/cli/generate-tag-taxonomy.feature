@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:GenerateTagTaxonomyCli
+@libar-docs-status:completed
+@libar-docs-product-area:CLI
 @libar-docs-implements:CliBehaviorTesting
 @cli @generate-tag-taxonomy
 Feature: generate-tag-taxonomy CLI

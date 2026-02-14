@@ -33,6 +33,7 @@ Files that implement this pattern:
 - [`states.ts`](../../src/validation/fsm/states.ts) - :PDR005MvpWorkflow
 - [`transitions.ts`](../../src/validation/fsm/transitions.ts) - :PDR005MvpWorkflow
 - [`validator.ts`](../../src/validation/fsm/validator.ts) - :PDR005MvpWorkflow
+- [`fsm-validator.feature`](../../tests/features/validation/fsm-validator.feature) - Pure validation functions for the 4-state FSM defined in PDR-005.
 
 ## Acceptance Criteria
 

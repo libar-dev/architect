@@ -1,5 +1,7 @@
+@libar-docs
 @libar-docs-implements:ProcessGuardLinter
-@behavior @process-guard @libar-docs-pattern:ProcessGuard
+@behavior @process-guard @libar-docs-pattern:ProcessGuardTesting
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
 Feature: Process Guard Linter
   Pure validation functions for enforcing delivery process rules per PDR-005.

@@ -1,6 +1,8 @@
-@behavior @dedent
+@libar-docs
 @libar-docs-pattern:DedentHelper
+@libar-docs-status:completed
 @libar-docs-product-area:Codec
+@behavior @dedent
 Feature: Dedent Helper Function Edge Cases
 
   The dedent helper function normalizes indentation in code blocks extracted

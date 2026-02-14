@@ -1,6 +1,9 @@
-@behavior @patterns-codec
-@libar-docs-pattern:PatternsCodec
+@libar-docs
+@libar-docs-pattern:PatternsCodecTesting
+@libar-docs-implements:PatternsCodec
+@libar-docs-status:completed
 @libar-docs-product-area:Codec
+@behavior @patterns-codec
 Feature: Patterns Document Codec
   The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument
   for generating PATTERNS.md and category detail files.

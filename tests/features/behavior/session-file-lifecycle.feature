@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:SessionFileLifecycle
+@libar-docs-status:completed
+@libar-docs-product-area:Behavior
 @behavior @session-lifecycle
 Feature: Session File Lifecycle Management
   Orphaned session files are automatically cleaned up during generation,

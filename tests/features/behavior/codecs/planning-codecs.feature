@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:PlanningCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Codec
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @planning-codecs
-@libar-docs-pattern:PlanningCodecTesting
-@libar-docs-product-area:Codec
 Feature: Planning Document Codecs
   The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)
   transform MasterDataset into RenderableDocuments for planning and retrospective views.

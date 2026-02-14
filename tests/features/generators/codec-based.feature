@@ -1,4 +1,8 @@
-@libar-docs-implements:GeneratorInfrastructureTesting
+@libar-docs
+@libar-docs-pattern:CodecBasedGeneratorTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generator
+@libar-docs-implements:CodecBasedGenerator,GeneratorInfrastructureTesting
 Feature: Codec-Based Generator
 
   Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)

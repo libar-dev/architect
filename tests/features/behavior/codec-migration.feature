@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ZodCodecMigration
+@libar-docs-status:completed
+@libar-docs-product-area:Behavior
 @behavior @codec
 Feature: Zod Codec Migration
   All JSON parsing and serialization uses type-safe Zod codec pattern,

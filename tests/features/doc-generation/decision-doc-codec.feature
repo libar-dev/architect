@@ -1,4 +1,8 @@
 @libar-docs
+@libar-docs-pattern:DecisionDocCodecTesting
+@libar-docs-implements:DecisionDocCodec
+@libar-docs-status:completed
+@libar-docs-product-area:DocGeneration
 Feature: Decision Document Codec
 
   Validates the Decision Doc Codec that parses decision documents (ADR/PDR

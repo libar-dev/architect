@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ScopeValidatorTests
 @libar-docs-status:completed
+@libar-docs-product-area:API
 Feature: Scope Validator - Pre-flight Session Readiness Checks
 
   **Problem:**

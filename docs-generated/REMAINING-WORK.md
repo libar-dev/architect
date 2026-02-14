@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 104/176 (59%)
+**Overall Progress:** [██████████████░░░░░░] 196/281 (70%)
 
 | Status | Count |
 | --- | --- |
-| 🚧 Active | 36 |
-| 📋 Planned | 36 |
-| **Total Remaining** | 72 |
+| 🚧 Active | 44 |
+| 📋 Planned | 41 |
+| **Total Remaining** | 85 |
 
 ---
 
@@ -24,17 +24,17 @@
 | 📋 [TraceabilityGenerator](remaining/phase-18-traceability-generator.md) | 1 | 0 | 0% |
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](remaining/phase-24-process-state-api-relationship-queries.md) | 1 | 1 | 50% |
-| 📋 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 4 | 0 | 56% |
+| 🚧 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 5 | 1 | 50% |
 | 🚧 [SourceMapper](remaining/phase-27-source-mapper.md) | 1 | 1 | 80% |
 | 🚧 [ReferenceDocShowcase](remaining/phase-30-reference-doc-showcase.md) | 1 | 1 | 0% |
-| 🚧 [DeclarationLevelShapeTagging](remaining/phase-31-declaration-level-shape-tagging.md) | 1 | 1 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 3 | 0 | 57% |
+| 📋 [RichContentHelpersTesting](remaining/phase-44-rich-content-helpers-testing.md) | 2 | 0 | 0% |
+| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 50% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 44 | 32 | 0% |
+| 🚧 Backlog (No Phase) | 54 | 40 | 0% |
 
 ---
 
@@ -42,9 +42,9 @@
 
 | Priority | Count |
 | --- | --- |
-| 🚧 In Progress | 36 |
-| ✅ Ready to Start | 35 |
-| ⚠️ Blocked | 2 |
+| 🚧 In Progress | 44 |
+| ✅ Ready to Start | 40 |
+| ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
 
@@ -53,11 +53,11 @@
 - Data API CLI Ergonomics (Phase 25)
 - Data API Platform Integration (Phase 25)
 - Data API Relationship Graph (Phase 25)
+- Kebab Case Slugs (Phase 44)
+- Rich Content Helpers Testing (Phase 44)
 - Prd Implementation Section (Phase 99)
 - Status Aware Eslint Suppression (Phase 99)
 - Streaming Git Diff (Phase 99)
-- Architecture Delta (Phase 100)
-- Business Rules Generator (Phase 100)
 
 See phase detail files for full list.
 
@@ -73,6 +73,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Data API Platform Integration (Phase 25) - 3d
 - 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 35 actionable items.
+Showing 5 of 40 actionable items.
 
 ---

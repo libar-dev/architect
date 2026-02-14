@@ -1,4 +1,7 @@
-@behavior @detect-changes @libar-docs-pattern:DetectChanges
+@libar-docs
+@behavior @detect-changes @libar-docs-pattern:DetectChangesTesting
+@libar-docs-implements:DetectChanges
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
 Feature: Deliverable Change Detection from Git Diff
   Tests for the detectDeliverableChanges function that parses git diff output.

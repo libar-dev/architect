@@ -1,5 +1,8 @@
+@libar-docs
 @behavior @shape-matcher
 @libar-docs-pattern:ShapeMatcherTesting
+@libar-docs-status:completed
+@libar-docs-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
 @libar-docs-product-area:Codec
 Feature: Shape Source Pattern Matching
 

@@ -32,6 +32,12 @@ export default defineConfig({
 });
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`define-config.feature`](../../tests/features/config/define-config.feature) - The defineConfig identity function and DeliveryProcessProjectConfigSchema
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

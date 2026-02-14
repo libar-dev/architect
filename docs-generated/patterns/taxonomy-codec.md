@@ -35,6 +35,12 @@ Or use the default export for standard behavior:
 const doc = TaxonomyDocumentCodec.decode(dataset);
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`taxonomy-codec.feature`](../../tests/features/doc-generation/taxonomy-codec.feature) - Validates the Taxonomy Codec that transforms MasterDataset into a
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

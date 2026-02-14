@@ -291,16 +291,10 @@ Detail Level: Compact summary
 
 | Type | Kind |
 | --- | --- |
-| RISK_LEVELS | const |
-| RiskLevel | type |
-| RenderableDocument | type |
+| normalizeStatus | function |
+| DELIVERABLE_STATUS_VALUES | const |
+| CategoryDefinition | interface |
 | SectionBlock | type |
-| HeadingBlock | type |
-| TableBlock | type |
-| ListBlock | type |
-| CodeBlock | type |
-| MermaidBlock | type |
-| CollapsibleBlock | type |
 
 
 === BEHAVIOR SPECIFICATIONS ===

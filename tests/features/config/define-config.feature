@@ -1,3 +1,8 @@
+@libar-docs
+@libar-docs-pattern:DefineConfigTesting
+@libar-docs-implements:DefineConfig
+@libar-docs-status:completed
+@libar-docs-product-area:Configuration
 @behavior @config
 Feature: Define Config - Schema Validation and Type Guards
   The defineConfig identity function and DeliveryProcessProjectConfigSchema

@@ -1,4 +1,9 @@
-@behavior @libar-docs-pattern:LayerInference @libar-docs-product-area:Extractor
+@libar-docs
+@libar-docs-pattern:LayerInferenceTesting
+@libar-docs-implements:LayerInference
+@libar-docs-status:completed
+@libar-docs-product-area:Extractor
+@behavior
 Feature: Layer Inference from Feature File Paths
   The layer inference module classifies feature files into testing layers
   (timeline, domain, integration, e2e, component) based on directory path patterns.

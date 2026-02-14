@@ -41,6 +41,7 @@ Files that implement this pattern:
 - [`transform-dataset.ts`](../../src/generators/pipeline/transform-dataset.ts) - ## TransformDataset - Single-Pass Pattern Transformation
 - [`rules.ts`](../../src/lint/rules.ts) - ## LintRules - Annotation Quality Rules
 - [`patterns.ts`](../../src/renderable/codecs/patterns.ts) - ## Patterns Document Codec
+- [`mermaid-rendering.feature`](../../tests/features/behavior/pattern-relationships/mermaid-rendering.feature) - Tests for rendering all relationship types in Mermaid dependency graphs
 
 ## Acceptance Criteria
 

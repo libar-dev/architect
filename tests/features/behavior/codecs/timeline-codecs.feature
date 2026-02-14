@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:TimelineCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Codec
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @timeline-codecs
-@libar-docs-pattern:TimelineCodecTesting
-@libar-docs-product-area:Codec
 Feature: Timeline Document Codecs
   The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)
   transform MasterDataset into RenderableDocuments for different timeline views.

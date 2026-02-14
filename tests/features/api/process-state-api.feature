@@ -1,6 +1,8 @@
+@libar-docs
 @libar-docs-implements:ProcessStateAPICLI
+@libar-docs-status:completed
 @behavior @process-state-api
-@libar-docs-pattern:ProcessStateAPI
+@libar-docs-pattern:ProcessStateAPITesting
 @libar-docs-product-area:API
 Feature: Process State API
   Programmatic interface for querying delivery process state.

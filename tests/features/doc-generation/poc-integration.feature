@@ -1,4 +1,7 @@
 @libar-docs
+@libar-docs-pattern:PocIntegration
+@libar-docs-status:completed
+@libar-docs-product-area:DocGeneration
 Feature: Documentation Generation POC Integration
 
   End-to-end integration tests that exercise the full documentation generation

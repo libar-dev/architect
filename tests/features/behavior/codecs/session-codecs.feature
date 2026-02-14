@@ -1,7 +1,9 @@
+@libar-docs
+@libar-docs-pattern:SessionCodecTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Codec
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @session-codecs
-@libar-docs-pattern:SessionCodecTesting
-@libar-docs-product-area:Codec
 Feature: Session Document Codecs
   The session codecs (SessionContextCodec, RemainingWorkCodec)
   transform MasterDataset into RenderableDocuments for AI session context

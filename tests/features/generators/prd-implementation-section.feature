@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:PrdImplementationSectionTesting
+@libar-docs-status:completed
+@libar-docs-product-area:Generator
 @libar-docs-implements:PrdImplementationSection
 Feature: PRD Implementation Section
 

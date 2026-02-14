@@ -9,9 +9,9 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 104 |
-| Completed Phases | 2 |
-| Total Phases | 15 |
+| Completed Patterns | 196 |
+| Completed Phases | 3 |
+| Total Phases | 16 |
 
 ---
 
@@ -40,21 +40,30 @@
 
 </details>
 
+<details>
+<summary>✅ DeclarationLevelShapeTagging (1 patterns)</summary>
+
+| Pattern | Description |
+| --- | --- |
+| Declaration Level Shape Tagging | The current shape extraction system operates at file granularity. |
+
+</details>
+
 ---
 
 ## Recent Completions
 
-- ✅ Codec Driven Reference Generation (Phase 27)
-- ✅ Data API Architecture Queries (Phase 25)
-- ✅ Data API Context Assembly (Phase 25)
-- ✅ Data API Output Shaping (Phase 25)
-- ✅ Data API Design Session Support (Phase 25)
-- ✅ Data API Stub Integration (Phase 25)
-- ✅ Doc Generation Proof Of Concept (Phase 27)
-- ✅ Gherkin Rules Support (Phase 100)
-- ✅ Mvp Workflow Implementation (Phase 99)
-- ✅ Pattern Relationship Model (Phase 99)
+- ✅ Arch Index Dataset
+- ✅ Arch Tag Extraction
+- ✅ Component Diagram Generation
+- ✅ Arch Generator Registration
+- ✅ Layered Diagram Generation
+- ✅ Composite Codec Testing
+- ✅ Convention Extractor Testing
+- ✅ Dedent Helper
+- ✅ Planning Codec Testing
+- ✅ Pr Changes Codec Testing
 
-Showing 10 of 104 completed patterns. See quarterly files for full history.
+Showing 10 of 196 completed patterns. See quarterly files for full history.
 
 ---

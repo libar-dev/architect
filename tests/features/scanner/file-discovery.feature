@@ -1,4 +1,7 @@
+@libar-docs
 @scanner @libar-docs-pattern:FileDiscovery @unit
+@libar-docs-status:completed
+@libar-docs-product-area:Scanner
 Feature: File Discovery
   The file discovery system uses glob patterns to find TypeScript files
   for documentation extraction. It applies sensible defaults to exclude

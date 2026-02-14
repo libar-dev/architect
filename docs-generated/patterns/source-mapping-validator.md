@@ -31,6 +31,12 @@ to fail fast with clear errors rather than producing incomplete output.
 3. **Compatibility**: Extraction methods must match file types
 4. **Table format**: Required columns must be present
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`source-mapping-validator.feature`](../../tests/features/doc-generation/source-mapping-validator.feature) - **Context:** Source mappings reference files that may not exist, use invalid
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

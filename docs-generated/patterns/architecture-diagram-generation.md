@@ -32,6 +32,16 @@
   | UML-inspired semantics | Relationship arrows match uses/depends-on/implements/extends |
   | CLI integration | `pnpm docs:architecture` via generator registry |
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`arch-index.feature`](../../tests/features/behavior/architecture-diagrams/arch-index.feature) - As a documentation generator
+- [`arch-tag-extraction.feature`](../../tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature) - As a documentation generator
+- [`component-diagram.feature`](../../tests/features/behavior/architecture-diagrams/component-diagram.feature) - As a documentation generator
+- [`generator-registration.feature`](../../tests/features/behavior/architecture-diagrams/generator-registration.feature) - As a CLI user
+- [`layered-diagram.feature`](../../tests/features/behavior/architecture-diagrams/layered-diagram.feature) - As a documentation generator
+
 ## Acceptance Criteria
 
 **Tag registry contains arch-role**

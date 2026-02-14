@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:RemainingWorkEnhancement
+@libar-docs-status:completed
+@libar-docs-product-area:Behavior
 @behavior @remaining-work
 Feature: Remaining Work Enhancement
   Enhanced REMAINING-WORK.md generation with priority-based sorting,

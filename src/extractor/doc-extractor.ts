@@ -202,8 +202,15 @@ export function buildPattern(
     if (sourceContent?.includes('libar-docs-shape') === true) {
       const taggedResult = discoverTaggedShapes(sourceContent);
       if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
-        const existingNames = new Set((extractedShapes ?? []).map((s) => s.name));
-        const newShapes = taggedResult.value.shapes.filter((s) => !existingNames.has(s.name));
+        const existingByName = new Map((extractedShapes ?? []).map((s) => [s.name, s]));
+        const newShapes = taggedResult.value.shapes.filter((s) => !existingByName.has(s.name));
+        // Merge group from tagged shapes onto existing Path 1 shapes
+        for (const tagged of taggedResult.value.shapes) {
+          const existing = existingByName.get(tagged.name);
+          if (existing !== undefined && tagged.group !== undefined) {
+            existing.group = tagged.group;
+          }
+        }
         extractedShapes = [...(extractedShapes ?? []), ...newShapes];
         extractionWarnings.push(...taggedResult.value.warnings);
       } else if (!taggedResult.ok) {

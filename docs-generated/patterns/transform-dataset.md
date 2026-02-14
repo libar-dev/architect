@@ -34,6 +34,12 @@ groups in a single iteration over the pattern array.
 - When computing all pattern views in a single pass
 - When transforming raw extracted data for generators
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`transform-dataset.feature`](../../tests/features/behavior/transform-dataset.feature) - The transformToMasterDataset function transforms raw extracted patterns
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

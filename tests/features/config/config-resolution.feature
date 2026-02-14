@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ConfigResolution
+@libar-docs-status:completed
+@libar-docs-product-area:Configuration
 @behavior @config
 Feature: Config Resolution - Defaults and Merging
   resolveProjectConfig transforms a raw DeliveryProcessProjectConfig into

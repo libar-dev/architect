@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ConfigSchemaValidation
+@libar-docs-status:completed
+@libar-docs-product-area:Validation
 @validation @config @security
 Feature: Configuration Schema Validation
   Configuration schemas validate scanner and generator inputs with security

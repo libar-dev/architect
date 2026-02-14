@@ -22,6 +22,12 @@ from directory path patterns. Enables filtering without explicit annotations.
 - When generating layer-specific documentation
 - When calculating test coverage by layer
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`layer-inference.feature`](../../tests/features/behavior/layer-inference.feature) - The layer inference module classifies feature files into testing layers
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

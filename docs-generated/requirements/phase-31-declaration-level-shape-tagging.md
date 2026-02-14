@@ -1,4 +1,4 @@
-# 🚧 Declaration Level Shape Tagging
+# ✅ Declaration Level Shape Tagging
 
 **Purpose:** Detailed requirements for the Declaration Level Shape Tagging feature
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | active |
+| Status | completed |
 | Product Area | DeliveryProcess |
 | Business Value | enables focused shape extraction without whole file dumping |
 | Phase | 31 |
@@ -428,13 +428,13 @@ _Verified by: All five declaration kinds are discoverable, JSDoc with gap larger
 
 ## Deliverables
 
-- Registry entry for shape tag (pending)
-- Group field on ExtractedShapeSchema (pending)
-- discoverTaggedShapes function (pending)
-- Wire tagged discovery into doc extractor (pending)
-- ShapeSelector schema and shapeSelectors on ReferenceDocConfig (pending)
-- Selector-based filtering in shape matcher (pending)
-- Showcase config using declaration-level shapes (pending)
+- Registry entry for shape tag (complete)
+- Group field on ExtractedShapeSchema (complete)
+- discoverTaggedShapes function (complete)
+- Wire tagged discovery into doc extractor (complete)
+- ShapeSelector schema and shapeSelectors on ReferenceDocConfig (complete)
+- Selector-based filtering in shape matcher (complete)
+- Showcase config using declaration-level shapes (complete)
 
 ---
 

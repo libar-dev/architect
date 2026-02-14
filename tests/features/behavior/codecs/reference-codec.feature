@@ -1,5 +1,8 @@
+@libar-docs
 @behavior @reference-codec
 @libar-docs-pattern:ReferenceCodecTesting
+@libar-docs-status:completed
+@libar-docs-implements:ReferenceDocShowcase
 @libar-docs-product-area:Codec
 Feature: Reference Document Codec
 

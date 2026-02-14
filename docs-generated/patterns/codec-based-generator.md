@@ -28,6 +28,12 @@ Architecture:
 GeneratorContext.masterDataset → Codec.decode() → RenderableDocument → renderDocumentWithFiles() → OutputFile[]
 ```
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`codec-based.feature`](../../tests/features/generators/codec-based.feature) - Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

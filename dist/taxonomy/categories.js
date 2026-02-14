@@ -1,4 +1,20 @@
 /**
+ * @libar-docs
+ * @libar-docs-pattern CategoryDefinitions
+ * @libar-docs-status completed
+ * @libar-docs-core
+ * @libar-docs-arch-role read-model
+ * @libar-docs-arch-context taxonomy
+ * @libar-docs-arch-layer domain
+ * @libar-docs-extract-shapes CategoryDefinition, CATEGORIES, CategoryTag, CATEGORY_TAGS
+ *
+ * ## Category Definitions
+ *
+ * Categories are used to classify patterns and organize documentation.
+ * Priority determines display order (lower = higher priority).
+ * The ddd-es-cqrs preset includes all 21 categories; simpler presets use subsets.
+ */
+/**
  * All category definitions for the monorepo
  */
 export const CATEGORIES = [

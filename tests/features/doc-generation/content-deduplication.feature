@@ -1,5 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ContentDeduplication
+@libar-docs-status:completed
+@libar-docs-product-area:DocGeneration
 Feature: Content Deduplication
 
   **Context:** Multiple sources may extract identical content, leading to

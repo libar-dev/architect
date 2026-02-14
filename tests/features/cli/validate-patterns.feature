@@ -1,3 +1,7 @@
+@libar-docs
+@libar-docs-pattern:ValidatePatternsCli
+@libar-docs-status:completed
+@libar-docs-product-area:CLI
 @libar-docs-implements:CliBehaviorTesting
 @cli @validate-patterns
 Feature: validate-patterns CLI

@@ -129,17 +129,29 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
             extractionWarnings.push(`[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`);
         }
         // Path 1: Existing @libar-docs-extract-shapes tag processing
-        if (sourceContent !== undefined && directive.extractShapes !== undefined && directive.extractShapes.length > 0) {
+        if (sourceContent !== undefined &&
+            directive.extractShapes !== undefined &&
+            directive.extractShapes.length > 0) {
             const shapeResult = processExtractShapesTag(sourceContent, directive.extractShapes.join(', '));
             extractedShapes = shapeResult.shapes;
             extractionWarnings.push(...shapeResult.warnings);
         }
         // Path 2: Declaration-level @libar-docs-shape discovery
+        // Performance note: when both paths fire, sourceCode is parsed by typescript-estree
+        // twice (once in processExtractShapesTag, once in discoverTaggedShapes). Acceptable
+        // for v1 — future optimization could accept a pre-parsed AST.
         if (sourceContent?.includes('libar-docs-shape') === true) {
             const taggedResult = discoverTaggedShapes(sourceContent);
             if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
-                const existingNames = new Set((extractedShapes ?? []).map((s) => s.name));
-                const newShapes = taggedResult.value.shapes.filter((s) => !existingNames.has(s.name));
+                const existingByName = new Map((extractedShapes ?? []).map((s) => [s.name, s]));
+                const newShapes = taggedResult.value.shapes.filter((s) => !existingByName.has(s.name));
+                // Merge group from tagged shapes onto existing Path 1 shapes
+                for (const tagged of taggedResult.value.shapes) {
+                    const existing = existingByName.get(tagged.name);
+                    if (existing !== undefined && tagged.group !== undefined) {
+                        existing.group = tagged.group;
+                    }
+                }
                 extractedShapes = [...(extractedShapes ?? []), ...newShapes];
                 extractionWarnings.push(...taggedResult.value.warnings);
             }

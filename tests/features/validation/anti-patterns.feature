@@ -1,5 +1,8 @@
+@libar-docs
 @behavior @anti-patterns
-@libar-docs-pattern:AntiPatternDetector
+@libar-docs-pattern:AntiPatternDetectorTesting
+@libar-docs-implements:AntiPatternDetector
+@libar-docs-status:completed
 @libar-docs-product-area:Validation
 Feature: Anti-Pattern Detection
   Detects violations of the dual-source documentation architecture and

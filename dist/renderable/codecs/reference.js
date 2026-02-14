@@ -103,6 +103,9 @@ export function createReferenceCodec(config, options) {
                 if (config.shapeSources.length > 0) {
                     diagnostics.push(`shapes [${config.shapeSources.join(', ')}]`);
                 }
+                if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
+                    diagnostics.push(`selectors [${config.shapeSelectors.length} selectors]`);
+                }
                 if (config.behaviorCategories.length > 0) {
                     diagnostics.push(`behaviors [${config.behaviorCategories.join(', ')}]`);
                 }

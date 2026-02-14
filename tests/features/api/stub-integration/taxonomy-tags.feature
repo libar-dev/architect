@@ -1,6 +1,7 @@
 @libar-docs
 @libar-docs-pattern:StubTaxonomyTagTests
 @libar-docs-status:active
+@libar-docs-product-area:API
 Feature: Stub Integration Taxonomy Tags
 
   **Problem:**

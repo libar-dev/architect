@@ -104,7 +104,9 @@ const DiagramScopeSchema = z
     archLayer: z.array(z.string().min(1)).readonly().optional(),
     direction: z.enum(['TB', 'LR']).optional(),
     title: z.string().min(1).optional(),
-    diagramType: z.enum(['graph', 'sequenceDiagram', 'stateDiagram-v2']).optional(),
+    diagramType: z
+        .enum(['graph', 'sequenceDiagram', 'stateDiagram-v2', 'C4Context', 'classDiagram'])
+        .optional(),
     showEdgeLabels: z.boolean().optional(),
 })
     .strict();

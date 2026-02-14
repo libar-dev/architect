@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 117 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 119 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 117 |
+| Total Components | 119 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -101,6 +101,7 @@ graph TB
     subgraph renderer["Renderer BC"]
         RenderableUtils["RenderableUtils"]
         RenderableDocument["RenderableDocument[read-model]"]
+        SectionBlock["SectionBlock"]
         UniversalRenderer["UniversalRenderer[service]"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         DocumentGenerator["DocumentGenerator[service]"]
@@ -141,6 +142,7 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinitions["CategoryDefinitions[read-model]"]
+        CategoryDefinition["CategoryDefinition"]
     end
     subgraph validation["Validation BC"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
@@ -171,9 +173,6 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
-        LintModule["LintModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -181,6 +180,11 @@ graph TB
         HierarchyLevels["HierarchyLevels"]
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
+        CategoryDefinition["CategoryDefinition"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -382,6 +386,7 @@ All components with architecture annotations:
 | 🚧 API Module | - | - | - | src/api/index.ts |
 | ✅ Built In Generators | - | - | - | src/generators/built-in/index.ts |
 | ✅ Business Rules Codec | - | - | - | src/renderable/codecs/business-rules.ts |
+|  CategoryDefinition | - | - | - | src/taxonomy/categories.ts |
 | ✅ CLI Error Handler | - | - | - | src/cli/error-handler.ts |
 | ✅ CLI Version Helper | - | - | - | src/cli/version.ts |
 | ✅ Codec Base Options | - | - | - | src/renderable/codecs/types/base.ts |
@@ -431,6 +436,7 @@ All components with architecture annotations:
 | ✅ Requirements Codec | - | - | - | src/renderable/codecs/requirements.ts |
 | ✅ Rich Content Helpers | - | - | - | src/renderable/codecs/helpers.ts |
 | ✅ Risk Levels | - | - | - | src/taxonomy/risk-levels.ts |
+|  SectionBlock | - | - | - | src/renderable/schema.ts |
 | ✅ Shape Extractor | - | - | - | src/extractor/shape-extractor.ts |
 | ✅ Shared Codec Schema | - | - | - | src/renderable/codecs/shared-schema.ts |
 | ✅ Source Mapping Validator | - | - | - | src/generators/source-mapping-validator.ts |

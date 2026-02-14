@@ -1,4 +1,8 @@
 @libar-docs
+@libar-docs-pattern:WarningCollectorTesting
+@libar-docs-implements:WarningCollector
+@libar-docs-status:completed
+@libar-docs-product-area:DocGeneration
 Feature: Warning Collector
 
   The warning collector provides a unified system for capturing, categorizing,
