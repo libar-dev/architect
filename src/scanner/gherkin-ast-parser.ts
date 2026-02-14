@@ -63,13 +63,12 @@ import {
 import type { Result } from '../types/index.js';
 import { Result as R } from '../types/index.js';
 import {
-  PROCESS_STATUS_VALUES,
-  ADR_STATUS_VALUES,
-  HIERARCHY_LEVELS,
   type ProcessStatusValue,
   type AdrStatusValue,
   type HierarchyLevel,
+  buildRegistry,
 } from '../taxonomy/index.js';
+import type { MetadataTagDefinitionForRegistry } from '../taxonomy/registry-builder.js';
 import { createRegexBuilders } from '../config/regex-builders.js';
 import { createDefaultTagRegistry, type TagRegistry } from '../validation-schemas/tag-registry.js';
 
@@ -81,6 +80,19 @@ const DEFAULT_BUILDERS = (() => {
   const registry = createDefaultTagRegistry();
   return createRegexBuilders(registry.tagPrefix, registry.fileOptInTag);
 })();
+
+/**
+ * Module-level lookup map from tag name to its registry definition.
+ * Built once from the TagRegistry, reused across all extractPatternTags() calls.
+ */
+const TAG_LOOKUP: ReadonlyMap<string, MetadataTagDefinitionForRegistry> = new Map(
+  buildRegistry().metadataTags.map((def) => [def.tag, def])
+);
+
+/** Convert kebab-case to camelCase (e.g., "depends-on" → "dependsOn") */
+function kebabToCamel(s: string): string {
+  return s.replace(/-([a-z])/g, (_: string, c: string) => c.toUpperCase());
+}
 
 /**
  * Normalize a Gherkin tag by stripping prefixes
@@ -511,10 +523,8 @@ export function extractPatternTags(tags: readonly string[]): {
   readonly status?: ProcessStatusValue;
   readonly dependsOn?: readonly string[];
   readonly enables?: readonly string[];
-  // UML-inspired relationship tags (PatternRelationshipModel)
   readonly implementsPatterns?: readonly string[];
   readonly extendsPattern?: string;
-  // Cross-reference and API navigation tags (PatternRelationshipModel enhancement)
   readonly seeAlso?: readonly string[];
   readonly apiRef?: readonly string[];
   readonly brief?: string;
@@ -522,6 +532,7 @@ export function extractPatternTags(tags: readonly string[]): {
   readonly quarter?: string;
   readonly completed?: string;
   readonly effort?: string;
+  readonly effortActual?: string;
   readonly team?: string;
   readonly workflow?: string;
   readonly risk?: string;
@@ -543,271 +554,97 @@ export function extractPatternTags(tags: readonly string[]): {
   readonly adrCategory?: string;
   readonly adrSupersedes?: string;
   readonly adrSupersededBy?: string;
-  // Design session stub metadata
+  readonly adrTheme?: string;
+  readonly adrLayer?: string;
   readonly target?: string;
   readonly since?: string;
-  // Convention tags for reference document generation
   readonly convention?: readonly string[];
+  readonly executableSpecs?: readonly string[];
+  readonly roadmapSpec?: string;
+  readonly archRole?: string;
+  readonly archContext?: string;
+  readonly archLayer?: string;
+  readonly archView?: readonly string[];
+  readonly extractShapes?: readonly string[];
+  readonly usecase?: string;
+  // Index signature enables registry-driven extensibility: new tags in
+  // buildRegistry() work without updating this return type.
+  readonly [key: string]: unknown;
 } {
-  const metadata: {
-    pattern?: string;
-    phase?: number;
-    release?: string;
-    status?: ProcessStatusValue;
-    dependsOn?: string[];
-    enables?: string[];
-    // UML-inspired relationship tags (PatternRelationshipModel)
-    implementsPatterns?: string[];
-    extendsPattern?: string;
-    // Cross-reference and API navigation tags (PatternRelationshipModel enhancement)
-    seeAlso?: string[];
-    apiRef?: string[];
-    brief?: string;
-    categories?: string[];
-    quarter?: string;
-    completed?: string;
-    effort?: string;
-    team?: string;
-    workflow?: string;
-    risk?: string;
-    priority?: string;
-    productArea?: string;
-    userRole?: string;
-    businessValue?: string;
-    level?: HierarchyLevel;
-    parent?: string;
-    title?: string;
-    behaviorFile?: string;
-    discoveredGaps?: string[];
-    discoveredImprovements?: string[];
-    discoveredRisks?: string[];
-    discoveredLearnings?: string[];
-    constraints?: string[];
-    adr?: string;
-    adrStatus?: AdrStatusValue;
-    adrCategory?: string;
-    adrSupersedes?: string;
-    adrSupersededBy?: string;
-    // Design session stub metadata
-    target?: string;
-    since?: string;
-    // Convention tags for reference document generation
-    convention?: string[];
-  } = {};
+  const metadata: Record<string, unknown> = {};
 
   for (const tag of tags) {
-    // Normalize tag (strips @ and configured prefix like @libar-docs-)
     const normalized = normalizeTag(tag);
+    const colonIdx = normalized.indexOf(':');
 
-    // @pattern:Name
-    if (normalized.startsWith('pattern:')) {
-      metadata.pattern = normalized.substring(8);
-    }
-    // @phase:N
-    else if (normalized.startsWith('phase:')) {
-      const phaseNum = parseInt(normalized.substring(6), 10);
-      if (!isNaN(phaseNum)) {
-        metadata.phase = phaseNum;
+    if (colonIdx === -1) {
+      // No colon: category tag (e.g., @ddd, @core, @event-sourcing)
+      // Skip known non-category tags
+      if (
+        normalized !== 'acceptance-criteria' &&
+        !normalized.startsWith('happy-path') &&
+        normalized !== 'libar-docs'
+      ) {
+        const existing = metadata['categories'] as string[] | undefined;
+        metadata['categories'] = [...(existing ?? []), normalized];
       }
+      continue;
     }
-    // @release:v0.1.0 or @release:vNEXT
-    else if (normalized.startsWith('release:')) {
-      metadata.release = normalized.substring(8);
-    }
-    // @status:roadmap|active|completed|deferred (per PDR-005 FSM, from taxonomy)
-    else if (normalized.startsWith('status:')) {
-      const status = normalized.substring(7);
-      if ((PROCESS_STATUS_VALUES as readonly string[]).includes(status)) {
-        metadata.status = status as (typeof PROCESS_STATUS_VALUES)[number];
+
+    const tagName = normalized.substring(0, colonIdx);
+    const rawValue = normalized.substring(colonIdx + 1);
+    const def = TAG_LOOKUP.get(tagName);
+
+    if (def === undefined) continue;
+
+    const key = def.metadataKey ?? kebabToCamel(tagName);
+
+    switch (def.format) {
+      case 'number': {
+        const num = parseInt(rawValue, 10);
+        if (!isNaN(num)) {
+          metadata[key] = num;
+        }
+        break;
       }
-    }
-    // @depends-on:Pattern
-    else if (normalized.startsWith('depends-on:')) {
-      const deps = normalized
-        .substring(11)
-        .split(',')
-        .map((s) => s.trim());
-      metadata.dependsOn = [...(metadata.dependsOn ?? []), ...deps];
-    }
-    // @enables:Pattern
-    else if (normalized.startsWith('enables:')) {
-      const enables = normalized
-        .substring(8)
-        .split(',')
-        .map((s) => s.trim());
-      metadata.enables = [...(metadata.enables ?? []), ...enables];
-    }
-    // @implements:Pattern1,Pattern2 (UML-inspired realization relationship)
-    else if (normalized.startsWith('implements:')) {
-      const impl = normalized
-        .substring(11)
-        .split(',')
-        .map((s) => s.trim());
-      metadata.implementsPatterns = [...(metadata.implementsPatterns ?? []), ...impl];
-    }
-    // @extends:BasePattern (UML-inspired generalization relationship)
-    else if (normalized.startsWith('extends:')) {
-      metadata.extendsPattern = normalized.substring(8);
-    }
-    // @see-also:Pattern1,Pattern2 (cross-reference without dependency)
-    else if (normalized.startsWith('see-also:')) {
-      const related = normalized
-        .substring(9)
-        .split(',')
-        .map((s) => s.trim());
-      metadata.seeAlso = [...(metadata.seeAlso ?? []), ...related];
-    }
-    // @api-ref:path/to/file.ts,another/file.ts (implementation API paths)
-    else if (normalized.startsWith('api-ref:')) {
-      const refs = normalized
-        .substring(8)
-        .split(',')
-        .map((s) => s.trim());
-      metadata.apiRef = [...(metadata.apiRef ?? []), ...refs];
-    }
-    // @brief:path
-    else if (normalized.startsWith('brief:')) {
-      metadata.brief = normalized.substring(6);
-    }
-    // @quarter:Q4-2024
-    else if (normalized.startsWith('quarter:')) {
-      metadata.quarter = normalized.substring(8);
-    }
-    // @completed:2024-12-15
-    else if (normalized.startsWith('completed:')) {
-      metadata.completed = normalized.substring(10);
-    }
-    // @effort:4w
-    else if (normalized.startsWith('effort:')) {
-      metadata.effort = normalized.substring(7);
-    }
-    // @team:platform
-    else if (normalized.startsWith('team:')) {
-      metadata.team = normalized.substring(5);
-    }
-    // @workflow:implementation
-    else if (normalized.startsWith('workflow:')) {
-      metadata.workflow = normalized.substring(9);
-    }
-    // @risk:medium
-    else if (normalized.startsWith('risk:')) {
-      metadata.risk = normalized.substring(5);
-    }
-    // @priority:high
-    else if (normalized.startsWith('priority:')) {
-      metadata.priority = normalized.substring(9);
-    }
-    // @product-area:Generators
-    else if (normalized.startsWith('product-area:')) {
-      metadata.productArea = normalized.substring(13);
-    }
-    // @user-role:Developer
-    else if (normalized.startsWith('user-role:')) {
-      metadata.userRole = normalized.substring(10);
-    }
-    // @business-value:Transform-features...
-    else if (normalized.startsWith('business-value:')) {
-      // Business value may use hyphens for spaces - convert back for display
-      metadata.businessValue = normalized.substring(15).replace(/-/g, ' ');
-    }
-    // @level:epic|phase|task (from taxonomy)
-    else if (normalized.startsWith('level:')) {
-      const level = normalized.substring(6);
-      if ((HIERARCHY_LEVELS as readonly string[]).includes(level)) {
-        metadata.level = level as HierarchyLevel;
+      case 'enum': {
+        if (def.values?.includes(rawValue) === true) {
+          metadata[key] = rawValue;
+        }
+        break;
       }
-    }
-    // @parent:ParentPatternName
-    else if (normalized.startsWith('parent:')) {
-      metadata.parent = normalized.substring(7);
-    }
-    // @title:"Human Readable Title" - supports quoted values for titles with spaces
-    else if (normalized.startsWith('title:')) {
-      const value = normalized.substring(6);
-      // Remove surrounding quotes if present
-      metadata.title = value.replace(/^["']|["']$/g, '');
-    }
-    // @behavior-file:path/to/file.feature
-    else if (normalized.startsWith('behavior-file:')) {
-      metadata.behaviorFile = normalized.substring(14);
-    }
-    // @discovered-gap:Value
-    else if (normalized.startsWith('discovered-gap:')) {
-      const value = normalized.substring(15).replace(/-/g, ' ');
-      metadata.discoveredGaps = [...(metadata.discoveredGaps ?? []), value];
-    }
-    // @discovered-improvement:Value
-    else if (normalized.startsWith('discovered-improvement:')) {
-      const value = normalized.substring(23).replace(/-/g, ' ');
-      metadata.discoveredImprovements = [...(metadata.discoveredImprovements ?? []), value];
-    }
-    // @discovered-risk:Value
-    else if (normalized.startsWith('discovered-risk:')) {
-      const value = normalized.substring(16).replace(/-/g, ' ');
-      metadata.discoveredRisks = [...(metadata.discoveredRisks ?? []), value];
-    }
-    // @discovered-learning:Value
-    else if (normalized.startsWith('discovered-learning:')) {
-      const value = normalized.substring(20).replace(/-/g, ' ');
-      metadata.discoveredLearnings = [...(metadata.discoveredLearnings ?? []), value];
-    }
-    // @constraint:Value
-    else if (normalized.startsWith('constraint:')) {
-      const value = normalized.substring(11).replace(/-/g, ' ');
-      metadata.constraints = [...(metadata.constraints ?? []), value];
-    }
-    // @libar-docs-adr:001 or @adr:001 (ADR number)
-    else if (normalized.startsWith('adr:')) {
-      // Pad to 3 digits for consistent formatting (e.g., "1" -> "001")
-      metadata.adr = normalized.substring(4).padStart(3, '0');
-    }
-    // @libar-docs-adr-status:accepted or @adr-status:accepted (from taxonomy)
-    else if (normalized.startsWith('adr-status:')) {
-      const status = normalized.substring(11);
-      if ((ADR_STATUS_VALUES as readonly string[]).includes(status)) {
-        metadata.adrStatus = status as AdrStatusValue;
+      case 'csv': {
+        const values = rawValue
+          .split(',')
+          .map((s) => s.trim())
+          .filter((s) => s.length > 0);
+        const validated =
+          def.values !== undefined
+            ? values.filter((v) => def.values?.includes(v) === true)
+            : values;
+        const transformed = def.transform !== undefined ? validated.map(def.transform) : validated;
+        const existing = metadata[key] as string[] | undefined;
+        metadata[key] = [...(existing ?? []), ...transformed];
+        break;
       }
-    }
-    // @libar-docs-adr-category:process or @adr-category:process
-    else if (normalized.startsWith('adr-category:')) {
-      metadata.adrCategory = normalized.substring(13);
-    }
-    // @libar-docs-adr-supersedes:001 or @adr-supersedes:001
-    else if (normalized.startsWith('adr-supersedes:')) {
-      metadata.adrSupersedes = normalized.substring(15).padStart(3, '0');
-    }
-    // @libar-docs-adr-superseded-by:005 or @adr-superseded-by:005
-    else if (normalized.startsWith('adr-superseded-by:')) {
-      metadata.adrSupersededBy = normalized.substring(18).padStart(3, '0');
-    }
-    // @libar-docs-target:src/api/stub-resolver.ts
-    else if (normalized.startsWith('target:')) {
-      metadata.target = normalized.substring(7);
-    }
-    // @libar-docs-since:DS-A
-    else if (normalized.startsWith('since:')) {
-      metadata.since = normalized.substring(6);
-    }
-    // @libar-docs-convention:fsm-rules,testing-policy (CSV format)
-    else if (normalized.startsWith('convention:')) {
-      metadata.convention = normalized
-        .substring(11)
-        .split(',')
-        .map((v) => v.trim())
-        .filter((v) => v.length > 0);
-    }
-    // Category tags: @ddd, @core, @event-sourcing, etc.
-    // These don't have a colon, so treat them as category tags
-    // Skip "libar-docs" (the bare opt-in marker) - it's not a domain category
-    else if (
-      !normalized.includes(':') &&
-      !normalized.startsWith('acceptance-criteria') &&
-      !normalized.startsWith('happy-path') &&
-      normalized !== 'libar-docs'
-    ) {
-      metadata.categories = [...(metadata.categories ?? []), normalized];
+      case 'flag': {
+        metadata[key] = true;
+        break;
+      }
+      case 'quoted-value':
+      case 'value':
+      default: {
+        const value = def.transform !== undefined ? def.transform(rawValue) : rawValue;
+        if (def.repeatable === true) {
+          const existing = metadata[key] as string[] | undefined;
+          metadata[key] = [...(existing ?? []), value];
+        } else {
+          metadata[key] = value;
+        }
+        break;
+      }
     }
   }
 
-  return metadata;
+  return metadata as ReturnType<typeof extractPatternTags>;
 }

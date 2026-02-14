@@ -391,11 +391,11 @@ _Verified by: CompositeCodec combines multiple codec outputs, renderToClaudeCont
 - Deep behavior rendering with parsed invariant/rationale (complete)
 - JSDoc prose in shape sections at standard level (complete)
 - archLayer filter in DiagramScope (complete)
-- Edge labels on diagram relationships (pending)
-- Custom node shapes per archRole (pending)
-- diagramType field in DiagramScope (pending)
-- Sequence diagram rendering (pending)
-- State machine diagram rendering (pending)
+- Edge labels on diagram relationships (complete)
+- Custom node shapes per archRole (complete)
+- diagramType field in DiagramScope (complete)
+- Sequence diagram rendering (complete)
+- State machine diagram rendering (complete)
 - C4 diagram rendering (pending)
 - Class diagram rendering (pending)
 - List block usage for scenario names under rules (complete)
@@ -406,11 +406,17 @@ _Verified by: CompositeCodec combines multiple codec outputs, renderToClaudeCont
 - Full property-level JSDoc without truncation (complete)
 - Auto-shape discovery mode (complete)
 - Convention content from TypeScript JSDoc (pending)
-- CompositeCodec for multi-codec assembly (pending)
+- CompositeCodec for multi-codec assembly (complete)
 - renderToClaudeContext renderer (pending)
 - Data-driven Gherkin tag extraction (pending)
 - Expanded sample config with all content sources (pending)
 - Sample convention decision with rich content (pending)
+
+## Implementations
+
+Files that implement this pattern:
+
+- [`composite.ts`](../../src/renderable/codecs/composite.ts) - ## Composite Document Codec
 
 ---
 

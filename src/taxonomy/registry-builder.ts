@@ -86,6 +86,10 @@ export interface MetadataTagDefinitionForRegistry {
   default?: string;
   /** Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") */
   example?: string;
+  /** Maps tag name to metadata object property name (defaults to kebab-to-camelCase) */
+  metadataKey?: string;
+  /** Post-parse value transformer applied after format-based parsing */
+  transform?: (value: string) => string;
 }
 
 // Type alias for consumers (backwards compatible)
@@ -112,6 +116,7 @@ interface AggregationTagDefinitionForRegistry {
  * - adr: Architecture decision records
  * - hierarchy: Epic/phase/task breakdown
  * - traceability: Two-tier spec architecture links
+ * - discovery: Session discovery findings (retrospective tags)
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
  * - stub: Design session stub metadata
@@ -150,13 +155,24 @@ export const METADATA_TAGS_BY_GROUP = {
     'adr-theme',
     'adr-layer',
   ] as const,
-  hierarchy: ['level', 'parent'] as const,
-  traceability: ['executable-specs', 'roadmap-spec'] as const,
+  hierarchy: ['level', 'parent', 'title'] as const,
+  traceability: ['executable-specs', 'roadmap-spec', 'behavior-file'] as const,
+  discovery: [
+    'discovered-gap',
+    'discovered-improvement',
+    'discovered-risk',
+    'discovered-learning',
+  ] as const,
   architecture: ['arch-role', 'arch-context', 'arch-layer', 'arch-view'] as const,
   extraction: ['extract-shapes'] as const,
   stub: ['target', 'since'] as const,
   convention: ['convention'] as const,
 } as const;
+
+// Transform helpers for data-driven Gherkin tag extraction
+const hyphenToSpace = (v: string): string => v.replace(/-/g, ' ');
+const padAdr = (v: string): string => v.padStart(3, '0');
+const stripQuotes = (v: string): string => v.replace(/^["']|["']$/g, '');
 
 /**
  * Build the complete tag registry from TypeScript constants
@@ -246,12 +262,14 @@ export function buildRegistry(): TagRegistry {
         tag: 'implements',
         format: 'csv',
         purpose: 'Patterns this code file realizes (realization relationship)',
+        metadataKey: 'implementsPatterns',
         example: '@libar-docs-implements EventStoreDurability, IdempotentAppend',
       },
       {
         tag: 'extends',
         format: 'value',
         purpose: 'Base pattern this pattern extends (generalization relationship)',
+        metadataKey: 'extendsPattern',
         example: '@libar-docs-extends ProjectionCategories',
       },
       {
@@ -321,6 +339,7 @@ export function buildRegistry(): TagRegistry {
         tag: 'business-value',
         format: 'value',
         purpose: 'Business value statement (hyphenated for tag format)',
+        transform: hyphenToSpace,
         example: '@libar-docs-business-value eliminates-event-replay-complexity',
       },
       {
@@ -328,12 +347,15 @@ export function buildRegistry(): TagRegistry {
         format: 'value',
         purpose: 'Technical constraint affecting feature implementation',
         repeatable: true,
+        metadataKey: 'constraints',
+        transform: hyphenToSpace,
         example: '@libar-docs-constraint requires-convex-backend',
       },
       {
         tag: 'adr',
         format: 'value',
         purpose: 'ADR/PDR number for decision tracking',
+        transform: padAdr,
         example: '@libar-docs-adr 015',
       },
       {
@@ -354,12 +376,14 @@ export function buildRegistry(): TagRegistry {
         tag: 'adr-supersedes',
         format: 'value',
         purpose: 'ADR/PDR number this decision supersedes',
+        transform: padAdr,
         example: '@libar-docs-adr-supersedes 012',
       },
       {
         tag: 'adr-superseded-by',
         format: 'value',
         purpose: 'ADR/PDR number that supersedes this decision',
+        transform: padAdr,
         example: '@libar-docs-adr-superseded-by 020',
       },
       {
@@ -390,6 +414,13 @@ export function buildRegistry(): TagRegistry {
         purpose: 'Parent pattern name in hierarchy (links tasks to phases, phases to epics)',
         example: '@libar-docs-parent AggregateArchitecture',
       },
+      {
+        tag: 'title',
+        format: 'quoted-value',
+        purpose: 'Human-readable display title (supports quoted values with spaces)',
+        transform: stripQuotes,
+        example: '@libar-docs-title:"Process Guard Linter"',
+      },
       // PDR-007: Two-Tier Spec Architecture traceability
       {
         tag: 'executable-specs',
@@ -402,6 +433,49 @@ export function buildRegistry(): TagRegistry {
         format: 'value',
         purpose: 'Links package spec back to roadmap pattern for traceability (PDR-007)',
         example: '@libar-docs-roadmap-spec DeciderPattern',
+      },
+      {
+        tag: 'behavior-file',
+        format: 'value',
+        purpose: 'Path to behavior test feature file for traceability',
+        example: '@libar-docs-behavior-file behavior/my-pattern.feature',
+      },
+      // Session discovery findings (retrospective tags)
+      {
+        tag: 'discovered-gap',
+        format: 'value',
+        purpose: 'Gap identified during session retrospective',
+        repeatable: true,
+        metadataKey: 'discoveredGaps',
+        transform: hyphenToSpace,
+        example: '@libar-docs-discovered-gap missing-error-handling',
+      },
+      {
+        tag: 'discovered-improvement',
+        format: 'value',
+        purpose: 'Improvement identified during session retrospective',
+        repeatable: true,
+        metadataKey: 'discoveredImprovements',
+        transform: hyphenToSpace,
+        example: '@libar-docs-discovered-improvement cache-invalidation',
+      },
+      {
+        tag: 'discovered-risk',
+        format: 'value',
+        purpose: 'Risk identified during session retrospective',
+        repeatable: true,
+        metadataKey: 'discoveredRisks',
+        transform: hyphenToSpace,
+        example: '@libar-docs-discovered-risk data-loss-on-migration',
+      },
+      {
+        tag: 'discovered-learning',
+        format: 'value',
+        purpose: 'Learning captured during session retrospective',
+        repeatable: true,
+        metadataKey: 'discoveredLearnings',
+        transform: hyphenToSpace,
+        example: '@libar-docs-discovered-learning convex-mutation-limits',
       },
       // Cross-reference and API navigation tags (PatternRelationshipModel enhancement)
       {

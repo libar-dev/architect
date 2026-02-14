@@ -5,22 +5,6 @@
 
 ---
 
-## Text commands return string from router
-
-**Invariant:** Commands returning structured text must bypass JSON.stringify.
-
-**Rationale:** Context bundles use === section markers designed for AI parsing. JSON wrapping provides no benefit and inflates token count by ~30%.
-
----
-
-## SubcommandContext replaces narrow router parameters
-
-**Invariant:** All subcommands receive context via SubcommandContext, not individual parameters.
-
-**Rationale:** Coverage and unannotated commands need input globs and registry for file discovery and opt-in detection. Threading multiple parameters through the router creates fragile signatures.
-
----
-
 ## Configuration Components
 
 Scoped architecture diagram showing component relationships:
@@ -28,7 +12,7 @@ Scoped architecture diagram showing component relationships:
 ```mermaid
 graph TB
     subgraph config["Config"]
-        DeliveryProcessFactory["DeliveryProcessFactory[service]"]
+        DeliveryProcessFactory("DeliveryProcessFactory")
     end
     DefineConfig["DefineConfig"]
     subgraph related["Related"]
@@ -37,14 +21,14 @@ graph TB
         ProjectConfigTypes["ProjectConfigTypes"]:::neighbor
         ConfigurationPresets["ConfigurationPresets"]:::neighbor
     end
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DefineConfig --> ProjectConfigTypes
-    RegexBuilders --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationPresets
-    ConfigurationPresets --> ConfigurationTypes
+    DeliveryProcessFactory -->|uses| ConfigurationTypes
+    DeliveryProcessFactory -->|uses| ConfigurationPresets
+    DeliveryProcessFactory -->|uses| RegexBuilders
+    DefineConfig -->|uses| ProjectConfigTypes
+    RegexBuilders -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
     classDef neighbor stroke-dasharray: 5 5
 ```
 

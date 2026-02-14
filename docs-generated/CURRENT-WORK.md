@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 104/174 (60%)
+**Overall Progress:** [████████████░░░░░░░░] 104/175 (59%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 174 |
+| Total Patterns | 175 |
 | Completed | 104 |
-| Active | 33 |
+| Active | 34 |
 | Planned | 37 |
 | Active Phases | 2 |
 
@@ -60,6 +60,7 @@
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
+| 🚧 Composite Codec | - | - | Assembles reference documents from multiple codec outputs by concatenating RenderableDocument sections. |
 | 🚧 Config Resolver | - | - | Resolves a raw `DeliveryProcessProjectConfig` into a fully-resolved `ResolvedConfig` with all defaults applied, stubs... |
 | 🚧 Context Assembler Impl | - | - | Pure function composition over MasterDataset. |
 | 🚧 Context Formatter Impl | - | - | First plain-text formatter in the codebase. |

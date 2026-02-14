@@ -56,6 +56,12 @@
 - Depends on: ScopedArchitecturalView
 - Depends on: ShapeExtraction
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`composite.ts`](../../src/renderable/codecs/composite.ts) - ## Composite Document Codec
+
 ## Acceptance Criteria
 
 **Detailed level renders full rule descriptions with structured content**

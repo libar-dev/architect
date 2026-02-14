@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 116 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 117 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 116 |
+| Total Components | 117 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -119,6 +119,7 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         Shared_Mermaid_Diagram_Utilities["Shared Mermaid Diagram Utilities"]
         DecisionDocCodec["DecisionDocCodec[projection]"]
+        CompositeCodec["CompositeCodec[projection]"]
         BusinessRulesCodec["BusinessRulesCodec"]
         ArchitectureCodec["ArchitectureCodec[projection]"]
         AdrDocumentCodec["AdrDocumentCodec"]
@@ -170,13 +171,8 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
-        StatusValues["StatusValues"]
-        RiskLevels["RiskLevels"]
-        NormalizedStatus["NormalizedStatus"]
-        LayerTypes["LayerTypes"]
-        HierarchyLevels["HierarchyLevels"]
-        FormatTypes["FormatTypes"]
-        DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
+        RenderableUtils["RenderableUtils"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
@@ -184,6 +180,13 @@ graph TB
         GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
+        CLIVersionHelper["CLIVersionHelper"]
+        ValidatePatternsCLI["ValidatePatternsCLI"]
+        LintProcessCLI["LintProcessCLI"]
+        LintPatternsCLI["LintPatternsCLI"]
+        TagTaxonomyCLI["TagTaxonomyCLI"]
+        Documentation_Generator_CLI["Documentation Generator CLI"]
+        CLIErrorHandler["CLIErrorHandler"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         ConfigResolver["ConfigResolver"]
@@ -194,27 +197,17 @@ graph TB
         SourceMerger["SourceMerger"]
         DefineConfig["DefineConfig"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        CLIVersionHelper["CLIVersionHelper"]
-        ValidatePatternsCLI["ValidatePatternsCLI"]
-        LintProcessCLI["LintProcessCLI"]
-        LintPatternsCLI["LintPatternsCLI"]
-        TagTaxonomyCLI["TagTaxonomyCLI"]
-        Documentation_Generator_CLI["Documentation Generator CLI"]
-        CLIErrorHandler["CLIErrorHandler"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
-        RenderableUtils["RenderableUtils"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
+        StatusValues["StatusValues"]
+        RiskLevels["RiskLevels"]
+        NormalizedStatus["NormalizedStatus"]
+        LayerTypes["LayerTypes"]
+        HierarchyLevels["HierarchyLevels"]
+        FormatTypes["FormatTypes"]
+        DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         FSMModule["FSMModule"]
-        ProcessGuardTypes["ProcessGuardTypes"]
-        ProcessGuardModule["ProcessGuardModule"]
-        DetectChanges["DetectChanges"]
-        DeriveProcessState["DeriveProcessState"]
-        PipelineModule["PipelineModule"]
-        ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
-        BuiltInGenerators["BuiltInGenerators"]
-        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
         TaxonomyCodec["TaxonomyCodec"]
@@ -228,6 +221,14 @@ graph TB
         RichContentHelpers["RichContentHelpers"]
         BusinessRulesCodec["BusinessRulesCodec"]
         AdrDocumentCodec["AdrDocumentCodec"]
+        ProcessGuardTypes["ProcessGuardTypes"]
+        ProcessGuardModule["ProcessGuardModule"]
+        DetectChanges["DetectChanges"]
+        DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
+        ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
+        BuiltInGenerators["BuiltInGenerators"]
+        CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
@@ -249,6 +250,20 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -266,20 +281,6 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> Pattern_Scanner
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -300,6 +301,7 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
+    ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
     PipelineModule --> TransformDataset
@@ -307,7 +309,6 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    ArchitectureCodec --> MasterDataset
 ```
 
 ---
@@ -359,6 +360,7 @@ All components with architecture annotations:
 | ✅ Lint Rules | lint | service | application | src/lint/rules.ts |
 |  Shared Mermaid Diagram Utilities | renderer | - | - | src/renderable/codecs/diagram-utils.ts |
 | ✅ Architecture Codec | renderer | projection | application | src/renderable/codecs/architecture.ts |
+| 🚧 Composite Codec | renderer | projection | application | src/renderable/codecs/composite.ts |
 | ✅ Decision Doc Codec | renderer | projection | application | src/renderable/codecs/decision-doc.ts |
 | ✅ Patterns Codec | renderer | projection | application | src/renderable/codecs/patterns.ts |
 | ✅ Session Codec | renderer | projection | application | src/renderable/codecs/session.ts |

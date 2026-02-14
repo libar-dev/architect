@@ -170,3 +170,59 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
     Then the metadata convention should contain "fsm-rules"
     And the metadata convention should contain "testing-policy"
     And the metadata convention should contain "cli-patterns"
+
+  # ==========================================================================
+  # Registry-Driven Extraction (Data-Driven Gherkin Tag Extraction)
+  # ==========================================================================
+
+  @happy-path @registry-driven
+  Scenario: Registry-driven enum tag without prior if/else branch
+    Given feature tags containing "adr-theme:persistence"
+    When extracting pattern tags
+    Then the metadata adrTheme should be "persistence"
+
+  @happy-path @registry-driven
+  Scenario: Registry-driven enum rejects invalid value
+    Given feature tags containing "adr-theme:invalid-theme"
+    When extracting pattern tags
+    Then the metadata should not have adrTheme
+
+  @happy-path @registry-driven
+  Scenario: Registry-driven CSV tag accumulates values
+    Given feature tags containing "arch-view:pipeline-overview,codec-transformation"
+    When extracting pattern tags
+    Then the metadata archView should contain "pipeline-overview"
+    And the metadata archView should contain "codec-transformation"
+
+  @happy-path @registry-driven
+  Scenario: Transform applies hyphen-to-space on business value
+    Given feature tags containing "business-value:eliminates-manual-docs"
+    When extracting pattern tags
+    Then the metadata businessValue should be "eliminates manual docs"
+
+  @happy-path @registry-driven
+  Scenario: Transform applies ADR number padding
+    Given feature tags containing "adr:5"
+    When extracting pattern tags
+    Then the metadata adr should be "005"
+
+  @happy-path @registry-driven
+  Scenario: Transform strips quotes from title tag
+    Given feature tags containing "title:'Process Guard Linter'"
+    When extracting pattern tags
+    Then the metadata title should be "Process Guard Linter"
+
+  @happy-path @registry-driven
+  Scenario: Repeatable value tag accumulates multiple occurrences
+    Given feature tags containing "discovered-gap:missing-tests" and "discovered-gap:no-validation"
+    When extracting pattern tags
+    Then the metadata discoveredGaps should contain "missing tests"
+    And the metadata discoveredGaps should contain "no validation"
+
+  @edge-case @registry-driven
+  Scenario: CSV with values constraint rejects invalid values
+    Given feature tags containing "convention:testing-policy,nonexistent-value,fsm-rules"
+    When extracting pattern tags
+    Then the metadata convention should contain "testing-policy"
+    And the metadata convention should contain "fsm-rules"
+    And the metadata convention should not contain "nonexistent-value"

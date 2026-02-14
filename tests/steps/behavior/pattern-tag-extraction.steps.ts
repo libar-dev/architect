@@ -433,4 +433,142 @@ describeFeature(feature, ({ Scenario, Background, BeforeEachScenario }) => {
       expect(state!.metadata.convention).toContain('cli-patterns');
     });
   });
+
+  // ===========================================================================
+  // Registry-Driven Extraction (Data-Driven Gherkin Tag Extraction)
+  // ===========================================================================
+
+  Scenario('Registry-driven enum tag without prior if/else branch', ({ Given, When, Then }) => {
+    Given('feature tags containing "adr-theme:persistence"', () => {
+      state!.tags = ['adr-theme:persistence'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata adrTheme should be "persistence"', () => {
+      expect(state!.metadata.adrTheme).toBe('persistence');
+    });
+  });
+
+  Scenario('Registry-driven enum rejects invalid value', ({ Given, When, Then }) => {
+    Given('feature tags containing "adr-theme:invalid-theme"', () => {
+      state!.tags = ['adr-theme:invalid-theme'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata should not have adrTheme', () => {
+      expect(state!.metadata.adrTheme).toBeUndefined();
+    });
+  });
+
+  Scenario('Registry-driven CSV tag accumulates values', ({ Given, When, Then, And }) => {
+    Given('feature tags containing "arch-view:pipeline-overview,codec-transformation"', () => {
+      state!.tags = ['arch-view:pipeline-overview,codec-transformation'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata archView should contain "pipeline-overview"', () => {
+      expect(state!.metadata.archView).toContain('pipeline-overview');
+    });
+
+    And('the metadata archView should contain "codec-transformation"', () => {
+      expect(state!.metadata.archView).toContain('codec-transformation');
+    });
+  });
+
+  Scenario('Transform applies hyphen-to-space on business value', ({ Given, When, Then }) => {
+    Given('feature tags containing "business-value:eliminates-manual-docs"', () => {
+      state!.tags = ['business-value:eliminates-manual-docs'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata businessValue should be "eliminates manual docs"', () => {
+      expect(state!.metadata.businessValue).toBe('eliminates manual docs');
+    });
+  });
+
+  Scenario('Transform applies ADR number padding', ({ Given, When, Then }) => {
+    Given('feature tags containing "adr:5"', () => {
+      state!.tags = ['adr:5'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata adr should be "005"', () => {
+      expect(state!.metadata.adr).toBe('005');
+    });
+  });
+
+  Scenario('Transform strips quotes from title tag', ({ Given, When, Then }) => {
+    Given('feature tags containing "title:\'Process Guard Linter\'"', () => {
+      state!.tags = ["title:'Process Guard Linter'"];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata title should be "Process Guard Linter"', () => {
+      expect(state!.metadata.title).toBe('Process Guard Linter');
+    });
+  });
+
+  Scenario(
+    'Repeatable value tag accumulates multiple occurrences',
+    ({ Given, When, Then, And }) => {
+      Given(
+        'feature tags containing "discovered-gap:missing-tests" and "discovered-gap:no-validation"',
+        () => {
+          state!.tags = ['discovered-gap:missing-tests', 'discovered-gap:no-validation'];
+        }
+      );
+
+      When('extracting pattern tags', () => {
+        state!.metadata = extractPatternTags(state!.tags);
+      });
+
+      Then('the metadata discoveredGaps should contain "missing tests"', () => {
+        expect(state!.metadata.discoveredGaps).toContain('missing tests');
+      });
+
+      And('the metadata discoveredGaps should contain "no validation"', () => {
+        expect(state!.metadata.discoveredGaps).toContain('no validation');
+      });
+    }
+  );
+
+  Scenario('CSV with values constraint rejects invalid values', ({ Given, When, Then, And }) => {
+    Given('feature tags containing "convention:testing-policy,nonexistent-value,fsm-rules"', () => {
+      state!.tags = ['convention:testing-policy,nonexistent-value,fsm-rules'];
+    });
+
+    When('extracting pattern tags', () => {
+      state!.metadata = extractPatternTags(state!.tags);
+    });
+
+    Then('the metadata convention should contain "testing-policy"', () => {
+      expect(state!.metadata.convention).toContain('testing-policy');
+    });
+
+    And('the metadata convention should contain "fsm-rules"', () => {
+      expect(state!.metadata.convention).toContain('fsm-rules');
+    });
+
+    And('the metadata convention should not contain "nonexistent-value"', () => {
+      expect(state!.metadata.convention).not.toContain('nonexistent-value');
+    });
+  });
 });

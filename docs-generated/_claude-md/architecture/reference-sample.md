@@ -5,18 +5,6 @@
 
 ---
 
-## Text commands return string from router
-
-**Invariant:** Commands returning structured text must bypass JSON.stringify.
-
----
-
-## SubcommandContext replaces narrow router parameters
-
-**Invariant:** All subcommands receive context via SubcommandContext, not individual parameters.
-
----
-
 ## API Types
 
 | Type | Kind |

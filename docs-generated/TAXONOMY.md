@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **46 metadata tags** | **3 aggregation tags**
+**3 categories** | **52 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@libar-docs-` prefix with `@libar-docs` file opt-in.
 
 | Component | Count | Description |
 | --- | --- | --- |
 | Categories | 3 | Pattern classification by domain |
-| Metadata Tags | 46 | Pattern enrichment and relationships |
+| Metadata Tags | 52 | Pattern enrichment and relationships |
 | Aggregation Tags | 3 | Document routing |
 
 ---
@@ -106,8 +106,14 @@ Tags for enriching patterns with additional metadata.
 | `constraint` | value | Technical constraint affecting feature implementation | No | `@libar-docs-constraint requires-convex-backend` |
 | `level` | enum | Hierarchy level for epic->phase->task breakdown | No | `@libar-docs-level epic` |
 | `parent` | value | Parent pattern name in hierarchy (links tasks to phases, phases to epics) | No | `@libar-docs-parent AggregateArchitecture` |
+| `title` | quoted-value | Human-readable display title (supports quoted values with spaces) | No | `@libar-docs-title:"Process Guard Linter"` |
 | `executable-specs` | csv | Links roadmap spec to package executable spec locations (PDR-007) | No | `@libar-docs-executable-specs platform-decider/tests/features/behavior` |
 | `roadmap-spec` | value | Links package spec back to roadmap pattern for traceability (PDR-007) | No | `@libar-docs-roadmap-spec DeciderPattern` |
+| `behavior-file` | value | Path to behavior test feature file for traceability | No | `@libar-docs-behavior-file behavior/my-pattern.feature` |
+| `discovered-gap` | value | Gap identified during session retrospective | No | `@libar-docs-discovered-gap missing-error-handling` |
+| `discovered-improvement` | value | Improvement identified during session retrospective | No | `@libar-docs-discovered-improvement cache-invalidation` |
+| `discovered-risk` | value | Risk identified during session retrospective | No | `@libar-docs-discovered-risk data-loss-on-migration` |
+| `discovered-learning` | value | Learning captured during session retrospective | No | `@libar-docs-discovered-learning convex-mutation-limits` |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
 | `target` | value | Target implementation path for stub files | No | `@libar-docs-target src/api/stub-resolver.ts` |
 | `since` | value | Design session that created this pattern | No | `@libar-docs-since DS-A` |

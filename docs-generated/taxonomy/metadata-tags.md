@@ -6,7 +6,7 @@
 
 ## Metadata Tag Definitions
 
-46 metadata tags with full details.
+52 metadata tags with full details.
 
 | Tag | Format | Purpose | Required | Repeatable | Values | Default |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -44,8 +44,14 @@
 | `adr-layer` | enum | Evolutionary layer of the decision | No | No | foundation, infrastructure, refinement | - |
 | `level` | enum | Hierarchy level for epic->phase->task breakdown | No | No | epic, phase, task | phase |
 | `parent` | value | Parent pattern name in hierarchy (links tasks to phases, phases to epics) | No | No | - | - |
+| `title` | quoted-value | Human-readable display title (supports quoted values with spaces) | No | No | - | - |
 | `executable-specs` | csv | Links roadmap spec to package executable spec locations (PDR-007) | No | No | - | - |
 | `roadmap-spec` | value | Links package spec back to roadmap pattern for traceability (PDR-007) | No | No | - | - |
+| `behavior-file` | value | Path to behavior test feature file for traceability | No | No | - | - |
+| `discovered-gap` | value | Gap identified during session retrospective | No | Yes | - | - |
+| `discovered-improvement` | value | Improvement identified during session retrospective | No | Yes | - | - |
+| `discovered-risk` | value | Risk identified during session retrospective | No | Yes | - | - |
+| `discovered-learning` | value | Learning captured during session retrospective | No | Yes | - | - |
 | `see-also` | csv | Related patterns for cross-reference without dependency implication | No | No | - | - |
 | `api-ref` | csv | File paths to implementation APIs (replaces 'See:' Markdown text in Rules) | No | No | - | - |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | No | - | - |
@@ -410,6 +416,16 @@
 | Repeatable | No |
 | Example | `@libar-docs-parent AggregateArchitecture` |
 
+### `title`
+
+| Property | Value |
+| --- | --- |
+| Format | quoted-value |
+| Purpose | Human-readable display title (supports quoted values with spaces) |
+| Required | No |
+| Repeatable | No |
+| Example | `@libar-docs-title:"Process Guard Linter"` |
+
 ### `executable-specs`
 
 | Property | Value |
@@ -429,6 +445,56 @@
 | Required | No |
 | Repeatable | No |
 | Example | `@libar-docs-roadmap-spec DeciderPattern` |
+
+### `behavior-file`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Path to behavior test feature file for traceability |
+| Required | No |
+| Repeatable | No |
+| Example | `@libar-docs-behavior-file behavior/my-pattern.feature` |
+
+### `discovered-gap`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Gap identified during session retrospective |
+| Required | No |
+| Repeatable | Yes |
+| Example | `@libar-docs-discovered-gap missing-error-handling` |
+
+### `discovered-improvement`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Improvement identified during session retrospective |
+| Required | No |
+| Repeatable | Yes |
+| Example | `@libar-docs-discovered-improvement cache-invalidation` |
+
+### `discovered-risk`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Risk identified during session retrospective |
+| Required | No |
+| Repeatable | Yes |
+| Example | `@libar-docs-discovered-risk data-loss-on-migration` |
+
+### `discovered-learning`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Learning captured during session retrospective |
+| Required | No |
+| Repeatable | Yes |
+| Example | `@libar-docs-discovered-learning convex-mutation-limits` |
 
 ### `see-also`
 

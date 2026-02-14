@@ -15,12 +15,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - **Deliverable Status Taxonomy**: Canonical status values for deliverables in Gherkin Background tables.
-- **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **Config Resolver**: Resolves a raw `DeliveryProcessProjectConfig` into a fully-resolved `ResolvedConfig` with all defaults applied, stubs...
 - **Project Config Types**: Unified project configuration for the delivery-process package.
 - **Project Config Schema**: Zod validation schema for `DeliveryProcessProjectConfig`.
 - **Source Merger**: Computes effective sources for a specific generator by applying per-generator overrides to the base resolved sources.
 - **Define Config**: Identity function for type-safe project configuration.
+- **File Cache**: Simple Map-based cache for file contents during a single generation run.
 - **Process API CLI Impl**: Exposes ProcessStateAPI methods as CLI subcommands with JSON output.
 - **Output Pipeline Impl**: Post-processing pipeline that transforms raw API results into shaped CLI output.
 - **Lint Process CLI**: Validates git changes against delivery process rules.
@@ -40,14 +40,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **FSM States**: :PDR005MvpWorkflow Defines the 4-state FSM from PDR-005 MVP Workflow: - roadmap: Planned work (fully editable) -...
 - **FSM Module**: :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ...
 - **Reference Document Codec**: A single codec factory that creates reference document codecs from configuration objects.
+- **Composite Codec**: Assembles reference documents from multiple codec outputs by concatenating RenderableDocument sections.
 - **Process Guard Types**: :FSMValidator Defines types for the process guard linter including: - Process state derived from file annotations -...
 - **Process Guard Module**: :FSMValidator,DeriveProcessState,DetectChanges,ProcessGuardDecider Enforces delivery process rules by validating...
 - **Detect Changes**: Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status...
 - **Derive Process State**: :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files.
 - **Process Guard Decider**: :FSMValidator,DeriveProcessState,DetectChanges Pure function that validates changes against process rules.
 - **Reference Generator Registration**: Registers all reference document generators.
-- **ADR 010 Pattern Naming Conventions**: The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation.
 - **Process State API Relationship Queries**: Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks...
+- **ADR 010 Pattern Naming Conventions**: The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation.
 
 ---
 
@@ -78,14 +79,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Dual Source Schemas**: Zod schemas for dual-source extraction types.
 - **Doc Directive Schema**: Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments.
 - **Codec Utils**: Provides factory functions for creating type-safe JSON parsing and serialization pipelines using Zod schemas.
-- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
-- **Validation Module**: Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -...
-- **DoD Validator**: Validates that completed phases meet Definition of Done criteria: 1.
-- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
 - **String Utilities**: Provides shared utilities for string manipulation used across the delivery-process package, including slugification...
 - **Utils Module**: Common helper functions used across the delivery-process package.
 - **Pattern Id Generator**: Generates unique, deterministic pattern IDs based on file path and line number.
 - **Collection Utilities**: Provides shared utilities for working with arrays and collections, such as grouping items by a key function.
+- **DoD Validation Types**: Types and schemas for Definition of Done (DoD) validation and anti-pattern detection.
+- **Validation Module**: Barrel export for validation module providing: - Definition of Done (DoD) validation for completed phases -...
+- **DoD Validator**: Validates that completed phases meet Definition of Done criteria: 1.
+- **Anti Pattern Detector**: Detects violations of the dual-source documentation architecture and process hygiene issues that lead to...
 - **Status Values**: THE single source of truth for FSM state values in the monorepo (per PDR-005 FSM).
 - **Risk Levels**: Three-tier risk classification for roadmap planning.
 - **Tag Registry Builder**: Constructs a complete TagRegistry from TypeScript constants.
@@ -155,13 +156,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Decision Doc Generator**: Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1.
 - **Codec Generator Registration**: Registers codec-based generators for the RenderableDocument Model (RDM) system.
 - **Codec Base Options**: Shared types, interfaces, and utilities for all document codecs.
-- **PDR 001 Self Documentation**
-- **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
-- **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
-- **ADR 004 Gherkin Only Testing**: The delivery-process package had dual test approaches creating inconsistency.
-- **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
-- **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
-- **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
 - **Universal Doc Generator Robustness**: This feature transforms the PoC document generator into a production-ready universal generator capable of operating...
 - **Shape Extraction**: Documentation comments duplicate type definitions that exist in the same file.
 - **Scoped Architectural View**: Full architecture diagrams show every annotated pattern in the project.
@@ -173,5 +167,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Data API Context Assembly**: Starting a Claude Code design or implementation session requires assembling 30-100KB of curated, multi-source context...
 - **Data API Architecture Queries**: The current `arch` subcommand provides basic queries (roles, context, layer, graph) but lacks deeper analysis needed...
 - **Codec Driven Reference Generation**: Each reference document (Process Guard, Taxonomy, Validation, etc.) required a hand-coded recipe feature that...
+- **PDR 001 Self Documentation**
+- **Process Guard**: The delivery workflow needs protection against accidental modifications: - Completed specs get modified without...
+- **ADR 005 Configurable Tag Prefix**: The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations.
+- **ADR 004 Gherkin Only Testing**: The delivery-process package had dual test approaches creating inconsistency.
+- **ADR 003 Ephemeral Persistent Separation**: Generated documentation mixed session-specific content with persistent docs.
+- **ADR 002 Progressive Disclosure Architecture**: Single-file PRD documentation became unwieldy at scale.
+- **ADR 001 Problem Solution Descriptions**: Feature descriptions in Gherkin files lacked consistent structure.
 
 ---
