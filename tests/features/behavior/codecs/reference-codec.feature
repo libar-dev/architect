@@ -187,6 +187,23 @@ Feature: Reference Document Codec
       Then the document does not have a heading "Component Overview"
 
     @happy-path
+    Scenario: archLayer filter selects patterns by architectural layer
+      Given a reference config with diagramScope archLayer "domain"
+      And a MasterDataset with patterns in domain and infrastructure layers
+      When decoding at detail level "detailed"
+      Then the document contains a mermaid block
+      And the mermaid content contains "DomainPattern"
+      And the mermaid content does not contain "InfraPattern"
+
+    @happy-path
+    Scenario: archLayer and archContext compose via OR
+      Given a reference config with diagramScope archLayer "domain" and archContext "shared"
+      And a MasterDataset with a domain-layer pattern and a shared-context pattern
+      When decoding at detail level "detailed"
+      Then the document contains a mermaid block
+      And the mermaid content contains both "DomainPattern" and "SharedPattern"
+
+    @happy-path
     Scenario: Summary level omits scoped diagram
       Given a reference config with diagramScope archContext "lint"
       And a MasterDataset with arch-annotated patterns in context "lint"
@@ -228,3 +245,64 @@ Feature: Reference Document Codec
       When decoding at detail level "standard"
       Then the document contains narrative text
       And the document does not contain text "Rationale"
+
+  Rule: Deep behavior rendering with structured annotations
+
+    @happy-path
+    Scenario: Detailed level renders structured behavior rules
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with structured rules
+      When decoding at detail level "detailed"
+      Then the document has a heading "Invariant Rule"
+      And the document contains text "Must follow FSM transitions"
+      And the rendered output includes rationale "Prevents state corruption"
+      And the document contains a verified-by list with "Scenario A" and "Scenario B"
+
+    @happy-path
+    Scenario: Standard level renders behavior rules without rationale
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with structured rules
+      When decoding at detail level "standard"
+      Then the document has a heading "Invariant Rule"
+      And the document contains text "Must follow FSM transitions"
+      And the document does not contain text "Prevents state corruption"
+
+    @happy-path
+    Scenario: Summary level shows behavior rules as truncated table
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with structured rules
+      When decoding at detail level "summary"
+      Then the document has at least 1 table
+      And the document does not have a heading "Invariant Rule"
+
+    @edge-case
+    Scenario: Scenario names and verifiedBy merge as deduplicated list
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with overlapping scenarioNames and verifiedBy
+      When decoding at detail level "detailed"
+      Then the document contains a verified-by list with 3 unique entries
+
+  Rule: Shape JSDoc prose renders at standard and detailed levels
+
+    @happy-path
+    Scenario: Standard level includes JSDoc paragraph before code blocks
+      Given a reference config with shapeSources "src/lint/*.ts"
+      And a MasterDataset with a shape pattern with JSDoc
+      When decoding at detail level "standard"
+      Then the document contains text "Input to the process guard decider function"
+
+    @happy-path
+    Scenario: Detailed level includes JSDoc paragraph and property table
+      Given a reference config with shapeSources "src/lint/*.ts"
+      And a MasterDataset with a shape pattern with JSDoc and property docs
+      When decoding at detail level "detailed"
+      Then the document contains text "Input to the process guard decider function"
+      And the document has at least 1 table
+
+    @edge-case
+    Scenario: Shapes without JSDoc render code blocks only
+      Given a reference config with shapeSources "src/lint/*.ts"
+      And a MasterDataset with a shape pattern without JSDoc
+      When decoding at detail level "standard"
+      Then the document does not contain text "Input to the process guard"
+      And the document contains a code block with "typescript"

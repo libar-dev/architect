@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 104/173 (60%)
+**Overall Progress:** [████████████░░░░░░░░] 104/174 (60%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 33 |
-| 📋 Planned | 36 |
-| **Total Remaining** | 69 |
+| 📋 Planned | 37 |
+| **Total Remaining** | 70 |
 
 ---
 
@@ -26,6 +26,7 @@
 | 🚧 [ProcessStateAPIRelationshipQueries](remaining/phase-24-process-state-api-relationship-queries.md) | 1 | 1 | 50% |
 | 📋 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 4 | 0 | 56% |
 | 🚧 [SourceMapper](remaining/phase-27-source-mapper.md) | 1 | 1 | 80% |
+| 📋 [ReferenceDocShowcase](remaining/phase-30-reference-doc-showcase.md) | 1 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 3 | 0 | 57% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
@@ -41,7 +42,7 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 33 |
-| ✅ Ready to Start | 35 |
+| ✅ Ready to Start | 36 |
 | ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
@@ -51,11 +52,11 @@
 - Data API CLI Ergonomics (Phase 25)
 - Data API Platform Integration (Phase 25)
 - Data API Relationship Graph (Phase 25)
+- Reference Doc Showcase (Phase 30)
 - Prd Implementation Section (Phase 99)
 - Status Aware Eslint Suppression (Phase 99)
 - Streaming Git Diff (Phase 99)
 - Architecture Delta (Phase 100)
-- Business Rules Generator (Phase 100)
 
 See phase detail files for full list.
 
@@ -71,6 +72,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Data API Platform Integration (Phase 25) - 3d
 - 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 35 actionable items.
+Showing 5 of 36 actionable items.
 
 ---

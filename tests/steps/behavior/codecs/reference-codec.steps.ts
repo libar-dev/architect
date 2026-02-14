@@ -15,6 +15,7 @@ import { createTestPattern, resetPatternCounter } from '../../../fixtures/patter
 import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
 import {
   findHeadings,
+  findLists,
   findParagraphs,
   findTables,
   findBlocksByType,
@@ -1016,6 +1017,132 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       }
     );
 
+    RuleScenario(
+      'archLayer filter selects patterns by architectural layer',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archLayer {string}',
+          (_ctx: unknown, layer: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { archLayer: [layer] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with patterns in domain and infrastructure layers', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'DomainPattern',
+                archContext: 'orders',
+                archLayer: 'domain',
+                archRole: 'decider',
+              }),
+              createTestPattern({
+                name: 'InfraPattern',
+                archContext: 'orders',
+                archLayer: 'infrastructure',
+                archRole: 'repository',
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content contains {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text);
+        });
+
+        And('the mermaid content does not contain {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).not.toContain(text);
+        });
+      }
+    );
+
+    RuleScenario('archLayer and archContext compose via OR', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with diagramScope archLayer {string} and archContext {string}',
+        (_ctx: unknown, layer: string, context: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            diagramScope: { archLayer: [layer], archContext: [context] },
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And('a MasterDataset with a domain-layer pattern and a shared-context pattern', () => {
+        state!.dataset = createTestMasterDataset({
+          patterns: [
+            createTestPattern({
+              name: 'DomainPattern',
+              archContext: 'orders',
+              archLayer: 'domain',
+              archRole: 'decider',
+            }),
+            createTestPattern({
+              name: 'SharedPattern',
+              archContext: 'shared',
+              archLayer: 'application',
+              archRole: 'service',
+            }),
+          ],
+        });
+      });
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document contains a mermaid block', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+      });
+
+      And(
+        'the mermaid content contains both {string} and {string}',
+        (_ctx: unknown, text1: string, text2: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text1);
+          expect(content).toContain(text2);
+        }
+      );
+    });
+
     RuleScenario('Summary level omits scoped diagram', ({ Given, And, When, Then }) => {
       Given(
         'a reference config with diagramScope archContext {string}',
@@ -1491,6 +1618,440 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
       }
     );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Deep behavior rendering with structured annotations
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Deep behavior rendering with structured annotations', ({ RuleScenario }) => {
+    RuleScenario(
+      'Detailed level renders structured behavior rules',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And('a MasterDataset with a behavior pattern with structured rules', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'BehaviorSpec',
+                category: 'process-guard',
+                description: 'Validates delivery workflow.',
+                rules: [
+                  {
+                    name: 'Invariant Rule',
+                    description: [
+                      '**Invariant:** Must follow FSM transitions.',
+                      '',
+                      '**Rationale:** Prevents state corruption.',
+                      '',
+                      '**Verified by:** Scenario A, Scenario B',
+                    ].join('\n'),
+                    scenarioCount: 2,
+                    scenarioNames: ['Scenario A', 'Scenario B'],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text.includes(headingText));
+          expect(match).toBe(true);
+        });
+
+        And('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain(text);
+        });
+
+        And('the rendered output includes rationale {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain(text);
+        });
+
+        And(
+          'the document contains a verified-by list with {string} and {string}',
+          (_ctx: unknown, item1: string, item2: string) => {
+            const lists = findLists(state!.document!);
+            expect(lists.length).toBeGreaterThanOrEqual(1);
+            const allItems = lists.flatMap((l) =>
+              l.items.map((i) => (typeof i === 'string' ? i : i.text))
+            );
+            expect(allItems).toContain(item1);
+            expect(allItems).toContain(item2);
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Standard level renders behavior rules without rationale',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And('a MasterDataset with a behavior pattern with structured rules', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'BehaviorSpecStd',
+                category: 'process-guard',
+                description: 'Validates delivery workflow.',
+                rules: [
+                  {
+                    name: 'Invariant Rule',
+                    description: [
+                      '**Invariant:** Must follow FSM transitions.',
+                      '',
+                      '**Rationale:** Prevents state corruption.',
+                      '',
+                      '**Verified by:** Scenario A, Scenario B',
+                    ].join('\n'),
+                    scenarioCount: 2,
+                    scenarioNames: ['Scenario A', 'Scenario B'],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text.includes(headingText));
+          expect(match).toBe(true);
+        });
+
+        And('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain(text);
+        });
+
+        And('the document does not contain text {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).not.toContain(text);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Summary level shows behavior rules as truncated table',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And('a MasterDataset with a behavior pattern with structured rules', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'BehaviorSpecSum',
+                category: 'process-guard',
+                description: 'Validates delivery workflow.',
+                rules: [
+                  {
+                    name: 'Invariant Rule',
+                    description: [
+                      '**Invariant:** Must follow FSM transitions.',
+                      '',
+                      '**Rationale:** Prevents state corruption.',
+                    ].join('\n'),
+                    scenarioCount: 2,
+                    scenarioNames: [],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document has at least {int} table', (_ctx: unknown, minCount: number) => {
+          const tables = findTables(state!.document!);
+          expect(tables.length).toBeGreaterThanOrEqual(minCount);
+        });
+
+        And(
+          'the document does not have a heading {string}',
+          (_ctx: unknown, headingText: string) => {
+            const headings = findHeadings(state!.document!);
+            const match = headings.some((h) => h.text.includes(headingText));
+            expect(match).toBe(false);
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Scenario names and verifiedBy merge as deduplicated list',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And(
+          'a MasterDataset with a behavior pattern with overlapping scenarioNames and verifiedBy',
+          () => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'BehaviorSpecDedup',
+                  category: 'process-guard',
+                  description: 'Validates delivery workflow.',
+                  rules: [
+                    {
+                      name: 'Dedup Rule',
+                      description: [
+                        '**Invariant:** Must follow FSM.',
+                        '',
+                        '**Verified by:** Scenario A, Scenario B',
+                      ].join('\n'),
+                      scenarioCount: 3,
+                      scenarioNames: ['Scenario A', 'Scenario C'],
+                    },
+                  ],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then(
+          'the document contains a verified-by list with {int} unique entries',
+          (_ctx: unknown, expectedCount: number) => {
+            const lists = findLists(state!.document!);
+            expect(lists.length).toBeGreaterThanOrEqual(1);
+            const allItems = lists.flatMap((l) =>
+              l.items.map((i) => (typeof i === 'string' ? i : i.text))
+            );
+            // Scenario A (from both sources, deduped), Scenario B (from verifiedBy), Scenario C (from scenarioNames)
+            expect(allItems).toHaveLength(expectedCount);
+          }
+        );
+      }
+    );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Shape JSDoc prose renders at standard and detailed levels
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Shape JSDoc prose renders at standard and detailed levels', ({ RuleScenario }) => {
+    RuleScenario(
+      'Standard level includes JSDoc paragraph before code blocks',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with shapeSources {string}',
+          (_ctx: unknown, shapeSources: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              behaviorCategories: [],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with a shape pattern with JSDoc', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'ShapeWithDoc',
+                filePath: 'src/lint/rules.ts',
+                extractedShapes: [
+                  {
+                    name: 'DeciderInput',
+                    kind: 'interface',
+                    sourceText: 'export interface DeciderInput { state: ProcessState; }',
+                    jsDoc: 'Input to the process guard decider function.',
+                    lineNumber: 10,
+                    exported: true,
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain(text);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Detailed level includes JSDoc paragraph and property table',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with shapeSources {string}',
+          (_ctx: unknown, shapeSources: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              behaviorCategories: [],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with a shape pattern with JSDoc and property docs', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'ShapeWithDocAndProps',
+                filePath: 'src/lint/rules.ts',
+                extractedShapes: [
+                  {
+                    name: 'DeciderInput',
+                    kind: 'interface',
+                    sourceText:
+                      'export interface DeciderInput {\n  state: ProcessState;\n  changes: Change[];\n}',
+                    jsDoc: 'Input to the process guard decider function.',
+                    lineNumber: 10,
+                    exported: true,
+                    propertyDocs: [
+                      { name: 'state', jsDoc: 'Current process state' },
+                      { name: 'changes', jsDoc: 'Staged changes to validate' },
+                    ],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain(text);
+        });
+
+        And('the document has at least {int} table', (_ctx: unknown, minCount: number) => {
+          const tables = findTables(state!.document!);
+          expect(tables.length).toBeGreaterThanOrEqual(minCount);
+        });
+      }
+    );
+
+    RuleScenario('Shapes without JSDoc render code blocks only', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with shapeSources {string}',
+        (_ctx: unknown, shapeSources: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            behaviorCategories: [],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And('a MasterDataset with a shape pattern without JSDoc', () => {
+        state!.dataset = createTestMasterDataset({
+          patterns: [
+            createTestPattern({
+              name: 'ShapeNoDoc',
+              filePath: 'src/lint/rules.ts',
+              extractedShapes: [
+                {
+                  name: 'SimpleType',
+                  kind: 'type',
+                  sourceText: 'export type SimpleType = string;',
+                  lineNumber: 1,
+                  exported: true,
+                },
+              ],
+            }),
+          ],
+        });
+      });
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document does not contain text {string}', (_ctx: unknown, text: string) => {
+        const rendered = getRenderedMarkdown();
+        expect(rendered).not.toContain(text);
+      });
+
+      And('the document contains a code block with {string}', (_ctx: unknown, language: string) => {
+        const codeBlocks = findBlocksByType(state!.document!, 'code');
+        const match = codeBlocks.some((b) => b.language === language);
+        expect(match).toBe(true);
+      });
+    });
   });
 
   // ──────────────────────────────────────────────────────────────────────

@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [████████████░░░░░░░░] 104/173 (60%)
+**Patterns:** [████████████░░░░░░░░] 104/174 (60%)
 
-**Phases:** 2/13 complete
+**Phases:** 2/14 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 173 |
+| Total Patterns | 174 |
 | Completed | 104 |
 | Active | 33 |
-| Planned | 36 |
+| Planned | 37 |
 
 ---
 
@@ -31,6 +31,7 @@
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 4/5 | 80% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
+| 📋 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -127,6 +128,16 @@
 | ✅ Source Mapping Validator | completed | Performs pre-flight checks on source mapping tables before extraction begins. |
 | ✅ Universal Doc Generator Robustness | completed | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
 | ✅ Warning Collector | completed | Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation. |
+
+---
+
+### 📋 ReferenceDocShowcase
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Reference Doc Showcase | planned | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
 
 ---
 

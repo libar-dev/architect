@@ -48,10 +48,10 @@ Feature: Reference Document Showcase
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Remove 120-char rule description truncation | Pending | src/renderable/codecs/reference.ts |
-      | Deep behavior rendering with parsed invariant/rationale | Pending | src/renderable/codecs/reference.ts |
-      | JSDoc prose in shape sections at standard level | Pending | src/renderable/codecs/reference.ts |
-      | archLayer filter in DiagramScope | Pending | src/renderable/codecs/reference.ts |
+      | Remove 120-char rule description truncation | Complete | src/renderable/codecs/reference.ts |
+      | Deep behavior rendering with parsed invariant/rationale | Complete | src/renderable/codecs/reference.ts |
+      | JSDoc prose in shape sections at standard level | Complete | src/renderable/codecs/reference.ts |
+      | archLayer filter in DiagramScope | Complete | src/renderable/codecs/reference.ts |
       | Edge labels on diagram relationships | Pending | src/renderable/codecs/reference.ts |
       | Custom node shapes per archRole | Pending | src/renderable/codecs/reference.ts |
       | diagramType field in DiagramScope | Pending | src/renderable/codecs/reference.ts |
@@ -59,7 +59,7 @@ Feature: Reference Document Showcase
       | State machine diagram rendering | Pending | src/renderable/codecs/reference.ts |
       | C4 diagram rendering | Pending | src/renderable/codecs/reference.ts |
       | Class diagram rendering | Pending | src/renderable/codecs/reference.ts |
-      | List block usage for scenario names under rules | Pending | src/renderable/codecs/reference.ts |
+      | List block usage for scenario names under rules | Complete | src/renderable/codecs/reference.ts |
       | Collapsible block for progressive disclosure | Pending | src/renderable/codecs/reference.ts |
       | Link-out block for cross-references | Pending | src/renderable/codecs/reference.ts |
       | Function signature surfacing in ExportInfo | Pending | src/scanner/ast-parser.ts |

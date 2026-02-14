@@ -118,6 +118,7 @@ const DiagramScopeSchema = z
     archContext: z.array(z.string().min(1)).readonly().optional(),
     patterns: z.array(z.string().min(1)).readonly().optional(),
     archView: z.array(z.string().min(1)).readonly().optional(),
+    archLayer: z.array(z.string().min(1)).readonly().optional(),
     direction: z.enum(['TB', 'LR']).optional(),
     title: z.string().min(1).optional(),
   })

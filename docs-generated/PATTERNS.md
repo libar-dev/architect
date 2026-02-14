@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [████████████░░░░░░░░] 104/173 (60% complete)
+**Overall:** [████████████░░░░░░░░] 104/174 (60% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 104 |
 | 🚧 Active | 33 |
-| 📋 Planned | 36 |
-| **Total** | 173 |
+| 📋 Planned | 37 |
+| **Total** | 174 |
 
 ---
 
@@ -23,7 +23,7 @@
 - [Cli](#cli) (6)
 - [Config](#config) (1)
 - [Core](#core) (71)
-- [DDD](#ddd) (36)
+- [DDD](#ddd) (37)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
@@ -209,6 +209,7 @@
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
+| 📋 Reference Doc Showcase | DDD | planned | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 ScopeValidator — Pre-flight Session Readiness Checker | Status | planned | Pure function composition over ProcessStateAPI and MasterDataset. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
@@ -324,7 +325,7 @@
 
 ### DDD
 
-17/36 complete (47%)
+17/37 complete (46%)
 
 - [✅ Codec Driven Reference Generation](patterns/codec-driven-reference-generation.md)
 - [✅ Data API Architecture Queries](patterns/data-api-architecture-queries.md)
@@ -356,6 +357,7 @@
 - [📋 Generator Infrastructure Testing](patterns/generator-infrastructure-testing.md)
 - [📋 Phase Numbering Conventions](patterns/phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](patterns/prd-implementation-section.md)
+- [📋 Reference Doc Showcase](patterns/reference-doc-showcase.md)
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](patterns/status-aware-eslint-suppression.md)
@@ -570,6 +572,11 @@ graph TD
     HandoffGenerator___Session_End_State_Summary --> MasterDataset
     HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
     HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> GherkinTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    AntiPatternDetector --> GherkinTypes
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -580,14 +587,8 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> GherkinTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
-    AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -603,6 +604,7 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -614,32 +616,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    ValidatePatternsCLI --> PatternScanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DocExtractor
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> Pattern_Scanner
-    ProcessAPICLIImpl --> Doc_Extractor
-    ProcessAPICLIImpl --> Gherkin_Scanner
-    ProcessAPICLIImpl --> Gherkin_Extractor
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    ProcessAPICLIImpl ..-> ProcessStateAPICLI
-    OutputPipelineImpl --> PatternSummarizerImpl
-    OutputPipelineImpl ..-> DataAPIOutputShaping
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    LintPatternsCLI --> PatternScanner
-    TagTaxonomyCLI --> ConfigLoader
-    TagTaxonomyCLI --> TagTaxonomyGenerator
-    Documentation_Generator_CLI --> Orchestrator
-    Documentation_Generator_CLI --> Generator_Registry
-    CLIErrorHandler --> DocError
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -660,16 +646,6 @@ graph TD
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -701,6 +677,32 @@ graph TD
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
     ArchQueriesImpl ..-> DataAPIArchitectureQueries
+    ValidatePatternsCLI --> PatternScanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DocExtractor
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> Doc_Extractor
+    ProcessAPICLIImpl --> Gherkin_Scanner
+    ProcessAPICLIImpl --> Gherkin_Extractor
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    ProcessAPICLIImpl ..-> ProcessStateAPICLI
+    OutputPipelineImpl --> PatternSummarizerImpl
+    OutputPipelineImpl ..-> DataAPIOutputShaping
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    LintPatternsCLI --> PatternScanner
+    TagTaxonomyCLI --> ConfigLoader
+    TagTaxonomyCLI --> TagTaxonomyGenerator
+    Documentation_Generator_CLI --> Orchestrator
+    Documentation_Generator_CLI --> Generator_Registry
+    CLIErrorHandler --> DocError
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -729,6 +731,9 @@ graph TD
     StreamingGitDiff -.-> ProcessGuardLinter
     ScopedArchitecturalView -.-> ArchitectureDiagramGeneration
     ScopedArchitecturalView -.-> ShapeExtraction
+    ReferenceDocShowcase -.-> CodecDrivenReferenceGeneration
+    ReferenceDocShowcase -.-> ScopedArchitecturalView
+    ReferenceDocShowcase -.-> ShapeExtraction
     DocGenerationProofOfConcept -.-> ShapeExtraction
     DataAPIDesignSessionSupport -.-> DataAPIContextAssembly
     DataAPIDesignSessionSupport -.-> DataAPIStubIntegration

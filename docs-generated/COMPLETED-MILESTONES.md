@@ -11,7 +11,7 @@
 | --- | --- |
 | Completed Patterns | 104 |
 | Completed Phases | 2 |
-| Total Phases | 13 |
+| Total Phases | 14 |
 
 ---
 

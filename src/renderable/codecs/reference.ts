@@ -36,6 +36,7 @@ import {
   separator,
   table,
   code,
+  list,
   mermaid,
   document,
 } from '../schema.js';
@@ -48,6 +49,7 @@ import {
 } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { extractConventions, type ConventionBundle } from './convention-extractor.js';
+import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset } from './shape-matcher.js';
 import { sanitizeNodeId, EDGE_STYLES } from './diagram-utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
@@ -73,6 +75,9 @@ export interface DiagramScope {
 
   /** Named architectural views to include (matches pattern.archView entries) */
   readonly archView?: readonly string[];
+
+  /** Architectural layers to include (matches pattern.archLayer) */
+  readonly archLayer?: readonly string[];
 
   /** Mermaid graph direction (default: 'TB') */
   readonly direction?: 'TB' | 'LR';
@@ -300,11 +305,50 @@ function buildBehaviorSections(
     }
 
     if (pattern.rules && pattern.rules.length > 0) {
-      const ruleRows = pattern.rules.map((r) => [
-        r.name,
-        r.description ? r.description.substring(0, 120) : '',
-      ]);
-      sections.push(table(['Rule', 'Description'], ruleRows));
+      if (detailLevel === 'summary') {
+        // Compact table with word-boundary-aware truncation
+        const ruleRows = pattern.rules.map((r) => [
+          r.name,
+          r.description ? truncateText(r.description, 120) : '',
+        ]);
+        sections.push(table(['Rule', 'Description'], ruleRows));
+      } else {
+        // Structured per-rule rendering with parsed annotations
+        for (const rule of pattern.rules) {
+          sections.push(heading(4, rule.name));
+          const annotations = parseBusinessRuleAnnotations(rule.description);
+
+          if (annotations.invariant) {
+            sections.push(paragraph(`**Invariant:** ${annotations.invariant}`));
+          }
+
+          if (annotations.rationale && detailLevel === 'detailed') {
+            sections.push(paragraph(`**Rationale:** ${annotations.rationale}`));
+          }
+
+          if (annotations.remainingContent) {
+            sections.push(paragraph(annotations.remainingContent));
+          }
+
+          if (annotations.codeExamples && detailLevel === 'detailed') {
+            for (const example of annotations.codeExamples) {
+              sections.push(example);
+            }
+          }
+
+          // Merged scenario names + verifiedBy as deduplicated list
+          const names = new Set(rule.scenarioNames);
+          if (annotations.verifiedBy) {
+            for (const v of annotations.verifiedBy) {
+              names.add(v);
+            }
+          }
+          if (names.size > 0) {
+            sections.push(paragraph('**Verified by:**'));
+            sections.push(list([...names]));
+          }
+        }
+      }
     }
   }
 
@@ -339,7 +383,7 @@ function buildShapeSections(
     for (const shape of shapes) {
       sections.push(heading(3, `${shape.name} (${shape.kind})`));
 
-      if (shape.jsDoc && detailLevel === 'detailed') {
+      if (shape.jsDoc) {
         sections.push(paragraph(shape.jsDoc));
       }
 
@@ -368,12 +412,14 @@ function collectScopePatterns(dataset: MasterDataset, scope: DiagramScope): Extr
   const nameSet = new Set(scope.patterns ?? []);
   const contextSet = new Set(scope.archContext ?? []);
   const viewSet = new Set(scope.archView ?? []);
+  const layerSet = new Set(scope.archLayer ?? []);
 
   return dataset.patterns.filter((p) => {
     const name = getPatternName(p);
     if (nameSet.has(name)) return true;
     if (p.archContext !== undefined && contextSet.has(p.archContext)) return true;
     if (p.archView?.some((v) => viewSet.has(v)) === true) return true;
+    if (p.archLayer !== undefined && layerSet.has(p.archLayer)) return true;
     return false;
   });
 }
