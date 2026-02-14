@@ -15,7 +15,7 @@ import type { ExtractedPattern } from '../../validation-schemas/index.js';
 import type { DetailLevel } from '../../renderable/codecs/types/base.js';
 import type { RenderableDocument } from '../../renderable/schema.js';
 import type { GeneratorRegistry } from '../registry.js';
-import { renderToMarkdown } from '../../renderable/render.js';
+import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
 import {
   createReferenceCodec,
   type ReferenceDocConfig,
@@ -210,7 +210,9 @@ class ReferenceDocGenerator implements DocumentGenerator {
     // Cast needed: Zod codec infers optional props as `T | undefined`,
     // but RenderableDocument uses exactOptionalPropertyTypes
     const doc = codec.decode(context.masterDataset) as RenderableDocument;
-    const content = renderToMarkdown(doc);
+    // Summary-level output (for _claude-md/) uses token-efficient renderer
+    const render = this.detailLevel === 'summary' ? renderToClaudeContext : renderToMarkdown;
+    const content = render(doc);
 
     return Promise.resolve({
       files: [{ path: this.outputPath, content }],
@@ -279,7 +281,7 @@ class ReferenceDocsGenerator implements DocumentGenerator {
       const summaryDoc = summaryCodec.decode(context.masterDataset) as RenderableDocument;
       files.push({
         path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-        content: renderToMarkdown(summaryDoc),
+        content: renderToClaudeContext(summaryDoc),
       });
     }
 

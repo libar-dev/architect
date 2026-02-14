@@ -399,6 +399,40 @@ Feature: Reference Document Codec
       Then the mermaid content contains a start pseudo-state transition
       And the mermaid content contains an end pseudo-state transition
 
+    @acceptance-criteria @happy-path
+    Scenario: C4 diagram renders system boundary format
+      Given a reference config with diagramScope archContext "orders" and diagramType "C4Context"
+      And a MasterDataset with patterns in context "orders" with uses relationships
+      When decoding at detail level "detailed"
+      Then the mermaid content starts with "C4Context"
+      And the mermaid content contains a Boundary block for "orders"
+      And the mermaid content contains System declarations
+      And the mermaid content contains Rel declarations
+
+    @acceptance-criteria @happy-path
+    Scenario: C4 diagram renders neighbor patterns as external systems
+      Given a reference config with diagramScope archContext "orders" and diagramType "C4Context"
+      And a MasterDataset with an orders pattern that uses an external pattern
+      When decoding at detail level "detailed"
+      Then the mermaid content contains a System_Ext declaration
+
+    @acceptance-criteria @happy-path
+    Scenario: Class diagram renders class members and relationships
+      Given a reference config with diagramScope archContext "orders" and diagramType "classDiagram"
+      And a MasterDataset with patterns in context "orders" with uses relationships
+      When decoding at detail level "detailed"
+      Then the mermaid content starts with "classDiagram"
+      And the mermaid content contains class declarations with members
+      And the mermaid content contains relationship arrows
+
+    @acceptance-criteria @happy-path
+    Scenario: Class diagram renders archRole as stereotype
+      Given a reference config with diagramScope archContext "orders" and diagramType "classDiagram"
+      And a MasterDataset with a service pattern and a projection pattern in context "orders"
+      When decoding at detail level "detailed"
+      Then the mermaid content contains a service stereotype
+      And the mermaid content contains a projection stereotype
+
   Rule: Edge labels and custom node shapes enrich diagram readability
 
     **Invariant:** Relationship edges display labels describing the relationship
@@ -443,3 +477,76 @@ Feature: Reference Document Codec
       And a MasterDataset with a pattern without archRole in context "orders"
       When decoding at detail level "detailed"
       Then the node uses default rectangle syntax
+
+  Rule: Collapsible blocks wrap behavior rules for progressive disclosure
+
+    **Invariant:** When a behavior pattern has 3 or more rules and detail level
+    is not summary, each rule's content is wrapped in a collapsible block with the
+    rule name and scenario count in the summary. Patterns with fewer than 3 rules
+    render rules flat. Summary level never produces collapsible blocks.
+
+    **Rationale:** Behavior sections with many rules produce substantial content at
+    detailed level. Collapsible blocks enable progressive disclosure so readers can
+    expand only the rules they need.
+
+    **Verified by:** Many rules use collapsible at detailed level,
+    Few rules render flat,
+    Summary level suppresses collapsible
+
+    @acceptance-criteria @happy-path
+    Scenario: Behavior pattern with many rules uses collapsible blocks at detailed level
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with 3 structured rules
+      When decoding at detail level "detailed"
+      Then the document contains at least 1 collapsible block
+      And each collapsible block summary includes a rule name
+
+    @acceptance-criteria @happy-path
+    Scenario: Behavior pattern with few rules does not use collapsible blocks
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with 2 structured rules
+      When decoding at detail level "detailed"
+      Then the document does not contain collapsible blocks
+
+    @acceptance-criteria @happy-path
+    Scenario: Summary level never produces collapsible blocks
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern with 3 structured rules
+      When decoding at detail level "summary"
+      Then the document does not contain collapsible blocks
+
+  Rule: Link-out blocks provide source file cross-references
+
+    **Invariant:** At standard and detailed levels, each behavior pattern includes
+    a link-out block referencing its source file path. At summary level, link-out
+    blocks are omitted for compact output.
+
+    **Rationale:** Cross-reference links enable readers to navigate from generated
+    documentation to the annotated source files, closing the loop between generated
+    docs and the single source of truth.
+
+    **Verified by:** Detailed level includes source link-out,
+    Standard level includes source link-out,
+    Summary level omits link-out
+
+    @acceptance-criteria @happy-path
+    Scenario: Behavior pattern includes source file link-out at detailed level
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern in category "process-guard"
+      When decoding at detail level "detailed"
+      Then the document contains at least 1 link-out block
+      And the link-out path references a source file
+
+    @acceptance-criteria @happy-path
+    Scenario: Standard level includes source file link-out
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern in category "process-guard"
+      When decoding at detail level "standard"
+      Then the document contains at least 1 link-out block
+
+    @acceptance-criteria @happy-path
+    Scenario: Summary level omits link-out blocks
+      Given a reference config with convention tags "" and behavior tags "process-guard"
+      And a MasterDataset with a behavior pattern in category "process-guard"
+      When decoding at detail level "summary"
+      Then the document does not contain link-out blocks

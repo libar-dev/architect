@@ -313,3 +313,80 @@ Feature: Universal Markdown Renderer
       | Some text          |
       | ---                |
       | ## Section 2       |
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Claude Context Renderer
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  @happy-path
+  Scenario: Claude context renders title and headings as section markers
+    Given a document with title "Test Document"
+    And the document has sections:
+      | type      | content      |
+      | heading   | Section One  |
+      | paragraph | Body text    |
+    When rendering to claude context
+    Then the claude context output contains "=== TEST DOCUMENT ==="
+    And the claude context output contains "=== SECTION ONE ==="
+    And the claude context output does not contain "#"
+
+  Scenario: Claude context renders sub-headings with different markers
+    Given a document with title "Doc"
+    And the document has a heading at level 3 with text "Sub Section"
+    When rendering to claude context
+    Then the claude context output contains "--- Sub Section ---"
+    And the claude context output does not contain "=== SUB SECTION ==="
+
+  Scenario: Claude context omits mermaid blocks
+    Given a document with title "Diagram Doc"
+    And the document has a mermaid block:
+      """
+      graph TD
+        A --> B
+      """
+    When rendering to claude context
+    Then the claude context output does not contain any of:
+      | text     |
+      | mermaid  |
+      | graph TD |
+
+  Scenario: Claude context flattens collapsible blocks
+    Given a document with title "Collapsible Doc"
+    And a collapsible block with summary "Click to expand"
+    And the collapsible contains a paragraph "Hidden content here"
+    When rendering to claude context
+    Then the claude context output contains all of:
+      | text                    |
+      | Hidden content here     |
+      | --- Click to expand --- |
+    And the claude context output does not contain any of:
+      | text       |
+      | <details>  |
+      | <summary>  |
+
+  Scenario: Claude context renders link-out as plain text
+    Given a document with title "Link Doc"
+    And the document has a link-out "See details" to "patterns/core.md"
+    When rendering to claude context
+    Then the claude context output contains "-> See details"
+    And the claude context output does not contain "[See details]"
+
+  Scenario: Claude context omits separator tokens
+    Given a document with title "Sep Doc"
+    And the document has sections:
+      | type      | content  |
+      | paragraph | Before   |
+      | separator |          |
+      | paragraph | After    |
+    When rendering to claude context
+    Then the claude context output contains all of:
+      | text   |
+      | Before |
+      | After  |
+    And the claude context output does not contain "---"
+
+  Scenario: Claude context produces fewer characters than markdown
+    Given a document with title "Doc" and a mermaid block and collapsible
+    When rendering to markdown
+    And rendering to claude context
+    Then the claude context output is shorter than the markdown output

@@ -28,14 +28,23 @@ export default defineConfig({
   referenceDocConfigs: [
     {
       title: 'Reference Generation Sample',
-      conventionTags: ['reference-sample'],
-      shapeSources: ['src/taxonomy/risk-levels.ts'],
+      conventionTags: ['reference-sample', 'output-format'],
+      shapeSources: ['src/taxonomy/risk-levels.ts', 'src/renderable/schema.ts'],
       behaviorCategories: ['infra'],
-      diagramScope: {
-        archView: ['reference-sample'],
-        direction: 'TB',
-        title: 'Configuration Components',
-      },
+      diagramScopes: [
+        {
+          archView: ['reference-sample'],
+          direction: 'TB',
+          title: 'Configuration Components',
+        },
+        {
+          archContext: ['renderer'],
+          direction: 'LR',
+          title: 'Renderer Pipeline',
+          diagramType: 'sequenceDiagram',
+          showEdgeLabels: true,
+        },
+      ],
       claudeMdSection: 'architecture',
       docsFilename: 'REFERENCE-SAMPLE.md',
       claudeMdFilename: 'reference-sample.md',

@@ -8,6 +8,7 @@ import { loadFeature, describeFeature } from '@amiceli/vitest-cucumber';
 import { expect } from 'vitest';
 import {
   renderToMarkdown,
+  renderToClaudeContext,
   renderDocumentWithFiles,
   type OutputFile,
 } from '../../../src/renderable/render.js';
@@ -39,6 +40,7 @@ interface RenderScenarioState {
 
   // Results
   markdown: string;
+  claudeContext: string;
   outputFiles: OutputFile[];
 
   // Collapsible builder state
@@ -57,6 +59,7 @@ function initState(): RenderScenarioState {
     doc: null,
     sections: [],
     markdown: '',
+    claudeContext: '',
     outputFiles: [],
     collapsibleSummary: '',
     collapsibleContent: [],
@@ -724,4 +727,258 @@ describeFeature(feature, ({ Scenario, ScenarioOutline, Background, AfterEachScen
       }
     });
   });
+
+  // ===========================================================================
+  // Claude Context Renderer
+  // ===========================================================================
+
+  Scenario(
+    'Claude context renders title and headings as section markers',
+    ({ Given, When, Then, And }) => {
+      Given('a document with title {string}', (_ctx: unknown, title: string) => {
+        state!.sections = [];
+        state!.doc = document(title, []);
+      });
+
+      And('the document has sections:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        for (const row of dataTable) {
+          switch (row.type) {
+            case 'heading':
+              state!.sections.push(heading(2, row.content));
+              break;
+            case 'paragraph':
+              state!.sections.push(paragraph(row.content));
+              break;
+            case 'separator':
+              state!.sections.push(separator());
+              break;
+          }
+        }
+        state!.doc = document(state!.doc!.title, state!.sections);
+      });
+
+      When('rendering to claude context', () => {
+        state!.claudeContext = renderToClaudeContext(state!.doc!);
+      });
+
+      Then('the claude context output contains {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.claudeContext).toContain(expected);
+      });
+
+      And('the claude context output contains {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.claudeContext).toContain(expected);
+      });
+
+      And(
+        'the claude context output does not contain {string}',
+        (_ctx: unknown, notExpected: string) => {
+          expect(state!.claudeContext).not.toContain(notExpected);
+        }
+      );
+    }
+  );
+
+  Scenario(
+    'Claude context renders sub-headings with different markers',
+    ({ Given, When, Then, And }) => {
+      Given('a document with title {string}', (_ctx: unknown, title: string) => {
+        state!.doc = document(title, []);
+      });
+
+      And(
+        'the document has a heading at level {int} with text {string}',
+        (_ctx: unknown, level: number, text: string) => {
+          state!.doc = document(state!.doc!.title, [{ type: 'heading', level, text }]);
+        }
+      );
+
+      When('rendering to claude context', () => {
+        state!.claudeContext = renderToClaudeContext(state!.doc!);
+      });
+
+      Then('the claude context output contains {string}', (_ctx: unknown, expected: string) => {
+        expect(state!.claudeContext).toContain(expected);
+      });
+
+      And(
+        'the claude context output does not contain {string}',
+        (_ctx: unknown, notExpected: string) => {
+          expect(state!.claudeContext).not.toContain(notExpected);
+        }
+      );
+    }
+  );
+
+  Scenario('Claude context omits mermaid blocks', ({ Given, When, Then, And }) => {
+    Given('a document with title {string}', (_ctx: unknown, title: string) => {
+      state!.doc = document(title, []);
+    });
+
+    And('the document has a mermaid block:', (_ctx: unknown, docString: string) => {
+      state!.doc = document(state!.doc!.title, [mermaid(docString.trim())]);
+    });
+
+    When('rendering to claude context', () => {
+      state!.claudeContext = renderToClaudeContext(state!.doc!);
+    });
+
+    Then(
+      'the claude context output does not contain any of:',
+      (_ctx: unknown, dataTable: DataTableRow[]) => {
+        for (const row of dataTable) {
+          expect(state!.claudeContext).not.toContain(row.text);
+        }
+      }
+    );
+  });
+
+  Scenario('Claude context flattens collapsible blocks', ({ Given, When, Then, And }) => {
+    Given('a document with title {string}', (_ctx: unknown, title: string) => {
+      state!.doc = document(title, []);
+    });
+
+    And('a collapsible block with summary {string}', (_ctx: unknown, summary: string) => {
+      state!.collapsibleSummary = summary;
+      state!.collapsibleContent = [];
+    });
+
+    And('the collapsible contains a paragraph {string}', (_ctx: unknown, text: string) => {
+      state!.collapsibleContent.push(paragraph(text));
+      state!.doc = document(state!.doc!.title, [
+        collapsible(state!.collapsibleSummary, state!.collapsibleContent),
+      ]);
+    });
+
+    When('rendering to claude context', () => {
+      state!.claudeContext = renderToClaudeContext(state!.doc!);
+    });
+
+    Then(
+      'the claude context output contains all of:',
+      (_ctx: unknown, dataTable: DataTableRow[]) => {
+        for (const row of dataTable) {
+          expect(state!.claudeContext).toContain(row.text);
+        }
+      }
+    );
+
+    And(
+      'the claude context output does not contain any of:',
+      (_ctx: unknown, dataTable: DataTableRow[]) => {
+        for (const row of dataTable) {
+          expect(state!.claudeContext).not.toContain(row.text);
+        }
+      }
+    );
+  });
+
+  Scenario('Claude context renders link-out as plain text', ({ Given, When, Then, And }) => {
+    Given('a document with title {string}', (_ctx: unknown, title: string) => {
+      state!.doc = document(title, []);
+    });
+
+    And(
+      'the document has a link-out {string} to {string}',
+      (_ctx: unknown, text: string, path: string) => {
+        state!.doc = document(state!.doc!.title, [linkOut(text, path)]);
+      }
+    );
+
+    When('rendering to claude context', () => {
+      state!.claudeContext = renderToClaudeContext(state!.doc!);
+    });
+
+    Then('the claude context output contains {string}', (_ctx: unknown, expected: string) => {
+      expect(state!.claudeContext).toContain(expected);
+    });
+
+    And(
+      'the claude context output does not contain {string}',
+      (_ctx: unknown, notExpected: string) => {
+        expect(state!.claudeContext).not.toContain(notExpected);
+      }
+    );
+  });
+
+  Scenario('Claude context omits separator tokens', ({ Given, When, Then, And }) => {
+    Given('a document with title {string}', (_ctx: unknown, title: string) => {
+      state!.sections = [];
+      state!.doc = document(title, []);
+    });
+
+    And('the document has sections:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+      for (const row of dataTable) {
+        switch (row.type) {
+          case 'heading':
+            state!.sections.push(heading(2, row.content));
+            break;
+          case 'paragraph':
+            state!.sections.push(paragraph(row.content));
+            break;
+          case 'separator':
+            state!.sections.push(separator());
+            break;
+        }
+      }
+      state!.doc = document(state!.doc!.title, state!.sections);
+    });
+
+    When('rendering to claude context', () => {
+      state!.claudeContext = renderToClaudeContext(state!.doc!);
+    });
+
+    Then(
+      'the claude context output contains all of:',
+      (_ctx: unknown, dataTable: DataTableRow[]) => {
+        for (const row of dataTable) {
+          expect(state!.claudeContext).toContain(row.text);
+        }
+      }
+    );
+
+    And(
+      'the claude context output does not contain {string}',
+      (_ctx: unknown, notExpected: string) => {
+        expect(state!.claudeContext).not.toContain(notExpected);
+      }
+    );
+  });
+
+  Scenario(
+    'Claude context produces fewer characters than markdown',
+    ({ Given, When, Then, And }) => {
+      Given(
+        'a document with title {string} and a mermaid block and collapsible',
+        (_ctx: unknown, title: string) => {
+          // Build a document with content that the Claude context renderer
+          // omits (mermaid) or simplifies (collapsible, separator, link-out),
+          // ensuring the output is genuinely shorter than markdown.
+          state!.doc = document(title, [
+            heading(2, 'Architecture'),
+            paragraph('System overview and component relationships.'),
+            mermaid(
+              'graph TD\n  A[Scanner] --> B[Extractor]\n  B --> C[Transformer]\n  C --> D[Codec]'
+            ),
+            separator(),
+            collapsible('Implementation Details', [
+              paragraph('Detailed implementation notes that are hidden by default.'),
+            ]),
+            linkOut('See full documentation', 'docs/REFERENCE.md'),
+          ]);
+        }
+      );
+
+      When('rendering to markdown', () => {
+        state!.markdown = renderToMarkdown(state!.doc!);
+      });
+
+      And('rendering to claude context', () => {
+        state!.claudeContext = renderToClaudeContext(state!.doc!);
+      });
+
+      Then('the claude context output is shorter than the markdown output', () => {
+        expect(state!.claudeContext.length).toBeLessThan(state!.markdown.length);
+      });
+    }
+  );
 });

@@ -19,6 +19,8 @@ import {
   findParagraphs,
   findTables,
   findBlocksByType,
+  findCollapsibles,
+  findLinkOuts,
 } from '../../../support/helpers/document-assertions.js';
 
 // ============================================================================
@@ -2724,6 +2726,265 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         expect(mermaidBlocks[0]!.content).toContain('--> [*]');
       });
     });
+
+    RuleScenario('C4 diagram renders system boundary format', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with diagramScope archContext {string} and diagramType {string}',
+        (_ctx: unknown, context: string, diagramType: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            diagramScope: {
+              archContext: [context],
+              diagramType: diagramType as 'C4Context',
+            },
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And(
+        'a MasterDataset with patterns in context {string} with uses relationships',
+        (_ctx: unknown, context: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'OrderService',
+                archContext: context,
+                archRole: 'service',
+                uses: ['InventoryService'],
+              }),
+              createTestPattern({
+                name: 'InventoryService',
+                archContext: context,
+                archRole: 'service',
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the mermaid content starts with {string}', (_ctx: unknown, prefix: string) => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        expect(mermaidBlocks[0]!.content.trimStart().startsWith(prefix)).toBe(true);
+      });
+
+      And(
+        'the mermaid content contains a Boundary block for {string}',
+        (_ctx: unknown, context: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain('Boundary(');
+          expect(content).toContain(context.charAt(0).toUpperCase() + context.slice(1));
+        }
+      );
+
+      And('the mermaid content contains System declarations', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks[0]!.content).toContain('System(');
+      });
+
+      And('the mermaid content contains Rel declarations', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks[0]!.content).toContain('Rel(');
+      });
+    });
+
+    RuleScenario(
+      'C4 diagram renders neighbor patterns as external systems',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archContext {string} and diagramType {string}',
+          (_ctx: unknown, context: string, diagramType: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: {
+                archContext: [context],
+                diagramType: diagramType as 'C4Context',
+              },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with an orders pattern that uses an external pattern', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'OrderService',
+                archContext: 'orders',
+                archRole: 'service',
+                uses: ['PaymentGateway'],
+              }),
+              createTestPattern({
+                name: 'PaymentGateway',
+                archContext: 'payments',
+                archRole: 'infrastructure',
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the mermaid content contains a System_Ext declaration', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          expect(mermaidBlocks[0]!.content).toContain('System_Ext(');
+        });
+      }
+    );
+
+    RuleScenario(
+      'Class diagram renders class members and relationships',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archContext {string} and diagramType {string}',
+          (_ctx: unknown, context: string, diagramType: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: {
+                archContext: [context],
+                diagramType: diagramType as 'classDiagram',
+              },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And(
+          'a MasterDataset with patterns in context {string} with uses relationships',
+          (_ctx: unknown, context: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'OrderService',
+                  archContext: context,
+                  archRole: 'service',
+                  uses: ['InventoryService'],
+                }),
+                createTestPattern({
+                  name: 'InventoryService',
+                  archContext: context,
+                  archRole: 'service',
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the mermaid content starts with {string}', (_ctx: unknown, prefix: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          expect(mermaidBlocks[0]!.content.trimStart().startsWith(prefix)).toBe(true);
+        });
+
+        And('the mermaid content contains class declarations with members', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain('class ');
+          expect(content).toContain('{');
+        });
+
+        And('the mermaid content contains relationship arrows', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain('..>');
+        });
+      }
+    );
+
+    RuleScenario('Class diagram renders archRole as stereotype', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with diagramScope archContext {string} and diagramType {string}',
+        (_ctx: unknown, context: string, diagramType: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            diagramScope: {
+              archContext: [context],
+              diagramType: diagramType as 'classDiagram',
+            },
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And(
+        'a MasterDataset with a service pattern and a projection pattern in context {string}',
+        (_ctx: unknown, context: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'OrderHandler',
+                archContext: context,
+                archRole: 'service',
+              }),
+              createTestPattern({
+                name: 'OrderProjection',
+                archContext: context,
+                archRole: 'projection',
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the mermaid content contains a service stereotype', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks[0]!.content).toContain('<<service>>');
+      });
+
+      And('the mermaid content contains a projection stereotype', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks[0]!.content).toContain('<<projection>>');
+      });
+    });
   });
 
   // ──────────────────────────────────────────────────────────────────────
@@ -2956,5 +3217,300 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
       }
     );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Collapsible blocks wrap behavior rules for progressive disclosure
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Collapsible blocks wrap behavior rules for progressive disclosure', ({ RuleScenario }) => {
+    RuleScenario(
+      'Behavior pattern with many rules uses collapsible blocks at detailed level',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And(
+          'a MasterDataset with a behavior pattern with {int} structured rules',
+          (_ctx: unknown, ruleCount: number) => {
+            const rules = [];
+            for (let i = 1; i <= ruleCount; i++) {
+              rules.push({
+                name: `Rule ${i}`,
+                description: `**Invariant:** Must follow rule ${i}\n\n**Rationale:** Prevents issue ${i}`,
+                scenarioCount: 2,
+                scenarioNames: [`Scenario ${i}A`, `Scenario ${i}B`],
+              });
+            }
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'MultiRuleBehavior',
+                  category: 'process-guard',
+                  description: 'Pattern with multiple rules.',
+                  rules,
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then(
+          'the document contains at least {int} collapsible block',
+          (_ctx: unknown, count: number) => {
+            const blocks = findCollapsibles(state!.document!);
+            expect(blocks.length).toBeGreaterThanOrEqual(count);
+          }
+        );
+
+        And('each collapsible block summary includes a rule name', () => {
+          const blocks = findCollapsibles(state!.document!);
+          for (const block of blocks) {
+            expect(block.summary).toMatch(/Rule \d+/);
+          }
+        });
+      }
+    );
+
+    RuleScenario(
+      'Behavior pattern with few rules does not use collapsible blocks',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And(
+          'a MasterDataset with a behavior pattern with {int} structured rules',
+          (_ctx: unknown, ruleCount: number) => {
+            const rules = [];
+            for (let i = 1; i <= ruleCount; i++) {
+              rules.push({
+                name: `Rule ${i}`,
+                description: `**Invariant:** Must follow rule ${i}\n\n**Rationale:** Prevents issue ${i}`,
+                scenarioCount: 2,
+                scenarioNames: [`Scenario ${i}A`, `Scenario ${i}B`],
+              });
+            }
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'FewRuleBehavior',
+                  category: 'process-guard',
+                  description: 'Pattern with few rules.',
+                  rules,
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document does not contain collapsible blocks', () => {
+          const blocks = findCollapsibles(state!.document!);
+          expect(blocks.length).toBe(0);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Summary level never produces collapsible blocks',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And(
+          'a MasterDataset with a behavior pattern with {int} structured rules',
+          (_ctx: unknown, ruleCount: number) => {
+            const rules = [];
+            for (let i = 1; i <= ruleCount; i++) {
+              rules.push({
+                name: `Rule ${i}`,
+                description: `**Invariant:** Must follow rule ${i}`,
+                scenarioCount: 0,
+                scenarioNames: [],
+              });
+            }
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'SummaryBehavior',
+                  category: 'process-guard',
+                  description: 'Pattern for summary level.',
+                  rules,
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document does not contain collapsible blocks', () => {
+          const blocks = findCollapsibles(state!.document!);
+          expect(blocks.length).toBe(0);
+        });
+      }
+    );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Link-out blocks provide source file cross-references
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Link-out blocks provide source file cross-references', ({ RuleScenario }) => {
+    RuleScenario(
+      'Behavior pattern includes source file link-out at detailed level',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And(
+          'a MasterDataset with a behavior pattern in category {string}',
+          (_ctx: unknown, category: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'LinkOutBehavior',
+                  category,
+                  description: 'Pattern for link-out testing.',
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then(
+          'the document contains at least {int} link-out block',
+          (_ctx: unknown, count: number) => {
+            const blocks = findLinkOuts(state!.document!);
+            expect(blocks.length).toBeGreaterThanOrEqual(count);
+          }
+        );
+
+        And('the link-out path references a source file', () => {
+          const blocks = findLinkOuts(state!.document!);
+          expect(blocks.length).toBeGreaterThan(0);
+          const hasSourceRef = blocks.some(
+            (b) => b.path.endsWith('.ts') || b.path.endsWith('.feature')
+          );
+          expect(hasSourceRef).toBe(true);
+        });
+      }
+    );
+
+    RuleScenario('Standard level includes source file link-out', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with convention tags {string} and behavior tags {string}',
+        (_ctx: unknown, convTags: string, behTags: string) => {
+          state!.config = makeConfig(convTags, behTags);
+        }
+      );
+
+      And(
+        'a MasterDataset with a behavior pattern in category {string}',
+        (_ctx: unknown, category: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LinkOutStandard',
+                category,
+                description: 'Pattern for standard level link-out.',
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then(
+        'the document contains at least {int} link-out block',
+        (_ctx: unknown, count: number) => {
+          const blocks = findLinkOuts(state!.document!);
+          expect(blocks.length).toBeGreaterThanOrEqual(count);
+        }
+      );
+    });
+
+    RuleScenario('Summary level omits link-out blocks', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with convention tags {string} and behavior tags {string}',
+        (_ctx: unknown, convTags: string, behTags: string) => {
+          state!.config = makeConfig(convTags, behTags);
+        }
+      );
+
+      And(
+        'a MasterDataset with a behavior pattern in category {string}',
+        (_ctx: unknown, category: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LinkOutSummary',
+                category,
+                description: 'Pattern for summary level link-out.',
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document does not contain link-out blocks', () => {
+        const blocks = findLinkOuts(state!.document!);
+        expect(blocks.length).toBe(0);
+      });
+    });
   });
 });

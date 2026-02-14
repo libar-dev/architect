@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ReferenceDocShowcase
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:30
 @libar-docs-effort:13d
 @libar-docs-product-area:DeliveryProcess
@@ -57,21 +57,21 @@ Feature: Reference Document Showcase
       | diagramType field in DiagramScope | Complete | src/renderable/codecs/reference.ts |
       | Sequence diagram rendering | Complete | src/renderable/codecs/reference.ts |
       | State machine diagram rendering | Complete | src/renderable/codecs/reference.ts |
-      | C4 diagram rendering | Pending | src/renderable/codecs/reference.ts |
-      | Class diagram rendering | Pending | src/renderable/codecs/reference.ts |
+      | C4 diagram rendering | Complete | src/renderable/codecs/reference.ts |
+      | Class diagram rendering | Complete | src/renderable/codecs/reference.ts |
       | List block usage for scenario names under rules | Complete | src/renderable/codecs/reference.ts |
-      | Collapsible block for progressive disclosure | Pending | src/renderable/codecs/reference.ts |
-      | Link-out block for cross-references | Pending | src/renderable/codecs/reference.ts |
+      | Collapsible block for progressive disclosure | Complete | src/renderable/codecs/reference.ts |
+      | Link-out block for cross-references | Complete | src/renderable/codecs/reference.ts |
       | Function signature surfacing in ExportInfo | Complete | src/scanner/ast-parser.ts |
       | Param/returns/throws extraction from JSDoc | Complete | src/extractor/shape-extractor.ts |
       | Full property-level JSDoc without truncation | Complete | src/extractor/shape-extractor.ts |
       | Auto-shape discovery mode | Complete | src/extractor/shape-extractor.ts |
       | Convention content from TypeScript JSDoc | Complete | src/scanner/ast-parser.ts |
       | CompositeCodec for multi-codec assembly | Complete | src/renderable/codecs/ |
-      | renderToClaudeContext renderer | Pending | src/renderable/ |
+      | renderToClaudeContext renderer | Complete | src/renderable/ |
       | Data-driven Gherkin tag extraction | Complete | src/scanner/gherkin-ast-parser.ts |
-      | Expanded sample config with all content sources | Pending | delivery-process.config.ts |
-      | Sample convention decision with rich content | Pending | delivery-process/decisions/ |
+      | Expanded sample config with all content sources | Complete | delivery-process.config.ts |
+      | Sample convention decision with rich content | Complete | delivery-process/decisions/ |
 
   Rule: Deep behavior rendering replaces shallow truncation
 

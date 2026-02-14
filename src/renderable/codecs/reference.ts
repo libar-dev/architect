@@ -38,6 +38,8 @@ import {
   code,
   list,
   mermaid,
+  collapsible,
+  linkOut,
   document,
 } from '../schema.js';
 import {
@@ -92,7 +94,12 @@ export interface DiagramScope {
   readonly title?: string;
 
   /** Mermaid diagram type (default: 'graph' for flowchart) */
-  readonly diagramType?: 'graph' | 'sequenceDiagram' | 'stateDiagram-v2';
+  readonly diagramType?:
+    | 'graph'
+    | 'sequenceDiagram'
+    | 'stateDiagram-v2'
+    | 'C4Context'
+    | 'classDiagram';
 
   /** Show relationship type labels on edges (default: true) */
   readonly showEdgeLabels?: boolean;
@@ -312,6 +319,11 @@ function buildBehaviorSections(
   for (const pattern of matchingPatterns) {
     sections.push(heading(3, pattern.name));
 
+    // Cross-reference link to source file (omitted at summary level)
+    if (detailLevel !== 'summary') {
+      sections.push(linkOut(`View ${pattern.name} source`, pattern.source.file));
+    }
+
     if (pattern.directive.description && detailLevel !== 'summary') {
       sections.push(paragraph(pattern.directive.description));
     }
@@ -326,25 +338,29 @@ function buildBehaviorSections(
         sections.push(table(['Rule', 'Description'], ruleRows));
       } else {
         // Structured per-rule rendering with parsed annotations
+        // Wrap in collapsible blocks when 3+ rules for progressive disclosure
+        const wrapInCollapsible = pattern.rules.length >= 3;
+
         for (const rule of pattern.rules) {
-          sections.push(heading(4, rule.name));
+          const ruleBlocks: SectionBlock[] = [];
+          ruleBlocks.push(heading(4, rule.name));
           const annotations = parseBusinessRuleAnnotations(rule.description);
 
           if (annotations.invariant) {
-            sections.push(paragraph(`**Invariant:** ${annotations.invariant}`));
+            ruleBlocks.push(paragraph(`**Invariant:** ${annotations.invariant}`));
           }
 
           if (annotations.rationale && detailLevel === 'detailed') {
-            sections.push(paragraph(`**Rationale:** ${annotations.rationale}`));
+            ruleBlocks.push(paragraph(`**Rationale:** ${annotations.rationale}`));
           }
 
           if (annotations.remainingContent) {
-            sections.push(paragraph(annotations.remainingContent));
+            ruleBlocks.push(paragraph(annotations.remainingContent));
           }
 
           if (annotations.codeExamples && detailLevel === 'detailed') {
             for (const example of annotations.codeExamples) {
-              sections.push(example);
+              ruleBlocks.push(example);
             }
           }
 
@@ -356,8 +372,17 @@ function buildBehaviorSections(
             }
           }
           if (names.size > 0) {
-            sections.push(paragraph('**Verified by:**'));
-            sections.push(list([...names]));
+            ruleBlocks.push(paragraph('**Verified by:**'));
+            ruleBlocks.push(list([...names]));
+          }
+
+          if (wrapInCollapsible) {
+            const scenarioCount = rule.scenarioNames.length;
+            const summary =
+              scenarioCount > 0 ? `${rule.name} (${scenarioCount} scenarios)` : rule.name;
+            sections.push(collapsible(summary, ruleBlocks));
+          } else {
+            sections.push(...ruleBlocks);
           }
         }
       }
@@ -749,6 +774,156 @@ function buildStateDiagram(ctx: DiagramContext, scope: DiagramScope): string[] {
   return lines;
 }
 
+/** Build a Mermaid C4 context diagram with system boundaries */
+function buildC4Diagram(ctx: DiagramContext, scope: DiagramScope): string[] {
+  const showLabels = scope.showEdgeLabels !== false;
+  const lines: string[] = ['C4Context'];
+
+  if (scope.title !== undefined) {
+    lines.push(`    title ${scope.title}`);
+  }
+
+  // Group scope patterns by archContext for system boundaries
+  const byContext = new Map<string, ExtractedPattern[]>();
+  const noContext: ExtractedPattern[] = [];
+  for (const pattern of ctx.scopePatterns) {
+    if (pattern.archContext !== undefined) {
+      const group = byContext.get(pattern.archContext) ?? [];
+      group.push(pattern);
+      byContext.set(pattern.archContext, group);
+    } else {
+      noContext.push(pattern);
+    }
+  }
+
+  // Emit system boundaries
+  for (const [context, patterns] of [...byContext.entries()].sort((a, b) =>
+    a[0].localeCompare(b[0])
+  )) {
+    const contextLabel = context.charAt(0).toUpperCase() + context.slice(1);
+    const contextId = sanitizeNodeId(context);
+    lines.push(`    Boundary(${contextId}, "${contextLabel}") {`);
+    for (const pattern of patterns) {
+      const name = getPatternName(pattern);
+      const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+      lines.push(`        System(${nodeId}, "${name}")`);
+    }
+    lines.push('    }');
+  }
+
+  // Emit standalone systems (no context)
+  for (const pattern of noContext) {
+    const name = getPatternName(pattern);
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    System(${nodeId}, "${name}")`);
+  }
+
+  // Emit external systems for neighbor patterns
+  for (const pattern of ctx.neighborPatterns) {
+    const name = getPatternName(pattern);
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    System_Ext(${nodeId}, "${name}")`);
+  }
+
+  // Emit relationships
+  const edgeTypes = ['uses', 'dependsOn', 'implementsPatterns'] as const;
+  for (const sourceName of ctx.allNames) {
+    const sourceId = ctx.nodeIds.get(sourceName);
+    if (sourceId === undefined) continue;
+
+    const rel = ctx.relationships[sourceName];
+    if (!rel) continue;
+
+    for (const type of edgeTypes) {
+      for (const target of rel[type]) {
+        const targetId = ctx.nodeIds.get(target);
+        if (targetId !== undefined) {
+          const label = showLabels ? EDGE_LABELS[type] : '';
+          lines.push(`    Rel(${sourceId}, ${targetId}, "${label}")`);
+        }
+      }
+    }
+
+    if (rel.extendsPattern !== undefined) {
+      const targetId = ctx.nodeIds.get(rel.extendsPattern);
+      if (targetId !== undefined) {
+        const label = showLabels ? EDGE_LABELS.extendsPattern : '';
+        lines.push(`    Rel(${sourceId}, ${targetId}, "${label}")`);
+      }
+    }
+  }
+
+  return lines;
+}
+
+/** Build a Mermaid class diagram with pattern exports and relationships */
+function buildClassDiagram(ctx: DiagramContext): string[] {
+  const lines: string[] = ['classDiagram'];
+  const edgeTypes = ['uses', 'dependsOn', 'implementsPatterns'] as const;
+
+  // Class arrow styles per relationship type
+  const classArrows: Record<string, string> = {
+    uses: '..>',
+    dependsOn: '..>',
+    implementsPatterns: '..|>',
+    extendsPattern: '--|>',
+  };
+
+  // Emit class declarations for scope patterns (with members)
+  for (const pattern of ctx.scopePatterns) {
+    const name = getPatternName(pattern);
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    class ${nodeId} {`);
+
+    if (pattern.archRole !== undefined) {
+      lines.push(`        <<${pattern.archRole}>>`);
+    }
+
+    if (pattern.exports.length > 0) {
+      for (const exp of pattern.exports) {
+        lines.push(`        +${exp.name} ${exp.type}`);
+      }
+    }
+
+    lines.push('    }');
+  }
+
+  // Emit class declarations for neighbor patterns (no members)
+  for (const pattern of ctx.neighborPatterns) {
+    const name = getPatternName(pattern);
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    class ${nodeId}`);
+  }
+
+  // Emit relationship edges
+  for (const sourceName of ctx.allNames) {
+    const sourceId = ctx.nodeIds.get(sourceName);
+    if (sourceId === undefined) continue;
+
+    const rel = ctx.relationships[sourceName];
+    if (!rel) continue;
+
+    for (const type of edgeTypes) {
+      for (const target of rel[type]) {
+        const targetId = ctx.nodeIds.get(target);
+        if (targetId !== undefined) {
+          const arrow = classArrows[type] ?? '..>';
+          lines.push(`    ${sourceId} ${arrow} ${targetId} : ${EDGE_LABELS[type]}`);
+        }
+      }
+    }
+
+    if (rel.extendsPattern !== undefined) {
+      const targetId = ctx.nodeIds.get(rel.extendsPattern);
+      if (targetId !== undefined) {
+        lines.push(`    ${sourceId} --|> ${targetId} : ${EDGE_LABELS.extendsPattern}`);
+      }
+    }
+  }
+
+  return lines;
+}
+
 /**
  * Build a scoped relationship diagram from DiagramScope config.
  *
@@ -769,6 +944,12 @@ function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): Sectio
       break;
     case 'stateDiagram-v2':
       diagramLines = buildStateDiagram(ctx, scope);
+      break;
+    case 'C4Context':
+      diagramLines = buildC4Diagram(ctx, scope);
+      break;
+    case 'classDiagram':
+      diagramLines = buildClassDiagram(ctx);
       break;
     case 'graph':
     default:
