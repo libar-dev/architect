@@ -6,36 +6,34 @@
 
 ## Overview
 
-| Property       | Value                                          |
-| -------------- | ---------------------------------------------- |
-| Status         | planned                                        |
-| Product Area   | Generation                                     |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Generation |
 | Business Value | ensure generator orchestration works correctly |
-| Phase          | 104                                            |
+| Phase | 104 |
 
 ## Description
 
 **Problem:**
-Core generator infrastructure lacks behavior specs:
+  Core generator infrastructure lacks behavior specs:
+  - `src/generators/orchestrator.ts` (~420 lines) - Main entry point, untested
+  - `src/generators/registry.ts` - Registry pattern, untested
+  - `src/generators/codec-based.ts` - Adapter pattern, untested
 
-- `src/generators/orchestrator.ts` (~420 lines) - Main entry point, untested
-- `src/generators/registry.ts` - Registry pattern, untested
-- `src/generators/codec-based.ts` - Adapter pattern, untested
+  These components orchestrate all document generation but have no executable tests.
 
-These components orchestrate all document generation but have no executable tests.
+  **Solution:**
+  Create behavior specs for:
+  - Orchestrator integration (dual-source merging, error handling)
+  - Registry operations (register, get, list)
+  - CodecBasedGenerator adapter (delegation, error handling)
 
-**Solution:**
-Create behavior specs for:
-
-- Orchestrator integration (dual-source merging, error handling)
-- Registry operations (register, get, list)
-- CodecBasedGenerator adapter (delegation, error handling)
-
-**Business Value:**
-| Benefit | How |
-| Pipeline Reliability | Generation orchestration works correctly |
-| Error Visibility | Failures produce clear error messages |
-| Extension Safety | New generators integrate correctly |
+  **Business Value:**
+  | Benefit | How |
+  | Pipeline Reliability | Generation orchestration works correctly |
+  | Error Visibility | Failures produce clear error messages |
+  | Extension Safety | New generators integrate correctly |
 
 ## Acceptance Criteria
 
@@ -158,7 +156,7 @@ Create behavior specs for:
 **Orchestrator coordinates full documentation generation pipeline**
 
 **Invariant:** Orchestrator merges TypeScript and Gherkin patterns,
-handles conflicts, and produces requested document types.
+    handles conflicts, and produces requested document types.
 
     **API:** See `src/generators/orchestrator.ts`
 
@@ -169,7 +167,7 @@ _Verified by: Orchestrator merges TypeScript and Gherkin patterns, Orchestrator 
 **Registry manages generator registration and retrieval**
 
 **Invariant:** Registry prevents duplicate names, returns undefined for
-unknown generators, and lists available generators alphabetically.
+    unknown generators, and lists available generators alphabetically.
 
     **API:** See `src/generators/registry.ts`
 
@@ -180,7 +178,7 @@ _Verified by: Register generator with unique name, Duplicate registration throws
 **CodecBasedGenerator adapts codecs to generator interface**
 
 **Invariant:** Generator delegates to underlying codec for transformation.
-Missing MasterDataset produces descriptive error.
+    Missing MasterDataset produces descriptive error.
 
     **API:** See `src/generators/codec-based.ts`
 

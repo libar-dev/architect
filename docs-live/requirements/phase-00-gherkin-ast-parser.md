@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 The Gherkin AST parser extracts feature metadata, scenarios, and steps
-from .feature files for timeline generation and process documentation.
+  from .feature files for timeline generation and process documentation.
 
 ## Acceptance Criteria
 
@@ -34,40 +34,40 @@ from .feature files for timeline generation and process documentation.
 ```markdown
 @libar-docs-pattern:ProjectionCategories @libar-docs-phase:15 @libar-docs-status:roadmap
 Feature: Projection Categories
-A taxonomy that categorizes projections by purpose.
+  A taxonomy that categorizes projections by purpose.
 
-@acceptance-criteria @happy-path
-Scenario: Define a View projection
-Given a projection definition
-When category is set to "view"
-Then projection is client-exposed
+  @acceptance-criteria @happy-path
+  Scenario: Define a View projection
+    Given a projection definition
+    When category is set to "view"
+    Then projection is client-exposed
 ```
 
-| field       | value                                               |
-| ----------- | --------------------------------------------------- |
-| name        | Projection Categories                               |
+| field | value |
+| --- | --- |
+| name | Projection Categories |
 | description | A taxonomy that categorizes projections by purpose. |
-| language    | en                                                  |
+| language | en |
 
-| tag                          |
-| ---------------------------- |
+| tag |
+| --- |
 | pattern:ProjectionCategories |
-| phase:15                     |
-| status:roadmap               |
+| phase:15 |
+| status:roadmap |
 
-| field | value                    |
-| ----- | ------------------------ |
-| name  | Define a View projection |
+| field | value |
+| --- | --- |
+| name | Define a View projection |
 
-| tag                 |
-| ------------------- |
+| tag |
+| --- |
 | acceptance-criteria |
-| happy-path          |
+| happy-path |
 
-| field   | value                   |
-| ------- | ----------------------- |
-| keyword | Given                   |
-| text    | a projection definition |
+| field | value |
+| --- | --- |
+| keyword | Given |
+| text | a projection definition |
 
 **Parse multiple scenarios**
 
@@ -80,22 +80,22 @@ Then projection is client-exposed
 ```markdown
 @libar-docs-pattern:MyPattern
 Feature: My Pattern
-Description
+  Description
 
-Scenario: First scenario
-Given setup
-When action
-Then result
+  Scenario: First scenario
+    Given setup
+    When action
+    Then result
 
-Scenario: Second scenario
-Given other setup
-When other action
-Then other result
+  Scenario: Second scenario
+    Given other setup
+    When other action
+    Then other result
 ```
 
-| name            |
-| --------------- |
-| First scenario  |
+| name |
+| --- |
+| First scenario |
 | Second scenario |
 
 **Handle feature without tags**
@@ -107,10 +107,10 @@ Then other result
 
 ```markdown
 Feature: Simple Feature
-A feature without tags
+  A feature without tags
 
-Scenario: Simple scenario
-Given setup
+  Scenario: Simple scenario
+    Given setup
 ```
 
 **Return error for malformed Gherkin**
@@ -134,7 +134,6 @@ This is not valid Gherkin
 
 ```markdown
 @libar-docs-pattern:Invalid
-
 # Just a comment
 ```
 

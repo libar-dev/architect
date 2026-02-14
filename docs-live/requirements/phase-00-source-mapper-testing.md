@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The Source Mapper aggregates content from multiple source files based on
-source mapping tables parsed from decision documents. It dispatches extraction
-to appropriate handlers based on extraction method and preserves ordering.
+  source mapping tables parsed from decision documents. It dispatches extraction
+  to appropriate handlers based on extraction method and preserves ordering.
 
 ## Acceptance Criteria
 
@@ -27,9 +27,9 @@ to appropriate handlers based on extraction method and preserves ordering.
 - Then extraction should use decision extractor
 - And extracted section should have name "Intro"
 
-| Section | Source File   | Extraction Method         |
-| ------- | ------------- | ------------------------- |
-| Intro   | THIS DECISION | Decision rule description |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| Intro | THIS DECISION | Decision rule description |
 
 **Dispatch to TypeScript extractor for .ts files**
 
@@ -39,8 +39,8 @@ to appropriate handlers based on extraction method and preserves ordering.
 - Then extraction should use TypeScript extractor
 - And extracted section should have name "API Types"
 
-| Section   | Source File       | Extraction Method   |
-| --------- | ----------------- | ------------------- |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
 | API Types | src/test-types.ts | @extract-shapes tag |
 
 **Dispatch to behavior spec extractor for .feature files**
@@ -51,9 +51,9 @@ to appropriate handlers based on extraction method and preserves ordering.
 - Then extraction should use behavior spec extractor
 - And extracted section should have name "Validation Rules"
 
-| Section          | Source File                 | Extraction Method |
-| ---------------- | --------------------------- | ----------------- |
-| Validation Rules | tests/features/test.feature | Rule blocks       |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| Validation Rules | tests/features/test.feature | Rule blocks |
 
 **Extract from THIS DECISION using rule description**
 
@@ -84,11 +84,11 @@ to appropriate handlers based on extraction method and preserves ordering.
 - Then 3 sections should be extracted
 - And sections should be in mapping order
 
-| Section   | Source File                 | Extraction Method         |
-| --------- | --------------------------- | ------------------------- |
-| Intro     | THIS DECISION               | Decision rule description |
-| API Types | src/test-types.ts           | @extract-shapes tag       |
-| Rules     | tests/features/test.feature | Rule blocks               |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| Intro | THIS DECISION | Decision rule description |
+| API Types | src/test-types.ts | @extract-shapes tag |
+| Rules | tests/features/test.feature | Rule blocks |
 
 **Ordering is preserved from mapping table**
 
@@ -97,17 +97,17 @@ to appropriate handlers based on extraction method and preserves ordering.
 - When executing source mapping
 - Then sections should be in order:
 
-| Section | Source File                 | Extraction Method         |
-| ------- | --------------------------- | ------------------------- |
-| Third   | THIS DECISION               | Decision rule description |
-| First   | src/test-types.ts           | @extract-shapes tag       |
-| Second  | tests/features/test.feature | Rule blocks               |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| Third | THIS DECISION | Decision rule description |
+| First | src/test-types.ts | @extract-shapes tag |
+| Second | tests/features/test.feature | Rule blocks |
 
-| Index | Name   |
-| ----- | ------ |
-| 1     | Third  |
-| 2     | First  |
-| 3     | Second |
+| Index | Name |
+| --- | --- |
+| 1 | Third |
+| 2 | First |
+| 3 | Second |
 
 **Missing source file produces warning**
 
@@ -123,10 +123,10 @@ to appropriate handlers based on extraction method and preserves ordering.
 - Then 1 section should be extracted
 - And 1 warning should be produced
 
-| Section | Source File    | Extraction Method         |
-| ------- | -------------- | ------------------------- |
-| Present | THIS DECISION  | Decision rule description |
-| Missing | nonexistent.ts | @extract-shapes tag       |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
+| Present | THIS DECISION | Decision rule description |
+| Missing | nonexistent.ts | @extract-shapes tag |
 
 **Validation checks all files before extraction**
 
@@ -154,14 +154,14 @@ to appropriate handlers based on extraction method and preserves ordering.
 - When normalizing each method
 - Then all methods should normalize correctly
 
-| Input                     | Expected                  |
-| ------------------------- | ------------------------- |
+| Input | Expected |
+| --- | --- |
 | Decision rule description | DECISION_RULE_DESCRIPTION |
-| @extract-shapes tag       | EXTRACT_SHAPES            |
-| Rule blocks               | RULE_BLOCKS               |
+| @extract-shapes tag | EXTRACT_SHAPES |
+| Rule blocks | RULE_BLOCKS |
 | Scenario Outline Examples | SCENARIO_OUTLINE_EXAMPLES |
-| JSDoc section             | JSDOC_SECTION             |
-| Fenced code block         | FENCED_CODE_BLOCK         |
+| JSDoc section | JSDOC_SECTION |
+| Fenced code block | FENCED_CODE_BLOCK |
 
 **Unknown extraction method produces warning**
 
@@ -174,42 +174,42 @@ to appropriate handlers based on extraction method and preserves ordering.
 **Extraction methods dispatch to correct handlers**
 
 The source mapper dispatches to different extraction functions based on
-the extraction method specified in the source mapping table.
+    the extraction method specified in the source mapping table.
 
 _Verified by: Dispatch to decision extraction for THIS DECISION, Dispatch to TypeScript extractor for .ts files, Dispatch to behavior spec extractor for .feature files_
 
 **Self-references extract from current decision document**
 
 THIS DECISION markers extract content from the current decision document
-rather than requiring a separate file path.
+    rather than requiring a separate file path.
 
 _Verified by: Extract from THIS DECISION using rule description, Extract DocStrings from THIS DECISION, Extract full document from THIS DECISION_
 
 **Multiple sources are aggregated in mapping order**
 
 Multiple source mappings result in content extraction from each file.
-The aggregated content preserves the order from the mapping table.
+    The aggregated content preserves the order from the mapping table.
 
 _Verified by: Aggregate from multiple sources, Ordering is preserved from mapping table_
 
 **Missing files produce warnings without failing**
 
 A referenced source file that does not exist produces a warning,
-but generation continues with available sources.
+    but generation continues with available sources.
 
 _Verified by: Missing source file produces warning, Partial extraction when some files missing, Validation checks all files before extraction_
 
 **Empty extraction results produce info warnings**
 
 Extraction that succeeds but produces no content (e.g., no shapes found)
-results in an informational warning being logged.
+    results in an informational warning being logged.
 
 _Verified by: Empty shapes extraction produces info warning, No matching rules produces info warning_
 
 **Extraction methods are normalized for dispatch**
 
 The extraction method column can be written in various formats
-and is normalized before dispatch.
+    and is normalized before dispatch.
 
 _Verified by: Normalize various extraction method formats, Unknown extraction method produces warning_
 

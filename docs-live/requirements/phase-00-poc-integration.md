@@ -6,18 +6,18 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 End-to-end integration tests that exercise the full documentation generation
-pipeline using the actual POC decision document and real source files.
+  pipeline using the actual POC decision document and real source files.
 
-This validates that all 11 source mappings from the POC decision document
-work correctly with real project files.
+  This validates that all 11 source mappings from the POC decision document
+  work correctly with real project files.
 
 ## Acceptance Criteria
 

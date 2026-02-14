@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Assembles reference documents from multiple codec outputs by
-concatenating RenderableDocument sections. Enables building
-documents composed from any combination of existing codecs.
+  concatenating RenderableDocument sections. Enables building
+  documents composed from any combination of existing codecs.
 
 ## Acceptance Criteria
 
@@ -82,7 +82,7 @@ documents composed from any combination of existing codecs.
 **CompositeCodec concatenates sections in codec array order**
 
 **Invariant:** Sections from child codecs appear in the composite
-output in the same order as the codecs array.
+    output in the same order as the codecs array.
 
     **Verified by:** Sections from two codecs appear in order,
     Three codecs produce sections in array order
@@ -92,8 +92,8 @@ _Verified by: Sections from two codecs appear in order, Three codecs produce sec
 **Separators between codec outputs are configurable**
 
 **Invariant:** By default, a separator block is inserted between
-each child codec's sections. When separateSections is false, no
-separators are added.
+    each child codec's sections. When separateSections is false, no
+    separators are added.
 
     **Verified by:** Default separator between sections,
     No separator when disabled
@@ -103,7 +103,7 @@ _Verified by: Default separator between sections, No separator when disabled_
 **additionalFiles merge with last-wins semantics**
 
 **Invariant:** additionalFiles from all children are merged into
-a single record. When keys collide, the later codec's value wins.
+    a single record. When keys collide, the later codec's value wins.
 
     **Verified by:** Non-overlapping files merged,
     Colliding keys use last-wins
@@ -113,7 +113,7 @@ _Verified by: Non-overlapping files merged, Colliding keys use last-wins_
 **composeDocuments works at document level without codecs**
 
 **Invariant:** composeDocuments accepts RenderableDocument array and
-produces a composed RenderableDocument without requiring codecs.
+    produces a composed RenderableDocument without requiring codecs.
 
     **Verified by:** Direct document composition
 
@@ -122,7 +122,7 @@ _Verified by: Direct document composition_
 **Empty codec outputs are handled gracefully**
 
 **Invariant:** Codecs producing empty sections arrays contribute
-nothing to the output. No separator is emitted for empty outputs.
+    nothing to the output. No separator is emitted for empty outputs.
 
     **Verified by:** Empty codec skipped without separator
 

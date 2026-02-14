@@ -6,24 +6,23 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | planned    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
 | Product Area | Generation |
-| Phase        | 44         |
+| Phase | 44 |
 
 ## Description
 
 As a document codec author
-I need helpers to render Gherkin rich content
-So that DataTables, DocStrings, and scenarios render consistently across codecs
+  I need helpers to render Gherkin rich content
+  So that DataTables, DocStrings, and scenarios render consistently across codecs
 
-The helpers handle edge cases like:
-
-- Unclosed DocStrings (fallback to plain paragraph)
-- Windows CRLF line endings (normalized to LF)
-- Empty inputs (graceful handling)
-- Missing table cells (empty string fallback)
+  The helpers handle edge cases like:
+  - Unclosed DocStrings (fallback to plain paragraph)
+  - Windows CRLF line endings (normalized to LF)
+  - Empty inputs (graceful handling)
+  - Missing table cells (empty string fallback)
 
 ## Acceptance Criteria
 
@@ -46,11 +45,11 @@ The helpers handle edge cases like:
 - When parsing for DocStrings
 - Then the result contains 3 blocks with types:
 
-| index | type      | language   |
-| ----- | --------- | ---------- |
-| 1     | paragraph |            |
-| 2     | code      | typescript |
-| 3     | paragraph |            |
+| index | type | language |
+| --- | --- | --- |
+| 1 | paragraph |  |
+| 2 | code | typescript |
+| 3 | paragraph |  |
 
 **DocString without language hint uses text**
 
@@ -85,10 +84,10 @@ The helpers handle edge cases like:
 - When rendering the DataTable
 - Then the output is a table block with 2 rows
 
-| A   | B   | C   |
+| A | B | C |
 | --- | --- | --- |
-| 1   | 2   | 3   |
-| 4   | 5   | 6   |
+| 1 | 2 | 3 |
+| 4 | 5 | 6 |
 
 **Missing cell values become empty strings**
 
@@ -103,11 +102,11 @@ The helpers handle edge cases like:
 - When rendering scenario content with default options
 - Then the output contains a list block with 3 items
 
-| keyword | text            |
-| ------- | --------------- |
-| Given   | initial state   |
-| When    | action taken    |
-| Then    | expected result |
+| keyword | text |
+| --- | --- |
+| Given | initial state |
+| When | action taken |
+| Then | expected result |
 
 **Skip steps when includeSteps is false**
 
@@ -115,9 +114,9 @@ The helpers handle edge cases like:
 - When rendering scenario content with includeSteps false
 - Then the output does not contain a list block
 
-| keyword | text      |
-| ------- | --------- |
-| Given   | some step |
+| keyword | text |
+| --- | --- |
+| Given | some step |
 
 **Render scenario with DataTable in step**
 

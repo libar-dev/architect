@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 loadProjectConfig loads and resolves configuration from file,
-supporting both new-style defineConfig and legacy createDeliveryProcess formats.
+  supporting both new-style defineConfig and legacy createDeliveryProcess formats.
 
-**Problem:**
+  **Problem:**
+  - Two config formats exist (new-style and legacy) that need unified loading
+  - Invalid configs must produce actionable error messages
+  - Missing config files should gracefully fall back to defaults
 
-- Two config formats exist (new-style and legacy) that need unified loading
-- Invalid configs must produce actionable error messages
-- Missing config files should gracefully fall back to defaults
-
-**Solution:**
-
-- loadProjectConfig returns ResolvedConfig for both formats
-- Zod validation errors are formatted with field paths
-- No config file returns default resolved config with isDefault=true
+  **Solution:**
+  - loadProjectConfig returns ResolvedConfig for both formats
+  - Zod validation errors are formatted with field paths
+  - No config file returns default resolved config with isDefault=true
 
 ## Acceptance Criteria
 

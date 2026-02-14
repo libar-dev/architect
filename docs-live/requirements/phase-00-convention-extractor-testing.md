@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Extracts convention content from MasterDataset decision records
-tagged with @libar-docs-convention. Produces structured ConventionBundles
-with rule content, tables, and invariant/rationale metadata.
+  tagged with @libar-docs-convention. Produces structured ConventionBundles
+  with rule content, tables, and invariant/rationale metadata.
 
 ## Acceptance Criteria
 
@@ -79,11 +79,11 @@ with rule content, tables, and invariant/rationale metadata.
 ```markdown
 **Invariant:** Each status has a protection level.
 
-| Status    | Protection   |
-| --------- | ------------ |
-| roadmap   | None         |
-| active    | Scope-locked |
-| completed | Hard-locked  |
+| Status | Protection |
+| --- | --- |
+| roadmap | None |
+| active | Scope-locked |
+| completed | Hard-locked |
 ```
 
 **Mermaid diagram in rule description is extracted as code example**
@@ -140,7 +140,6 @@ Plain narrative text without any diagrams.
 
 ```markdown
 ## Transition Rules
-
 **Invariant:** Only valid FSM transitions are allowed.
 ```
 

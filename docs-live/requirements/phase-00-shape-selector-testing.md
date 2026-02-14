@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tests the filterShapesBySelectors function that provides fine-grained
-shape selection via structural discriminated union selectors.
+  shape selection via structural discriminated union selectors.
 
 ## Acceptance Criteria
 
@@ -25,11 +25,11 @@ shape selection via structural discriminated union selectors.
 - Then 2 shapes are returned including "RiskLevel" and "RISK_LEVELS"
 - And shape "RiskCalculator" is not included
 
-| Pattern Source              | Shape Name     | Group     | Kind     |
-| --------------------------- | -------------- | --------- | -------- |
-| src/taxonomy/risk-levels.ts | RiskLevel      | api-types | type     |
-| src/taxonomy/risk-levels.ts | RISK_LEVELS    | api-types | const    |
-| src/taxonomy/risk-levels.ts | RiskCalculator |           | function |
+| Pattern Source | Shape Name | Group | Kind |
+| --- | --- | --- | --- |
+| src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
+| src/taxonomy/risk-levels.ts | RISK_LEVELS | api-types | const |
+| src/taxonomy/risk-levels.ts | RiskCalculator |  | function |
 
 **Select all shapes in a group**
 
@@ -38,11 +38,11 @@ shape selection via structural discriminated union selectors.
 - Then 2 shapes are returned including "RiskLevel" and "ProcessStatus"
 - And shape "StatusHelper" is not included
 
-| Pattern Source                | Shape Name    | Group     | Kind     |
-| ----------------------------- | ------------- | --------- | -------- |
-| src/taxonomy/risk-levels.ts   | RiskLevel     | api-types | type     |
-| src/taxonomy/status-values.ts | ProcessStatus | api-types | type     |
-| src/taxonomy/status-values.ts | StatusHelper  |           | function |
+| Pattern Source | Shape Name | Group | Kind |
+| --- | --- | --- | --- |
+| src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
+| src/taxonomy/status-values.ts | ProcessStatus | api-types | type |
+| src/taxonomy/status-values.ts | StatusHelper |  | function |
 
 **Select all tagged shapes from a source file**
 
@@ -51,30 +51,30 @@ shape selection via structural discriminated union selectors.
 - Then 3 shapes are returned
 - And shape "ProcessStatus" is not included
 
-| Pattern Source                | Shape Name     | Group     | Kind     |
-| ----------------------------- | -------------- | --------- | -------- |
-| src/taxonomy/risk-levels.ts   | RiskLevel      | api-types | type     |
-| src/taxonomy/risk-levels.ts   | RISK_LEVELS    | api-types | const    |
-| src/taxonomy/risk-levels.ts   | RiskCalculator |           | function |
-| src/taxonomy/status-values.ts | ProcessStatus  | api-types | type     |
+| Pattern Source | Shape Name | Group | Kind |
+| --- | --- | --- | --- |
+| src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
+| src/taxonomy/risk-levels.ts | RISK_LEVELS | api-types | const |
+| src/taxonomy/risk-levels.ts | RiskCalculator |  | function |
+| src/taxonomy/status-values.ts | ProcessStatus | api-types | type |
 
 **shapeSources without shapeSelectors returns all shapes**
 
 - Given a MasterDataset with patterns containing these extracted shapes:
-- When extracting shapes with shapeSources "src/taxonomy/\*.ts"
+- When extracting shapes with shapeSources "src/taxonomy/*.ts"
 - Then 2 shapes are returned including "RiskLevel" and "RISK_LEVELS"
 
-| Pattern Source              | Shape Name  | Group     | Kind  |
-| --------------------------- | ----------- | --------- | ----- |
-| src/taxonomy/risk-levels.ts | RiskLevel   | api-types | type  |
-| src/taxonomy/risk-levels.ts | RISK_LEVELS |           | const |
+| Pattern Source | Shape Name | Group | Kind |
+| --- | --- | --- | --- |
+| src/taxonomy/risk-levels.ts | RiskLevel | api-types | type |
+| src/taxonomy/risk-levels.ts | RISK_LEVELS |  | const |
 
 ## Business Rules
 
 **Reference doc configs select shapes via shapeSelectors**
 
 **Invariant:** shapeSelectors provides three selection modes: by
-source path + specific names, by group tag, or by source path alone.
+    source path + specific names, by group tag, or by source path alone.
 
     **Verified by:** Select by source and names,
     Select by group,

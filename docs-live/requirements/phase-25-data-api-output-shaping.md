@@ -6,40 +6,39 @@
 
 ## Overview
 
-| Property       | Value                        |
-| -------------- | ---------------------------- |
-| Status         | completed                    |
-| Product Area   | DataAPI                      |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 | Business Value | compact output for ai agents |
-| Phase          | 25                           |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
-List queries (e.g., `getCurrentWork`) produce ~594KB of JSON because each pattern
-includes full `directive` (raw JSDoc AST), `code` (source text), and dozens of
-empty/null fields. AI agents waste context tokens parsing verbose output that is
-99% noise. There is no way to request compact summaries, filter fields, or get
-counts without downloading the full dataset.
+  The ProcessStateAPI CLI returns raw `ExtractedPattern` objects via `JSON.stringify`.
+  List queries (e.g., `getCurrentWork`) produce ~594KB of JSON because each pattern
+  includes full `directive` (raw JSDoc AST), `code` (source text), and dozens of
+  empty/null fields. AI agents waste context tokens parsing verbose output that is
+  99% noise. There is no way to request compact summaries, filter fields, or get
+  counts without downloading the full dataset.
 
-**Solution:**
-Add an output shaping pipeline that transforms raw API responses into compact,
-AI-optimized formats:
+  **Solution:**
+  Add an output shaping pipeline that transforms raw API responses into compact,
+  AI-optimized formats:
+  1. `summarizePattern()` projects patterns to ~100 bytes (vs ~3.5KB raw)
+  2. Global output modifiers: `--names-only`, `--count`, `--fields`
+  3. Format control: `--format compact|json` with empty field stripping
+  4. `list` subcommand with composable filters (`--status`, `--phase`, `--category`)
+  5. `search` subcommand with fuzzy pattern name matching
+  6. CLI ergonomics: config file defaults, `-f` shorthand, pnpm banner fix
 
-1. `summarizePattern()` projects patterns to ~100 bytes (vs ~3.5KB raw)
-2. Global output modifiers: `--names-only`, `--count`, `--fields`
-3. Format control: `--format compact|json` with empty field stripping
-4. `list` subcommand with composable filters (`--status`, `--phase`, `--category`)
-5. `search` subcommand with fuzzy pattern name matching
-6. CLI ergonomics: config file defaults, `-f` shorthand, pnpm banner fix
-
-**Business Value:**
-| Benefit | Impact |
-| 594KB to 4KB list output | 99% context reduction for list queries |
-| Fuzzy matching | Eliminates agent retry loops on typos |
-| Config defaults | No more repeating --input and --features paths |
-| Composable filters | One command replaces multiple API method calls |
+  **Business Value:**
+  | Benefit | Impact |
+  | 594KB to 4KB list output | 99% context reduction for list queries |
+  | Fuzzy matching | Eliminates agent retry loops on typos |
+  | Config defaults | No more repeating --input and --features paths |
+  | Composable filters | One command replaces multiple API method calls |
 
 ## Acceptance Criteria
 
@@ -181,7 +180,7 @@ AI-optimized formats:
 **List queries return compact pattern summaries by default**
 
 **Invariant:** List-returning API methods produce summaries, not full ExtractedPattern
-objects, unless `--full` is explicitly requested.
+    objects, unless `--full` is explicitly requested.
 
     **Rationale:** The single biggest usability problem. `getCurrentWork` returns 3 active
     patterns at ~3.5KB each = 10.5KB. Summarized: ~300 bytes total. The `directive` field
@@ -204,7 +203,7 @@ _Verified by: List queries return compact summaries, Full flag returns complete 
 **Global output modifier flags apply to any list-returning command**
 
 **Invariant:** Output modifiers are composable and apply uniformly across all
-list-returning subcommands and query methods.
+    list-returning subcommands and query methods.
 
     **Rationale:** AI agents frequently need just pattern names (for further queries),
     just counts (for progress checks), or specific fields (for focused analysis).
@@ -223,7 +222,7 @@ _Verified by: Names-only output for list queries, Count output for list queries,
 **Output format is configurable with typed response envelope**
 
 **Invariant:** All CLI output uses the QueryResult envelope for success/error
-discrimination. The compact format strips empty and null fields.
+    discrimination. The compact format strips empty and null fields.
 
     **Rationale:** The existing `QueryResult<T>` types (`QuerySuccess`, `QueryError`) are
     defined in `src/api/types.ts` but not wired into the CLI output. Agents cannot
@@ -244,8 +243,8 @@ _Verified by: Successful query returns typed envelope, Failed query returns erro
 **List subcommand provides composable filters and fuzzy search**
 
 **Invariant:** The `list` subcommand replaces the need to call specific
-`getPatternsByX` methods. Filters are composable via AND logic.
-The `query` subcommand remains available for programmatic/raw access.
+    `getPatternsByX` methods. Filters are composable via AND logic.
+    The `query` subcommand remains available for programmatic/raw access.
 
     **Rationale:** Currently, filtering by status AND category requires calling
     `getPatternsByCategory` then manually filtering by status. A single `list`
@@ -268,7 +267,7 @@ _Verified by: List with single filter, List with composed filters, Search with f
 **CLI provides ergonomic defaults and helpful error messages**
 
 **Invariant:** Common operations require minimal flags. Pattern name typos
-produce actionable suggestions. Empty results explain why.
+    produce actionable suggestions. Empty results explain why.
 
     **Rationale:** Every extra flag and every retry loop costs AI agent context
     tokens. Config file defaults eliminate repetitive path arguments. Fuzzy matching

@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
-The AST Parser extracts @libar-docs-\* directives from TypeScript source files
-using the TypeScript compiler API. It identifies exports, extracts metadata,
-and validates directive structure.
+The AST Parser extracts @libar-docs-* directives from TypeScript source files
+  using the TypeScript compiler API. It identifies exports, extracts metadata,
+  and validates directive structure.
 
 ## Acceptance Criteria
 
@@ -29,20 +29,19 @@ and validates directive structure.
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Test function for authentication
-  \*/
-  export function authenticate(username: string, password: string): boolean {
+/**
+ * @libar-docs-core
+ * Test function for authentication
+ */
+export function authenticate(username: string, password: string): boolean {
   return username === 'admin' && password === 'secret';
-  }
+}
 ```
 
-| field | value        |
-| ----- | ------------ |
-| type  | function     |
-| name  | authenticate |
+| field | value |
+| --- | --- |
+| type | function |
+| name | authenticate |
 
 **Parse type export with directive**
 
@@ -53,26 +52,25 @@ and validates directive structure.
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core @libar-docs-types
-- User type definition
-  \*/
-  export type User = {
+/**
+ * @libar-docs-core @libar-docs-types
+ * User type definition
+ */
+export type User = {
   id: string;
   name: string;
-  };
+};
 ```
 
-| value             |
-| ----------------- |
-| @libar-docs-core  |
+| value |
+| --- |
+| @libar-docs-core |
 | @libar-docs-types |
 
 | field | value |
-| ----- | ----- |
-| type  | type  |
-| name  | User  |
+| --- | --- |
+| type | type |
+| name | User |
 
 **Parse interface export with directive**
 
@@ -82,21 +80,20 @@ and validates directive structure.
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Config interface
-  \*/
-  export interface Config {
+/**
+ * @libar-docs-core
+ * Config interface
+ */
+export interface Config {
   apiUrl: string;
   timeout: number;
-  }
+}
 ```
 
-| field | value     |
-| ----- | --------- |
-| type  | interface |
-| name  | Config    |
+| field | value |
+| --- | --- |
+| type | interface |
+| name | Config |
 
 **Parse const export with directive**
 
@@ -106,21 +103,20 @@ and validates directive structure.
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- API configuration
-  \*/
-  export const API_CONFIG = {
+/**
+ * @libar-docs-core
+ * API configuration
+ */
+export const API_CONFIG = {
   baseUrl: 'https://api.example.com',
   version: 'v1'
-  };
+};
 ```
 
-| field | value      |
-| ----- | ---------- |
-| type  | const      |
-| name  | API_CONFIG |
+| field | value |
+| --- | --- |
+| type | const |
+| name | API_CONFIG |
 
 **Parse class export with directive**
 
@@ -130,24 +126,23 @@ and validates directive structure.
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- User service class
-  \*/
-  export class UserService {
+/**
+ * @libar-docs-core
+ * User service class
+ */
+export class UserService {
   constructor(private db: Database) {}
 
-async getUser(id: string) {
-return this.db.findUser(id);
-}
+  async getUser(id: string) {
+    return this.db.findUser(id);
+  }
 }
 ```
 
-| field | value       |
-| ----- | ----------- |
-| type  | class       |
-| name  | UserService |
+| field | value |
+| --- | --- |
+| type | class |
+| name | UserService |
 
 **Parse enum export with directive**
 
@@ -158,22 +153,21 @@ return this.db.findUser(id);
 - And the directive code should contain "export enum Status"
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Enum export
-  \*/
-  export enum Status {
+/**
+ * @libar-docs-core
+ * Enum export
+ */
+export enum Status {
   Active = 'active',
   Inactive = 'inactive',
   Pending = 'pending'
-  }
+}
 ```
 
-| field | value  |
-| ----- | ------ |
-| type  | enum   |
-| name  | Status |
+| field | value |
+| --- | --- |
+| type | enum |
+| name | Status |
 
 **Parse const enum export with directive**
 
@@ -184,23 +178,22 @@ return this.db.findUser(id);
 - And the directive code should contain "export const enum Direction"
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Const enum export
-  \*/
-  export const enum Direction {
+/**
+ * @libar-docs-core
+ * Const enum export
+ */
+export const enum Direction {
   Up = 1,
   Down = 2,
   Left = 3,
   Right = 4
-  }
+}
 ```
 
-| field | value     |
-| ----- | --------- |
-| type  | enum      |
-| name  | Direction |
+| field | value |
+| --- | --- |
+| type | enum |
+| name | Direction |
 
 **Parse abstract class export with directive**
 
@@ -210,24 +203,23 @@ return this.db.findUser(id);
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Abstract class export
-  \*/
-  export abstract class BaseService {
+/**
+ * @libar-docs-core
+ * Abstract class export
+ */
+export abstract class BaseService {
   abstract process(): void;
 
-log(message: string) {
-console.log(message);
-}
+  log(message: string) {
+    console.log(message);
+  }
 }
 ```
 
-| field | value       |
-| ----- | ----------- |
-| type  | class       |
-| name  | BaseService |
+| field | value |
+| --- | --- |
+| type | class |
+| name | BaseService |
 
 **Parse arrow function export with directive**
 
@@ -237,20 +229,19 @@ console.log(message);
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Arrow function export
-  \*/
-  export const fetchData = async (url: string): Promise<Response> => {
+/**
+ * @libar-docs-core
+ * Arrow function export
+ */
+export const fetchData = async (url: string): Promise<Response> => {
   return fetch(url);
-  };
+};
 ```
 
-| field | value     |
-| ----- | --------- |
-| type  | const     |
-| name  | fetchData |
+| field | value |
+| --- | --- |
+| type | const |
+| name | fetchData |
 
 **Parse async function export with directive**
 
@@ -261,21 +252,20 @@ console.log(message);
 - And the directive code should contain "async function loadData"
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Async function export
-  \*/
-  export async function loadData(id: string): Promise<Data> {
+/**
+ * @libar-docs-core
+ * Async function export
+ */
+export async function loadData(id: string): Promise<Data> {
   const response = await fetch(`/api/data/${id}`);
   return response.json();
-  }
+}
 ```
 
-| field | value    |
-| ----- | -------- |
-| type  | function |
-| name  | loadData |
+| field | value |
+| --- | --- |
+| type | function |
+| name | loadData |
 
 **Parse generic function export with directive**
 
@@ -286,20 +276,19 @@ console.log(message);
 - And the directive code should contain "<T, U>"
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Generic function export
-  \*/
-  export function map<T, U>(items: T[], fn: (item: T) => U): U[] {
+/**
+ * @libar-docs-core
+ * Generic function export
+ */
+export function map<T, U>(items: T[], fn: (item: T) => U): U[] {
   return items.map(fn);
-  }
+}
 ```
 
-| field | value    |
-| ----- | -------- |
-| type  | function |
-| name  | map      |
+| field | value |
+| --- | --- |
+| type | function |
+| name | map |
 
 **Parse default export with directive**
 
@@ -309,20 +298,19 @@ console.log(message);
 - And the first export should be:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Default export
-  \*/
-  export default function authenticate() {
+/**
+ * @libar-docs-core
+ * Default export
+ */
+export default function authenticate() {
   return true;
-  }
+}
 ```
 
-| field | value    |
-| ----- | -------- |
-| type  | function |
-| name  | default  |
+| field | value |
+| --- | --- |
+| type | function |
+| name | default |
 
 **Parse re-exports with directive**
 
@@ -333,18 +321,17 @@ console.log(message);
 - And the exports should include names:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Re-exported utilities
-  \*/
-  export { foo, bar } from './utils';
+/**
+ * @libar-docs-core
+ * Re-exported utilities
+ */
+export { foo, bar } from './utils';
 ```
 
 | value |
-| ----- |
-| foo   |
-| bar   |
+| --- |
+| foo |
+| bar |
 
 **Parse multiple exports in single statement**
 
@@ -355,17 +342,16 @@ console.log(message);
 - And the exports should include names:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Multiple exports
-  \*/
-  export const USER_ROLE = 'admin', USER_STATUS = 'active';
+/**
+ * @libar-docs-core
+ * Multiple exports
+ */
+export const USER_ROLE = 'admin', USER_STATUS = 'active';
 ```
 
-| value       |
-| ----------- |
-| USER_ROLE   |
+| value |
+| --- |
+| USER_ROLE |
 | USER_STATUS |
 
 **Parse multiple directives in same file**
@@ -376,29 +362,27 @@ console.log(message);
 - And the directives should have details:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- First function
-  \*/
-  export function first() {
+/**
+ * @libar-docs-core
+ * First function
+ */
+export function first() {
   return 'first';
-  }
+}
 
-/\*\*
-
-- @libar-docs-domain
-- Second function
-  \*/
-  export function second() {
+/**
+ * @libar-docs-domain
+ * Second function
+ */
+export function second() {
   return 'second';
-  }
+}
 ```
 
-| index | tag                | exportName |
-| ----- | ------------------ | ---------- |
-| 1     | @libar-docs-core   | first      |
-| 2     | @libar-docs-domain | second     |
+| index | tag | exportName |
+| --- | --- | --- |
+| 1 | @libar-docs-core | first |
+| 2 | @libar-docs-domain | second |
 
 **Extract examples from directive**
 
@@ -409,36 +393,28 @@ console.log(message);
 - And the examples should contain:
 
 ````markdown
-/\*\*
-
-- @libar-docs-core
-- Test function with examples
--
-- @example
-- ```typescript
-
-  ```
-- const result = test('hello');
-- console.log(result); // 'HELLO'
-- ```
-
-  ```
--
-- @example
-- ```typescript
-
-  ```
-- const result = test('world');
-- ```
-   */
-  export function test(input: string): string {
-    return input.toUpperCase();
-  }
-  ```
+/**
+ * @libar-docs-core
+ * Test function with examples
+ *
+ * @example
+ * ```typescript
+ * const result = test('hello');
+ * console.log(result); // 'HELLO'
+ * ```
+ *
+ * @example
+ * ```typescript
+ * const result = test('world');
+ * ```
+ */
+export function test(input: string): string {
+  return input.toUpperCase();
+}
 ````
 
-| value         |
-| ------------- |
+| value |
+| --- |
 | test('hello') |
 | test('world') |
 
@@ -450,24 +426,23 @@ console.log(message);
 - And the directive description should contain all:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- This is a detailed description
-- that spans multiple lines
-- and should be captured.
-  \*/
-  export function test() {
+/**
+ * @libar-docs-core
+ *
+ * This is a detailed description
+ * that spans multiple lines
+ * and should be captured.
+ */
+export function test() {
   return 'test';
-  }
+}
 ```
 
-| value                |
-| -------------------- |
+| value |
+| --- |
 | detailed description |
-| multiple lines       |
-| captured             |
+| multiple lines |
+| captured |
 
 **Track line numbers correctly**
 
@@ -479,20 +454,19 @@ console.log(message);
 ```markdown
 // Line 1
 // Line 2
-/\*\*
-
-- @libar-docs-core
-- Test
-  \*/
-  export function test() {
+/**
+ * @libar-docs-core
+ * Test
+ */
+export function test() {
   return 'test';
-  }
+}
 ```
 
-| field     | value |
-| --------- | ----- |
-| startLine | 3     |
-| endLine   | 6     |
+| field | value |
+| --- | --- |
+| startLine | 3 |
+| endLine | 6 |
 
 **Extract function signature information**
 
@@ -502,14 +476,13 @@ console.log(message);
 - And the first export signature should contain "calculate"
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Function with signature
-  \*/
-  export function calculate(a: number, b: number, c: string): number {
+/**
+ * @libar-docs-core
+ * Function with signature
+ */
+export function calculate(a: number, b: number, c: string): number {
   return a + b;
-  }
+}
 ```
 
 **Ignore @param and @returns in description**
@@ -521,22 +494,21 @@ console.log(message);
 - And the directive description should not contain any:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Test function
--
-- @param input - The input string
-- @returns The processed output
-  \*/
-  export function test(input: string): string {
+/**
+ * @libar-docs-core
+ * Test function
+ *
+ * @param input - The input string
+ * @returns The processed output
+ */
+export function test(input: string): string {
   return input;
-  }
+}
 ```
 
-| value    |
-| -------- |
-| @param   |
+| value |
+| --- |
+| @param |
 | @returns |
 
 **Extract multiple tags from directive section**
@@ -548,22 +520,21 @@ console.log(message);
 - And the directive should have tags:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core @libar-docs-api
-- @libar-docs-overview
--
-- This is the description.
-  \*/
-  export function multiTagged() {
+/**
+ * @libar-docs-core @libar-docs-api
+ * @libar-docs-overview
+ *
+ * This is the description.
+ */
+export function multiTagged() {
   return true;
-  }
+}
 ```
 
-| value                |
-| -------------------- |
-| @libar-docs-core     |
-| @libar-docs-api      |
+| value |
+| --- |
+| @libar-docs-core |
+| @libar-docs-api |
 | @libar-docs-overview |
 
 **Extract tag with description on same line**
@@ -575,13 +546,12 @@ console.log(message);
 - And the directive should have tag "@libar-docs-core"
 
 ```markdown
-/\*\*
-
-- @libar-docs-core Brief description on same line
-  \*/
-  export function inlineDesc() {
+/**
+ * @libar-docs-core Brief description on same line
+ */
+export function inlineDesc() {
   return true;
-  }
+}
 ```
 
 **NOT extract tags mentioned in description**
@@ -594,21 +564,20 @@ console.log(message);
 - And the directive should not have any tags:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- This function works with @libar-docs-api patterns.
-- It supports @libar-docs-saga for orchestration.
-  \*/
-  export function processRequest() {
+/**
+ * @libar-docs-core
+ *
+ * This function works with @libar-docs-api patterns.
+ * It supports @libar-docs-saga for orchestration.
+ */
+export function processRequest() {
   return true;
-  }
+}
 ```
 
-| value            |
-| ---------------- |
-| @libar-docs-api  |
+| value |
+| --- |
+| @libar-docs-api |
 | @libar-docs-saga |
 
 **NOT extract tags mentioned in @example sections**
@@ -621,29 +590,25 @@ console.log(message);
 - And the directive should not have any tags:
 
 ````markdown
-/\*\*
-
-- @libar-docs-core
-- Test function
--
-- @example
-- ```typescript
-
-  ```
-- hasTag('@libar-docs-example'); // checking for a tag
-- hasTag('@libar-docs-saga'); // another example
-- ```
-   */
-  export function hasTag(tag: string): boolean {
-    return tag.startsWith('@libar-docs');
-  }
-  ```
+/**
+ * @libar-docs-core
+ * Test function
+ *
+ * @example
+ * ```typescript
+ * hasTag('@libar-docs-example'); // checking for a tag
+ * hasTag('@libar-docs-saga'); // another example
+ * ```
+ */
+export function hasTag(tag: string): boolean {
+  return tag.startsWith('@libar-docs');
+}
 ````
 
-| value               |
-| ------------------- |
+| value |
+| --- |
 | @libar-docs-example |
-| @libar-docs-saga    |
+| @libar-docs-saga |
 
 **Extract When to Use heading format with bullet points**
 
@@ -654,28 +619,27 @@ console.log(message);
 - And the directive whenToUse should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- ## Pattern Description
--
-- ### When to Use
--
-- - Command validation requires complex rules
-- - You want property-based testing
-- - Multiple handlers share logic
-    \*/
-    export function decider() {
-    return true;
-    }
+/**
+ * @libar-docs-core
+ *
+ * ## Pattern Description
+ *
+ * ### When to Use
+ *
+ * - Command validation requires complex rules
+ * - You want property-based testing
+ * - Multiple handlers share logic
+ */
+export function decider() {
+  return true;
+}
 ```
 
-| value                                     |
-| ----------------------------------------- |
+| value |
+| --- |
 | Command validation requires complex rules |
-| You want property-based testing           |
-| Multiple handlers share logic             |
+| You want property-based testing |
+| Multiple handlers share logic |
 
 **Extract When to use inline format**
 
@@ -686,21 +650,20 @@ console.log(message);
 - And the directive whenToUse should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- **When to use:** Command validation requires complex business rules.
--
-- This is additional description.
-  \*/
-  export function decider() {
+/**
+ * @libar-docs-core
+ *
+ * **When to use:** Command validation requires complex business rules.
+ *
+ * This is additional description.
+ */
+export function decider() {
   return true;
-  }
+}
 ```
 
-| value                                               |
-| --------------------------------------------------- |
+| value |
+| --- |
 | Command validation requires complex business rules. |
 
 **Extract asterisk bullets in When to Use section**
@@ -711,27 +674,26 @@ console.log(message);
 - And the directive whenToUse should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- ## Pattern
--
-- Description of the pattern.
--
-- ### When to Use
--
-- - First bullet with asterisk
-- - Second bullet with asterisk
-    \*/
-    export function withAsteriskBullets() {
-    return true;
-    }
+/**
+ * @libar-docs-core
+ *
+ * ## Pattern
+ *
+ * Description of the pattern.
+ *
+ * ### When to Use
+ *
+ * * First bullet with asterisk
+ * * Second bullet with asterisk
+ */
+export function withAsteriskBullets() {
+  return true;
+}
 ```
 
-| value                       |
-| --------------------------- |
-| First bullet with asterisk  |
+| value |
+| --- |
+| First bullet with asterisk |
 | Second bullet with asterisk |
 
 **Not set whenToUse when section is missing**
@@ -742,15 +704,14 @@ console.log(message);
 - And the directive whenToUse should be undefined
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- Just a regular description without When to Use section.
-  \*/
-  export function regular() {
+/**
+ * @libar-docs-core
+ *
+ * Just a regular description without When to Use section.
+ */
+export function regular() {
   return true;
-  }
+}
 ```
 
 **Extract @libar-docs-uses with single value**
@@ -761,20 +722,19 @@ console.log(message);
 - And the directive uses should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- @libar-docs-uses FSM Types
--
-- Pattern that uses another pattern.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ * @libar-docs-uses FSM Types
+ *
+ * Pattern that uses another pattern.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-| value     |
-| --------- |
+| value |
+| --- |
 | FSM Types |
 
 **Extract @libar-docs-uses with comma-separated values**
@@ -786,23 +746,22 @@ console.log(message);
 - And the directive uses should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- @libar-docs-uses FSM Types, Invariant Error, CMS Types
--
-- Pattern that uses multiple patterns.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ * @libar-docs-uses FSM Types, Invariant Error, CMS Types
+ *
+ * Pattern that uses multiple patterns.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-| value           |
-| --------------- |
-| FSM Types       |
+| value |
+| --- |
+| FSM Types |
 | Invariant Error |
-| CMS Types       |
+| CMS Types |
 
 **Extract @libar-docs-used-by with single value**
 
@@ -812,20 +771,19 @@ console.log(message);
 - And the directive usedBy should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- @libar-docs-used-by createDeciderHandler Factory
--
-- Pattern used by another pattern.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ * @libar-docs-used-by createDeciderHandler Factory
+ *
+ * Pattern used by another pattern.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-| value                        |
-| ---------------------------- |
+| value |
+| --- |
 | createDeciderHandler Factory |
 
 **Extract @libar-docs-used-by with comma-separated values**
@@ -837,22 +795,21 @@ console.log(message);
 - And the directive usedBy should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- @libar-docs-used-by defineFSM Factory, Decider Types
--
-- Pattern used by multiple patterns.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ * @libar-docs-used-by defineFSM Factory, Decider Types
+ *
+ * Pattern used by multiple patterns.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-| value             |
-| ----------------- |
+| value |
+| --- |
 | defineFSM Factory |
-| Decider Types     |
+| Decider Types |
 
 **Extract both uses and usedBy from same directive**
 
@@ -863,25 +820,24 @@ console.log(message);
 - And the directive usedBy should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- @libar-docs-uses FSM Types
-- @libar-docs-used-by createDeciderHandler Factory
--
-- Pattern with both uses and used-by relationships.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ * @libar-docs-uses FSM Types
+ * @libar-docs-used-by createDeciderHandler Factory
+ *
+ * Pattern with both uses and used-by relationships.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-| value     |
-| --------- |
+| value |
+| --- |
 | FSM Types |
 
-| value                        |
-| ---------------------------- |
+| value |
+| --- |
 | createDeciderHandler Factory |
 
 **NOT capture uses/usedBy values in description**
@@ -895,32 +851,31 @@ console.log(message);
 - And the directive usedBy should contain:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- @libar-docs-uses FSM Types
-- @libar-docs-used-by createDeciderHandler Factory
--
-- ## Decider Pattern - Pure Domain Decision Logic
--
-- The Decider pattern separates pure business logic.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ * @libar-docs-uses FSM Types
+ * @libar-docs-used-by createDeciderHandler Factory
+ *
+ * ## Decider Pattern - Pure Domain Decision Logic
+ *
+ * The Decider pattern separates pure business logic.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-| value                        |
-| ---------------------------- |
+| value |
+| --- |
 | createDeciderHandler Factory |
-| FSM Types                    |
-
-| value     |
-| --------- |
 | FSM Types |
 
-| value                        |
-| ---------------------------- |
+| value |
+| --- |
+| FSM Types |
+
+| value |
+| --- |
 | createDeciderHandler Factory |
 
 **Not set uses/usedBy when no relationship tags exist**
@@ -932,33 +887,31 @@ console.log(message);
 - And the directive usedBy should be undefined
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
--
-- Pattern without relationship tags.
-  \*/
-  export function pattern() {
+/**
+ * @libar-docs-core
+ *
+ * Pattern without relationship tags.
+ */
+export function pattern() {
   return true;
-  }
+}
 ```
 
-**Skip comments without @libar-docs-\* tags**
+**Skip comments without @libar-docs-* tags**
 
 - Given a TypeScript file with content:
 - When the file is parsed for directives
 - Then 0 directives should be found
 
 ```markdown
-/\*\*
-
-- Regular JSDoc comment
-- @param foo - parameter
-- @returns result
-  \*/
-  export function regular(foo: string) {
+/**
+ * Regular JSDoc comment
+ * @param foo - parameter
+ * @returns result
+ */
+export function regular(foo: string) {
   return foo;
-  }
+}
 ```
 
 **Skip invalid directive with incomplete tag**
@@ -968,13 +921,12 @@ console.log(message);
 - Then 0 directives should be found
 
 ```markdown
-/\*\*
-
-- @libar-docs-
-  \*/
-  export function invalid() {
+/**
+ * @libar-docs-
+ */
+export function invalid() {
   return 'invalid';
-  }
+}
 ```
 
 **Handle malformed TypeScript gracefully**
@@ -985,12 +937,11 @@ console.log(message);
 - And the parse error should contain the file path
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- This will fail to parse
-  \*/
-  export function broken(
+/**
+ * @libar-docs-core
+ * This will fail to parse
+ */
+export function broken(
   // Missing closing parenthesis and function body
 ```
 
@@ -1008,6 +959,8 @@ console.log(message);
 
 ```markdown
 
+
+
 ```
 
 **Handle file with only comments and no exports**
@@ -1017,11 +970,10 @@ console.log(message);
 - Then 0 directives should be found
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- This is a comment with no following export
-  \*/
+/**
+ * @libar-docs-core
+ * This is a comment with no following export
+ */
 
 // Some other comment
 ```
@@ -1035,7 +987,7 @@ console.log(message);
 ```markdown
 // @libar-docs-core - This is an inline comment
 export function test() {
-return 'test';
+  return 'test';
 }
 ```
 
@@ -1047,20 +999,19 @@ return 'test';
 - And the directive description should contain all:
 
 ```markdown
-/\*\*
-
-- @libar-docs-core
-- Funcion de autenticacion con emojis
-  \*/
-  export function autenticar() {
+/**
+ * @libar-docs-core
+ * Funcion de autenticacion con emojis
+ */
+export function autenticar() {
   return true;
-  }
+}
 ```
 
-| value   |
-| ------- |
+| value |
+| --- |
 | Funcion |
-| emojis  |
+| emojis |
 
 ---
 

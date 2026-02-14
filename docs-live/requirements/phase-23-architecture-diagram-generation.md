@@ -6,32 +6,31 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | planned    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
 | Product Area | Generation |
-| Phase        | 23         |
+| Phase | 23 |
 
 ## Description
 
 **Problem:** Architecture documentation requires manually maintaining mermaid diagrams
-that duplicate information already encoded in source code. When code changes,
-diagrams become stale. Manual sync is error-prone and time-consuming.
+  that duplicate information already encoded in source code. When code changes,
+  diagrams become stale. Manual sync is error-prone and time-consuming.
 
-**Solution:** Generate architecture diagrams automatically from source code annotations
-using dedicated `arch-*` tags for precise control. Three tags classify components:
+  **Solution:** Generate architecture diagrams automatically from source code annotations
+  using dedicated `arch-*` tags for precise control. Three tags classify components:
+  - `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
+  - `@libar-docs-arch-context` - Bounded context for subgraph grouping
+  - `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
 
-- `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
-- `@libar-docs-arch-context` - Bounded context for subgraph grouping
-- `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
-
-**Why It Matters:**
-| Benefit | How |
-| Always-current diagrams | Generated from source annotations |
-| Bounded context isolation | arch-context groups into subgraphs |
-| Multiple diagram types | Component diagrams + layered diagrams |
-| UML-inspired semantics | Relationship arrows match uses/depends-on/implements/extends |
-| CLI integration | `pnpm docs:architecture` via generator registry |
+  **Why It Matters:**
+  | Benefit | How |
+  | Always-current diagrams | Generated from source annotations |
+  | Bounded context isolation | arch-context groups into subgraphs |
+  | Multiple diagram types | Component diagrams + layered diagrams |
+  | UML-inspired semantics | Relationship arrows match uses/depends-on/implements/extends |
+  | CLI integration | `pnpm docs:architecture` via generator registry |
 
 ## Acceptance Criteria
 
@@ -145,11 +144,11 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - Then archIndex.byRole["command-handler"] contains 2 patterns
 - And archIndex.byRole["projection"] contains 1 pattern
 
-| Pattern     | arch-role       |
-| ----------- | --------------- |
-| Handler1    | command-handler |
-| Handler2    | command-handler |
-| Projection1 | projection      |
+| Pattern | arch-role |
+| --- | --- |
+| Handler1 | command-handler |
+| Handler2 | command-handler |
+| Projection1 | projection |
 
 **archIndex groups patterns by arch-context**
 
@@ -158,11 +157,11 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - Then archIndex.byContext["orders"] contains 2 patterns
 - And archIndex.byContext["inventory"] contains 1 pattern
 
-| Pattern          | arch-context |
-| ---------------- | ------------ |
-| OrderHandler     | orders       |
-| OrderProjection  | orders       |
-| InventoryHandler | inventory    |
+| Pattern | arch-context |
+| --- | --- |
+| OrderHandler | orders |
+| OrderProjection | orders |
+| InventoryHandler | inventory |
 
 **archIndex groups patterns by arch-layer**
 
@@ -172,11 +171,11 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - And archIndex.byLayer["application"] contains 1 pattern
 - And archIndex.byLayer["infrastructure"] contains 1 pattern
 
-| Pattern  | arch-layer     |
-| -------- | -------------- |
-| Decider1 | domain         |
-| Handler1 | application    |
-| Infra1   | infrastructure |
+| Pattern | arch-layer |
+| --- | --- |
+| Decider1 | domain |
+| Handler1 | application |
+| Infra1 | infrastructure |
 
 **archIndex.all contains all patterns with any arch tag**
 
@@ -185,12 +184,12 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - Then archIndex.all contains 3 patterns
 - And archIndex.all does not contain "NoArchTags"
 
-| Pattern     | arch-role  | arch-context | arch-layer  |
-| ----------- | ---------- | ------------ | ----------- |
-| WithAll     | projection | orders       | application |
-| WithRole    | saga       | -            | -           |
-| WithContext | -          | inventory    | -           |
-| NoArchTags  | -          | -            | -           |
+| Pattern | arch-role | arch-context | arch-layer |
+| --- | --- | --- | --- |
+| WithAll | projection | orders | application |
+| WithRole | saga | - | - |
+| WithContext | - | inventory | - |
+| NoArchTags | - | - | - |
 
 **Generate subgraphs per bounded context**
 
@@ -201,11 +200,11 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - And OrderHandler is inside Orders BC subgraph
 - And InventoryHandler is inside Inventory BC subgraph
 
-| Pattern          | arch-context | arch-role       |
-| ---------------- | ------------ | --------------- |
-| OrderHandler     | orders       | command-handler |
-| OrderProjection  | orders       | projection      |
-| InventoryHandler | inventory    | command-handler |
+| Pattern | arch-context | arch-role |
+| --- | --- | --- |
+| OrderHandler | orders | command-handler |
+| OrderProjection | orders | projection |
+| InventoryHandler | inventory | command-handler |
 
 **Patterns without arch-context go to Shared Infrastructure**
 
@@ -215,11 +214,11 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - And GlobalSaga is inside Shared Infrastructure subgraph
 - And CrossContextProjection is inside Shared Infrastructure subgraph
 
-| Pattern                | arch-context | arch-role       |
-| ---------------------- | ------------ | --------------- |
-| OrderHandler           | orders       | command-handler |
-| GlobalSaga             | -            | saga            |
-| CrossContextProjection | -            | projection      |
+| Pattern | arch-context | arch-role |
+| --- | --- | --- |
+| OrderHandler | orders | command-handler |
+| GlobalSaga | - | saga |
+| CrossContextProjection | - | projection |
 
 **Render uses relationship as solid arrow**
 
@@ -227,10 +226,10 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - When the component diagram codec runs
 - Then output contains "SagaA --> HandlerB"
 
-| Pattern  | arch-role       | uses     |
-| -------- | --------------- | -------- |
-| SagaA    | saga            | HandlerB |
-| HandlerB | command-handler | -        |
+| Pattern | arch-role | uses |
+| --- | --- | --- |
+| SagaA | saga | HandlerB |
+| HandlerB | command-handler | - |
 
 **Render depends-on relationship as dashed arrow**
 
@@ -238,10 +237,10 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - When the component diagram codec runs
 - Then output contains "FeatureA -.-> FeatureB"
 
-| Pattern  | arch-role  | depends-on |
-| -------- | ---------- | ---------- |
-| FeatureA | projection | FeatureB   |
-| FeatureB | projection | -          |
+| Pattern | arch-role | depends-on |
+| --- | --- | --- |
+| FeatureA | projection | FeatureB |
+| FeatureB | projection | - |
 
 **Render implements relationship as dotted arrow**
 
@@ -249,10 +248,10 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - When the component diagram codec runs
 - Then output contains "ConcreteImpl ..-> AbstractSpec"
 
-| Pattern      | arch-role       | implements   |
-| ------------ | --------------- | ------------ |
+| Pattern | arch-role | implements |
+| --- | --- | --- |
 | ConcreteImpl | command-handler | AbstractSpec |
-| AbstractSpec | -               | -            |
+| AbstractSpec | - | - |
 
 **Render extends relationship as open arrow**
 
@@ -260,10 +259,10 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - When the component diagram codec runs
 - Then output contains "SpecializedHandler -->> BaseHandler"
 
-| Pattern            | arch-role       | extends     |
-| ------------------ | --------------- | ----------- |
+| Pattern | arch-role | extends |
+| --- | --- | --- |
 | SpecializedHandler | command-handler | BaseHandler |
-| BaseHandler        | command-handler | -           |
+| BaseHandler | command-handler | - |
 
 **Arrows only render between annotated components**
 
@@ -272,9 +271,9 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - When the component diagram codec runs
 - Then output does not contain arrow to UnannotatedB
 
-| Pattern    | arch-role | uses         |
-| ---------- | --------- | ------------ |
-| AnnotatedA | saga      | UnannotatedB |
+| Pattern | arch-role | uses |
+| --- | --- | --- |
+| AnnotatedA | saga | UnannotatedB |
 
 **Generate subgraphs per layer**
 
@@ -284,11 +283,11 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - And output contains subgraph "Application Layer"
 - And output contains subgraph "Infrastructure Layer"
 
-| Pattern | arch-layer     | arch-context |
-| ------- | -------------- | ------------ |
-| Decider | domain         | orders       |
-| Handler | application    | orders       |
-| Infra   | infrastructure | -            |
+| Pattern | arch-layer | arch-context |
+| --- | --- | --- |
+| Decider | domain | orders |
+| Handler | application | orders |
+| Infra | infrastructure | - |
 
 **Layer order is infrastructure-application-domain**
 
@@ -304,10 +303,10 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - Then OrderHandler node label includes "(orders)"
 - And InventoryHandler node label includes "(inventory)"
 
-| Pattern          | arch-layer  | arch-context |
-| ---------------- | ----------- | ------------ |
-| OrderHandler     | application | orders       |
-| InventoryHandler | application | inventory    |
+| Pattern | arch-layer | arch-context |
+| --- | --- | --- |
+| OrderHandler | application | orders |
+| InventoryHandler | application | inventory |
 
 **Patterns without layer go to Other subgraph**
 
@@ -316,10 +315,10 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 - Then output contains subgraph "Other"
 - And Unlayered is inside Other subgraph
 
-| Pattern   | arch-layer  | arch-role |
-| --------- | ----------- | --------- |
-| Layered   | application | handler   |
-| Unlayered | -           | saga      |
+| Pattern | arch-layer | arch-role |
+| --- | --- | --- |
+| Layered | application | handler |
+| Unlayered | - | saga |
 
 **Architecture generator is registered**
 
@@ -379,7 +378,7 @@ using dedicated `arch-*` tags for precise control. Three tags classify component
 **Architecture tags exist in the tag registry**
 
 **Invariant:** Three architecture-specific tags (`arch-role`, `arch-context`,
-`arch-layer`) must exist in the tag registry with correct format and enum values.
+    `arch-layer`) must exist in the tag registry with correct format and enum values.
 
     **Rationale:** Architecture diagram generation requires metadata to classify
     source files into diagram components. Standard tag infrastructure enables
@@ -397,7 +396,7 @@ _Verified by: Tag registry contains arch-role, Tag registry contains arch-contex
 **AST parser extracts architecture tags from TypeScript**
 
 **Invariant:** The AST parser must extract `arch-role`, `arch-context`, and
-`arch-layer` tags from TypeScript JSDoc comments into DocDirective objects.
+    `arch-layer` tags from TypeScript JSDoc comments into DocDirective objects.
 
     **Rationale:** Source code annotations are the single source of truth for
     architectural metadata. Parser must extract them alongside existing pattern metadata.
@@ -410,7 +409,7 @@ _Verified by: Extract arch-role from TypeScript annotation, Extract arch-context
 **MasterDataset builds archIndex during transformation**
 
 **Invariant:** The `transformToMasterDataset` function must build an `archIndex`
-that groups patterns by role, context, and layer for efficient diagram generation.
+    that groups patterns by role, context, and layer for efficient diagram generation.
 
     **Rationale:** Single-pass extraction during dataset transformation avoids
     expensive re-traversal. Index structure enables O(1) lookup by each dimension.
@@ -423,7 +422,7 @@ _Verified by: archIndex groups patterns by arch-role, archIndex groups patterns 
 **Component diagrams group patterns by bounded context**
 
 **Invariant:** Component diagrams must render patterns as nodes grouped into
-bounded context subgraphs, with relationship arrows using UML-inspired styles.
+    bounded context subgraphs, with relationship arrows using UML-inspired styles.
 
     **Rationale:** Component diagrams visualize system architecture showing how
     bounded contexts isolate components. Subgraphs enforce visual separation.
@@ -436,7 +435,7 @@ _Verified by: Generate subgraphs per bounded context, Patterns without arch-cont
 **Layered diagrams group patterns by architectural layer**
 
 **Invariant:** Layered diagrams must render patterns grouped by architectural
-layer (domain, application, infrastructure) with top-to-bottom flow.
+    layer (domain, application, infrastructure) with top-to-bottom flow.
 
     **Rationale:** Layered architecture visualization shows dependency direction -
     infrastructure at top, domain at bottom - following conventional layer ordering.
@@ -449,7 +448,7 @@ _Verified by: Generate subgraphs per layer, Layer order is infrastructure-applic
 **Architecture generator is registered with generator registry**
 
 **Invariant:** An "architecture" generator must be registered with the generator
-registry to enable `pnpm docs:architecture` via the existing `generate-docs.js` CLI.
+    registry to enable `pnpm docs:architecture` via the existing `generate-docs.js` CLI.
 
     **Rationale:** The delivery-process uses a generator registry pattern. New
     generators register with the orchestrator rather than creating separate CLI commands.
@@ -462,7 +461,7 @@ _Verified by: Architecture generator is registered, Generator produces component
 **Sequence diagrams render interaction flows**
 
 **Invariant:** Sequence diagrams must render interaction flows (command flow,
-saga flow) showing step-by-step message passing between components.
+    saga flow) showing step-by-step message passing between components.
 
     **Rationale:** Component diagrams show structure but not behavior. Sequence
     diagrams show runtime flow - essential for understanding command/saga execution.

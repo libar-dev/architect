@@ -6,39 +6,37 @@
 
 ## Overview
 
-| Property       | Value                                                  |
-| -------------- | ------------------------------------------------------ |
-| Status         | completed                                              |
-| Product Area   | Annotation                                             |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Annotation |
 | Business Value | enable human readable documentation from feature files |
-| Phase          | 100                                                    |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Feature files were limited to flat scenario lists. Business rules, rationale,
-and rich descriptions could not be captured in a way that:
+  Feature files were limited to flat scenario lists. Business rules, rationale,
+  and rich descriptions could not be captured in a way that:
+  - Tests ignore (vitest-cucumber skips descriptions)
+  - Generators render (PRD shows business context)
+  - Maintains single source of truth (one file, two purposes)
 
-- Tests ignore (vitest-cucumber skips descriptions)
-- Generators render (PRD shows business context)
-- Maintains single source of truth (one file, two purposes)
+  The Gherkin `Rule:` keyword was parsed by @cucumber/gherkin but our pipeline
+  dropped the data at scanner/extractor stages.
 
-The Gherkin `Rule:` keyword was parsed by @cucumber/gherkin but our pipeline
-dropped the data at scanner/extractor stages.
+  **Solution:**
+  Extended the documentation pipeline to capture and render:
+  - `Rule:` keyword as Business Rules sections
+  - Rule descriptions (rationale, exceptions, context)
+  - DataTables in steps as Markdown tables
+  - DocStrings in steps as code blocks
 
-**Solution:**
-Extended the documentation pipeline to capture and render:
+  Infrastructure changes (schema, scanner, extractor) are shared by all generators.
+  Rendering was added to PRD generator as reference implementation.
 
-- `Rule:` keyword as Business Rules sections
-- Rule descriptions (rationale, exceptions, context)
-- DataTables in steps as Markdown tables
-- DocStrings in steps as code blocks
-
-Infrastructure changes (schema, scanner, extractor) are shared by all generators.
-Rendering was added to PRD generator as reference implementation.
-
-Confirmed vitest-cucumber supports Rules via `Rule()` + `RuleScenario()` syntax.
-No migration to alternative frameworks needed.
+  Confirmed vitest-cucumber supports Rules via `Rule()` + `RuleScenario()` syntax.
+  No migration to alternative frameworks needed.
 
 ## Acceptance Criteria
 
@@ -95,30 +93,30 @@ No migration to alternative frameworks needed.
 **Rules flow through the entire pipeline without data loss**
 
 The @cucumber/gherkin parser extracts Rules natively. Our pipeline must
-preserve this data through scanner, extractor, and into ExtractedPattern
-so generators can access rule names, descriptions, and nested scenarios.
+    preserve this data through scanner, extractor, and into ExtractedPattern
+    so generators can access rule names, descriptions, and nested scenarios.
 
 _Verified by: Rules are captured by AST parser, Rules pass through scanner, Rules are mapped to ExtractedPattern_
 
 **Generators can render rules as business documentation**
 
 Business stakeholders see rule names and descriptions as "Business Rules"
-sections, not Given/When/Then syntax. This enables human-readable PRDs
-from the same files used for test execution.
+    sections, not Given/When/Then syntax. This enables human-readable PRDs
+    from the same files used for test execution.
 
 _Verified by: PRD generator renders Business Rules section_
 
 **Custom content blocks render in acceptance criteria**
 
 DataTables and DocStrings in steps should appear in generated documentation,
-providing structured data and code examples alongside step descriptions.
+    providing structured data and code examples alongside step descriptions.
 
 _Verified by: DataTables render as Markdown tables, DocStrings render as code blocks_
 
 **vitest-cucumber executes scenarios inside Rules**
 
 Test execution must work for scenarios inside Rule blocks.
-Use Rule() function with RuleScenario() instead of Scenario().
+    Use Rule() function with RuleScenario() instead of Scenario().
 
 _Verified by: Rule scenarios execute with vitest-cucumber_
 

@@ -6,28 +6,27 @@
 
 ## Overview
 
-| Property       | Value                                                     |
-| -------------- | --------------------------------------------------------- |
-| Status         | planned                                                   |
-| Product Area   | Process                                                   |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Process |
 | Business Value | ensure session directory only contains active phase files |
-| Phase          | 100                                                       |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Session files (docs-living/sessions/phase-\*.md) are ephemeral working
-documents for active phases. When phases complete or are paused, orphaned
-session files should be cleaned up. The cleanup behavior is documented
-but not specified with acceptance criteria.
+  Session files (docs-living/sessions/phase-*.md) are ephemeral working
+  documents for active phases. When phases complete or are paused, orphaned
+  session files should be cleaned up. The cleanup behavior is documented
+  but not specified with acceptance criteria.
 
-**Solution:**
-Formalize cleanup behavior with specifications covering:
-
-- When cleanup triggers
-- What files are deleted vs preserved
-- Error handling
-- Logging/notification of cleanup actions
+  **Solution:**
+  Formalize cleanup behavior with specifications covering:
+  - When cleanup triggers
+  - What files are deleted vs preserved
+  - Error handling
+  - Logging/notification of cleanup actions
 
 ## Acceptance Criteria
 
@@ -48,11 +47,11 @@ Formalize cleanup behavior with specifications covering:
 - And .gitkeep is preserved
 - And notes.md is preserved
 
-| File        | Type             |
-| ----------- | ---------------- |
+| File | Type |
+| --- | --- |
 | phase-31.md | orphaned session |
-| .gitkeep    | infrastructure   |
-| notes.md    | manual notes     |
+| .gitkeep | infrastructure |
+| notes.md | manual notes |
 
 **Permission error during cleanup**
 
@@ -75,7 +74,7 @@ Formalize cleanup behavior with specifications covering:
 
 _Verified by: Cleanup runs after generating session files_
 
-**Only phase-\*.md files are candidates for cleanup**
+**Only phase-*.md files are candidates for cleanup**
 
 _Verified by: Non-session files are preserved_
 

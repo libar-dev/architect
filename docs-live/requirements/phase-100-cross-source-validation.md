@@ -6,28 +6,27 @@
 
 ## Overview
 
-| Property       | Value                                                         |
-| -------------- | ------------------------------------------------------------- |
-| Status         | planned                                                       |
-| Product Area   | Annotation                                                    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Annotation |
 | Business Value | detect inconsistencies between typescript and gherkin sources |
-| Phase          | 100                                                           |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-The delivery process uses dual sources (TypeScript phase files and Gherkin
-feature files) that must remain consistent. Currently there's no validation
-to detect:
+  The delivery process uses dual sources (TypeScript phase files and Gherkin
+  feature files) that must remain consistent. Currently there's no validation
+  to detect:
+  - Pattern name mismatches
+  - Missing spec file references
+  - Circular dependency chains
+  - Orphaned deliverables (not linked to any phase)
 
-- Pattern name mismatches
-- Missing spec file references
-- Circular dependency chains
-- Orphaned deliverables (not linked to any phase)
-
-**Solution:**
-Implement cross-source validation that scans both source types and
-detects inconsistencies, broken references, and logical errors.
+  **Solution:**
+  Implement cross-source validation that scans both source types and
+  detects inconsistencies, broken references, and logical errors.
 
 ## Acceptance Criteria
 

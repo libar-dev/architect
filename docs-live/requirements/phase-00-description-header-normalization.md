@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Pattern descriptions should not create duplicate headers when rendered.
-If directive descriptions start with markdown headers, those headers
-should be stripped before rendering under the "Description" section.
+  If directive descriptions start with markdown headers, those headers
+  should be stripped before rendering under the "Description" section.
 
 ## Acceptance Criteria
 
@@ -42,16 +42,15 @@ Events that fail processing are tracked and isolated.
 
 ```markdown
 ## Topic Name
-
 ### Subtopic
 
 Actual content starts here.
 ```
 
-| header        |
-| ------------- |
+| header |
+| --- |
 | ## Topic Name |
-| ### Subtopic  |
+| ### Subtopic |
 
 **Preserve description without leading header**
 
@@ -82,7 +81,9 @@ They are moved to a poison queue for manual review.
 - Then no Description section is rendered
 
 ```markdown
+
 ## Header Only
+
 ```
 
 **Header in middle of description is preserved**

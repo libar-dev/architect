@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Tests for the detectDeliverableChanges function that parses git diff output.
-Verifies that status changes are correctly identified as modifications,
-not as additions or removals.
+  Verifies that status changes are correctly identified as modifications,
+  not as additions or removals.
 
 ## Acceptance Criteria
 
@@ -60,11 +60,11 @@ not as additions or removals.
 - And the deliverable "New feature" is in the "added" list
 - And the deliverable "Old feature" is in the "removed" list
 
-| change_type   | deliverable      |
-| ------------- | ---------------- |
+| change_type | deliverable |
+| --- | --- |
 | status_change | Existing feature |
-| added         | New feature      |
-| removed       | Old feature      |
+| added | New feature |
+| removed | Old feature |
 
 **Changes in Examples tables are not detected as deliverable changes**
 

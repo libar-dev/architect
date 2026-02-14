@@ -6,42 +6,40 @@
 
 ## Overview
 
-| Property       | Value                                   |
-| -------------- | --------------------------------------- |
-| Status         | planned                                 |
-| Product Area   | Process                                 |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Process |
 | Business Value | make existing behavior specs executable |
-| Phase          | 103                                     |
+| Phase | 103 |
 
 ## Description
 
 **Problem:**
-7 feature files in tests/features/behavior/ have complete Gherkin specs
-but NO step definitions. These specs describe expected behavior but are
-NOT executable - they're documentation without tests.
+  7 feature files in tests/features/behavior/ have complete Gherkin specs
+  but NO step definitions. These specs describe expected behavior but are
+  NOT executable - they're documentation without tests.
 
-**Solution:**
-Create step definitions for each existing feature file:
+  **Solution:**
+  Create step definitions for each existing feature file:
+  - pr-changes-generation.feature (12 scenarios)
+  - remaining-work-enhancement.feature (7 scenarios)
+  - remaining-work-totals.feature (6 scenarios)
+  - session-handoffs.feature (9 scenarios)
+  - description-headers.feature (6 scenarios)
+  - description-quality-foundation.feature (10 scenarios)
+  - implementation-links.feature (5 scenarios)
 
-- pr-changes-generation.feature (12 scenarios)
-- remaining-work-enhancement.feature (7 scenarios)
-- remaining-work-totals.feature (6 scenarios)
-- session-handoffs.feature (9 scenarios)
-- description-headers.feature (6 scenarios)
-- description-quality-foundation.feature (10 scenarios)
-- implementation-links.feature (5 scenarios)
+  Additionally, 3 feature files in other directories need step definitions:
+  - tests/features/generators/table-extraction.feature
+  - tests/features/scanner/docstring-mediatype.feature
+  - tests/features/generators/business-rules-codec.feature
 
-Additionally, 3 feature files in other directories need step definitions:
-
-- tests/features/generators/table-extraction.feature
-- tests/features/scanner/docstring-mediatype.feature
-- tests/features/generators/business-rules-codec.feature
-
-**Business Value:**
-| Benefit | How |
-| Executable Tests | Specs become regression tests |
-| CI Integration | Tests run on every commit |
-| Refactoring Safety | Changes verified against specs |
+  **Business Value:**
+  | Benefit | How |
+  | Executable Tests | Specs become regression tests |
+  | CI Integration | Tests run on every commit |
+  | Refactoring Safety | Changes verified against specs |
 
 ## Acceptance Criteria
 
@@ -97,7 +95,7 @@ Additionally, 3 feature files in other directories need step definitions:
 **Generator-related specs need step definitions for output validation**
 
 **Invariant:** Step definitions test actual codec output against expected structure.
-Factory functions from tests/fixtures/ should be used for test data.
+    Factory functions from tests/fixtures/ should be used for test data.
 
     **Existing Specs:**
     - `tests/features/behavior/pr-changes-generation.feature` - 12 scenarios
@@ -118,7 +116,7 @@ _Verified by: pr-changes-generation.steps.ts implements all 12 scenarios, remain
 **Renderable helper specs need step definitions for utility functions**
 
 **Invariant:** Helper functions are pure and easy to unit test.
-Step definitions should test edge cases identified in specs.
+    Step definitions should test edge cases identified in specs.
 
     **Existing Specs:**
     - `tests/features/behavior/description-headers.feature` - 6 scenarios
@@ -136,7 +134,9 @@ _Verified by: description-headers.steps.ts tests header stripping, description-q
 
 **Remaining specs in other directories need step definitions**
 
-**Existing Specs:** - `tests/features/generators/table-extraction.feature` - `tests/features/scanner/docstring-mediatype.feature`
+**Existing Specs:**
+    - `tests/features/generators/table-extraction.feature`
+    - `tests/features/scanner/docstring-mediatype.feature`
 
     **Verified by:** Table extraction step defs, DocString mediatype step defs
 
@@ -145,7 +145,7 @@ _Verified by: table-extraction.steps.ts tests stripMarkdownTables, docstring-med
 **Step definition implementation follows project patterns**
 
 **Pattern:** All step definitions should follow the established patterns in
-existing .steps.ts files for consistency.
+    existing .steps.ts files for consistency.
 
     **Template:**
     ```typescript

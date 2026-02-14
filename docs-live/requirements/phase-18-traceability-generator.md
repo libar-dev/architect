@@ -6,30 +6,29 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | planned    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
 | Product Area | Generation |
-| Phase        | 18         |
+| Phase | 18 |
 
 ## Description
 
 **Business Value:** Provide audit-ready traceability matrices that demonstrate
-test coverage for business rules without manual documentation.
+  test coverage for business rules without manual documentation.
 
-**How It Works:**
+  **How It Works:**
+  - Parse `**Verified by:**` annotations in Rule descriptions
+  - Match scenario names to actual scenarios in feature files
+  - Generate traceability matrix showing Rule → Scenario mappings
+  - Report coverage gaps (rules without scenarios, orphan scenarios)
 
-- Parse `**Verified by:**` annotations in Rule descriptions
-- Match scenario names to actual scenarios in feature files
-- Generate traceability matrix showing Rule → Scenario mappings
-- Report coverage gaps (rules without scenarios, orphan scenarios)
-
-**Why It Matters:**
-| Benefit | How |
-| Audit compliance | Demonstrates which tests verify which business rules |
-| Coverage visibility | Identifies rules without verification scenarios |
-| Orphan detection | Finds scenarios not linked to any rule |
-| Impact analysis | Shows which scenarios to run when a rule changes |
+  **Why It Matters:**
+  | Benefit | How |
+  | Audit compliance | Demonstrates which tests verify which business rules |
+  | Coverage visibility | Identifies rules without verification scenarios |
+  | Orphan detection | Finds scenarios not linked to any rule |
+  | Impact analysis | Shows which scenarios to run when a rule changes |
 
 ## Acceptance Criteria
 
@@ -44,11 +43,11 @@ Rule: Reservations prevent race conditions
   **Verified by:** Concurrent reservations, Expired reservation cleanup, User cancels
 ```
 
-| Scenario Reference          |
-| --------------------------- |
-| Concurrent reservations     |
+| Scenario Reference |
+| --- |
+| Concurrent reservations |
 | Expired reservation cleanup |
-| User cancels                |
+| User cancels |
 
 **Reports unmatched scenario references**
 
@@ -64,11 +63,11 @@ Rule: Reservations prevent race conditions
 - When the traceability generator runs
 - Then the matrix should include 3 rows for each Rule
 
-| Feature                     | Rule                                 |
-| --------------------------- | ------------------------------------ |
+| Feature | Rule |
+| --- | --- |
 | reservation-pattern.feature | Reservations prevent race conditions |
-| reservation-pattern.feature | TTL enables auto-cleanup             |
-| event-store.feature         | Events are immutable                 |
+| reservation-pattern.feature | TTL enables auto-cleanup |
+| event-store.feature | Events are immutable |
 
 **Matrix shows verification status with scenario count**
 
@@ -77,9 +76,9 @@ Rule: Reservations prevent race conditions
 - Then the Rule row should show "2 scenarios"
 - And the Rule row should show status "verified"
 
-| Scenario                    |
-| --------------------------- |
-| Concurrent reservations     |
+| Scenario |
+| --- |
+| Concurrent reservations |
 | Expired reservation cleanup |
 
 **Matrix marks unverified rules**
@@ -98,11 +97,11 @@ Rule: Reservations prevent race conditions
 - And section should list "Internal helper scenario"
 - And section should NOT list "Concurrent reservations"
 
-| Scenario                 | Referenced by Rule |
-| ------------------------ | ------------------ |
-| Concurrent reservations  | Yes                |
-| Random utility test      | No                 |
-| Internal helper scenario | No                 |
+| Scenario | Referenced by Rule |
+| --- | --- |
+| Concurrent reservations | Yes |
+| Random utility test | No |
+| Internal helper scenario | No |
 
 **Reports unverified rules**
 
@@ -111,10 +110,10 @@ Rule: Reservations prevent race conditions
 - Then output should include "Unverified Rules" section
 - And section should list "Legacy rule without annotation"
 
-| Rule                                 | Has Verified by |
-| ------------------------------------ | --------------- |
-| Reservations prevent race conditions | Yes             |
-| Legacy rule without annotation       | No              |
+| Rule | Has Verified by |
+| --- | --- |
+| Reservations prevent race conditions | Yes |
+| Legacy rule without annotation | No |
 
 **Filters matrix by phase**
 
@@ -133,7 +132,7 @@ Rule: Reservations prevent race conditions
 **Parses Verified by annotations to extract scenario references**
 
 **Invariant:** Scenario names in `**Verified by:**` are matched against actual
-scenarios in feature files. Unmatched references are reported as warnings.
+    scenarios in feature files. Unmatched references are reported as warnings.
 
     **Rationale:** Verified by annotations create explicit traceability. Validating
     references ensures the traceability matrix reflects actual test coverage.
@@ -145,7 +144,7 @@ _Verified by: Parses comma-separated scenario list, Reports unmatched scenario r
 **Generates Rule-to-Scenario traceability matrix**
 
 **Invariant:** Every Rule appears in the matrix with its verification status.
-Scenarios are linked by name and file location.
+    Scenarios are linked by name and file location.
 
     **Rationale:** A matrix format enables quick scanning of coverage status and
     supports audit requirements for bidirectional traceability.
@@ -157,7 +156,7 @@ _Verified by: Matrix includes all rules from feature files, Matrix shows verific
 **Detects and reports coverage gaps**
 
 **Invariant:** Orphan scenarios (not referenced by any Rule) and unverified
-rules are listed in dedicated sections.
+    rules are listed in dedicated sections.
 
     **Rationale:** Coverage gaps indicate either missing traceability annotations
     or actual missing test coverage. Surfacing them enables remediation.
@@ -169,7 +168,7 @@ _Verified by: Reports orphan scenarios not linked to any rule, Reports unverifie
 **Supports filtering by phase and domain**
 
 **Invariant:** CLI flags allow filtering the matrix by phase number or domain
-category to generate focused traceability reports.
+    category to generate focused traceability reports.
 
     **Rationale:** Large codebases have many rules. Filtering enables relevant
     subset extraction for specific audits or reviews.

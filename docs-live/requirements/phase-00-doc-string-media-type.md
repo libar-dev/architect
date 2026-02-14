@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 DocString language hints (mediaType) should be preserved through the parsing
-pipeline from feature files to rendered output. This prevents code blocks
-from being incorrectly escaped when the language hint is lost.
+  pipeline from feature files to rendered output. This prevents code blocks
+  from being incorrectly escaped when the language hint is lost.
 
 ## Acceptance Criteria
 
@@ -54,7 +54,7 @@ from being incorrectly escaped when the language hint is lost.
 
 **JSDoc mediaType prevents asterisk escaping**
 
-- Given a docString with content "/\*_ @param name _/" and mediaType "jsdoc"
+- Given a docString with content "/** @param name */" and mediaType "jsdoc"
 - When the step docString is rendered
 - Then the code block language is "jsdoc"
 - And asterisks are not escaped in the output

@@ -6,27 +6,26 @@
 
 ## Overview
 
-| Property       | Value                                                         |
-| -------------- | ------------------------------------------------------------- |
-| Status         | planned                                                       |
-| Product Area   | Validation                                                    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Validation |
 | Business Value | prevent phase number conflicts and ensure consistent ordering |
-| Phase          | 100                                                           |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Phase numbers are assigned manually without validation, leading to
-potential conflicts (duplicate numbers), gaps that confuse ordering,
-and inconsistent conventions across sources.
+  Phase numbers are assigned manually without validation, leading to
+  potential conflicts (duplicate numbers), gaps that confuse ordering,
+  and inconsistent conventions across sources.
 
-**Solution:**
-Define and validate phase numbering conventions:
-
-- Unique phase numbers per release version
-- Gap detection and warnings
-- Cross-source consistency validation
-- Suggested next phase number
+  **Solution:**
+  Define and validate phase numbering conventions:
+  - Unique phase numbers per release version
+  - Gap detection and warnings
+  - Cross-source consistency validation
+  - Suggested next phase number
 
 ## Acceptance Criteria
 

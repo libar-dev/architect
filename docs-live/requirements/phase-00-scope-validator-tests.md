@@ -6,20 +6,20 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | DataAPI   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 
 ## Description
 
 **Problem:**
-Starting an implementation or design session without checking prerequisites
-wastes time when blockers are discovered mid-session.
+  Starting an implementation or design session without checking prerequisites
+  wastes time when blockers are discovered mid-session.
 
-**Solution:**
-ScopeValidator runs composable checks and aggregates results into a verdict
-(ready, blocked, or warnings) before a session starts.
+  **Solution:**
+  ScopeValidator runs composable checks and aggregates results into a verdict
+  (ready, blocked, or warnings) before a session starts.
 
 ## Acceptance Criteria
 

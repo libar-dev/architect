@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | DataAPI   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 
 ## Description
 
@@ -42,13 +42,13 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 **Fail without --input flag**
 
-- When running "validate-patterns -F features/\*.feature"
+- When running "validate-patterns -F features/*.feature"
 - Then exit code is 1
 - And stderr contains "No TypeScript sources specified"
 
 **Fail without --features flag**
 
-- When running "validate-patterns -i src/\*.ts"
+- When running "validate-patterns -i src/*.ts"
 - Then exit code is 1
 - And stderr contains "No feature files specified"
 
@@ -56,7 +56,7 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 - Given a TypeScript file "src/pattern.ts" with pattern "TestPattern" at phase 1 status "completed"
 - And a Gherkin file "features/test.feature" with pattern "TestPattern" at phase 1 status "completed"
-- When running "validate-patterns -i src/_.ts -F features/_.feature"
+- When running "validate-patterns -i src/*.ts -F features/*.feature"
 - Then exit code is 0
 - And stdout contains "All validations passed"
 
@@ -64,7 +64,7 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 - Given a TypeScript file "src/pattern.ts" with pattern "MismatchPattern" at phase 1 status "active"
 - And a Gherkin file "features/test.feature" with pattern "MismatchPattern" at phase 2 status "active"
-- When running "validate-patterns -i src/_.ts -F features/_.feature"
+- When running "validate-patterns -i src/*.ts -F features/*.feature"
 - Then exit code is 1
 - And stdout contains "Phase mismatch"
 
@@ -72,7 +72,7 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 - Given a TypeScript file "src/pattern.ts" with pattern "StatusMismatch" at phase 1 status "active"
 - And a Gherkin file "features/test.feature" with pattern "StatusMismatch" at phase 1 status "completed"
-- When running "validate-patterns -i src/_.ts -F features/_.feature"
+- When running "validate-patterns -i src/*.ts -F features/*.feature"
 - Then exit code is 1
 - And stdout contains "Status mismatch"
 
@@ -80,7 +80,7 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 - Given a TypeScript file "src/pattern.ts" with pattern "JsonTest" at phase 1 status "completed"
 - And a Gherkin file "features/test.feature" with pattern "JsonTest" at phase 1 status "completed"
-- When running "validate-patterns -i src/_.ts -F features/_.feature --format json"
+- When running "validate-patterns -i src/*.ts -F features/*.feature --format json"
 - Then exit code is 0
 - And stdout is valid JSON
 
@@ -88,27 +88,27 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 - Given a TypeScript file "src/pattern.ts" with pattern "PrettyTest" at phase 1 status "completed"
 - And a Gherkin file "features/test.feature" with pattern "PrettyTest" at phase 1 status "completed"
-- When running "validate-patterns -i src/_.ts -F features/_.feature"
+- When running "validate-patterns -i src/*.ts -F features/*.feature"
 - Then exit code is 0
 - And stdout contains "Pattern Validation Summary"
 
 **Strict mode exits with code 2 on warnings**
 
 - Given a TypeScript file "src/pattern.ts" with pattern "StrictTest" at phase 1 status "active"
-- When running "validate-patterns -i src/_.ts -F features/_.feature --strict"
+- When running "validate-patterns -i src/*.ts -F features/*.feature --strict"
 - Then exit code is 2
 
 **Non-strict mode passes with warnings**
 
 - Given a TypeScript file "src/pattern.ts" with pattern "NonStrictTest" at phase 1 status "active"
-- When running "validate-patterns -i src/_.ts -F features/_.feature"
+- When running "validate-patterns -i src/*.ts -F features/*.feature"
 - Then exit code is 0
 
 **Warn on unknown flag but continue**
 
 - Given a TypeScript file "src/pattern.ts" with pattern "UnknownFlagTest" at phase 1 status "completed"
 - And a Gherkin file "features/test.feature" with pattern "UnknownFlagTest" at phase 1 status "completed"
-- When running "validate-patterns --unknown-flag -i src/_.ts -F features/_.feature"
+- When running "validate-patterns --unknown-flag -i src/*.ts -F features/*.feature"
 - Then exit code is 0
 - And output contains "Warning"
 

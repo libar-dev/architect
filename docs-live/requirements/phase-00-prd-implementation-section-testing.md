@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tests the Implementations section rendering in pattern documents.
-Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
-with working links to the source files.
+  Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
+  with working links to the source files.
 
 ## Acceptance Criteria
 
@@ -28,14 +28,14 @@ with working links to the source files.
 - And the document contains file link to "durability/outbox.ts"
 - And the document contains implementation description "Action results captured"
 
-| Field    | Value          |
-| -------- | -------------- |
-| status   | roadmap        |
+| Field | Value |
+| --- | --- |
+| status | roadmap |
 | category | event-sourcing |
 
-| Field       | Value                                           |
-| ----------- | ----------------------------------------------- |
-| name        | OutboxPattern                                   |
+| Field | Value |
+| --- | --- |
+| name | OutboxPattern |
 | description | Action results captured via onComplete mutation |
 
 **Implementation includes description when available**
@@ -45,14 +45,14 @@ with working links to the source files.
 - When generating the pattern document for "TestPattern"
 - Then the document contains implementation description "This implementation provides core functionality"
 
-| Field    | Value  |
-| -------- | ------ |
-| status   | active |
-| category | core   |
+| Field | Value |
+| --- | --- |
+| status | active |
+| category | core |
 
-| Field       | Value                                           |
-| ----------- | ----------------------------------------------- |
-| name        | TestImpl                                        |
+| Field | Value |
+| --- | --- |
+| name | TestImpl |
 | description | This implementation provides core functionality |
 
 **Multiple implementations sorted by file path**
@@ -62,22 +62,22 @@ with working links to the source files.
 - When generating the pattern document for "MultiImplPattern"
 - Then implementations appear in file path order:
 
-| Field    | Value  |
-| -------- | ------ |
-| status   | active |
-| category | core   |
+| Field | Value |
+| --- | --- |
+| status | active |
+| category | core |
 
-| File                           | Name               |
-| ------------------------------ | ------------------ |
-| durability/outbox.ts           | OutboxPattern      |
-| durability/publication.ts      | PublicationPattern |
-| durability/idempotentAppend.ts | IdempotentAppend   |
+| File | Name |
+| --- | --- |
+| durability/outbox.ts | OutboxPattern |
+| durability/publication.ts | PublicationPattern |
+| durability/idempotentAppend.ts | IdempotentAppend |
 
-| File                           |
-| ------------------------------ |
+| File |
+| --- |
 | durability/idempotentAppend.ts |
-| durability/outbox.ts           |
-| durability/publication.ts      |
+| durability/outbox.ts |
+| durability/publication.ts |
 
 **No implementations section when none exist**
 
@@ -86,10 +86,10 @@ with working links to the source files.
 - When generating the pattern document for "NoImplPattern"
 - Then the document does not contain heading "Implementations"
 
-| Field    | Value   |
-| -------- | ------- |
-| status   | roadmap |
-| category | core    |
+| Field | Value |
+| --- | --- |
+| status | roadmap |
+| category | core |
 
 **Links are relative from patterns directory**
 
@@ -99,14 +99,14 @@ with working links to the source files.
 - Then the implementation link path starts with "../"
 - And the implementation link path contains "outbox.ts"
 
-| Field    | Value  |
-| -------- | ------ |
-| status   | active |
-| category | infra  |
+| Field | Value |
+| --- | --- |
+| status | active |
+| category | infra |
 
-| Field       | Value                 |
-| ----------- | --------------------- |
-| name        | Outbox                |
+| Field | Value |
+| --- | --- |
+| name | Outbox |
 | description | Outbox implementation |
 
 ## Business Rules

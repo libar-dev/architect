@@ -6,17 +6,17 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The warning collector provides a unified system for capturing, categorizing,
-and reporting non-fatal issues during document generation. It replaces
-scattered console.warn calls with structured warning handling that integrates
-with the Result pattern.
+  and reporting non-fatal issues during document generation. It replaces
+  scattered console.warn calls with structured warning handling that integrates
+  with the Result pattern.
 
 ## Acceptance Criteria
 
@@ -146,42 +146,42 @@ with the Result pattern.
 **Warnings are captured with source context**
 
 Each warning includes the source location, category, and message to
-enable debugging and targeted fixes.
+    enable debugging and targeted fixes.
 
 _Verified by: Warning includes source file, Warning includes line number when available, Warning includes category_
 
 **Warnings are categorized for filtering and grouping**
 
 Warning categories enable filtering by severity, source, or type
-for different reporting needs.
+    for different reporting needs.
 
 _Verified by: Warning categories are supported, Warnings can be filtered by category, Warnings can be filtered by source file_
 
 **Warnings are aggregated across the pipeline**
 
 The collector aggregates warnings from all pipeline stages, maintaining
-insertion order and source attribution.
+    insertion order and source attribution.
 
 _Verified by: Warnings from multiple stages are collected, Warnings are grouped by source file, Summary counts by category_
 
 **Warnings integrate with the Result pattern**
 
 The warning collector integrates with Result<T, E> to include warnings
-in successful results, enabling callers to inspect non-fatal issues.
+    in successful results, enabling callers to inspect non-fatal issues.
 
 _Verified by: Successful result includes warnings, Failed result includes warnings collected before failure, Warnings propagate through pipeline_
 
 **Warnings can be formatted for different outputs**
 
 The collector provides formatters for console output, JSON, and
-markdown to support different reporting needs.
+    markdown to support different reporting needs.
 
 _Verified by: Console format includes color and location, JSON format is machine-readable, Markdown format for documentation_
 
 **Existing console.warn calls are migrated to collector**
 
 All console.warn calls in the source mapper and related modules
-are replaced with warning collector calls.
+    are replaced with warning collector calls.
 
 _Verified by: Source mapper uses warning collector, Shape extractor uses warning collector_
 

@@ -6,19 +6,19 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 **Context:** Document generation pipeline needs validation, deduplication, and
-warning collection to work together correctly for production use.
+  warning collection to work together correctly for production use.
 
-**Approach:** Integration tests verify the full pipeline with all robustness
-features enabled, ensuring validation runs first, deduplication merges content,
-and warnings are collected across stages.
+  **Approach:** Integration tests verify the full pipeline with all robustness
+  features enabled, ensuring validation runs first, deduplication merges content,
+  and warnings are collected across stages.
 
 ## Acceptance Criteria
 
@@ -55,10 +55,10 @@ and warnings are collected across stages.
 - Then output contains exactly one "Protection Levels" section
 - And source attribution shows primary source
 
-| Source                         | Method                    |
-| ------------------------------ | ------------------------- |
+| Source | Method |
+| --- | --- |
 | THIS DECISION (Rule: Decision) | Decision rule description |
-| src/lint/process-guard.ts      | JSDoc section             |
+| src/lint/process-guard.ts | JSDoc section |
 
 **Non-duplicate sections are preserved**
 
@@ -130,8 +130,8 @@ and warnings are collected across stages.
 **Validation runs before extraction in the pipeline**
 
 **Invariant:** Validation must complete and pass before extraction begins.
-**Rationale:** Prevents wasted extraction work and provides clear fail-fast behavior.
-**Verified by:** @acceptance-criteria scenarios below.
+    **Rationale:** Prevents wasted extraction work and provides clear fail-fast behavior.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     The validation layer must run first and halt the pipeline if errors
     are found, preventing wasted extraction work.
@@ -141,8 +141,8 @@ _Verified by: Valid decision document generates successfully, Invalid mapping ha
 **Deduplication runs after extraction before assembly**
 
 **Invariant:** Deduplication processes all extracted content before document assembly.
-**Rationale:** All sources must be extracted to identify cross-source duplicates.
-**Verified by:** @acceptance-criteria scenarios below.
+    **Rationale:** All sources must be extracted to identify cross-source duplicates.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     Content from all sources is extracted first, then deduplicated,
     then assembled into the final document.
@@ -152,8 +152,8 @@ _Verified by: Duplicate content is removed from final output, Non-duplicate sect
 **Warnings from all stages are collected and reported**
 
 **Invariant:** Warnings from all pipeline stages are aggregated in the result.
-**Rationale:** Users need visibility into non-fatal issues without blocking generation.
-**Verified by:** @acceptance-criteria scenarios below.
+    **Rationale:** Users need visibility into non-fatal issues without blocking generation.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     Non-fatal issues from validation, extraction, and deduplication are
     collected and included in the result.
@@ -163,8 +163,8 @@ _Verified by: Warnings are collected across pipeline stages, Warnings do not pre
 **Pipeline provides actionable error messages**
 
 **Invariant:** Error messages include context and fix suggestions.
-**Rationale:** Users should fix issues in one iteration without guessing.
-**Verified by:** @acceptance-criteria scenarios below.
+    **Rationale:** Users should fix issues in one iteration without guessing.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     Errors include enough context for users to understand and fix the issue.
 
@@ -173,8 +173,8 @@ _Verified by: File not found error includes fix suggestion, Invalid method error
 **Existing decision documents continue to work**
 
 **Invariant:** Valid existing decision documents generate without new errors.
-**Rationale:** Robustness improvements must be backward compatible.
-**Verified by:** @acceptance-criteria scenarios below.
+    **Rationale:** Robustness improvements must be backward compatible.
+    **Verified by:** @acceptance-criteria scenarios below.
 
     The robustness improvements must not break existing valid decision
     documents that worked with the PoC.

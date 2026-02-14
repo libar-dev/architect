@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 Tests the discoverTaggedShapes function that scans TypeScript source
-code for declarations annotated with the libar-docs-shape JSDoc tag.
+  code for declarations annotated with the libar-docs-shape JSDoc tag.
 
 ## Acceptance Criteria
 
@@ -69,11 +69,7 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
 ```typescript
 /** @libar-docs-shape */
-export enum Priority {
-  Low,
-  Medium,
-  High,
-}
+export enum Priority { Low, Medium, High }
 ```
 
 **Non-exported tagged declaration is extracted**
@@ -109,11 +105,7 @@ export interface Config {
 export type Status = 'active' | 'inactive';
 
 /** @libar-docs-shape core-types */
-export enum Priority {
-  Low,
-  Medium,
-  High,
-}
+export enum Priority { Low, Medium, High }
 
 /** @libar-docs-shape core-types */
 export function validate(input: string): boolean {
@@ -133,7 +125,9 @@ export const MAX_RETRIES: number = 3;
 ```typescript
 /** @libar-docs-shape */
 
+
 // unrelated comment
+
 
 export interface TooFar {
   readonly value: string;
@@ -193,7 +187,7 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 **Declarations opt in via libar-docs-shape tag**
 
 **Invariant:** Only declarations with the libar-docs-shape tag in their
-immediately preceding JSDoc are collected as tagged shapes.
+    immediately preceding JSDoc are collected as tagged shapes.
 
     **Verified by:** Tagged declaration is extracted,
     Untagged export is ignored,
@@ -206,7 +200,7 @@ _Verified by: Tagged declaration is extracted as shape, Untagged exported declar
 **Discovery uses existing estree parser with JSDoc comment scanning**
 
 **Invariant:** The discoverTaggedShapes function uses the existing
-typescript-estree parse() and extractPrecedingJsDoc() approach.
+    typescript-estree parse() and extractPrecedingJsDoc() approach.
 
     **Verified by:** All 5 declaration kinds supported,
     JSDoc gap enforcement,

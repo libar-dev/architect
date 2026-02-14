@@ -6,36 +6,34 @@
 
 ## Overview
 
-| Property       | Value                            |
-| -------------- | -------------------------------- |
-| Status         | planned                          |
-| Product Area   | Validation                       |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Validation |
 | Business Value | filter work by risk and priority |
-| Phase          | 100                              |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Enterprise governance patterns applied everywhere create overhead.
-Simple utility patterns don't need risk tables and stakeholder approvals.
-No way to filter views by governance level.
+  Enterprise governance patterns applied everywhere create overhead.
+  Simple utility patterns don't need risk tables and stakeholder approvals.
+  No way to filter views by governance level.
 
-**Solution:**
-Enable governance as a lens, not a mandate:
+  **Solution:**
+  Enable governance as a lens, not a mandate:
+  - Default: Lightweight (no risk/compliance tags required)
+  - Opt-in: Rich governance for high-risk patterns only
 
-- Default: Lightweight (no risk/compliance tags required)
-- Opt-in: Rich governance for high-risk patterns only
+  Use risk metadata to:
+  - Filter roadmap views by risk level
+  - Require additional metadata only for high-risk patterns
+  - Generate risk-focused dashboards when requested
 
-Use risk metadata to:
+  Implements Convergence Opportunity 6: Progressive Governance.
 
-- Filter roadmap views by risk level
-- Require additional metadata only for high-risk patterns
-- Generate risk-focused dashboards when requested
-
-Implements Convergence Opportunity 6: Progressive Governance.
-
-Note: This is lower priority because simple --filter "risk=high" on
-existing generators achieves 80% of the value. This phase adds polish.
+  Note: This is lower priority because simple --filter "risk=high" on
+  existing generators achieves 80% of the value. This phase adds polish.
 
 ## Acceptance Criteria
 

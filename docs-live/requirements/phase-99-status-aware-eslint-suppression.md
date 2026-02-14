@@ -6,37 +6,35 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | planned    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
 | Product Area | Validation |
-| Phase        | 99         |
+| Phase | 99 |
 
 ## Description
 
 **Problem:**
-Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused
-exports that define API shapes before implementation. Current workaround uses directory-based
-ESLint exclusions which:
+  Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused
+  exports that define API shapes before implementation. Current workaround uses directory-based
+  ESLint exclusions which:
+  - Don't account for status transitions (roadmap -> active -> completed)
+  - Create tech debt when implementations land (exclusions persist)
+  - Require manual maintenance as files move between statuses
 
-- Don't account for status transitions (roadmap -> active -> completed)
-- Create tech debt when implementations land (exclusions persist)
-- Require manual maintenance as files move between statuses
+  **Solution:**
+  Extend the Process Guard Linter infrastructure with an ESLint integration that:
+  1. Reads `@libar-docs-status` from file-level JSDoc comments
+  2. Maps status to protection level using existing `deriveProcessState()`
+  3. Generates dynamic ESLint configuration or filters messages at runtime
+  4. Removes the need for directory-based exclusions entirely
 
-**Solution:**
-Extend the Process Guard Linter infrastructure with an ESLint integration that:
-
-1. Reads `@libar-docs-status` from file-level JSDoc comments
-2. Maps status to protection level using existing `deriveProcessState()`
-3. Generates dynamic ESLint configuration or filters messages at runtime
-4. Removes the need for directory-based exclusions entirely
-
-**Why It Matters:**
-| Benefit | How |
-| Automatic lifecycle handling | Files graduating from roadmap to completed automatically get strict linting |
-| Zero maintenance | No manual exclusion updates when files change status |
-| Consistency with Process Guard | Same status extraction logic, same protection level mapping |
-| Tech debt elimination | Removes ~20 lines of directory-based exclusions from eslint.config.js |
+  **Why It Matters:**
+  | Benefit | How |
+  | Automatic lifecycle handling | Files graduating from roadmap to completed automatically get strict linting |
+  | Zero maintenance | No manual exclusion updates when files change status |
+  | Consistency with Process Guard | Same status extraction logic, same protection level mapping |
+  | Tech debt elimination | Removes ~20 lines of directory-based exclusions from eslint.config.js |
 
 ## Acceptance Criteria
 
@@ -58,7 +56,7 @@ export interface ReservationResult {
 }
 
 export function reserve(): void {
-  throw new Error('Not implemented');
+  throw new Error("Not implemented");
 }
 ```
 
@@ -100,12 +98,12 @@ export interface CMSState {
 - When ESLint processor maps each status
 - Then all mappings match Process Guard behavior
 
-| Status   | Expected Protection |
-| -------- | ------------------- |
-| roadmap  | none                |
-| deferred | none                |
-| active   | scope               |
-| complete | hard                |
+| Status | Expected Protection |
+| --- | --- |
+| roadmap | none |
+| deferred | none |
+| active | scope |
+| complete | hard |
 
 **Processor filters messages in postprocess**
 
@@ -113,10 +111,10 @@ export interface CMSState {
 - When the status-aware processor runs postprocess
 - Then messages are filtered out (removed) or downgraded to severity 1 (warn)
 
-| ruleId                            | severity | message                                       |
-| --------------------------------- | -------- | --------------------------------------------- |
-| @typescript-eslint/no-unused-vars | 2        | 'ReservationResult' is defined but never used |
-| @typescript-eslint/no-unused-vars | 2        | 'reserve' is defined but never used           |
+| ruleId | severity | message |
+| --- | --- | --- |
+| @typescript-eslint/no-unused-vars | 2 | 'ReservationResult' is defined but never used |
+| @typescript-eslint/no-unused-vars | 2 | 'reserve' is defined but never used |
 
 **No source code modification occurs**
 
@@ -131,9 +129,9 @@ export interface CMSState {
 - When the status-aware processor runs postprocess
 - Then the no-explicit-any error is preserved unchanged
 
-| ruleId                             | severity | message        |
-| ---------------------------------- | -------- | -------------- |
-| @typescript-eslint/no-explicit-any | 2        | Unexpected any |
+| ruleId | severity | message |
+| --- | --- | --- |
+| @typescript-eslint/no-explicit-any | 2 | Unexpected any |
 
 **CLI generates ESLint ignore file list**
 
@@ -144,10 +142,10 @@ export interface CMSState {
 - And output does NOT include "src/cms/dual-write.ts"
 - And output format is glob patterns suitable for eslint.config.js
 
-| File                  | Status   |
-| --------------------- | -------- |
-| src/dcb/execute.ts    | roadmap  |
-| src/dcb/types.ts      | roadmap  |
+| File | Status |
+| --- | --- |
+| src/dcb/execute.ts | roadmap |
+| src/dcb/types.ts | roadmap |
 | src/cms/dual-write.ts | complete |
 
 **JSON output mode for programmatic consumption**
@@ -170,10 +168,10 @@ export interface CMSState {
 - Then files pass lint (no unused-vars errors)
 - And files have @libar-docs-status:roadmap annotations
 
-| File                                                              |
-| ----------------------------------------------------------------- |
+| File |
+| --- |
 | delivery-process/stubs/reservation-pattern/reservation-pattern.ts |
-| delivery-process/stubs/durability-types/durability-types.ts       |
+| delivery-process/stubs/durability-types/durability-types.ts |
 
 **Default configuration relaxes no-unused-vars**
 
@@ -190,8 +188,11 @@ export interface CMSState {
 
 ```javascript
 statusAwareProcessor({
-  relaxedRules: ['@typescript-eslint/no-unused-vars', '@typescript-eslint/no-empty-interface'],
-});
+  relaxedRules: [
+    "@typescript-eslint/no-unused-vars",
+    "@typescript-eslint/no-empty-interface",
+  ],
+})
 ```
 
 ## Business Rules
@@ -199,7 +200,7 @@ statusAwareProcessor({
 **File status determines unused-vars enforcement**
 
 **Invariant:** Files with `@libar-docs-status roadmap` or `deferred` have relaxed
-unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.
+    unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.
 
     **Rationale:** Design artifacts (roadmap stubs) define API shapes that are intentionally
     unused until implementation. Relaxing rules for these files prevents false positives
@@ -219,7 +220,7 @@ _Verified by: Roadmap file has relaxed unused-vars rules, Completed file has str
 **Reuses deriveProcessState for status extraction**
 
 **Invariant:** Status extraction logic must be shared with Process Guard Linter.
-No duplicate parsing or status-to-protection mapping.
+    No duplicate parsing or status-to-protection mapping.
 
     **Rationale:** DRY principle - the Process Guard already has battle-tested status
     extraction from JSDoc comments. Duplicating this logic creates maintenance burden
@@ -229,21 +230,21 @@ No duplicate parsing or status-to-protection mapping.
 
 ```typescript
 // Process Guard already has this:
-import { deriveProcessState } from '../lint/process-guard/index.js';
+    import { deriveProcessState } from "../lint/process-guard/index.js";
 
-const state = await deriveProcessState(ctx, files);
-// state.files.get(path).protection -> "none" | "scope" | "hard"
+    const state = await deriveProcessState(ctx, files);
+    // state.files.get(path).protection -> "none" | "scope" | "hard"
 ```
 
 **Target State:**
 
 ```typescript
 // ESLint integration reuses the same logic:
-import { getFileProtectionLevel } from '../lint/process-guard/index.js';
+    import { getFileProtectionLevel } from "../lint/process-guard/index.js";
 
-const protection = getFileProtectionLevel(filePath);
-// protection === "none" -> relax unused-vars
-// protection === "scope" | "hard" -> strict unused-vars
+    const protection = getFileProtectionLevel(filePath);
+    // protection === "none" -> relax unused-vars
+    // protection === "scope" | "hard" -> strict unused-vars
 ```
 
 **Verified by:** Protection level from Process Guard, Consistent status mapping
@@ -253,7 +254,7 @@ _Verified by: Protection level matches Process Guard derivation, Status-to-prote
 **ESLint Processor filters messages based on status**
 
 **Invariant:** The processor uses ESLint's postprocess hook to filter or downgrade
-messages. Source code is never modified. No eslint-disable comments are injected.
+    messages. Source code is never modified. No eslint-disable comments are injected.
 
     **Rationale:** ESLint processors can inspect and filter linting messages after rules
     run. This approach:
@@ -268,7 +269,7 @@ _Verified by: Processor filters messages in postprocess, No source code modifica
 **CLI can generate static ESLint ignore list**
 
 **Invariant:** Running `pnpm lint:process --eslint-ignores` outputs a list of files
-that should have relaxed linting, suitable for inclusion in eslint.config.js.
+    that should have relaxed linting, suitable for inclusion in eslint.config.js.
 
     **Rationale:** For CI environments or users preferring static configuration, a
     generated list provides an alternative to runtime processing. The list can be
@@ -281,7 +282,7 @@ _Verified by: CLI generates ESLint ignore file list, JSON output mode for progra
 **Replaces directory-based ESLint exclusions**
 
 **Invariant:** After implementation, the directory-based exclusions in eslint.config.js
-(lines 30-57) are removed. All suppression is driven by @libar-docs-status annotations.
+    (lines 30-57) are removed. All suppression is driven by @libar-docs-status annotations.
 
     **Rationale:** Directory-based exclusions are tech debt:
     - They don't account for file lifecycle (roadmap -> completed)
@@ -324,7 +325,7 @@ _Verified by: Directory exclusions are removed after migration, Existing roadmap
 **Rule relaxation is configurable**
 
 **Invariant:** The set of rules relaxed for roadmap/deferred files is configurable,
-defaulting to `@typescript-eslint/no-unused-vars`.
+    defaulting to `@typescript-eslint/no-unused-vars`.
 
     **Rationale:** Different projects may want to relax different rules for design
     artifacts. The default covers the common case (unused exports in API stubs).

@@ -6,44 +6,42 @@
 
 ## Overview
 
-| Property       | Value                                |
-| -------------- | ------------------------------------ |
-| Status         | completed                            |
-| Product Area   | DataAPI                              |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 | Business Value | automate session context compilation |
-| Phase          | 25                                   |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-Starting a design or implementation session requires manually compiling
-elaborate context prompts. For example, DS-3 (LLM Integration) needs:
+  Starting a design or implementation session requires manually compiling
+  elaborate context prompts. For example, DS-3 (LLM Integration) needs:
+  - The spec to design against (agent-llm-integration.feature)
+  - Dependency stubs from DS-1 and DS-2 (action-handler, event-subscription, schema)
+  - Consumer specs for outside-in validation (churn-risk, admin-frontend)
+  - Existing infrastructure (CommandOrchestrator, EventBus)
+  - Dependency chain status and design decisions from prior sessions
 
-- The spec to design against (agent-llm-integration.feature)
-- Dependency stubs from DS-1 and DS-2 (action-handler, event-subscription, schema)
-- Consumer specs for outside-in validation (churn-risk, admin-frontend)
-- Existing infrastructure (CommandOrchestrator, EventBus)
-- Dependency chain status and design decisions from prior sessions
+  This manual compilation takes 10-15 minutes per session start and is
+  error-prone (missing dependencies, stale context). Multi-session work
+  requires handoff documentation that is also manually maintained.
 
-This manual compilation takes 10-15 minutes per session start and is
-error-prone (missing dependencies, stale context). Multi-session work
-requires handoff documentation that is also manually maintained.
+  **Solution:**
+  Add session workflow commands that automate two critical session moments:
+  1. **Pre-flight check:** `scope-validate <pattern>` verifies implementation readiness
+  2. **Session end:** `handoff [--pattern X]` generates handoff documentation
 
-**Solution:**
-Add session workflow commands that automate two critical session moments:
+  Session context assembly (the "session start" moment) lives in DataAPIContextAssembly
+  via `context <pattern> --session design|implement|planning`. This spec focuses on
+  the validation and handoff capabilities that build on top of context assembly.
 
-1. **Pre-flight check:** `scope-validate <pattern>` verifies implementation readiness
-2. **Session end:** `handoff [--pattern X]` generates handoff documentation
-
-Session context assembly (the "session start" moment) lives in DataAPIContextAssembly
-via `context <pattern> --session design|implement|planning`. This spec focuses on
-the validation and handoff capabilities that build on top of context assembly.
-
-**Business Value:**
-| Benefit | Impact |
-| 10-15 min session start -> 1 command | Eliminates manual context compilation |
-| Pre-flight catches blockers early | No wasted sessions on unready patterns |
-| Automated handoff | Consistent multi-session state tracking |
+  **Business Value:**
+  | Benefit | Impact |
+  | 10-15 min session start -> 1 command | Eliminates manual context compilation |
+  | Pre-flight catches blockers early | No wasted sessions on unready patterns |
+  | Automated handoff | Consistent multi-session state tracking |
 
 ## Acceptance Criteria
 
@@ -91,7 +89,7 @@ the validation and handoff capabilities that build on top of context assembly.
 **Scope-validate checks implementation prerequisites before session start**
 
 **Invariant:** Scope validation surfaces all blocking conditions before
-committing to a session, preventing wasted effort on unready patterns.
+    committing to a session, preventing wasted effort on unready patterns.
 
     **Rationale:** Starting implementation on a pattern with incomplete
     dependencies wastes an entire session. Starting a design session without
@@ -115,7 +113,7 @@ _Verified by: All scope validation checks pass, Dependency blocker detected, FSM
 **Handoff generates compact session state summary for multi-session work**
 
 **Invariant:** Handoff documentation captures everything the next session
-needs to continue work without context loss.
+    needs to continue work without context loss.
 
     **Rationale:** Multi-session work (common for design phases spanning DS-1
     through DS-7) requires state transfer between sessions. Without automated

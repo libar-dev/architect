@@ -6,23 +6,22 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | CoreTypes |
 
 ## Description
 
 Error factories create structured, discriminated error types with consistent
-message formatting. Each error type has a unique discriminator for exhaustive
-pattern matching in switch statements.
+  message formatting. Each error type has a unique discriminator for exhaustive
+  pattern matching in switch statements.
 
-**Why typed errors matter:**
-
-- Compile-time exhaustiveness checking in error handlers
-- Consistent message formatting across the codebase
-- Structured data for logging and reporting
-- Type narrowing via discriminator field
+  **Why typed errors matter:**
+  - Compile-time exhaustiveness checking in error handlers
+  - Consistent message formatting across the codebase
+  - Structured data for logging and reporting
+  - Type narrowing via discriminator field
 
 ## Acceptance Criteria
 
@@ -71,9 +70,9 @@ pattern matching in switch statements.
 - And the error patternName should be "UserAuth"
 - And the error message should contain all of:
 
-| text        |
-| ----------- |
-| UserAuth    |
+| text |
+| --- |
+| UserAuth |
 | src/auth.ts |
 
 **createPatternValidationError includes validation errors array**
@@ -82,14 +81,14 @@ pattern matching in switch statements.
 - Then the error validationErrors should have 2 items
 - And validationErrors should contain all:
 
-| error                    |
-| ------------------------ |
-| tags: Required           |
+| error |
+| --- |
+| tags: Required |
 | description: Must be set |
 
-| error                    |
-| ------------------------ |
-| tags: Required           |
+| error |
+| --- |
+| tags: Required |
 | description: Must be set |
 
 **createPatternValidationError omits validationErrors when not provided**
@@ -111,10 +110,10 @@ pattern matching in switch statements.
 - Then the error validationErrors should have 2 items
 - And validationErrors should contain "status: Invalid enum value"
 
-| error                      |
-| -------------------------- |
+| error |
+| --- |
 | status: Invalid enum value |
-| phase: Expected number     |
+| phase: Expected number |
 
 **createDeliverableValidationError formats file and reason**
 
@@ -139,9 +138,9 @@ pattern matching in switch statements.
 - When I create a DeliverableValidationError with validation errors:
 - Then the error validationErrors should have 2 items
 
-| error                  |
-| ---------------------- |
-| name: Required         |
+| error |
+| --- |
+| name: Required |
 | tests: Expected number |
 
 ---

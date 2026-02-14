@@ -6,31 +6,28 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Validates that completed phases meet Definition of Done criteria:
+  1. All deliverables must have "complete" status
+  2. At least one @acceptance-criteria scenario must exist
 
-1. All deliverables must have "complete" status
-2. At least one @acceptance-criteria scenario must exist
+  **Problem:**
+  - Phases marked "completed" without all deliverables done
+  - Missing acceptance criteria means no BDD tests
+  - Manual review burden without automated validation
 
-**Problem:**
-
-- Phases marked "completed" without all deliverables done
-- Missing acceptance criteria means no BDD tests
-- Manual review burden without automated validation
-
-**Solution:**
-
-- isDeliverableComplete() detects completion via status patterns
-- hasAcceptanceCriteria() checks for AC scenarios
-- validateDoDForPhase() validates single phase
-- validateDoD() validates across multiple phases
-- formatDoDSummary() renders console-friendly output
+  **Solution:**
+  - isDeliverableComplete() detects completion via status patterns
+  - hasAcceptanceCriteria() checks for AC scenarios
+  - validateDoDForPhase() validates single phase
+  - validateDoD() validates across multiple phases
+  - formatDoDSummary() renders console-friendly output
 
 ## Acceptance Criteria
 
@@ -52,10 +49,10 @@ Validates that completed phases meet Definition of Done criteria:
 - When checking for acceptance criteria
 - Then acceptance criteria is found
 
-| name                     | tags                |
-| ------------------------ | ------------------- |
-| Basic functionality test | happy-path          |
-| Validates edge cases     | acceptance-criteria |
+| name | tags |
+| --- | --- |
+| Basic functionality test | happy-path |
+| Validates edge cases | acceptance-criteria |
 
 **Feature without @acceptance-criteria fails**
 
@@ -63,10 +60,10 @@ Validates that completed phases meet Definition of Done criteria:
 - When checking for acceptance criteria
 - Then acceptance criteria is NOT found
 
-| name                     | tags       |
-| ------------------------ | ---------- |
+| name | tags |
+| --- | --- |
 | Basic functionality test | happy-path |
-| Edge case test           | edge-case  |
+| Edge case test | edge-case |
 
 **Tag matching is case-insensitive**
 
@@ -74,8 +71,8 @@ Validates that completed phases meet Definition of Done criteria:
 - When checking for acceptance criteria
 - Then acceptance criteria is found
 
-| name        | tags                |
-| ----------- | ------------------- |
+| name | tags |
+| --- | --- |
 | AC scenario | ACCEPTANCE-CRITERIA |
 
 **Extract multiple AC scenario names**
@@ -84,16 +81,16 @@ Validates that completed phases meet Definition of Done criteria:
 - When extracting acceptance criteria scenarios
 - Then the extracted scenarios are:
 
-| name                    | tags                |
-| ----------------------- | ------------------- |
-| Setup test              | setup               |
-| User can log in         | acceptance-criteria |
+| name | tags |
+| --- | --- |
+| Setup test | setup |
+| User can log in | acceptance-criteria |
 | User can view dashboard | acceptance-criteria |
-| Edge case test          | edge-case           |
+| Edge case test | edge-case |
 
-| name                    |
-| ----------------------- |
-| User can log in         |
+| name |
+| --- |
+| User can log in |
 | User can view dashboard |
 
 **No AC scenarios returns empty list**
@@ -102,8 +99,8 @@ Validates that completed phases meet Definition of Done criteria:
 - When extracting acceptance criteria scenarios
 - Then no scenarios are extracted
 
-| name      | tags       |
-| --------- | ---------- |
+| name | tags |
+| --- | --- |
 | Some test | happy-path |
 
 **Phase with all deliverables complete and AC passes**
@@ -115,14 +112,14 @@ Validates that completed phases meet Definition of Done criteria:
 - Then DoD is met
 - And the result message contains "DoD met"
 
-| name          | status   |
-| ------------- | -------- |
+| name | status |
+| --- | --- |
 | Implement API | complete |
-| Write tests   | complete |
+| Write tests | complete |
 | Documentation | complete |
 
-| tag                 |
-| ------------------- |
+| tag |
+| --- |
 | acceptance-criteria |
 
 **Phase with incomplete deliverables fails**
@@ -135,14 +132,14 @@ Validates that completed phases meet Definition of Done criteria:
 - And the result has 2 incomplete deliverables
 - And the result message contains "2/3 deliverables incomplete"
 
-| name          | status      |
-| ------------- | ----------- |
-| Implement API | complete    |
-| Write tests   | in-progress |
-| Documentation | pending     |
+| name | status |
+| --- | --- |
+| Implement API | complete |
+| Write tests | in-progress |
+| Documentation | pending |
 
-| tag                 |
-| ------------------- |
+| tag |
+| --- |
 | acceptance-criteria |
 
 **Phase without acceptance criteria fails**
@@ -154,12 +151,12 @@ Validates that completed phases meet Definition of Done criteria:
 - Then DoD is NOT met
 - And the result message contains "No @acceptance-criteria scenarios found"
 
-| name          | status   |
-| ------------- | -------- |
+| name | status |
+| --- | --- |
 | Implement API | complete |
 
-| tag        |
-| ---------- |
+| tag |
+| --- |
 | happy-path |
 
 **Phase without deliverables fails**
@@ -170,8 +167,8 @@ Validates that completed phases meet Definition of Done criteria:
 - Then DoD is NOT met
 - And the result message contains "No deliverables defined"
 
-| tag                 |
-| ------------------- |
+| tag |
+| --- |
 | acceptance-criteria |
 
 **All completed phases passing DoD**
@@ -182,11 +179,11 @@ Validates that completed phases meet Definition of Done criteria:
 - And the summary shows 2 passed phases
 - And the summary shows 0 failed phases
 
-| pattern  | phase | status    | deliverables_complete | has_ac |
-| -------- | ----- | --------- | --------------------- | ------ |
-| PatternA | 10    | completed | true                  | true   |
-| PatternB | 11    | completed | true                  | true   |
-| PatternC | 12    | roadmap   | false                 | false  |
+| pattern | phase | status | deliverables_complete | has_ac |
+| --- | --- | --- | --- | --- |
+| PatternA | 10 | completed | true | true |
+| PatternB | 11 | completed | true | true |
+| PatternC | 12 | roadmap | false | false |
 
 **Mixed pass/fail results**
 
@@ -196,11 +193,11 @@ Validates that completed phases meet Definition of Done criteria:
 - And the summary shows 1 passed phases
 - And the summary shows 2 failed phases
 
-| pattern  | phase | status    | deliverables_complete | has_ac |
-| -------- | ----- | --------- | --------------------- | ------ |
-| PatternA | 10    | completed | true                  | true   |
-| PatternB | 11    | completed | false                 | true   |
-| PatternC | 12    | completed | true                  | false  |
+| pattern | phase | status | deliverables_complete | has_ac |
+| --- | --- | --- | --- | --- |
+| PatternA | 10 | completed | true | true |
+| PatternB | 11 | completed | false | true |
+| PatternC | 12 | completed | true | false |
 
 **Only completed phases are validated by default**
 
@@ -209,11 +206,11 @@ Validates that completed phases meet Definition of Done criteria:
 - Then the summary shows 1 total phases
 - And the summary shows 1 passed phases
 
-| pattern  | phase | status    | deliverables_complete | has_ac |
-| -------- | ----- | --------- | --------------------- | ------ |
-| PatternA | 10    | completed | true                  | true   |
-| PatternB | 11    | active    | false                 | false  |
-| PatternC | 12    | roadmap   | false                 | false  |
+| pattern | phase | status | deliverables_complete | has_ac |
+| --- | --- | --- | --- | --- |
+| PatternA | 10 | completed | true | true |
+| PatternB | 11 | active | false | false |
+| PatternC | 12 | roadmap | false | false |
 
 **Filter to specific phases**
 
@@ -222,11 +219,11 @@ Validates that completed phases meet Definition of Done criteria:
 - Then the summary shows 2 total phases
 - And the summary shows 2 passed phases
 
-| pattern  | phase | status    | deliverables_complete | has_ac |
-| -------- | ----- | --------- | --------------------- | ------ |
-| PatternA | 10    | completed | true                  | true   |
-| PatternB | 11    | active    | true                  | true   |
-| PatternC | 12    | roadmap   | true                  | true   |
+| pattern | phase | status | deliverables_complete | has_ac |
+| --- | --- | --- | --- | --- |
+| PatternA | 10 | completed | true | true |
+| PatternB | 11 | active | true | true |
+| PatternC | 12 | roadmap | true | true |
 
 **Empty summary shows no completed phases message**
 
@@ -243,10 +240,10 @@ Validates that completed phases meet Definition of Done criteria:
 - Then the output shows 2 passed and 0 failed
 - And the output shows passed phase details
 
-| pattern  | phase | passed | deliverable_count |
-| -------- | ----- | ------ | ----------------- |
-| PatternA | 10    | true   | 3                 |
-| PatternB | 11    | true   | 2                 |
+| pattern | phase | passed | deliverable_count |
+| --- | --- | --- | --- |
+| PatternA | 10 | true | 3 |
+| PatternB | 11 | true | 2 |
 
 **Summary with failed phases shows details**
 
@@ -255,10 +252,10 @@ Validates that completed phases meet Definition of Done criteria:
 - Then the output shows 2 failed phases
 - And the output shows failed phase details with messages
 
-| pattern  | phase | message                                 |
-| -------- | ----- | --------------------------------------- |
-| PatternA | 10    | 1/2 deliverables incomplete             |
-| PatternB | 11    | No @acceptance-criteria scenarios found |
+| pattern | phase | message |
+| --- | --- | --- |
+| PatternA | 10 | 1/2 deliverables incomplete |
+| PatternB | 11 | No @acceptance-criteria scenarios found |
 
 ## Business Rules
 

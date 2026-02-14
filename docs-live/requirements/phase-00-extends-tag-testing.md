@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 Tests for the @libar-docs-extends tag which establishes generalization
-relationships between patterns (pattern inheritance).
+  relationships between patterns (pattern inheritance).
 
 ## Acceptance Criteria
 
@@ -52,10 +52,10 @@ Feature: Reactive Projections
 - When the relationship index is built
 - Then "ProjectionCategories" should have extendedBy ["ReactiveProjections", "CachedProjections"]
 
-| name                | extendsPattern       |
-| ------------------- | -------------------- |
+| name | extendsPattern |
+| --- | --- |
 | ReactiveProjections | ProjectionCategories |
-| CachedProjections   | ProjectionCategories |
+| CachedProjections | ProjectionCategories |
 
 **Direct circular inheritance detected**
 
@@ -82,7 +82,7 @@ _Verified by: Extends tag exists in registry_
 **Patterns can extend exactly one base pattern**
 
 Extends uses single-value format because pattern inheritance should be
-single-inheritance to avoid diamond problems.
+    single-inheritance to avoid diamond problems.
 
 _Verified by: Parse extends from feature file, Extends preserved through extraction pipeline_
 

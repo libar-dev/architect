@@ -6,43 +6,42 @@
 
 ## Overview
 
-| Property       | Value                                   |
-| -------------- | --------------------------------------- |
-| Status         | completed                               |
-| Product Area   | DataAPI                                 |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 | Business Value | replace explore agents with one command |
-| Phase          | 25                                      |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-Starting a Claude Code design or implementation session requires assembling
-30-100KB of curated, multi-source context from hundreds of annotated files.
-Today this requires either manual context compilation by the user or 5-10
-explore agents burning context and time. The delivery-process pipeline already
-has rich data (MasterDataset with archIndex, relationshipIndex, byPhase,
-byStatus views) but no command combines data from multiple indexes around
-a focal pattern into a compact, session-oriented context bundle.
+  Starting a Claude Code design or implementation session requires assembling
+  30-100KB of curated, multi-source context from hundreds of annotated files.
+  Today this requires either manual context compilation by the user or 5-10
+  explore agents burning context and time. The delivery-process pipeline already
+  has rich data (MasterDataset with archIndex, relationshipIndex, byPhase,
+  byStatus views) but no command combines data from multiple indexes around
+  a focal pattern into a compact, session-oriented context bundle.
 
-**Solution:**
-Add context assembly subcommands that answer "what should I read next?"
-rather than "what data exists?":
+  **Solution:**
+  Add context assembly subcommands that answer "what should I read next?"
+  rather than "what data exists?":
+  1. `context <pattern>` assembles metadata + spec path + stub paths +
+     dependency chain + related patterns into ~1.5KB of file paths
+  2. `files <pattern>` returns only file paths organized by relevance
+  3. `dep-tree <pattern>` walks dependency chains recursively with status
+  4. `overview` gives executive project summary
+  5. Session type tailoring via `--session planning|design|implement`
 
-1. `context <pattern>` assembles metadata + spec path + stub paths +
-   dependency chain + related patterns into ~1.5KB of file paths
-2. `files <pattern>` returns only file paths organized by relevance
-3. `dep-tree <pattern>` walks dependency chains recursively with status
-4. `overview` gives executive project summary
-5. Session type tailoring via `--session planning|design|implement`
+  Implementation readiness checks (`scope-validate`) live in DataAPIDesignSessionSupport.
 
-Implementation readiness checks (`scope-validate`) live in DataAPIDesignSessionSupport.
-
-**Business Value:**
-| Benefit | Impact |
-| Replace 5-10 explore agents | One command provides curated context |
-| 1.5KB vs 100KB context | 98% reduction in context assembly tokens |
-| Session-type tailoring | Right context for the right workflow |
-| Dependency chain visibility | Know blocking status before starting |
+  **Business Value:**
+  | Benefit | Impact |
+  | Replace 5-10 explore agents | One command provides curated context |
+  | 1.5KB vs 100KB context | 98% reduction in context assembly tokens |
+  | Session-type tailoring | Right context for the right workflow |
+  | Dependency chain visibility | Know blocking status before starting |
 
 ## Acceptance Criteria
 
@@ -163,8 +162,8 @@ Implementation readiness checks (`scope-validate`) live in DataAPIDesignSessionS
 **Context command assembles curated context for a single pattern**
 
 **Invariant:** Given a pattern name, `context` returns everything needed to
-start working on that pattern: metadata, file locations, dependency status,
-and architecture position -- in ~1.5KB of structured text.
+    start working on that pattern: metadata, file locations, dependency status,
+    and architecture position -- in ~1.5KB of structured text.
 
     **Rationale:** This is the core value proposition. The command crosses five
     gaps simultaneously: it assembles data from multiple MasterDataset indexes,
@@ -194,7 +193,7 @@ _Verified by: Assemble design session context, Assemble planning session context
 **Files command returns only file paths organized by relevance**
 
 **Invariant:** `files` returns the most token-efficient output possible --
-just file paths that Claude Code can read directly.
+    just file paths that Claude Code can read directly.
 
     **Rationale:** Most context tokens are spent reading actual files, not
     metadata. The `files` command tells Claude Code *which* files to read,
@@ -216,7 +215,7 @@ _Verified by: File reading list with related patterns, File reading list without
 **Dep-tree command shows recursive dependency chain with status**
 
 **Invariant:** The dependency tree walks both `dependsOn`/`enables` (planning)
-and `uses`/`usedBy` (implementation) relationships with configurable depth.
+    and `uses`/`usedBy` (implementation) relationships with configurable depth.
 
     **Rationale:** Before starting work on a pattern, agents need to know the
     full dependency chain: what must be complete first, what this unblocks, and
@@ -239,7 +238,7 @@ _Verified by: Dependency tree with status markers, Dependency tree with depth li
 **Context command supports multiple patterns with merged output**
 
 **Invariant:** Multi-pattern context deduplicates shared dependencies and
-highlights overlap between patterns.
+    highlights overlap between patterns.
 
     **Rationale:** Design sessions often span multiple related patterns
     (e.g., reviewing DS-2 through DS-5 together). Separate `context` calls

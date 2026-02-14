@@ -6,29 +6,27 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 The extractPatternTags function parses Gherkin feature tags
-into structured metadata objects for pattern processing.
+  into structured metadata objects for pattern processing.
 
-**Problem:**
+  **Problem:**
+  - Gherkin tags are flat strings needing semantic interpretation
+  - Multiple tag formats exist: @tag:value, @libar-process-tag:value
+  - Dependencies and enables can have comma-separated values
+  - Category tags have no colon and must be distinguished from other tags
 
-- Gherkin tags are flat strings needing semantic interpretation
-- Multiple tag formats exist: @tag:value, @libar-process-tag:value
-- Dependencies and enables can have comma-separated values
-- Category tags have no colon and must be distinguished from other tags
-
-**Solution:**
-
-- extractPatternTags parses tag strings into structured metadata
-- Normalizes both @tag:value and @libar-process-tag:value formats
-- Splits comma-separated values for dependencies and enables
-- Filters non-category tags (acceptance-criteria, happy-path, etc.)
+  **Solution:**
+  - extractPatternTags parses tag strings into structured metadata
+  - Normalizes both @tag:value and @libar-process-tag:value formats
+  - Splits comma-separated values for dependencies and enables
+  - Filters non-category tags (acceptance-criteria, happy-path, etc.)
 
 ## Acceptance Criteria
 

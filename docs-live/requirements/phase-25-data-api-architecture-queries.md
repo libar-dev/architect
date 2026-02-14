@@ -6,38 +6,37 @@
 
 ## Overview
 
-| Property       | Value                                             |
-| -------------- | ------------------------------------------------- |
-| Status         | completed                                         |
-| Product Area   | DataAPI                                           |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 | Business Value | deep architecture exploration for design sessions |
-| Phase          | 25                                                |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-The current `arch` subcommand provides basic queries (roles, context, layer, graph)
-but lacks deeper analysis needed for design sessions: pattern neighborhoods (what's
-directly connected), cross-context comparison, annotation coverage gaps, and
-taxonomy discovery. Agents exploring architecture must make multiple queries and
-mentally assemble the picture, wasting context tokens.
+  The current `arch` subcommand provides basic queries (roles, context, layer, graph)
+  but lacks deeper analysis needed for design sessions: pattern neighborhoods (what's
+  directly connected), cross-context comparison, annotation coverage gaps, and
+  taxonomy discovery. Agents exploring architecture must make multiple queries and
+  mentally assemble the picture, wasting context tokens.
 
-**Solution:**
-Extend the `arch` subcommand and add new discovery commands:
+  **Solution:**
+  Extend the `arch` subcommand and add new discovery commands:
+  1. `arch neighborhood <pattern>` shows 1-hop relationships (direct uses/usedBy)
+  2. `arch compare <ctx1> <ctx2>` shows shared deps and integration points
+  3. `arch coverage` reports annotation completeness with gaps
+  4. `tags` lists all tags in use with counts
+  5. `sources` shows file inventory by type
+  6. `unannotated [--path glob]` finds files without the libar-docs opt-in marker
 
-1. `arch neighborhood <pattern>` shows 1-hop relationships (direct uses/usedBy)
-2. `arch compare <ctx1> <ctx2>` shows shared deps and integration points
-3. `arch coverage` reports annotation completeness with gaps
-4. `tags` lists all tags in use with counts
-5. `sources` shows file inventory by type
-6. `unannotated [--path glob]` finds files without the libar-docs opt-in marker
-
-**Business Value:**
-| Benefit | Impact |
-| Pattern neighborhoods | Understand local architecture in one call |
-| Coverage gaps | Find unannotated files that need attention |
-| Taxonomy discovery | Know what tags and categories are available |
-| Cross-context analysis | Compare bounded contexts for integration |
+  **Business Value:**
+  | Benefit | Impact |
+  | Pattern neighborhoods | Understand local architecture in one call |
+  | Coverage gaps | Find unannotated files that need attention |
+  | Taxonomy discovery | Know what tags and categories are available |
+  | Cross-context analysis | Compare bounded contexts for integration |
 
 ## Acceptance Criteria
 
@@ -77,7 +76,7 @@ Extend the `arch` subcommand and add new discovery commands:
 **Find unannotated files with path filter**
 
 - Given some TypeScript files without the libar-docs opt-in marker
-- When running "process-api unannotated --path 'src/generators/\*_/_.ts'"
+- When running "process-api unannotated --path 'src/generators/**/*.ts'"
 - Then the output lists only unannotated files matching the glob
 - And each file shows its location relative to base directory
 
@@ -116,7 +115,7 @@ Extend the `arch` subcommand and add new discovery commands:
 **Arch subcommand provides neighborhood and comparison views**
 
 **Invariant:** Architecture queries resolve pattern names to concrete
-relationships and file paths, not just abstract names.
+    relationships and file paths, not just abstract names.
 
     **Rationale:** The current `arch graph <pattern>` returns dependency and
     relationship names but not the full picture of what surrounds a pattern.
@@ -137,7 +136,7 @@ _Verified by: Pattern neighborhood shows direct connections, Cross-context compa
 **Coverage analysis reports annotation completeness with gaps**
 
 **Invariant:** Coverage reports identify unannotated files that should have
-the libar-docs opt-in marker based on their location and content.
+    the libar-docs opt-in marker based on their location and content.
 
     **Rationale:** Annotation completeness directly impacts the quality of all
     generated documentation and API queries. Files without the opt-in marker are
@@ -159,8 +158,8 @@ _Verified by: Architecture coverage report, Find unannotated files with path fil
 **Tags and sources commands provide taxonomy and inventory views**
 
 **Invariant:** All tag values in use are discoverable without reading
-configuration files. Source file inventory shows the full scope of
-annotated and scanned content.
+    configuration files. Source file inventory shows the full scope of
+    annotated and scanned content.
 
     **Rationale:** Agents frequently need to know "what categories exist?"
     or "how many feature files are there?" without reading taxonomy

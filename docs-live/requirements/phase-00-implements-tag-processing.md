@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 Tests for the @libar-docs-implements tag which links implementation files
-to their corresponding roadmap pattern specifications.
+  to their corresponding roadmap pattern specifications.
 
 ## Acceptance Criteria
 
@@ -74,8 +74,8 @@ export function durabilityPrimitive() {}
 - When the relationship index is built
 - Then "EventStoreDurability" should have implementedBy ["outbox.ts"]
 
-| name      | implementsPatterns   |
-| --------- | -------------------- |
+| name | implementsPatterns |
+| --- | --- |
 | outbox.ts | EventStoreDurability |
 
 **Multiple implementations aggregate**
@@ -85,10 +85,10 @@ export function durabilityPrimitive() {}
 - When the relationship index is built
 - Then "EventStoreDurability" should have implementedBy containing all three files
 
-| name                | implementsPatterns   |
-| ------------------- | -------------------- |
-| outbox.ts           | EventStoreDurability |
-| publication.ts      | EventStoreDurability |
+| name | implementsPatterns |
+| --- | --- |
+| outbox.ts | EventStoreDurability |
+| publication.ts | EventStoreDurability |
 | idempotentAppend.ts | EventStoreDurability |
 
 **DocDirective schema accepts implements**
@@ -108,7 +108,7 @@ export function durabilityPrimitive() {}
 **Implements tag is defined in taxonomy registry**
 
 The tag registry defines `implements` with CSV format, enabling the
-data-driven AST parser to automatically extract it.
+    data-driven AST parser to automatically extract it.
 
 _Verified by: Implements tag exists in registry_
 

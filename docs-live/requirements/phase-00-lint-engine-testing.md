@@ -6,23 +6,22 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 The lint engine orchestrates rule execution, aggregates violations,
-and formats output for human and machine consumption.
+  and formats output for human and machine consumption.
 
-The engine provides:
-
-- Single directive linting
-- Multi-file batch linting
-- Failure detection (with strict mode)
-- Violation sorting
-- Pretty and JSON output formats
+  The engine provides:
+  - Single directive linting
+  - Multi-file batch linting
+  - Failure detection (with strict mode)
+  - Violation sorting
+  - Pretty and JSON output formats
 
 ## Acceptance Criteria
 
@@ -32,12 +31,12 @@ The engine provides:
 - When I lint the directive with default rules
 - Then the violation count should be 0
 
-| field       | value                                 |
-| ----------- | ------------------------------------- |
-| patternName | TestPattern                           |
-| status      | completed                             |
-| whenToUse   | When testing                          |
-| uses        | OtherPattern                          |
+| field | value |
+| --- | --- |
+| patternName | TestPattern |
+| status | completed |
+| whenToUse | When testing |
+| uses | OtherPattern |
 | description | A meaningful description for testing. |
 
 **Return violations for failing rules**
@@ -55,17 +54,17 @@ The engine provides:
 - Then the violation count should be 3
 - And the violations should have rules:
 
-| id    | severity |
-| ----- | -------- |
-| rule1 | error    |
-| rule2 | warning  |
-| rule3 | info     |
+| id | severity |
+| --- | --- |
+| rule1 | error |
+| rule2 | warning |
+| rule3 | info |
 
 | ruleId |
-| ------ |
-| rule1  |
-| rule2  |
-| rule3  |
+| --- |
+| rule1 |
+| rule2 |
+| rule3 |
 
 **Include correct file and line in violations**
 
@@ -87,8 +86,8 @@ The engine provides:
 - And the files scanned should be 2
 - And the directives checked should be 2
 
-| file      |
-| --------- |
+| file |
+| --- |
 | /file1.ts |
 | /file2.ts |
 
@@ -99,13 +98,13 @@ The engine provides:
 - Then the result count should be 2
 - And results should include files:
 
-| file      | line |
-| --------- | ---- |
-| /file1.ts | 1    |
-| /file2.ts | 5    |
+| file | line |
+| --- | --- |
+| /file1.ts | 1 |
+| /file2.ts | 5 |
 
-| file      |
-| --------- |
+| file |
+| --- |
 | /file1.ts |
 | /file2.ts |
 
@@ -119,12 +118,12 @@ The engine provides:
 - And the warning count should be 1
 - And the info count should be 1
 
-| id  | severity |
-| --- | -------- |
-| e1  | error    |
-| e2  | error    |
-| w1  | warning  |
-| i1  | info     |
+| id | severity |
+| --- | --- |
+| e1 | error |
+| e2 | error |
+| w1 | warning |
+| i1 | info |
 
 **Handle multiple directives per file**
 
@@ -134,10 +133,10 @@ The engine provides:
 - And the result count should be 1
 - And the first result should have more than 1 violation
 
-| patternName | status      | line |
-| ----------- | ----------- | ---- |
-| A           |             | 1    |
-| B           | implemented | 50   |
+| patternName | status | line |
+| --- | --- | --- |
+| A |  | 1 |
+| B | implemented | 50 |
 
 **Return true when there are errors**
 
@@ -146,8 +145,8 @@ The engine provides:
 - And hasFailures should return true in strict mode
 
 | errorCount | warningCount | infoCount |
-| ---------- | ------------ | --------- |
-| 1          | 0            | 0         |
+| --- | --- | --- |
+| 1 | 0 | 0 |
 
 **Return false for warnings only in non-strict mode**
 
@@ -155,8 +154,8 @@ The engine provides:
 - Then hasFailures should return false in normal mode
 
 | errorCount | warningCount | infoCount |
-| ---------- | ------------ | --------- |
-| 0          | 5            | 0         |
+| --- | --- | --- |
+| 0 | 5 | 0 |
 
 **Return true for warnings in strict mode**
 
@@ -164,8 +163,8 @@ The engine provides:
 - Then hasFailures should return true in strict mode
 
 | errorCount | warningCount | infoCount |
-| ---------- | ------------ | --------- |
-| 0          | 1            | 0         |
+| --- | --- | --- |
+| 0 | 1 | 0 |
 
 **Return false for info only**
 
@@ -174,8 +173,8 @@ The engine provides:
 - And hasFailures should return false in strict mode
 
 | errorCount | warningCount | infoCount |
-| ---------- | ------------ | --------- |
-| 0          | 0            | 10        |
+| --- | --- | --- |
+| 0 | 0 | 10 |
 
 **Return false when no violations**
 
@@ -184,8 +183,8 @@ The engine provides:
 - And hasFailures should return false in strict mode
 
 | errorCount | warningCount | infoCount | filesScanned | directivesChecked |
-| ---------- | ------------ | --------- | ------------ | ----------------- |
-| 0          | 0            | 0         | 10           | 50                |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 0 | 10 | 50 |
 
 **Sort errors first then warnings then info**
 
@@ -193,21 +192,21 @@ The engine provides:
 - When I sort violations by severity
 - Then the severity order should be:
 
-| rule  | severity | line |
-| ----- | -------- | ---- |
-| info1 | info     | 1    |
-| warn1 | warning  | 2    |
-| err1  | error    | 3    |
-| warn2 | warning  | 4    |
-| err2  | error    | 5    |
+| rule | severity | line |
+| --- | --- | --- |
+| info1 | info | 1 |
+| warn1 | warning | 2 |
+| err1 | error | 3 |
+| warn2 | warning | 4 |
+| err2 | error | 5 |
 
 | severity |
-| -------- |
-| error    |
-| error    |
-| warning  |
-| warning  |
-| info     |
+| --- |
+| error |
+| error |
+| warning |
+| warning |
+| info |
 
 **Sort by line number within same severity**
 
@@ -216,16 +215,16 @@ The engine provides:
 - Then the line order should be:
 
 | rule | severity | line |
-| ---- | -------- | ---- |
-| e1   | error    | 50   |
-| e2   | error    | 10   |
-| e3   | error    | 30   |
+| --- | --- | --- |
+| e1 | error | 50 |
+| e2 | error | 10 |
+| e3 | error | 30 |
 
 | line |
-| ---- |
-| 10   |
-| 30   |
-| 50   |
+| --- |
+| 10 |
+| 30 |
+| 50 |
 
 **Not mutate original array**
 
@@ -235,9 +234,9 @@ The engine provides:
 - And the sorted first violation should have severity "error"
 
 | rule | severity | line |
-| ---- | -------- | ---- |
-| info | info     | 1    |
-| err  | error    | 2    |
+| --- | --- | --- |
+| info | info | 1 |
+| err | error | 2 |
 
 **Show success message when no violations**
 
@@ -246,12 +245,12 @@ The engine provides:
 - Then the output should contain:
 
 | errorCount | warningCount | infoCount | filesScanned | directivesChecked |
-| ---------- | ------------ | --------- | ------------ | ----------------- |
-| 0          | 0            | 0         | 10           | 25                |
+| --- | --- | --- | --- | --- |
+| 0 | 0 | 0 | 10 | 25 |
 
-| text                  |
-| --------------------- |
-| No issues found       |
+| text |
+| --- |
+| No issues found |
 | 25 directives checked |
 
 **Format violations with file line severity and message**
@@ -260,16 +259,16 @@ The engine provides:
 - When I format the summary as pretty
 - Then the output should contain:
 
-| file             | line | severity | rule      | message            |
-| ---------------- | ---- | -------- | --------- | ------------------ |
-| /path/to/file.ts | 42   | error    | test-rule | Test error message |
+| file | line | severity | rule | message |
+| --- | --- | --- | --- | --- |
+| /path/to/file.ts | 42 | error | test-rule | Test error message |
 
-| text               |
-| ------------------ |
-| /path/to/file.ts   |
-| 42:1               |
-| error              |
-| test-rule          |
+| text |
+| --- |
+| /path/to/file.ts |
+| 42:1 |
+| error |
+| test-rule |
 | Test error message |
 
 **Show summary line with counts**
@@ -278,14 +277,14 @@ The engine provides:
 - When I format the summary as pretty
 - Then the output should contain:
 
-| file  | line | severity | rule | message |
-| ----- | ---- | -------- | ---- | ------- |
-| /f.ts | 1    | error    | e    |         |
-| /f.ts | 2    | warning  | w    |         |
+| file | line | severity | rule | message |
+| --- | --- | --- | --- | --- |
+| /f.ts | 1 | error | e |  |
+| /f.ts | 2 | warning | w |  |
 
-| text      |
-| --------- |
-| 1 error   |
+| text |
+| --- |
+| 1 error |
 | 1 warning |
 
 **Filter out warnings and info in quiet mode**
@@ -295,16 +294,16 @@ The engine provides:
 - Then the output should contain "Error"
 - And the output should not contain:
 
-| file  | line | severity | rule | message |
-| ----- | ---- | -------- | ---- | ------- |
-| /f.ts | 1    | error    | e    | Error   |
-| /f.ts | 2    | warning  | w    | Warning |
-| /f.ts | 3    | info     | i    | Info    |
+| file | line | severity | rule | message |
+| --- | --- | --- | --- | --- |
+| /f.ts | 1 | error | e | Error |
+| /f.ts | 2 | warning | w | Warning |
+| /f.ts | 3 | info | i | Info |
 
-| text    |
-| ------- |
+| text |
+| --- |
 | Warning |
-| Info    |
+| Info |
 
 **Return valid JSON**
 
@@ -314,9 +313,9 @@ The engine provides:
 - And the JSON results count should be 1
 - And the JSON summary errors should be 1
 
-| file     | line | severity | rule | message |
-| -------- | ---- | -------- | ---- | ------- |
-| /test.ts | 1    | error    | test | msg     |
+| file | line | severity | rule | message |
+| --- | --- | --- | --- | --- |
+| /test.ts | 1 | error | test | msg |
 
 **Include all summary fields**
 
@@ -325,16 +324,16 @@ The engine provides:
 - Then the JSON summary should match:
 
 | errorCount | warningCount | infoCount | filesScanned | directivesChecked |
-| ---------- | ------------ | --------- | ------------ | ----------------- |
-| 2          | 3            | 5         | 10           | 25                |
+| --- | --- | --- | --- | --- |
+| 2 | 3 | 5 | 10 | 25 |
 
-| field             | value |
-| ----------------- | ----- |
-| errors            | 2     |
-| warnings          | 3     |
-| info              | 5     |
-| filesScanned      | 10    |
-| directivesChecked | 25    |
+| field | value |
+| --- | --- |
+| errors | 2 |
+| warnings | 3 |
+| info | 5 |
+| filesScanned | 10 |
+| directivesChecked | 25 |
 
 **Include violation details**
 
@@ -342,16 +341,16 @@ The engine provides:
 - When I format the summary as JSON
 - Then the first JSON violation should have:
 
-| file          | line | severity | rule    | message          |
-| ------------- | ---- | -------- | ------- | ---------------- |
-| /path/file.ts | 42   | warning  | rule-id | Detailed message |
+| file | line | severity | rule | message |
+| --- | --- | --- | --- | --- |
+| /path/file.ts | 42 | warning | rule-id | Detailed message |
 
-| field    | value            |
-| -------- | ---------------- |
-| rule     | rule-id          |
-| severity | warning          |
-| message  | Detailed message |
-| line     | 42               |
+| field | value |
+| --- | --- |
+| rule | rule-id |
+| severity | warning |
+| message | Detailed message |
+| line | 42 |
 
 ---
 

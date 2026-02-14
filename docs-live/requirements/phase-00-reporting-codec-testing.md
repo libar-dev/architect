@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
-transform MasterDataset into RenderableDocuments for reporting outputs.
+  transform MasterDataset into RenderableDocuments for reporting outputs.
 
-**Problem:**
+  **Problem:**
+  - Need to generate changelog, traceability, and overview documents
+  - Each view requires different filtering, grouping, and formatting logic
 
-- Need to generate changelog, traceability, and overview documents
-- Each view requires different filtering, grouping, and formatting logic
-
-**Solution:**
-
-- Three specialized codecs for different reporting perspectives
-- Keep a Changelog format for ChangelogCodec
-- Coverage statistics and gap reporting for TraceabilityCodec
-- Architecture and summary views for OverviewCodec
+  **Solution:**
+  - Three specialized codecs for different reporting perspectives
+  - Keep a Changelog format for ChangelogCodec
+  - Coverage statistics and gap reporting for TraceabilityCodec
+  - Architecture and summary views for OverviewCodec
 
 ## Acceptance Criteria
 
@@ -52,16 +50,16 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - Then the release sections appear in order:
 
 | release | count |
-| ------- | ----- |
-| v0.1.0  | 2     |
-| v0.2.0  | 3     |
-| v1.0.0  | 1     |
+| --- | --- |
+| v0.1.0 | 2 |
+| v0.2.0 | 3 |
+| v1.0.0 | 1 |
 
 | release |
-| ------- |
-| v1.0.0  |
-| v0.2.0  |
-| v0.1.0  |
+| --- |
+| v1.0.0 |
+| v0.2.0 |
+| v0.1.0 |
 
 **Quarter fallback for patterns without release**
 
@@ -83,13 +81,13 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - When decoding with ChangelogCodec
 - Then each category maps to correct change type
 
-| category   | expectedType |
-| ---------- | ------------ |
-| fix        | Fixed        |
-| bugfix     | Fixed        |
-| refactor   | Changed      |
-| security   | Security     |
-| deprecated | Removed      |
+| category | expectedType |
+| --- | --- |
+| fix | Fixed |
+| bugfix | Fixed |
+| refactor | Changed |
+| security | Security |
+| deprecated | Removed |
 
 **Exclude unreleased when option disabled**
 
@@ -103,14 +101,14 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - When decoding with ChangelogCodec
 - Then change type sections follow order:
 
-| type       |
-| ---------- |
-| Added      |
-| Changed    |
+| type |
+| --- |
+| Added |
+| Changed |
 | Deprecated |
-| Removed    |
-| Fixed      |
-| Security   |
+| Removed |
+| Fixed |
+| Security |
 
 **No timeline patterns produces empty message**
 
@@ -125,18 +123,18 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - When decoding with TraceabilityCodec
 - Then the coverage statistics table shows:
 
-| name      | phase | hasBehaviorFile |
-| --------- | ----- | --------------- |
-| Pattern A | 1     | true            |
-| Pattern B | 1     | true            |
-| Pattern C | 2     | false           |
+| name | phase | hasBehaviorFile |
+| --- | --- | --- |
+| Pattern A | 1 | true |
+| Pattern B | 1 | true |
+| Pattern C | 2 | false |
 
-| metric                 | value |
-| ---------------------- | ----- |
-| Timeline Phases        | 3     |
-| With Behavior Tests    | 2     |
-| Missing Behavior Tests | 1     |
-| Coverage               | 67%   |
+| metric | value |
+| --- | --- |
+| Timeline Phases | 3 |
+| With Behavior Tests | 2 |
+| Missing Behavior Tests | 1 |
+| Coverage | 67% |
 
 **Coverage gaps table shows missing coverage**
 
@@ -164,9 +162,9 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - When decoding with includeStats disabled
 - Then the document does not contain "Coverage Statistics" heading
 
-| name      | phase | hasBehaviorFile |
-| --------- | ----- | --------------- |
-| Pattern A | 1     | true            |
+| name | phase | hasBehaviorFile |
+| --- | --- | --- |
+| Pattern A | 1 | true |
 
 **Exclude covered when option disabled**
 
@@ -202,11 +200,11 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - And the patterns summary shows progress percentage
 - And the patterns summary shows category counts table
 
-| status    | count |
-| --------- | ----- |
-| completed | 6     |
-| active    | 2     |
-| planned   | 2     |
+| status | count |
+| --- | --- |
+| completed | 6 |
+| active | 2 |
+| planned | 2 |
 
 **Timeline summary with phase counts**
 
@@ -215,12 +213,12 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - Then the document contains "Timeline Summary" heading
 - And the timeline summary table shows:
 
-| metric           |
-| ---------------- |
-| Total Phases     |
+| metric |
+| --- |
+| Total Phases |
 | Completed Phases |
-| Active Phases    |
-| Patterns         |
+| Active Phases |
+| Patterns |
 
 **Exclude architecture when option disabled**
 
@@ -234,9 +232,9 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - When decoding with includePatternsSummary disabled
 - Then the document does not contain "Patterns Summary" heading
 
-| status    | count |
-| --------- | ----- |
-| completed | 5     |
+| status | count |
+| --- | --- |
+| completed | 5 |
 
 **Exclude timeline summary when option disabled**
 
@@ -250,11 +248,11 @@ transform MasterDataset into RenderableDocuments for reporting outputs.
 - When decoding with OverviewCodec
 - Then the architecture section has 3 subsections
 
-| name              | description              |
-| ----------------- | ------------------------ |
-| Event Store       | Core event persistence   |
-| Projection Engine | Read model generation    |
-| Command Handler   | Write side orchestration |
+| name | description |
+| --- | --- |
+| Event Store | Core event persistence |
+| Projection Engine | Read model generation |
+| Command Handler | Write side orchestration |
 
 ## Business Rules
 

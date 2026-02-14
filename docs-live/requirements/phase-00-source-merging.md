@@ -6,28 +6,26 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 mergeSourcesForGenerator computes effective sources for a specific
-generator by applying per-generator overrides to base resolved sources.
+  generator by applying per-generator overrides to base resolved sources.
 
-**Problem:**
+  **Problem:**
+  - Different generators may need different feature or input sources
+  - Override semantics must be predictable and well-defined
+  - Base exclude patterns must always be inherited
 
-- Different generators may need different feature or input sources
-- Override semantics must be predictable and well-defined
-- Base exclude patterns must always be inherited
-
-**Solution:**
-
-- replaceFeatures (non-empty) replaces base features entirely
-- additionalFeatures appends to base features
-- additionalInput appends to base typescript sources
-- exclude is always inherited from base (no override mechanism)
+  **Solution:**
+  - replaceFeatures (non-empty) replaces base features entirely
+  - additionalFeatures appends to base features
+  - additionalInput appends to base typescript sources
+  - exclude is always inherited from base (no override mechanism)
 
 ## Acceptance Criteria
 

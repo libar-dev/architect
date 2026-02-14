@@ -6,20 +6,20 @@
 
 ## Overview
 
-| Property       | Value                                 |
-| -------------- | ------------------------------------- |
-| Status         | completed                             |
-| Product Area   | Generation                            |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Generation |
 | Business Value | enables monorepo scale doc generation |
-| Phase          | 28                                    |
+| Phase | 28 |
 
 ## Description
 
 This feature transforms the PoC document generator into a production-ready
-universal generator capable of operating at monorepo scale (~210 manual docs
-to be replaced across the convex-event-sourcing repository).
+  universal generator capable of operating at monorepo scale (~210 manual docs
+  to be replaced across the convex-event-sourcing repository).
 
-**GitHub Issue:** libar-ai/convex-event-sourcing#134
+  **GitHub Issue:** libar-ai/convex-event-sourcing#134
 
 ## Acceptance Criteria
 
@@ -46,8 +46,8 @@ to be replaced across the convex-event-sourcing repository).
 - Then validation succeeds
 - And no warnings are produced
 
-| Section   | Source File  | Extraction Method   |
-| --------- | ------------ | ------------------- |
+| Section | Source File | Extraction Method |
+| --- | --- | --- |
 | API Types | src/types.ts | @extract-shapes tag |
 
 **Missing file produces validation error**
@@ -167,22 +167,22 @@ to be replaced across the convex-event-sourcing repository).
 **Duplicate content must be detected and merged**
 
 Content fingerprinting identifies duplicate sections extracted from multiple
-sources. When duplicates are found, the system merges them intelligently
-based on source priority.
+    sources. When duplicates are found, the system merges them intelligently
+    based on source priority.
 
 _Verified by: Identical sections are deduplicated, Similar but non-identical sections are preserved_
 
 **Invalid source mappings must fail fast with clear errors**
 
 Pre-flight validation catches configuration errors before extraction begins.
-This prevents silent failures and provides actionable error messages.
+    This prevents silent failures and provides actionable error messages.
 
 _Verified by: Valid source mapping passes validation, Missing file produces validation error, Invalid extraction method produces validation error, Unreadable file produces validation error_
 
 **Warnings must be collected and reported consistently**
 
 The warning collector replaces scattered console.warn calls with a
-structured system that aggregates warnings and reports them consistently.
+    structured system that aggregates warnings and reports them consistently.
 
 _Verified by: Warnings are collected during extraction, Multiple warnings from different sources are aggregated, Warnings are included in Result type_
 

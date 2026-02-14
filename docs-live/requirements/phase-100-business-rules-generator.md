@@ -6,30 +6,29 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | planned    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
 | Product Area | Generation |
-| Phase        | 100        |
+| Phase | 100 |
 
 ## Description
 
 **Business Value:** Enable stakeholders to understand domain constraints without reading
-implementation details or full feature files.
+  implementation details or full feature files.
 
-**How It Works:**
+  **How It Works:**
+  - Extract `Rule:` blocks from feature files
+  - Parse `**Invariant:**` and `**Rationale:**` annotations
+  - Generate organized Business Rules document by domain/phase
+  - Include traceability via `**Verified by:**` links to scenarios
 
-- Extract `Rule:` blocks from feature files
-- Parse `**Invariant:**` and `**Rationale:**` annotations
-- Generate organized Business Rules document by domain/phase
-- Include traceability via `**Verified by:**` links to scenarios
-
-**Why It Matters:**
-| Benefit | How |
-| Domain knowledge capture | Invariants document what must always be true |
-| Onboarding acceleration | New developers understand constraints quickly |
-| Business alignment | Rationale explains why constraints exist |
-| Audit readiness | Traceability shows which tests verify each rule |
+  **Why It Matters:**
+  | Benefit | How |
+  | Domain knowledge capture | Invariants document what must always be true |
+  | Onboarding acceleration | New developers understand constraints quickly |
+  | Business alignment | Rationale explains why constraints exist |
+  | Audit readiness | Traceability shows which tests verify each rule |
 
 ## Acceptance Criteria
 
@@ -73,11 +72,11 @@ Rule: Events are immutable
 - And output should have section "## Event Sourcing Patterns"
 - And output should have section "## CQRS Patterns"
 
-| Feature                       | Domain Tag                 | Rule                                 |
-| ----------------------------- | -------------------------- | ------------------------------------ |
-| reservation-pattern.feature   | @libar-docs-ddd            | Reservations prevent race conditions |
-| event-store.feature           | @libar-docs-event-sourcing | Events are immutable                 |
-| projection-categories.feature | @libar-docs-cqrs           | Projections must declare category    |
+| Feature | Domain Tag | Rule |
+| --- | --- | --- |
+| reservation-pattern.feature | @libar-docs-ddd | Reservations prevent race conditions |
+| event-store.feature | @libar-docs-event-sourcing | Events are immutable |
+| projection-categories.feature | @libar-docs-cqrs | Projections must declare category |
 
 **Orders rules by phase within domain**
 
@@ -85,11 +84,11 @@ Rule: Events are immutable
 - When the business rules generator runs
 - Then Phase 16 rules should appear before Phase 20 rules
 
-| Feature                     | Phase | Rule                                 |
-| --------------------------- | ----- | ------------------------------------ |
-| ecst-fat-events.feature     | 20    | Events contain full context          |
-| reservation-pattern.feature | 20    | Reservations prevent race conditions |
-| dynamic-consistency.feature | 16    | DCB enables cross-entity validation  |
+| Feature | Phase | Rule |
+| --- | --- | --- |
+| ecst-fat-events.feature | 20 | Events contain full context |
+| reservation-pattern.feature | 20 | Reservations prevent race conditions |
+| dynamic-consistency.feature | 16 | DCB enables cross-entity validation |
 
 **Includes code examples from DocStrings**
 
@@ -132,7 +131,7 @@ Rule: Reservations prevent race conditions
 **Extracts Rule blocks with Invariant and Rationale**
 
 **Invariant:** Every `Rule:` block with `**Invariant:**` annotation must be extracted.
-Rules without annotations are included with rule name only.
+    Rules without annotations are included with rule name only.
 
     **Rationale:** Business rules are the core domain constraints. Extracting them separately
     from acceptance criteria creates a focused reference document for domain understanding.
@@ -144,7 +143,7 @@ _Verified by: Extracts annotated Rule with Invariant and Rationale, Extracts una
 **Organizes rules by domain category and phase**
 
 **Invariant:** Rules are grouped first by domain category (from `@libar-docs-*` flags),
-then by phase number for temporal ordering.
+    then by phase number for temporal ordering.
 
     **Rationale:** Domain-organized documentation helps stakeholders find rules relevant
     to their area of concern without scanning all rules.
@@ -156,7 +155,7 @@ _Verified by: Groups rules by domain category, Orders rules by phase within doma
 **Preserves code examples and comparison tables**
 
 **Invariant:** DocStrings (`"""typescript`) and tables in Rule descriptions are
-rendered in the business rules document.
+    rendered in the business rules document.
 
     **Rationale:** Code examples and tables provide concrete understanding of abstract
     rules. Removing them loses critical context.
@@ -168,7 +167,7 @@ _Verified by: Includes code examples from DocStrings, Includes comparison tables
 **Generates scenario traceability links**
 
 **Invariant:** Each rule's `**Verified by:**` section generates links to the
-scenarios that verify the rule.
+    scenarios that verify the rule.
 
     **Rationale:** Traceability enables audit compliance and helps developers find
     relevant tests when modifying rules.

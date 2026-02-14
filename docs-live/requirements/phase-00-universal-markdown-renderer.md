@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The universal renderer converts RenderableDocument to markdown.
-It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
+  It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 
 ## Acceptance Criteria
 
@@ -45,11 +45,11 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - Then the output contains "**Purpose:** Show everything"
 - And the output contains "**Detail Level:** comprehensive"
 
-| field       | value           |
-| ----------- | --------------- |
-| title       | Complete Doc    |
-| purpose     | Show everything |
-| detailLevel | comprehensive   |
+| field | value |
+| --- | --- |
+| title | Complete Doc |
+| purpose | Show everything |
+| detailLevel | comprehensive |
 
 **Render headings at different levels**
 
@@ -79,9 +79,9 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 
 **Render paragraph with special characters**
 
-- Given a document with a paragraph "Has _bold_ and _italic_ and `code`"
+- Given a document with a paragraph "Has *bold* and _italic_ and `code`"
 - When rendering to markdown
-- Then the output contains "Has _bold_ and _italic_ and `code`"
+- Then the output contains "Has *bold* and _italic_ and `code`"
 
 **Render separator**
 
@@ -96,15 +96,15 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - Then the output contains the table:
 
 | Column1 | Column2 |
-| ------- | ------- |
-| a       | b       |
-| c       | d       |
+| --- | --- |
+| a | b |
+| c | d |
 
 ```markdown
 | Column1 | Column2 |
-| ------- | ------- |
-| a       | b       |
-| c       | d       |
+| --- | --- |
+| a | b |
+| c | d |
 ```
 
 **Render table with alignment**
@@ -114,10 +114,10 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - Then the output contains "| --- | :---: | ---: |"
 
 | Column | Alignment |
-| ------ | --------- |
-| Left   | left      |
-| Center | center    |
-| Right  | right     |
+| --- | --- |
+| Left | left |
+| Center | center |
+| Right | right |
 
 **Render empty table (no columns)**
 
@@ -149,14 +149,14 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - When rendering to markdown
 - Then the output contains all of:
 
-| item   |
-| ------ |
+| item |
+| --- |
 | Item 1 |
 | Item 2 |
 | Item 3 |
 
-| text     |
-| -------- |
+| text |
+| --- |
 | - Item 1 |
 | - Item 2 |
 | - Item 3 |
@@ -167,17 +167,17 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - When rendering to markdown
 - Then the output contains all of:
 
-| item        |
-| ----------- |
-| First item  |
+| item |
+| --- |
+| First item |
 | Second item |
-| Third item  |
+| Third item |
 
-| text           |
-| -------------- |
-| 1. First item  |
+| text |
+| --- |
+| 1. First item |
 | 2. Second item |
-| 3. Third item  |
+| 3. Third item |
 
 **Render checkbox list with checked items**
 
@@ -185,14 +185,14 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - When rendering to markdown
 - Then the output contains all of:
 
-| text     | checked |
-| -------- | ------- |
-| Done     | true    |
-| Not done | false   |
+| text | checked |
+| --- | --- |
+| Done | true |
+| Not done | false |
 
-| text           |
-| -------------- |
-| - [x] Done     |
+| text |
+| --- |
+| - [x] Done |
 | - [ ] Not done |
 
 **Render nested list**
@@ -208,8 +208,8 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 - Parent 2
 ```
 
-| text       |
-| ---------- |
+| text |
+| --- |
 | - Parent 1 |
 | - Child 1a |
 | - Child 1b |
@@ -225,11 +225,11 @@ It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 const x = 42;
 ```
 
-| text          |
-| ------------- |
+| text |
+| --- |
 | ```typescript |
 | const x = 42; |
-| ```           |
+| ``` |
 
 **Render code block without language**
 
@@ -241,9 +241,9 @@ const x = 42;
 plain code
 ```
 
-| text       |
-| ---------- |
-| ```        |
+| text |
+| --- |
+| ``` |
 | plain code |
 
 **Render mermaid diagram**
@@ -254,14 +254,14 @@ plain code
 
 ```markdown
 graph TD
-A --> B
+  A --> B
 ```
 
-| text       |
-| ---------- |
+| text |
+| --- |
 | ```mermaid |
-| graph TD   |
-| A --> B    |
+| graph TD |
+| A --> B |
 
 **Render collapsible block**
 
@@ -270,12 +270,12 @@ A --> B
 - When rendering to markdown
 - Then the output contains all of:
 
-| text                               |
-| ---------------------------------- |
-| <details>                          |
+| text |
+| --- |
+| <details> |
 | <summary>Click to expand</summary> |
-| Hidden content here                |
-| </details>                         |
+| Hidden content here |
+| </details> |
 
 **Render collapsible with HTML entities in summary**
 
@@ -322,25 +322,25 @@ A --> B
 - When rendering to markdown
 - Then the output contains all of:
 
-| field   | value            |
-| ------- | ---------------- |
-| title   | Complex Document |
-| purpose | Test all blocks  |
+| field | value |
+| --- | --- |
+| title | Complex Document |
+| purpose | Test all blocks |
 
-| type      | content   |
-| --------- | --------- |
-| heading   | Section 1 |
+| type | content |
+| --- | --- |
+| heading | Section 1 |
 | paragraph | Some text |
-| separator |           |
-| heading   | Section 2 |
+| separator |  |
+| heading | Section 2 |
 
-| text               |
-| ------------------ |
+| text |
+| --- |
 | # Complex Document |
-| ## Section 1       |
-| Some text          |
-| ---                |
-| ## Section 2       |
+| ## Section 1 |
+| Some text |
+| --- |
+| ## Section 2 |
 
 **Claude context renders title and headings as section markers**
 
@@ -351,10 +351,10 @@ A --> B
 - And the claude context output contains "=== SECTION ONE ==="
 - And the claude context output does not contain "#"
 
-| type      | content     |
-| --------- | ----------- |
-| heading   | Section One |
-| paragraph | Body text   |
+| type | content |
+| --- | --- |
+| heading | Section One |
+| paragraph | Body text |
 
 **Claude context renders sub-headings with different markers**
 
@@ -373,12 +373,12 @@ A --> B
 
 ```markdown
 graph TD
-A --> B
+  A --> B
 ```
 
-| text     |
-| -------- |
-| mermaid  |
+| text |
+| --- |
+| mermaid |
 | graph TD |
 
 **Claude context flattens collapsible blocks**
@@ -390,13 +390,13 @@ A --> B
 - Then the claude context output contains all of:
 - And the claude context output does not contain any of:
 
-| text                    |
-| ----------------------- |
-| Hidden content here     |
+| text |
+| --- |
+| Hidden content here |
 | --- Click to expand --- |
 
-| text      |
-| --------- |
+| text |
+| --- |
 | <details> |
 | <summary> |
 
@@ -416,16 +416,16 @@ A --> B
 - Then the claude context output contains all of:
 - And the claude context output does not contain "---"
 
-| type      | content |
-| --------- | ------- |
-| paragraph | Before  |
-| separator |         |
-| paragraph | After   |
+| type | content |
+| --- | --- |
+| paragraph | Before |
+| separator |  |
+| paragraph | After |
 
-| text   |
-| ------ |
+| text |
+| --- |
 | Before |
-| After  |
+| After |
 
 **Claude context produces fewer characters than markdown**
 

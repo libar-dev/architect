@@ -6,29 +6,29 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | planned    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
 | Product Area | Generation |
-| Phase        | 99         |
+| Phase | 99 |
 
 ## Description
 
 **Problem:** Implementation files with `@libar-docs-implements:PatternName` contain rich
-relationship metadata (`@libar-docs-uses`, `@libar-docs-used-by`, `@libar-docs-usecase`)
-that is not rendered in generated PRD documentation. This metadata provides valuable API
-guidance and dependency information.
+  relationship metadata (`@libar-docs-uses`, `@libar-docs-used-by`, `@libar-docs-usecase`)
+  that is not rendered in generated PRD documentation. This metadata provides valuable API
+  guidance and dependency information.
 
-**Solution:** Extend the PRD generator to collect all files with `@libar-docs-implements:X`
-and render their metadata in a dedicated "## Implementations" section. This leverages the
-relationship model from PatternRelationshipModel without requiring specs to list file paths.
+  **Solution:** Extend the PRD generator to collect all files with `@libar-docs-implements:X`
+  and render their metadata in a dedicated "## Implementations" section. This leverages the
+  relationship model from PatternRelationshipModel without requiring specs to list file paths.
 
-**Business Value:**
-| Benefit | How |
-| PRDs include implementation context | `implements` files auto-discovered and rendered |
-| Dependency visibility | `uses`/`used-by` from implementations shown in PRD |
-| Usage guidance in docs | `usecase` annotations rendered as "When to Use" |
-| Zero manual sync | Code declares relationship, PRD reflects it |
+  **Business Value:**
+  | Benefit | How |
+  | PRDs include implementation context | `implements` files auto-discovered and rendered |
+  | Dependency visibility | `uses`/`used-by` from implementations shown in PRD |
+  | Usage guidance in docs | `usecase` annotations rendered as "When to Use" |
+  | Zero manual sync | Code declares relationship, PRD reflects it |
 
 ## Acceptance Criteria
 
@@ -47,10 +47,10 @@ relationship model from PatternRelationshipModel without requiring specs to list
 - Then the "## Implementations" section lists both files
 - And each file's metadata is rendered separately
 
-| File                | Uses                    | Usecase                    |
-| ------------------- | ----------------------- | -------------------------- |
-| outbox.ts           | Workpool, ActionRetrier | "Capture external results" |
-| idempotentAppend.ts | EventStore              | "Prevent duplicate events" |
+| File | Uses | Usecase |
+| --- | --- | --- |
+| outbox.ts | Workpool, ActionRetrier | "Capture external results" |
+| idempotentAppend.ts | EventStore | "Prevent duplicate events" |
 
 **Implementations section generated in PRD**
 
@@ -89,8 +89,8 @@ relationship model from PatternRelationshipModel without requiring specs to list
 **PRD generator discovers implementations from relationship index**
 
 **Invariant:** When generating PRD for pattern X, the generator queries the
-relationship index for all files where `implements === X`. No explicit listing
-in the spec file is required.
+    relationship index for all files where `implements === X`. No explicit listing
+    in the spec file is required.
 
     **Rationale:** The `@libar-docs-implements` tag creates a backward link from
     code to spec. The relationship index aggregates these. PRD generation simply
@@ -103,8 +103,8 @@ _Verified by: Implementations discovered from relationship index, Multiple imple
 **Implementation metadata appears in dedicated PRD section**
 
 **Invariant:** The PRD output includes a "## Implementations" section listing
-all files that implement the pattern. Each file shows its `uses`, `usedBy`,
-and `usecase` metadata in a consistent format.
+    all files that implement the pattern. Each file shows its `uses`, `usedBy`,
+    and `usecase` metadata in a consistent format.
 
     **Rationale:** Developers reading PRDs benefit from seeing the implementation
     landscape alongside requirements, without cross-referencing code files.
@@ -116,7 +116,7 @@ _Verified by: Implementations section generated in PRD, Dependencies rendered pe
 **Patterns without implementations render cleanly**
 
 **Invariant:** If no files have `@libar-docs-implements:X` for pattern X,
-the "## Implementations" section is omitted (not rendered as empty).
+    the "## Implementations" section is omitted (not rendered as empty).
 
     **Rationale:** Planned patterns may not have implementations yet. Empty
     sections add noise without value.

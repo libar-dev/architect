@@ -6,35 +6,35 @@
 
 ## Overview
 
-| Property       | Value                                                                 |
-| -------------- | --------------------------------------------------------------------- |
-| Status         | completed                                                             |
-| Product Area   | Generation                                                            |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Generation |
 | Business Value | eliminates per document recipe features with config driven generation |
-| Phase          | 27                                                                    |
+| Phase | 27 |
 
 ## Description
 
 **Problem:**
-Each reference document (Process Guard, Taxonomy, Validation, etc.) required a
-hand-coded recipe feature that duplicated codec setup, rendering, and file output
-logic. Adding a new reference document meant creating a new feature file, a new
-codec wrapper, and a new generator class -- all following the same pattern.
+  Each reference document (Process Guard, Taxonomy, Validation, etc.) required a
+  hand-coded recipe feature that duplicated codec setup, rendering, and file output
+  logic. Adding a new reference document meant creating a new feature file, a new
+  codec wrapper, and a new generator class -- all following the same pattern.
 
-**Solution:**
-A single `createReferenceCodec` factory driven by `ReferenceDocConfig` objects.
-Each config declares four content sources -- convention tags, diagram scopes,
-shape source globs, and behavior categories -- that compose automatically in
-AD-5 order. 13 configs produce 27 generators (13 detailed for `docs/` +
-13 summary for `_claude-md/` + 1 meta-generator).
+  **Solution:**
+  A single `createReferenceCodec` factory driven by `ReferenceDocConfig` objects.
+  Each config declares four content sources -- convention tags, diagram scopes,
+  shape source globs, and behavior categories -- that compose automatically in
+  AD-5 order. 13 configs produce 27 generators (13 detailed for `docs/` +
+  13 summary for `_claude-md/` + 1 meta-generator).
 
-**Why It Matters:**
-| Benefit | How |
-| Zero-code new documents | Add a config object, get two output files |
-| Consistent structure | Every reference doc follows the same composition order |
-| Two detail levels | Detailed (full source, diagrams) and summary (compact tables) |
-| Convention-driven content | Decision records auto-populate via tag matching |
-| Shape extraction | TypeScript types rendered from AST, not duplicated in prose |
+  **Why It Matters:**
+  | Benefit | How |
+  | Zero-code new documents | Add a config object, get two output files |
+  | Consistent structure | Every reference doc follows the same composition order |
+  | Two detail levels | Detailed (full source, diagrams) and summary (compact tables) |
+  | Convention-driven content | Decision records auto-populate via tag matching |
+  | Shape extraction | TypeScript types rendered from AST, not duplicated in prose |
 
 ## Acceptance Criteria
 
@@ -101,8 +101,8 @@ AD-5 order. 13 configs produce 27 generators (13 detailed for `docs/` +
 **Config-driven codec replaces per-document recipe features**
 
 **Invariant:** A single `ReferenceDocConfig` object is sufficient to produce
-a complete reference document. No per-document codec subclass or recipe feature
-is required.
+    a complete reference document. No per-document codec subclass or recipe feature
+    is required.
 
     **Rationale:** The codec composition logic is identical across all reference
     documents. Only the content sources differ. Extracting this into a config-driven
@@ -117,8 +117,8 @@ _Verified by: Config with matching data produces a complete document, Config wit
 **Four content sources compose in AD-5 order**
 
 **Invariant:** Reference documents always compose content in this order:
-conventions, then scoped diagrams, then shapes, then behaviors. Empty sources
-are omitted without placeholder sections.
+    conventions, then scoped diagrams, then shapes, then behaviors. Empty sources
+    are omitted without placeholder sections.
 
     **Rationale:** AD-5 established that conceptual context (conventions and
     architectural diagrams) should precede implementation details (shapes and
@@ -133,9 +133,9 @@ _Verified by: Composition follows AD-5 order, Empty sources are omitted graceful
 **Detail level controls output density**
 
 **Invariant:** Three detail levels produce progressively more content from the
-same config. Summary: type tables only, no diagrams, no narrative. Standard:
-narrative and code examples, no rationale. Detailed: full rationale, property
-documentation, and scoped diagrams.
+    same config. Summary: type tables only, no diagrams, no narrative. Standard:
+    narrative and code examples, no rationale. Detailed: full rationale, property
+    documentation, and scoped diagrams.
 
     **Rationale:** AI context windows need compact summaries. Human readers need
     full documentation. The same config serves both audiences by parameterizing
@@ -149,8 +149,8 @@ _Verified by: Summary level produces compact type tables, Detailed level include
 **Generator registration produces paired detailed and summary outputs**
 
 **Invariant:** Each ReferenceDocConfig produces exactly two generators
-(detailed for `docs/`, summary for `_claude-md/`) plus a meta-generator
-that invokes all pairs. Total: N configs x 2 + 1 = 2N + 1 generators.
+    (detailed for `docs/`, summary for `_claude-md/`) plus a meta-generator
+    that invokes all pairs. Total: N configs x 2 + 1 = 2N + 1 generators.
 
     **Rationale:** Every reference document needs both a human-readable detailed
     version and an AI-optimized compact version. The meta-generator enables

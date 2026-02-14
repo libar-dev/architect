@@ -6,28 +6,26 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 The config loader discovers and loads `delivery-process.config.ts` files
-for hierarchical configuration, enabling package-level and repo-level
-taxonomy customization.
+  for hierarchical configuration, enabling package-level and repo-level
+  taxonomy customization.
 
-**Problem:**
+  **Problem:**
+  - Different directories need different taxonomies
+  - Package-level config should override repo-level
+  - CLI tools need automatic config discovery
 
-- Different directories need different taxonomies
-- Package-level config should override repo-level
-- CLI tools need automatic config discovery
-
-**Solution:**
-
-- Walk up directories looking for `delivery-process.config.ts`
-- Stop at repo root (.git marker)
-- Fall back to libar-generic preset (3 categories) if no config found
+  **Solution:**
+  - Walk up directories looking for `delivery-process.config.ts`
+  - Stop at repo root (.git marker)
+  - Fall back to libar-generic preset (3 categories) if no config found
 
 ## Acceptance Criteria
 
@@ -38,8 +36,8 @@ taxonomy customization.
 - Then config file should be found
 - And config path should end with "delivery-process.config.js"
 
-| path                       | type   |
-| -------------------------- | ------ |
+| path | type |
+| --- | --- |
 | delivery-process.config.js | config |
 
 **Find config file in parent directory**
@@ -49,10 +47,10 @@ taxonomy customization.
 - Then config file should be found
 - And config path should end with "delivery-process.config.js"
 
-| path                       | type   |
-| -------------------------- | ------ |
+| path | type |
+| --- | --- |
 | delivery-process.config.js | config |
-| nested/src/file.ts         | source |
+| nested/src/file.ts | source |
 
 **Prefer TypeScript config over JavaScript**
 
@@ -61,8 +59,8 @@ taxonomy customization.
 - Then config file should be found
 - And config path should end with "delivery-process.config.ts"
 
-| path                       | type   |
-| -------------------------- | ------ |
+| path | type |
+| --- | --- |
 | delivery-process.config.ts | config |
 | delivery-process.config.js | config |
 
@@ -72,8 +70,8 @@ taxonomy customization.
 - When finding config file from "src"
 - Then config file should NOT be found
 
-| path        | type   |
-| ----------- | ------ |
+| path | type |
+| --- | --- |
 | src/file.ts | source |
 
 **Stop at .git directory marker**
@@ -83,9 +81,9 @@ taxonomy customization.
 - Then config file should be found
 - And config path should NOT contain "project/nested"
 
-| path                       | type   |
-| -------------------------- | ------ |
-| .git/config                | git    |
+| path | type |
+| --- | --- |
+| .git/config | git |
 | delivery-process.config.js | config |
 | project/nested/src/file.ts | source |
 

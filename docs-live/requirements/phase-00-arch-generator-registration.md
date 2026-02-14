@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 As a CLI user
-I want an architecture generator registered in the generator registry
-So that I can run pnpm docs:architecture to generate diagrams
+  I want an architecture generator registered in the generator registry
+  So that I can run pnpm docs:architecture to generate diagrams
 
 ## Acceptance Criteria
 
@@ -32,15 +32,15 @@ So that I can run pnpm docs:architecture to generate diagrams
 - Then the output contains file "ARCHITECTURE.md"
 - And the file contains required elements:
 
-| name         | archRole        | archContext |
-| ------------ | --------------- | ----------- |
-| OrderHandler | command-handler | orders      |
-| InvHandler   | command-handler | inventory   |
+| name | archRole | archContext |
+| --- | --- | --- |
+| OrderHandler | command-handler | orders |
+| InvHandler | command-handler | inventory |
 
-| text            |
-| --------------- |
+| text |
+| --- |
 | System Overview |
-| subgraph        |
+| subgraph |
 
 **Generate layered diagram with options**
 
@@ -50,10 +50,10 @@ So that I can run pnpm docs:architecture to generate diagrams
 - Then the output contains file "ARCHITECTURE.md"
 - And the file contains "Layered Architecture"
 
-| name     | archRole        | archContext | archLayer   |
-| -------- | --------------- | ----------- | ----------- |
-| Decider1 | decider         | orders      | domain      |
-| Handler1 | command-handler | orders      | application |
+| name | archRole | archContext | archLayer |
+| --- | --- | --- | --- |
+| Decider1 | decider | orders | domain |
+| Handler1 | command-handler | orders | application |
 
 **Filter to specific contexts**
 
@@ -63,39 +63,39 @@ So that I can run pnpm docs:architecture to generate diagrams
 - Then the file contains "Orders BC"
 - And the file does not contain "Inventory BC"
 
-| name         | archRole        | archContext |
-| ------------ | --------------- | ----------- |
-| OrderHandler | command-handler | orders      |
-| OrderProj    | projection      | orders      |
-| InvHandler   | command-handler | inventory   |
+| name | archRole | archContext |
+| --- | --- | --- |
+| OrderHandler | command-handler | orders |
+| OrderProj | projection | orders |
+| InvHandler | command-handler | inventory |
 
 ## Business Rules
 
 **Architecture generator is registered in the registry**
 
 The architecture generator must be registered like other built-in
-generators so it can be invoked via CLI.
+    generators so it can be invoked via CLI.
 
 _Verified by: Generator is available in registry_
 
 **Architecture generator produces component diagram by default**
 
 Running the architecture generator without options produces
-a component diagram (bounded context view).
+    a component diagram (bounded context view).
 
 _Verified by: Default generation produces component diagram_
 
 **Architecture generator supports diagram type options**
 
 The generator accepts options to specify diagram type
-(component or layered).
+    (component or layered).
 
 _Verified by: Generate layered diagram with options_
 
 **Architecture generator supports context filtering**
 
 The generator can filter to specific bounded contexts
-for focused diagram output.
+    for focused diagram output.
 
 _Verified by: Filter to specific contexts_
 

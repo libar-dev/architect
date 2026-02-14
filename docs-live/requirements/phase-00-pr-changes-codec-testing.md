@@ -6,29 +6,27 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The PrChangesCodec transforms MasterDataset into RenderableDocument for
-PR-scoped documentation. It filters patterns by changed files and/or
-release version tags, groups by phase or priority, and generates
-review-focused output.
+  PR-scoped documentation. It filters patterns by changed files and/or
+  release version tags, groups by phase or priority, and generates
+  review-focused output.
 
-**Problem:**
+  **Problem:**
+  - Need to generate PR-specific documentation from patterns
+  - Filters by changed files and release version tags
+  - Different grouping options (phase, priority, workflow)
 
-- Need to generate PR-specific documentation from patterns
-- Filters by changed files and release version tags
-- Different grouping options (phase, priority, workflow)
-
-**Solution:**
-
-- PrChangesCodec with configurable filtering and grouping
-- Generates review checklists and dependency sections
-- OR logic for combined filters
+  **Solution:**
+  - PrChangesCodec with configurable filtering and grouping
+  - Generates review checklists and dependency sections
+  - OR logic for combined filters
 
 ## Acceptance Criteria
 
@@ -62,11 +60,11 @@ review-focused output.
 - And the document contains a "Summary" section
 - And the summary table shows:
 
-| metric         | value |
-| -------------- | ----- |
-| Patterns in PR | 3     |
-| Completed      | 1     |
-| Active         | 2     |
+| metric | value |
+| --- | --- |
+| Patterns in PR | 3 |
+| Completed | 1 |
+| Active | 2 |
 
 **Summary shows release tag when releaseFilter is set**
 
@@ -88,7 +86,7 @@ review-focused output.
 - And the document contains phase headings:
 
 | heading |
-| ------- |
+| --- |
 | Phase 1 |
 | Phase 2 |
 
@@ -105,11 +103,11 @@ review-focused output.
 - Then the document contains a "Changes by Priority" section
 - And the document contains priority headings:
 
-| heading         |
-| --------------- |
-| High Priority   |
+| heading |
+| --- |
+| High Priority |
 | Medium Priority |
-| Low Priority    |
+| Low Priority |
 
 **Priority groups show correct patterns**
 
@@ -132,9 +130,9 @@ review-focused output.
 - Then pattern details include metadata table with:
 
 | property |
-| -------- |
-| Status   |
-| Phase    |
+| --- |
+| Status |
+| Phase |
 
 **Pattern detail shows business value when available**
 
@@ -142,8 +140,8 @@ review-focused output.
 - When decoding with PrChangesCodec
 - Then pattern details include metadata table with:
 
-| property       |
-| -------------- |
+| property |
+| --- |
 | Business Value |
 
 **Pattern detail shows description**
@@ -202,11 +200,11 @@ review-focused output.
 - Then the document contains a "Review Checklist" section
 - And the review checklist contains standard items:
 
-| item                             |
-| -------------------------------- |
+| item |
+| --- |
 | Code follows project conventions |
-| Tests added/updated for changes  |
-| Documentation updated if needed  |
+| Tests added/updated for changes |
+| Documentation updated if needed |
 
 **Review checklist includes completed patterns item when applicable**
 

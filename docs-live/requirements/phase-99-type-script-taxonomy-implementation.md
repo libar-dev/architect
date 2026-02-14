@@ -6,22 +6,22 @@
 
 ## Overview
 
-| Property       | Value                            |
-| -------------- | -------------------------------- |
-| Status         | completed                        |
-| Product Area   | Annotation                       |
-| User Role      | Developer                        |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Annotation |
+| User Role | Developer |
 | Business Value | compile time taxonomy protection |
-| Phase          | 99                               |
+| Phase | 99 |
 
 ## Description
 
 As a delivery-process developer
-I want taxonomy defined in TypeScript with Zod integration
-So that I get compile-time safety and runtime validation
+  I want taxonomy defined in TypeScript with Zod integration
+  So that I get compile-time safety and runtime validation
 
-**Note (D12):** Implementation uses TypeScript as the single source of truth,
-with consumers importing directly rather than generating intermediate JSON files.
+  **Note (D12):** Implementation uses TypeScript as the single source of truth,
+  with consumers importing directly rather than generating intermediate JSON files.
 
 ## Acceptance Criteria
 

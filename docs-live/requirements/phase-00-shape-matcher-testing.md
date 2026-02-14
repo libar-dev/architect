@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Matches file paths against glob patterns for TypeScript shape extraction.
-Uses in-memory string matching (no filesystem access) per AD-6.
+  Uses in-memory string matching (no filesystem access) per AD-6.
 
 ## Acceptance Criteria
 
@@ -30,70 +30,70 @@ Uses in-memory string matching (no filesystem access) per AD-6.
 
 **Single glob matches file in target directory**
 
-- When matching path "src/lint/rules.ts" against pattern "src/lint/\*.ts"
+- When matching path "src/lint/rules.ts" against pattern "src/lint/*.ts"
 - Then the match result is true
 
 **Single glob does not match nested subdirectory**
 
-- When matching path "src/lint/sub/rules.ts" against pattern "src/lint/\*.ts"
+- When matching path "src/lint/sub/rules.ts" against pattern "src/lint/*.ts"
 - Then the match result is false
 
 **Single glob does not match wrong extension**
 
-- When matching path "src/lint/rules.js" against pattern "src/lint/\*.ts"
+- When matching path "src/lint/rules.js" against pattern "src/lint/*.ts"
 - Then the match result is false
 
 **Recursive glob matches file at target depth**
 
-- When matching path "src/generators/pipeline/transform.ts" against pattern "src/generators/\*_/_.ts"
+- When matching path "src/generators/pipeline/transform.ts" against pattern "src/generators/**/*.ts"
 - Then the match result is true
 
 **Recursive glob matches file at deeper depth**
 
-- When matching path "src/generators/pipeline/sub/deep.ts" against pattern "src/\*_/_.ts"
+- When matching path "src/generators/pipeline/sub/deep.ts" against pattern "src/**/*.ts"
 - Then the match result is true
 
 **Recursive glob matches file at top level**
 
-- When matching path "src/index.ts" against pattern "src/\*_/_.ts"
+- When matching path "src/index.ts" against pattern "src/**/*.ts"
 - Then the match result is true
 
 **Recursive glob does not match wrong prefix**
 
-- When matching path "other/generators/types.ts" against pattern "src/\*_/_.ts"
+- When matching path "other/generators/types.ts" against pattern "src/**/*.ts"
 - Then the match result is false
 
 **Shapes are extracted from matching patterns**
 
 - Given a MasterDataset with patterns:
-- When extracting shapes with source pattern "src/lint/\*.ts"
+- When extracting shapes with source pattern "src/lint/*.ts"
 - Then 2 shapes are returned
 - And the shape names are "LintRule" and "LintConfig"
 
-| filePath           | shapeName  | shapeKind |
-| ------------------ | ---------- | --------- |
-| src/lint/rules.ts  | LintRule   | interface |
-| src/lint/config.ts | LintConfig | type      |
+| filePath | shapeName | shapeKind |
+| --- | --- | --- |
+| src/lint/rules.ts | LintRule | interface |
+| src/lint/config.ts | LintConfig | type |
 
 **Duplicate shape names are deduplicated**
 
 - Given a MasterDataset with patterns:
-- When extracting shapes with source pattern "src/lint/\*.ts"
+- When extracting shapes with source pattern "src/lint/*.ts"
 - Then 1 shapes are returned
 
-| filePath           | shapeName | shapeKind |
-| ------------------ | --------- | --------- |
-| src/lint/rules.ts  | LintRule  | interface |
-| src/lint/config.ts | LintRule  | type      |
+| filePath | shapeName | shapeKind |
+| --- | --- | --- |
+| src/lint/rules.ts | LintRule | interface |
+| src/lint/config.ts | LintRule | type |
 
 **No shapes returned when glob does not match**
 
 - Given a MasterDataset with patterns:
-- When extracting shapes with source pattern "src/lint/\*.ts"
+- When extracting shapes with source pattern "src/lint/*.ts"
 - Then 0 shapes are returned
 
-| filePath               | shapeName | shapeKind |
-| ---------------------- | --------- | --------- |
+| filePath | shapeName | shapeKind |
+| --- | --- | --- |
 | src/other/unrelated.ts | Unrelated | interface |
 
 ## Business Rules

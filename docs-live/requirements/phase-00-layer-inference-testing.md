@@ -6,31 +6,29 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 The layer inference module classifies feature files into testing layers
-(timeline, domain, integration, e2e, component) based on directory path patterns.
-This enables automatic filtering and documentation grouping without explicit annotations.
+  (timeline, domain, integration, e2e, component) based on directory path patterns.
+  This enables automatic filtering and documentation grouping without explicit annotations.
 
-**Problem:**
+  **Problem:**
+  - Manual layer annotation in every feature file is tedious and error-prone
+  - Inconsistent classification across projects makes filtering unreliable
+  - Cross-platform path differences (Windows backslashes) cause classification failures
+  - No fallback for unclassified features leads to missing test coverage
 
-- Manual layer annotation in every feature file is tedious and error-prone
-- Inconsistent classification across projects makes filtering unreliable
-- Cross-platform path differences (Windows backslashes) cause classification failures
-- No fallback for unclassified features leads to missing test coverage
-
-**Solution:**
-
-- Directory-based inference using path pattern matching
-- Priority-based pattern matching (integration checked before domain)
-- Path normalization handles Windows, mixed separators, and case differences
-- "unknown" fallback layer ensures all features are captured
-- FEATURE_LAYERS constant provides validated layer enumeration
+  **Solution:**
+  - Directory-based inference using path pattern matching
+  - Priority-based pattern matching (integration checked before domain)
+  - Path normalization handles Windows, mixed separators, and case differences
+  - "unknown" fallback layer ensures all features are captured
+  - FEATURE_LAYERS constant provides validated layer enumeration
 
 ## Acceptance Criteria
 

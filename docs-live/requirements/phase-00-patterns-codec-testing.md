@@ -6,25 +6,23 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument
-for generating PATTERNS.md and category detail files.
+  for generating PATTERNS.md and category detail files.
 
-**Problem:**
+  **Problem:**
+  - Need to generate a comprehensive pattern registry from extracted patterns
+  - Output should include progress tracking, navigation, and categorization
 
-- Need to generate a comprehensive pattern registry from extracted patterns
-- Output should include progress tracking, navigation, and categorization
-
-**Solution:**
-
-- Codec transforms MasterDataset → RenderableDocument in a single decode call
-- Generates main document with optional category detail files
+  **Solution:**
+  - Codec transforms MasterDataset → RenderableDocument in a single decode call
+  - Generates main document with optional category detail files
 
 ## Acceptance Criteria
 
@@ -43,10 +41,10 @@ for generating PATTERNS.md and category detail files.
 - Then the document title is "Pattern Registry"
 - And the document contains sections:
 
-| heading      |
-| ------------ |
-| Progress     |
-| Categories   |
+| heading |
+| --- |
+| Progress |
+| Categories |
 | All Patterns |
 
 **Progress summary shows correct counts**
@@ -56,18 +54,18 @@ for generating PATTERNS.md and category detail files.
 - Then the progress section shows:
 - And the progress shows "30% complete"
 
-| status    | count |
-| --------- | ----- |
-| completed | 3     |
-| active    | 2     |
-| planned   | 5     |
+| status | count |
+| --- | --- |
+| completed | 3 |
+| active | 2 |
+| planned | 5 |
 
-| status    | count |
-| --------- | ----- |
-| Completed | 3     |
-| Active    | 2     |
-| Planned   | 5     |
-| Total     | 10    |
+| status | count |
+| --- | --- |
+| Completed | 3 |
+| Active | 2 |
+| Planned | 5 |
+| Total | 10 |
 
 **Pattern table includes all patterns**
 
@@ -76,11 +74,11 @@ for generating PATTERNS.md and category detail files.
 - Then the pattern table has 4 rows
 - And the pattern table has columns:
 
-| column      |
-| ----------- |
-| Pattern     |
-| Category    |
-| Status      |
+| column |
+| --- |
+| Pattern |
+| Category |
+| Status |
 | Description |
 
 **Pattern table is sorted by status then name**
@@ -89,18 +87,18 @@ for generating PATTERNS.md and category detail files.
 - When decoding with PatternsDocumentCodec
 - Then the pattern table rows are in order:
 
-| name  | status    |
-| ----- | --------- |
+| name | status |
+| --- | --- |
 | Zebra | completed |
-| Alpha | roadmap   |
-| Beta  | active    |
+| Alpha | roadmap |
+| Beta | active |
 | Gamma | completed |
 
-| name  |
-| ----- |
+| name |
+| --- |
 | Gamma |
 | Zebra |
-| Beta  |
+| Beta |
 | Alpha |
 
 **Category sections with pattern lists**
@@ -110,14 +108,14 @@ for generating PATTERNS.md and category detail files.
 - Then the document has category sections:
 
 | category | count |
-| -------- | ----- |
-| core     | 3     |
-| ddd      | 2     |
+| --- | --- |
+| core | 3 |
+| ddd | 2 |
 
 | category | patternCount |
-| -------- | ------------ |
-| core     | 3            |
-| ddd      | 2            |
+| --- | --- |
+| core | 3 |
+| ddd | 2 |
 
 **Dependency graph included when relationships exist**
 
@@ -145,15 +143,15 @@ for generating PATTERNS.md and category detail files.
 - And the category sections include only:
 
 | category | count |
-| -------- | ----- |
-| core     | 3     |
-| ddd      | 2     |
-| saga     | 1     |
+| --- | --- |
+| core | 3 |
+| ddd | 2 |
+| saga | 1 |
 
 | category |
-| -------- |
-| core     |
-| ddd      |
+| --- |
+| core |
+| ddd |
 
 **Generate individual pattern files when enabled**
 
@@ -163,17 +161,17 @@ for generating PATTERNS.md and category detail files.
 - And category links are anchor links
 - And pattern links point to individual files
 
-| name         | category |
-| ------------ | -------- |
-| Core Pattern | core     |
-| Another Core | core     |
-| DDD Pattern  | ddd      |
+| name | category |
+| --- | --- |
+| Core Pattern | core |
+| Another Core | core |
+| DDD Pattern | ddd |
 
-| path                     |
-| ------------------------ |
+| path |
+| --- |
 | patterns/core-pattern.md |
 | patterns/another-core.md |
-| patterns/ddd-pattern.md  |
+| patterns/ddd-pattern.md |
 
 **No detail files when disabled**
 

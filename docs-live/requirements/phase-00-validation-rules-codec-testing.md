@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Validates the Validation Rules Codec that transforms MasterDataset into a
-RenderableDocument for Process Guard validation rules reference (VALIDATION-RULES.md).
+  RenderableDocument for Process Guard validation rules reference (VALIDATION-RULES.md).
 
 ## Acceptance Criteria
 
@@ -106,42 +106,42 @@ RenderableDocument for Process Guard validation rules reference (VALIDATION-RULE
 **Document metadata is correctly set**
 
 The validation rules document has standard metadata fields for title,
-purpose, and detail level.
+    purpose, and detail level.
 
 _Verified by: Document title is Validation Rules, Document purpose describes Process Guard, Detail level reflects generateDetailFiles option_
 
 **All validation rules are documented in a table**
 
 The rules table includes all 6 Process Guard validation rules with
-their severity levels and descriptions.
+    their severity levels and descriptions.
 
 _Verified by: All 6 rules appear in table, Rules have correct severity levels_
 
 **FSM state diagram is generated from transitions**
 
 The Mermaid diagram shows all valid state transitions for the
-Process Guard FSM.
+    Process Guard FSM.
 
 _Verified by: Mermaid diagram generated when includeFSMDiagram enabled, Diagram includes all 4 states, FSM diagram excluded when includeFSMDiagram disabled_
 
 **Protection level matrix shows status protections**
 
 The protection matrix documents which statuses have which protection
-levels (none, scope-locked, hard-locked).
+    levels (none, scope-locked, hard-locked).
 
 _Verified by: Matrix shows all 4 statuses with protection levels, Protection matrix excluded when includeProtectionMatrix disabled_
 
 **CLI usage is documented with options and exit codes**
 
 The CLI section shows how to invoke the Process Guard linter
-with various options.
+    with various options.
 
 _Verified by: CLI example code block included, All 6 CLI options documented, Exit codes documented, CLI section excluded when includeCLIUsage disabled_
 
 **Escape hatches are documented for special cases**
 
 The escape hatches section documents how to override Process Guard
-validation for legitimate use cases.
+    validation for legitimate use cases.
 
 _Verified by: All 3 escape hatches documented, Escape hatches section excluded when includeEscapeHatches disabled_
 

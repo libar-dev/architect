@@ -6,25 +6,23 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)
-transform MasterDataset into RenderableDocuments for different timeline views.
+  transform MasterDataset into RenderableDocuments for different timeline views.
 
-**Problem:**
+  **Problem:**
+  - Need to generate roadmap, milestones, and current work documents from patterns
+  - Each view requires different filtering and grouping logic
 
-- Need to generate roadmap, milestones, and current work documents from patterns
-- Each view requires different filtering and grouping logic
-
-**Solution:**
-
-- Three specialized codecs for different timeline perspectives
-- Shared phase grouping with status-specific filtering
+  **Solution:**
+  - Three specialized codecs for different timeline perspectives
+  - Shared phase grouping with status-specific filtering
 
 ## Acceptance Criteria
 
@@ -43,11 +41,11 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - Then the document title is "Development Roadmap"
 - And the document contains sections:
 
-| heading          |
-| ---------------- |
+| heading |
+| --- |
 | Overall Progress |
 | Phase Navigation |
-| Phases           |
+| Phases |
 
 **Progress section shows correct status counts**
 
@@ -56,18 +54,18 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - Then the overall progress table shows:
 - And the overall progress shows "50%"
 
-| status    | count |
-| --------- | ----- |
-| completed | 5     |
-| active    | 3     |
-| planned   | 2     |
+| status | count |
+| --- | --- |
+| completed | 5 |
+| active | 3 |
+| planned | 2 |
 
-| metric         | value |
-| -------------- | ----- |
-| Total Patterns | 10    |
-| Completed      | 5     |
-| Active         | 3     |
-| Planned        | 2     |
+| metric | value |
+| --- | --- |
+| Total Patterns | 10 |
+| Completed | 5 |
+| Active | 3 |
+| Planned | 2 |
 
 **Phase navigation table with progress**
 
@@ -76,9 +74,9 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - Then the phase navigation table has columns:
 - And the phase navigation has 4 rows
 
-| column   |
-| -------- |
-| Phase    |
+| column |
+| --- |
+| Phase |
 | Progress |
 | Complete |
 
@@ -95,12 +93,12 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - When decoding with generateDetailFiles enabled for roadmap
 - Then the document has phase detail files:
 
-| path                                       |
-| ------------------------------------------ |
-| phases/phase-01-foundation-types.md        |
-| phases/phase-02-cms-integration.md         |
+| path |
+| --- |
+| phases/phase-01-foundation-types.md |
+| phases/phase-02-cms-integration.md |
 | phases/phase-03-event-store-enhancement.md |
-| phases/phase-04-advanced-projections.md    |
+| phases/phase-04-advanced-projections.md |
 
 **No detail files when disabled**
 
@@ -116,7 +114,7 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - And the quarterly timeline table has quarters:
 
 | quarter |
-| ------- |
+| --- |
 | Q4-2025 |
 | Q1-2026 |
 | Q2-2026 |
@@ -135,9 +133,9 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - Then the document title is "Completed Milestones"
 - And the summary table shows:
 
-| metric             | value |
-| ------------------ | ----- |
-| Completed Patterns | 2     |
+| metric | value |
+| --- | --- |
+| Completed Patterns | 2 |
 
 **Quarterly navigation with completed patterns**
 
@@ -166,8 +164,8 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - When decoding with generateDetailFiles enabled for milestones
 - Then the document has quarterly milestone files:
 
-| path                  |
-| --------------------- |
+| path |
+| --- |
 | milestones/Q4-2025.md |
 | milestones/Q1-2026.md |
 
@@ -206,11 +204,11 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - Then the document contains an "All Active Patterns" section
 - And the active patterns table has columns:
 
-| column      |
-| ----------- |
-| Pattern     |
-| Phase       |
-| Effort      |
+| column |
+| --- |
+| Pattern |
+| Phase |
+| Effort |
 | Description |
 
 **Generate current work detail files when enabled**
@@ -219,8 +217,8 @@ transform MasterDataset into RenderableDocuments for different timeline views.
 - When decoding with generateDetailFiles enabled for current work
 - Then the document has current work detail files:
 
-| path                                        |
-| ------------------------------------------- |
+| path |
+| --- |
 | current/phase-03-event-store-enhancement.md |
 
 ## Business Rules

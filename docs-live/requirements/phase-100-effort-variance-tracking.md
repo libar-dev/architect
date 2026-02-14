@@ -6,31 +6,30 @@
 
 ## Overview
 
-| Property       | Value                                   |
-| -------------- | --------------------------------------- |
-| Status         | planned                                 |
-| Product Area   | Process                                 |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Process |
 | Business Value | track planned vs actual effort variance |
-| Phase          | 100                                     |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-No systematic way to track planned vs actual effort.
-Cannot learn from estimation accuracy patterns.
-No visibility into "where time goes" across workflows.
+  No systematic way to track planned vs actual effort.
+  Cannot learn from estimation accuracy patterns.
+  No visibility into "where time goes" across workflows.
 
-**Solution:**
-Generate EFFORT-ANALYSIS.md report showing:
+  **Solution:**
+  Generate EFFORT-ANALYSIS.md report showing:
+  - Phase burndown (planned vs actual per phase)
+  - Estimation accuracy trends over time
+  - Time distribution by workflow type (design, implementation, testing, docs)
 
-- Phase burndown (planned vs actual per phase)
-- Estimation accuracy trends over time
-- Time distribution by workflow type (design, implementation, testing, docs)
+  Uses effort and effort-actual metadata from TypeScript phase files.
+  Uses workflow metadata for time distribution analysis.
 
-Uses effort and effort-actual metadata from TypeScript phase files.
-Uses workflow metadata for time distribution analysis.
-
-Implements Convergence Opportunity 3: Earned-Value Tracking (lightweight).
+  Implements Convergence Opportunity 3: Earned-Value Tracking (lightweight).
 
 ## Acceptance Criteria
 

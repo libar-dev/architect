@@ -6,20 +6,20 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description
 
 **Problem:**
-Stub metadata (target path, design session) was stored as plain text
-in JSDoc descriptions, invisible to structured queries.
+  Stub metadata (target path, design session) was stored as plain text
+  in JSDoc descriptions, invisible to structured queries.
 
-**Solution:**
-Register libar-docs-target and libar-docs-since as taxonomy tags
-so they flow through the extraction pipeline as structured fields.
+  **Solution:**
+  Register libar-docs-target and libar-docs-since as taxonomy tags
+  so they flow through the extraction pipeline as structured fields.
 
 ## Acceptance Criteria
 

@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 This feature tests whether vitest-cucumber supports the Rule keyword
-for organizing scenarios under business rules.
+  for organizing scenarios under business rules.
 
 ## Acceptance Criteria
 
@@ -51,14 +51,14 @@ for organizing scenarios under business rules.
 **Basic arithmetic operations work correctly**
 
 The calculator should perform standard math operations
-with correct results.
+    with correct results.
 
 _Verified by: Addition of two positive numbers, Subtraction of two numbers_
 
 **Division has special constraints**
 
 Division by zero must be handled gracefully to prevent
-system errors.
+    system errors.
 
 _Verified by: Division of two numbers, Division by zero is prevented_
 

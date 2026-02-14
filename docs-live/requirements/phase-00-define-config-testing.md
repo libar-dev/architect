@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 The defineConfig identity function and DeliveryProcessProjectConfigSchema
-provide type-safe configuration authoring with runtime validation.
+  provide type-safe configuration authoring with runtime validation.
 
-**Problem:**
+  **Problem:**
+  - Users need type-safe config authoring without runtime overhead
+  - Invalid configs must be caught at load time, not at usage time
+  - New-style vs legacy config must be distinguishable programmatically
 
-- Users need type-safe config authoring without runtime overhead
-- Invalid configs must be caught at load time, not at usage time
-- New-style vs legacy config must be distinguishable programmatically
-
-**Solution:**
-
-- defineConfig() is a zero-cost identity function for TypeScript autocompletion
-- Zod schema validates at load time with precise error messages
-- isProjectConfig() and isLegacyInstance() type guards disambiguate config formats
+  **Solution:**
+  - defineConfig() is a zero-cost identity function for TypeScript autocompletion
+  - Zod schema validates at load time with precise error messages
+  - isProjectConfig() and isLegacyInstance() type guards disambiguate config formats
 
 ## Acceptance Criteria
 

@@ -6,28 +6,27 @@
 
 ## Overview
 
-| Property       | Value                                             |
-| -------------- | ------------------------------------------------- |
-| Status         | planned                                           |
-| Product Area   | Validation                                        |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Validation |
 | Business Value | enforce separation of specs from release metadata |
-| Phase          | 100                                               |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-PDR-002 and PDR-003 define conventions for separating specs from release
-metadata, but there's no automated enforcement. Spec files may
-inadvertently include release columns, and TypeScript phase files may
-have incorrect structure.
+  PDR-002 and PDR-003 define conventions for separating specs from release
+  metadata, but there's no automated enforcement. Spec files may
+  inadvertently include release columns, and TypeScript phase files may
+  have incorrect structure.
 
-**Solution:**
-Implement validation rules for:
-
-- Spec file compliance (no release columns in DataTables)
-- TypeScript phase file structure
-- Cross-reference validation (spec references exist)
-- Release version format (semver pattern)
+  **Solution:**
+  Implement validation rules for:
+  - Spec file compliance (no release columns in DataTables)
+  - TypeScript phase file structure
+  - Cross-reference validation (spec references exist)
+  - Release version format (semver pattern)
 
 ## Acceptance Criteria
 

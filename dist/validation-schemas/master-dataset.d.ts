@@ -150,8 +150,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -252,8 +252,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -391,8 +391,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -493,8 +493,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -632,8 +632,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -734,8 +734,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -892,8 +892,8 @@ export declare const PhaseGroupSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -994,8 +994,8 @@ export declare const PhaseGroupSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1144,8 +1144,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1246,8 +1246,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1385,8 +1385,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1487,8 +1487,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1626,8 +1626,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1728,8 +1728,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1867,8 +1867,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1969,8 +1969,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2147,8 +2147,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2249,8 +2249,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2388,8 +2388,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2490,8 +2490,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2629,8 +2629,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2731,8 +2731,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2870,8 +2870,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2972,8 +2972,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3111,8 +3111,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -3213,8 +3213,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3360,8 +3360,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -3462,8 +3462,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3640,8 +3640,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3742,8 +3742,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3881,8 +3881,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3983,8 +3983,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4122,8 +4122,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -4224,8 +4224,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4367,8 +4367,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -4469,8 +4469,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4615,8 +4615,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -4717,8 +4717,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -4856,8 +4856,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -4958,8 +4958,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -5098,8 +5098,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5200,8 +5200,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5339,8 +5339,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5441,8 +5441,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5580,8 +5580,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5682,8 +5682,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5821,8 +5821,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5923,8 +5923,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6088,8 +6088,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6190,8 +6190,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6329,8 +6329,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6431,8 +6431,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6570,8 +6570,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6672,8 +6672,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6811,8 +6811,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6913,8 +6913,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -7052,8 +7052,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -7154,8 +7154,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;

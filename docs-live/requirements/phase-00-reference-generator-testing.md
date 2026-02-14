@@ -6,17 +6,17 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Registers all 13 reference document generators. Each config produces
-TWO individual generators (detailed + summary) plus one meta-generator
-("reference-docs") that produces all 26 files at once, yielding 27 total.
-Generators implement DocumentGenerator directly, not via CodecBasedGenerator.
+  TWO individual generators (detailed + summary) plus one meta-generator
+  ("reference-docs") that produces all 26 files at once, yielding 27 total.
+  Generators implement DocumentGenerator directly, not via CodecBasedGenerator.
 
 ## Acceptance Criteria
 

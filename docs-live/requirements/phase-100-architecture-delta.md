@@ -6,33 +6,32 @@
 
 ## Overview
 
-| Property       | Value                                  |
-| -------------- | -------------------------------------- |
-| Status         | planned                                |
-| Product Area   | Generation                             |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Generation |
 | Business Value | document release changes automatically |
-| Phase          | 100                                    |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Architecture evolution is not visible between releases.
-Breaking changes are not clearly documented.
-New constraints introduced by phases are hard to track.
-No automated way to generate "what changed" for a release.
+  Architecture evolution is not visible between releases.
+  Breaking changes are not clearly documented.
+  New constraints introduced by phases are hard to track.
+  No automated way to generate "what changed" for a release.
 
-**Solution:**
-Generate ARCH-DELTA.md showing changes since last release:
+  **Solution:**
+  Generate ARCH-DELTA.md showing changes since last release:
+  - New patterns introduced (with ADR references)
+  - Deprecated patterns (with replacement guidance)
+  - New constraints (with rationale)
+  - Breaking changes (with migration notes)
 
-- New patterns introduced (with ADR references)
-- Deprecated patterns (with replacement guidance)
-- New constraints (with rationale)
-- Breaking changes (with migration notes)
+  Uses git tags to determine release boundaries.
+  Uses @libar-docs-decision, @libar-docs-replaces annotations.
 
-Uses git tags to determine release boundaries.
-Uses @libar-docs-decision, @libar-docs-replaces annotations.
-
-Implements Convergence Opportunity 5: Architecture Change Control.
+  Implements Convergence Opportunity 5: Architecture Change Control.
 
 ## Acceptance Criteria
 

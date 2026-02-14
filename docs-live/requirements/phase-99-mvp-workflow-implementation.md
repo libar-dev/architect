@@ -6,26 +6,25 @@
 
 ## Overview
 
-| Property       | Value                         |
-| -------------- | ----------------------------- |
-| Status         | completed                     |
-| Product Area   | Process                       |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Process |
 | Business Value | align package with pdr005 fsm |
-| Phase          | 99                            |
+| Phase | 99 |
 
 ## Description
 
 **Problem:**
-PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`)
-but the delivery-process package validation schemas and generators may still
-reference legacy status values. Need to ensure alignment.
+  PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`)
+  but the delivery-process package validation schemas and generators may still
+  reference legacy status values. Need to ensure alignment.
 
-**Solution:**
-Implement PDR-005 status values via taxonomy module refactor:
-
-1. Create taxonomy module as single source of truth (src/taxonomy/status-values.ts)
-2. Update validation schemas to import from taxonomy module
-3. Update generators to use normalizeStatus() for display bucket mapping
+  **Solution:**
+  Implement PDR-005 status values via taxonomy module refactor:
+  1. Create taxonomy module as single source of truth (src/taxonomy/status-values.ts)
+  2. Update validation schemas to import from taxonomy module
+  3. Update generators to use normalizeStatus() for display bucket mapping
 
 ## Acceptance Criteria
 

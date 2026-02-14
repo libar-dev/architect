@@ -6,37 +6,35 @@
 
 ## Overview
 
-| Property       | Value                                             |
-| -------------- | ------------------------------------------------- |
-| Status         | planned                                           |
-| Product Area   | Generation                                        |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Generation |
 | Business Value | ensure all document codecs produce correct output |
-| Phase          | 102                                               |
+| Phase | 102 |
 
 ## Description
 
 **Problem:**
-Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs:
+  Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs:
+  - PatternsDocumentCodec (tested)
+  - BusinessRulesCodec (tested)
+  - ArchitectureDocumentCodec (tested)
 
-- PatternsDocumentCodec (tested)
-- BusinessRulesCodec (tested)
-- ArchitectureDocumentCodec (tested)
+  The remaining 14 codecs lack executable specs, meaning document generation
+  correctness is unverified.
 
-The remaining 14 codecs lack executable specs, meaning document generation
-correctness is unverified.
+  **Solution:**
+  Create behavior specs for each untested codec covering:
+  - Input transformation (MasterDataset to RenderableDocument)
+  - Output structure (correct sections, headings, content)
+  - Edge cases (empty data, missing fields)
 
-**Solution:**
-Create behavior specs for each untested codec covering:
-
-- Input transformation (MasterDataset to RenderableDocument)
-- Output structure (correct sections, headings, content)
-- Edge cases (empty data, missing fields)
-
-**Business Value:**
-| Benefit | How |
-| Correctness | Generated docs match expected structure |
-| Regression Prevention | Changes to codecs don't break output |
-| Confidence | Safe to modify codec logic |
+  **Business Value:**
+  | Benefit | How |
+  | Correctness | Generated docs match expected structure |
+  | Regression Prevention | Changes to codecs don't break output |
+  | Confidence | Safe to modify codec logic |
 
 ## Acceptance Criteria
 
@@ -129,7 +127,7 @@ Create behavior specs for each untested codec covering:
 **Timeline codecs group patterns by phase and status**
 
 **Invariant:** Roadmap shows planned work, Milestones shows completed work,
-CurrentWork shows active patterns only.
+    CurrentWork shows active patterns only.
 
     **API:** See `src/renderable/codecs/timeline.ts`
 
@@ -140,7 +138,7 @@ _Verified by: RoadmapDocumentCodec groups by phase, CompletedMilestonesCodec sho
 **Session codecs provide working context for AI sessions**
 
 **Invariant:** SessionContext shows active patterns with deliverables.
-RemainingWork aggregates incomplete work by phase.
+    RemainingWork aggregates incomplete work by phase.
 
     **API:** See `src/renderable/codecs/session.ts`
 
@@ -151,7 +149,7 @@ _Verified by: SessionContextCodec includes active pattern details, RemainingWork
 **Requirements codec produces PRD-style documentation**
 
 **Invariant:** Features include problem, solution, business value.
-Acceptance criteria are formatted with bold keywords.
+    Acceptance criteria are formatted with bold keywords.
 
     **API:** See `src/renderable/codecs/requirements.ts`
 
@@ -162,7 +160,7 @@ _Verified by: RequirementsDocumentCodec includes full feature descriptions, Acce
 **Reporting codecs support release management and auditing**
 
 **Invariant:** Changelog follows Keep a Changelog format.
-Traceability maps rules to scenarios.
+    Traceability maps rules to scenarios.
 
     **API:** See `src/renderable/codecs/reporting.ts`
 
@@ -173,7 +171,7 @@ _Verified by: ChangelogCodec follows Keep a Changelog format, TraceabilityCodec 
 **Planning codecs support implementation sessions**
 
 **Invariant:** Planning checklist includes DoD items.
-Session plan shows implementation steps.
+    Session plan shows implementation steps.
 
     **API:** See `src/renderable/codecs/planning.ts`
 

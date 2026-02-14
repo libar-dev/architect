@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 The file discovery system uses glob patterns to find TypeScript files
-for documentation extraction. It applies sensible defaults to exclude
-common non-source directories like node_modules, dist, and test files.
+  for documentation extraction. It applies sensible defaults to exclude
+  common non-source directories like node_modules, dist, and test files.
 
 ## Acceptance Criteria
 
@@ -27,17 +27,17 @@ common non-source directories like node_modules, dist, and test files.
 - Then 2 files should be found
 - And files ending with should be found:
 
-| path         | content |
-| ------------ | ------- |
+| path | content |
+| --- | --- |
 | src/file1.ts | // test |
 | src/file2.ts | // test |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
 
-| ending   |
-| -------- |
+| ending |
+| --- |
 | file1.ts |
 | file2.ts |
 
@@ -49,14 +49,14 @@ common non-source directories like node_modules, dist, and test files.
 - Then no files containing "node_modules" should be found
 - And a file ending with "app.ts" should be found
 
-| path                    | content |
-| ----------------------- | ------- |
+| path | content |
+| --- | --- |
 | node_modules/package.ts | // test |
-| src/app.ts              | // test |
+| src/app.ts | // test |
 
-| pattern  |
-| -------- |
-| \*_/_.ts |
+| pattern |
+| --- |
+| **/*.ts |
 
 **Exclude dist directory by default**
 
@@ -66,14 +66,14 @@ common non-source directories like node_modules, dist, and test files.
 - Then no files containing "dist" should be found
 - And a file ending with "source.ts" should be found
 
-| path             | content |
-| ---------------- | ------- |
+| path | content |
+| --- | --- |
 | dist/compiled.ts | // test |
-| src/source.ts    | // test |
+| src/source.ts | // test |
 
-| pattern  |
-| -------- |
-| \*_/_.ts |
+| pattern |
+| --- |
+| **/*.ts |
 
 **Exclude test files by default**
 
@@ -83,18 +83,18 @@ common non-source directories like node_modules, dist, and test files.
 - Then files ending with should NOT be found:
 - And a file ending with "app.ts" should be found
 
-| path            | content |
-| --------------- | ------- |
+| path | content |
+| --- | --- |
 | src/app.test.ts | // test |
 | src/app.spec.ts | // test |
-| src/app.ts      | // test |
+| src/app.ts | // test |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
 
-| ending   |
-| -------- |
+| ending |
+| --- |
 | .test.ts |
 | .spec.ts |
 
@@ -106,14 +106,14 @@ common non-source directories like node_modules, dist, and test files.
 - Then no files ending with ".d.ts" should be found
 - And a file ending with "app.ts" should be found
 
-| path           | content         |
-| -------------- | --------------- |
+| path | content |
+| --- | --- |
 | src/types.d.ts | // declarations |
-| src/app.ts     | // source       |
+| src/app.ts | // source |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
 
 **Respect custom exclude patterns**
 
@@ -124,17 +124,17 @@ common non-source directories like node_modules, dist, and test files.
 - Then no files containing "internal" should be found
 - And a file containing "public" should be found
 
-| path                   | content     |
-| ---------------------- | ----------- |
+| path | content |
+| --- | --- |
 | src/internal/secret.ts | // internal |
-| src/public/api.ts      | // public   |
+| src/public/api.ts | // public |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
 
-| pattern        |
-| -------------- |
+| pattern |
+| --- |
 | **/internal/** |
 
 **Return absolute paths**
@@ -145,13 +145,13 @@ common non-source directories like node_modules, dist, and test files.
 - Then 1 file should be found
 - And all found paths should be absolute
 
-| path       | content |
-| ---------- | ------- |
+| path | content |
+| --- | --- |
 | src/app.ts | // test |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
 
 **Support multiple glob patterns**
 
@@ -161,20 +161,20 @@ common non-source directories like node_modules, dist, and test files.
 - Then 2 files should be found
 - And files containing should be found:
 
-| path         | content |
-| ------------ | ------- |
-| src/app.ts   | // src  |
-| lib/utils.ts | // lib  |
+| path | content |
+| --- | --- |
+| src/app.ts | // src |
+| lib/utils.ts | // lib |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
-| lib/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
+| lib/**/*.ts |
 
 | substring |
-| --------- |
-| src       |
-| lib       |
+| --- |
+| src |
+| lib |
 
 **Return empty array when no files match**
 
@@ -182,9 +182,9 @@ common non-source directories like node_modules, dist, and test files.
 - When files are scanned
 - Then 0 files should be found
 
-| pattern              |
-| -------------------- |
-| nonexistent/\*_/_.ts |
+| pattern |
+| --- |
+| nonexistent/**/*.ts |
 
 **Handle nested directory structures**
 
@@ -194,13 +194,13 @@ common non-source directories like node_modules, dist, and test files.
 - Then 1 file should be found
 - And a file containing "components/auth/login.ts" should be found
 
-| path                         | content  |
-| ---------------------------- | -------- |
+| path | content |
+| --- | --- |
 | src/components/auth/login.ts | // login |
 
-| pattern      |
-| ------------ |
-| src/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
 
 ---
 

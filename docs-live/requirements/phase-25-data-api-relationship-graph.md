@@ -6,44 +6,43 @@
 
 ## Overview
 
-| Property       | Value                                      |
-| -------------- | ------------------------------------------ |
-| Status         | planned                                    |
-| Product Area   | DataAPI                                    |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | DataAPI |
 | Business Value | deep dependency analysis and health checks |
-| Phase          | 25                                         |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-The current API provides flat relationship lookups (`getPatternDependencies`,
-`getPatternRelationships`) but no recursive traversal, impact analysis, or
-graph health checks. Agents cannot answer "if I change X, what breaks?",
-"what's the path from A to B?", or "which patterns have broken references?"
-without manual multi-step exploration.
+  The current API provides flat relationship lookups (`getPatternDependencies`,
+  `getPatternRelationships`) but no recursive traversal, impact analysis, or
+  graph health checks. Agents cannot answer "if I change X, what breaks?",
+  "what's the path from A to B?", or "which patterns have broken references?"
+  without manual multi-step exploration.
 
-**Solution:**
-Add graph query commands that operate on the full relationship graph:
+  **Solution:**
+  Add graph query commands that operate on the full relationship graph:
+  1. `graph <pattern> [--depth N] [--direction up|down|both]` for recursive traversal
+  2. `graph impact <pattern>` for transitive dependent analysis
+  3. `graph path <from> <to>` for finding relationship chains
+  4. `graph dangling` for broken reference detection
+  5. `graph orphans` for isolated pattern detection
+  6. `graph blocking` for blocked chain visualization
 
-1. `graph <pattern> [--depth N] [--direction up|down|both]` for recursive traversal
-2. `graph impact <pattern>` for transitive dependent analysis
-3. `graph path <from> <to>` for finding relationship chains
-4. `graph dangling` for broken reference detection
-5. `graph orphans` for isolated pattern detection
-6. `graph blocking` for blocked chain visualization
+  **Business Value:**
+  | Benefit | Impact |
+  | Impact analysis | Know change blast radius before modifying |
+  | Dangling references | Detect annotation errors automatically |
+  | Blocking chains | Understand what prevents progress |
+  | Path finding | Discover non-obvious relationships |
 
-**Business Value:**
-| Benefit | Impact |
-| Impact analysis | Know change blast radius before modifying |
-| Dangling references | Detect annotation errors automatically |
-| Blocking chains | Understand what prevents progress |
-| Path finding | Discover non-obvious relationships |
-
-**Relationship to ProcessStateAPIRelationshipQueries:**
-This spec supersedes the earlier ProcessStateAPIRelationshipQueries spec,
-which focused on implementation/inheritance convenience methods. The
-underlying data is available via getPatternRelationships(). This spec
-adds graph-level operations that traverse relationships recursively.
+  **Relationship to ProcessStateAPIRelationshipQueries:**
+  This spec supersedes the earlier ProcessStateAPIRelationshipQueries spec,
+  which focused on implementation/inheritance convenience methods. The
+  underlying data is available via getPatternRelationships(). This spec
+  adds graph-level operations that traverse relationships recursively.
 
 ## Acceptance Criteria
 
@@ -114,8 +113,8 @@ adds graph-level operations that traverse relationships recursively.
 **Graph command traverses relationships recursively with configurable depth**
 
 **Invariant:** Graph traversal walks both planning relationships (`dependsOn`,
-`enables`) and implementation relationships (`uses`, `usedBy`) with cycle
-detection to prevent infinite loops.
+    `enables`) and implementation relationships (`uses`, `usedBy`) with cycle
+    detection to prevent infinite loops.
 
     **Rationale:** Flat lookups show direct connections. Recursive traversal shows
     the full picture: transitive dependencies, indirect consumers, and the complete
@@ -129,7 +128,7 @@ _Verified by: Recursive graph traversal, Bidirectional traversal with depth limi
 **Impact analysis shows transitive dependents of a pattern**
 
 **Invariant:** Impact analysis answers "if I change X, what else is affected?"
-by walking `usedBy` + `enables` recursively.
+    by walking `usedBy` + `enables` recursively.
 
     **Rationale:** Before modifying a completed pattern (which requires unlock),
     understanding the blast radius prevents unintended breakage. Impact analysis
@@ -142,8 +141,8 @@ _Verified by: Impact analysis shows transitive dependents, Impact analysis for l
 **Path finding discovers relationship chains between two patterns**
 
 **Invariant:** Path finding returns the shortest chain of relationships
-connecting two patterns, or indicates no path exists. Traversal considers
-all relationship types (uses, usedBy, dependsOn, enables).
+    connecting two patterns, or indicates no path exists. Traversal considers
+    all relationship types (uses, usedBy, dependsOn, enables).
 
     **Rationale:** Understanding how two seemingly unrelated patterns connect
     helps agents assess indirect dependencies before making changes. When
@@ -157,8 +156,8 @@ _Verified by: Find path between connected patterns, No path between disconnected
 **Graph health commands detect broken references and isolated patterns**
 
 **Invariant:** Dangling references (pattern names in `uses`/`dependsOn` that
-don't match any pattern definition) are detectable. Orphan patterns (no
-relationships at all) are identifiable.
+    don't match any pattern definition) are detectable. Orphan patterns (no
+    relationships at all) are identifiable.
 
     **Rationale:** The MasterDataset transformer already computes dangling
     references during Pass 3 (relationship resolution) but does not expose them

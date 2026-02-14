@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 As a documentation generator
-I want to generate component diagrams from architecture metadata
-So that system architecture is automatically visualized with bounded context subgraphs
+  I want to generate component diagrams from architecture metadata
+  So that system architecture is automatically visualized with bounded context subgraphs
 
 ## Acceptance Criteria
 
@@ -25,15 +25,15 @@ So that system architecture is automatically visualized with bounded context sub
 - When the component diagram is generated
 - Then the Mermaid output contains subgraphs for contexts:
 
-| name         | archRole        | archContext |
-| ------------ | --------------- | ----------- |
-| OrderHandler | command-handler | orders      |
-| OrderProj    | projection      | orders      |
-| InvHandler   | command-handler | inventory   |
+| name | archRole | archContext |
+| --- | --- | --- |
+| OrderHandler | command-handler | orders |
+| OrderProj | projection | orders |
+| InvHandler | command-handler | inventory |
 
-| context   |
-| --------- |
-| orders    |
+| context |
+| --- |
+| orders |
 | inventory |
 
 **Shared infrastructure subgraph for context-less patterns**
@@ -43,11 +43,11 @@ So that system architecture is automatically visualized with bounded context sub
 - Then the Mermaid output contains subgraph "Shared Infrastructure"
 - And the pattern "EventBus" appears in the diagram
 
-| name         | archRole        | archContext |
-| ------------ | --------------- | ----------- |
-| OrderHandler | command-handler | orders      |
-| EventBus     | infrastructure  | -           |
-| Logger       | infrastructure  | -           |
+| name | archRole | archContext |
+| --- | --- | --- |
+| OrderHandler | command-handler | orders |
+| EventBus | infrastructure | - |
+| Logger | infrastructure | - |
 
 **Arrow styles for relationship types**
 
@@ -55,18 +55,18 @@ So that system architecture is automatically visualized with bounded context sub
 - When the component diagram is generated
 - Then the Mermaid output contains arrows:
 
-| name         | archRole        | archContext | uses      | dependsOn | implements |
-| ------------ | --------------- | ----------- | --------- | --------- | ---------- |
-| OrderHandler | command-handler | orders      | OrderRepo | -         | -          |
-| OrderRepo    | repository      | orders      | -         | Database  | Repository |
-| Database     | infrastructure  | -           | -         | -         | -          |
-| Repository   | repository      | -           | -         | -         | -          |
+| name | archRole | archContext | uses | dependsOn | implements |
+| --- | --- | --- | --- | --- | --- |
+| OrderHandler | command-handler | orders | OrderRepo | - | - |
+| OrderRepo | repository | orders | - | Database | Repository |
+| Database | infrastructure | - | - | - | - |
+| Repository | repository | - | - | - | - |
 
-| arrow                      |
-| -------------------------- |
+| arrow |
+| --- |
 | OrderHandler --> OrderRepo |
-| OrderRepo -.-> Database    |
-| OrderRepo ..-> Repository  |
+| OrderRepo -.-> Database |
+| OrderRepo ..-> Repository |
 
 **Skip arrows to non-annotated targets**
 
@@ -75,10 +75,10 @@ So that system architecture is automatically visualized with bounded context sub
 - Then the Mermaid output contains arrow "OrderHandler --> OrderRepo"
 - And the Mermaid output does not contain "External"
 
-| name         | archRole        | archContext | uses               |
-| ------------ | --------------- | ----------- | ------------------ |
-| OrderHandler | command-handler | orders      | OrderRepo,External |
-| OrderRepo    | repository      | orders      | -                  |
+| name | archRole | archContext | uses |
+| --- | --- | --- | --- |
+| OrderHandler | command-handler | orders | OrderRepo,External |
+| OrderRepo | repository | orders | - |
 
 **Summary section with counts**
 
@@ -86,17 +86,17 @@ So that system architecture is automatically visualized with bounded context sub
 - When the component diagram is generated
 - Then the document contains elements:
 
-| name         | archRole        | archContext |
-| ------------ | --------------- | ----------- |
-| OrderHandler | command-handler | orders      |
-| OrderProj    | projection      | orders      |
-| InvHandler   | command-handler | inventory   |
+| name | archRole | archContext |
+| --- | --- | --- |
+| OrderHandler | command-handler | orders |
+| OrderProj | projection | orders |
+| InvHandler | command-handler | inventory |
 
-| text                     |
-| ------------------------ |
-| ## Overview              |
+| text |
+| --- |
+| ## Overview |
 | 3 annotated source files |
-| 2 bounded context        |
+| 2 bounded context |
 
 **Legend section with arrow explanations**
 
@@ -104,14 +104,14 @@ So that system architecture is automatically visualized with bounded context sub
 - When the component diagram is generated
 - Then the document contains elements:
 
-| name         | archRole        | archContext |
-| ------------ | --------------- | ----------- |
-| OrderHandler | command-handler | orders      |
+| name | archRole | archContext |
+| --- | --- | --- |
+| OrderHandler | command-handler | orders |
 
-| text       |
-| ---------- |
-| ## Legend  |
-| uses       |
+| text |
+| --- |
+| ## Legend |
+| uses |
 | depends-on |
 
 **Inventory table with component details**
@@ -121,17 +121,17 @@ So that system architecture is automatically visualized with bounded context sub
 - Then the document contains "## Component Inventory"
 - And the inventory table includes columns:
 
-| name         | archRole        | archContext | archLayer   |
-| ------------ | --------------- | ----------- | ----------- |
-| OrderHandler | command-handler | orders      | application |
-| OrderProj    | projection      | orders      | application |
+| name | archRole | archContext | archLayer |
+| --- | --- | --- | --- |
+| OrderHandler | command-handler | orders | application |
+| OrderProj | projection | orders | application |
 
-| column    |
-| --------- |
+| column |
+| --- |
 | Component |
-| Context   |
-| Role      |
-| Layer     |
+| Context |
+| Role |
+| Layer |
 
 **No architecture data message**
 
@@ -139,9 +139,9 @@ So that system architecture is automatically visualized with bounded context sub
 - When the component diagram is generated
 - Then the document contains elements:
 
-| text                  |
-| --------------------- |
-| No Architecture Data  |
+| text |
+| --- |
+| No Architecture Data |
 | @libar-docs-arch-role |
 
 ## Business Rules
@@ -149,34 +149,38 @@ So that system architecture is automatically visualized with bounded context sub
 **Component diagrams group patterns by bounded context**
 
 Patterns with arch-context are grouped into Mermaid subgraphs.
-Each bounded context becomes a visual container.
+    Each bounded context becomes a visual container.
 
 _Verified by: Generate subgraphs for bounded contexts_
 
 **Context-less patterns go to Shared Infrastructure**
 
 Patterns without arch-context are grouped into a
-"Shared Infrastructure" subgraph.
+    "Shared Infrastructure" subgraph.
 
 _Verified by: Shared infrastructure subgraph for context-less patterns_
 
 **Relationship types render with distinct arrow styles**
 
-Arrow styles follow UML conventions: - uses: solid arrow (-->) - depends-on: dashed arrow (-.->) - implements: dotted arrow (..->) - extends: open arrow (-->>)
+Arrow styles follow UML conventions:
+    - uses: solid arrow (-->)
+    - depends-on: dashed arrow (-.->)
+    - implements: dotted arrow (..->)
+    - extends: open arrow (-->>)
 
 _Verified by: Arrow styles for relationship types_
 
 **Arrows only connect annotated components**
 
 Relationships pointing to non-annotated patterns
-are not rendered (target would not exist in diagram).
+    are not rendered (target would not exist in diagram).
 
 _Verified by: Skip arrows to non-annotated targets_
 
 **Component diagram includes summary section**
 
 The generated document starts with an overview section
-showing component counts and bounded context statistics.
+    showing component counts and bounded context statistics.
 
 _Verified by: Summary section with counts_
 
@@ -195,7 +199,7 @@ _Verified by: Inventory table with component details_
 **Empty architecture data shows guidance message**
 
 If no patterns have architecture annotations,
-the document explains how to add them.
+    the document explains how to add them.
 
 _Verified by: No architecture data message_
 

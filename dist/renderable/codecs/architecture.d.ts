@@ -205,8 +205,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -307,8 +307,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -485,8 +485,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -587,8 +587,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -726,8 +726,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -828,8 +828,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -967,8 +967,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -1069,8 +1069,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1212,8 +1212,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -1314,8 +1314,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1460,8 +1460,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1562,8 +1562,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1701,8 +1701,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                unknown: "unknown";
                 domain: "domain";
+                unknown: "unknown";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1803,8 +1803,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                interface: "interface";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1943,8 +1943,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2045,8 +2045,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2184,8 +2184,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2286,8 +2286,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2425,8 +2425,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2527,8 +2527,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2666,8 +2666,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -2768,8 +2768,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2933,8 +2933,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3035,8 +3035,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3174,8 +3174,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3276,8 +3276,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3415,8 +3415,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3517,8 +3517,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3656,8 +3656,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3758,8 +3758,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3897,8 +3897,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    unknown: "unknown";
                     domain: "domain";
+                    unknown: "unknown";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3999,8 +3999,8 @@ export declare const ArchitectureDocumentCodec: z.ZodCodec<z.ZodObject<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    interface: "interface";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;

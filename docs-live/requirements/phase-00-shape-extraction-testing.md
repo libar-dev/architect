@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 Validates the shape extraction system that extracts TypeScript type
-definitions (interfaces, type aliases, enums, function signatures)
-from source files for documentation generation.
+  definitions (interfaces, type aliases, enums, function signatures)
+  from source files for documentation generation.
 
 ## Acceptance Criteria
 
@@ -33,8 +33,8 @@ from source files for documentation generation.
 
 ```markdown
 export interface MyConfig {
-timeout: number;
-retries: number;
+  timeout: number;
+  retries: number;
 }
 ```
 
@@ -46,10 +46,10 @@ retries: number;
 - And the shape JSDoc should contain "Configuration for the processor"
 
 ```markdown
-/** Configuration for the processor. \*/
+/** Configuration for the processor. */
 export interface ConfigOptions {
-/** Timeout in milliseconds. \*/
-timeout: number;
+  /** Timeout in milliseconds. */
+  timeout: number;
 }
 ```
 
@@ -62,8 +62,8 @@ timeout: number;
 
 ```markdown
 export interface Result<T, E = Error> {
-value?: T;
-error?: E;
+  value?: T;
+  error?: E;
 }
 ```
 
@@ -77,7 +77,7 @@ error?: E;
 ```markdown
 interface BaseConfig { base: string; }
 export interface ExtendedConfig extends BaseConfig {
-extra: string;
+  extra: string;
 }
 ```
 
@@ -102,10 +102,10 @@ export interface Exists { x: number; }
 
 ```markdown
 export interface User {
-/** The user's unique identifier \*/
-id: string;
-/** The user's display name \*/
-name: string;
+  /** The user's unique identifier */
+  id: string;
+  /** The user's display name */
+  name: string;
 }
 ```
 
@@ -118,15 +118,14 @@ name: string;
 - And the shape should not have property docs for "name"
 
 ```markdown
-/\*\*
-
-- Represents a user in the system.
-- This JSDoc belongs to the interface.
-  \*/
-  export interface User {
+/**
+ * Represents a user in the system.
+ * This JSDoc belongs to the interface.
+ */
+export interface User {
   id: string;
   name: string;
-  }
+}
 ```
 
 **Mixed documented and undocumented properties**
@@ -139,11 +138,11 @@ name: string;
 
 ```markdown
 export interface Config {
-/** Required API key \*/
-apiKey: string;
-timeout: number;
-/** Optional retry count \*/
-retries: number;
+  /** Required API key */
+  apiKey: string;
+  timeout: number;
+  /** Optional retry count */
+  retries: number;
 }
 ```
 
@@ -189,9 +188,9 @@ export type Unwrap<T> = T extends Promise<infer U> ? U : T;
 
 ```markdown
 export enum Severity {
-Error = 'error',
-Warning = 'warning',
-Info = 'info',
+  Error = 'error',
+  Warning = 'warning',
+  Info = 'info',
 }
 ```
 
@@ -204,10 +203,10 @@ Info = 'info',
 
 ```markdown
 export const enum Direction {
-Up,
-Down,
-Left,
-Right,
+  Up,
+  Down,
+  Left,
+  Right,
 }
 ```
 
@@ -221,7 +220,7 @@ Right,
 
 ```markdown
 export function validateChanges(input: DeciderInput): DeciderOutput {
-return { result: true, events: [] };
+  return { result: true, events: [] };
 }
 ```
 
@@ -234,8 +233,8 @@ return { result: true, events: [] };
 
 ```markdown
 export async function fetchData<T>(url: string): Promise<T> {
-const response = await fetch(url);
-return response.json();
+  const response = await fetch(url);
+  return response.json();
 }
 ```
 
@@ -292,7 +291,7 @@ export interface Output { result: number; }
 ```markdown
 import { Request } from './types.js';
 export interface MyHandler {
-handle(req: Request): void;
+  handle(req: Request): void;
 }
 ```
 
@@ -348,7 +347,7 @@ export interface { broken syntax
 
 ```markdown
 interface InternalConfig {
-secret: string;
+  secret: string;
 }
 ```
 
@@ -390,6 +389,80 @@ export interface Input { data: string; }
 export interface Output { result: number; }
 ```
 
+**JSDoc with only annotation tags produces no jsDoc**
+
+- Given TypeScript source code:
+- When extracting shapes "OnlyTags"
+- Then the shape "OnlyTags" should have no jsDoc
+
+```markdown
+/**
+ * @libar-docs
+ * @libar-docs-pattern ShapeExtractor
+ * @libar-docs-status completed
+ */
+export interface OnlyTags {
+  value: string;
+}
+```
+
+**Mixed JSDoc preserves standard tags and strips annotation tags**
+
+- Given TypeScript source code:
+- When extracting shapes "MixedTags"
+- Then the shape "MixedTags" jsDoc should contain "Configuration for the pipeline"
+- And the shape "MixedTags" jsDoc should contain "@param timeout"
+- And the shape "MixedTags" jsDoc should contain "@returns"
+- And the shape "MixedTags" jsDoc should not contain "@libar-docs"
+
+```markdown
+/**
+ * @libar-docs
+ * @libar-docs-status active
+ *
+ * Configuration for the pipeline.
+ *
+ * @param timeout - Request timeout in ms
+ * @returns The configured instance
+ */
+export interface MixedTags {
+  timeout: number;
+}
+```
+
+**Single-line annotation-only JSDoc produces no jsDoc**
+
+- Given TypeScript source code:
+- When extracting shapes "SingleLine"
+- Then the shape "SingleLine" should have no jsDoc
+
+```markdown
+/** @libar-docs-shape Foo */
+export interface SingleLine {
+  id: string;
+}
+```
+
+**Consecutive empty lines after tag removal are collapsed**
+
+- Given TypeScript source code:
+- When extracting shapes "CollapsedLines"
+- Then the shape "CollapsedLines" jsDoc should contain "Useful description here"
+- And the shape "CollapsedLines" jsDoc should not contain consecutive empty JSDoc lines
+
+```markdown
+/**
+ * @libar-docs
+ * @libar-docs-status roadmap
+ *
+ *
+ * Useful description here.
+ */
+export interface CollapsedLines {
+  name: string;
+}
+```
+
 **Source code exceeding 5MB limit returns error**
 
 - Given TypeScript source code larger than 5MB
@@ -409,7 +482,7 @@ _Verified by: Extract simple interface, Extract interface with JSDoc, Extract in
 **Property-level JSDoc is extracted for interface properties**
 
 The extractor uses strict adjacency (gap = 1 line) to prevent
-interface-level JSDoc from being misattributed to the first property.
+    interface-level JSDoc from being misattributed to the first property.
 
 _Verified by: Extract properties with adjacent JSDoc, Interface JSDoc not attributed to first property, Mixed documented and undocumented properties_
 
@@ -452,6 +525,15 @@ _Verified by: Extract non-exported interface, Re-export marks internal shape as 
 **Shape rendering supports grouping options**
 
 _Verified by: Grouped rendering in single code block, Separate rendering with multiple code blocks_
+
+**Annotation tags are stripped from extracted JSDoc while preserving standard tags**
+
+**Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+
+    **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata
+    for the extraction pipeline, not user-visible documentation content.
+
+_Verified by: JSDoc with only annotation tags produces no jsDoc, Mixed JSDoc preserves standard tags and strips annotation tags, Single-line annotation-only JSDoc produces no jsDoc, Consecutive empty lines after tag removal are collapsed_
 
 **Large source files are rejected to prevent memory exhaustion**
 

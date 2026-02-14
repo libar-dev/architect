@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tests the GeneratorRegistry registration, lookup, and listing capabilities.
-The registry manages document generators with name uniqueness constraints.
+  The registry manages document generators with name uniqueness constraints.
 
 ## Acceptance Criteria
 
@@ -39,10 +39,10 @@ The registry manages document generators with name uniqueness constraints.
 - Then the generator should be returned
 - And the generator name should be "patterns"
 
-| name     |
-| -------- |
+| name |
+| --- |
 | patterns |
-| roadmap  |
+| roadmap |
 
 **Get unknown generator returns undefined**
 
@@ -50,8 +50,8 @@ The registry manages document generators with name uniqueness constraints.
 - When getting generator "unknown"
 - Then undefined should be returned
 
-| name     |
-| -------- |
+| name |
+| --- |
 | patterns |
 
 **Available returns sorted list**
@@ -60,17 +60,17 @@ The registry manages document generators with name uniqueness constraints.
 - When calling available
 - Then the list should be:
 
-| name      |
-| --------- |
-| roadmap   |
-| patterns  |
+| name |
+| --- |
+| roadmap |
+| patterns |
 | changelog |
 
-| name      |
-| --------- |
+| name |
+| --- |
 | changelog |
-| patterns  |
-| roadmap   |
+| patterns |
+| roadmap |
 
 ## Business Rules
 

@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | active     |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | Annotation |
 
 ## Description
 
 Tests extraction of @libar-docs-depends-on and @libar-docs-enables
-relationship tags from Gherkin files.
+  relationship tags from Gherkin files.
 
 ## Acceptance Criteria
 
@@ -104,10 +104,10 @@ Feature: Foundation
 - Then "FeatureB" should have dependsOn containing "FeatureA"
 - And "FeatureC" should have dependsOn containing "FeatureA"
 
-| name     | dependsOn |
-| -------- | --------- |
-| FeatureB | FeatureA  |
-| FeatureC | FeatureA  |
+| name | dependsOn |
+| --- | --- |
+| FeatureB | FeatureA |
+| FeatureC | FeatureA |
 
 **Enables relationships stored explicitly**
 
@@ -129,8 +129,8 @@ _Verified by: Depends-on extracted from feature file, Multiple depends-on values
 **Depends-on in TypeScript triggers anti-pattern warning**
 
 The depends-on tag is for planning dependencies and belongs in feature
-files, not TypeScript code. TypeScript files should use "uses" for
-runtime dependencies.
+    files, not TypeScript code. TypeScript files should use "uses" for
+    runtime dependencies.
 
 _Verified by: Depends-on in TypeScript is detected by lint rule_
 
@@ -141,7 +141,7 @@ _Verified by: Enables extracted from feature file, Multiple enables values extra
 **Planning dependencies are stored in relationship index**
 
 The relationship index stores dependsOn and enables relationships
-directly from pattern metadata. These are explicit declarations.
+    directly from pattern metadata. These are explicit declarations.
 
 _Verified by: DependsOn relationships stored in relationship index, Enables relationships stored explicitly_
 

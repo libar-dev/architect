@@ -6,9 +6,9 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description

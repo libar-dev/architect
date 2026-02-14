@@ -6,31 +6,29 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | Process   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Process |
 
 ## Description
 
 The delivery process supports mid-phase handoffs between sessions and
-coordination across multiple developers through structured templates,
-checklists, and generated documentation.
+  coordination across multiple developers through structured templates,
+  checklists, and generated documentation.
 
-**Problem:**
+  **Problem:**
+  - Context is lost when work pauses mid-phase (LLM sessions have no memory)
+  - Discoveries made during sessions are not captured for roadmap refinement
+  - Multiple developers working on same phase can create conflicts
+  - Resuming work requires re-reading scattered feature files
 
-- Context is lost when work pauses mid-phase (LLM sessions have no memory)
-- Discoveries made during sessions are not captured for roadmap refinement
-- Multiple developers working on same phase can create conflicts
-- Resuming work requires re-reading scattered feature files
-
-**Solution:**
-
-- Discovery tags (@libar-process-discovered-\*) capture learnings inline
-- SESSION-CONTEXT.md provides complete phase context for LLM planning
-- Handoff template standardizes state capture at session boundaries
-- Retrospective checklist ensures discoveries flow to findings generator
-- PROCESS_SETUP.md documents coordination patterns for parallel work
+  **Solution:**
+  - Discovery tags (@libar-process-discovered-*) capture learnings inline
+  - SESSION-CONTEXT.md provides complete phase context for LLM planning
+  - Handoff template standardizes state capture at session boundaries
+  - Retrospective checklist ensures discoveries flow to findings generator
+  - PROCESS_SETUP.md documents coordination patterns for parallel work
 
 ## Acceptance Criteria
 
@@ -50,11 +48,11 @@ checklists, and generated documentation.
 - And the handoff context should show improvements suggested
 - And the handoff context should show learnings captured
 
-| Tag Type    | Value                               |
-| ----------- | ----------------------------------- |
-| gap         | Missing-validation-for-edge-case    |
-| improvement | Could-cache-parsed-results          |
-| learning    | Gherkin-requires-strict-indentation |
+| Tag Type | Value |
+| --- | --- |
+| gap | Missing-validation-for-edge-case |
+| improvement | Could-cache-parsed-results |
+| learning | Gherkin-requires-strict-indentation |
 
 **Paused phase shows status indicator**
 
@@ -68,26 +66,26 @@ checklists, and generated documentation.
 - Given the session handoff template at catalogue/templates/session-handoff.md
 - Then the template should contain the following sections:
 
-| section                       |
-| ----------------------------- |
-| When to Handoff               |
+| section |
+| --- |
+| When to Handoff |
 | Handoff Information Checklist |
-| State Capture Template        |
-| Resume Procedure              |
-| Common Pitfalls               |
+| State Capture Template |
+| Resume Procedure |
+| Common Pitfalls |
 
 **Retrospective checklist exists and contains required sections**
 
 - Given the session retrospective checklist at catalogue/checklists/session-retrospective.md
 - Then the checklist should contain the following sections:
 
-| section                 |
-| ----------------------- |
+| section |
+| --- |
 | Pre-Retrospective Tasks |
-| Progress Review         |
-| Discovery Capture       |
-| Handoff Preparation     |
-| Session Summary         |
+| Progress Review |
+| Discovery Capture |
+| Handoff Preparation |
+| Session Summary |
 
 **PROCESS_SETUP.md documents handoff protocol**
 

@@ -6,31 +6,30 @@
 
 ## Overview
 
-| Property       | Value                                     |
-| -------------- | ----------------------------------------- |
-| Status         | planned                                   |
-| Product Area   | Validation                                |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Validation |
 | Business Value | enable machine checkable phase completion |
-| Phase          | 100                                       |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Phase completion is currently subjective ("done when we feel it").
-No objective criteria validation, easy to miss deliverables.
-Cannot gate CI/releases on DoD compliance.
+  Phase completion is currently subjective ("done when we feel it").
+  No objective criteria validation, easy to miss deliverables.
+  Cannot gate CI/releases on DoD compliance.
 
-**Solution:**
-Implement `pnpm validate:dod --phase N` CLI command that:
+  **Solution:**
+  Implement `pnpm validate:dod --phase N` CLI command that:
+  - Checks all deliverables have status "Complete"/"Done"
+  - Verifies at least one @acceptance-criteria scenario exists
+  - Warns if effort-actual is missing for completed phases
+  - Returns exit code for CI gating
 
-- Checks all deliverables have status "Complete"/"Done"
-- Verifies at least one @acceptance-criteria scenario exists
-- Warns if effort-actual is missing for completed phases
-- Returns exit code for CI gating
+  Implements Convergence Opportunity 2: DoD as Machine-Checkable.
 
-Implements Convergence Opportunity 2: DoD as Machine-Checkable.
-
-See: docs/ideation-convergence/01-delivery-process-opportunities.md
+  See: docs/ideation-convergence/01-delivery-process-opportunities.md
 
 ## Acceptance Criteria
 

@@ -6,38 +6,37 @@
 
 ## Overview
 
-| Property       | Value                                               |
-| -------------- | --------------------------------------------------- |
-| Status         | planned                                             |
-| Product Area   | DataAPI                                             |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | DataAPI |
 | Business Value | native claude code integration and monorepo support |
-| Phase          | 25                                                  |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-The process-api CLI requires subprocess invocation for every query, adding
-shell overhead and preventing stateful interaction. Claude Code's native tool
-integration mechanism is Model Context Protocol (MCP), which the process API
-does not support. Additionally, in the monorepo context, queries must specify
-input paths for each package manually -- there is no cross-package view or
-package-scoped filtering.
+  The process-api CLI requires subprocess invocation for every query, adding
+  shell overhead and preventing stateful interaction. Claude Code's native tool
+  integration mechanism is Model Context Protocol (MCP), which the process API
+  does not support. Additionally, in the monorepo context, queries must specify
+  input paths for each package manually -- there is no cross-package view or
+  package-scoped filtering.
 
-**Solution:**
-Two integration capabilities:
+  **Solution:**
+  Two integration capabilities:
+  1. **MCP Server Mode** -- Expose ProcessStateAPI as an MCP server that Claude
+     Code connects to directly. Eliminates CLI overhead and enables stateful
+     queries (pipeline loaded once, multiple queries without re-scanning).
+  2. **Monorepo Support** -- Cross-package dependency views, package-scoped
+     filtering, multi-package presets, and per-package coverage reports.
 
-1. **MCP Server Mode** -- Expose ProcessStateAPI as an MCP server that Claude
-   Code connects to directly. Eliminates CLI overhead and enables stateful
-   queries (pipeline loaded once, multiple queries without re-scanning).
-2. **Monorepo Support** -- Cross-package dependency views, package-scoped
-   filtering, multi-package presets, and per-package coverage reports.
-
-**Business Value:**
-| Benefit | Impact |
-| MCP integration | Claude Code calls API as native tool |
-| Stateful queries | No re-scanning between calls |
-| Cross-package views | Understand monorepo-wide dependencies |
-| Package-scoped queries | Focus on specific packages |
+  **Business Value:**
+  | Benefit | Impact |
+  | MCP integration | Claude Code calls API as native tool |
+  | Stateful queries | No re-scanning between calls |
+  | Cross-package views | Understand monorepo-wide dependencies |
+  | Package-scoped queries | Focus on specific packages |
 
 ## Acceptance Criteria
 
@@ -131,8 +130,8 @@ Two integration capabilities:
 **ProcessStateAPI is accessible as an MCP server for Claude Code**
 
 **Invariant:** The MCP server exposes all ProcessStateAPI methods as MCP tools
-with typed input/output schemas. The pipeline is loaded once on server start
-and refreshed on source file changes.
+    with typed input/output schemas. The pipeline is loaded once on server start
+    and refreshed on source file changes.
 
     **Rationale:** MCP is Claude Code's native tool integration protocol. An MCP
     server eliminates the CLI subprocess overhead (2-5s per query) and enables
@@ -159,7 +158,7 @@ _Verified by: MCP server exposes ProcessStateAPI tools, MCP tool invocation retu
 **Process state can be auto-generated as CLAUDE.md context sections**
 
 **Invariant:** Generated CLAUDE.md sections are additive layers that provide
-pattern metadata, relationships, and reading lists for specific scopes.
+    pattern metadata, relationships, and reading lists for specific scopes.
 
     **Rationale:** CLAUDE.md is the primary mechanism for providing persistent
     context to Claude Code sessions. Auto-generating CLAUDE.md sections from
@@ -174,7 +173,7 @@ _Verified by: Generate CLAUDE.md context layer for bounded context, Context laye
 **Cross-package views show dependencies spanning multiple packages**
 
 **Invariant:** Cross-package queries aggregate patterns from multiple
-input sources and resolve cross-package relationships.
+    input sources and resolve cross-package relationships.
 
     **Rationale:** In the monorepo, patterns in `platform-core` are used by
     patterns in `platform-bc`, which are used by the example app. Understanding
@@ -189,7 +188,7 @@ _Verified by: Cross-package dependency view, Package-scoped query filtering, Que
 **Process validation integrates with git hooks and file watching**
 
 **Invariant:** Pre-commit hooks validate annotation consistency. Watch mode
-re-generates docs on source changes.
+    re-generates docs on source changes.
 
     **Rationale:** Git hooks catch annotation errors at commit time (e.g., new
     `uses` reference to non-existent pattern, invalid `arch-role` value, stub

@@ -5,6 +5,111 @@
 
 ---
 
+## Product area canonical values
+
+**Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
+
+| Value | Reader Question | Covers |
+| --- | --- | --- |
+| Annotation | How do I annotate code? | Scanning, extraction, tag parsing, dual-source |
+| Configuration | How do I configure the tool? | Config loading, presets, resolution |
+| Generation | How does code become docs? | Codecs, generators, rendering, diagrams |
+| Validation | How is the workflow enforced? | FSM, DoD, anti-patterns, process guard, lint |
+| DataAPI | How do I query process state? | Process state API, stubs, context assembly, CLI |
+| CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
+| Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
+
+---
+
+## ADR category canonical values
+
+**Invariant:** The adr-category tag uses one of 4 values.
+
+| Value | Purpose |
+| --- | --- |
+| architecture | System structure, component design, data flow |
+| process | Workflow, conventions, annotation rules |
+| testing | Test strategy, verification approach |
+| documentation | Documentation generation, content structure |
+
+---
+
+## FSM status values and protection levels
+
+**Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.
+
+| Status | Protection | Can Add Deliverables | Allowed Actions |
+| --- | --- | --- | --- |
+| roadmap | None | Yes | Full editing |
+| active | Scope-locked | No | Edit existing deliverables only |
+| completed | Hard-locked | No | Requires unlock-reason tag |
+| deferred | None | Yes | Full editing |
+
+---
+
+## Valid FSM transitions
+
+**Invariant:** Only these transitions are valid. All others are rejected by Process Guard. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+
+| From | To | Trigger |
+| --- | --- | --- |
+| roadmap | active | Start work |
+| roadmap | deferred | Postpone |
+| active | completed | All deliverables done |
+| active | roadmap | Blocked/regressed |
+| deferred | roadmap | Resume planning |
+
+---
+
+## Tag format types
+
+**Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
+
+| Format | Parsing | Example |
+| --- | --- | --- |
+| flag | Boolean presence, no value | @libar-docs-core |
+| value | Simple string | @libar-docs-pattern MyPattern |
+| enum | Constrained to predefined list | @libar-docs-status completed |
+| csv | Comma-separated values | @libar-docs-uses A, B, C |
+| number | Numeric value | @libar-docs-phase 15 |
+| quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
+
+---
+
+## Source ownership
+
+**Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
+
+| Tag | Correct Source | Wrong Source | Rationale |
+| --- | --- | --- | --- |
+| uses | TypeScript | Feature files | TS owns runtime dependencies |
+| depends-on | Feature files | TypeScript | Gherkin owns planning dependencies |
+| quarter | Feature files | TypeScript | Gherkin owns timeline metadata |
+| team | Feature files | TypeScript | Gherkin owns ownership metadata |
+
+---
+
+## Quarter format convention
+
+**Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
+
+---
+
+## Deliverable status canonical values
+
+**Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
+
+| Value | Meaning |
+| --- | --- |
+| complete | Work is done |
+| in-progress | Work is ongoing |
+| pending | Work has not started |
+| deferred | Work postponed |
+| superseded | Replaced by another |
+| n/a | Not applicable |
+
+---
+
 ## Configuration Components
 
 Scoped architecture diagram showing component relationships:
@@ -63,22 +168,158 @@ sequenceDiagram
 
 ---
 
-## API Types
+## Generator Class Model
 
-### SectionBlock (type)
+Scoped architecture diagram showing component relationships:
 
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
+```mermaid
+classDiagram
+    class SourceMapper {
+        <<infrastructure>>
+    }
+    class Documentation_Generation_Orchestrator {
+        <<service>>
+    }
+    class ContentDeduplicator {
+        <<infrastructure>>
+    }
+    class CodecBasedGenerator {
+        <<service>>
+    }
+    class FileCache {
+        <<infrastructure>>
+        +FileCache interface
+    }
+    class TransformDataset {
+        <<service>>
+    }
+    class DecisionDocGenerator {
+        <<service>>
+    }
+    class MasterDataset
+    class Pattern_Scanner
+    class GherkinASTParser
+    class ShapeExtractor
+    class DecisionDocCodec
+    class PatternRelationshipModel
+    SourceMapper ..> DecisionDocCodec : depends on
+    SourceMapper ..> ShapeExtractor : depends on
+    SourceMapper ..> GherkinASTParser : depends on
+    Documentation_Generation_Orchestrator ..> Pattern_Scanner : uses
+    TransformDataset ..> MasterDataset : uses
+    TransformDataset ..|> PatternRelationshipModel : implements
+    DecisionDocGenerator ..> DecisionDocCodec : depends on
+    DecisionDocGenerator ..> SourceMapper : depends on
 ```
+
+---
+
+## Validation State Model
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+stateDiagram-v2
+    state "DoDValidator" as DoDValidator
+    state "AntiPatternDetector" as AntiPatternDetector
+    state "FSMValidator" as FSMValidator
+    state "FSMTransitions" as FSMTransitions
+    state "FSMStates" as FSMStates
+    state "DoDValidationTypes" as DoDValidationTypes
+    state "DualSourceExtractor" as DualSourceExtractor
+    state "PhaseStateMachineValidation" as PhaseStateMachineValidation
+    [*] --> DoDValidator
+    [*] --> AntiPatternDetector
+    [*] --> FSMValidator
+    [*] --> FSMTransitions
+    [*] --> FSMStates
+    DoDValidator --> [*]
+    AntiPatternDetector --> [*]
+    FSMValidator --> [*]
+    FSMTransitions --> [*]
+    FSMStates --> [*]
+```
+
+---
+
+## Scanning & Extraction Boundary
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+C4Context
+    title Scanning & Extraction Boundary
+    Boundary(extractor, "Extractor") {
+        System(GherkinExtractor, "GherkinExtractor")
+        System(DualSourceExtractor, "DualSourceExtractor")
+        System(Document_Extractor, "Document Extractor")
+    }
+    Boundary(scanner, "Scanner") {
+        System(Pattern_Scanner, "Pattern Scanner")
+        System(GherkinScanner, "GherkinScanner")
+        System(GherkinASTParser, "GherkinASTParser")
+        System(TypeScript_AST_Parser, "TypeScript AST Parser")
+    }
+    System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
+    System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
+    Rel(GherkinExtractor, GherkinASTParser, "uses")
+    Rel(GherkinExtractor, GherkinRulesSupport, "implements")
+    Rel(DualSourceExtractor, GherkinExtractor, "uses")
+    Rel(DualSourceExtractor, GherkinScanner, "uses")
+    Rel(Document_Extractor, Pattern_Scanner, "uses")
+```
+
+---
+
+## Domain Layer Overview
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+graph LR
+    subgraph api["Api"]
+        MasterDataset[/"MasterDataset"/]
+        PatternHelpers["PatternHelpers"]
+        ArchQueriesImpl("ArchQueriesImpl")
+    end
+    subgraph renderer["Renderer"]
+        RenderableDocument[/"RenderableDocument"/]
+    end
+    subgraph taxonomy["Taxonomy"]
+        TagRegistryBuilder("TagRegistryBuilder")
+        CategoryDefinitions[/"CategoryDefinitions"/]
+    end
+    subgraph validation["Validation"]
+        FSMTransitions[/"FSMTransitions"/]
+        FSMStates[/"FSMStates"/]
+    end
+    subgraph related["Related"]
+        ProcessStateAPI["ProcessStateAPI"]:::neighbor
+        TypeScriptTaxonomyImplementation["TypeScriptTaxonomyImplementation"]:::neighbor
+        PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
+        DataAPIOutputShaping["DataAPIOutputShaping"]:::neighbor
+        DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
+    end
+    TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
+    PatternHelpers ..->|implements| DataAPIOutputShaping
+    ArchQueriesImpl -->|uses| ProcessStateAPI
+    ArchQueriesImpl -->|uses| MasterDataset
+    ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    FSMTransitions ..->|implements| PhaseStateMachineValidation
+    FSMStates ..->|implements| PhaseStateMachineValidation
+    ProcessStateAPI -->|uses| MasterDataset
+    ProcessStateAPI ..->|implements| PhaseStateMachineValidation
+    DataAPIArchitectureQueries -.->|depends on| DataAPIOutputShaping
+    classDef neighbor stroke-dasharray: 5 5
+```
+
+---
+
+## API Types
 
 ### normalizeStatus (function)
 
@@ -172,6 +413,21 @@ interface CategoryDefinition {
 | priority | Display order priority - lower values appear first in sorted output |
 | description | Brief description of the category's purpose and typical patterns |
 | aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ---
 

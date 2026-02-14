@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description
 
 Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to
-PatternSummary (~100 bytes) with the correct 6 fields.
+  PatternSummary (~100 bytes) with the correct 6 fields.
 
 ## Acceptance Criteria
 

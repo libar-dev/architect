@@ -6,26 +6,24 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 Presets provide pre-configured taxonomies for different project types.
 
-**Problem:**
+  **Problem:**
+  - New users need sensible defaults for their project type
+  - DDD projects need full taxonomy
+  - Simple projects need minimal configuration
 
-- New users need sensible defaults for their project type
-- DDD projects need full taxonomy
-- Simple projects need minimal configuration
-
-**Solution:**
-
-- GENERIC_PRESET for non-DDD projects
-- DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
-- PRESETS lookup map for programmatic access
+  **Solution:**
+  - GENERIC_PRESET for non-DDD projects
+  - DDD_ES_CQRS_PRESET for full DDD/ES/CQRS taxonomy
+  - PRESETS lookup map for programmatic access
 
 ## Acceptance Criteria
 

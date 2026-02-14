@@ -6,11 +6,11 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
-| Phase        | 25      |
+| Phase | 25 |
 
 ## Acceptance Criteria
 

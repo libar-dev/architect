@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Tests for lint rules that validate relationship integrity, detect conflicts,
-and ensure bidirectional traceability consistency.
+  and ensure bidirectional traceability consistency.
 
 ## Acceptance Criteria
 
@@ -106,7 +106,7 @@ and ensure bidirectional traceability consistency.
 **Pattern cannot implement itself (circular reference)**
 
 A file cannot define a pattern that implements itself. This creates a
-circular reference. Different patterns are allowed (sub-pattern hierarchy).
+    circular reference. Different patterns are allowed (sub-pattern hierarchy).
 
 _Verified by: Pattern tag with implements tag causes error, Implements without pattern tag is valid_
 

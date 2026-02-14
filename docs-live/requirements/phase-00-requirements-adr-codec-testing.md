@@ -6,25 +6,23 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
-into RenderableDocuments for PRD-style and architecture decision documentation.
+  into RenderableDocuments for PRD-style and architecture decision documentation.
 
-**Problem:**
+  **Problem:**
+  - Need to generate product requirements documents with flexible groupings
+  - Need to document architecture decisions with status tracking and supersession
 
-- Need to generate product requirements documents with flexible groupings
-- Need to document architecture decisions with status tracking and supersession
-
-**Solution:**
-
-- RequirementsDocumentCodec generates PRD-style docs grouped by product area, user role, or phase
-- AdrDocumentCodec generates ADR documentation with category, phase, or date groupings
+  **Solution:**
+  - RequirementsDocumentCodec generates PRD-style docs grouped by product area, user role, or phase
+  - AdrDocumentCodec generates ADR documentation with category, phase, or date groupings
 
 ## Acceptance Criteria
 
@@ -43,11 +41,11 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - And the document contains a "Summary" section
 - And the summary table shows:
 
-| metric         | value |
-| -------------- | ----- |
-| Total Features | 4     |
-| Product Areas  | 2     |
-| User Roles     | 2     |
+| metric | value |
+| --- | --- |
+| Total Features | 4 |
+| Product Areas | 2 |
+| User Roles | 2 |
 
 **By product area section groups patterns correctly**
 
@@ -83,12 +81,12 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - Then the document contains an "All Features" section
 - And the all features table has columns:
 
-| column       |
-| ------------ |
-| Feature      |
+| column |
+| --- |
+| Feature |
 | Product Area |
-| User Role    |
-| Status       |
+| User Role |
+| Status |
 
 **Business value rendering when enabled**
 
@@ -102,12 +100,12 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - When decoding with generateDetailFiles enabled for requirements
 - Then the document has requirement detail files:
 
-| path                                         |
-| -------------------------------------------- |
+| path |
+| --- |
 | requirements/phase-01-user-authentication.md |
-| requirements/phase-01-user-registration.md   |
-| requirements/phase-02-metrics-dashboard.md   |
-| requirements/phase-02-admin-dashboard.md     |
+| requirements/phase-01-user-registration.md |
+| requirements/phase-02-metrics-dashboard.md |
+| requirements/phase-02-admin-dashboard.md |
 
 **Requirement detail file contains acceptance criteria from scenarios**
 
@@ -143,13 +141,13 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - And the document contains a "Summary" section
 - And the ADR summary table shows:
 
-| metric     | value |
-| ---------- | ----- |
-| Total ADRs | 4     |
-| Accepted   | 2     |
-| Proposed   | 1     |
-| Superseded | 1     |
-| Categories | 2     |
+| metric | value |
+| --- | --- |
+| Total ADRs | 4 |
+| Accepted | 2 |
+| Proposed | 1 |
+| Superseded | 1 |
+| Categories | 2 |
 
 **ADRs grouped by category**
 
@@ -179,11 +177,11 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - Then the document contains an "ADR Index" section
 - And the ADR index table has columns:
 
-| column   |
-| -------- |
-| ADR      |
-| Title    |
-| Status   |
+| column |
+| --- |
+| ADR |
+| Title |
+| Status |
 | Category |
 
 **Status emoji mapping in ADR entries**
@@ -192,12 +190,12 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - When decoding with AdrDocumentCodec
 - Then ADR entries show correct status emojis:
 
-| status     | emoji |
-| ---------- | ----- |
-| accepted   | true  |
-| proposed   | true  |
-| superseded | true  |
-| deprecated | true  |
+| status | emoji |
+| --- | --- |
+| accepted | true |
+| proposed | true |
+| superseded | true |
+| deprecated | true |
 
 **Context, Decision, Consequences sections from Rule keywords**
 
@@ -218,12 +216,12 @@ into RenderableDocuments for PRD-style and architecture decision documentation.
 - When decoding with generateDetailFiles enabled for ADR
 - Then the document has ADR detail files:
 
-| path                                     |
-| ---------------------------------------- |
-| decisions/adr-001-event-sourcing.md      |
-| decisions/adr-002-cqrs-pattern.md        |
+| path |
+| --- |
+| decisions/adr-001-event-sourcing.md |
+| decisions/adr-002-cqrs-pattern.md |
 | decisions/adr-003-workflow-automation.md |
-| decisions/adr-004-use-temporal.md        |
+| decisions/adr-004-use-temporal.md |
 
 **ADR detail file contains full content**
 

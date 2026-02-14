@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | DataAPI   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 
 ## Description
 
 Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
+  Designed for Claude Code integration and tool automation.
 
-**Problem:**
+  **Problem:**
+  - Markdown generation is not ideal for programmatic access
+  - Claude Code needs structured data to answer process questions
+  - Multiple queries require redundant parsing of MasterDataset
 
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
-
-**Solution:**
-
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
+  **Solution:**
+  - ProcessStateAPI wraps MasterDataset with typed query methods
+  - Returns structured data suitable for programmatic consumption
+  - Integrates FSM validation for transition checks
 
 ## Acceptance Criteria
 

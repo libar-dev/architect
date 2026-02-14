@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Pure validation functions for the 4-state FSM defined in PDR-005.
-All validation follows the Decider pattern: no I/O, no side effects.
+  All validation follows the Decider pattern: no I/O, no side effects.
 
-**Problem:**
+  **Problem:**
+  - Status values must conform to PDR-005 FSM states
+  - Status transitions must follow valid paths in the state machine
+  - Completed patterns should have proper metadata (date, effort)
 
-- Status values must conform to PDR-005 FSM states
-- Status transitions must follow valid paths in the state machine
-- Completed patterns should have proper metadata (date, effort)
-
-**Solution:**
-
-- validateStatus() checks status values against allowed enum
-- validateTransition() validates transitions against FSM matrix
-- validateCompletionMetadata() warns about missing completion info
+  **Solution:**
+  - validateStatus() checks status values against allowed enum
+  - validateTransition() validates transitions against FSM matrix
+  - validateCompletionMetadata() warns about missing completion info
 
 ## Acceptance Criteria
 

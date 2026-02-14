@@ -6,30 +6,28 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Pure validation functions for enforcing delivery process rules per PDR-005.
-All validation follows the Decider pattern: (state, changes, options) => result.
+  All validation follows the Decider pattern: (state, changes, options) => result.
 
-**Problem:**
+  **Problem:**
+  - Completed specs modified without explicit unlock reason
+  - Invalid status transitions bypass FSM rules
+  - Active specs expand scope unexpectedly with new deliverables
+  - Changes occur outside session boundaries
 
-- Completed specs modified without explicit unlock reason
-- Invalid status transitions bypass FSM rules
-- Active specs expand scope unexpectedly with new deliverables
-- Changes occur outside session boundaries
-
-**Solution:**
-
-- checkProtectionLevel() enforces unlock-reason for completed (hard) files
-- checkStatusTransitions() validates transitions against FSM matrix
-- checkScopeCreep() prevents deliverable addition to active (scope) specs
-- checkSessionScope() warns about files outside session scope
-- checkSessionExcluded() errors on explicitly excluded files
+  **Solution:**
+  - checkProtectionLevel() enforces unlock-reason for completed (hard) files
+  - checkStatusTransitions() validates transitions against FSM matrix
+  - checkScopeCreep() prevents deliverable addition to active (scope) specs
+  - checkSessionScope() warns about files outside session scope
+  - checkSessionExcluded() errors on explicitly excluded files
 
 ## Acceptance Criteria
 

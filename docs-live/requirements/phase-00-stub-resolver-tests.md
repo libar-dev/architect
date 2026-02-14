@@ -6,20 +6,20 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description
 
 **Problem:**
-Design session stubs need structured discovery and resolution
-to determine which stubs have been implemented and which remain.
+  Design session stubs need structured discovery and resolution
+  to determine which stubs have been implemented and which remain.
 
-**Solution:**
-StubResolver functions identify, resolve, and group stubs from
-the MasterDataset with filesystem existence checks.
+  **Solution:**
+  StubResolver functions identify, resolve, and group stubs from
+  the MasterDataset with filesystem existence checks.
 
 ## Acceptance Criteria
 

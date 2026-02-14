@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | DataAPI   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 
 ## Description
 

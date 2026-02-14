@@ -6,23 +6,22 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The extractSummary function transforms multi-line pattern descriptions into
-concise, single-line summaries suitable for table display in generated docs.
+  concise, single-line summaries suitable for table display in generated docs.
 
-**Key behaviors:**
-
-- Combines multiple lines until finding a complete sentence
-- Truncates at sentence boundaries when possible
-- Adds "..." for incomplete text (no sentence ending)
-- Skips tautological first lines (just the pattern name)
-- Skips section header labels like "Problem:", "Solution:"
+  **Key behaviors:**
+  - Combines multiple lines until finding a complete sentence
+  - Truncates at sentence boundaries when possible
+  - Adds "..." for incomplete text (no sentence ending)
+  - Skips tautological first lines (just the pattern name)
+  - Skips section header labels like "Problem:", "Solution:"
 
 ## Acceptance Criteria
 
@@ -64,7 +63,6 @@ Events are stored in the Event Store.
 Additional context follows here.
 
 How It Works:
-
 - Parse annotations in Rule descriptions
 ```
 
@@ -154,7 +152,6 @@ Use a pub/sub pattern with event routing.
 
 ```markdown
 # Pattern Title
-
 This is the actual content.
 ```
 

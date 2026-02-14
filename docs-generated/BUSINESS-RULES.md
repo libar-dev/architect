@@ -5,7 +5,7 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 609 rules from 128 features across 7 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 610 rules from 128 features across 7 product areas.**
 
 ---
 
@@ -526,6 +526,14 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 
 #### Shape rendering supports grouping options
+
+
+
+#### Annotation tags are stripped from extracted JSDoc while preserving standard tags
+
+- **Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+
+- **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata for the extraction pipeline, not user-visible documentation content.
 
 
 

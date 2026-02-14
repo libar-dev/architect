@@ -62,7 +62,7 @@
 | `include` | csv | Cross-cutting document inclusion for content routing and diagram scoping | No | No | - | - |
 | `target` | value | Target implementation path for stub files | No | No | - | - |
 | `since` | value | Design session that created this pattern | No | No | - | - |
-| `convention` | csv | Convention domains for reference document generation from decision records | No | No | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation | - |
+| `convention` | csv | Convention domains for reference document generation from decision records | No | No | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation, taxonomy-rules | - |
 
 ## Tag Details
 
@@ -607,7 +607,7 @@
 | Purpose | Convention domains for reference document generation from decision records |
 | Required | No |
 | Repeatable | No |
-| Valid Values | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation |
+| Valid Values | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation, taxonomy-rules |
 | Example | `@libar-docs-convention fsm-rules, testing-policy` |
 
 ---

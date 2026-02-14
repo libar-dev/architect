@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 resolveProjectConfig transforms a raw DeliveryProcessProjectConfig into
-a fully resolved ResolvedConfig with all defaults applied.
+  a fully resolved ResolvedConfig with all defaults applied.
 
-**Problem:**
+  **Problem:**
+  - Raw user config is partial with many optional fields
+  - Stubs need to be merged into typescript sources transparently
+  - Defaults must be applied consistently across all consumers
 
-- Raw user config is partial with many optional fields
-- Stubs need to be merged into typescript sources transparently
-- Defaults must be applied consistently across all consumers
-
-**Solution:**
-
-- resolveProjectConfig applies defaults in a predictable order
-- createDefaultResolvedConfig provides a complete fallback
-- Stubs are merged into typescript sources at resolution time
+  **Solution:**
+  - resolveProjectConfig applies defaults in a predictable order
+  - createDefaultResolvedConfig provides a complete fallback
+  - Stubs are merged into typescript sources at resolution time
 
 ## Acceptance Criteria
 

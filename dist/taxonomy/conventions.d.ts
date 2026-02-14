@@ -8,6 +8,6 @@
  *
  * @see CodecDrivenReferenceGeneration spec
  */
-export declare const CONVENTION_VALUES: readonly ["testing-policy", "fsm-rules", "cli-patterns", "output-format", "pattern-naming", "session-workflow", "config-presets", "annotation-system", "pipeline-architecture", "publishing", "doc-generation"];
+export declare const CONVENTION_VALUES: readonly ["testing-policy", "fsm-rules", "cli-patterns", "output-format", "pattern-naming", "session-workflow", "config-presets", "annotation-system", "pipeline-architecture", "publishing", "doc-generation", "taxonomy-rules"];
 export type ConventionValue = (typeof CONVENTION_VALUES)[number];
 //# sourceMappingURL=conventions.d.ts.map

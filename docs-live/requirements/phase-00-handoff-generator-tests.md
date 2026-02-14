@@ -6,21 +6,21 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | DataAPI   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | DataAPI |
 
 ## Description
 
 **Problem:**
-Multi-session work loses critical state between sessions when handoff
-documentation is manual or forgotten.
+  Multi-session work loses critical state between sessions when handoff
+  documentation is manual or forgotten.
 
-**Solution:**
-HandoffGenerator assembles a structured handoff document from ProcessStateAPI
-and MasterDataset, capturing completed work, remaining items, discovered
-issues, and next-session priorities.
+  **Solution:**
+  HandoffGenerator assembles a structured handoff document from ProcessStateAPI
+  and MasterDataset, capturing completed work, remaining items, discovered
+  issues, and next-session priorities.
 
 ## Acceptance Criteria
 

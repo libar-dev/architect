@@ -6,33 +6,32 @@
 
 ## Overview
 
-| Property       | Value                                                             |
-| -------------- | ----------------------------------------------------------------- |
-| Status         | planned                                                           |
-| Product Area   | Process                                                           |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Process |
 | Business Value | ensure cli commands work correctly with all argument combinations |
-| Phase          | 101                                                               |
+| Phase | 101 |
 
 ## Description
 
 **Problem:**
-All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns,
-generate-tag-taxonomy) have zero behavior specs. These are user-facing interfaces
-that need comprehensive testing for argument parsing, error handling, and output formats.
+  All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns,
+  generate-tag-taxonomy) have zero behavior specs. These are user-facing interfaces
+  that need comprehensive testing for argument parsing, error handling, and output formats.
 
-**Solution:**
-Create behavior specs for each CLI command covering:
+  **Solution:**
+  Create behavior specs for each CLI command covering:
+  - Argument parsing (all flags and combinations)
+  - Error handling (missing/invalid input)
+  - Output format validation (JSON, pretty)
+  - Exit code behavior
 
-- Argument parsing (all flags and combinations)
-- Error handling (missing/invalid input)
-- Output format validation (JSON, pretty)
-- Exit code behavior
-
-**Business Value:**
-| Benefit | How |
-| Reliability | CLI commands work correctly in all scenarios |
-| User Experience | Clear error messages for invalid usage |
-| CI/CD Integration | Predictable exit codes for automation |
+  **Business Value:**
+  | Benefit | How |
+  | Reliability | CLI commands work correctly in all scenarios |
+  | User Experience | Clear error messages for invalid usage |
+  | CI/CD Integration | Predictable exit codes for automation |
 
 ## Acceptance Criteria
 
@@ -68,28 +67,28 @@ Create behavior specs for each CLI command covering:
 **Lint passes for valid annotations**
 
 - Given TypeScript files with complete @libar-docs annotations
-- When running "lint-patterns -i 'src/\*_/_.ts'"
+- When running "lint-patterns -i 'src/**/*.ts'"
 - Then exit code is 0
 - And output indicates "No violations found"
 
 **Lint fails for missing pattern name**
 
 - Given TypeScript file with @libar-docs but no @libar-docs-pattern
-- When running "lint-patterns -i 'src/\*_/_.ts'"
+- When running "lint-patterns -i 'src/**/*.ts'"
 - Then exit code is 1
 - And output contains "missingPatternName" violation
 
 **JSON output format**
 
 - Given TypeScript files with lint violations
-- When running "lint-patterns -i 'src/\*_/_.ts' --format json"
+- When running "lint-patterns -i 'src/**/*.ts' --format json"
 - Then output is valid JSON
 - And JSON includes violations array with severity, message, file, line
 
 **Strict mode treats warnings as errors**
 
 - Given TypeScript files with warning-level violations only
-- When running "lint-patterns -i 'src/\*_/_.ts' --strict"
+- When running "lint-patterns -i 'src/**/*.ts' --strict"
 - Then exit code is 1
 
 **DoD validation for specific phase**
@@ -114,14 +113,14 @@ Create behavior specs for each CLI command covering:
 
 **File not found error includes path**
 
-- When running "generate-docs -i 'nonexistent/\*_/_.ts' -g patterns -o docs"
+- When running "generate-docs -i 'nonexistent/**/*.ts' -g patterns -o docs"
 - Then error message contains file path
 - And exit code is 1
 
 **Parse error includes line number**
 
 - Given TypeScript file with invalid JSDoc syntax
-- When running "lint-patterns -i 'src/\*_/_.ts'"
+- When running "lint-patterns -i 'src/**/*.ts'"
 - Then error includes file path and line number
 
 ## Business Rules
@@ -129,7 +128,7 @@ Create behavior specs for each CLI command covering:
 **generate-docs handles all argument combinations correctly**
 
 **Invariant:** Invalid arguments produce clear error messages with usage hints.
-Valid arguments produce expected output files.
+    Valid arguments produce expected output files.
 
     **API:** See `src/cli/generate-docs.ts`
 
@@ -140,7 +139,7 @@ _Verified by: Generate specific document type, Generate multiple document types,
 **lint-patterns validates annotation quality with configurable strictness**
 
 **Invariant:** Lint violations are reported with file, line, and severity.
-Exit codes reflect violation presence based on strictness setting.
+    Exit codes reflect violation presence based on strictness setting.
 
     **API:** See `src/cli/lint-patterns.ts`
 
@@ -151,7 +150,7 @@ _Verified by: Lint passes for valid annotations, Lint fails for missing pattern 
 **validate-patterns performs cross-source validation with DoD checks**
 
 **Invariant:** DoD and anti-pattern violations are reported per phase.
-Exit codes reflect validation state.
+    Exit codes reflect validation state.
 
     **API:** See `src/cli/validate-patterns.ts`
 
@@ -162,7 +161,7 @@ _Verified by: DoD validation for specific phase, Anti-pattern detection, Combine
 **All CLIs handle errors consistently with DocError pattern**
 
 **Invariant:** Errors include type, file, line (when applicable), and reason.
-Unknown errors are caught and formatted safely.
+    Unknown errors are caught and formatted safely.
 
     **Verified by:** Error formatting, Unknown error handling
 

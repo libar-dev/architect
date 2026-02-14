@@ -6,23 +6,22 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
-The lint system validates @libar-docs-\* documentation annotations for quality.
+The lint system validates @libar-docs-* documentation annotations for quality.
 
-Rules check parsed directives for completeness and quality, enabling
-CI enforcement of documentation standards.
+  Rules check parsed directives for completeness and quality, enabling
+  CI enforcement of documentation standards.
 
-Each rule has a severity level:
-
-- error: Must fix before merge
-- warning: Should fix for quality
-- info: Suggestions for improvement
+  Each rule has a severity level:
+  - error: Must fix before merge
+  - warning: Should fix for quality
+  - info: Suggestions for improvement
 
 ## Acceptance Criteria
 
@@ -43,7 +42,7 @@ Each rule has a severity level:
 
 **Detect whitespace-only pattern name**
 
-- Given a directive with patternName " "
+- Given a directive with patternName "   "
 - When I apply the missing-pattern-name rule
 - Then a violation should be detected
 - And the violation severity should be "error"
@@ -115,8 +114,8 @@ Each rule has a severity level:
 - When I apply the missing-when-to-use rule
 - Then no violation should be detected
 
-| value                        |
-| ---------------------------- |
+| value |
+| --- |
 | Use when processing commands |
 
 **Detect description that equals pattern name**
@@ -127,8 +126,8 @@ Each rule has a severity level:
 - And the violation severity should be "error"
 - And the violation message should contain "repeats pattern name"
 
-| field       | value               |
-| ----------- | ------------------- |
+| field | value |
+| --- | --- |
 | patternName | CommandOrchestrator |
 | description | CommandOrchestrator |
 
@@ -139,9 +138,9 @@ Each rule has a severity level:
 - Then a violation should be detected
 - And the violation severity should be "error"
 
-| field       | value                 |
-| ----------- | --------------------- |
-| patternName | Command Orchestrator  |
+| field | value |
+| --- | --- |
+| patternName | Command Orchestrator |
 | description | Command-Orchestrator. |
 
 **Detect short description starting with pattern name**
@@ -150,9 +149,9 @@ Each rule has a severity level:
 - When I apply the tautological-description rule
 - Then a violation should be detected
 
-| field       | value            |
-| ----------- | ---------------- |
-| patternName | FSM Types        |
+| field | value |
+| --- | --- |
+| patternName | FSM Types |
 | description | FSM Types module |
 
 **Accept description with substantial content after name**
@@ -161,9 +160,9 @@ Each rule has a severity level:
 - When I apply the tautological-description rule
 - Then no violation should be detected
 
-| field       | value                                                                                        |
-| ----------- | -------------------------------------------------------------------------------------------- |
-| patternName | FSM Types                                                                                    |
+| field | value |
+| --- | --- |
+| patternName | FSM Types |
 | description | FSM Types provides strongly-typed state machine definitions for entity lifecycle management. |
 
 **Accept meaningfully different description**
@@ -172,9 +171,9 @@ Each rule has a severity level:
 - When I apply the tautological-description rule
 - Then no violation should be detected
 
-| field       | value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| patternName | CommandOrchestrator                                         |
+| field | value |
+| --- | --- |
+| patternName | CommandOrchestrator |
 | description | The 7-step dual-write pattern for atomic command execution. |
 
 **Ignore empty descriptions**
@@ -183,10 +182,10 @@ Each rule has a severity level:
 - When I apply the tautological-description rule
 - Then no violation should be detected
 
-| field       | value |
-| ----------- | ----- |
-| patternName | Test  |
-| description |       |
+| field | value |
+| --- | --- |
+| patternName | Test |
+| description |  |
 
 **Ignore missing pattern name**
 
@@ -200,9 +199,9 @@ Each rule has a severity level:
 - When I apply the tautological-description rule
 - Then no violation should be detected
 
-| field       | value                                                    |
-| ----------- | -------------------------------------------------------- |
-| patternName | Test Pattern                                             |
+| field | value |
+| --- | --- |
+| patternName | Test Pattern |
 | description | ## Test Pattern<br><br>This is a meaningful description. |
 
 **Skip "When to use" sections when finding first line**
@@ -211,9 +210,9 @@ Each rule has a severity level:
 - When I apply the tautological-description rule
 - Then no violation should be detected
 
-| field       | value                                                                 |
-| ----------- | --------------------------------------------------------------------- |
-| patternName | Test                                                                  |
+| field | value |
+| --- | --- |
+| patternName | Test |
 | description | **When to use:** Some guidance<br><br>This is the actual description. |
 
 **Detect missing relationship tags**
@@ -236,8 +235,8 @@ Each rule has a severity level:
 - When I apply the missing-relationships rule
 - Then no violation should be detected
 
-| value     |
-| --------- |
+| value |
+| --- |
 | FSM Types |
 
 **Accept usedBy with content**
@@ -246,8 +245,8 @@ Each rule has a severity level:
 - When I apply the missing-relationships rule
 - Then no violation should be detected
 
-| value               |
-| ------------------- |
+| value |
+| --- |
 | CommandOrchestrator |
 
 **Accept both uses and usedBy**
@@ -256,9 +255,9 @@ Each rule has a severity level:
 - When I apply the missing-relationships rule
 - Then no violation should be detected
 
-| field  | value           |
-| ------ | --------------- |
-| uses   | FSM Types       |
+| field | value |
+| --- | --- |
+| uses | FSM Types |
 | usedBy | Decider Factory |
 
 **Default rules contains all 8 rules**
@@ -282,14 +281,14 @@ Each rule has a severity level:
 - When I check the default rules collection
 - Then it should include all rules:
 
-| ruleId                         |
-| ------------------------------ |
-| missing-pattern-name           |
-| invalid-status                 |
-| missing-status                 |
-| missing-when-to-use            |
-| tautological-description       |
-| missing-relationships          |
+| ruleId |
+| --- |
+| missing-pattern-name |
+| invalid-status |
+| missing-status |
+| missing-when-to-use |
+| tautological-description |
+| missing-relationships |
 | pattern-conflict-in-implements |
 
 **Filter returns all rules for info severity**

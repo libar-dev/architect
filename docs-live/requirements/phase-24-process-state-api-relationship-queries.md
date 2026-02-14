@@ -6,30 +6,29 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
-| Phase        | 24      |
+| Phase | 24 |
 
 ## Description
 
 **Problem:** ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`,
-`enables`) but lacks implementation relationship queries. Claude Code cannot ask "what code
-implements this pattern?" or "what pattern does this file implement?"
+  `enables`) but lacks implementation relationship queries. Claude Code cannot ask "what code
+  implements this pattern?" or "what pattern does this file implement?"
 
-**Solution:** Extend ProcessStateAPI with relationship query methods that leverage the new
-`implements`/`extends` tags from PatternRelationshipModel:
+  **Solution:** Extend ProcessStateAPI with relationship query methods that leverage the new
+  `implements`/`extends` tags from PatternRelationshipModel:
+  - Bidirectional traceability: spec → code and code → spec
+  - Inheritance hierarchy navigation: base → specializations
+  - Implementation discovery: pattern → implementing files
 
-- Bidirectional traceability: spec → code and code → spec
-- Inheritance hierarchy navigation: base → specializations
-- Implementation discovery: pattern → implementing files
-
-**Business Value:**
-| Benefit | How |
-| Reduced context usage | Query exact relationships vs reading multiple files |
-| Faster exploration | "Show implementations" in one call vs grep + read |
-| Accurate traceability | Real-time from source annotations, not stale docs |
+  **Business Value:**
+  | Benefit | How |
+  | Reduced context usage | Query exact relationships vs reading multiple files |
+  | Faster exploration | "Show implementations" in one call vs grep + read |
+  | Accurate traceability | Real-time from source annotations, not stale docs |
 
 ## Acceptance Criteria
 
@@ -41,9 +40,9 @@ implements this pattern?" or "what pattern does this file implement?"
 - Then the result should contain both file paths
 - And the result should be sorted alphabetically
 
-| File                                   | Via Tag                                   |
-| -------------------------------------- | ----------------------------------------- |
-| src/lint/process-guard/decider.ts      | @libar-docs-implements:ProcessGuardLinter |
+| File | Via Tag |
+| --- | --- |
+| src/lint/process-guard/decider.ts | @libar-docs-implements:ProcessGuardLinter |
 | src/lint/process-guard/derive-state.ts | @libar-docs-implements:ProcessGuardLinter |
 
 **Query implemented patterns for a file**
@@ -64,11 +63,11 @@ implements this pattern?" or "what pattern does this file implement?"
 - When querying getExtensions("ProjectionCategories")
 - Then the result should contain ["ReactiveProjections", "CachedProjections"]
 
-| Pattern              | Extends              |
-| -------------------- | -------------------- |
-| ProjectionCategories | (none)               |
-| ReactiveProjections  | ProjectionCategories |
-| CachedProjections    | ProjectionCategories |
+| Pattern | Extends |
+| --- | --- |
+| ProjectionCategories | (none) |
+| ReactiveProjections | ProjectionCategories |
+| CachedProjections | ProjectionCategories |
 
 **Query base pattern**
 
@@ -82,11 +81,11 @@ implements this pattern?" or "what pattern does this file implement?"
 - When querying getInheritanceChain("ReactiveProjections")
 - Then the result should be ["ReactiveProjections", "ProjectionCategories", "BaseProjection"]
 
-| Pattern              | Extends              |
-| -------------------- | -------------------- |
-| BaseProjection       | (none)               |
-| ProjectionCategories | BaseProjection       |
-| ReactiveProjections  | ProjectionCategories |
+| Pattern | Extends |
+| --- | --- |
+| BaseProjection | (none) |
+| ProjectionCategories | BaseProjection |
+| ReactiveProjections | ProjectionCategories |
 
 **Get all relationships for a pattern**
 
@@ -95,12 +94,12 @@ implements this pattern?" or "what pattern does this file implement?"
 - Then the result should include all relationship types
 - And each type should have its values populated
 
-| Relationship  | Values                   |
-| ------------- | ------------------------ |
-| uses          | CMSDualWrite, CommandBus |
-| usedBy        | CommandOrchestrator      |
-| implementedBy | dcb-executor.ts          |
-| extends       | (none)                   |
+| Relationship | Values |
+| --- | --- |
+| uses | CMSDualWrite, CommandBus |
+| usedBy | CommandOrchestrator |
+| implementedBy | dcb-executor.ts |
+| extends | (none) |
 
 **Filter patterns by relationship existence**
 
@@ -116,10 +115,10 @@ implements this pattern?" or "what pattern does this file implement?"
 - And hasImplementations should be true
 - And isSymmetric should be true
 
-| Attribute       | Value                                     |
-| --------------- | ----------------------------------------- |
+| Attribute | Value |
+| --- | --- |
 | executableSpecs | platform-core/tests/features/behavior/dcb |
-| implementedBy   | dcb-executor.ts, dcb-state.ts             |
+| implementedBy | dcb-executor.ts, dcb-state.ts |
 
 **Detect broken traceability links**
 
@@ -129,11 +128,11 @@ implements this pattern?" or "what pattern does this file implement?"
 - And the result should include "PatternB" (missing specs)
 - And the result should NOT include "PatternC"
 
-| Pattern  | Has executableSpecs | Has implementedBy |
-| -------- | ------------------- | ----------------- |
-| PatternA | Yes                 | No                |
-| PatternB | No                  | Yes               |
-| PatternC | Yes                 | Yes               |
+| Pattern | Has executableSpecs | Has implementedBy |
+| --- | --- | --- |
+| PatternA | Yes | No |
+| PatternB | No | Yes |
+| PatternC | Yes | Yes |
 
 ## Business Rules
 

@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Validates the Taxonomy Codec that transforms MasterDataset into a
-RenderableDocument for tag taxonomy reference documentation (TAXONOMY.md).
+  RenderableDocument for tag taxonomy reference documentation (TAXONOMY.md).
 
 ## Acceptance Criteria
 
@@ -130,50 +130,50 @@ RenderableDocument for tag taxonomy reference documentation (TAXONOMY.md).
 **Document metadata is correctly set**
 
 The taxonomy document has standard metadata fields for title, purpose,
-and detail level that describe the generated content.
+    and detail level that describe the generated content.
 
 _Verified by: Document title is Taxonomy Reference, Document purpose describes tag taxonomy, Detail level reflects generateDetailFiles option_
 
 **Categories section is generated from TagRegistry**
 
 The categories section lists all configured tag categories with their
-domain, priority, and description in a sortable table.
+    domain, priority, and description in a sortable table.
 
 _Verified by: Categories section is included in output, Category table has correct columns, LinkOut to detail file when generateDetailFiles enabled_
 
 **Metadata tags can be grouped by domain**
 
 The groupByDomain option organizes metadata tags into subsections
-by their semantic domain (Core, Relationship, Timeline, etc.).
+    by their semantic domain (Core, Relationship, Timeline, etc.).
 
 _Verified by: With groupByDomain enabled tags are grouped into subsections, With groupByDomain disabled single table rendered_
 
 **Tags are classified into domains by hardcoded mapping**
 
 The domain classification is intentionally hardcoded for documentation
-stability. Core, Relationship, Timeline, ADR, and Architecture tags
-have specific domain assignments.
+    stability. Core, Relationship, Timeline, ADR, and Architecture tags
+    have specific domain assignments.
 
 _Verified by: Core tags correctly classified, Relationship tags correctly classified, Timeline tags correctly classified, ADR prefix matching works, Unknown tags go to Other Tags group_
 
 **Optional sections can be disabled via codec options**
 
 The codec supports disabling format types, presets, and architecture
-diagram sections for compact output generation.
+    diagram sections for compact output generation.
 
 _Verified by: includeFormatTypes disabled excludes Format Types section, includePresets disabled excludes Presets section, includeArchDiagram disabled excludes Architecture section_
 
 **Detail files are generated for progressive disclosure**
 
 The generateDetailFiles option creates additional files for
-categories, metadata tags, and format types with detailed content.
+    categories, metadata tags, and format types with detailed content.
 
 _Verified by: generateDetailFiles creates 3 additional files, Detail files have correct paths, generateDetailFiles disabled creates no additional files_
 
 **Format types are documented with descriptions and examples**
 
 The Format Types section documents all supported tag value formats
-with descriptions and examples for each type.
+    with descriptions and examples for each type.
 
 _Verified by: All 6 format types are documented_
 

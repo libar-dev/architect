@@ -6,26 +6,25 @@
 
 ## Overview
 
-| Property       | Value                                                    |
-| -------------- | -------------------------------------------------------- |
-| Status         | completed                                                |
-| Product Area   | Validation                                               |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Validation |
 | Business Value | ensure state machine rules are enforced programmatically |
-| Phase          | 100                                                      |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.
-Invalid transitions can occur silently, leading to inconsistent process state.
+  Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.
+  Invalid transitions can occur silently, leading to inconsistent process state.
 
-**Solution:**
-Implement state machine validation that:
-
-- Validates all status transitions
-- Enforces required metadata for terminal states
-- Provides clear error messages for invalid transitions
-- Integrates with generators and linters
+  **Solution:**
+  Implement state machine validation that:
+  - Validates all status transitions
+  - Enforces required metadata for terminal states
+  - Provides clear error messages for invalid transitions
+  - Integrates with generators and linters
 
 ## Acceptance Criteria
 

@@ -6,31 +6,29 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Enhanced documentation generation with human-readable names,
-behavior file verification, and numbered acceptance criteria for PRD quality.
+  behavior file verification, and numbered acceptance criteria for PRD quality.
 
-**Problem:**
+  **Problem:**
+  - CamelCase pattern names (e.g., "RemainingWorkEnhancement") are hard to read
+  - File extensions like ".md" incorrectly trigger sentence-ending detection
+  - Business value tags with hyphens display as "enable-rich-prd" instead of readable text
+  - No way to verify behavior file traceability during extraction
+  - PRD acceptance criteria lack visual structure and numbering
 
-- CamelCase pattern names (e.g., "RemainingWorkEnhancement") are hard to read
-- File extensions like ".md" incorrectly trigger sentence-ending detection
-- Business value tags with hyphens display as "enable-rich-prd" instead of readable text
-- No way to verify behavior file traceability during extraction
-- PRD acceptance criteria lack visual structure and numbering
-
-**Solution:**
-
-- Transform CamelCase to title case ("Remaining Work Enhancement")
-- Skip file extension patterns when detecting sentence boundaries
-- Convert hyphenated business values to readable phrases
-- Verify behavior file existence during pattern extraction
-- Number acceptance criteria and bold Given/When/Then keywords in PRD output
+  **Solution:**
+  - Transform CamelCase to title case ("Remaining Work Enhancement")
+  - Skip file extension patterns when detecting sentence boundaries
+  - Convert hyphenated business values to readable phrases
+  - Verify behavior file existence during pattern extraction
+  - Number acceptance criteria and bold Given/When/Then keywords in PRD output
 
 ## Acceptance Criteria
 
@@ -64,11 +62,11 @@ behavior file verification, and numbered acceptance criteria for PRD quality.
 - And the covered table includes "Remaining Work" and "Changelog Gen"
 - And the gaps section includes "No Behavior File"
 
-| Phase | Name             | BehaviorFile                                   | Verified |
-| ----- | ---------------- | ---------------------------------------------- | -------- |
-| 37    | Remaining Work   | tests/features/behavior/remaining-work.feature | true     |
-| 34    | Changelog Gen    | tests/features/behavior/changelog.feature      | true     |
-| 99    | No Behavior File |                                                |          |
+| Phase | Name | BehaviorFile | Verified |
+| --- | --- | --- | --- |
+| 37 | Remaining Work | tests/features/behavior/remaining-work.feature | true |
+| 34 | Changelog Gen | tests/features/behavior/changelog.feature | true |
+| 99 | No Behavior File |  |  |
 
 **CamelCase pattern names transformed to title case**
 
@@ -96,9 +94,9 @@ behavior file verification, and numbered acceptance criteria for PRD quality.
 - Then scenarios are numbered starting from 1
 - And steps have bold keywords (Given, When, Then)
 
-| Scenario Name                     |
-| --------------------------------- |
-| Pattern names display correctly   |
+| Scenario Name |
+| --- |
+| Pattern names display correctly |
 | Behavior file verified at extract |
 
 **PRD respects includeScenarioSteps flag**
@@ -134,14 +132,14 @@ behavior file verification, and numbered acceptance criteria for PRD quality.
 - Then the Next Actionable table includes a Business Value column
 - And the Business Value column shows expected values:
 
-| Phase | Name            | BusinessValue                          | Dependencies |
-| ----- | --------------- | -------------------------------------- | ------------ |
-| 3     | Watch Mode      | Eliminate-manual-regeneration          |              |
-| 10    | Full Cycle Demo | Documented-full-cycle-enables-adoption |              |
+| Phase | Name | BusinessValue | Dependencies |
+| --- | --- | --- | --- |
+| 3 | Watch Mode | Eliminate-manual-regeneration |  |
+| 10 | Full Cycle Demo | Documented-full-cycle-enables-adoption |  |
 
-| value                                  |
-| -------------------------------------- |
-| Eliminate manual regeneration          |
+| value |
+| --- |
+| Eliminate manual regeneration |
 | Documented full cycle enables adoption |
 
 **PRD shows full Feature description without truncation**

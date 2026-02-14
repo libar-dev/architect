@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description
 
 Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-buildOverview() pure functions that operate on MasterDataset.
+  buildOverview() pure functions that operate on MasterDataset.
 
 ## Acceptance Criteria
 

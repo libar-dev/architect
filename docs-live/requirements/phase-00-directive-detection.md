@@ -6,29 +6,27 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 Pure functions that detect @libar-docs directives in TypeScript source code.
-These functions enable quick file filtering before full AST parsing.
+  These functions enable quick file filtering before full AST parsing.
 
-**Problem:**
+  **Problem:**
+  - Full AST parsing of every TypeScript file is expensive and slow
+  - Files without documentation directives waste processing time
+  - Need to distinguish file-level opt-in (@libar-docs) from section tags (@libar-docs-*)
+  - Similar patterns like @libar-doc-core could cause false positives
 
-- Full AST parsing of every TypeScript file is expensive and slow
-- Files without documentation directives waste processing time
-- Need to distinguish file-level opt-in (@libar-docs) from section tags (@libar-docs-\*)
-- Similar patterns like @libar-doc-core could cause false positives
-
-**Solution:**
-
-- hasDocDirectives: Fast regex check for any @libar-docs-\* directive
-- hasFileOptIn: Validates explicit @libar-docs opt-in (not @libar-docs-\*)
-- Both use regex patterns optimized for quick filtering before AST parsing
-- Negative lookahead ensures @libar-docs doesn't match @libar-docs-\*
+  **Solution:**
+  - hasDocDirectives: Fast regex check for any @libar-docs-* directive
+  - hasFileOptIn: Validates explicit @libar-docs opt-in (not @libar-docs-*)
+  - Both use regex patterns optimized for quick filtering before AST parsing
+  - Negative lookahead ensures @libar-docs doesn't match @libar-docs-*
 
 ## Acceptance Criteria
 
@@ -38,7 +36,7 @@ These functions enable quick file filtering before full AST parsing.
 - When checking for documentation directives
 - Then hasDocDirectives should return true
 
-**Detect various @libar-docs-\* directives**
+**Detect various @libar-docs-* directives**
 
 - Given source code containing directive "<directive>"
 - When checking for documentation directives
@@ -52,7 +50,7 @@ These functions enable quick file filtering before full AST parsing.
 
 **Detect multiple directives on same line**
 
-- Given source code "/\*_ @libar-docs-core @libar-docs-validation _/"
+- Given source code "/** @libar-docs-core @libar-docs-validation */"
 - When checking for documentation directives
 - Then hasDocDirectives should return true
 
@@ -88,7 +86,7 @@ These functions enable quick file filtering before full AST parsing.
 
 **Detect @libar-docs with description on same line**
 
-- Given source code "/\*_ @libar-docs This file is documented _/"
+- Given source code "/** @libar-docs This file is documented */"
 - When checking for file opt-in
 - Then hasFileOptIn should return true
 
@@ -106,7 +104,7 @@ These functions enable quick file filtering before full AST parsing.
 
 **Detect @libar-docs combined with section tags**
 
-- Given source code "/\*_ @libar-docs @libar-docs-core _/"
+- Given source code "/** @libar-docs @libar-docs-core */"
 - When checking for file opt-in
 - Then hasFileOptIn should return true
 
@@ -118,7 +116,7 @@ These functions enable quick file filtering before full AST parsing.
 
 **Return false for multiple section tags without opt-in**
 
-- Given source code "/\*_ @libar-docs-core @libar-docs-validation _/"
+- Given source code "/** @libar-docs-core @libar-docs-validation */"
 - When checking for file opt-in
 - Then hasFileOptIn should return false
 
@@ -134,9 +132,9 @@ These functions enable quick file filtering before full AST parsing.
 - When checking for file opt-in
 - Then hasFileOptIn should return false
 
-**Not confuse @libar-docs-\* with @libar-docs opt-in**
+**Not confuse @libar-docs-* with @libar-docs opt-in**
 
-- Given source code "/\*_ @libar-docs-event-sourcing _/"
+- Given source code "/** @libar-docs-event-sourcing */"
 - When checking for file opt-in
 - Then hasFileOptIn should return false
 

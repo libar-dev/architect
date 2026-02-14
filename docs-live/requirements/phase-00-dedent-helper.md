@@ -6,28 +6,26 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The dedent helper function normalizes indentation in code blocks extracted
-from DocStrings. It handles various whitespace patterns including tabs,
-mixed indentation, and edge cases.
+  from DocStrings. It handles various whitespace patterns including tabs,
+  mixed indentation, and edge cases.
 
-**Problem:**
+  **Problem:**
+  - DocStrings in Gherkin files have consistent indentation for alignment
+  - Tab characters vs spaces create inconsistent indentation calculation
+  - Edge cases like empty lines, all-empty input, single lines need handling
 
-- DocStrings in Gherkin files have consistent indentation for alignment
-- Tab characters vs spaces create inconsistent indentation calculation
-- Edge cases like empty lines, all-empty input, single lines need handling
-
-**Solution:**
-
-- Normalize tabs to spaces before calculating minimum indentation
-- Handle edge cases gracefully without throwing errors
-- Preserve relative indentation after removing common prefix
+  **Solution:**
+  - Normalize tabs to spaces before calculating minimum indentation
+  - Handle edge cases gracefully without throwing errors
+  - Preserve relative indentation after removing common prefix
 
 ## Acceptance Criteria
 
@@ -38,8 +36,8 @@ mixed indentation, and edge cases.
 - Then the output is:
 
 ```markdown
-    	const x = 1;
-    	const y = 2;
+		const x = 1;
+		const y = 2;
 ```
 
 ```markdown
@@ -54,8 +52,8 @@ const y = 2;
 - Then the output has no leading whitespace on first non-empty line
 
 ```markdown
-      const x = 1;
-      const y = 2;
+	  const x = 1;
+	  const y = 2;
 ```
 
 **Empty lines with trailing spaces are preserved**
@@ -80,7 +78,7 @@ const y = 2;
 
 **Single line with indentation is dedented**
 
-- Given input text " const x = 1;"
+- Given input text "    const x = 1;"
 - When dedenting the text
 - Then the output is "const x = 1;"
 
@@ -112,9 +110,9 @@ const y = 2;
 
 ```markdown
 function foo() {
-if (true) {
-return 42;
-}
+  if (true) {
+    return 42;
+  }
 }
 ```
 
@@ -134,9 +132,9 @@ return 42;
 
 ```markdown
 level0
-level1
-level2
-level1
+  level1
+    level2
+  level1
 level0
 ```
 

@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value         |
-| ------------ | ------------- |
-| Status       | completed     |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Configuration |
 
 ## Description
 
 The createDeliveryProcess factory provides a type-safe way to configure
-the delivery process with custom tag prefixes and presets.
+  the delivery process with custom tag prefixes and presets.
 
-**Problem:**
+  **Problem:**
+  - Different projects need different tag prefixes
+  - Default taxonomy may not fit all use cases
+  - Configuration should be type-safe and validated
 
-- Different projects need different tag prefixes
-- Default taxonomy may not fit all use cases
-- Configuration should be type-safe and validated
-
-**Solution:**
-
-- createDeliveryProcess() factory with preset support
-- Custom tagPrefix and fileOptInTag overrides
-- Type-safe configuration with generics
+  **Solution:**
+  - createDeliveryProcess() factory with preset support
+  - Custom tagPrefix and fileOptInTag overrides
+  - Type-safe configuration with generics
 
 ## Acceptance Criteria
 

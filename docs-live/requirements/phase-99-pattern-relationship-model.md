@@ -6,34 +6,33 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
-| Phase        | 99         |
+| Phase | 99 |
 
 ## Description
 
 **Problem:** The delivery process lacks a comprehensive relationship model between artifacts.
-Code files, roadmap specs, executable specs, and patterns exist but their relationships
-are implicit or limited to basic dependency tracking (`uses`, `depends-on`).
+  Code files, roadmap specs, executable specs, and patterns exist but their relationships
+  are implicit or limited to basic dependency tracking (`uses`, `depends-on`).
 
-**Solution:** Implement a relationship taxonomy inspired by UML/TML modeling practices:
+  **Solution:** Implement a relationship taxonomy inspired by UML/TML modeling practices:
+  - **Realization** (`implements`) - Code realizes a pattern specification
+  - **Generalization** (`extends`) - Pattern extends another pattern's capabilities
+  - **Dependency** (`uses`, `used-by`) - Technical dependencies between patterns
+  - **Composition** (`parent`, `level`) - Hierarchical pattern organization
+  - **Traceability** (`roadmap-spec`, `executable-specs`) - Cross-tier linking
 
-- **Realization** (`implements`) - Code realizes a pattern specification
-- **Generalization** (`extends`) - Pattern extends another pattern's capabilities
-- **Dependency** (`uses`, `used-by`) - Technical dependencies between patterns
-- **Composition** (`parent`, `level`) - Hierarchical pattern organization
-- **Traceability** (`roadmap-spec`, `executable-specs`) - Cross-tier linking
-
-**Business Value:**
-| Benefit | How |
-| Complete dependency graphs | All relationships rendered in Mermaid with distinct arrow styles |
-| Implementation tracking | `implements` links code stubs to roadmap specs |
-| Code-sourced documentation | Generated docs pull from both .feature files AND code stubs |
-| Impact analysis | Know what code breaks when pattern spec changes |
-| Agentic workflows | Claude can navigate from pattern to implementations and back |
-| UML-grade modeling | Professional relationship semantics enable rich tooling |
+  **Business Value:**
+  | Benefit | How |
+  | Complete dependency graphs | All relationships rendered in Mermaid with distinct arrow styles |
+  | Implementation tracking | `implements` links code stubs to roadmap specs |
+  | Code-sourced documentation | Generated docs pull from both .feature files AND code stubs |
+  | Impact analysis | Know what code breaks when pattern spec changes |
+  | Agentic workflows | Claude can navigate from pattern to implementations and back |
+  | UML-grade modeling | Professional relationship semantics enable rich tooling |
 
 ## Acceptance Criteria
 
@@ -198,9 +197,9 @@ are implicit or limited to basic dependency tracking (`uses`, `depends-on`).
 **Code files declare pattern realization via implements tag**
 
 **Invariant:** Files with `@libar-docs-implements:PatternName,OtherPattern` are linked
-to the specified patterns without causing conflicts. Pattern definitions remain in
-roadmap specs; implementation files provide supplementary metadata. Multiple files can
-implement the same pattern, and one file can implement multiple patterns.
+    to the specified patterns without causing conflicts. Pattern definitions remain in
+    roadmap specs; implementation files provide supplementary metadata. Multiple files can
+    implement the same pattern, and one file can implement multiple patterns.
 
     **Rationale:** This mirrors UML's "realization" relationship where a class implements
     an interface. Code realizes the specification. Direction is code→spec (backward link).
@@ -216,8 +215,8 @@ _Verified by: Implements tag parsed from TypeScript, Multiple patterns implement
 **Pattern inheritance uses extends relationship tag**
 
 **Invariant:** Files with `@libar-docs-extends:BasePattern` declare that they extend
-another pattern's capabilities. This is a generalization relationship where the
-extending pattern is a specialization of the base pattern.
+    another pattern's capabilities. This is a generalization relationship where the
+    extending pattern is a specialization of the base pattern.
 
     **Rationale:** Pattern families exist where specialized patterns build on base patterns.
     For example, `ReactiveProjections` extends `ProjectionCategories`. The extends
@@ -232,8 +231,8 @@ _Verified by: Extends tag parsed from feature file, Extended-by reverse lookup c
 **Technical dependencies use directed relationship tags**
 
 **Invariant:** `@libar-docs-uses` declares outbound dependencies (what this
-pattern depends on). `@libar-docs-used-by` declares inbound dependencies
-(what depends on this pattern). Both are CSV format.
+    pattern depends on). `@libar-docs-used-by` declares inbound dependencies
+    (what depends on this pattern). Both are CSV format.
 
     **Rationale:** These represent technical coupling between patterns. The
     distinction matters for impact analysis: changing a pattern affects its
@@ -246,8 +245,8 @@ _Verified by: Uses rendered as solid arrows in graph, Used-by aggregated in patt
 **Roadmap sequencing uses ordering relationship tags**
 
 **Invariant:** `@libar-docs-depends-on` declares what must be completed first
-(roadmap sequencing). `@libar-docs-enables` declares what this unlocks when
-completed. These are planning relationships, not technical dependencies.
+    (roadmap sequencing). `@libar-docs-enables` declares what this unlocks when
+    completed. These are planning relationships, not technical dependencies.
 
     **Rationale:** Sequencing is about order of work, not runtime coupling.
     A pattern may depend on another being complete without using its code.
@@ -259,8 +258,8 @@ _Verified by: Depends-on rendered as dashed arrows, Enables is inverse of depend
 **Cross-tier linking uses traceability tags (PDR-007)**
 
 **Invariant:** `@libar-docs-executable-specs` on roadmap specs points to test
-locations. `@libar-docs-roadmap-spec` on package specs points back to the
-pattern. These create bidirectional traceability.
+    locations. `@libar-docs-roadmap-spec` on package specs points back to the
+    pattern. These create bidirectional traceability.
 
     **Rationale:** Two-tier architecture (PDR-007) separates planning specs from
     executable tests. Traceability tags maintain the connection for navigation
@@ -273,8 +272,8 @@ _Verified by: Bidirectional links established, Orphan executable spec detected_
 **Epic/Phase/Task hierarchy uses parent-child relationships**
 
 **Invariant:** `@libar-docs-level` declares the hierarchy tier (epic, phase, task).
-`@libar-docs-parent` links to the containing pattern. This enables rollup
-progress tracking.
+    `@libar-docs-parent` links to the containing pattern. This enables rollup
+    progress tracking.
 
     **Rationale:** Large initiatives decompose into phases and tasks. The hierarchy
     allows progress aggregation (e.g., "Epic 80% complete based on child phases").
@@ -286,8 +285,8 @@ _Verified by: Parent link validated, Invalid parent detected_
 **All relationships appear in generated documentation**
 
 **Invariant:** The PATTERNS.md dependency graph renders all relationship types
-with distinct visual styles. Pattern detail pages list all related artifacts
-grouped by relationship type.
+    with distinct visual styles. Pattern detail pages list all related artifacts
+    grouped by relationship type.
 
     **Rationale:** Visualization makes the relationship model accessible. Different
     arrow styles distinguish relationship semantics at a glance.
@@ -305,7 +304,7 @@ _Verified by: Graph uses distinct arrow styles, Pattern detail page shows all re
 **Linter detects relationship violations**
 
 **Invariant:** The pattern linter validates that all relationship targets exist,
-implements files don't have pattern tags, and bidirectional links are consistent.
+    implements files don't have pattern tags, and bidirectional links are consistent.
 
     **Rationale:** Broken relationships cause confusion and incorrect generated docs.
     Early detection during linting prevents propagation of errors.

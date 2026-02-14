@@ -6,20 +6,20 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Annotation |
 
 ## Description
 
 **Problem:**
-Patterns in standard directories (src/validation/, src/scanner/) should
-automatically receive architecture context without explicit annotation.
+  Patterns in standard directories (src/validation/, src/scanner/) should
+  automatically receive architecture context without explicit annotation.
 
-**Solution:**
-Implement configurable inference rules that map file path patterns to
-bounded contexts using wildcard matching.
+  **Solution:**
+  Implement configurable inference rules that map file path patterns to
+  bounded contexts using wildcard matching.
 
 ## Acceptance Criteria
 
@@ -75,10 +75,10 @@ bounded contexts using wildcard matching.
 - When transforming to master dataset with rules
 - Then the pattern archContext should be "validation"
 
-| pattern             | context    |
-| ------------------- | ---------- |
-| src/validation/\*\* | validation |
-| src/\*\*            | general    |
+| pattern | context |
+| --- | --- |
+| src/validation/** | validation |
+| src/** | general |
 
 **Explicit context takes precedence over inference**
 
@@ -105,11 +105,11 @@ bounded contexts using wildcard matching.
 
 ## Business Rules
 
-**matchPattern supports recursive wildcard \*\***
+**matchPattern supports recursive wildcard ****
 
 _Verified by: Recursive wildcard matches nested paths_
 
-**matchPattern supports single-level wildcard /\***
+**matchPattern supports single-level wildcard /***
 
 _Verified by: Single-level wildcard matches direct children only_
 

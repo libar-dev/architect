@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Parameterized codec factory that creates reference document codecs
-from configuration objects. Each config replaces one recipe .feature file
-and produces a RenderableDocument at configurable detail levels.
+  from configuration objects. Each config replaces one recipe .feature file
+  and produces a RenderableDocument at configurable detail levels.
 
 ## Acceptance Criteria
 
@@ -35,9 +35,9 @@ and produces a RenderableDocument at configurable detail levels.
 - Then the document has a heading "FSM Transitions"
 - And the document contains text "Only valid transitions apply"
 
-| convention | ruleName        | invariant                    |
-| ---------- | --------------- | ---------------------------- |
-| fsm-rules  | FSM Transitions | Only valid transitions apply |
+| convention | ruleName | invariant |
+| --- | --- | --- |
+| fsm-rules | FSM Transitions | Only valid transitions apply |
 
 **Convention tables are rendered in the document**
 
@@ -70,7 +70,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Shapes appear when source file matches shapeSources glob**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
 - When decoding at detail level "detailed"
 - Then the document has a heading "API Types"
@@ -78,7 +78,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Summary level shows shapes as a compact table**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
 - When decoding at detail level "summary"
 - Then the document has a heading "API Types"
@@ -86,7 +86,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **No shapes when source file does not match glob**
 
-- Given a reference config with shapeSources "src/config/\*.ts"
+- Given a reference config with shapeSources "src/config/*.ts"
 - And a MasterDataset with a pattern at "src/lint/rules.ts" with extracted shapes
 - When decoding at detail level "detailed"
 - Then the document does not have a heading "API Types"
@@ -269,16 +269,16 @@ and produces a RenderableDocument at configurable detail levels.
 - When decoding at detail level "detailed"
 - Then the document contains a verified-by list with 3 unique entries
 
-**Standard level includes JSDoc paragraph before code blocks**
+**Standard level includes JSDoc in code blocks**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a shape pattern with JSDoc
 - When decoding at detail level "standard"
 - Then the document contains text "Input to the process guard decider function"
 
-**Detailed level includes JSDoc paragraph and property table**
+**Detailed level includes JSDoc in code block and property table**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a shape pattern with JSDoc and property docs
 - When decoding at detail level "detailed"
 - Then the document contains text "Input to the process guard decider function"
@@ -286,7 +286,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Shapes without JSDoc render code blocks only**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a shape pattern without JSDoc
 - When decoding at detail level "standard"
 - Then the document does not contain text "Input to the process guard"
@@ -294,7 +294,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Detailed level renders param table for function shapes**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a function shape with param docs
 - When decoding at detail level "detailed"
 - Then the document has a table with columns "Parameter" and "Type" and "Description"
@@ -302,7 +302,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Detailed level renders returns and throws documentation**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a function shape with returns and throws docs
 - When decoding at detail level "detailed"
 - Then the rendered output contains returns paragraph with type and description
@@ -310,7 +310,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Standard level renders param table without throws**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a function shape with param and throws docs
 - When decoding at detail level "standard"
 - Then the document has a table with columns "Parameter" and "Type" and "Description"
@@ -318,7 +318,7 @@ and produces a RenderableDocument at configurable detail levels.
 
 **Shapes without param docs skip param table**
 
-- Given a reference config with shapeSources "src/lint/\*.ts"
+- Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a shape pattern with JSDoc
 - When decoding at detail level "detailed"
 - Then the document does not have a table with column "Parameter"
@@ -547,7 +547,7 @@ _Verified by: Detailed level renders structured behavior rules, Standard level r
 
 **Shape JSDoc prose renders at standard and detailed levels**
 
-_Verified by: Standard level includes JSDoc paragraph before code blocks, Detailed level includes JSDoc paragraph and property table, Shapes without JSDoc render code blocks only_
+_Verified by: Standard level includes JSDoc in code blocks, Detailed level includes JSDoc in code block and property table, Shapes without JSDoc render code blocks only_
 
 **Shape sections render param returns and throws documentation**
 
@@ -556,9 +556,9 @@ _Verified by: Detailed level renders param table for function shapes, Detailed l
 **Diagram type controls Mermaid output format**
 
 **Invariant:** The diagramType field on DiagramScope selects the Mermaid
-output format. Supported types are graph (flowchart, default),
-sequenceDiagram, and stateDiagram-v2. Each type produces syntactically
-valid Mermaid output with type-appropriate node and edge rendering.
+    output format. Supported types are graph (flowchart, default),
+    sequenceDiagram, and stateDiagram-v2. Each type produces syntactically
+    valid Mermaid output with type-appropriate node and edge rendering.
 
     **Rationale:** Flowcharts cannot naturally express event flows (sequence),
     FSM visualization (state), or temporal ordering. Multiple diagram types
@@ -575,9 +575,9 @@ _Verified by: Default diagramType produces flowchart, Sequence diagram renders p
 **Edge labels and custom node shapes enrich diagram readability**
 
 **Invariant:** Relationship edges display labels describing the relationship
-type (uses, depends on, implements, extends). Edge labels are enabled by
-default and can be disabled via showEdgeLabels false. Node shapes in
-flowchart diagrams vary by archRole value using Mermaid shape syntax.
+    type (uses, depends on, implements, extends). Edge labels are enabled by
+    default and can be disabled via showEdgeLabels false. Node shapes in
+    flowchart diagrams vary by archRole value using Mermaid shape syntax.
 
     **Rationale:** Unlabeled edges are ambiguous without consulting a legend.
     Custom node shapes make archRole visually distinguishable without color
@@ -593,9 +593,9 @@ _Verified by: Relationship edges display type labels by default, Edge labels can
 **Collapsible blocks wrap behavior rules for progressive disclosure**
 
 **Invariant:** When a behavior pattern has 3 or more rules and detail level
-is not summary, each rule's content is wrapped in a collapsible block with the
-rule name and scenario count in the summary. Patterns with fewer than 3 rules
-render rules flat. Summary level never produces collapsible blocks.
+    is not summary, each rule's content is wrapped in a collapsible block with the
+    rule name and scenario count in the summary. Patterns with fewer than 3 rules
+    render rules flat. Summary level never produces collapsible blocks.
 
     **Rationale:** Behavior sections with many rules produce substantial content at
     detailed level. Collapsible blocks enable progressive disclosure so readers can
@@ -610,8 +610,8 @@ _Verified by: Behavior pattern with many rules uses collapsible blocks at detail
 **Link-out blocks provide source file cross-references**
 
 **Invariant:** At standard and detailed levels, each behavior pattern includes
-a link-out block referencing its source file path. At summary level, link-out
-blocks are omitted for compact output.
+    a link-out block referencing its source file path. At summary level, link-out
+    blocks are omitted for compact output.
 
     **Rationale:** Cross-reference links enable readers to navigate from generated
     documentation to the annotated source files, closing the loop between generated
@@ -626,8 +626,8 @@ _Verified by: Behavior pattern includes source file link-out at detailed level, 
 **Include tags route cross-cutting content into reference documents**
 
 **Invariant:** Patterns with matching include tags appear alongside
-category-selected patterns in the behavior section. The merging
-is additive (OR semantics).
+    category-selected patterns in the behavior section. The merging
+    is additive (OR semantics).
 
     **Verified by:** Include-tagged pattern appears in behavior section,
     Include-tagged pattern is additive with category-selected patterns,

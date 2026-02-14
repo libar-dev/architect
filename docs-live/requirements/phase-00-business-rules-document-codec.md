@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
-Verifies rule extraction, organization by domain/phase, and progressive disclosure.
+  Verifies rule extraction, organization by domain/phase, and progressive disclosure.
 
 ## Acceptance Criteria
 
@@ -27,12 +27,12 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - And the document contains rationale text "Check-then-create patterns"
 - And the document contains verified by link to "Concurrent reservations scenario"
 
-| Field      | Value                                                    |
-| ---------- | -------------------------------------------------------- |
-| name       | Reservations prevent race conditions                     |
-| invariant  | Only one reservation can exist for a given key at a time |
-| rationale  | Check-then-create patterns have TOCTOU vulnerabilities   |
-| verifiedBy | Concurrent reservations scenario                         |
+| Field | Value |
+| --- | --- |
+| name | Reservations prevent race conditions |
+| invariant | Only one reservation can exist for a given key at a time |
+| rationale | Check-then-create patterns have TOCTOU vulnerabilities |
+| verifiedBy | Concurrent reservations scenario |
 
 **Extracts unannotated Rule without showing not specified**
 
@@ -42,9 +42,9 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - And the document contains description "Events cannot be modified"
 - And the document does not contain "not specified"
 
-| Field       | Value                                    |
-| ----------- | ---------------------------------------- |
-| name        | Events are immutable                     |
+| Field | Value |
+| --- | --- |
+| name | Events are immutable |
 | description | Events cannot be modified after creation |
 
 **Groups rules by product area and phase**
@@ -53,11 +53,11 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - When decoding with BusinessRulesCodec in standard mode
 - Then the document has product area sections with phases
 
-| Category       | Rule Name                            |
-| -------------- | ------------------------------------ |
-| ddd            | Reservations prevent race conditions |
-| event-sourcing | Events are immutable                 |
-| cqrs           | Projections must declare category    |
+| Category | Rule Name |
+| --- | --- |
+| ddd | Reservations prevent race conditions |
+| event-sourcing | Events are immutable |
+| cqrs | Projections must declare category |
 
 **Orders rules by phase within domain**
 
@@ -65,11 +65,11 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - When decoding with BusinessRulesCodec in standard mode
 - Then phase 16 content appears before phase 20 content
 
-| Phase | Rule Name                            |
-| ----- | ------------------------------------ |
-| 16    | DCB enables cross-entity validation  |
-| 20    | Events contain full context          |
-| 20    | Reservations prevent race conditions |
+| Phase | Rule Name |
+| --- | --- |
+| 16 | DCB enables cross-entity validation |
+| 20 | Events contain full context |
+| 20 | Reservations prevent race conditions |
 
 **Summary mode includes statistics line**
 

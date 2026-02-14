@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tests for rendering all relationship types in Mermaid dependency graphs
-with distinct visual styles per relationship semantics.
+  with distinct visual styles per relationship semantics.
 
 ## Acceptance Criteria
 
@@ -56,12 +56,12 @@ with distinct visual styles per relationship semantics.
 - Then the graph should contain at least one of each arrow type
 - And the graph header should be "graph TD"
 
-| name                | uses         | dependsOn      | implements           | extends              |
-| ------------------- | ------------ | -------------- | -------------------- | -------------------- |
-| Orchestrator        | CommandBus   | -              | -                    | -                    |
-| DCB                 | CMSDualWrite | DeciderPattern | -                    | -                    |
-| ReactiveProjections | -            | -              | -                    | ProjectionCategories |
-| outbox.ts           | -            | -              | EventStoreDurability | -                    |
+| name | uses | dependsOn | implements | extends |
+| --- | --- | --- | --- | --- |
+| Orchestrator | CommandBus | - | - | - |
+| DCB | CMSDualWrite | DeciderPattern | - | - |
+| ReactiveProjections | - | - | - | ProjectionCategories |
+| outbox.ts | - | - | EventStoreDurability | - |
 
 ## Business Rules
 

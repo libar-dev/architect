@@ -6,23 +6,22 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | CoreTypes |
 
 ## Description
 
 String utilities provide consistent text transformations across the codebase.
-These functions handle URL slugification and case conversion with proper
-handling of edge cases like acronyms and special characters.
+  These functions handle URL slugification and case conversion with proper
+  handling of edge cases like acronyms and special characters.
 
-**Covered functions:**
+  **Covered functions:**
+  - `slugify` - Convert text to URL-safe slugs (lowercase, alphanumeric, hyphens)
+  - `camelCaseToTitleCase` - Convert CamelCase to "Title Case" with spaces
 
-- `slugify` - Convert text to URL-safe slugs (lowercase, alphanumeric, hyphens)
-- `camelCaseToTitleCase` - Convert CamelCase to "Title Case" with spaces
-
-**Note:** `toKebabCase` is already tested in kebab-case-slugs.feature
+  **Note:** `toKebabCase` is already tested in kebab-case-slugs.feature
 
 ## Acceptance Criteria
 

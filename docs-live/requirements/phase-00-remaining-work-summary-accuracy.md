@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Summary totals in REMAINING-WORK.md must match the sum of phase table rows.
-The backlog calculation must correctly identify patterns without phases
-using pattern.id (which is always defined) rather than patternName.
+  The backlog calculation must correctly identify patterns without phases
+  using pattern.id (which is always defined) rather than patternName.
 
 ## Acceptance Criteria
 
@@ -27,11 +27,11 @@ using pattern.id (which is always defined) rather than patternName.
 - And summary shows Total Remaining count 3
 - And phase table rows sum to Active: 2, Remaining: 3
 
-| id  | patternName | status  | phase |
-| --- | ----------- | ------- | ----- |
-| p1  | PatternA    | active  | 1     |
-| p2  | PatternB    | active  | 1     |
-| p3  | PatternC    | planned | 2     |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | PatternA | active | 1 |
+| p2 | PatternB | active | 1 |
+| p3 | PatternC | planned | 2 |
 
 **Summary includes completed patterns correctly**
 
@@ -41,11 +41,11 @@ using pattern.id (which is always defined) rather than patternName.
 - And summary shows Total Remaining count 2
 - And completed patterns are not in remaining count
 
-| id  | patternName | status    | phase |
-| --- | ----------- | --------- | ----- |
-| p1  | PatternA    | active    | 1     |
-| p2  | PatternB    | completed | 1     |
-| p3  | PatternC    | planned   | 2     |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | PatternA | active | 1 |
+| p2 | PatternB | completed | 1 |
+| p3 | PatternC | planned | 2 |
 
 **Summary includes backlog patterns without phase**
 
@@ -56,11 +56,11 @@ using pattern.id (which is always defined) rather than patternName.
 - And phase table shows phase 1 row with Remaining: 1, Active: 1
 - And phase table shows "Backlog" with Remaining: 2, Active: 1
 
-| id  | patternName | status  | phase |
-| --- | ----------- | ------- | ----- |
-| p1  | PatternA    | active  | 1     |
-| p2  | PatternB    | active  |       |
-| p3  | PatternC    | planned |       |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | PatternA | active | 1 |
+| p2 | PatternB | active |  |
+| p3 | PatternC | planned |  |
 
 **All patterns in backlog when none have phases**
 
@@ -70,10 +70,10 @@ using pattern.id (which is always defined) rather than patternName.
 - And summary shows Active count 1
 - And summary shows Total Remaining count 2
 
-| id  | patternName | status  | phase |
-| --- | ----------- | ------- | ----- |
-| p1  | PatternA    | active  |       |
-| p2  | PatternB    | planned |       |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | PatternA | active |  |
+| p2 | PatternB | planned |  |
 
 **Patterns with undefined patternName counted correctly**
 
@@ -83,10 +83,10 @@ using pattern.id (which is always defined) rather than patternName.
 - And no patterns are double-counted
 - And no patterns are missing from count
 
-| id  | patternName | status  | phase |
-| --- | ----------- | ------- | ----- |
-| p1  |             | active  | 1     |
-| p2  |             | planned |       |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 |  | active | 1 |
+| p2 |  | planned |  |
 
 **Mixed patterns with and without patternName**
 
@@ -97,12 +97,12 @@ using pattern.id (which is always defined) rather than patternName.
 - And phase 1 row shows Remaining: 2, Active: 2
 - And backlog row shows Remaining: 2, Active: 0
 
-| id  | patternName | status  | phase |
-| --- | ----------- | ------- | ----- |
-| p1  | PatternA    | active  | 1     |
-| p2  |             | active  | 1     |
-| p3  | PatternC    | planned |       |
-| p4  |             | planned |       |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | PatternA | active | 1 |
+| p2 |  | active | 1 |
+| p3 | PatternC | planned |  |
+| p4 |  | planned |  |
 
 **Multiple phases shown in order**
 
@@ -111,11 +111,11 @@ using pattern.id (which is always defined) rather than patternName.
 - Then phase table shows phases in order: 1, 3, 5
 - And each phase row has correct counts
 
-| id  | patternName | status  | phase |
-| --- | ----------- | ------- | ----- |
-| p1  | A           | active  | 1     |
-| p2  | B           | planned | 5     |
-| p3  | C           | planned | 3     |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | A | active | 1 |
+| p2 | B | planned | 5 |
+| p3 | C | planned | 3 |
 
 **Completed phases not shown in remaining work**
 
@@ -124,11 +124,11 @@ using pattern.id (which is always defined) rather than patternName.
 - Then phase 1 is not shown in phase table
 - And phase 2 is shown with Remaining: 1
 
-| id  | patternName | status    | phase |
-| --- | ----------- | --------- | ----- |
-| p1  | A           | completed | 1     |
-| p2  | B           | completed | 1     |
-| p3  | C           | active    | 2     |
+| id | patternName | status | phase |
+| --- | --- | --- | --- |
+| p1 | A | completed | 1 |
+| p2 | B | completed | 1 |
+| p3 | C | active | 2 |
 
 ## Business Rules
 

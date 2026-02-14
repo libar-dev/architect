@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
-codec system to the DocumentGenerator interface. This enables codec-based
-document generation to work seamlessly with the existing orchestrator.
+  codec system to the DocumentGenerator interface. This enables codec-based
+  document generation to work seamlessly with the existing orchestrator.
 
 ## Acceptance Criteria
 
@@ -43,10 +43,10 @@ document generation to work seamlessly with the existing orchestrator.
 - When the generator generate method is called
 - Then the output should contain a file with path "working/PR-CHANGES.md"
 
-| file              |
-| ----------------- |
+| file |
+| --- |
 | src/core/types.ts |
-| src/api/index.ts  |
+| src/api/index.ts |
 
 ## Business Rules
 

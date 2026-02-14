@@ -6,22 +6,21 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Configuration schemas validate scanner and generator inputs with security
-constraints to prevent path traversal attacks and ensure safe file operations.
+  constraints to prevent path traversal attacks and ensure safe file operations.
 
-**Security focus:**
-
-- Parent directory traversal (..) is blocked in glob patterns
-- Output directories must be within project bounds
-- Registry files must be .json format
-- Symlink bypass attempts are prevented
+  **Security focus:**
+  - Parent directory traversal (..) is blocked in glob patterns
+  - Output directories must be within project bounds
+  - Registry files must be .json format
+  - Symlink bypass attempts are prevented
 
 ## Acceptance Criteria
 
@@ -29,11 +28,11 @@ constraints to prevent path traversal attacks and ensure safe file operations.
 
 - When I validate a scanner config with:
 - Then the scanner config should be valid
-- And the validated patterns should include "src/\*_/_.ts"
+- And the validated patterns should include "src/**/*.ts"
 
-| patterns     | baseDir  |
-| ------------ | -------- |
-| src/\*_/_.ts | /project |
+| patterns | baseDir |
+| --- | --- |
+| src/**/*.ts | /project |
 
 **ScannerConfigSchema accepts multiple patterns**
 
@@ -41,11 +40,11 @@ constraints to prevent path traversal attacks and ensure safe file operations.
 - Then the scanner config should be valid
 - And the validated patterns should have 3 items
 
-| pattern        |
-| -------------- |
-| src/\*_/_.ts   |
-| lib/\*_/_.ts   |
-| tests/\*_/_.ts |
+| pattern |
+| --- |
+| src/**/*.ts |
+| lib/**/*.ts |
+| tests/**/*.ts |
 
 **ScannerConfigSchema rejects empty patterns array**
 
@@ -55,7 +54,7 @@ constraints to prevent path traversal attacks and ensure safe file operations.
 
 **ScannerConfigSchema rejects parent traversal in patterns**
 
-- When I validate a scanner config with pattern "../secret/\*.ts"
+- When I validate a scanner config with pattern "../secret/*.ts"
 - Then the scanner config should be invalid
 - And the validation error should mention "parent directory traversal"
 
@@ -77,10 +76,10 @@ constraints to prevent path traversal attacks and ensure safe file operations.
 - Then the scanner config should be valid
 - And the validated exclude should have 2 items
 
-| pattern           |
-| ----------------- |
-| \*\*/node_modules |
-| \*\*/.git         |
+| pattern |
+| --- |
+| **/node_modules |
+| **/.git |
 
 **GeneratorConfigSchema validates correct configuration**
 
@@ -88,9 +87,9 @@ constraints to prevent path traversal attacks and ensure safe file operations.
 - When I validate a generator config with:
 - Then the generator config should be valid
 
-| outputDir | registryPath  |
-| --------- | ------------- |
-| docs      | registry.json |
+| outputDir | registryPath |
+| --- | --- |
+| docs | registry.json |
 
 **GeneratorConfigSchema requires .json registry file**
 

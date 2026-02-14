@@ -6,27 +6,25 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The session codecs (SessionContextCodec, RemainingWorkCodec)
-transform MasterDataset into RenderableDocuments for AI session context
-and incomplete work aggregation views.
+  transform MasterDataset into RenderableDocuments for AI session context
+  and incomplete work aggregation views.
 
-**Problem:**
+  **Problem:**
+  - Need to generate session context and remaining work documents from patterns
+  - Each view requires different filtering, grouping, and prioritization logic
 
-- Need to generate session context and remaining work documents from patterns
-- Each view requires different filtering, grouping, and prioritization logic
-
-**Solution:**
-
-- Two specialized codecs for session planning perspectives
-- SessionContextCodec focuses on current work and phase navigation
-- RemainingWorkCodec aggregates incomplete work with priority sorting
+  **Solution:**
+  - Two specialized codecs for session planning perspectives
+  - SessionContextCodec focuses on current work and phase navigation
+  - RemainingWorkCodec aggregates incomplete work with priority sorting
 
 ## Acceptance Criteria
 
@@ -45,10 +43,10 @@ and incomplete work aggregation views.
 - Then the document title is "Session Context"
 - And the document contains sections:
 
-| heading        |
-| -------------- |
+| heading |
+| --- |
 | Session Status |
-| Active Work    |
+| Active Work |
 
 **Session status shows current focus**
 
@@ -57,17 +55,17 @@ and incomplete work aggregation views.
 - Then the session status section shows:
 - And the session status shows current focus
 
-| status    | count |
-| --------- | ----- |
-| completed | 3     |
-| active    | 2     |
-| planned   | 5     |
+| status | count |
+| --- | --- |
+| completed | 3 |
+| active | 2 |
+| planned | 5 |
 
-| metric          | value |
-| --------------- | ----- |
-| Active Patterns | 2     |
-| Completed       | 3     |
-| Remaining       | 7     |
+| metric | value |
+| --- | --- |
+| Active Patterns | 2 |
+| Completed | 3 |
+| Remaining | 7 |
 
 **Phase navigation for incomplete phases**
 
@@ -77,11 +75,11 @@ and incomplete work aggregation views.
 - And the phase navigation table has columns:
 - And the phase navigation shows only incomplete phases
 
-| column    |
-| --------- |
-| Phase     |
+| column |
+| --- |
+| Phase |
 | Remaining |
-| Complete  |
+| Complete |
 
 **Active work grouped by phase**
 
@@ -116,10 +114,10 @@ and incomplete work aggregation views.
 - When decoding with generateDetailFiles enabled for session
 - Then the document has session detail files:
 
-| path                                         |
-| -------------------------------------------- |
+| path |
+| --- |
 | sessions/phase-03-event-store-enhancement.md |
-| sessions/phase-04-advanced-projections.md    |
+| sessions/phase-04-advanced-projections.md |
 
 **No detail files when disabled**
 
@@ -141,17 +139,17 @@ and incomplete work aggregation views.
 - Then the document title is "Remaining Work"
 - And the summary table shows:
 
-| status    | count |
-| --------- | ----- |
-| completed | 3     |
-| active    | 2     |
-| planned   | 5     |
+| status | count |
+| --- | --- |
+| completed | 3 |
+| active | 2 |
+| planned | 5 |
 
-| status          | count |
-| --------------- | ----- |
-| Active          | 2     |
-| Planned         | 5     |
-| Total Remaining | 7     |
+| status | count |
+| --- | --- |
+| Active | 2 |
+| Planned | 5 |
+| Total Remaining | 7 |
 
 **Phase navigation with remaining count**
 
@@ -160,12 +158,12 @@ and incomplete work aggregation views.
 - Then the document contains a "By Phase" section
 - And the by phase table has columns:
 
-| column    |
-| --------- |
-| Phase     |
+| column |
+| --- |
+| Phase |
 | Remaining |
-| Active    |
-| Complete  |
+| Active |
+| Complete |
 
 **By priority shows ready vs blocked**
 
@@ -174,11 +172,11 @@ and incomplete work aggregation views.
 - Then the document contains a "By Priority" section
 - And the by priority table shows:
 
-| priority       | present |
-| -------------- | ------- |
-| In Progress    | yes     |
-| Ready to Start | yes     |
-| Blocked        | yes     |
+| priority | present |
+| --- | --- |
+| In Progress | yes |
+| Ready to Start | yes |
+| Blocked | yes |
 
 **Next actionable items section**
 
@@ -211,10 +209,10 @@ and incomplete work aggregation views.
 - When decoding with generateDetailFiles enabled for remaining
 - Then the document has remaining detail files:
 
-| path                                          |
-| --------------------------------------------- |
+| path |
+| --- |
 | remaining/phase-03-event-store-enhancement.md |
-| remaining/phase-04-advanced-projections.md    |
+| remaining/phase-04-advanced-projections.md |
 
 **No detail files when disabled for remaining**
 

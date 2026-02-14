@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Tests for the detectStatusTransitions function that parses git diff output.
-Verifies that status tags inside docstrings are ignored and only file-level
-tags are used for FSM transition validation.
+  Verifies that status tags inside docstrings are ignored and only file-level
+  tags are used for FSM transition validation.
 
 ## Acceptance Criteria
 
@@ -49,12 +49,12 @@ tags are used for FSM transition validation.
 - And the transition is from "roadmap" to "active"
 - And the transition location is at line 2
 
-| line | content                      |
-| ---- | ---------------------------- |
-| 2    | @libar-docs-status:active    |
-| 10   | """                          |
-| 11   | @libar-docs-status:completed |
-| 12   | """                          |
+| line | content |
+| --- | --- |
+| 2 | @libar-docs-status:active |
+| 10 | """ |
+| 11 | @libar-docs-status:completed |
+| 12 | """ |
 
 **Multiple docstring status tags are all ignored**
 
@@ -64,15 +64,15 @@ tags are used for FSM transition validation.
 - And the transition is from "roadmap" to "active"
 - And the all-detected-tags list has 3 entries
 
-| line | content                      |
-| ---- | ---------------------------- |
-| 2    | @libar-docs-status:active    |
-| 15   | """                          |
-| 16   | @libar-docs-status:roadmap   |
-| 17   | """                          |
-| 30   | """                          |
-| 31   | @libar-docs-status:completed |
-| 32   | """                          |
+| line | content |
+| --- | --- |
+| 2 | @libar-docs-status:active |
+| 15 | """ |
+| 16 | @libar-docs-status:roadmap |
+| 17 | """ |
+| 30 | """ |
+| 31 | @libar-docs-status:completed |
+| 32 | """ |
 
 **Only docstring status tags results in no transition**
 
@@ -80,11 +80,11 @@ tags are used for FSM transition validation.
 - When detecting status transitions
 - Then no transition is detected for "specs/only-docstring.feature"
 
-| line | content                   |
-| ---- | ------------------------- |
-| 5    | """                       |
-| 6    | @libar-docs-status:active |
-| 7    | """                       |
+| line | content |
+| --- | --- |
+| 5 | """ |
+| 6 | @libar-docs-status:active |
+| 7 | """ |
 
 **First file-level tag wins over subsequent tags**
 
@@ -94,10 +94,10 @@ tags are used for FSM transition validation.
 - And the transition is from "roadmap" to "active"
 - And the transition location is at line 2
 
-| line | content                      |
-| ---- | ---------------------------- |
-| 2    | @libar-docs-status:active    |
-| 50   | @libar-docs-status:completed |
+| line | content |
+| --- | --- |
+| 2 | @libar-docs-status:active |
+| 50 | @libar-docs-status:completed |
 
 **Transition location includes correct line number**
 

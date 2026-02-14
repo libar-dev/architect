@@ -6,42 +6,41 @@
 
 ## Overview
 
-| Property       | Value                                      |
-| -------------- | ------------------------------------------ |
-| Status         | planned                                    |
-| Product Area   | Validation                                 |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Validation |
 | Business Value | enable process guard on large repositories |
-| Phase          | 99                                         |
+| Phase | 99 |
 
 ## Description
 
 **Problem:**
-The process guard (`lint-process --all`) fails with `ENOBUFS` error on large
-repositories. The current implementation uses `execSync` which buffers the
-entire `git diff` output in memory. When comparing against `main` in repos
-with hundreds of changed files, the diff output can exceed Node.js buffer
-limits (~1MB default), causing the pipe to overflow.
+  The process guard (`lint-process --all`) fails with `ENOBUFS` error on large
+  repositories. The current implementation uses `execSync` which buffers the
+  entire `git diff` output in memory. When comparing against `main` in repos
+  with hundreds of changed files, the diff output can exceed Node.js buffer
+  limits (~1MB default), causing the pipe to overflow.
 
-This prevents using `--all` mode in CI/CD pipelines for production repositories.
+  This prevents using `--all` mode in CI/CD pipelines for production repositories.
 
-**Solution:**
-Replace synchronous buffered git execution with streaming approach:
+  **Solution:**
+  Replace synchronous buffered git execution with streaming approach:
 
-1. Use `spawn` instead of `execSync` for git diff commands
-2. Process diff output line-by-line as it streams
-3. Extract status transitions and deliverable changes incrementally
-4. Never hold full diff content in memory
+  1. Use `spawn` instead of `execSync` for git diff commands
+  2. Process diff output line-by-line as it streams
+  3. Extract status transitions and deliverable changes incrementally
+  4. Never hold full diff content in memory
 
-**Design Principles:**
+  **Design Principles:**
+  - Constant memory usage regardless of diff size
+  - Same validation results as current implementation
+  - Backward compatible - no CLI changes required
+  - Async/await API for streaming operations
 
-- Constant memory usage regardless of diff size
-- Same validation results as current implementation
-- Backward compatible - no CLI changes required
-- Async/await API for streaming operations
-
-**Scope:**
-Only `detect-changes.ts` requires modification. The `deriveProcessState`
-and validation logic remain unchanged - they receive the same data structures.
+  **Scope:**
+  Only `detect-changes.ts` requires modification. The `deriveProcessState`
+  and validation logic remain unchanged - they receive the same data structures.
 
 ## Acceptance Criteria
 

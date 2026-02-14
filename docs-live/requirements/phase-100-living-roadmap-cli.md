@@ -6,32 +6,31 @@
 
 ## Overview
 
-| Property       | Value                               |
-| -------------- | ----------------------------------- |
-| Status         | planned                             |
-| Product Area   | Process                             |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Process |
 | Business Value | query roadmap with natural language |
-| Phase          | 100                                 |
+| Phase | 100 |
 
 ## Description
 
 **Problem:**
-Roadmap is a static document that requires regeneration.
-No interactive way to answer "what's next?" or "what's blocked?"
-Critical path analysis requires manual inspection.
+  Roadmap is a static document that requires regeneration.
+  No interactive way to answer "what's next?" or "what's blocked?"
+  Critical path analysis requires manual inspection.
 
-**Solution:**
-Add interactive CLI commands for roadmap queries:
+  **Solution:**
+  Add interactive CLI commands for roadmap queries:
+  - `pnpm roadmap:next` - Show next actionable phase
+  - `pnpm roadmap:blocked` - Show phases waiting on dependencies
+  - `pnpm roadmap:path-to --phase N` - Show critical path to target
+  - `pnpm roadmap:status` - Quick summary (completed/active/roadmap counts)
 
-- `pnpm roadmap:next` - Show next actionable phase
-- `pnpm roadmap:blocked` - Show phases waiting on dependencies
-- `pnpm roadmap:path-to --phase N` - Show critical path to target
-- `pnpm roadmap:status` - Quick summary (completed/active/roadmap counts)
+  This is the capstone for Setup A (Framework Roadmap OS).
+  Transforms roadmap from "document to maintain" to "queries over reality".
 
-This is the capstone for Setup A (Framework Roadmap OS).
-Transforms roadmap from "document to maintain" to "queries over reality".
-
-Implements Convergence Opportunity 8: Living Roadmap That Compiles.
+  Implements Convergence Opportunity 8: Living Roadmap That Compiles.
 
 ## Acceptance Criteria
 

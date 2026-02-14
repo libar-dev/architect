@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Tables in business rule descriptions should appear exactly once in output.
-The extractTables() function extracts tables for proper formatting, and
-stripMarkdownTables() removes them from the raw text to prevent duplicates.
+  The extractTables() function extracts tables for proper formatting, and
+  stripMarkdownTables() removes them from the raw text to prevent duplicates.
 
 ## Acceptance Criteria
 
@@ -29,10 +29,10 @@ stripMarkdownTables() removes them from the raw text to prevent duplicates.
 ```markdown
 Categories must be valid.
 
-| Category  | Purpose      |
-| --------- | ------------ |
+| Category | Purpose |
+| --- | --- |
 | aggregate | State change |
-| process   | Workflow     |
+| process | Workflow |
 ```
 
 **Table is extracted and properly formatted**
@@ -72,8 +72,8 @@ Second table:
 Introduction text.
 
 | Col1 | Col2 |
-| ---- | ---- |
-| A    | B    |
+| --- | --- |
+| A | B |
 
 Conclusion text.
 ```

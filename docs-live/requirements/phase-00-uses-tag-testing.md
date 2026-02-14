@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | active     |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | Annotation |
 
 ## Description
 
 Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by
-relationship tags from TypeScript files.
+  relationship tags from TypeScript files.
 
 ## Acceptance Criteria
 
@@ -106,8 +106,8 @@ export class Foundation {}
 - Then "ServiceA" should have uses containing "ServiceB"
 - And "ServiceC" should have uses containing "ServiceB"
 
-| name     | uses     |
-| -------- | -------- |
+| name | uses |
+| --- | --- |
 | ServiceA | ServiceB |
 | ServiceC | ServiceB |
 
@@ -147,7 +147,7 @@ _Verified by: Single used-by value extracted, Multiple used-by values extracted 
 **Uses relationships are stored in relationship index**
 
 The relationship index stores uses and usedBy relationships directly
-from pattern metadata. Unlike implements, these are explicit declarations.
+    from pattern metadata. Unlike implements, these are explicit declarations.
 
 _Verified by: Uses relationships stored in relationship index, UsedBy relationships stored explicitly_
 

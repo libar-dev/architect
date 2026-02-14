@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 As a documentation generator
-I want architecture tags extracted from source code
-So that I can generate accurate architecture diagrams
+  I want architecture tags extracted from source code
+  So that I can generate accurate architecture diagrams
 
 ## Acceptance Criteria
 
@@ -193,22 +193,22 @@ export const noArchTags = {};
 **arch-role tag is defined in the registry**
 
 Architecture roles classify components for diagram rendering.
-Valid roles: command-handler, projection, saga, process-manager,
-infrastructure, repository, decider, read-model, bounded-context.
+    Valid roles: command-handler, projection, saga, process-manager,
+    infrastructure, repository, decider, read-model, bounded-context.
 
 _Verified by: arch-role tag exists with enum format, arch-role has required enum values_
 
 **arch-context tag is defined in the registry**
 
 Context tags group components into bounded context subgraphs.
-Format is "value" (free-form string like "orders", "inventory").
+    Format is "value" (free-form string like "orders", "inventory").
 
 _Verified by: arch-context tag exists with value format_
 
 **arch-layer tag is defined in the registry**
 
 Layer tags enable layered architecture diagrams.
-Valid layers: domain, application, infrastructure.
+    Valid layers: domain, application, infrastructure.
 
 _Verified by: arch-layer tag exists with enum format, arch-layer has exactly three values_
 

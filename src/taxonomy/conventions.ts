@@ -21,6 +21,7 @@ export const CONVENTION_VALUES = [
   'pipeline-architecture',
   'publishing',
   'doc-generation',
+  'taxonomy-rules',
 ] as const;
 
 export type ConventionValue = (typeof CONVENTION_VALUES)[number];

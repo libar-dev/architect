@@ -6,39 +6,39 @@
 
 ## Overview
 
-| Property       | Value                                                            |
-| -------------- | ---------------------------------------------------------------- |
-| Status         | completed                                                        |
-| Product Area   | Generation                                                       |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Generation |
 | Business Value | enables selective pattern composition with architecture diagrams |
-| Phase          | 28                                                               |
+| Phase | 28 |
 
 ## Description
 
 **Problem:**
-Full architecture diagrams show every annotated pattern in the project. For focused
-use cases -- design session context, PR descriptions, CLAUDE.md module sections --
-developers need views scoped to a small set of relevant patterns with their immediate
-neighbors. Manually curating diagram content defeats the code-first principle.
+  Full architecture diagrams show every annotated pattern in the project. For focused
+  use cases -- design session context, PR descriptions, CLAUDE.md module sections --
+  developers need views scoped to a small set of relevant patterns with their immediate
+  neighbors. Manually curating diagram content defeats the code-first principle.
 
-**Solution:**
-A `DiagramScope` filter interface that selects patterns by three dimensions
-(`archContext`, `archView`, or explicit pattern names), automatically discovers
-neighbor patterns via relationship edges, and renders scoped Mermaid diagrams
-with subgraph grouping and distinct neighbor styling.
+  **Solution:**
+  A `DiagramScope` filter interface that selects patterns by three dimensions
+  (`archContext`, `archView`, or explicit pattern names), automatically discovers
+  neighbor patterns via relationship edges, and renders scoped Mermaid diagrams
+  with subgraph grouping and distinct neighbor styling.
 
-The `arch-view` tag enables patterns to declare membership in named architectural
-views (e.g., `codec-transformation`, `pipeline-stages`). A single pattern can
-belong to multiple views. The transformer groups patterns by view in the
-`ArchIndex.byView` pre-computed index for O(1) access at render time.
+  The `arch-view` tag enables patterns to declare membership in named architectural
+  views (e.g., `codec-transformation`, `pipeline-stages`). A single pattern can
+  belong to multiple views. The transformer groups patterns by view in the
+  `ArchIndex.byView` pre-computed index for O(1) access at render time.
 
-**Why It Matters:**
-| Benefit | How |
-| Focused context for AI sessions | Select 3-5 patterns instead of 50+ |
-| Automatic neighbor discovery | Related patterns appear without explicit listing |
-| Multiple views per pattern | One annotation, many documents |
-| Two detail levels from one config | Detailed (with diagram) and summary (table only) |
-| Reusable across document types | PR descriptions, CLAUDE.md, design context |
+  **Why It Matters:**
+  | Benefit | How |
+  | Focused context for AI sessions | Select 3-5 patterns instead of 50+ |
+  | Automatic neighbor discovery | Related patterns appear without explicit listing |
+  | Multiple views per pattern | One annotation, many documents |
+  | Two detail levels from one config | Detailed (with diagram) and summary (table only) |
+  | Reusable across document types | PR descriptions, CLAUDE.md, design context |
 
 ## Acceptance Criteria
 
@@ -100,9 +100,9 @@ belong to multiple views. The transformer groups patterns by view in the
 **Scope filtering selects patterns by context, view, or name**
 
 **Invariant:** A pattern matches a DiagramScope if ANY of three conditions hold:
-its name is in `scope.patterns`, its `archContext` is in `scope.archContext`,
-or any of its `archView` entries is in `scope.archView`. These dimensions are
-OR'd together -- a pattern need only match one.
+    its name is in `scope.patterns`, its `archContext` is in `scope.archContext`,
+    or any of its `archView` entries is in `scope.archView`. These dimensions are
+    OR'd together -- a pattern need only match one.
 
     **Rationale:** Three filter dimensions cover different authoring workflows.
     Explicit names for ad-hoc documents, archContext for bounded context views,
@@ -116,8 +116,8 @@ _Verified by: archContext filter matches patterns in that context, archView filt
 **Neighbor discovery finds connected patterns outside scope**
 
 **Invariant:** Patterns connected to scope patterns via relationship edges
-(uses, dependsOn, implementsPatterns, extendsPattern) but NOT themselves in
-scope appear in a "Related" subgraph with dashed border styling.
+    (uses, dependsOn, implementsPatterns, extendsPattern) but NOT themselves in
+    scope appear in a "Related" subgraph with dashed border styling.
 
     **Rationale:** Scoped views need context. Showing only in-scope patterns
     without their dependencies loses critical relationship information.
@@ -130,8 +130,8 @@ _Verified by: Neighbor patterns appear with dashed styling, Self-contained scope
 **Multiple diagram scopes compose in sequence**
 
 **Invariant:** When `diagramScopes` is an array, each scope produces its own
-Mermaid diagram section with independent title, direction, and pattern selection.
-At summary detail level, all diagrams are suppressed.
+    Mermaid diagram section with independent title, direction, and pattern selection.
+    At summary detail level, all diagrams are suppressed.
 
     **Rationale:** A single reference document may need multiple architectural
     perspectives. Pipeline Overview shows both a codec transformation view (TB)

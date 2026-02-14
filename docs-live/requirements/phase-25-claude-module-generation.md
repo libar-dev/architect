@@ -6,44 +6,42 @@
 
 ## Overview
 
-| Property       | Value                                   |
-| -------------- | --------------------------------------- |
-| Status         | planned                                 |
-| Product Area   | Generation                              |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | Generation |
 | Business Value | automated claude md modules from source |
-| Phase          | 25                                      |
+| Phase | 25 |
 
 ## Description
 
 **Problem:** CLAUDE.md modules are hand-written markdown files that drift from source
-code over time. When behavior specs or implementation details change, module content
-becomes stale. Manual synchronization is tedious and error-prone. Different consumers
-need different detail levels (compact for AI context, detailed for human reference).
+  code over time. When behavior specs or implementation details change, module content
+  becomes stale. Manual synchronization is tedious and error-prone. Different consumers
+  need different detail levels (compact for AI context, detailed for human reference).
 
-**Solution:** Generate CLAUDE.md modules directly from behavior spec feature files using
-dedicated `claude-*` tags. The same source generates both:
+  **Solution:** Generate CLAUDE.md modules directly from behavior spec feature files using
+  dedicated `claude-*` tags. The same source generates both:
+  - Compact modules for `_claude-md/` (AI context optimized)
+  - Detailed documentation for `docs/` (human reference, progressive disclosure)
 
-- Compact modules for `_claude-md/` (AI context optimized)
-- Detailed documentation for `docs/` (human reference, progressive disclosure)
+  Three tags control module generation:
+  - `@libar-docs-claude-module` - Module identifier (becomes filename)
+  - `@libar-docs-claude-section` - Target section directory in `_claude-md/`
+  - `@libar-docs-claude-tags` - Tags for variation filtering in modular-claude-md
 
-Three tags control module generation:
+  **Why It Matters:**
+  | Benefit | How |
+  | Single source of truth | Behavior specs ARE the module content |
+  | Always-current modules | Generated on each docs build |
+  | Progressive disclosure | Same source → compact module + detailed docs |
+  | Preserves Rule structure | `Rule:` blocks become module sections |
+  | Extracts decision tables | `Scenario Outline Examples:` become lookup tables |
+  | CLI integration | `pnpm docs:claude-modules` via generator registry |
 
-- `@libar-docs-claude-module` - Module identifier (becomes filename)
-- `@libar-docs-claude-section` - Target section directory in `_claude-md/`
-- `@libar-docs-claude-tags` - Tags for variation filtering in modular-claude-md
-
-**Why It Matters:**
-| Benefit | How |
-| Single source of truth | Behavior specs ARE the module content |
-| Always-current modules | Generated on each docs build |
-| Progressive disclosure | Same source → compact module + detailed docs |
-| Preserves Rule structure | `Rule:` blocks become module sections |
-| Extracts decision tables | `Scenario Outline Examples:` become lookup tables |
-| CLI integration | `pnpm docs:claude-modules` via generator registry |
-
-**Prototype Example:**
-The Process Guard behavior spec (`tests/features/validation/process-guard.feature`)
-generates both `_claude-md/delivery-process/process-guard.md` and detailed docs.
+  **Prototype Example:**
+  The Process Guard behavior spec (`tests/features/validation/process-guard.feature`)
+  generates both `_claude-md/delivery-process/process-guard.md` and detailed docs.
 
 ## Acceptance Criteria
 
@@ -207,8 +205,6 @@ pnpm lint-process --staged
 ```
 ````
 
-````
-
 **See-also link to full documentation is included**
 
 - Given a pattern with claude-module "process-guard"
@@ -274,7 +270,7 @@ generate-docs \
   --features 'tests/features/behavior/**/*.feature' \
   --generators claude-modules \
   --output _claude-md
-````
+```
 
 **Generator supports fullDocsPath option**
 
@@ -308,7 +304,7 @@ generate-docs \
 **Claude module tags exist in the tag registry**
 
 **Invariant:** Three claude-specific tags (`claude-module`, `claude-section`,
-`claude-tags`) must exist in the tag registry with correct format and values.
+    `claude-tags`) must exist in the tag registry with correct format and values.
 
     **Rationale:** Module generation requires metadata to determine output path,
     section placement, and variation filtering. Standard tag infrastructure enables
@@ -322,7 +318,7 @@ _Verified by: Tag registry contains claude-module, Tag registry contains claude-
 **Gherkin parser extracts claude module tags from feature files**
 
 **Invariant:** The Gherkin extractor must extract `claude-module`, `claude-section`,
-and `claude-tags` from feature file tags into ExtractedPattern objects.
+    and `claude-tags` from feature file tags into ExtractedPattern objects.
 
     **Rationale:** Behavior specs are the source of truth for CLAUDE.md module content.
     Parser must extract module metadata alongside existing pattern metadata.
@@ -335,7 +331,7 @@ _Verified by: Extract claude-module from feature tags, Extract claude-section fr
 **Module content is extracted from feature file structure**
 
 **Invariant:** The codec must extract content from standard feature file elements:
-Feature description (Problem/Solution), Rule blocks, and Scenario Outline Examples.
+    Feature description (Problem/Solution), Rule blocks, and Scenario Outline Examples.
 
     **Rationale:** Behavior specs already contain well-structured, prescriptive content.
     The extraction preserves structure rather than flattening to prose.
@@ -348,7 +344,7 @@ _Verified by: Feature description becomes module introduction, Rule blocks becom
 **ClaudeModuleCodec produces compact markdown modules**
 
 **Invariant:** The codec transforms patterns with claude tags into markdown files
-suitable for the `_claude-md/` directory structure.
+    suitable for the `_claude-md/` directory structure.
 
     **Rationale:** CLAUDE.md modules must be compact and actionable. The codec
     produces ready-to-use markdown without truncation (let modular-claude-md
@@ -362,7 +358,7 @@ _Verified by: Module uses correct heading levels, Tables from rule descriptions 
 **Claude module generator writes files to correct locations**
 
 **Invariant:** The generator must write module files to `{outputDir}/{section}/{module}.md`
-based on the `claude-section` and `claude-module` tags.
+    based on the `claude-section` and `claude-module` tags.
 
     **Rationale:** Output path structure must match modular-claude-md expectations.
     The `claude-section` determines the subdirectory, `claude-module` determines filename.
@@ -375,7 +371,7 @@ _Verified by: Output path uses section as directory, Multiple modules generated 
 **Claude module generator is registered with generator registry**
 
 **Invariant:** A "claude-modules" generator must be registered with the generator
-registry to enable `pnpm docs:claude-modules` via the existing CLI.
+    registry to enable `pnpm docs:claude-modules` via the existing CLI.
 
     **Rationale:** Consistent with architecture-diagram-generation pattern. New
     generators register with the orchestrator rather than creating separate commands.
@@ -387,7 +383,7 @@ _Verified by: Generator is registered with name "claude-modules", CLI command ge
 **Same source generates detailed docs with progressive disclosure**
 
 **Invariant:** When running with `detailLevel: "detailed"`, the codec produces
-expanded documentation including all Rule content, code examples, and scenario details.
+    expanded documentation including all Rule content, code examples, and scenario details.
 
     **Rationale:** Single source generates both compact modules (AI context) and
     detailed docs (human reference). Progressive disclosure is already a codec capability.

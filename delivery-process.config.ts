@@ -31,7 +31,7 @@ export default defineConfig({
   referenceDocConfigs: [
     {
       title: 'Reference Generation Sample',
-      conventionTags: [],
+      conventionTags: ['taxonomy-rules'],
       shapeSources: [],
       shapeSelectors: [
         { group: 'reference-sample' },
@@ -50,6 +50,27 @@ export default defineConfig({
           title: 'Renderer Pipeline',
           diagramType: 'sequenceDiagram',
           showEdgeLabels: true,
+        },
+        {
+          archContext: ['generator'],
+          title: 'Generator Class Model',
+          diagramType: 'classDiagram',
+        },
+        {
+          archContext: ['validation'],
+          title: 'Validation State Model',
+          diagramType: 'stateDiagram-v2',
+          showEdgeLabels: false,
+        },
+        {
+          archContext: ['scanner', 'extractor'],
+          title: 'Scanning & Extraction Boundary',
+          diagramType: 'C4Context',
+        },
+        {
+          archLayer: ['domain'],
+          direction: 'LR',
+          title: 'Domain Layer Overview',
         },
       ],
       claudeMdSection: 'architecture',

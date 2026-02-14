@@ -6,31 +6,29 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 All JSON parsing and serialization uses type-safe Zod codec pattern,
-replacing raw JSON.parse/stringify with single-step validated operations.
+  replacing raw JSON.parse/stringify with single-step validated operations.
 
-**Problem:**
+  **Problem:**
+  - Raw JSON.parse returns unknown/any types, losing type safety at runtime
+  - JSON.stringify doesn't validate output matches expected schema
+  - Error handling for malformed JSON scattered across codebase
+  - No structured validation errors with field-level details
+  - $schema fields from JSON Schema files cause Zod strict mode failures
 
-- Raw JSON.parse returns unknown/any types, losing type safety at runtime
-- JSON.stringify doesn't validate output matches expected schema
-- Error handling for malformed JSON scattered across codebase
-- No structured validation errors with field-level details
-- $schema fields from JSON Schema files cause Zod strict mode failures
-
-**Solution:**
-
-- Input codec (createJsonInputCodec) combines parsing + validation in one step
-- Output codec (createJsonOutputCodec) validates before serialization
-- Structured CodecError type with operation, source, and validation details
-- $schema stripping before validation for JSON Schema compatibility
-- formatCodecError utility for consistent human-readable error output
+  **Solution:**
+  - Input codec (createJsonInputCodec) combines parsing + validation in one step
+  - Output codec (createJsonOutputCodec) validates before serialization
+  - Structured CodecError type with operation, source, and validation details
+  - $schema stripping before validation for JSON Schema compatibility
+  - formatCodecError utility for consistent human-readable error output
 
 ## Acceptance Criteria
 
@@ -65,8 +63,8 @@ replacing raw JSON.parse/stringify with single-step validated operations.
 - And the validation errors should mention fields:
 
 | field |
-| ----- |
-| name  |
+| --- |
+| name |
 | count |
 
 **Input codec strips $schema field before validation**
@@ -112,13 +110,13 @@ replacing raw JSON.parse/stringify with single-step validated operations.
 - Then the serialize result should be successful
 - And the serialized JSON should be parseable
 
-| field             | value |
-| ----------------- | ----- |
-| errors            | 2     |
-| warnings          | 1     |
-| info              | 0     |
-| filesScanned      | 10    |
-| directivesChecked | 25    |
+| field | value |
+| --- | --- |
+| errors | 2 |
+| warnings | 1 |
+| info | 0 |
+| filesScanned | 10 |
+| directivesChecked | 25 |
 
 **LintOutputSchema rejects invalid severity**
 
@@ -134,13 +132,13 @@ replacing raw JSON.parse/stringify with single-step validated operations.
 - Then the serialize result should be successful
 - And the serialized JSON should be parseable
 
-| field               | value |
-| ------------------- | ----- |
-| typescriptPatterns  | 15    |
-| gherkinPatterns     | 12    |
-| matched             | 10    |
-| missingInGherkin    | 5     |
-| missingInTypeScript | 2     |
+| field | value |
+| --- | --- |
+| typescriptPatterns | 15 |
+| gherkinPatterns | 12 |
+| matched | 10 |
+| missingInGherkin | 5 |
+| missingInTypeScript | 2 |
 
 **ValidationSummaryOutputSchema rejects invalid issue source**
 
@@ -162,16 +160,16 @@ replacing raw JSON.parse/stringify with single-step validated operations.
 - When I format the codec error
 - Then the formatted output should contain all of:
 
-| path  | message         |
-| ----- | --------------- |
-| name  | Expected string |
+| path | message |
+| --- | --- |
+| name | Expected string |
 | count | Expected number |
 
-| text                   |
-| ---------------------- |
-| Codec error            |
-| Validation errors:     |
-| name: Expected string  |
+| text |
+| --- |
+| Codec error |
+| Validation errors: |
+| name: Expected string |
 | count: Expected number |
 
 **safeParse returns typed value on valid JSON**

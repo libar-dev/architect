@@ -6,39 +6,38 @@
 
 ## Overview
 
-| Property       | Value                                     |
-| -------------- | ----------------------------------------- |
-| Status         | planned                                   |
-| Product Area   | DataAPI                                   |
+| Property | Value |
+| --- | --- |
+| Status | planned |
+| Product Area | DataAPI |
 | Business Value | fast interactive cli for repeated queries |
-| Phase          | 25                                        |
+| Phase | 25 |
 
 ## Description
 
 **Problem:**
-The process-api CLI runs the full pipeline (scan, extract, transform) on every
-invocation, taking 2-5 seconds. During design sessions with 10-20 queries, this
-adds up to 1-2 minutes of waiting. There is no way to keep the pipeline loaded
-between queries. Per-subcommand help is missing -- `process-api context --help`
-does not work. FSM-only queries (like `isValidTransition`) run the full pipeline
-even though FSM rules are static.
+  The process-api CLI runs the full pipeline (scan, extract, transform) on every
+  invocation, taking 2-5 seconds. During design sessions with 10-20 queries, this
+  adds up to 1-2 minutes of waiting. There is no way to keep the pipeline loaded
+  between queries. Per-subcommand help is missing -- `process-api context --help`
+  does not work. FSM-only queries (like `isValidTransition`) run the full pipeline
+  even though FSM rules are static.
 
-**Solution:**
-Add performance and ergonomic improvements:
+  **Solution:**
+  Add performance and ergonomic improvements:
+  1. **Pipeline caching** -- Cache MasterDataset to temp file with mtime invalidation
+  2. **REPL mode** -- `process-api repl` keeps pipeline loaded for interactive queries
+  3. **FSM short-circuit** -- FSM queries skip the scan pipeline entirely
+  4. **Per-subcommand help** -- `process-api <subcommand> --help` with examples
+  5. **Dry-run mode** -- `--dry-run` shows what would be scanned without running
+  6. **Validation summary** -- Include pipeline health in response metadata
 
-1. **Pipeline caching** -- Cache MasterDataset to temp file with mtime invalidation
-2. **REPL mode** -- `process-api repl` keeps pipeline loaded for interactive queries
-3. **FSM short-circuit** -- FSM queries skip the scan pipeline entirely
-4. **Per-subcommand help** -- `process-api <subcommand> --help` with examples
-5. **Dry-run mode** -- `--dry-run` shows what would be scanned without running
-6. **Validation summary** -- Include pipeline health in response metadata
-
-**Business Value:**
-| Benefit | Impact |
-| Cached queries | 2-5s to <100ms for repeated queries |
-| REPL mode | Interactive exploration during sessions |
-| FSM short-circuit | Instant transition checks |
-| Per-subcommand help | Self-documenting for AI agents |
+  **Business Value:**
+  | Benefit | Impact |
+  | Cached queries | 2-5s to <100ms for repeated queries |
+  | REPL mode | Interactive exploration during sessions |
+  | FSM short-circuit | Instant transition checks |
+  | Per-subcommand help | Self-documenting for AI agents |
 
 ## Acceptance Criteria
 
@@ -100,7 +99,7 @@ Add performance and ergonomic improvements:
 **MasterDataset is cached between invocations with file-change invalidation**
 
 **Invariant:** Cache is automatically invalidated when any source file
-(TypeScript or Gherkin) has a modification time newer than the cache.
+    (TypeScript or Gherkin) has a modification time newer than the cache.
 
     **Rationale:** The pipeline (scan -> extract -> transform) runs fresh on every
     invocation (~2-5 seconds). Most queries during a session don't need fresh data
@@ -115,7 +114,7 @@ _Verified by: Second query uses cached dataset, Cache invalidated on source file
 **REPL mode keeps pipeline loaded for interactive multi-query sessions**
 
 **Invariant:** REPL mode loads the pipeline once and accepts multiple queries
-on stdin, with optional tab completion for pattern names and subcommands.
+    on stdin, with optional tab completion for pattern names and subcommands.
 
     **Rationale:** Design sessions often involve 10-20 exploratory queries in
     sequence (check status, look up pattern, check deps, look up another pattern).
@@ -128,7 +127,7 @@ _Verified by: REPL accepts multiple queries, REPL reloads on source change notif
 **Per-subcommand help and diagnostic modes aid discoverability**
 
 **Invariant:** Every subcommand supports `--help` with usage, flags, and
-examples. Dry-run shows pipeline scope without executing.
+    examples. Dry-run shows pipeline scope without executing.
 
     **Rationale:** AI agents read `--help` output to discover available
     commands and flags. Without per-subcommand help, agents must read external

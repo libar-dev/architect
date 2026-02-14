@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description
 
 Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
-and formatOverview() plain text rendering functions.
+  and formatOverview() plain text rendering functions.
 
 ## Acceptance Criteria
 
@@ -24,10 +24,10 @@ and formatOverview() plain text rendering functions.
 - When I format the bundle
 - Then the output contains all expected sections
 
-| section              |
-| -------------------- |
-| === PATTERN:         |
-| === STUBS ===        |
+| section |
+| --- |
+| === PATTERN: |
+| === STUBS === |
 | === DEPENDENCIES === |
 | === DELIVERABLES === |
 
@@ -38,10 +38,10 @@ and formatOverview() plain text rendering functions.
 - Then the output contains all expected sections
 - And the output contains checkbox markers
 
-| section              |
-| -------------------- |
+| section |
+| --- |
 | === DELIVERABLES === |
-| === FSM ===          |
+| === FSM === |
 
 **Tree renders with arrows and focal marker**
 
@@ -49,9 +49,9 @@ and formatOverview() plain text rendering functions.
 - When I format the tree
 - Then the output contains all expected sections
 
-| section         |
-| --------------- |
-| ->              |
+| section |
+| --- |
+| -> |
 | <- YOU ARE HERE |
 
 **Overview renders progress line**
@@ -60,10 +60,10 @@ and formatOverview() plain text rendering functions.
 - When I format the overview
 - Then the output contains all expected sections
 
-| section          |
-| ---------------- |
-| 69 patterns      |
-| 52%              |
+| section |
+| --- |
+| 69 patterns |
+| 52% |
 | === PROGRESS === |
 
 **File list renders primary and dependency sections**

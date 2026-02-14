@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 Validates the Decision Doc Codec that parses decision documents (ADR/PDR
-in .feature format) and extracts content for documentation generation.
+  in .feature format) and extracts content for documentation generation.
 
 ## Acceptance Criteria
 
@@ -27,11 +27,11 @@ in .feature format) and extracts content for documentation generation.
 - And consequences should have 1 rule
 - And other should have 0 rules
 
-| Name                       | Description             |
-| -------------------------- | ----------------------- |
-| Context - Why we need this | Background explanation  |
-| Decision - How it works    | Implementation approach |
-| Consequences - Trade-offs  | Benefits and costs      |
+| Name | Description |
+| --- | --- |
+| Context - Why we need this | Background explanation |
+| Decision - How it works | Implementation approach |
+| Consequences - Trade-offs | Benefits and costs |
 
 **Non-standard rules go to other category**
 
@@ -40,10 +40,10 @@ in .feature format) and extracts content for documentation generation.
 - Then other should have 2 rules
 - And context should have 0 rules
 
-| Name                     | Description            |
-| ------------------------ | ---------------------- |
-| Proof of Concept - Demo  | Example implementation |
-| Expected Output - Format | Output specification   |
+| Name | Description |
+| --- | --- |
+| Proof of Concept - Demo | Example implementation |
+| Expected Output - Format | Output specification |
 
 **Extract single DocString**
 
@@ -139,9 +139,9 @@ in .feature format) and extracts content for documentation generation.
 - When finding rule "Context - Problem"
 - Then the found rule should have name "Context - Problem"
 
-| Name                | Description              |
-| ------------------- | ------------------------ |
-| Context - Problem   | The problem description  |
+| Name | Description |
+| --- | --- |
+| Context - Problem | The problem description |
 | Decision - Solution | The solution description |
 
 **Find rule by partial name**
@@ -150,10 +150,10 @@ in .feature format) and extracts content for documentation generation.
 - When finding rule "Context"
 - Then the found rule should have name "Context - Why we need this feature"
 
-| Name                                   | Description |
-| -------------------------------------- | ----------- |
-| Context - Why we need this feature     | Background  |
-| Decision - The implementation approach | Solution    |
+| Name | Description |
+| --- | --- |
+| Context - Why we need this feature | Background |
+| Decision - The implementation approach | Solution |
 
 **Rule not found returns undefined**
 
@@ -161,8 +161,8 @@ in .feature format) and extracts content for documentation generation.
 - When finding rule "NonExistent"
 - Then no rule should be found
 
-| Name              | Description |
-| ----------------- | ----------- |
+| Name | Description |
+| --- | --- |
 | Context - Problem | Description |
 
 ## Business Rules
@@ -170,8 +170,8 @@ in .feature format) and extracts content for documentation generation.
 **Rule blocks are partitioned by semantic prefix**
 
 Decision documents use Rule: blocks with semantic prefixes to organize
-content into Context, Decision, and Consequences sections (standard ADR
-format). Additional rules (like "Proof of Concept") are classified as other.
+    content into Context, Decision, and Consequences sections (standard ADR
+    format). Additional rules (like "Proof of Concept") are classified as other.
 
 _Verified by: Partition rules into ADR sections, Non-standard rules go to other category_
 
@@ -190,7 +190,7 @@ _Verified by: Parse basic source mapping table, No source mapping returns empty_
 **Self-reference markers are correctly detected**
 
 Source files can reference the current decision document using special
-markers like "THIS DECISION", "THIS DECISION (Rule: X)", etc.
+    markers like "THIS DECISION", "THIS DECISION (Rule: X)", etc.
 
 _Verified by: Detect THIS DECISION marker, Detect THIS DECISION with Rule, Regular file path is not self-reference, Parse self-reference types, Parse self-reference with rule name_
 

@@ -6,29 +6,27 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Validation |
 
 ## Description
 
 Detects violations of the dual-source documentation architecture and
-process hygiene issues that lead to documentation drift.
+  process hygiene issues that lead to documentation drift.
 
-**Problem:**
+  **Problem:**
+  - Dependencies in features (should be code-only) cause drift
+  - Process metadata in code (should be features-only) violates separation
+  - Generator hints in features create tight coupling
+  - Large feature files are hard to maintain
 
-- Dependencies in features (should be code-only) cause drift
-- Process metadata in code (should be features-only) violates separation
-- Generator hints in features create tight coupling
-- Large feature files are hard to maintain
-
-**Solution:**
-
-- detectProcessInCode() finds feature-only tags in code
-- detectMagicComments() finds generator hints in features
-- detectScenarioBloat() warns about too many scenarios
-- detectMegaFeature() warns about large feature files
+  **Solution:**
+  - detectProcessInCode() finds feature-only tags in code
+  - detectMagicComments() finds generator hints in features
+  - detectScenarioBloat() warns about too many scenarios
+  - detectMegaFeature() warns about large feature files
 
 ## Acceptance Criteria
 
@@ -38,11 +36,11 @@ process hygiene issues that lead to documentation drift.
 - When detecting process-in-code anti-patterns
 - Then no violations are found
 
-| tag                    |
-| ---------------------- |
-| @libar-docs            |
-| @libar-docs-pattern    |
-| @libar-docs-status     |
+| tag |
+| --- |
+| @libar-docs |
+| @libar-docs-pattern |
+| @libar-docs-status |
 | @libar-docs-depends-on |
 
 **Feature-only process tags in code are flagged**
@@ -61,11 +59,11 @@ process hygiene issues that lead to documentation drift.
 
 ```markdown
 Feature: Normal Feature
-A normal feature without generator hints.
+  A normal feature without generator hints.
 
 Scenario: Normal scenario
-Given some precondition
-Then some result
+  Given some precondition
+  Then some result
 ```
 
 **Features with excessive magic comments are flagged**
@@ -84,9 +82,8 @@ Then some result
 
 ```markdown
 # GENERATOR: header
-
 Feature: Acceptable Feature
-Some generator hint is OK.
+  Some generator hint is OK.
 ```
 
 **Feature with few scenarios passes**
@@ -125,13 +122,13 @@ Some generator hint is OK.
 - Then 1 violation is found
 - And violations include "process-in-code"
 
-| tag                 |
-| ------------------- |
-| @libar-docs         |
+| tag |
+| --- |
+| @libar-docs |
 | @libar-docs-quarter |
 
-| tag                       |
-| ------------------------- |
+| tag |
+| --- |
 | libar-docs-pattern:MyTest |
 
 **Empty violations produce clean report**
@@ -148,11 +145,11 @@ Some generator hint is OK.
 - And the report contains "Warnings (hygiene issues)"
 - And the report shows "2 errors, 1 warning"
 
-| id              | severity |
-| --------------- | -------- |
-| tag-duplication | error    |
-| magic-comments  | warning  |
-| process-in-code | error    |
+| id | severity |
+| --- | --- |
+| tag-duplication | error |
+| magic-comments | warning |
+| process-in-code | error |
 
 ## Business Rules
 

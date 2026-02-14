@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property     | Value   |
-| ------------ | ------- |
-| Status       | active  |
+| Property | Value |
+| --- | --- |
+| Status | active |
 | Product Area | DataAPI |
 
 ## Description
 
 Validates the output pipeline transforms: summarization, modifiers,
-list filters, empty stripping, and format output.
+  list filters, empty stripping, and format output.
 
 ## Acceptance Criteria
 

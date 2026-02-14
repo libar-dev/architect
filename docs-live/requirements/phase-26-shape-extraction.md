@@ -6,82 +6,77 @@
 
 ## Overview
 
-| Property       | Value                                        |
-| -------------- | -------------------------------------------- |
-| Status         | completed                                    |
-| Product Area   | Annotation                                   |
+| Property | Value |
+| --- | --- |
+| Status | completed |
+| Product Area | Annotation |
 | Business Value | eliminates type duplication in documentation |
-| Phase          | 26                                           |
+| Phase | 26 |
 
 ## Description
 
 **Problem:**
-Documentation comments duplicate type definitions that exist in the same file.
-When interfaces change, the JSDoc examples drift. Maintaining two copies of the
-same type information violates DRY and creates documentation rot.
+  Documentation comments duplicate type definitions that exist in the same file.
+  When interfaces change, the JSDoc examples drift. Maintaining two copies of the
+  same type information violates DRY and creates documentation rot.
 
-**Relationship to Documentation Generation:**
-This capability is a critical enabler for ADR-021 (DocGenerationProofOfConcept).
-Shape extraction allows code to own API type documentation while decisions own
-intro/context and behavior specs own rules/examples. See the source mapping
-pattern in doc-generation-proof-of-concept.feature.
+  **Relationship to Documentation Generation:**
+  This capability is a critical enabler for ADR-021 (DocGenerationProofOfConcept).
+  Shape extraction allows code to own API type documentation while decisions own
+  intro/context and behavior specs own rules/examples. See the source mapping
+  pattern in doc-generation-proof-of-concept.feature.
 
-Current pattern (duplication):
-"""typescript
-/\*\*
+  Current pattern (duplication):
+  """typescript
+  /**
+   * @libar-docs
+   *
+   * ## API
+   *
+   * ```typescript
+   * // DUPLICATED from actual interface below
+   * interface DeciderInput {
+   *   state: ProcessState;
+   *   changes: ChangeDetection;
+   * }
+   * ```
+   */
 
-- @libar-docs
--
-- ## API
--
-- ```typescript
+  // The actual source of truth
+  export interface DeciderInput {
+    state: ProcessState;
+    changes: ChangeDetection;
+  }
+  """
 
-  ```
-- // DUPLICATED from actual interface below
-- interface DeciderInput {
-- state: ProcessState;
-- changes: ChangeDetection;
-- }
-- ```
-  */
-  ```
+  **Solution:**
+  New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
+  The extractor pulls actual TypeScript definitions from AST and inserts them into
+  generated documentation as fenced code blocks.
 
-// The actual source of truth
-export interface DeciderInput {
-state: ProcessState;
-changes: ChangeDetection;
-}
-"""
+  Target pattern (single source):
+  """typescript
+  /**
+   * @libar-docs
+   * @libar-docs-extract-shapes DeciderInput, ValidationResult
+   *
+   * ## API
+   *
+   * (shapes inserted at generation time)
+   */
 
-**Solution:**
-New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
-The extractor pulls actual TypeScript definitions from AST and inserts them into
-generated documentation as fenced code blocks.
+  export interface DeciderInput {
+    state: ProcessState;
+    changes: ChangeDetection;
+  }
+  """
 
-Target pattern (single source):
-"""typescript
-/\*\*
-
-- @libar-docs
-- @libar-docs-extract-shapes DeciderInput, ValidationResult
--
-- ## API
--
-- (shapes inserted at generation time)
-  \*/
-
-export interface DeciderInput {
-state: ProcessState;
-changes: ChangeDetection;
-}
-"""
-
-**Why It Matters:**
-| Benefit | How |
-| Single source of truth | Types defined once, extracted for docs |
-| Always-current docs | Generated from actual code definitions |
-| Reduced maintenance | Change type once, docs update automatically |
-| API documentation | Public interfaces documented without duplication |
+  **Why It Matters:**
+  | Benefit | How |
+  | Single source of truth | Types defined once, extracted for docs |
+  | Always-current docs | Generated from actual code definitions |
+  | Reduced maintenance | Change type once, docs update automatically |
+  | API documentation | Public interfaces documented without duplication |
 
 ## Acceptance Criteria
 
@@ -348,15 +343,9 @@ export const createValidator: (rules: Rule[]) => Validator = (rules) => {
  * @libar-docs-extract-shapes Output, Input, Options
  */
 
-export interface Input {
-  /* first in source */
-}
-export interface Options {
-  /* second in source */
-}
-export interface Output {
-  /* third in source */
-}
+export interface Input { /* first in source */ }
+export interface Options { /* second in source */ }
+export interface Output { /* third in source */ }
 ```
 
 **Mixed shape types in specified order**
@@ -372,12 +361,8 @@ export interface Output {
  */
 
 export type Status = 'ok' | 'error';
-export interface Config {
-  timeout: number;
-}
-export function validate(input: unknown): boolean {
-  return true;
-}
+export interface Config { timeout: number; }
+export function validate(input: unknown): boolean { return true; }
 ```
 
 **Shapes render in claude module**
@@ -398,8 +383,6 @@ interface Output {
   // ...
 }
 ```
-````
-
 ````
 
 **Shapes render in detailed docs**
@@ -428,7 +411,7 @@ import { Request, Response } from './types.js';
 export interface MyHandler {
   handle(req: Request): Response;
 }
-````
+```
 
 **Shape extraction does not follow imports**
 
@@ -516,8 +499,6 @@ interface Options { ... }
 ```
 ````
 
-````
-
 **Separate rendering for detailed output**
 
 - Given extracted shapes "Input", "Output"
@@ -525,16 +506,15 @@ interface Options { ... }
 - When generating markdown
 - Then output is:
 
-```markdown
+````markdown
 ```typescript
 interface Input { ... }
-````
+```
 
 ```typescript
 interface Output { ... }
 ```
-
-```
+````
 
 ## Business Rules
 
@@ -633,4 +613,3 @@ Files that implement this pattern:
 ---
 
 [← Back to Product Requirements](../PRODUCT-REQUIREMENTS.md)
-```

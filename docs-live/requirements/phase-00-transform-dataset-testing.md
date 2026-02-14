@@ -6,28 +6,26 @@
 
 ## Overview
 
-| Property     | Value      |
-| ------------ | ---------- |
-| Status       | completed  |
+| Property | Value |
+| --- | --- |
+| Status | completed |
 | Product Area | Generation |
 
 ## Description
 
 The transformToMasterDataset function transforms raw extracted patterns
-into a MasterDataset with all pre-computed views in a single pass.
-This is the core of the unified transformation pipeline.
+  into a MasterDataset with all pre-computed views in a single pass.
+  This is the core of the unified transformation pipeline.
 
-**Problem:**
+  **Problem:**
+  - Generators need multiple views of the same pattern data
+  - Computing views lazily leads to O(n*v) complexity
+  - Views must be consistent with each other
 
-- Generators need multiple views of the same pattern data
-- Computing views lazily leads to O(n\*v) complexity
-- Views must be consistent with each other
-
-**Solution:**
-
-- Single-pass transformation computes all views in O(n)
-- All views are immutable and pre-computed
-- MasterDataset is the source of truth for all generators
+  **Solution:**
+  - Single-pass transformation computes all views in O(n)
+  - All views are immutable and pre-computed
+  - MasterDataset is the source of truth for all generators
 
 ## Acceptance Criteria
 
@@ -49,11 +47,11 @@ This is the core of the unified transformation pipeline.
 - And byStatus.planned has 2 patterns
 - And counts.total is 10
 
-| status    | count |
-| --------- | ----- |
-| completed | 5     |
-| active    | 3     |
-| planned   | 2     |
+| status | count |
+| --- | --- |
+| completed | 5 |
+| active | 3 |
+| planned | 2 |
 
 **Normalize status variants to canonical values**
 
@@ -61,12 +59,12 @@ This is the core of the unified transformation pipeline.
 - When transforming to MasterDataset
 - Then each pattern is grouped in the expected status bucket
 
-| status    | expected  |
-| --------- | --------- |
+| status | expected |
+| --- | --- |
 | completed | completed |
-| active    | active    |
-| roadmap   | planned   |
-| deferred  | planned   |
+| active | active |
+| roadmap | planned |
+| deferred | planned |
 
 **Group patterns by phase**
 
@@ -75,16 +73,16 @@ This is the core of the unified transformation pipeline.
 - Then byPhase has 3 phase groups with counts:
 
 | phase | count |
-| ----- | ----- |
-| 1     | 2     |
-| 2     | 3     |
-| 3     | 1     |
+| --- | --- |
+| 1 | 2 |
+| 2 | 3 |
+| 3 | 1 |
 
 | phase | count |
-| ----- | ----- |
-| 1     | 2     |
-| 2     | 3     |
-| 3     | 1     |
+| --- | --- |
+| 1 | 2 |
+| 2 | 3 |
+| 3 | 1 |
 
 **Sort phases by phase number**
 
@@ -98,12 +96,12 @@ This is the core of the unified transformation pipeline.
 - When transforming to MasterDataset
 - Then phase 1 counts are:
 
-| field     | value |
-| --------- | ----- |
-| completed | 2     |
-| active    | 1     |
-| planned   | 0     |
-| total     | 3     |
+| field | value |
+| --- | --- |
+| completed | 2 |
+| active | 1 |
+| planned | 0 |
+| total | 3 |
 
 **Patterns without phase are not in byPhase**
 
@@ -120,16 +118,16 @@ This is the core of the unified transformation pipeline.
 - Then byQuarter has 3 quarters with counts:
 
 | quarter | count |
-| ------- | ----- |
-| Q1-2024 | 2     |
-| Q2-2024 | 3     |
-| Q4-2024 | 1     |
+| --- | --- |
+| Q1-2024 | 2 |
+| Q2-2024 | 3 |
+| Q4-2024 | 1 |
 
 | quarter | count |
-| ------- | ----- |
-| Q1-2024 | 2     |
-| Q2-2024 | 3     |
-| Q4-2024 | 1     |
+| --- | --- |
+| Q1-2024 | 2 |
+| Q2-2024 | 3 |
+| Q4-2024 | 1 |
 
 **Patterns without quarter are not in byQuarter**
 
@@ -146,16 +144,16 @@ This is the core of the unified transformation pipeline.
 - And categoryCount is 3
 
 | category | count |
-| -------- | ----- |
-| core     | 3     |
-| ddd      | 2     |
-| saga     | 1     |
+| --- | --- |
+| core | 3 |
+| ddd | 2 |
+| saga | 1 |
 
 | category | count |
-| -------- | ----- |
-| core     | 3     |
-| ddd      | 2     |
-| saga     | 1     |
+| --- | --- |
+| core | 3 |
+| ddd | 2 |
+| saga | 1 |
 
 **Group patterns by source file type**
 
@@ -164,11 +162,11 @@ This is the core of the unified transformation pipeline.
 - Then bySource.typescript has 2 patterns
 - And bySource.gherkin has 1 pattern
 
-| source                      | expectedView |
-| --------------------------- | ------------ |
-| src/patterns/core.ts        | typescript   |
-| src/patterns/ddd.ts         | typescript   |
-| tests/features/saga.feature | gherkin      |
+| source | expectedView |
+| --- | --- |
+| src/patterns/core.ts | typescript |
+| src/patterns/ddd.ts | typescript |
+| tests/features/saga.feature | gherkin |
 
 **Patterns with phase are also in roadmap view**
 
@@ -191,19 +189,19 @@ This is the core of the unified transformation pipeline.
 - When transforming to MasterDataset
 - Then the relationship index for "Feature" contains:
 
-| type      | targets        |
-| --------- | -------------- |
-| uses      | Utility        |
-| usedBy    | Application    |
+| type | targets |
+| --- | --- |
+| uses | Utility |
+| usedBy | Application |
 | dependsOn | Infrastructure |
-| enables   | Extension      |
+| enables | Extension |
 
-| field     | value          |
-| --------- | -------------- |
-| uses      | Utility        |
-| usedBy    | Application    |
+| field | value |
+| --- | --- |
+| uses | Utility |
+| usedBy | Application |
 | dependsOn | Infrastructure |
-| enables   | Extension      |
+| enables | Extension |
 
 **Reverse lookup computes enables from dependsOn**
 
@@ -246,16 +244,16 @@ This is the core of the unified transformation pipeline.
 - When transforming with the workflow
 - Then the result includes the workflow with phase names:
 
-| order | name                 |
-| ----- | -------------------- |
-| 1     | Foundation           |
-| 2     | Core Patterns        |
-| 3     | Advanced Integration |
+| order | name |
+| --- | --- |
+| 1 | Foundation |
+| 2 | Core Patterns |
+| 3 | Advanced Integration |
 
-| phase | name          |
-| ----- | ------------- |
-| 1     | Foundation    |
-| 2     | Core Patterns |
+| phase | name |
+| --- | --- |
+| 1 | Foundation |
+| 2 | Core Patterns |
 
 **Result omits workflow when not provided**
 
