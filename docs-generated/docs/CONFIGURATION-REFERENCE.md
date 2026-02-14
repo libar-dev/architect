@@ -1210,6 +1210,304 @@ interface RegexBuilders {
 function createRegexBuilders(tagPrefix: string, fileOptInTag: string): RegexBuilders;
 ```
 
+### DeliveryProcessProjectConfig (interface)
+
+/**
+ * Unified project configuration for delivery-process.
+ *
+ * This is the shape users provide in `delivery-process.config.ts`.
+ * `defineConfig()` is an identity function providing type safety.
+ *
+ * @example
+ * ```typescript
+ * import { defineConfig } from '@libar-dev/delivery-process/config';
+ *
+ * export default defineConfig({
+ *   preset: 'ddd-es-cqrs',
+ *   sources: {
+ *     typescript: ['packages/* /src/** /*.ts'],
+ *     features: ['delivery-process/specs/** /*.feature'],
+ *     stubs: ['delivery-process/stubs/** /*.ts'],
+ *   },
+ *   output: { directory: 'docs-living', overwrite: true },
+ * });
+ * ```
+ */
+
+```typescript
+interface DeliveryProcessProjectConfig {
+  // --- Taxonomy ---
+
+  /** Use a preset taxonomy configuration */
+  readonly preset?: PresetName;
+
+  /** Custom tag prefix (overrides preset, e.g., '@docs-') */
+  readonly tagPrefix?: string;
+
+  /** Custom file opt-in tag (overrides preset, e.g., '@docs') */
+  readonly fileOptInTag?: string;
+
+  /** Custom categories (replaces preset categories entirely) */
+  readonly categories?: DeliveryProcessConfig['categories'];
+
+  // --- Sources ---
+
+  /** Source file glob configuration */
+  readonly sources?: SourcesConfig;
+
+  // --- Output ---
+
+  /** Output configuration for generated docs */
+  readonly output?: OutputConfig;
+
+  // --- Generators ---
+
+  /** Default generator names to run when CLI doesn't specify --generators */
+  readonly generators?: readonly string[];
+
+  /** Per-generator source and output overrides */
+  readonly generatorOverrides?: Readonly<Record<string, GeneratorSourceOverride>>;
+
+  // --- Advanced ---
+
+  /** Rules for auto-inferring bounded context from file paths */
+  readonly contextInferenceRules?: readonly ContextInferenceRule[];
+
+  /** Path to custom workflow config JSON (relative to config file) */
+  readonly workflowPath?: string;
+
+  // --- Reference Documents ---
+
+  /**
+   * Reference document configurations for convention-based doc generation.
+   * Each config defines one reference document's content composition via
+   * convention tags, shape sources, behavior categories, and diagram scopes.
+   *
+   * When not specified, no reference generators are registered.
+   * Import `LIBAR_REFERENCE_CONFIGS` from the generators module
+   * to use the built-in set.
+   */
+  readonly referenceDocConfigs?: readonly ReferenceDocConfig[];
+}
+```
+
+| Property | Description |
+| --- | --- |
+| preset | Use a preset taxonomy configuration |
+| tagPrefix | Custom tag prefix (overrides preset, e.g., '@docs-') |
+| fileOptInTag | Custom file opt-in tag (overrides preset, e.g., '@docs') |
+| categories | Custom categories (replaces preset categories entirely) |
+| sources | Source file glob configuration |
+| output | Output configuration for generated docs |
+| generators | Default generator names to run when CLI doesn't specify --generators |
+| generatorOverrides | Per-generator source and output overrides |
+| contextInferenceRules | Rules for auto-inferring bounded context from file paths |
+| workflowPath | Path to custom workflow config JSON (relative to config file) |
+| referenceDocConfigs | Reference document configurations for convention-based doc generation. |
+
+### SourcesConfig (interface)
+
+/**
+ * Source glob configuration for the project.
+ * Centralizes what previously lived in CLI --input/--features flags.
+ */
+
+```typescript
+interface SourcesConfig {
+  /** Glob patterns for TypeScript source files (replaces --input) */
+  readonly typescript: readonly string[];
+
+  /**
+   * Glob patterns for Gherkin feature files (replaces --features).
+   * Includes both `.feature` and `.feature.md` files.
+   */
+  readonly features?: readonly string[];
+
+  /**
+   * Glob patterns for design stub files.
+   * Stubs are TypeScript files that live outside `src/` (e.g., `delivery-process/stubs/`).
+   * Merged into TypeScript sources at resolution time.
+   */
+  readonly stubs?: readonly string[];
+
+  /** Glob patterns to exclude from all scanning */
+  readonly exclude?: readonly string[];
+}
+```
+
+| Property | Description |
+| --- | --- |
+| typescript | Glob patterns for TypeScript source files (replaces --input) |
+| features | Glob patterns for Gherkin feature files (replaces --features). |
+| stubs | Glob patterns for design stub files. |
+| exclude | Glob patterns to exclude from all scanning |
+
+### OutputConfig (interface)
+
+/**
+ * Output configuration for generated documentation.
+ */
+
+```typescript
+interface OutputConfig {
+  /** Output directory for generated docs (default: 'docs/architecture') */
+  readonly directory?: string;
+  /** Overwrite existing files (default: false) */
+  readonly overwrite?: boolean;
+}
+```
+
+| Property | Description |
+| --- | --- |
+| directory | Output directory for generated docs (default: 'docs/architecture') |
+| overwrite | Overwrite existing files (default: false) |
+
+### GeneratorSourceOverride (interface)
+
+/**
+ * Generator-specific source overrides.
+ *
+ * Some generators need different sources than the base config.
+ * For example, `changelog` needs `decisions/*.feature` and `releases/*.feature`
+ * in addition to the base feature set.
+ *
+ * ### Override Semantics
+ *
+ * - `additionalFeatures` / `additionalInput`: Appended to base sources
+ * - `replaceFeatures`: Used INSTEAD of base features (for generators needing a different set)
+ * - `outputDirectory`: Override the base output directory for this generator
+ *
+ * ### Mutual Exclusivity
+ *
+ * `replaceFeatures` and `additionalFeatures` are mutually exclusive when both are
+ * non-empty. This constraint is enforced at runtime by the Zod `.refine()` in
+ * {@link GeneratorSourceOverrideSchema} (in `project-config-schema.ts`).
+ *
+ * The TypeScript type intentionally permits both fields to coexist because
+ * `mergeSourcesForGenerator()` treats an empty `replaceFeatures: []` as "no replace",
+ * falling through to `additionalFeatures`. Encoding this length-dependent semantics
+ * via `never` would reject valid runtime states.
+ */
+
+```typescript
+interface GeneratorSourceOverride {
+  /** Additional feature file globs appended to base features */
+  readonly additionalFeatures?: readonly string[];
+  /** Additional TypeScript globs appended to base TypeScript sources */
+  readonly additionalInput?: readonly string[];
+  /**
+   * Feature globs used INSTEAD of base features.
+   * Mutually exclusive with non-empty `additionalFeatures`.
+   * @see GeneratorSourceOverrideSchema for runtime validation
+   */
+  readonly replaceFeatures?: readonly string[];
+  /** Override output directory for this generator */
+  readonly outputDirectory?: string;
+}
+```
+
+| Property | Description |
+| --- | --- |
+| additionalFeatures | Additional feature file globs appended to base features |
+| additionalInput | Additional TypeScript globs appended to base TypeScript sources |
+| replaceFeatures | Feature globs used INSTEAD of base features. |
+| outputDirectory | Override output directory for this generator |
+
+### ResolvedConfig (type)
+
+/**
+ * Fully resolved configuration combining the taxonomy instance
+ * and the project-level config.
+ *
+ * This is the primary type consumed by the orchestrator and CLIs.
+ *
+ * Discriminated union on `isDefault`:
+ * - `isDefault: true` means no config file was found; `configPath` is `undefined`.
+ * - `isDefault: false` means a config file was loaded; `configPath` is a `string`.
+ */
+
+```typescript
+type ResolvedConfig =
+  | {
+      /** The taxonomy instance (registry + regexBuilders) */
+      readonly instance: DeliveryProcessInstance;
+      /** The resolved project config with defaults applied */
+      readonly project: ResolvedProjectConfig;
+      /** Config was generated from defaults (no config file found) */
+      readonly isDefault: true;
+      /** No config file path when using defaults */
+      readonly configPath?: undefined;
+    }
+  | {
+      /** The taxonomy instance (registry + regexBuilders) */
+      readonly instance: DeliveryProcessInstance;
+      /** The resolved project config with defaults applied */
+      readonly project: ResolvedProjectConfig;
+      /** Config was loaded from a file */
+      readonly isDefault: false;
+      /** Path to the config file that was loaded */
+      readonly configPath: string;
+    };
+```
+
+### ResolvedProjectConfig (interface)
+
+/**
+ * Fully resolved project configuration with all defaults applied.
+ */
+
+```typescript
+interface ResolvedProjectConfig {
+  /** Resolved source globs (stubs merged, defaults applied) */
+  readonly sources: ResolvedSourcesConfig;
+  /** Resolved output config with all defaults */
+  readonly output: Readonly<Required<OutputConfig>>;
+  /** Default generator names */
+  readonly generators: readonly string[];
+  /** Per-generator source overrides */
+  readonly generatorOverrides: Readonly<Record<string, GeneratorSourceOverride>>;
+  /** Context inference rules (user rules prepended to defaults) */
+  readonly contextInferenceRules: readonly ContextInferenceRule[];
+  /** Workflow config path (null if not specified) */
+  readonly workflowPath: string | null;
+  /** Reference document configurations (empty array if none) */
+  readonly referenceDocConfigs: readonly ReferenceDocConfig[];
+}
+```
+
+| Property | Description |
+| --- | --- |
+| sources | Resolved source globs (stubs merged, defaults applied) |
+| output | Resolved output config with all defaults |
+| generators | Default generator names |
+| generatorOverrides | Per-generator source overrides |
+| contextInferenceRules | Context inference rules (user rules prepended to defaults) |
+| workflowPath | Workflow config path (null if not specified) |
+| referenceDocConfigs | Reference document configurations (empty array if none) |
+
+### ResolvedSourcesConfig (interface)
+
+/**
+ * Resolved sources config where all optional fields have been applied with defaults.
+ */
+
+```typescript
+interface ResolvedSourcesConfig {
+  /** TypeScript source globs (includes merged stubs) */
+  readonly typescript: readonly string[];
+  /** Gherkin feature file globs */
+  readonly features: readonly string[];
+  /** Glob patterns to exclude from scanning */
+  readonly exclude: readonly string[];
+}
+```
+
+| Property | Description |
+| --- | --- |
+| typescript | TypeScript source globs (includes merged stubs) |
+| features | Gherkin feature file globs |
+| exclude | Glob patterns to exclude from scanning |
+
 ### GENERIC_PRESET (const)
 
 /**
@@ -1534,13 +1832,10 @@ async function findConfigFile(startDir: string): Promise<string | null>;
 ### loadConfig (function)
 
 /**
- * Load configuration from file or use defaults
+ * Load configuration from file or use defaults.
  *
- * Discovery strategy:
- * 1. Search for `delivery-process.config.ts` starting from baseDir
- * 2. Walk up parent directories until repo root
- * 3. If found, import and return the configuration
- * 4. If not found, return default libar-generic preset configuration
+ * Delegates to {@link loadProjectConfig} for file discovery and parsing,
+ * then maps the result to the legacy {@link ConfigDiscoveryResult} shape.
  *
  * @param baseDir - Directory to start searching from (usually cwd or project root)
  * @returns Result with loaded configuration or error

@@ -799,8 +799,8 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
-        DecisionDocGenerator["DecisionDocGenerator[service]"]
         TransformDataset["TransformDataset[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
     end
     subgraph renderer["Renderer"]
         RenderableDocument["RenderableDocument[read-model]"]
@@ -825,10 +825,10 @@ graph TB
     Documentation_Generation_Orchestrator --> Pattern_Scanner
     PatternsCodec ..-> PatternRelationshipModel
     ArchitectureCodec --> MasterDataset
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
     TransformDataset --> MasterDataset
     TransformDataset ..-> PatternRelationshipModel
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     classDef neighbor stroke-dasharray: 5 5
 ```
 

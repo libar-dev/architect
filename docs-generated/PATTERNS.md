@@ -587,11 +587,6 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    LintRules ..-> PatternRelationshipModel
-    LintModule --> LintRules
-    LintModule --> LintEngine
-    LintEngine --> LintRules
-    LintEngine --> CodecUtils
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -603,16 +598,11 @@ graph TD
     TypeScript_AST_Parser --> DocDirectiveSchema
     TypeScript_AST_Parser --> typescript_estree
     TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    LintRules ..-> PatternRelationshipModel
+    LintModule --> LintRules
+    LintModule --> LintEngine
+    LintEngine --> LintRules
+    LintEngine --> CodecUtils
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -644,6 +634,16 @@ graph TD
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -704,16 +704,16 @@ graph TD
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
+    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
+    PatternsCodec ..-> PatternRelationshipModel
+    ArchitectureCodec --> MasterDataset
+    ArchitectureCodec --> ArchIndex
     ProcessGuardTypes ..-> ProcessGuardLinter
     ProcessGuardModule ..-> ProcessGuardLinter
     DetectChanges --> DeriveProcessState
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
-    PatternsCodec ..-> PatternRelationshipModel
-    ArchitectureCodec --> MasterDataset
-    ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry

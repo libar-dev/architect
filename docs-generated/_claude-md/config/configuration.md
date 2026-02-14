@@ -491,6 +491,13 @@
 | DeliveryProcessInstance | interface |
 | RegexBuilders | interface |
 | createRegexBuilders | function |
+| DeliveryProcessProjectConfig | interface |
+| SourcesConfig | interface |
+| OutputConfig | interface |
+| GeneratorSourceOverride | interface |
+| ResolvedConfig | type |
+| ResolvedProjectConfig | interface |
+| ResolvedSourcesConfig | interface |
 | GENERIC_PRESET | const |
 | LIBAR_GENERIC_PRESET | const |
 | DDD_ES_CQRS_PRESET | const |
