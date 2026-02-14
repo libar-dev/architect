@@ -122,6 +122,10 @@ Feature: Cross-Cutting Document Inclusion
   conventionTag. The include tag closes the granularity gap for all
   content types uniformly.
 
+  # ===========================================================================
+  # DELIVERABLES
+  # ===========================================================================
+
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
@@ -136,6 +140,10 @@ Feature: Cross-Cutting Document Inclusion
       | Rename archView in dataset views and transform | Complete | src/generators/pipeline/transform-dataset.ts |
       | Update all source file annotations from arch-view to include | Complete | src/**/*.ts |
       | Update configs: rename archView, add includeTags | Complete | delivery-process.config.ts |
+
+  # ===========================================================================
+  # RULE 1: Include Tag Routes Content
+  # ===========================================================================
 
   Rule: Include tag routes content to named documents
 
@@ -205,6 +213,10 @@ Feature: Cross-Cutting Document Inclusion
       When the reference codec renders
       Then "PlainPattern" does not appear in the behavior section
 
+  # ===========================================================================
+  # RULE 2: Include Tag Scopes Diagrams
+  # ===========================================================================
+
   Rule: Include tag scopes diagrams (replaces arch-view)
 
     **Invariant:** DiagramScope.include matches patterns whose
@@ -244,6 +256,10 @@ Feature: Cross-Cutting Document Inclusion
       When the reference codec renders
       Then "DefineConfig" appears in the behavior section
       And "DefineConfig" appears as a diagram node
+
+  # ===========================================================================
+  # RULE 3: Shapes Use Include Tag
+  # ===========================================================================
 
   Rule: Shapes use include tag for document routing
 
@@ -308,6 +324,10 @@ Feature: Cross-Cutting Document Inclusion
       And no includeTags configured
       When the reference codec renders
       Then the API Types section includes "RiskLevel"
+
+  # ===========================================================================
+  # RULE 4: Conventions Use Include Tag
+  # ===========================================================================
 
   Rule: Conventions use include tag for selective inclusion
 

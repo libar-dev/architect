@@ -107,13 +107,17 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
             }>>;
             title: z.ZodOptional<z.ZodString>;
             diagramType: z.ZodOptional<z.ZodEnum<{
-                "stateDiagram-v2": "stateDiagram-v2";
                 graph: "graph";
                 sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
                 C4Context: "C4Context";
                 classDiagram: "classDiagram";
             }>>;
             showEdgeLabels: z.ZodOptional<z.ZodBoolean>;
+            source: z.ZodOptional<z.ZodEnum<{
+                "fsm-lifecycle": "fsm-lifecycle";
+                "generation-pipeline": "generation-pipeline";
+            }>>;
         }, z.core.$strict>>;
         diagramScopes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -126,13 +130,17 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
             }>>;
             title: z.ZodOptional<z.ZodString>;
             diagramType: z.ZodOptional<z.ZodEnum<{
-                "stateDiagram-v2": "stateDiagram-v2";
                 graph: "graph";
                 sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
                 C4Context: "C4Context";
                 classDiagram: "classDiagram";
             }>>;
             showEdgeLabels: z.ZodOptional<z.ZodBoolean>;
+            source: z.ZodOptional<z.ZodEnum<{
+                "fsm-lifecycle": "fsm-lifecycle";
+                "generation-pipeline": "generation-pipeline";
+            }>>;
         }, z.core.$strict>>>>;
         claudeMdSection: z.ZodString;
         docsFilename: z.ZodString;

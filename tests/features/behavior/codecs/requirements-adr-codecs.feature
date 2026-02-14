@@ -167,15 +167,10 @@ Feature: Requirements and ADR Document Codecs
         | Status   |
         | Category |
 
-    Scenario: Status emoji mapping in ADR entries
+    Scenario: ADR entries use clean text without emojis
       Given a MasterDataset with ADR patterns
       When decoding with AdrDocumentCodec
-      Then ADR entries show correct status emojis:
-        | status     | emoji |
-        | accepted   | true  |
-        | proposed   | true  |
-        | superseded | true  |
-        | deprecated | true  |
+      Then ADR index entries contain no emojis
 
     Scenario: Context, Decision, Consequences sections from Rule keywords
       Given a MasterDataset with ADR patterns with semantic rules

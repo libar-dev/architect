@@ -21,12 +21,17 @@ Feature: ADR-003 - Source-First Pattern Architecture
   artifacts are annotated source code, executable specs, and decision specs.
 
   **Consequences:**
-  - (+) Pattern identity travels with code from stub through production
-  - (+) Eliminates stale tier 1 spec maintenance burden
-  - (+) Executable specs become the living specification (richer, verified)
-  - (+) Retroactive annotation works without merge conflicts
-  - (-) Migration effort for existing tier 1 specs
-  - (-) Requires updating CLAUDE.md annotation ownership guidance
+  | Type | Impact |
+  | Positive | Pattern identity travels with code from stub through production |
+  | Positive | Eliminates stale tier 1 spec maintenance burden |
+  | Positive | Executable specs become the living specification (richer, verified) |
+  | Positive | Retroactive annotation works without merge conflicts |
+  | Negative | Migration effort for existing tier 1 specs |
+  | Negative | Requires updating CLAUDE.md annotation ownership guidance |
+
+  # ===========================================================================
+  # DELIVERABLES
+  # ===========================================================================
 
   Background: Deliverables
     Given the following deliverables:
@@ -35,6 +40,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
       | Update CLAUDE.md annotation ownership | pending | CLAUDE.md |
       | Update monorepo source-annotations.md | pending | monorepo _claude-md/ |
       | Reframe tag-duplication anti-pattern | pending | src/validation/anti-patterns.ts |
+
+  # ===========================================================================
+  # RULE 1: TypeScript Source Owns Pattern Identity
+  # ===========================================================================
 
   Rule: TypeScript source owns pattern identity
 
@@ -48,9 +57,13 @@ Feature: ADR-003 - Source-First Pattern Architecture
     | Implementation | `src/path/to/module.ts` | active |
     | Completed | `src/path/to/module.ts` | completed |
 
-    **Exception:** Patterns with no TypeScript implementation (pure process or
+    Exception: Patterns with no TypeScript implementation (pure process or
     workflow concerns) may be defined in decision specs. The constraint is:
     one definition per pattern, regardless of source type.
+
+  # ===========================================================================
+  # RULE 2: Tier 1 Specs Are Ephemeral
+  # ===========================================================================
 
   Rule: Tier 1 specs are ephemeral working documents
 
@@ -65,6 +78,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
     | active | Medium (deliverable tracking) | Low (stale snapshot) |
     | completed | None | None (executable specs are better) |
 
+  # ===========================================================================
+  # RULE 3: Three Durable Artifact Types
+  # ===========================================================================
+
   Rule: Three durable artifact types
 
     **Invariant:** The delivery process produces three artifact types with
@@ -75,6 +92,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
     | Executable specs | Behavior verification, invariants | Rules, rationale, acceptance criteria |
     | Decision specs (ADR/PDR) | Architectural choices, rationale | Why decisions were made |
 
+  # ===========================================================================
+  # RULE 4: Implements Is UML Realization
+  # ===========================================================================
+
   Rule: Implements is UML Realization (many-to-one)
 
     **Invariant:** `@libar-docs-implements` declares a realization relationship.
@@ -84,6 +105,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
     | Relationship | Tag | Cardinality |
     | Definition | `@libar-docs-pattern` | Exactly one per pattern |
     | Realization | `@libar-docs-implements` | Many-to-one |
+
+  # ===========================================================================
+  # RULE 5: Single-Definition Constraint
+  # ===========================================================================
 
   Rule: Single-definition constraint
 
@@ -99,6 +124,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
     | Pattern only in TS | Already correct |
     | Pattern only in executable spec | Valid if no TS implementation exists |
 
+  # ===========================================================================
+  # RULE 6: Reverse Links Preferred
+  # ===========================================================================
+
   Rule: Reverse links preferred over forward links
 
     **Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern")
@@ -108,6 +137,10 @@ Feature: ADR-003 - Source-First Pattern Architecture
     | Mechanism | Usage | Reliability |
     | `@implements` (reverse) | 14 patterns (32%) | Self-maintaining, lives in test |
     | `@executable-specs` (forward) | 9 patterns (20%) | Requires tier 1 spec maintenance |
+
+  # ===========================================================================
+  # ACCEPTANCE CRITERIA
+  # ===========================================================================
 
   @acceptance-criteria
   Scenario: TypeScript source is canonical pattern definition

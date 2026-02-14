@@ -16,6 +16,10 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
   **Decision:**
   Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
+  # ===========================================================================
+  # DECISION CONTEXT
+  # ===========================================================================
+
   Background: Decision Context
     Given the following options were considered:
       | Option | Approach | Impact |
@@ -23,17 +27,29 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
       | DD-2b | Opt-in git via flag | Keeps core logic pure and testable |
       | DD-3b | Infer from status with override | Ergonomic default, explicit escape hatch |
 
+  # ===========================================================================
+  # RULE 1: DD-1 - Text Output With Section Markers
+  # ===========================================================================
+
   Rule: DD-1 - Text output with section markers
 
     Both scope-validate and handoff return string from the router, using
     === SECTION === markers. Follows the dual output path where text
     commands bypass JSON.stringify.
 
+  # ===========================================================================
+  # RULE 2: DD-2 - Git Integration Is Opt-In
+  # ===========================================================================
+
   Rule: DD-2 - Git integration is opt-in via --git flag
 
     The handoff command accepts an optional --git flag. The CLI handler
     calls git diff and passes file list to the pure generator function.
     No shell dependency in domain logic.
+
+  # ===========================================================================
+  # RULE 3: DD-3 - Session Type Inferred From FSM Status
+  # ===========================================================================
 
   Rule: DD-3 - Session type inferred from FSM status
 
@@ -46,6 +62,10 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
     | completed | review |
     | deferred | design |
 
+  # ===========================================================================
+  # RULE 4: DD-4 - Severity Levels Match Process Guard
+  # ===========================================================================
+
   Rule: DD-4 - Severity levels match Process Guard model
 
     Scope validation uses three severity levels:
@@ -57,20 +77,36 @@ Feature: PDR-001 - Session Workflow Commands Design Decisions
 
     The --strict flag promotes WARN to BLOCKED.
 
+  # ===========================================================================
+  # RULE 5: DD-5 - Current Date Only For Handoff
+  # ===========================================================================
+
   Rule: DD-5 - Current date only for handoff
 
     Handoff always uses the current date. No --date flag.
+
+  # ===========================================================================
+  # RULE 6: DD-6 - Both Positional And Flag Forms
+  # ===========================================================================
 
   Rule: DD-6 - Both positional and flag forms for scope type
 
     scope-validate accepts scope type as both positional argument
     and --type flag.
 
+  # ===========================================================================
+  # RULE 7: DD-7 - Co-Located Formatter Functions
+  # ===========================================================================
+
   Rule: DD-7 - Co-located formatter functions
 
     Each module (scope-validator.ts, handoff-generator.ts) exports
     both the data builder and the text formatter. Simpler than the
     context-assembler/context-formatter split.
+
+  # ===========================================================================
+  # ACCEPTANCE CRITERIA
+  # ===========================================================================
 
   @acceptance-criteria @happy-path
   Scenario: scope-validate outputs structured text

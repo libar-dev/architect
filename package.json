@@ -82,7 +82,7 @@
     "docs:remaining": "tsx src/cli/generate-docs.ts -g remaining",
     "docs:changelog": "tsx src/cli/generate-docs.ts -g changelog",
     "docs:architecture": "tsx src/cli/generate-docs.ts -g architecture",
-    "docs:decisions": "tsx src/cli/generate-docs.ts -g doc-from-decision",
+    "docs:decisions": "tsx src/cli/generate-docs.ts -g adrs",
     "docs:taxonomy": "tsx src/cli/generate-docs.ts -g taxonomy",
     "docs:validation": "tsx src/cli/generate-docs.ts -g validation-rules",
     "docs:requirements": "tsx src/cli/generate-docs.ts -g requirements",

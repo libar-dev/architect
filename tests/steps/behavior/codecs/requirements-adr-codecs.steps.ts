@@ -938,7 +938,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
     });
 
-    RuleScenario('Status emoji mapping in ADR entries', ({ Given, When, Then }) => {
+    RuleScenario('ADR entries use clean text without emojis', ({ Given, When, Then }) => {
       Given('a MasterDataset with ADR patterns', () => {
         state!.dataset = createTestMasterDataset({ patterns: createAdrPatterns() });
       });
@@ -947,30 +947,22 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         state!.document = AdrDocumentCodec.decode(state!.dataset!);
       });
 
-      Then(
-        'ADR entries show correct status emojis:',
-        (_ctx: unknown, dataTable: DataTableRow[]) => {
-          const table = findAdrIndexTable(state!.document!);
-          expect(table).toBeDefined();
+      Then('ADR index entries contain no emojis', () => {
+        const table = findAdrIndexTable(state!.document!);
+        expect(table).toBeDefined();
 
-          // Check that each status has an emoji in the table
-          for (const row of dataTable) {
-            if (row.emoji === 'true') {
-              // The table should have rows with emojis
-              const hasEmoji = table!.rows.some((r) =>
-                r.some(
-                  (cell) =>
-                    cell.includes('✅') ||
-                    cell.includes('📋') ||
-                    cell.includes('🔄') ||
-                    cell.includes('⚠️')
-                )
-              );
-              expect(hasEmoji).toBe(true);
-            }
-          }
-        }
-      );
+        // Verify no emoji characters appear in any table cell
+        const hasEmoji = table!.rows.some((r) =>
+          r.some(
+            (cell) =>
+              cell.includes('✅') ||
+              cell.includes('📋') ||
+              cell.includes('🔄') ||
+              cell.includes('⚠️')
+          )
+        );
+        expect(hasEmoji).toBe(false);
+      });
     });
 
     RuleScenario(

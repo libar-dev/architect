@@ -39,6 +39,7 @@ import {
   heading,
   paragraph,
   code,
+  table,
   list,
   separator,
   collapsible,
@@ -51,8 +52,10 @@ import {
 } from '../../renderable/codecs/decision-doc.js';
 import {
   parseDescriptionWithDocStrings,
+  parseBusinessRuleAnnotations,
   renderPropertyDocsTable,
 } from '../../renderable/codecs/helpers.js';
+import { extractTablesFromDescription } from '../../renderable/codecs/convention-extractor.js';
 import {
   executeSourceMapping,
   type SourceMapperOptions,
@@ -269,6 +272,65 @@ export function generateCompactOutput(
 }
 
 /**
+ * Render a rule description using structured annotation parsing.
+ *
+ * Extracts `**Invariant:**`, `**Rationale:**`, `**Verified by:**`, tables, and
+ * code examples for polished output with proper table formatting.
+ *
+ * @param description - Raw rule description text from Gherkin Rule: block
+ * @returns Array of SectionBlocks with structured content
+ */
+function renderRuleDescription(description: string): SectionBlock[] {
+  const blocks: SectionBlock[] = [];
+  const annotations = parseBusinessRuleAnnotations(description);
+
+  // 1. Render structured annotations first (extracted cleanly)
+  if (annotations.invariant) {
+    blocks.push(paragraph(`**Invariant:** ${annotations.invariant}`));
+  }
+
+  if (annotations.rationale) {
+    blocks.push(paragraph(`**Rationale:** ${annotations.rationale}`));
+  }
+
+  // 2. Extract tables and render with proper markdown formatting (separator rows)
+  const tables = extractTablesFromDescription(description);
+  for (const tbl of tables) {
+    const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
+    blocks.push(table([...tbl.headers], rows));
+  }
+
+  // 3. Render remaining content with interleaved DocStrings preserved.
+  //    Strip known annotations and table lines from the original description,
+  //    then pass through parseDescriptionWithDocStrings which preserves
+  //    text → code → text → code ordering.
+  let stripped = description;
+  stripped = stripped.replace(/\*\*Invariant:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+  stripped = stripped.replace(/\*\*Rationale:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+  stripped = stripped.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+  stripped = stripped
+    .split('\n')
+    .filter((line) => {
+      const trimmed = line.trim();
+      return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
+    })
+    .join('\n');
+
+  const strippedTrimmed = stripped.trim();
+  if (strippedTrimmed.length > 0) {
+    blocks.push(...parseDescriptionWithDocStrings(strippedTrimmed));
+  }
+
+  // 4. Render verified-by list last
+  if (annotations.verifiedBy && annotations.verifiedBy.length > 0) {
+    blocks.push(paragraph('**Verified by:**'));
+    blocks.push(list([...annotations.verifiedBy]));
+  }
+
+  return blocks;
+}
+
+/**
  * Generate detailed output (~300 lines)
  *
  * Includes everything: JSDoc, examples, full descriptions.
@@ -300,7 +362,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.context) {
       sections.push(heading(3, rule.name.replace(/^Context\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+        sections.push(...renderRuleDescription(rule.description));
       }
     }
   }
@@ -311,7 +373,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.decision) {
       sections.push(heading(3, rule.name.replace(/^Decision\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+        sections.push(...renderRuleDescription(rule.description));
       }
     }
   }
@@ -383,7 +445,7 @@ export function generateDetailedOutput(
     for (const rule of decisionContent.rules.consequences) {
       sections.push(heading(3, rule.name.replace(/^Consequence[s]?\s*[-:]\s*/i, '')));
       if (rule.description) {
-        sections.push(...parseDescriptionWithDocStrings(rule.description));
+        sections.push(...renderRuleDescription(rule.description));
       }
     }
   }
@@ -437,7 +499,7 @@ export function generateDetailedOutput(
       if (!isCovered) {
         sections.push(heading(2, rule.name));
         if (rule.description) {
-          sections.push(...parseDescriptionWithDocStrings(rule.description));
+          sections.push(...renderRuleDescription(rule.description));
         }
       }
     }

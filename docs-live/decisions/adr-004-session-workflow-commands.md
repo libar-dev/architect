@@ -1,4 +1,4 @@
-# ✅ ADR-004: PDR 001 Session Workflow Commands
+# ADR-004: PDR 001 Session Workflow Commands
 
 **Purpose:** Architecture decision record for PDR 001 Session Workflow Commands
 
@@ -10,6 +10,14 @@
 | -------- | ------------ |
 | Status   | accepted     |
 | Category | architecture |
+
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
+
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
 
 ## Rules
 
@@ -27,23 +35,25 @@ No shell dependency in domain logic.
 
 ### DD-3 - Session type inferred from FSM status
 
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
+
 Handoff infers session type from pattern's current FSM status.
 An explicit --session flag overrides inference.
 
-    | Status | Inferred Session |
-    | roadmap | design |
-    | active | implement |
-    | completed | review |
-    | deferred | design |
-
 ### DD-4 - Severity levels match Process Guard model
 
-Scope validation uses three severity levels:
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
 
-    | Severity | Meaning |
-    | PASS | Check passed |
-    | BLOCKED | Hard prerequisite missing |
-    | WARN | Recommendation not met |
+Scope validation uses three severity levels:
 
     The --strict flag promotes WARN to BLOCKED.
 

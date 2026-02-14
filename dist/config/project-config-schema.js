@@ -20,6 +20,7 @@
  * - `replaceFeatures` and `additionalFeatures` are mutually exclusive
  */
 import { z } from 'zod';
+import { DIAGRAM_SOURCE_VALUES } from '../renderable/codecs/reference.js';
 /**
  * Glob pattern validation — replicates the security rules from
  * `src/validation-schemas/config.ts` without importing to avoid
@@ -108,6 +109,7 @@ const DiagramScopeSchema = z
         .enum(['graph', 'sequenceDiagram', 'stateDiagram-v2', 'C4Context', 'classDiagram'])
         .optional(),
     showEdgeLabels: z.boolean().optional(),
+    source: z.enum(DIAGRAM_SOURCE_VALUES).optional(),
 })
     .strict();
 /**

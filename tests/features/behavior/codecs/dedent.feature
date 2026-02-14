@@ -22,9 +22,9 @@ Feature: Dedent Helper Function Edge Cases
   Background:
     Given a dedent test context
 
-  # =============================================================================
-  # Tab Handling
-  # =============================================================================
+  # ===========================================================================
+  # RULE 1: Tab Handling
+  # ===========================================================================
 
   Rule: Tabs are normalized to spaces before dedent
 
@@ -52,9 +52,9 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output has no leading whitespace on first non-empty line
 
-  # =============================================================================
-  # Empty Line Handling
-  # =============================================================================
+  # ===========================================================================
+  # RULE 2: Empty Line Handling
+  # ===========================================================================
 
   Rule: Empty lines are handled correctly
 
@@ -77,9 +77,9 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output equals the input
 
-  # =============================================================================
-  # Single Line and Minimal Input
-  # =============================================================================
+  # ===========================================================================
+  # RULE 3: Single Line and Minimal Input
+  # ===========================================================================
 
   Rule: Single line input is handled
 
@@ -95,9 +95,9 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output is "const x = 1;"
 
-  # =============================================================================
-  # Unicode and Special Characters
-  # =============================================================================
+  # ===========================================================================
+  # RULE 4: Unicode and Special Characters
+  # ===========================================================================
 
   Rule: Unicode whitespace is handled
 
@@ -107,9 +107,9 @@ Feature: Dedent Helper Function Edge Cases
       When dedenting the text
       Then the output preserves non-breaking spaces in content
 
-  # =============================================================================
-  # Relative Indentation Preservation
-  # =============================================================================
+  # ===========================================================================
+  # RULE 5: Relative Indentation Preservation
+  # ===========================================================================
 
   Rule: Relative indentation is preserved
 

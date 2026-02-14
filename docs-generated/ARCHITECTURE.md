@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 121 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 122 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 121 |
+| Total Components | 122 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -145,6 +145,10 @@ graph TB
         CategoryDefinition["CategoryDefinition"]
     end
     subgraph validation["Validation BC"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -153,16 +157,14 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator[service]"]
-        AntiPatternDetector["AntiPatternDetector[service]"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -171,8 +173,6 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -187,6 +187,10 @@ graph TB
         LintModule["LintModule"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         ConfigResolver["ConfigResolver"]
@@ -197,10 +201,6 @@ graph TB
         SourceMerger["SourceMerger"]
         DefineConfig["DefineConfig"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -234,13 +234,14 @@ graph TB
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
+        ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
         ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
         ProcessGuardTesting["ProcessGuardTesting"]
     end
-    ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    ExtractedPatternSchema --> DocDirectiveSchema
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
@@ -251,6 +252,11 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -268,11 +274,6 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DualSourceExtractor
     ValidatePatternsCLI --> CodecUtils
@@ -385,6 +386,7 @@ All components with architecture annotations:
 | ✅ Anti Pattern Detector | validation | service | application | src/validation/anti-patterns.ts |
 | ✅ DoD Validator | validation | service | application | src/validation/dod-validator.ts |
 | 📋 ADR 001 Taxonomy Canonical Values | - | - | - | delivery-process/decisions/adr-001-taxonomy-canonical-values.feature |
+| ✅ ADR 005 Codec Based Markdown Rendering | - | - | - | delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature |
 | ✅ Adr Document Codec | - | - | - | src/renderable/codecs/adr.ts |
 | 🚧 API Module | - | - | - | src/api/index.ts |
 | ✅ Built In Generators | - | - | - | src/generators/built-in/index.ts |

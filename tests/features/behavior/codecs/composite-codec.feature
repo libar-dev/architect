@@ -12,6 +12,10 @@ Feature: Composite Codec
   Background: Composite codec test context
     Given a composite codec test context
 
+  # ===========================================================================
+  # RULE 1: Section Ordering
+  # ===========================================================================
+
   Rule: CompositeCodec concatenates sections in codec array order
 
     **Invariant:** Sections from child codecs appear in the composite
@@ -33,6 +37,10 @@ Feature: Composite Codec
       Given three codecs producing paragraphs "First", "Second", "Third"
       When CompositeCodec assembles them with title "Three Codec Test"
       Then paragraphs appear in order "First", "Second", "Third"
+
+  # ===========================================================================
+  # RULE 2: Separator Configuration
+  # ===========================================================================
 
   Rule: Separators between codec outputs are configurable
 
@@ -57,6 +65,10 @@ Feature: Composite Codec
       When CompositeCodec assembles them with separateSections disabled
       Then no separator block exists in the output
 
+  # ===========================================================================
+  # RULE 3: Additional Files Merging
+  # ===========================================================================
+
   Rule: additionalFiles merge with last-wins semantics
 
     **Invariant:** additionalFiles from all children are merged into
@@ -79,6 +91,10 @@ Feature: Composite Codec
       When CompositeCodec assembles them with title "Collision Test"
       Then additionalFiles key "shared.md" has title "From B"
 
+  # ===========================================================================
+  # RULE 4: Document-Level Composition
+  # ===========================================================================
+
   Rule: composeDocuments works at document level without codecs
 
     **Invariant:** composeDocuments accepts RenderableDocument array and
@@ -93,6 +109,10 @@ Feature: Composite Codec
       When composeDocuments assembles them with title "Composed"
       Then the result has title "Composed"
       And paragraph "Doc One" appears before "Doc Two"
+
+  # ===========================================================================
+  # RULE 5: Empty Codec Handling
+  # ===========================================================================
 
   Rule: Empty codec outputs are handled gracefully
 

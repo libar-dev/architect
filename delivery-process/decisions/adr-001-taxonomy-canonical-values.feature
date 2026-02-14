@@ -21,10 +21,15 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
   These are the durable constants of the delivery process.
 
   **Consequences:**
-  - (+) Generated docs group into coherent sections
-  - (+) FSM enforcement has clear, auditable state definitions
-  - (+) Source ownership prevents cross-domain tag confusion
-  - (-) Migration effort for existing specs with non-canonical values
+  | Type | Impact |
+  | Positive | Generated docs group into coherent sections |
+  | Positive | FSM enforcement has clear, auditable state definitions |
+  | Positive | Source ownership prevents cross-domain tag confusion |
+  | Negative | Migration effort for existing specs with non-canonical values |
+
+  # ===========================================================================
+  # DELIVERABLES
+  # ===========================================================================
 
   Background: Deliverables
     Given the following deliverables:
@@ -33,6 +38,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
       | Migrate executable spec product-area tags | complete | tests/features/**/*.feature |
       | Migrate tier 1 spec product-area tags | complete | delivery-process/specs/*.feature |
       | Fix adr-category on existing decisions | pending | delivery-process/decisions/*.feature |
+
+  # ===========================================================================
+  # RULE 1: Product Area Canonical Values
+  # ===========================================================================
 
   Rule: Product area canonical values
 
@@ -49,6 +58,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
     | Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
 
+  # ===========================================================================
+  # RULE 2: ADR Category Canonical Values
+  # ===========================================================================
+
   Rule: ADR category canonical values
 
     **Invariant:** The adr-category tag uses one of 4 values.
@@ -58,6 +71,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | process | Workflow, conventions, annotation rules |
     | testing | Test strategy, verification approach |
     | documentation | Documentation generation, content structure |
+
+  # ===========================================================================
+  # RULE 3: FSM Status Values
+  # ===========================================================================
 
   Rule: FSM status values and protection levels
 
@@ -69,6 +86,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | active | Scope-locked | No | Edit existing deliverables only |
     | completed | Hard-locked | No | Requires unlock-reason tag |
     | deferred | None | Yes | Full editing |
+
+  # ===========================================================================
+  # RULE 4: Valid FSM Transitions
+  # ===========================================================================
 
   Rule: Valid FSM transitions
 
@@ -85,6 +106,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     Completed is a terminal state. Modifications require
     `@libar-docs-unlock-reason` escape hatch.
 
+  # ===========================================================================
+  # RULE 5: Tag Format Types
+  # ===========================================================================
+
   Rule: Tag format types
 
     **Invariant:** Every tag has one of 6 format types that determines
@@ -98,6 +123,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | number | Numeric value | @libar-docs-phase 15 |
     | quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
 
+  # ===========================================================================
+  # RULE 6: Source Ownership
+  # ===========================================================================
+
   Rule: Source ownership
 
     **Invariant:** Relationship tags have defined ownership by source type.
@@ -109,10 +138,18 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | quarter | Feature files | TypeScript | Gherkin owns timeline metadata |
     | team | Feature files | TypeScript | Gherkin owns ownership metadata |
 
+  # ===========================================================================
+  # RULE 7: Quarter Format Convention
+  # ===========================================================================
+
   Rule: Quarter format convention
 
     **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`).
     ISO-year-first sorting works lexicographically.
+
+  # ===========================================================================
+  # RULE 8: Deliverable Status Canonical Values
+  # ===========================================================================
 
   Rule: Deliverable status canonical values
 
@@ -126,6 +163,10 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     | deferred | Work postponed |
     | superseded | Replaced by another |
     | n/a | Not applicable |
+
+  # ===========================================================================
+  # ACCEPTANCE CRITERIA
+  # ===========================================================================
 
   @acceptance-criteria
   Scenario: Canonical values are enforced

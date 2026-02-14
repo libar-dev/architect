@@ -184,18 +184,11 @@ The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
 | Status |
 | Category |
 
-**Status emoji mapping in ADR entries**
+**ADR entries use clean text without emojis**
 
 - Given a MasterDataset with ADR patterns
 - When decoding with AdrDocumentCodec
-- Then ADR entries show correct status emojis:
-
-| status | emoji |
-| --- | --- |
-| accepted | true |
-| proposed | true |
-| superseded | true |
-| deprecated | true |
+- Then ADR index entries contain no emojis
 
 **Context, Decision, Consequences sections from Rule keywords**
 
@@ -238,7 +231,7 @@ _Verified by: No patterns with PRD metadata produces empty message, Summary show
 
 **AdrDocumentCodec documents architecture decisions**
 
-_Verified by: No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, Status emoji mapping in ADR entries, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content_
+_Verified by: No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, ADR entries use clean text without emojis, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content_
 
 ---
 

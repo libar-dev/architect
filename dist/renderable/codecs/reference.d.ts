@@ -24,6 +24,10 @@
  */
 import { type BaseCodecOptions, type DetailLevel, type DocumentCodec } from './types/base.js';
 import type { ShapeSelector } from './shape-matcher.js';
+/** Content source identifiers for hardcoded domain diagrams */
+export declare const DIAGRAM_SOURCE_VALUES: readonly ["fsm-lifecycle", "generation-pipeline"];
+/** Discriminated source type for DiagramScope.source */
+export type DiagramSource = (typeof DIAGRAM_SOURCE_VALUES)[number];
 /**
  * Scoped diagram filter for dynamic mermaid generation from relationship metadata.
  *
@@ -47,6 +51,12 @@ export interface DiagramScope {
     readonly diagramType?: 'graph' | 'sequenceDiagram' | 'stateDiagram-v2' | 'C4Context' | 'classDiagram';
     /** Show relationship type labels on edges (default: true) */
     readonly showEdgeLabels?: boolean;
+    /** Content source override. When set, uses hardcoded domain content
+     * instead of computing from pattern relationships.
+     * - 'fsm-lifecycle': FSM state transitions with protection levels
+     * - 'generation-pipeline': 4-stage generation pipeline temporal flow
+     */
+    readonly source?: DiagramSource;
 }
 /**
  * Configuration for a reference document type.

@@ -37,8 +37,9 @@
  */
 import { z } from 'zod';
 import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js';
-import { partitionRulesByPrefix, parseDescriptionWithDocStrings, } from './helpers.js';
-import { heading, paragraph, separator, table, collapsible, linkOut, document, } from '../schema.js';
+import { partitionRulesByPrefix, parseBusinessRuleAnnotations, parseDescriptionWithDocStrings, dedent, } from './helpers.js';
+import { extractTablesFromDescription } from './convention-extractor.js';
+import { heading, paragraph, separator, table, list, code, collapsible, linkOut, document, } from '../schema.js';
 import { getDisplayName } from '../utils.js';
 import { groupBy } from '../../utils/index.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
@@ -198,9 +199,8 @@ function buildAdrsByCategory(patterns, options) {
                 const adrNum = p.adr ?? '???';
                 const name = getDisplayName(p);
                 const status = p.adrStatus ?? 'proposed';
-                const statusEmoji = getAdrStatusEmoji(status);
                 const slug = adrToSlug(p);
-                return [`[${statusEmoji} ADR-${adrNum}](decisions/${slug}.md)`, name, status];
+                return [`[ADR-${adrNum}](decisions/${slug}.md)`, name, status];
             });
             sections.push(table(['ADR', 'Title', 'Status'], adrRows), separator());
         }
@@ -234,9 +234,7 @@ function buildAdrEntry(pattern, options) {
     const name = getDisplayName(pattern);
     const adrNum = pattern.adr ?? '???';
     const status = pattern.adrStatus ?? 'proposed';
-    // Status emoji
-    const statusEmoji = getAdrStatusEmoji(status);
-    sections.push(heading(4, `${statusEmoji} ADR-${adrNum}: ${name}`));
+    sections.push(heading(4, `ADR-${adrNum}: ${name}`));
     // Metadata
     const metaRows = [['Status', status]];
     if (pattern.adrCategory) {
@@ -321,12 +319,11 @@ function buildAdrIndexTable(patterns, options) {
         const name = getDisplayName(p);
         const status = p.adrStatus ?? 'proposed';
         const category = p.adrCategory ?? '-';
-        const statusEmoji = getAdrStatusEmoji(status);
         if (options.generateDetailFiles) {
             const slug = adrToSlug(p);
-            return [`[${statusEmoji} ADR-${adrNum}](decisions/${slug}.md)`, name, status, category];
+            return [`[ADR-${adrNum}](decisions/${slug}.md)`, name, status, category];
         }
-        return [`${statusEmoji} ADR-${adrNum}`, name, status, category];
+        return [`ADR-${adrNum}`, name, status, category];
     });
     return [
         heading(2, 'ADR Index'),
@@ -401,7 +398,6 @@ function buildSingleAdrDocument(pattern, options) {
     const name = getDisplayName(pattern);
     const adrNum = pattern.adr ?? '???';
     const status = pattern.adrStatus ?? 'proposed';
-    const statusEmoji = getAdrStatusEmoji(status);
     // Metadata
     const metaRows = [['Status', status]];
     if (pattern.adrCategory) {
@@ -417,6 +413,14 @@ function buildSingleAdrDocument(pattern, options) {
         metaRows.push(['Superseded By', `ADR-${pattern.adrSupersededBy}`]);
     }
     sections.push(heading(2, 'Overview'), table(['Property', 'Value'], metaRows));
+    // Feature description content (Context, Decision, Consequences as prose)
+    // Some ADRs/PDRs use the Feature description for structured content instead of
+    // Rule: prefix naming. Render it between Overview and Rules.
+    // IMPORTANT: dedent BEFORE trim — trim strips first-line indent, defeating dedent.
+    const featureDesc = pattern.directive.description;
+    if (featureDesc.trim()) {
+        sections.push(...renderFeatureDescription(featureDesc));
+    }
     // ADR Content sections from Gherkin Rule: keywords
     // Rules are partitioned by semantic prefix: "Context...", "Decision...", "Consequence..."
     const partitioned = partitionRulesByPrefix(pattern.rules, {
@@ -426,13 +430,159 @@ function buildSingleAdrDocument(pattern, options) {
     sections.push(...renderPartitionedAdrSections(partitioned, options, 2));
     // Back link
     sections.push(separator(), linkOut('← Back to All Decisions', '../DECISIONS.md'));
-    return document(`${statusEmoji} ADR-${adrNum}: ${name}`, sections, {
+    return document(`ADR-${adrNum}: ${name}`, sections, {
         purpose: `Architecture decision record for ${name}`,
     });
 }
 // ═══════════════════════════════════════════════════════════════════════════
 // Utilities
 // ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Render a rule description using structured annotation parsing.
+ *
+ * Extracts `**Invariant:**`, `**Rationale:**`, `**Verified by:**`, tables, and
+ * code examples — the same parsing pipeline used by the reference codec for
+ * polished output with proper table formatting and separator rows.
+ *
+ * @param description - Raw rule description text from Gherkin Rule: block
+ * @returns Array of SectionBlocks with structured content
+ */
+function renderRuleDescription(description) {
+    const blocks = [];
+    const annotations = parseBusinessRuleAnnotations(description);
+    // 1. Render structured annotations first (extracted cleanly)
+    if (annotations.invariant) {
+        blocks.push(paragraph(`**Invariant:** ${annotations.invariant}`));
+    }
+    if (annotations.rationale) {
+        blocks.push(paragraph(`**Rationale:** ${annotations.rationale}`));
+    }
+    // 2. Extract tables and render with proper markdown formatting (separator rows)
+    const tables = extractTablesFromDescription(description);
+    for (const tbl of tables) {
+        const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
+        blocks.push(table([...tbl.headers], rows));
+    }
+    // 3. Render remaining content with interleaved DocStrings preserved.
+    //    Strip table lines FIRST (before annotation regexes) so that bold markers
+    //    inside table cells (e.g. `| **Context:** ... |`) don't act as false
+    //    annotation boundaries that truncate the lazy `[\s\S]*?` capture.
+    //    Then strip known annotations and pass through parseDescriptionWithDocStrings
+    //    which preserves text → code → text → code ordering.
+    let stripped = description
+        .split('\n')
+        .filter((line) => {
+        const trimmed = line.trim();
+        return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
+    })
+        .join('\n');
+    stripped = stripped.replace(/\*\*Invariant:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+    stripped = stripped.replace(/\*\*Rationale:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+    stripped = stripped.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
+    const strippedTrimmed = stripped.trim();
+    if (strippedTrimmed.length > 0) {
+        blocks.push(...parseDescriptionWithDocStrings(strippedTrimmed));
+    }
+    // 4. Render verified-by list last
+    if (annotations.verifiedBy && annotations.verifiedBy.length > 0) {
+        blocks.push(paragraph('**Verified by:**'));
+        blocks.push(list([...annotations.verifiedBy]));
+    }
+    return blocks;
+}
+/**
+ * Render a Feature description preserving content order.
+ *
+ * Unlike `renderRuleDescription` (which extracts annotations and tables out-of-order),
+ * this function walks the description linearly, detecting transitions between prose,
+ * table blocks, and DocString blocks. Each block type is rendered appropriately:
+ * - Prose → `paragraph()` with dedented text
+ * - Tables → `table()` with proper separator rows via `extractTablesFromDescription`
+ * - DocStrings → `code()` with language hint and dedented content
+ *
+ * @param description - Raw Feature description text (Gherkin-indented)
+ * @returns Array of SectionBlocks preserving the original content order
+ */
+function renderFeatureDescription(description) {
+    const blocks = [];
+    const dedented = dedent(description);
+    const lines = dedented.split('\n');
+    let currentBlock = [];
+    let blockType = 'prose';
+    let docStringLang = '';
+    const flushBlock = () => {
+        const content = currentBlock.join('\n').trim();
+        if (content.length === 0) {
+            currentBlock = [];
+            return;
+        }
+        if (blockType === 'table') {
+            // Parse table lines into structured table with separator rows
+            const extracted = extractTablesFromDescription(content);
+            for (const tbl of extracted) {
+                const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
+                blocks.push(table([...tbl.headers], rows));
+            }
+        }
+        else if (blockType === 'docstring') {
+            blocks.push(code(dedent(content), docStringLang || 'text'));
+        }
+        else {
+            blocks.push(paragraph(content));
+        }
+        currentBlock = [];
+    };
+    let inDocString = false;
+    for (const line of lines) {
+        const trimmed = line.trim();
+        // DocString delimiter detection
+        if (trimmed.startsWith('"""')) {
+            if (!inDocString) {
+                // Opening delimiter — flush current block, start DocString
+                flushBlock();
+                inDocString = true;
+                blockType = 'docstring';
+                docStringLang = trimmed.slice(3).trim();
+                continue;
+            }
+            else {
+                // Closing delimiter — flush DocString
+                inDocString = true;
+                flushBlock();
+                inDocString = false;
+                blockType = 'prose';
+                continue;
+            }
+        }
+        if (inDocString) {
+            currentBlock.push(line);
+            continue;
+        }
+        // Detect table lines (start and end with |)
+        const isTableLine = trimmed.startsWith('|') && trimmed.endsWith('|');
+        if (isTableLine && blockType !== 'table') {
+            // Transition: prose → table
+            flushBlock();
+            blockType = 'table';
+            currentBlock.push(trimmed);
+        }
+        else if (!isTableLine && blockType === 'table') {
+            // Transition: table → prose
+            flushBlock();
+            blockType = 'prose';
+            currentBlock.push(trimmed);
+        }
+        else {
+            // Prose lines: trimmed to strip Gherkin indentation
+            // Table lines: trimmed for consistent pipe alignment
+            // DocString lines: raw (handled separately above)
+            currentBlock.push(trimmed);
+        }
+    }
+    // Flush any remaining content
+    flushBlock();
+    return blocks;
+}
 /**
  * Render partitioned ADR sections (Context, Decision, Consequences)
  *
@@ -450,7 +600,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
         sections.push(heading(headingLevel, 'Context'));
         for (const rule of partitioned.context) {
             if (rule.description) {
-                sections.push(...parseDescriptionWithDocStrings(rule.description));
+                sections.push(...renderRuleDescription(rule.description));
             }
         }
     }
@@ -459,7 +609,7 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
         sections.push(heading(headingLevel, 'Decision'));
         for (const rule of partitioned.decision) {
             if (rule.description) {
-                sections.push(...parseDescriptionWithDocStrings(rule.description));
+                sections.push(...renderRuleDescription(rule.description));
             }
         }
     }
@@ -468,37 +618,21 @@ function renderPartitionedAdrSections(partitioned, options, headingLevel) {
         sections.push(heading(headingLevel, 'Consequences'));
         for (const rule of partitioned.consequences) {
             if (rule.description) {
-                sections.push(...parseDescriptionWithDocStrings(rule.description));
+                sections.push(...renderRuleDescription(rule.description));
             }
         }
     }
     // Render rules that don't match ADR prefixes (e.g., "DD-1 - ...", invariants)
     if (partitioned.other.length > 0) {
         sections.push(heading(headingLevel, 'Rules'));
+        const ruleHeadingLevel = headingLevel === 2 ? 3 : 6;
         for (const rule of partitioned.other) {
-            sections.push(heading(headingLevel === 2 ? 3 : 6, rule.name));
+            sections.push(heading(ruleHeadingLevel, rule.name));
             if (rule.description) {
-                sections.push(...parseDescriptionWithDocStrings(rule.description));
+                sections.push(...renderRuleDescription(rule.description));
             }
         }
     }
     return sections;
-}
-/**
- * Get emoji for ADR status
- */
-function getAdrStatusEmoji(status) {
-    switch (status) {
-        case 'accepted':
-            return '✅';
-        case 'proposed':
-            return '📋';
-        case 'deprecated':
-            return '⚠️';
-        case 'superseded':
-            return '🔄';
-        default:
-            return '📋';
-    }
 }
 //# sourceMappingURL=adr.js.map

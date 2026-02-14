@@ -20,16 +20,25 @@ Feature: ADR-002 - Gherkin-Only Testing Policy
   - Edge cases use Scenario Outline with Examples tables
 
   **Consequences:**
-  - (+) Single source of truth for tests AND documentation
-  - (+) Demonstrates Gherkin sufficiency — the package practices what it preaches
-  - (+) Living documentation always matches test coverage
-  - (+) Forces better scenario design with Examples tables
-  - (-) Scenario Outline syntax more verbose than parameterized tests
+  | Type | Impact |
+  | Positive | Single source of truth for tests AND documentation |
+  | Positive | Demonstrates Gherkin sufficiency -- the package practices what it preaches |
+  | Positive | Living documentation always matches test coverage |
+  | Positive | Forces better scenario design with Examples tables |
+  | Negative | Scenario Outline syntax more verbose than parameterized tests |
+
+  # ===========================================================================
+  # DELIVERABLES
+  # ===========================================================================
 
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
       | Policy definition in CLAUDE.md | complete | CLAUDE.md |
+
+  # ===========================================================================
+  # RULE 1: Source-Driven Process Benefit
+  # ===========================================================================
 
   Rule: Source-driven process benefit
 
@@ -42,6 +51,10 @@ Feature: ADR-002 - Gherkin-Only Testing Policy
     | Business rules | Manually maintained | Extracted from Rule blocks |
     | Acceptance criteria | Implicit in test code | Explicit @acceptance-criteria tags |
     | Traceability | Manual cross-referencing | @libar-docs-implements links |
+
+  # ===========================================================================
+  # ACCEPTANCE CRITERIA
+  # ===========================================================================
 
   @acceptance-criteria
   Scenario: Gherkin-only policy enforced
