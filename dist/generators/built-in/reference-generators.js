@@ -137,8 +137,8 @@ export const LIBAR_REFERENCE_CONFIGS = [
         ],
         behaviorCategories: [],
         diagramScopes: [
-            { archView: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
-            { archView: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
+            { include: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
+            { include: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
         ],
         claudeMdSection: 'architecture',
         docsFilename: 'PIPELINE-OVERVIEW.md',
@@ -150,7 +150,7 @@ export const LIBAR_REFERENCE_CONFIGS = [
         shapeSources: ['src/renderable/schema.ts', 'src/validation-schemas/master-dataset.ts'],
         behaviorCategories: [],
         diagramScopes: [
-            { archView: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
+            { include: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
         ],
         claudeMdSection: 'architecture',
         docsFilename: 'CODEC-ARCHITECTURE.md',

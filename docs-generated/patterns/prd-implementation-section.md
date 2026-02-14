@@ -1,4 +1,4 @@
-# ✅ Prd Implementation Section
+# 📋 Prd Implementation Section
 
 **Purpose:** Detailed documentation for the Prd Implementation Section pattern
 
@@ -8,130 +8,128 @@
 
 | Property | Value |
 | --- | --- |
-| Status | completed |
+| Status | planned |
 | Category | DDD |
+| Phase | 99 |
 
 ## Description
 
-Tests the Implementations section rendering in pattern documents.
-  Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
-  with working links to the source files.
+**Problem:** Implementation files with `@libar-docs-implements:PatternName` contain rich
+  relationship metadata (`@libar-docs-uses`, `@libar-docs-used-by`, `@libar-docs-usecase`)
+  that is not rendered in generated PRD documentation. This metadata provides valuable API
+  guidance and dependency information.
+
+  **Solution:** Extend the PRD generator to collect all files with `@libar-docs-implements:X`
+  and render their metadata in a dedicated "## Implementations" section. This leverages the
+  relationship model from PatternRelationshipModel without requiring specs to list file paths.
+
+  **Business Value:**
+  | Benefit | How |
+  | PRDs include implementation context | `implements` files auto-discovered and rendered |
+  | Dependency visibility | `uses`/`used-by` from implementations shown in PRD |
+  | Usage guidance in docs | `usecase` annotations rendered as "When to Use" |
+  | Zero manual sync | Code declares relationship, PRD reflects it |
 
 ## Implementations
 
 Files that implement this pattern:
 
-- [`prd-generator-code-annotations-inclusion.feature`](../../delivery-process/specs/prd-generator-code-annotations-inclusion.feature) - **Problem:** Implementation files with `@libar-docs-implements:PatternName` contain rich
+- [`prd-implementation-section.feature`](../../tests/features/generators/prd-implementation-section.feature) - Tests the Implementations section rendering in pattern documents.
 
 ## Acceptance Criteria
 
-**Implementations section renders with file links**
+**Implementations discovered from relationship index**
 
-- Given a pattern "EventStoreDurability" defined with:
-- And a TypeScript file "durability/outbox.ts" that implements "EventStoreDurability" with:
-- When generating the pattern document for "EventStoreDurability"
-- Then the document contains heading "Implementations"
-- And the document contains file link to "durability/outbox.ts"
-- And the document contains implementation description "Action results captured"
+- Given a roadmap spec with `@libar-docs-pattern:EventStoreDurability`
+- And three TypeScript files with `@libar-docs-implements:EventStoreDurability`
+- When the PRD generator processes the pattern
+- Then all three implementation files are discovered
+- And no directory path is needed in the spec
 
-| Field | Value |
-| --- | --- |
-| status | roadmap |
-| category | event-sourcing |
+**Multiple implementations aggregated**
 
-| Field | Value |
-| --- | --- |
-| name | OutboxPattern |
-| description | Action results captured via onComplete mutation |
+- Given pattern "EventStoreDurability" with implementations:
+- When the PRD generator runs
+- Then the "## Implementations" section lists both files
+- And each file's metadata is rendered separately
 
-**Implementation includes description when available**
+| File | Uses | Usecase |
+| --- | --- | --- |
+| outbox.ts | Workpool, ActionRetrier | "Capture external results" |
+| idempotentAppend.ts | EventStore | "Prevent duplicate events" |
 
-- Given a pattern "TestPattern" defined with:
-- And a TypeScript file "impl/test-impl.ts" that implements "TestPattern" with:
-- When generating the pattern document for "TestPattern"
-- Then the document contains implementation description "This implementation provides core functionality"
+**Implementations section generated in PRD**
 
-| Field | Value |
-| --- | --- |
-| status | active |
-| category | core |
+- Given a pattern with implementation files
+- When the PRD generator runs
+- Then the output includes "## Implementations"
+- And each file is listed with its relative path
 
-| Field | Value |
-| --- | --- |
-| name | TestImpl |
-| description | This implementation provides core functionality |
+**Dependencies rendered per implementation**
 
-**Multiple implementations sorted by file path**
+- Given implementation file with `@libar-docs-uses EventStore, Workpool`
+- When rendered in PRD
+- Then output includes "**Dependencies:** EventStore, Workpool"
 
-- Given a pattern "MultiImplPattern" defined with:
-- And TypeScript files that implement "MultiImplPattern":
-- When generating the pattern document for "MultiImplPattern"
-- Then implementations appear in file path order:
+**Usecases rendered as guidance**
 
-| Field | Value |
-| --- | --- |
-| status | active |
-| category | core |
+- Given implementation file with `@libar-docs-usecase "When event append must survive failures"`
+- When rendered in PRD
+- Then output includes "**When to Use:** When event append must survive failures"
 
-| File | Name |
-| --- | --- |
-| durability/outbox.ts | OutboxPattern |
-| durability/publication.ts | PublicationPattern |
-| durability/idempotentAppend.ts | IdempotentAppend |
+**Used-by rendered for visibility**
 
-| File |
-| --- |
-| durability/idempotentAppend.ts |
-| durability/outbox.ts |
-| durability/publication.ts |
+- Given implementation file with `@libar-docs-used-by CommandOrchestrator, SagaEngine`
+- When rendered in PRD
+- Then output includes "**Used By:** CommandOrchestrator, SagaEngine"
 
-**No implementations section when none exist**
+**Section omitted when no implementations exist**
 
-- Given a pattern "NoImplPattern" defined with:
-- And no TypeScript files implement "NoImplPattern"
-- When generating the pattern document for "NoImplPattern"
-- Then the document does not contain heading "Implementations"
-
-| Field | Value |
-| --- | --- |
-| status | roadmap |
-| category | core |
-
-**Links are relative from patterns directory**
-
-- Given a pattern "LinkTestPattern" defined with:
-- And a TypeScript file "packages/@libar-dev/platform-core/src/durability/outbox.ts" that implements "LinkTestPattern" with:
-- When generating the pattern document for "LinkTestPattern"
-- Then the implementation link path starts with "../"
-- And the implementation link path contains "outbox.ts"
-
-| Field | Value |
-| --- | --- |
-| status | active |
-| category | infra |
-
-| Field | Value |
-| --- | --- |
-| name | Outbox |
-| description | Outbox implementation |
+- Given a pattern "FuturePattern" with status "roadmap"
+- And no files have `@libar-docs-implements:FuturePattern`
+- When the PRD generator runs
+- Then the output does not include "## Implementations"
 
 ## Business Rules
 
-**Implementation files appear in pattern docs via @libar-docs-implements**
+**PRD generator discovers implementations from relationship index**
 
-_Verified by: Implementations section renders with file links, Implementation includes description when available_
+**Invariant:** When generating PRD for pattern X, the generator queries the
+    relationship index for all files where `implements === X`. No explicit listing
+    in the spec file is required.
 
-**Multiple implementations are listed alphabetically**
+    **Rationale:** The `@libar-docs-implements` tag creates a backward link from
+    code to spec. The relationship index aggregates these. PRD generation simply
+    queries the index rather than scanning directories.
 
-_Verified by: Multiple implementations sorted by file path_
+    **Verified by:** Implementations discovered, Multiple files aggregated
 
-**Patterns without implementations omit the section**
+_Verified by: Implementations discovered from relationship index, Multiple implementations aggregated_
 
-_Verified by: No implementations section when none exist_
+**Implementation metadata appears in dedicated PRD section**
 
-**Implementation references use relative file links**
+**Invariant:** The PRD output includes a "## Implementations" section listing
+    all files that implement the pattern. Each file shows its `uses`, `usedBy`,
+    and `usecase` metadata in a consistent format.
 
-_Verified by: Links are relative from patterns directory_
+    **Rationale:** Developers reading PRDs benefit from seeing the implementation
+    landscape alongside requirements, without cross-referencing code files.
+
+    **Verified by:** Section generated, Dependencies rendered, Usecases rendered
+
+_Verified by: Implementations section generated in PRD, Dependencies rendered per implementation, Usecases rendered as guidance, Used-by rendered for visibility_
+
+**Patterns without implementations render cleanly**
+
+**Invariant:** If no files have `@libar-docs-implements:X` for pattern X,
+    the "## Implementations" section is omitted (not rendered as empty).
+
+    **Rationale:** Planned patterns may not have implementations yet. Empty
+    sections add noise without value.
+
+    **Verified by:** Section omitted when empty
+
+_Verified by: Section omitted when no implementations exist_
 
 ---
 

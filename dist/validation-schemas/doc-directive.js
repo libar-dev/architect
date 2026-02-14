@@ -204,8 +204,8 @@ export const DocDirectiveSchema = z
     archContext: z.string().optional(),
     /** Architectural layer (from @libar-docs-arch-layer tag) */
     archLayer: z.string().optional(),
-    /** Named architectural views for scoped diagram generation (from @libar-docs-arch-view CSV tag) */
-    archView: z.array(z.string().min(1)).readonly().optional(),
+    /** Cross-cutting document inclusion for content routing and diagram scoping (from @libar-docs-include CSV tag) */
+    include: z.array(z.string().min(1)).readonly().optional(),
     // Shape extraction fields
     /** Shape names to extract from this file (from @libar-docs-extract-shapes tag) */
     extractShapes: z.array(z.string()).readonly().optional(),

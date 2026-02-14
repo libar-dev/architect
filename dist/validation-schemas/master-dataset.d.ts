@@ -11,7 +11,7 @@
  * @libar-docs-arch-role read-model
  * @libar-docs-arch-context api
  * @libar-docs-arch-layer domain
- * @libar-docs-arch-view codec-transformation
+ * @libar-docs-include codec-transformation
  *
  * ## MasterDataset - Unified Pattern Views Schema
  *
@@ -56,10 +56,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -86,7 +86,7 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -120,10 +120,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -150,8 +150,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -181,10 +181,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -210,8 +210,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -229,13 +229,13 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -245,15 +245,15 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -263,6 +263,7 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -296,10 +297,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -326,7 +327,7 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -360,10 +361,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -390,8 +391,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -421,10 +422,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -450,8 +451,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -469,13 +470,13 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -485,15 +486,15 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -503,6 +504,7 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -536,10 +538,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -566,7 +568,7 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -600,10 +602,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -630,8 +632,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -661,10 +663,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -690,8 +692,8 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -709,13 +711,13 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -725,15 +727,15 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -743,6 +745,7 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -795,10 +798,10 @@ export declare const PhaseGroupSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -825,7 +828,7 @@ export declare const PhaseGroupSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -859,10 +862,10 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -889,8 +892,8 @@ export declare const PhaseGroupSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -920,10 +923,10 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -949,8 +952,8 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -968,13 +971,13 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -984,15 +987,15 @@ export declare const PhaseGroupSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1002,6 +1005,7 @@ export declare const PhaseGroupSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -1046,10 +1050,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1076,7 +1080,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -1110,10 +1114,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1140,8 +1144,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1171,10 +1175,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1200,8 +1204,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -1219,13 +1223,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1235,15 +1239,15 @@ export declare const SourceViewsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1253,6 +1257,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -1286,10 +1291,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1316,7 +1321,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -1350,10 +1355,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1380,8 +1385,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1411,10 +1416,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1440,8 +1445,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -1459,13 +1464,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1475,15 +1480,15 @@ export declare const SourceViewsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1493,6 +1498,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -1526,10 +1532,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1556,7 +1562,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -1590,10 +1596,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1620,8 +1626,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1651,10 +1657,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1680,8 +1686,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -1699,13 +1705,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1715,15 +1721,15 @@ export declare const SourceViewsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1733,6 +1739,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -1766,10 +1773,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1796,7 +1803,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -1830,10 +1837,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -1860,8 +1867,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -1891,10 +1898,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -1920,8 +1927,8 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -1939,13 +1946,13 @@ export declare const SourceViewsSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -1955,15 +1962,15 @@ export declare const SourceViewsSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1973,6 +1980,7 @@ export declare const SourceViewsSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -2045,10 +2053,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2075,7 +2083,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -2109,10 +2117,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2139,8 +2147,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2170,10 +2178,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -2199,8 +2207,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -2218,13 +2226,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2234,15 +2242,15 @@ export declare const ArchIndexSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2252,6 +2260,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -2285,10 +2294,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2315,7 +2324,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -2349,10 +2358,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2379,8 +2388,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2410,10 +2419,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -2439,8 +2448,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -2458,13 +2467,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2474,15 +2483,15 @@ export declare const ArchIndexSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2492,6 +2501,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -2525,10 +2535,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2555,7 +2565,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -2589,10 +2599,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2619,8 +2629,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2650,10 +2660,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -2679,8 +2689,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -2698,13 +2708,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2714,15 +2724,15 @@ export declare const ArchIndexSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2732,6 +2742,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -2765,10 +2776,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2795,7 +2806,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -2829,10 +2840,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -2859,8 +2870,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -2890,10 +2901,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -2919,8 +2930,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -2938,13 +2949,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -2954,15 +2965,15 @@ export declare const ArchIndexSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2972,6 +2983,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -3005,10 +3017,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3035,7 +3047,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -3069,10 +3081,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3099,8 +3111,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -3130,10 +3142,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -3159,8 +3171,8 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -3178,13 +3190,13 @@ export declare const ArchIndexSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -3194,15 +3206,15 @@ export declare const ArchIndexSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3212,6 +3224,7 @@ export declare const ArchIndexSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -3253,10 +3266,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3283,7 +3296,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -3317,10 +3330,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3347,8 +3360,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -3378,10 +3391,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -3407,8 +3420,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -3426,13 +3439,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -3442,15 +3455,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3460,6 +3473,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -3532,10 +3546,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3562,7 +3576,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3596,10 +3610,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3626,8 +3640,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3657,10 +3671,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3686,8 +3700,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -3705,13 +3719,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3721,15 +3735,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3739,6 +3753,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -3772,10 +3787,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3802,7 +3817,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3836,10 +3851,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -3866,8 +3881,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -3897,10 +3912,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -3926,8 +3941,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -3945,13 +3960,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -3961,15 +3976,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3979,6 +3994,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -4012,10 +4028,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4042,7 +4058,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -4076,10 +4092,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4106,8 +4122,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -4137,10 +4153,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -4166,8 +4182,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -4185,13 +4201,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4201,15 +4217,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4219,6 +4235,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -4256,10 +4273,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4286,7 +4303,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -4320,10 +4337,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4350,8 +4367,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -4381,10 +4398,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -4410,8 +4427,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -4429,13 +4446,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -4445,15 +4462,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4463,6 +4480,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -4503,10 +4521,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4533,7 +4551,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -4567,10 +4585,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4597,8 +4615,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -4628,10 +4646,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -4657,8 +4675,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -4676,13 +4694,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -4692,15 +4710,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -4710,6 +4728,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -4743,10 +4762,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strict>;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4773,7 +4792,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -4807,10 +4826,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         extractedAt: z.ZodISODateTime;
         patternName: z.ZodOptional<z.ZodString>;
         status: z.ZodOptional<z.ZodEnum<{
-            deferred: "deferred";
-            completed: "completed";
-            active: "active";
             roadmap: "roadmap";
+            active: "active";
+            completed: "completed";
+            deferred: "deferred";
         }>>;
         isCore: z.ZodOptional<z.ZodBoolean>;
         useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -4837,8 +4856,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
+                domain: "domain";
                 timeline: "timeline";
                 integration: "integration";
                 e2e: "e2e";
@@ -4868,10 +4887,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             status: z.ZodEnum<{
+                deferred: "deferred";
                 complete: "complete";
                 "in-progress": "in-progress";
                 pending: "pending";
-                deferred: "deferred";
                 superseded: "superseded";
                 "n/a": "n/a";
             }>;
@@ -4897,8 +4916,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            superseded: "superseded";
             deprecated: "deprecated";
+            superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
         }>>;
@@ -4916,13 +4935,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
             "bounded-context": "bounded-context";
-            decider: "decider";
+            "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
             infrastructure: "infrastructure";
-            "command-handler": "command-handler";
             repository: "repository";
+            decider: "decider";
             "read-model": "read-model";
             service: "service";
         }>>;
@@ -4932,15 +4951,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
-        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
                 type: "type";
                 enum: "enum";
-                const: "const";
                 interface: "interface";
+                const: "const";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -4950,6 +4969,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             exported: z.ZodDefault<z.ZodBoolean>;
             group: z.ZodOptional<z.ZodString>;
+            includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 jsDoc: z.ZodString;
@@ -4984,10 +5004,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5014,7 +5034,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -5048,10 +5068,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5078,8 +5098,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5109,10 +5129,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -5138,8 +5158,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -5157,13 +5177,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5173,15 +5193,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5191,6 +5211,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -5224,10 +5245,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5254,7 +5275,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -5288,10 +5309,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5318,8 +5339,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5349,10 +5370,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -5378,8 +5399,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -5397,13 +5418,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5413,15 +5434,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5431,6 +5452,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -5464,10 +5486,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5494,7 +5516,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -5528,10 +5550,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5558,8 +5580,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5589,10 +5611,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -5618,8 +5640,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -5637,13 +5659,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5653,15 +5675,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5671,6 +5693,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -5704,10 +5727,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5734,7 +5757,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -5768,10 +5791,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -5798,8 +5821,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -5829,10 +5852,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -5858,8 +5881,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -5877,13 +5900,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -5893,15 +5916,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5911,6 +5934,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -5970,10 +5994,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6000,7 +6024,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6034,10 +6058,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6064,8 +6088,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6095,10 +6119,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6124,8 +6148,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -6143,13 +6167,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6159,15 +6183,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6177,6 +6201,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -6210,10 +6235,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6240,7 +6265,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6274,10 +6299,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6304,8 +6329,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6335,10 +6360,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6364,8 +6389,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -6383,13 +6408,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6399,15 +6424,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6417,6 +6442,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -6450,10 +6476,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6480,7 +6506,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6514,10 +6540,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6544,8 +6570,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6575,10 +6601,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6604,8 +6630,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -6623,13 +6649,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6639,15 +6665,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6657,6 +6683,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -6690,10 +6717,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6720,7 +6747,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6754,10 +6781,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6784,8 +6811,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -6815,10 +6842,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -6844,8 +6871,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -6863,13 +6890,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -6879,15 +6906,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6897,6 +6924,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;
@@ -6930,10 +6958,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 }, z.core.$strict>;
                 patternName: z.ZodOptional<z.ZodString>;
                 status: z.ZodOptional<z.ZodEnum<{
-                    deferred: "deferred";
-                    completed: "completed";
-                    active: "active";
                     roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
                 }>>;
                 isCore: z.ZodOptional<z.ZodBoolean>;
                 useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -6960,7 +6988,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
-                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6994,10 +7022,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             extractedAt: z.ZodISODateTime;
             patternName: z.ZodOptional<z.ZodString>;
             status: z.ZodOptional<z.ZodEnum<{
-                deferred: "deferred";
-                completed: "completed";
-                active: "active";
                 roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
             }>>;
             isCore: z.ZodOptional<z.ZodBoolean>;
             useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
@@ -7024,8 +7052,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
+                    domain: "domain";
                     timeline: "timeline";
                     integration: "integration";
                     e2e: "e2e";
@@ -7055,10 +7083,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 status: z.ZodEnum<{
+                    deferred: "deferred";
                     complete: "complete";
                     "in-progress": "in-progress";
                     pending: "pending";
-                    deferred: "deferred";
                     superseded: "superseded";
                     "n/a": "n/a";
                 }>;
@@ -7084,8 +7112,8 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                superseded: "superseded";
                 deprecated: "deprecated";
+                superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
             }>>;
@@ -7103,13 +7131,13 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
                 "bounded-context": "bounded-context";
-                decider: "decider";
+                "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
                 infrastructure: "infrastructure";
-                "command-handler": "command-handler";
                 repository: "repository";
+                decider: "decider";
                 "read-model": "read-model";
                 service: "service";
             }>>;
@@ -7119,15 +7147,15 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
                     type: "type";
                     enum: "enum";
-                    const: "const";
                     interface: "interface";
+                    const: "const";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -7137,6 +7165,7 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 exported: z.ZodDefault<z.ZodBoolean>;
                 group: z.ZodOptional<z.ZodString>;
+                includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                     name: z.ZodString;
                     jsDoc: z.ZodString;

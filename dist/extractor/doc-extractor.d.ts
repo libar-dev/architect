@@ -6,7 +6,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context extractor
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view pipeline-stages
+ * @libar-docs-include pipeline-stages
  * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
  * @libar-docs-used-by Orchestrator, Generators
  * @libar-docs-usecase "When converting scanned files to ExtractedPattern objects"

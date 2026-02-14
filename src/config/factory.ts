@@ -6,7 +6,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context config
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view reference-sample
+ * @libar-docs-include reference-sample
  * @libar-docs-uses ConfigurationTypes, ConfigurationPresets, RegexBuilders, TagRegistry
  * @libar-docs-used-by PublicAPI
  * @libar-docs-extract-shapes CreateDeliveryProcessOptions, createDeliveryProcess

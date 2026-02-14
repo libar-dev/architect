@@ -173,6 +173,9 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -181,9 +184,6 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
-        RenderableUtils["RenderableUtils"]
-        SectionBlock["SectionBlock"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
@@ -191,6 +191,13 @@ graph TB
         GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
+        CLIVersionHelper["CLIVersionHelper"]
+        ValidatePatternsCLI["ValidatePatternsCLI"]
+        LintProcessCLI["LintProcessCLI"]
+        LintPatternsCLI["LintPatternsCLI"]
+        TagTaxonomyCLI["TagTaxonomyCLI"]
+        Documentation_Generator_CLI["Documentation Generator CLI"]
+        CLIErrorHandler["CLIErrorHandler"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         ConfigResolver["ConfigResolver"]
@@ -201,13 +208,6 @@ graph TB
         SourceMerger["SourceMerger"]
         DefineConfig["DefineConfig"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        CLIVersionHelper["CLIVersionHelper"]
-        ValidatePatternsCLI["ValidatePatternsCLI"]
-        LintProcessCLI["LintProcessCLI"]
-        LintPatternsCLI["LintPatternsCLI"]
-        TagTaxonomyCLI["TagTaxonomyCLI"]
-        Documentation_Generator_CLI["Documentation Generator CLI"]
-        CLIErrorHandler["CLIErrorHandler"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -254,6 +254,20 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -271,20 +285,6 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> Pattern_Scanner
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI

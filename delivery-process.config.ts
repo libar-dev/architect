@@ -39,7 +39,7 @@ export default defineConfig({
       behaviorCategories: ['infra'],
       diagramScopes: [
         {
-          archView: ['reference-sample'],
+          include: ['reference-sample'],
           direction: 'TB',
           title: 'Configuration Components',
         },

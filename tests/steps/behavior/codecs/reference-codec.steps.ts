@@ -1191,17 +1191,17 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     });
 
     RuleScenario(
-      'archView filter selects patterns by view membership',
+      'include filter selects patterns by include tag membership',
       ({ Given, And, When, Then }) => {
         Given(
-          'a reference config with diagramScope archView {string}',
+          'a reference config with diagramScope include {string}',
           (_ctx: unknown, viewName: string) => {
             state!.config = {
               title: 'Test Reference Document',
               conventionTags: [],
               shapeSources: [],
               behaviorCategories: [],
-              diagramScope: { archView: [viewName] },
+              diagramScope: { include: [viewName] },
               claudeMdSection: 'test',
               docsFilename: 'TEST-REFERENCE.md',
               claudeMdFilename: 'test.md',
@@ -1210,7 +1210,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         And(
-          'a MasterDataset with patterns in arch view {string}',
+          'a MasterDataset with patterns in include {string}',
           (_ctx: unknown, viewName: string) => {
             state!.dataset = createTestMasterDataset({
               patterns: [
@@ -1218,13 +1218,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                   name: 'PatternScanner',
                   archContext: 'scanner',
                   archRole: 'infrastructure',
-                  archView: [viewName],
+                  include: [viewName],
                 }),
                 createTestPattern({
                   name: 'DocExtractor',
                   archContext: 'extractor',
                   archRole: 'service',
-                  archView: [viewName],
+                  include: [viewName],
                 }),
               ],
             });
@@ -1253,13 +1253,13 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario('Multiple filter dimensions OR together', ({ Given, And, When, Then }) => {
-      Given('a reference config with diagramScope combining archContext and archView', () => {
+      Given('a reference config with diagramScope combining archContext and include', () => {
         state!.config = {
           title: 'Test Reference Document',
           conventionTags: [],
           shapeSources: [],
           behaviorCategories: [],
-          diagramScope: { archContext: ['lint'], archView: ['pipeline-stages'] },
+          diagramScope: { archContext: ['lint'], include: ['pipeline-stages'] },
           claudeMdSection: 'test',
           docsFilename: 'TEST-REFERENCE.md',
           claudeMdFilename: 'test.md',
@@ -1267,7 +1267,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
 
       And(
-        'a MasterDataset where one pattern matches archContext and another matches archView',
+        'a MasterDataset where one pattern matches archContext and another matches include',
         () => {
           state!.dataset = createTestMasterDataset({
             patterns: [
@@ -1280,7 +1280,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                 name: 'DocExtractor',
                 archContext: 'extractor',
                 archRole: 'service',
-                archView: ['pipeline-stages'],
+                include: ['pipeline-stages'],
               }),
             ],
           });
@@ -1451,11 +1451,11 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             behaviorCategories: [],
             diagramScopes: [
               {
-                archView: ['codec-transformation'],
+                include: ['codec-transformation'],
                 title: 'Codec Transformation',
                 direction: 'TB',
               },
-              { archView: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
+              { include: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
             ],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -1463,20 +1463,20 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
           };
         });
 
-        And('a MasterDataset with patterns in two different arch views', () => {
+        And('a MasterDataset with patterns in two different include groups', () => {
           state!.dataset = createTestMasterDataset({
             patterns: [
               createTestPattern({
                 name: 'SessionCodec',
                 archContext: 'renderer',
                 archRole: 'projection',
-                archView: ['codec-transformation'],
+                include: ['codec-transformation'],
               }),
               createTestPattern({
                 name: 'PatternScanner',
                 archContext: 'scanner',
                 archRole: 'infrastructure',
-                archView: ['pipeline-stages'],
+                include: ['pipeline-stages'],
               }),
             ],
           });
@@ -1517,7 +1517,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
             shapeSources: [],
             behaviorCategories: [],
             diagramScopes: [
-              { archView: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
+              { include: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
             ],
             claudeMdSection: 'test',
             docsFilename: 'TEST-REFERENCE.md',
@@ -1526,7 +1526,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         And(
-          'a MasterDataset with patterns in arch view {string}',
+          'a MasterDataset with patterns in include {string}',
           (_ctx: unknown, viewName: string) => {
             state!.dataset = createTestMasterDataset({
               patterns: [
@@ -1534,7 +1534,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
                   name: 'PatternScanner',
                   archContext: 'scanner',
                   archRole: 'infrastructure',
-                  archView: [viewName],
+                  include: [viewName],
                 }),
               ],
             });

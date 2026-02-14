@@ -86,7 +86,7 @@ export const METADATA_TAGS_BY_GROUP = {
         'discovered-risk',
         'discovered-learning',
     ],
-    architecture: ['arch-role', 'arch-context', 'arch-layer', 'arch-view'],
+    architecture: ['arch-role', 'arch-context', 'arch-layer', 'include'],
     extraction: ['extract-shapes', 'shape'],
     stub: ['target', 'since'],
     convention: ['convention'],
@@ -456,10 +456,10 @@ export function buildRegistry() {
                 example: '@libar-docs-arch-layer application',
             },
             {
-                tag: 'arch-view',
+                tag: 'include',
                 format: 'csv',
-                purpose: 'Named architectural views for scoped diagram generation',
-                example: '@libar-docs-arch-view codec-transformation,pipeline-overview',
+                purpose: 'Cross-cutting document inclusion for content routing and diagram scoping',
+                example: '@libar-docs-include reference-sample,codec-system',
             },
             // Design session stub metadata tags (DataAPIStubIntegration Phase B)
             {

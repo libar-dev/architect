@@ -41,7 +41,12 @@ Files that implement this pattern:
 - [`transform-dataset.ts`](../../src/generators/pipeline/transform-dataset.ts) - ## TransformDataset - Single-Pass Pattern Transformation
 - [`rules.ts`](../../src/lint/rules.ts) - ## LintRules - Annotation Quality Rules
 - [`patterns.ts`](../../src/renderable/codecs/patterns.ts) - ## Patterns Document Codec
+- [`depends-on-tag.feature`](../../tests/features/behavior/pattern-relationships/depends-on-tag.feature) - Tests extraction of @libar-docs-depends-on and @libar-docs-enables
+- [`extends-tag.feature`](../../tests/features/behavior/pattern-relationships/extends-tag.feature) - Tests for the @libar-docs-extends tag which establishes generalization
+- [`implements-tag.feature`](../../tests/features/behavior/pattern-relationships/implements-tag.feature) - Tests for the @libar-docs-implements tag which links implementation files
+- [`linter-validation.feature`](../../tests/features/behavior/pattern-relationships/linter-validation.feature) - Tests for lint rules that validate relationship integrity, detect conflicts,
 - [`mermaid-rendering.feature`](../../tests/features/behavior/pattern-relationships/mermaid-rendering.feature) - Tests for rendering all relationship types in Mermaid dependency graphs
+- [`uses-tag.feature`](../../tests/features/behavior/pattern-relationships/uses-tag.feature) - Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by
 
 ## Acceptance Criteria
 

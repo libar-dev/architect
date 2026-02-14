@@ -6,7 +6,7 @@
  * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view codec-transformation
+ * @libar-docs-include codec-transformation
  * @libar-docs-uses MasterDataset, ArchIndex
  *
  * ## Architecture Diagram Codec

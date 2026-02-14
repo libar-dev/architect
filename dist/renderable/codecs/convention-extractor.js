@@ -257,4 +257,51 @@ export function extractConventions(dataset, conventionTags) {
     }
     return result;
 }
+/**
+ * Extract convention bundles from pre-filtered patterns.
+ *
+ * DD-1 (CrossCuttingDocumentInclusion): Used by the include-tag pass to
+ * build convention content from patterns selected by include tag rather
+ * than by conventionTags filter. Groups output by each pattern's convention
+ * tag values.
+ *
+ * @param patterns - Pre-filtered patterns that have convention content
+ * @returns Array of ConventionBundles
+ */
+export function extractConventionsFromPatterns(patterns) {
+    const bundles = new Map();
+    for (const pattern of patterns) {
+        if (!pattern.convention || pattern.convention.length === 0)
+            continue;
+        let ruleContents;
+        if (pattern.rules && pattern.rules.length > 0) {
+            ruleContents = pattern.rules.map(extractConventionRuleContent);
+        }
+        else if (pattern.directive.description) {
+            ruleContents = extractConventionRulesFromDescription(pattern.directive.description, pattern.name);
+        }
+        else {
+            ruleContents = [];
+        }
+        if (ruleContents.length === 0)
+            continue;
+        for (const tag of pattern.convention) {
+            const bundle = bundles.get(tag) ?? { sourceDecisions: [], rules: [] };
+            bundle.sourceDecisions.push(pattern.name);
+            bundle.rules.push(...ruleContents);
+            bundles.set(tag, bundle);
+        }
+    }
+    const result = [];
+    for (const [tag, bundle] of bundles) {
+        if (bundle.rules.length === 0)
+            continue;
+        result.push({
+            conventionTag: tag,
+            sourceDecisions: bundle.sourceDecisions,
+            rules: bundle.rules,
+        });
+    }
+    return result;
+}
 //# sourceMappingURL=convention-extractor.js.map

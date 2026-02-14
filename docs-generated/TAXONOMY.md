@@ -93,7 +93,6 @@ Tags for enriching patterns with additional metadata.
 | `arch-role` | enum | Architectural role for diagram generation (component type) | No | `@libar-docs-arch-role projection` |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | `@libar-docs-arch-context orders` |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | `@libar-docs-arch-layer application` |
-| `arch-view` | csv | Named architectural views for scoped diagram generation | No | `@libar-docs-arch-view codec-transformation,pipeline-overview` |
 
 ### Other Tags
 
@@ -116,6 +115,7 @@ Tags for enriching patterns with additional metadata.
 | `discovered-learning` | value | Learning captured during session retrospective | No | `@libar-docs-discovered-learning convex-mutation-limits` |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
 | `shape` | value | Marks declaration as documentable shape, optionally with group name | No | `@libar-docs-shape api-types` |
+| `include` | csv | Cross-cutting document inclusion for content routing and diagram scoping | No | `@libar-docs-include reference-sample,codec-system` |
 | `target` | value | Target implementation path for stub files | No | `@libar-docs-target src/api/stub-resolver.ts` |
 | `since` | value | Design session that created this pattern | No | `@libar-docs-since DS-A` |
 | `convention` | csv | Convention domains for reference document generation from decision records | No | `@libar-docs-convention fsm-rules, testing-policy` |

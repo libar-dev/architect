@@ -9,9 +9,9 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 196 |
-| Completed Phases | 3 |
-| Total Phases | 16 |
+| Completed Patterns | 208 |
+| Completed Phases | 5 |
+| Total Phases | 18 |
 
 ---
 
@@ -49,6 +49,27 @@
 
 </details>
 
+<details>
+<summary>✅ CrossCuttingDocumentInclusion (1 patterns)</summary>
+
+| Pattern | Description |
+| --- | --- |
+| Cross Cutting Document Inclusion | The reference doc codec assembles content from four sources, each with its own selection mechanism: conventionTags... |
+
+</details>
+
+<details>
+<summary>✅ ADR004GherkinOnlyTesting (4 patterns)</summary>
+
+| Pattern | Description |
+| --- | --- |
+| ADR 004 Gherkin Only Testing | The delivery-process package had dual test approaches creating inconsistency. |
+| ADR 003 Ephemeral Persistent Separation | Generated documentation mixed session-specific content with persistent docs. |
+| ADR 002 Progressive Disclosure Architecture | Single-file PRD documentation became unwieldy at scale. |
+| ADR 001 Problem Solution Descriptions | Feature descriptions in Gherkin files lacked consistent structure. |
+
+</details>
+
 ---
 
 ## Recent Completions
@@ -64,6 +85,6 @@
 - ✅ Planning Codec Testing
 - ✅ Pr Changes Codec Testing
 
-Showing 10 of 196 completed patterns. See quarterly files for full history.
+Showing 10 of 208 completed patterns. See quarterly files for full history.
 
 ---

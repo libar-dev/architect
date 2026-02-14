@@ -139,10 +139,10 @@ Parameterized codec factory that creates reference document codecs
 - And the mermaid diagram includes a Related subgraph
 - And the mermaid diagram includes dashed neighbor styling
 
-**archView filter selects patterns by view membership**
+**include filter selects patterns by include tag membership**
 
-- Given a reference config with diagramScope archView "pipeline-stages"
-- And a MasterDataset with patterns in arch view "pipeline-stages"
+- Given a reference config with diagramScope include "pipeline-stages"
+- And a MasterDataset with patterns in include "pipeline-stages"
 - When decoding at detail level "detailed"
 - Then the document contains a mermaid block
 - And the mermaid content contains "PatternScanner"
@@ -157,8 +157,8 @@ Parameterized codec factory that creates reference document codecs
 
 **Multiple filter dimensions OR together**
 
-- Given a reference config with diagramScope combining archContext and archView
-- And a MasterDataset where one pattern matches archContext and another matches archView
+- Given a reference config with diagramScope combining archContext and include
+- And a MasterDataset where one pattern matches archContext and another matches include
 - When decoding at detail level "detailed"
 - Then the document contains a mermaid block
 - And the mermaid content contains both "LintRules" and "DocExtractor"
@@ -206,7 +206,7 @@ Parameterized codec factory that creates reference document codecs
 **Config with diagramScopes array produces multiple diagrams**
 
 - Given a reference config with two diagramScopes
-- And a MasterDataset with patterns in two different arch views
+- And a MasterDataset with patterns in two different include groups
 - When decoding at detail level "detailed"
 - Then the document contains 2 mermaid blocks
 - And the document has headings "Codec Transformation" and "Pipeline Data Flow"
@@ -214,7 +214,7 @@ Parameterized codec factory that creates reference document codecs
 **Diagram direction is reflected in mermaid output**
 
 - Given a reference config with LR direction diagramScope
-- And a MasterDataset with patterns in arch view "pipeline-stages"
+- And a MasterDataset with patterns in include "pipeline-stages"
 - When decoding at detail level "detailed"
 - Then the document contains a mermaid block
 - And the mermaid content contains "graph LR"
@@ -508,7 +508,7 @@ _Verified by: Convention with mermaid content produces mermaid block in output, 
 
 **Scoped diagrams are generated from diagramScope config**
 
-_Verified by: Config with diagramScope produces mermaid block at detailed level, Neighbor patterns appear in diagram with distinct style, archView filter selects patterns by view membership, Self-contained scope produces no Related subgraph, Multiple filter dimensions OR together, Explicit pattern names filter selects named patterns, Config without diagramScope produces no diagram section, archLayer filter selects patterns by architectural layer, archLayer and archContext compose via OR, Summary level omits scoped diagram_
+_Verified by: Config with diagramScope produces mermaid block at detailed level, Neighbor patterns appear in diagram with distinct style, include filter selects patterns by include tag membership, Self-contained scope produces no Related subgraph, Multiple filter dimensions OR together, Explicit pattern names filter selects named patterns, Config without diagramScope produces no diagram section, archLayer filter selects patterns by architectural layer, archLayer and archContext compose via OR, Summary level omits scoped diagram_
 
 **Multiple diagram scopes produce multiple mermaid blocks**
 

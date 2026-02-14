@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 196/281 (70%)
+**Patterns:** [██████████████░░░░░░] 208/304 (68%)
 
-**Phases:** 3/16 complete
+**Phases:** 5/18 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 281 |
-| Completed | 196 |
-| Active | 44 |
-| Planned | 41 |
+| Total Patterns | 304 |
+| Completed | 208 |
+| Active | 47 |
+| Planned | 49 |
 
 ---
 
@@ -33,8 +33,10 @@
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
 | 🚧 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
 | ✅ [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 1/1 | 100% |
-| 📋 [RichContentHelpersTesting](phases/phase-44-rich-content-helpers-testing.md) | 0/2 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/8 | 50% |
+| ✅ [CrossCuttingDocumentInclusion](phases/phase-32-cross-cutting-document-inclusion.md) | 1/1 | 100% |
+| ✅ [ADR004GherkinOnlyTesting](phases/phase-43-adr-004-gherkin-only-testing.md) | 4/4 | 100% |
+| 📋 [ADR005ConfigurableTagPrefix](phases/phase-44-adr-005-configurable-tag-prefix.md) | 1/3 | 33% |
+| 🚧 [ADR011PublishingStrategy](phases/phase-99-adr-011-publishing-strategy.md) | 5/12 | 42% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
@@ -154,26 +156,54 @@
 
 ---
 
-### 📋 RichContentHelpersTesting
+### ✅ CrossCuttingDocumentInclusion
 
-[░░░░░░░░░░░░░░░] 0/2 0% complete
+[███████████████] 1/1 100% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
+| ✅ Cross Cutting Document Inclusion | completed | The reference doc codec assembles content from four sources, each with its own selection mechanism: conventionTags... |
+
+---
+
+### ✅ ADR004GherkinOnlyTesting
+
+[███████████████] 4/4 100% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ ADR 001 Problem Solution Descriptions | completed | Feature descriptions in Gherkin files lacked consistent structure. |
+| ✅ ADR 002 Progressive Disclosure Architecture | completed | Single-file PRD documentation became unwieldy at scale. |
+| ✅ ADR 003 Ephemeral Persistent Separation | completed | Generated documentation mixed session-specific content with persistent docs. |
+| ✅ ADR 004 Gherkin Only Testing | completed | The delivery-process package had dual test approaches creating inconsistency. |
+
+---
+
+### 📋 ADR005ConfigurableTagPrefix
+
+[█████░░░░░░░░░░] 1/3 33% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| ✅ ADR 005 Configurable Tag Prefix | completed | The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations. |
 | 📋 Kebab Case Slugs | planned | As a documentation generator I need to generate readable, URL-safe slugs from pattern names So that generated file... |
 | 📋 Rich Content Helpers Testing | planned | As a document codec author I need helpers to render Gherkin rich content So that DataTables, DocStrings, and... |
 
 ---
 
-### 📋 TypeScriptTaxonomyImplementation
+### 🚧 ADR011PublishingStrategy
 
-[████████░░░░░░░] 4/8 50% complete
+[██████░░░░░░░░░] 5/12 42% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
+| 📋 ADR 009 Pipeline Architecture | planned | The documentation generation system needs a clear, maintainable architecture that transforms annotated source code... |
+| 🚧 ADR 010 Pattern Naming Conventions | active | The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation. |
+| 📋 ADR 011 Publishing Strategy | planned | Publishing the package to npm requires following specific versioning strategies, workflow steps, and troubleshooting... |
 | ✅ Mvp Workflow Implementation | completed | PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package... |
 | ✅ Pattern Relationship Model | completed | Problem: The delivery process lacks a comprehensive relationship model between artifacts. |
 | 📋 Prd Implementation Section | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
+| ✅ Process Guard | completed | The delivery workflow needs protection against accidental modifications: - Completed specs get modified without... |
 | ✅ Process Guard Linter | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
 | 📋 Status Aware Eslint Suppression | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Streaming Git Diff | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |

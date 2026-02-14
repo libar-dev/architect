@@ -59,7 +59,7 @@
 | `arch-role` | enum | Architectural role for diagram generation (component type) | No | No | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model, service | - |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | No | - | - |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | No | domain, application, infrastructure | - |
-| `arch-view` | csv | Named architectural views for scoped diagram generation | No | No | - | - |
+| `include` | csv | Cross-cutting document inclusion for content routing and diagram scoping | No | No | - | - |
 | `target` | value | Target implementation path for stub files | No | No | - | - |
 | `since` | value | Design session that created this pattern | No | No | - | - |
 | `convention` | csv | Convention domains for reference document generation from decision records | No | No | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation | - |
@@ -569,15 +569,15 @@
 | Valid Values | domain, application, infrastructure |
 | Example | `@libar-docs-arch-layer application` |
 
-### `arch-view`
+### `include`
 
 | Property | Value |
 | --- | --- |
 | Format | csv |
-| Purpose | Named architectural views for scoped diagram generation |
+| Purpose | Cross-cutting document inclusion for content routing and diagram scoping |
 | Required | No |
 | Repeatable | No |
-| Example | `@libar-docs-arch-view codec-transformation,pipeline-overview` |
+| Example | `@libar-docs-include reference-sample,codec-system` |
 
 ### `target`
 

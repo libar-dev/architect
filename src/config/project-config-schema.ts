@@ -117,7 +117,7 @@ const DiagramScopeSchema = z
   .object({
     archContext: z.array(z.string().min(1)).readonly().optional(),
     patterns: z.array(z.string().min(1)).readonly().optional(),
-    archView: z.array(z.string().min(1)).readonly().optional(),
+    include: z.array(z.string().min(1)).readonly().optional(),
     archLayer: z.array(z.string().min(1)).readonly().optional(),
     direction: z.enum(['TB', 'LR']).optional(),
     title: z.string().min(1).optional(),
@@ -159,6 +159,8 @@ const ReferenceDocConfigSchema = z
       )
       .readonly()
       .optional(),
+    // DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing
+    includeTags: z.array(z.string().min(1)).readonly().optional(),
   })
   .strict();
 

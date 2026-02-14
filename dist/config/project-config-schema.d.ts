@@ -99,7 +99,7 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
         diagramScope: z.ZodOptional<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             patterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             archLayer: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             direction: z.ZodOptional<z.ZodEnum<{
                 TB: "TB";
@@ -107,9 +107,9 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
             }>>;
             title: z.ZodOptional<z.ZodString>;
             diagramType: z.ZodOptional<z.ZodEnum<{
-                "stateDiagram-v2": "stateDiagram-v2";
                 graph: "graph";
                 sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
                 C4Context: "C4Context";
                 classDiagram: "classDiagram";
             }>>;
@@ -118,7 +118,7 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
         diagramScopes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             patterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
-            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             archLayer: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             direction: z.ZodOptional<z.ZodEnum<{
                 TB: "TB";
@@ -126,9 +126,9 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
             }>>;
             title: z.ZodOptional<z.ZodString>;
             diagramType: z.ZodOptional<z.ZodEnum<{
-                "stateDiagram-v2": "stateDiagram-v2";
                 graph: "graph";
                 sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
                 C4Context: "C4Context";
                 classDiagram: "classDiagram";
             }>>;
@@ -145,6 +145,7 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
         }, z.core.$strict>, z.ZodObject<{
             source: z.ZodString;
         }, z.core.$strict>]>>>>;
+        includeTags: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     }, z.core.$strict>>>>;
 }, z.core.$strict>;
 /**

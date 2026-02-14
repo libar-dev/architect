@@ -16,6 +16,7 @@
  * @see ReferenceDocShowcase spec
  */
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { SectionBlock } from '../schema.js';
 /**
  * Structured content extracted from a decision record Rule block.
@@ -75,4 +76,16 @@ export interface ConventionBundle {
  * ```
  */
 export declare function extractConventions(dataset: MasterDataset, conventionTags: readonly string[]): ConventionBundle[];
+/**
+ * Extract convention bundles from pre-filtered patterns.
+ *
+ * DD-1 (CrossCuttingDocumentInclusion): Used by the include-tag pass to
+ * build convention content from patterns selected by include tag rather
+ * than by conventionTags filter. Groups output by each pattern's convention
+ * tag values.
+ *
+ * @param patterns - Pre-filtered patterns that have convention content
+ * @returns Array of ConventionBundles
+ */
+export declare function extractConventionsFromPatterns(patterns: readonly ExtractedPattern[]): ConventionBundle[];
 //# sourceMappingURL=convention-extractor.d.ts.map

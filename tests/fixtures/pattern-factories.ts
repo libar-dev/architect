@@ -123,8 +123,8 @@ export interface TestPatternOptions {
   archContext?: string;
   /** Architecture layer (default: none) */
   archLayer?: string;
-  /** Named architectural views for scoped diagrams (default: none) */
-  archView?: string[];
+  /** Cross-cutting include tags for content routing and diagram scoping (default: none) */
+  include?: string[];
   /** Convention domains for reference doc generation (default: none) */
   convention?: string[];
   /** Business rules from Gherkin Rule: blocks (default: none) */
@@ -223,7 +223,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     archRole,
     archContext,
     archLayer,
-    archView,
+    include,
     // Convention and rules fields
     convention,
     rules,
@@ -302,7 +302,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(archRole ? { archRole } : {}),
     ...(archContext ? { archContext } : {}),
     ...(archLayer ? { archLayer } : {}),
-    ...(archView && archView.length > 0 ? { archView } : {}),
+    ...(include && include.length > 0 ? { include } : {}),
     // Convention and rules fields
     ...(convention && convention.length > 0 ? { convention } : {}),
     ...(rules && rules.length > 0 ? { rules } : {}),

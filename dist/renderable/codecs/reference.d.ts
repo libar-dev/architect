@@ -35,8 +35,8 @@ export interface DiagramScope {
     readonly archContext?: readonly string[];
     /** Explicit pattern names to include */
     readonly patterns?: readonly string[];
-    /** Named architectural views to include (matches pattern.archView entries) */
-    readonly archView?: readonly string[];
+    /** Cross-cutting include tags (matches pattern.include entries) */
+    readonly include?: readonly string[];
     /** Architectural layers to include (matches pattern.archLayer) */
     readonly archLayer?: readonly string[];
     /** Mermaid graph direction (default: 'TB') */
@@ -78,6 +78,8 @@ export interface ReferenceDocConfig {
     readonly claudeMdFilename: string;
     /** DD-3/DD-6: Fine-grained shape selectors for declaration-level filtering */
     readonly shapeSelectors?: readonly ShapeSelector[];
+    /** DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing */
+    readonly includeTags?: readonly string[];
 }
 export interface ReferenceCodecOptions extends BaseCodecOptions {
     /** Override detail level (default: 'standard') */

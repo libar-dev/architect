@@ -23,8 +23,8 @@ export declare const ShapeKindSchema: z.ZodEnum<{
     function: "function";
     type: "type";
     enum: "enum";
-    const: "const";
     interface: "interface";
+    const: "const";
 }>;
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
 /**
@@ -75,8 +75,8 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
         function: "function";
         type: "type";
         enum: "enum";
-        const: "const";
         interface: "interface";
+        const: "const";
     }>;
     sourceText: z.ZodString;
     jsDoc: z.ZodOptional<z.ZodString>;
@@ -86,6 +86,7 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     exported: z.ZodDefault<z.ZodBoolean>;
     group: z.ZodOptional<z.ZodString>;
+    includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
         name: z.ZodString;
         jsDoc: z.ZodString;
@@ -132,8 +133,8 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
             function: "function";
             type: "type";
             enum: "enum";
-            const: "const";
             interface: "interface";
+            const: "const";
         }>;
         sourceText: z.ZodString;
         jsDoc: z.ZodOptional<z.ZodString>;
@@ -143,6 +144,7 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         exported: z.ZodDefault<z.ZodBoolean>;
         group: z.ZodOptional<z.ZodString>;
+        includes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             jsDoc: z.ZodString;

@@ -3,7 +3,7 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern DefineConfig
  * @libar-docs-status active
- * @libar-docs-arch-view reference-sample
+ * @libar-docs-include reference-sample
  * @libar-docs-uses ProjectConfigTypes
  * @libar-docs-used-by ConfigLoader
  *

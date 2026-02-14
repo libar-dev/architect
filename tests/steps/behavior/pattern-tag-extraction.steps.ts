@@ -467,20 +467,20 @@ describeFeature(feature, ({ Scenario, Background, BeforeEachScenario }) => {
   });
 
   Scenario('Registry-driven CSV tag accumulates values', ({ Given, When, Then, And }) => {
-    Given('feature tags containing "arch-view:pipeline-overview,codec-transformation"', () => {
-      state!.tags = ['arch-view:pipeline-overview,codec-transformation'];
+    Given('feature tags containing "include:pipeline-overview,codec-transformation"', () => {
+      state!.tags = ['include:pipeline-overview,codec-transformation'];
     });
 
     When('extracting pattern tags', () => {
       state!.metadata = extractPatternTags(state!.tags);
     });
 
-    Then('the metadata archView should contain "pipeline-overview"', () => {
-      expect(state!.metadata.archView).toContain('pipeline-overview');
+    Then('the metadata include should contain "pipeline-overview"', () => {
+      expect(state!.metadata.include).toContain('pipeline-overview');
     });
 
-    And('the metadata archView should contain "codec-transformation"', () => {
-      expect(state!.metadata.archView).toContain('codec-transformation');
+    And('the metadata include should contain "codec-transformation"', () => {
+      expect(state!.metadata.include).toContain('codec-transformation');
     });
   });
 

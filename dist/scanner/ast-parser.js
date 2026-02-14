@@ -472,8 +472,8 @@ function parseDirective(commentText, loc, filePath, registry) {
     const archRole = metadataResults.get('arch-role');
     const archContext = metadataResults.get('arch-context');
     const archLayer = metadataResults.get('arch-layer');
-    const archViewRaw = metadataResults.get('arch-view');
-    const archView = Array.isArray(archViewRaw) ? archViewRaw : undefined;
+    const includeRaw = metadataResults.get('include');
+    const include = Array.isArray(includeRaw) ? includeRaw : undefined;
     // Design session stub metadata tags
     const target = metadataResults.get('target');
     const since = metadataResults.get('since');
@@ -558,7 +558,7 @@ function parseDirective(commentText, loc, filePath, registry) {
         ...(archRole && { archRole }),
         ...(archContext && { archContext }),
         ...(archLayer && { archLayer }),
-        ...(archView && archView.length > 0 && { archView }),
+        ...(include && include.length > 0 && { include }),
         // Shape extraction fields
         ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
         // Convention tags for reference document generation

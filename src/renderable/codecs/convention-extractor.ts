@@ -17,7 +17,7 @@
  */
 
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
-import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import type { BusinessRule, ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { SectionBlock } from '../schema.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
 
@@ -332,6 +332,59 @@ export function extractConventions(
     const bundle = bundles.get(tag);
     if (!bundle) continue;
     if (bundle.rules.length === 0 && bundle.sourceDecisions.length === 0) continue;
+    result.push({
+      conventionTag: tag,
+      sourceDecisions: bundle.sourceDecisions,
+      rules: bundle.rules,
+    });
+  }
+  return result;
+}
+
+/**
+ * Extract convention bundles from pre-filtered patterns.
+ *
+ * DD-1 (CrossCuttingDocumentInclusion): Used by the include-tag pass to
+ * build convention content from patterns selected by include tag rather
+ * than by conventionTags filter. Groups output by each pattern's convention
+ * tag values.
+ *
+ * @param patterns - Pre-filtered patterns that have convention content
+ * @returns Array of ConventionBundles
+ */
+export function extractConventionsFromPatterns(
+  patterns: readonly ExtractedPattern[]
+): ConventionBundle[] {
+  const bundles = new Map<string, { sourceDecisions: string[]; rules: ConventionRuleContent[] }>();
+
+  for (const pattern of patterns) {
+    if (!pattern.convention || pattern.convention.length === 0) continue;
+
+    let ruleContents: ConventionRuleContent[];
+    if (pattern.rules && pattern.rules.length > 0) {
+      ruleContents = pattern.rules.map(extractConventionRuleContent);
+    } else if (pattern.directive.description) {
+      ruleContents = extractConventionRulesFromDescription(
+        pattern.directive.description,
+        pattern.name
+      );
+    } else {
+      ruleContents = [];
+    }
+
+    if (ruleContents.length === 0) continue;
+
+    for (const tag of pattern.convention) {
+      const bundle = bundles.get(tag) ?? { sourceDecisions: [], rules: [] };
+      bundle.sourceDecisions.push(pattern.name);
+      bundle.rules.push(...ruleContents);
+      bundles.set(tag, bundle);
+    }
+  }
+
+  const result: ConventionBundle[] = [];
+  for (const [tag, bundle] of bundles) {
+    if (bundle.rules.length === 0) continue;
     result.push({
       conventionTag: tag,
       sourceDecisions: bundle.sourceDecisions,

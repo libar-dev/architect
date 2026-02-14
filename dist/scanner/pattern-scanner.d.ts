@@ -6,7 +6,7 @@
  * @libar-docs-arch-role infrastructure
  * @libar-docs-arch-context scanner
  * @libar-docs-arch-layer infrastructure
- * @libar-docs-arch-view pipeline-stages
+ * @libar-docs-include pipeline-stages
  * @libar-docs-uses glob, AST Parser
  * @libar-docs-used-by Doc Extractor, Orchestrator
  * @libar-docs-usecase "When discovering TypeScript files for documentation extraction"

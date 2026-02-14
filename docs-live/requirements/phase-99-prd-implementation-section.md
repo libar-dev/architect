@@ -134,7 +134,7 @@ _Verified by: Section omitted when no implementations exist_
 
 Files that implement this pattern:
 
-- [`prd-generator-code-annotations-inclusion.feature`](../../delivery-process/specs/prd-generator-code-annotations-inclusion.feature) - **Problem:** Implementation files with `@libar-docs-implements:PatternName` contain rich
+- [`prd-implementation-section.feature`](../../tests/features/generators/prd-implementation-section.feature) - Tests the Implementations section rendering in pattern documents.
 
 ---
 

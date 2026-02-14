@@ -87,7 +87,7 @@ export declare const METADATA_TAGS_BY_GROUP: {
     readonly hierarchy: readonly ["level", "parent", "title"];
     readonly traceability: readonly ["executable-specs", "roadmap-spec", "behavior-file"];
     readonly discovery: readonly ["discovered-gap", "discovered-improvement", "discovered-risk", "discovered-learning"];
-    readonly architecture: readonly ["arch-role", "arch-context", "arch-layer", "arch-view"];
+    readonly architecture: readonly ["arch-role", "arch-context", "arch-layer", "include"];
     readonly extraction: readonly ["extract-shapes", "shape"];
     readonly stub: readonly ["target", "since"];
     readonly convention: readonly ["convention"];

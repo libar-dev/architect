@@ -50,7 +50,11 @@ import {
   mergeOptions,
 } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
-import { extractConventions, type ConventionBundle } from './convention-extractor.js';
+import {
+  extractConventions,
+  extractConventionsFromPatterns,
+  type ConventionBundle,
+} from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
 import type { ShapeSelector } from './shape-matcher.js';
@@ -82,8 +86,8 @@ export interface DiagramScope {
   /** Explicit pattern names to include */
   readonly patterns?: readonly string[];
 
-  /** Named architectural views to include (matches pattern.archView entries) */
-  readonly archView?: readonly string[];
+  /** Cross-cutting include tags (matches pattern.include entries) */
+  readonly include?: readonly string[];
 
   /** Architectural layers to include (matches pattern.archLayer) */
   readonly archLayer?: readonly string[];
@@ -145,6 +149,9 @@ export interface ReferenceDocConfig {
 
   /** DD-3/DD-6: Fine-grained shape selectors for declaration-level filtering */
   readonly shapeSelectors?: readonly ShapeSelector[];
+
+  /** DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing */
+  readonly includeTags?: readonly string[];
 }
 
 // ============================================================================
@@ -187,8 +194,32 @@ export function createReferenceCodec(
     decode: (dataset: MasterDataset): RenderableDocument => {
       const sections: SectionBlock[] = [];
 
+      // DD-1 (CrossCuttingDocumentInclusion): Pre-compute include set for additive merging
+      const includeSet =
+        config.includeTags !== undefined && config.includeTags.length > 0
+          ? new Set(config.includeTags)
+          : undefined;
+
       // 1. Convention content from tagged decision records
       const conventions = extractConventions(dataset, config.conventionTags);
+
+      // DD-1: Merge include-tagged convention patterns (additive)
+      if (includeSet !== undefined) {
+        const existingNames = new Set(conventions.flatMap((b) => b.sourceDecisions));
+        const includedConventionPatterns = dataset.patterns.filter(
+          (p) =>
+            !existingNames.has(p.name) &&
+            p.include?.some((v) => includeSet.has(v)) === true &&
+            p.convention !== undefined &&
+            p.convention.length > 0
+        );
+        if (includedConventionPatterns.length > 0) {
+          // Build bundles from included convention patterns
+          const includedConventions = extractConventionsFromPatterns(includedConventionPatterns);
+          conventions.push(...includedConventions);
+        }
+      }
+
       if (conventions.length > 0) {
         sections.push(...buildConventionSections(conventions, opts.detailLevel));
       }
@@ -225,16 +256,49 @@ export function createReferenceCodec(
           }
         }
 
+        // DD-1: Merge include-tagged shapes (additive)
+        if (includeSet !== undefined) {
+          const seenNames = new Set(allShapes.map((s) => s.name));
+          for (const pattern of dataset.patterns) {
+            if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0)
+              continue;
+            for (const shape of pattern.extractedShapes) {
+              if (
+                !seenNames.has(shape.name) &&
+                shape.includes?.some((v) => includeSet.has(v)) === true
+              ) {
+                seenNames.add(shape.name);
+                allShapes.push(shape);
+              }
+            }
+          }
+        }
+
         if (allShapes.length > 0) {
           sections.push(...buildShapeSections(allShapes, opts.detailLevel));
         }
       }
 
       // 4. Behavior content from tagged patterns
-      if (config.behaviorCategories.length > 0) {
-        sections.push(
-          ...buildBehaviorSections(dataset, config.behaviorCategories, opts.detailLevel)
+      const behaviorPatterns =
+        config.behaviorCategories.length > 0
+          ? dataset.patterns.filter((p) => config.behaviorCategories.includes(p.category))
+          : [];
+
+      // DD-1: Merge include-tagged behavior patterns (additive)
+      if (includeSet !== undefined) {
+        const existingNames = new Set(behaviorPatterns.map((p) => p.name));
+        const includedBehaviors = dataset.patterns.filter(
+          (p) =>
+            !existingNames.has(p.name) &&
+            p.include?.some((v) => includeSet.has(v)) === true &&
+            (p.directive.description.length > 0 || (p.rules !== undefined && p.rules.length > 0))
         );
+        behaviorPatterns.push(...includedBehaviors);
+      }
+
+      if (behaviorPatterns.length > 0) {
+        sections.push(...buildBehaviorSectionsFromPatterns(behaviorPatterns, opts.detailLevel));
       }
 
       if (sections.length === 0) {
@@ -250,6 +314,9 @@ export function createReferenceCodec(
         }
         if (config.behaviorCategories.length > 0) {
           diagnostics.push(`behaviors [${config.behaviorCategories.join(', ')}]`);
+        }
+        if (includeSet !== undefined) {
+          diagnostics.push(`includeTags [${[...includeSet].join(', ')}]`);
         }
         sections.push(paragraph(`No content found. Sources checked: ${diagnostics.join('; ')}.`));
       }
@@ -323,23 +390,22 @@ function buildConventionSections(
 }
 
 /**
- * Build sections from behavior-tagged patterns.
+ * Build sections from a pre-filtered list of behavior patterns.
+ *
+ * DD-1 (CrossCuttingDocumentInclusion): Extracted from buildBehaviorSections to
+ * accept pre-merged patterns (category-selected + include-tagged).
  */
-function buildBehaviorSections(
-  dataset: MasterDataset,
-  behaviorCategories: readonly string[],
+function buildBehaviorSectionsFromPatterns(
+  patterns: readonly ExtractedPattern[],
   detailLevel: DetailLevel
 ): SectionBlock[] {
   const sections: SectionBlock[] = [];
 
-  // Filter patterns whose category matches any behaviorCategory
-  const matchingPatterns = dataset.patterns.filter((p) => behaviorCategories.includes(p.category));
-
-  if (matchingPatterns.length === 0) return sections;
+  if (patterns.length === 0) return sections;
 
   sections.push(heading(2, 'Behavior Specifications'));
 
-  for (const pattern of matchingPatterns) {
+  for (const pattern of patterns) {
     sections.push(heading(3, pattern.name));
 
     // Cross-reference link to source file (omitted at summary level)
@@ -492,14 +558,14 @@ function buildShapeSections(
 function collectScopePatterns(dataset: MasterDataset, scope: DiagramScope): ExtractedPattern[] {
   const nameSet = new Set(scope.patterns ?? []);
   const contextSet = new Set(scope.archContext ?? []);
-  const viewSet = new Set(scope.archView ?? []);
+  const viewSet = new Set(scope.include ?? []);
   const layerSet = new Set(scope.archLayer ?? []);
 
   return dataset.patterns.filter((p) => {
     const name = getPatternName(p);
     if (nameSet.has(name)) return true;
     if (p.archContext !== undefined && contextSet.has(p.archContext)) return true;
-    if (p.archView?.some((v) => viewSet.has(v)) === true) return true;
+    if (p.include?.some((v) => viewSet.has(v)) === true) return true;
     if (p.archLayer !== undefined && layerSet.has(p.archLayer)) return true;
     return false;
   });

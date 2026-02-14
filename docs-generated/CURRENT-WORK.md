@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 196/281 (70%)
+**Overall Progress:** [██████████████░░░░░░] 208/304 (68%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 281 |
-| Completed | 196 |
-| Active | 44 |
-| Planned | 41 |
-| Active Phases | 4 |
+| Total Patterns | 304 |
+| Completed | 208 |
+| Active | 47 |
+| Planned | 49 |
+| Active Phases | 5 |
 
 ---
 
@@ -103,6 +103,22 @@
 
 ---
 
+### 🚧 ADR011PublishingStrategy
+
+[██████░░░░░░░░░] 5/12 42% complete (5 done, 1 active, 6 planned)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 ADR 010 Pattern Naming Conventions | The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation. |
+
+#### Deliverables
+
+- ✅ Pattern naming decision
+
+[View ADR011PublishingStrategy details →](current/phase-99-adr-011-publishing-strategy.md)
+
+---
+
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
@@ -111,6 +127,7 @@
 | 🚧 Pattern Helpers Tests | Phase 25 | - | - |
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+| 🚧 ADR 010 Pattern Naming Conventions | Phase 99 | - | The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Arch Queries Test | - | - | - |
@@ -123,6 +140,7 @@
 | 🚧 Coverage Analyzer Impl | - | - | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
 | 🚧 Define Config | - | - | Identity function for type-safe project configuration. |
 | 🚧 Deliverable Status Taxonomy | - | - | Canonical status values for deliverables in Gherkin Background tables. |
+| 🚧 Depends On Tag Testing | - | - | Tests extraction of @libar-docs-depends-on and @libar-docs-enables relationship tags from Gherkin files. |
 | 🚧 Derive Process State | - | - | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | - | - | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
 | 🚧 FSM Module | - | - | :PDR005MvpWorkflow Central export for the 4-state FSM defined in PDR-005: ``` roadmap ──→ active ──→ completed │     ... |
@@ -151,5 +169,6 @@
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 🚧 Stub Resolver Tests | - | - | Design session stubs need structured discovery and resolution to determine which stubs have been implemented and... |
 | 🚧 Stub Taxonomy Tag Tests | - | - | Stub metadata (target path, design session) was stored as plain text in JSDoc descriptions, invisible to structured... |
+| 🚧 Uses Tag Testing | - | - | Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by relationship tags from TypeScript files. |
 
 ---

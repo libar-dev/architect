@@ -136,6 +136,9 @@ export const ExtractedShapeSchema = z.object({
   /** DD-5: Optional group name from @libar-docs-shape tag value */
   group: z.string().optional(),
 
+  /** DD-3: Cross-cutting document inclusion tags from @libar-docs-include CSV */
+  includes: z.array(z.string().min(1)).readonly().optional(),
+
   /** For interfaces: JSDoc documentation for each property */
   propertyDocs: z.array(PropertyDocSchema).readonly().optional(),
 

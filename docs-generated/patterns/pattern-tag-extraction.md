@@ -171,10 +171,10 @@ The extractPatternTags function parses Gherkin feature tags
 
 **Registry-driven CSV tag accumulates values**
 
-- Given feature tags containing "arch-view:pipeline-overview,codec-transformation"
+- Given feature tags containing "include:pipeline-overview,codec-transformation"
 - When extracting pattern tags
-- Then the metadata archView should contain "pipeline-overview"
-- And the metadata archView should contain "codec-transformation"
+- Then the metadata include should contain "pipeline-overview"
+- And the metadata include should contain "codec-transformation"
 
 **Transform applies hyphen-to-space on business value**
 

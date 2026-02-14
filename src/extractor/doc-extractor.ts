@@ -6,7 +6,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context extractor
  * @libar-docs-arch-layer application
- * @libar-docs-arch-view pipeline-stages
+ * @libar-docs-include pipeline-stages
  * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
  * @libar-docs-used-by Orchestrator, Generators
  * @libar-docs-usecase "When converting scanned files to ExtractedPattern objects"
@@ -204,11 +204,16 @@ export function buildPattern(
       if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
         const existingByName = new Map((extractedShapes ?? []).map((s) => [s.name, s]));
         const newShapes = taggedResult.value.shapes.filter((s) => !existingByName.has(s.name));
-        // Merge group from tagged shapes onto existing Path 1 shapes
+        // Merge group and includes from tagged shapes onto existing Path 1 shapes
         for (const tagged of taggedResult.value.shapes) {
           const existing = existingByName.get(tagged.name);
-          if (existing !== undefined && tagged.group !== undefined) {
-            existing.group = tagged.group;
+          if (existing !== undefined) {
+            if (tagged.group !== undefined) {
+              existing.group = tagged.group;
+            }
+            if (tagged.includes !== undefined) {
+              existing.includes = tagged.includes;
+            }
           }
         }
         extractedShapes = [...(extractedShapes ?? []), ...newShapes];
@@ -282,8 +287,8 @@ export function buildPattern(
     ...(directive.archRole !== undefined && { archRole: directive.archRole }),
     ...(directive.archContext !== undefined && { archContext: directive.archContext }),
     ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
-    ...(directive.archView !== undefined &&
-      directive.archView.length > 0 && { archView: directive.archView }),
+    ...(directive.include !== undefined &&
+      directive.include.length > 0 && { include: directive.include }),
     // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
     ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
     // Convention tags for reference document generation

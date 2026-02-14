@@ -151,7 +151,7 @@ export declare function extractPatternTags(tags: readonly string[]): {
     readonly archRole?: string;
     readonly archContext?: string;
     readonly archLayer?: string;
-    readonly archView?: readonly string[];
+    readonly include?: readonly string[];
     readonly extractShapes?: readonly string[];
     readonly usecase?: string;
     readonly [key: string]: unknown;

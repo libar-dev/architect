@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:CrossCuttingDocumentInclusion
-@libar-docs-status:roadmap
+@libar-docs-status:completed
 @libar-docs-phase:32
 @libar-docs-effort:2d
 @libar-docs-product-area:DeliveryProcess
@@ -125,17 +125,17 @@ Feature: Cross-Cutting Document Inclusion
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Replace arch-view with include in tag registry | Pending | src/taxonomy/registry-builder.ts |
-      | Rename archView to include on directive and pattern schemas | Pending | src/validation-schemas/ |
-      | Includes field on ExtractedShape | Pending | src/validation-schemas/extracted-shape.ts |
-      | Rename arch-view extraction to include in parsers | Pending | src/scanner/ |
-      | Rename and extract include in doc extractor | Pending | src/extractor/doc-extractor.ts |
-      | Extract include CSV from declaration JSDoc | Pending | src/extractor/shape-extractor.ts |
-      | Rename DiagramScope.archView to include | Pending | src/renderable/codecs/reference.ts |
-      | Add includeTags to ReferenceDocConfig with inclusion pass | Pending | src/renderable/codecs/reference.ts |
-      | Rename archView in dataset views and transform | Pending | src/generators/pipeline/transform-dataset.ts |
-      | Update all source file annotations from arch-view to include | Pending | src/**/*.ts |
-      | Update configs: rename archView, add includeTags | Pending | delivery-process.config.ts |
+      | Replace arch-view with include in tag registry | Complete | src/taxonomy/registry-builder.ts |
+      | Rename archView to include on directive and pattern schemas | Complete | src/validation-schemas/ |
+      | Includes field on ExtractedShape | Complete | src/validation-schemas/extracted-shape.ts |
+      | Rename arch-view extraction to include in parsers | Complete | src/scanner/ |
+      | Rename and extract include in doc extractor | Complete | src/extractor/doc-extractor.ts |
+      | Extract include CSV from declaration JSDoc | Complete | src/extractor/shape-extractor.ts |
+      | Rename DiagramScope.archView to include | Complete | src/renderable/codecs/reference.ts |
+      | Add includeTags to ReferenceDocConfig with inclusion pass | Complete | src/renderable/codecs/reference.ts |
+      | Rename archView in dataset views and transform | Complete | src/generators/pipeline/transform-dataset.ts |
+      | Update all source file annotations from arch-view to include | Complete | src/**/*.ts |
+      | Update configs: rename archView, add includeTags | Complete | delivery-process.config.ts |
 
   Rule: Include tag routes content to named documents
 

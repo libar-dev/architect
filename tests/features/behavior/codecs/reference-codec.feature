@@ -150,9 +150,9 @@ Feature: Reference Document Codec
       And the mermaid diagram includes dashed neighbor styling
 
     @happy-path
-    Scenario: archView filter selects patterns by view membership
-      Given a reference config with diagramScope archView "pipeline-stages"
-      And a MasterDataset with patterns in arch view "pipeline-stages"
+    Scenario: include filter selects patterns by include tag membership
+      Given a reference config with diagramScope include "pipeline-stages"
+      And a MasterDataset with patterns in include "pipeline-stages"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "PatternScanner"
@@ -167,8 +167,8 @@ Feature: Reference Document Codec
 
     @edge-case
     Scenario: Multiple filter dimensions OR together
-      Given a reference config with diagramScope combining archContext and archView
-      And a MasterDataset where one pattern matches archContext and another matches archView
+      Given a reference config with diagramScope combining archContext and include
+      And a MasterDataset where one pattern matches archContext and another matches include
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains both "LintRules" and "DocExtractor"
@@ -218,7 +218,7 @@ Feature: Reference Document Codec
     @happy-path
     Scenario: Config with diagramScopes array produces multiple diagrams
       Given a reference config with two diagramScopes
-      And a MasterDataset with patterns in two different arch views
+      And a MasterDataset with patterns in two different include groups
       When decoding at detail level "detailed"
       Then the document contains 2 mermaid blocks
       And the document has headings "Codec Transformation" and "Pipeline Data Flow"
@@ -226,7 +226,7 @@ Feature: Reference Document Codec
     @happy-path
     Scenario: Diagram direction is reflected in mermaid output
       Given a reference config with LR direction diagramScope
-      And a MasterDataset with patterns in arch view "pipeline-stages"
+      And a MasterDataset with patterns in include "pipeline-stages"
       When decoding at detail level "detailed"
       Then the document contains a mermaid block
       And the mermaid content contains "graph LR"

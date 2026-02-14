@@ -1013,6 +1013,26 @@ function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string }
 }
 
 /**
+ * Extract the @libar-docs-include tag from JSDoc text.
+ *
+ * Returns an array of include values if the tag is present (CSV format),
+ * or `undefined` if the tag is absent. Values are trimmed and filtered for empties.
+ *
+ * @param jsDocText - Raw JSDoc text including delimiters
+ */
+function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
+  const match = /libar-docs-include(?!-)(?:\s+([^\n@*]+))?/.exec(jsDocText);
+  if (!match) return undefined;
+  const raw = match[1];
+  if (raw === undefined) return undefined;
+  const values = raw
+    .split(',')
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0);
+  return values.length > 0 ? values : undefined;
+}
+
+/**
  * Discover declarations tagged with @libar-docs-shape in source code.
  *
  * Scans all top-level declarations (exported and non-exported per DD-7)
@@ -1072,7 +1092,13 @@ export function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractS
     });
 
     // DD-5: Add group field from tag value
-    shapes.push({ ...shape, group: tagResult.group });
+    // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
+    const includeValues = extractIncludeTag(jsDoc);
+    shapes.push({
+      ...shape,
+      group: tagResult.group,
+      ...(includeValues !== undefined && { includes: includeValues }),
+    });
   }
 
   return Result.ok({ shapes, warnings });
