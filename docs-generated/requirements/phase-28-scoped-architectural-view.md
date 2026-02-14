@@ -157,12 +157,6 @@ _Verified by: Two diagram scopes produce two mermaid blocks, Direction controls 
 - diagramScopes (plural) support (complete)
 - sanitizeNodeId shared utility (complete)
 
-## Implementations
-
-Files that implement this pattern:
-
-- [`diagram-utils.ts`](../../src/renderable/codecs/diagram-utils.ts) - ## Shared Mermaid Diagram Utilities
-
 ---
 
 [← Back to Product Requirements](../PRODUCT-REQUIREMENTS.md)

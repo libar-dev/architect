@@ -44,12 +44,6 @@
 - Depends on: ArchitectureDiagramGeneration
 - Depends on: ShapeExtraction
 
-## Implementations
-
-Files that implement this pattern:
-
-- [`diagram-utils.ts`](../../src/renderable/codecs/diagram-utils.ts) - ## Shared Mermaid Diagram Utilities
-
 ## Acceptance Criteria
 
 **archContext filter matches patterns in that context**

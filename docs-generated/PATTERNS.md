@@ -27,7 +27,6 @@
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
-- [Implements](#implements) (1)
 - [Infra](#infra) (1)
 - [Lint](#lint) (8)
 - [Opportunity 2](#opportunity-2) (1)
@@ -39,6 +38,7 @@
 - [Pattern](#pattern) (13)
 - [Scanner](#scanner) (2)
 - [Status](#status) (10)
+- [Used](#used) (1)
 - [Validation](#validation) (11)
 
 ---
@@ -177,7 +177,7 @@
 | 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 🚧 Reference Document Codec | Pattern | active | A single codec factory that creates reference document codecs from configuration objects. |
-| 🚧 Reference Generator Registration | Pattern | active | Registers all 13 reference document generators. |
+| 🚧 Reference Generator Registration | Pattern | active | Registers all reference document generators. |
 | 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
@@ -207,7 +207,7 @@
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 ScopeValidator — Pre-flight Session Readiness Checker | Status | planned | Pure function composition over ProcessStateAPI and MasterDataset. |
 | 📋 Session File Cleanup | DDD | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
-|  Shared Mermaid Diagram Utilities | Implements | planned | Sanitization and formatting helpers shared across architecture.ts and reference.ts diagram builders. |
+|  Shared Mermaid Diagram Utilities | Used | planned | Sanitization and formatting helpers shared across architecture.ts and reference.ts diagram builders. |
 | 📋 Status Aware Eslint Suppression | DDD | planned | Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused exports that define API... |
 | 📋 Step Definition Completion | DDD | planned | 7 feature files in tests/features/behavior/ have complete Gherkin specs but NO step definitions. |
 | 📋 Streaming Git Diff | DDD | planned | The process guard (`lint-process --all`) fails with `ENOBUFS` error on large repositories. |
@@ -383,14 +383,6 @@
 
 ---
 
-### Implements
-
-0/1 complete (0%)
-
-- [ Shared Mermaid Diagram Utilities](patterns/shared-mermaid-diagram-utilities.md)
-
----
-
 ### Infra
 
 1/1 complete (100%)
@@ -508,6 +500,14 @@
 
 ---
 
+### Used
+
+0/1 complete (0%)
+
+- [ Shared Mermaid Diagram Utilities](patterns/shared-mermaid-diagram-utilities.md)
+
+---
+
 ### Validation
 
 8/11 complete (73%)
@@ -577,7 +577,6 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -614,6 +613,19 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -640,18 +652,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    RegexBuilders --> ConfigurationTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -686,28 +686,27 @@ graph TD
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
+    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
+    PatternsCodec ..-> PatternRelationshipModel
+    ArchitectureCodec --> MasterDataset
+    ArchitectureCodec --> ArchIndex
     ProcessGuardTypes ..-> ProcessGuardLinter
     ProcessGuardModule ..-> ProcessGuardLinter
     DetectChanges --> DeriveProcessState
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
-    PatternsCodec ..-> PatternRelationshipModel
-    Shared_Mermaid_Diagram_Utilities ..-> ScopedArchitecturalView
-    ArchitectureCodec --> MasterDataset
-    ArchitectureCodec --> ArchIndex
+    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
-    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     ScopedArchitecturalView -.-> ArchitectureDiagramGeneration

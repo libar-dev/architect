@@ -82,7 +82,7 @@
 | 🚧 Process State API | - | - | TypeScript interface for querying delivery process state. |
 | 🚧 Process State Types | - | - | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 🚧 Reference Document Codec | - | - | A single codec factory that creates reference document codecs from configuration objects. |
-| 🚧 Reference Generator Registration | - | - | Registers all 13 reference document generators. |
+| 🚧 Reference Generator Registration | - | - | Registers all reference document generators. |
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 
 ---

@@ -799,8 +799,8 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
-        TransformDataset["TransformDataset[service]"]
         DecisionDocGenerator["DecisionDocGenerator[service]"]
+        TransformDataset["TransformDataset[service]"]
     end
     subgraph renderer["Renderer"]
         RenderableDocument["RenderableDocument[read-model]"]
@@ -817,7 +817,6 @@ graph TB
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         GherkinASTParser["GherkinASTParser"]:::neighbor
         ShapeExtractor["ShapeExtractor"]:::neighbor
-        ScopedArchitecturalView["ScopedArchitecturalView"]:::neighbor
         PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
     end
     SourceMapper -.-> DecisionDocCodec
@@ -825,12 +824,11 @@ graph TB
     SourceMapper -.-> GherkinASTParser
     Documentation_Generation_Orchestrator --> Pattern_Scanner
     PatternsCodec ..-> PatternRelationshipModel
-    Shared_Mermaid_Diagram_Utilities ..-> ScopedArchitecturalView
     ArchitectureCodec --> MasterDataset
-    TransformDataset --> MasterDataset
-    TransformDataset ..-> PatternRelationshipModel
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    TransformDataset --> MasterDataset
+    TransformDataset ..-> PatternRelationshipModel
     classDef neighbor stroke-dasharray: 5 5
 ```
 

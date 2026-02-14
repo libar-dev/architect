@@ -9,7 +9,7 @@
 | Property | Value |
 | --- | --- |
 | Status | planned |
-| Category | Implements |
+| Category | Used |
 
 ## Description
 

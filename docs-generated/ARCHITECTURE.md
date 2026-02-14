@@ -175,12 +175,12 @@ graph TB
         RenderableUtils["RenderableUtils"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
+        ShapeExtractor["ShapeExtractor"]
+        LayerInference["LayerInference"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
-        ShapeExtractor["ShapeExtractor"]
-        LayerInference["LayerInference"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         RegexBuilders["RegexBuilders"]
@@ -230,15 +230,15 @@ graph TB
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     RegexBuilders --> ConfigurationTypes
