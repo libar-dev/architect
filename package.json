@@ -59,7 +59,8 @@
     "lint-process": "./dist/cli/lint-process.js",
     "generate-tag-taxonomy": "./dist/cli/generate-tag-taxonomy.js",
     "validate-patterns": "./dist/cli/validate-patterns.js",
-    "process-api": "./dist/cli/process-api.js"
+    "process-api": "./dist/cli/process-api.js",
+    "lint-steps": "./dist/cli/lint-steps.js"
   },
   "scripts": {
     "build": "tsc",
@@ -72,6 +73,7 @@
     "lint:fix": "eslint src tests --fix",
     "lint:process": "tsx src/cli/lint-process.ts --staged",
     "lint:process:all": "tsx src/cli/lint-process.ts --all",
+    "lint:steps": "tsx src/cli/lint-steps.ts",
     "lint-patterns": "tsx src/cli/lint-patterns.ts --input 'src/**/*.ts' --input 'delivery-process/stubs/**/*.ts'",
     "validate:patterns": "tsx src/cli/validate-patterns.ts",
     "validate:dod": "tsx src/cli/validate-patterns.ts --dod",

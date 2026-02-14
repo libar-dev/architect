@@ -179,9 +179,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -239,10 +239,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -326,8 +326,8 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                value: "value";
                 enum: "enum";
+                value: "value";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -459,9 +459,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -519,10 +519,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -700,9 +700,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -760,10 +760,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -941,9 +941,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1001,10 +1001,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1186,9 +1186,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1246,10 +1246,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1434,9 +1434,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1494,10 +1494,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1675,9 +1675,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                 }, z.core.$strict>>;
             }, z.core.$strict>>>>;
             layer: z.ZodOptional<z.ZodEnum<{
-                domain: "domain";
                 unknown: "unknown";
                 timeline: "timeline";
+                domain: "domain";
                 integration: "integration";
                 e2e: "e2e";
                 component: "component";
@@ -1735,10 +1735,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
-            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
+            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1917,9 +1917,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -1977,10 +1977,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2158,9 +2158,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2218,10 +2218,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2399,9 +2399,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2459,10 +2459,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2640,9 +2640,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2700,10 +2700,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2907,9 +2907,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -2967,10 +2967,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3148,9 +3148,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3208,10 +3208,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3389,9 +3389,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3449,10 +3449,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3630,9 +3630,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3690,10 +3690,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3871,9 +3871,9 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
                     }, z.core.$strict>>;
                 }, z.core.$strict>>>>;
                 layer: z.ZodOptional<z.ZodEnum<{
-                    domain: "domain";
                     unknown: "unknown";
                     timeline: "timeline";
+                    domain: "domain";
                     integration: "integration";
                     e2e: "e2e";
                     component: "component";
@@ -3931,10 +3931,10 @@ export declare const RequirementsDocumentCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
-                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
+                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;

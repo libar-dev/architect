@@ -45,3 +45,7 @@ export {
 
 // Process Guard (FSM validation, change detection, protection enforcement)
 export * from './process-guard/index.js';
+
+// Step Lint (vitest-cucumber feature/step compatibility checking)
+export { runStepLint, STEP_LINT_RULES } from './steps/index.js';
+export type { StepLintRule, FeatureStepPair, StepLintOptions } from './steps/index.js';

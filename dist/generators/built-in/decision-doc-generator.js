@@ -30,11 +30,10 @@
  * - Compact: `_claude-md/{section}/{module}.md` (~50 lines)
  * - Detailed: `docs/{PATTERN-NAME}.md` (~300 lines)
  */
-import { heading, paragraph, code, table, list, separator, collapsible, document as createDocument, } from '../../renderable/schema.js';
+import { heading, paragraph, code, list, separator, collapsible, document as createDocument, } from '../../renderable/schema.js';
 import { renderToMarkdown } from '../../renderable/render.js';
 import { parseDecisionDocument, } from '../../renderable/codecs/decision-doc.js';
-import { parseDescriptionWithDocStrings, parseBusinessRuleAnnotations, renderPropertyDocsTable, } from '../../renderable/codecs/helpers.js';
-import { extractTablesFromDescription } from '../../renderable/codecs/convention-extractor.js';
+import { parseDescriptionWithDocStrings, renderRuleDescription, renderPropertyDocsTable, } from '../../renderable/codecs/helpers.js';
 import { executeSourceMapping, } from '../source-mapper.js';
 import { toKebabCase, toUpperKebabCase } from '../../utils/string-utils.js';
 import { createWarningCollector, } from '../warning-collector.js';
@@ -152,57 +151,6 @@ export function generateCompactOutput(decisionContent, aggregatedContent) {
         purpose: 'Compact reference for Claude context',
         detailLevel: 'summary',
     });
-}
-/**
- * Render a rule description using structured annotation parsing.
- *
- * Extracts `**Invariant:**`, `**Rationale:**`, `**Verified by:**`, tables, and
- * code examples for polished output with proper table formatting.
- *
- * @param description - Raw rule description text from Gherkin Rule: block
- * @returns Array of SectionBlocks with structured content
- */
-function renderRuleDescription(description) {
-    const blocks = [];
-    const annotations = parseBusinessRuleAnnotations(description);
-    // 1. Render structured annotations first (extracted cleanly)
-    if (annotations.invariant) {
-        blocks.push(paragraph(`**Invariant:** ${annotations.invariant}`));
-    }
-    if (annotations.rationale) {
-        blocks.push(paragraph(`**Rationale:** ${annotations.rationale}`));
-    }
-    // 2. Extract tables and render with proper markdown formatting (separator rows)
-    const tables = extractTablesFromDescription(description);
-    for (const tbl of tables) {
-        const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
-        blocks.push(table([...tbl.headers], rows));
-    }
-    // 3. Render remaining content with interleaved DocStrings preserved.
-    //    Strip known annotations and table lines from the original description,
-    //    then pass through parseDescriptionWithDocStrings which preserves
-    //    text → code → text → code ordering.
-    let stripped = description;
-    stripped = stripped.replace(/\*\*Invariant:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
-    stripped = stripped.replace(/\*\*Rationale:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
-    stripped = stripped.replace(/\*\*Verified by:\*\*\s*[\s\S]*?(?=\*\*[A-Z]|\*\*$|$)/i, '');
-    stripped = stripped
-        .split('\n')
-        .filter((line) => {
-        const trimmed = line.trim();
-        return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
-    })
-        .join('\n');
-    const strippedTrimmed = stripped.trim();
-    if (strippedTrimmed.length > 0) {
-        blocks.push(...parseDescriptionWithDocStrings(strippedTrimmed));
-    }
-    // 4. Render verified-by list last
-    if (annotations.verifiedBy && annotations.verifiedBy.length > 0) {
-        blocks.push(paragraph('**Verified by:**'));
-        blocks.push(list([...annotations.verifiedBy]));
-    }
-    return blocks;
 }
 /**
  * Generate detailed output (~300 lines)
