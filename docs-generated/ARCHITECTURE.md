@@ -145,10 +145,6 @@ graph TB
         CategoryDefinition["CategoryDefinition"]
     end
     subgraph validation["Validation BC"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
-        DoDValidator["DoDValidator[service]"]
-        AntiPatternDetector["AntiPatternDetector[service]"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -157,14 +153,16 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
         FSMValidator["FSMValidator[decider]"]
         FSMTransitions["FSMTransitions[read-model]"]
         FSMStates["FSMStates[read-model]"]
         FSMModule["FSMModule"]
     end
     subgraph shared["Shared Infrastructure"]
-        DoDValidationTypes["DoDValidationTypes"]
-        ValidationModule["ValidationModule"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
         OutputSchemas["OutputSchemas"]
@@ -173,14 +171,8 @@ graph TB
         DualSourceSchemas["DualSourceSchemas"]
         DocDirectiveSchema["DocDirectiveSchema"]
         CodecUtils["CodecUtils"]
-        StatusValues["StatusValues"]
-        RiskLevels["RiskLevels"]
-        NormalizedStatus["NormalizedStatus"]
-        LayerTypes["LayerTypes"]
-        HierarchyLevels["HierarchyLevels"]
-        FormatTypes["FormatTypes"]
-        DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
-        CategoryDefinition["CategoryDefinition"]
+        DoDValidationTypes["DoDValidationTypes"]
+        ValidationModule["ValidationModule"]
         RenderableUtils["RenderableUtils"]
         SectionBlock["SectionBlock"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
@@ -191,6 +183,14 @@ graph TB
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
         GeneratorRegistry["GeneratorRegistry"]
+        StatusValues["StatusValues"]
+        RiskLevels["RiskLevels"]
+        NormalizedStatus["NormalizedStatus"]
+        LayerTypes["LayerTypes"]
+        HierarchyLevels["HierarchyLevels"]
+        FormatTypes["FormatTypes"]
+        DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
+        CategoryDefinition["CategoryDefinition"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         ConfigResolver["ConfigResolver"]
@@ -238,10 +238,10 @@ graph TB
         ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
         ProcessGuardTesting["ProcessGuardTesting"]
     end
+    ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
-    ExtractedPatternSchema --> DocDirectiveSchema
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules

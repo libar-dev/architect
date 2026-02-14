@@ -206,9 +206,9 @@ classDiagram
         <<service>>
     }
     class MasterDataset
+    class ShapeExtractor
     class Pattern_Scanner
     class GherkinASTParser
-    class ShapeExtractor
     class DecisionDocCodec
     class PatternRelationshipModel
     SourceMapper ..> DecisionDocCodec : depends on
@@ -273,15 +273,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---
@@ -331,21 +331,6 @@ graph LR
 ---
 
 ## API Types
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ### normalizeStatus (function)
 
@@ -439,6 +424,21 @@ interface CategoryDefinition {
 | priority | Display order priority - lower values appear first in sorted output |
 | description | Brief description of the category's purpose and typical patterns |
 | aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ---
 

@@ -872,18 +872,39 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
-    UtilsModule --> StringUtilities
-    UtilsModule --> CollectionUtilities
     DoDValidator --> DoDValidationTypes
     DoDValidator --> GherkinTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
     AntiPatternDetector --> GherkinTypes
+    UtilsModule --> StringUtilities
+    UtilsModule --> CollectionUtilities
+    Pattern_Scanner --> glob
+    Pattern_Scanner --> AST_Parser
+    GherkinScanner --> GherkinASTParser
+    GherkinScanner --> GherkinTypes
+    GherkinScanner ..-> GherkinRulesSupport
+    GherkinASTParser --> GherkinTypes
+    GherkinASTParser ..-> GherkinRulesSupport
+    TypeScript_AST_Parser --> TagRegistry
+    TypeScript_AST_Parser --> DocDirectiveSchema
+    TypeScript_AST_Parser --> typescript_estree
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ShapeExtractor --> typescript_estree
     ShapeExtractor ..-> ShapeExtraction
     GherkinExtractor --> GherkinTypes
@@ -895,17 +916,6 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -952,16 +962,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    Pattern_Scanner --> glob
-    Pattern_Scanner --> AST_Parser
-    GherkinScanner --> GherkinASTParser
-    GherkinScanner --> GherkinTypes
-    GherkinScanner ..-> GherkinRulesSupport
-    GherkinASTParser --> GherkinTypes
-    GherkinASTParser ..-> GherkinRulesSupport
-    TypeScript_AST_Parser --> TagRegistry
-    TypeScript_AST_Parser --> DocDirectiveSchema
-    TypeScript_AST_Parser --> typescript_estree
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -1018,6 +1018,7 @@ graph TD
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    PDR001SessionWorkflowCommands -.-> DataAPIDesignSessionSupport
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     ScopedArchitecturalView -.-> ArchitectureDiagramGeneration
@@ -1038,7 +1039,6 @@ graph TD
     CodecDrivenReferenceGeneration -.-> DocGenerationProofOfConcept
     CodecDrivenReferenceGeneration -.-> ScopedArchitecturalView
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
-    PDR001SessionWorkflowCommands -.-> DataAPIDesignSessionSupport
     StatusTransitionDetectionTesting ..-> DetectChanges
     ProcessGuardTesting ..-> ProcessGuardLinter
     FSMValidatorTesting ..-> PhaseStateMachineValidation
@@ -1047,6 +1047,10 @@ graph TD
     AntiPatternDetectorTesting ..-> AntiPatternDetector
     LintRulesTesting ..-> LintRules
     LintEngineTesting ..-> LintEngine
+    ShapeExtractionTesting ..-> ReferenceDocShowcase
+    ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
+    DualSourceExtractorTesting ..-> DualSourceExtractor
+    DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
     GeneratorRegistryTesting ..-> GeneratorRegistry
     GeneratorRegistryTesting ..-> GeneratorInfrastructureTesting
     PrdImplementationSectionTesting ..-> PrdImplementationSection
@@ -1055,10 +1059,6 @@ graph TD
     CodecBasedGeneratorTesting ..-> CodecBasedGenerator
     CodecBasedGeneratorTesting ..-> GeneratorInfrastructureTesting
     BusinessRulesDocumentCodec ..-> BusinessRulesGenerator
-    ShapeExtractionTesting ..-> ReferenceDocShowcase
-    ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
-    DualSourceExtractorTesting ..-> DualSourceExtractor
-    DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
     WarningCollectorTesting ..-> WarningCollector
     ValidationRulesCodecTesting ..-> ValidationRulesCodec
     TaxonomyCodecTesting ..-> TaxonomyCodec
@@ -1066,25 +1066,30 @@ graph TD
     SourceMapperTesting ..-> SourceMapper
     DecisionDocGeneratorTesting ..-> DecisionDocGenerator
     DecisionDocCodecTesting ..-> DecisionDocCodec
+    DefineConfigTesting ..-> DefineConfig
+    ConfigLoaderTesting ..-> ConfigLoader
     ValidatePatternsCli ..-> CliBehaviorTesting
     ProcessApiCli ..-> ProcessStateAPICLI
     LintProcessCli ..-> CliBehaviorTesting
     LintPatternsCli ..-> CliBehaviorTesting
     GenerateTagTaxonomyCli ..-> CliBehaviorTesting
     GenerateDocsCli ..-> CliBehaviorTesting
+    ProcessStateAPITesting ..-> ProcessStateAPICLI
     TransformDatasetTesting ..-> TransformDataset
     RichContentHelpersTesting ..-> RichContentHelpers
     PatternsCodecTesting ..-> PatternsCodec
     LayerInferenceTesting ..-> LayerInference
-    ProcessStateAPITesting ..-> ProcessStateAPICLI
-    DefineConfigTesting ..-> DefineConfig
-    ConfigLoaderTesting ..-> ConfigLoader
     UsesTagTesting ..-> PatternRelationshipModel
     MermaidRelationshipRendering ..-> PatternRelationshipModel
     LinterValidationTesting ..-> PatternRelationshipModel
     ImplementsTagProcessing ..-> PatternRelationshipModel
     ExtendsTagTesting ..-> PatternRelationshipModel
     DependsOnTagTesting ..-> PatternRelationshipModel
+    LayeredDiagramGeneration ..-> ArchitectureDiagramGeneration
+    ArchGeneratorRegistration ..-> ArchitectureDiagramGeneration
+    ComponentDiagramGeneration ..-> ArchitectureDiagramGeneration
+    ArchTagExtraction ..-> ArchitectureDiagramGeneration
+    ArchIndexDataset ..-> ArchitectureDiagramGeneration
     TimelineCodecTesting ..-> CodecBehaviorTesting
     ShapeSelectorTesting ..-> ReferenceDocShowcase
     ShapeSelectorTesting ..-> DeclarationLevelShapeTagging
@@ -1099,11 +1104,6 @@ graph TD
     PlanningCodecTesting ..-> CodecBehaviorTesting
     ConventionExtractorTesting ..-> ReferenceDocShowcase
     CompositeCodecTesting ..-> ReferenceDocShowcase
-    LayeredDiagramGeneration ..-> ArchitectureDiagramGeneration
-    ArchGeneratorRegistration ..-> ArchitectureDiagramGeneration
-    ComponentDiagramGeneration ..-> ArchitectureDiagramGeneration
-    ArchTagExtraction ..-> ArchitectureDiagramGeneration
-    ArchIndexDataset ..-> ArchitectureDiagramGeneration
 ```
 
 ---

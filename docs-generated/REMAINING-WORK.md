@@ -25,7 +25,7 @@
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](remaining/phase-24-process-state-api-relationship-queries.md) | 1 | 1 | 50% |
 | 🚧 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 5 | 1 | 50% |
-| 🚧 [FileCache](remaining/phase-27-file-cache.md) | 1 | 1 | 80% |
+| 🚧 [SourceMapper](remaining/phase-27-source-mapper.md) | 1 | 1 | 80% |
 | 🚧 [ReferenceDocShowcase](remaining/phase-30-reference-doc-showcase.md) | 1 | 1 | 0% |
 | 📋 [RichContentHelpersTesting](remaining/phase-44-rich-content-helpers-testing.md) | 2 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 50% |
