@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:DeclarationLevelShapeTagging
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:31
 @libar-docs-effort:3d
 @libar-docs-product-area:DeliveryProcess
