@@ -394,6 +394,27 @@ function buildShapeSections(
         const propRows = shape.propertyDocs.map((p) => [p.name, p.jsDoc]);
         sections.push(table(['Property', 'Description'], propRows));
       }
+
+      // Param docs table for functions at standard and detailed levels
+      if (shape.params && shape.params.length > 0) {
+        const paramRows = shape.params.map((p) => [p.name, p.type ?? '', p.description]);
+        sections.push(table(['Parameter', 'Type', 'Description'], paramRows));
+      }
+
+      // Returns and throws docs at detailed level only
+      if (detailLevel === 'detailed') {
+        if (shape.returns) {
+          const returnText = shape.returns.type
+            ? `**Returns** (\`${shape.returns.type}\`): ${shape.returns.description}`
+            : `**Returns:** ${shape.returns.description}`;
+          sections.push(paragraph(returnText));
+        }
+
+        if (shape.throws && shape.throws.length > 0) {
+          const throwsRows = shape.throws.map((t) => [t.type ?? '', t.description]);
+          sections.push(table(['Exception', 'Description'], throwsRows));
+        }
+      }
     }
   }
 

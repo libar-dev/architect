@@ -62,10 +62,10 @@ Feature: Reference Document Showcase
       | List block usage for scenario names under rules | Complete | src/renderable/codecs/reference.ts |
       | Collapsible block for progressive disclosure | Pending | src/renderable/codecs/reference.ts |
       | Link-out block for cross-references | Pending | src/renderable/codecs/reference.ts |
-      | Function signature surfacing in ExportInfo | Pending | src/scanner/ast-parser.ts |
-      | Param/returns/throws extraction from JSDoc | Pending | src/scanner/ast-parser.ts |
-      | Full property-level JSDoc without truncation | Pending | src/extractor/shape-extractor.ts |
-      | Auto-shape discovery mode | Pending | src/extractor/shape-extractor.ts |
+      | Function signature surfacing in ExportInfo | Complete | src/scanner/ast-parser.ts |
+      | Param/returns/throws extraction from JSDoc | Complete | src/extractor/shape-extractor.ts |
+      | Full property-level JSDoc without truncation | Complete | src/extractor/shape-extractor.ts |
+      | Auto-shape discovery mode | Complete | src/extractor/shape-extractor.ts |
       | Convention content from TypeScript JSDoc | Pending | src/scanner/ast-parser.ts |
       | CompositeCodec for multi-codec assembly | Pending | src/renderable/codecs/ |
       | renderToClaudeContext renderer | Pending | src/renderable/ |

@@ -2055,6 +2055,290 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
+  // Rule: Shape sections render param returns and throws documentation
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Shape sections render param returns and throws documentation', ({ RuleScenario }) => {
+    RuleScenario(
+      'Detailed level renders param table for function shapes',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with shapeSources {string}',
+          (_ctx: unknown, shapeSources: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              behaviorCategories: [],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with a function shape with param docs', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'FuncWithParams',
+                filePath: 'src/lint/process.ts',
+                extractedShapes: [
+                  {
+                    name: 'processOrder',
+                    kind: 'function',
+                    sourceText:
+                      'export function processOrder(orderId: string, quantity: number): OrderResult { }',
+                    jsDoc: 'Process an order with validation.',
+                    lineNumber: 10,
+                    exported: true,
+                    params: [
+                      {
+                        name: 'orderId',
+                        type: 'string',
+                        description: 'The unique order identifier',
+                      },
+                      {
+                        name: 'quantity',
+                        type: 'number',
+                        description: 'Number of items to process',
+                      },
+                    ],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then(
+          'the document has a table with columns {string} and {string} and {string}',
+          (_ctx: unknown, col1: string, col2: string, col3: string) => {
+            const tables = findTables(state!.document!);
+            const match = tables.some(
+              (t) =>
+                t.columns.includes(col1) && t.columns.includes(col2) && t.columns.includes(col3)
+            );
+            expect(match).toBe(true);
+          }
+        );
+
+        And(
+          'the table contains param {string} with description {string}',
+          (_ctx: unknown, paramName: string, description: string) => {
+            const tables = findTables(state!.document!);
+            const paramTable = tables.find((t) => t.columns.includes('Parameter'));
+            expect(paramTable).toBeDefined();
+            const row = paramTable!.rows.find((r) => r[0] === paramName);
+            expect(row).toBeDefined();
+            expect(row![2]).toContain(description);
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Detailed level renders returns and throws documentation',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with shapeSources {string}',
+          (_ctx: unknown, shapeSources: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              behaviorCategories: [],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with a function shape with returns and throws docs', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'FuncWithReturnsThrows',
+                filePath: 'src/lint/validate.ts',
+                extractedShapes: [
+                  {
+                    name: 'validate',
+                    kind: 'function',
+                    sourceText: 'export function validate(data: string): boolean { }',
+                    jsDoc: 'Validate input data.',
+                    lineNumber: 5,
+                    exported: true,
+                    returns: { type: 'boolean', description: 'The processed result' },
+                    throws: [
+                      { type: 'ValidationError', description: 'When input fails schema check' },
+                      { type: 'TypeError', description: 'When input is not a string' },
+                    ],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the rendered output contains returns paragraph with type and description', () => {
+          const rendered = getRenderedMarkdown();
+          expect(rendered).toContain('Returns');
+          expect(rendered).toContain('The processed result');
+        });
+
+        And(
+          'the document has a table with columns {string} and {string}',
+          (_ctx: unknown, col1: string, col2: string) => {
+            const tables = findTables(state!.document!);
+            const match = tables.some((t) => t.columns.includes(col1) && t.columns.includes(col2));
+            expect(match).toBe(true);
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Standard level renders param table without throws',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with shapeSources {string}',
+          (_ctx: unknown, shapeSources: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: shapeSources.split(',').map((s) => s.trim()),
+              behaviorCategories: [],
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with a function shape with param and throws docs', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'FuncWithParamThrows',
+                filePath: 'src/lint/check.ts',
+                extractedShapes: [
+                  {
+                    name: 'check',
+                    kind: 'function',
+                    sourceText: 'export function check(input: string): void { }',
+                    jsDoc: 'Check input.',
+                    lineNumber: 1,
+                    exported: true,
+                    params: [{ name: 'input', type: 'string', description: 'The input to check' }],
+                    throws: [{ type: 'CheckError', description: 'When check fails' }],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then(
+          'the document has a table with columns {string} and {string} and {string}',
+          (_ctx: unknown, col1: string, col2: string, col3: string) => {
+            const tables = findTables(state!.document!);
+            const match = tables.some(
+              (t) =>
+                t.columns.includes(col1) && t.columns.includes(col2) && t.columns.includes(col3)
+            );
+            expect(match).toBe(true);
+          }
+        );
+
+        And(
+          'the document does not have a table with column {string}',
+          (_ctx: unknown, colName: string) => {
+            const tables = findTables(state!.document!);
+            const match = tables.some((t) => t.columns.includes(colName));
+            expect(match).toBe(false);
+          }
+        );
+      }
+    );
+
+    RuleScenario('Shapes without param docs skip param table', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with shapeSources {string}',
+        (_ctx: unknown, shapeSources: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            behaviorCategories: [],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And('a MasterDataset with a shape pattern with JSDoc', () => {
+        state!.dataset = createTestMasterDataset({
+          patterns: [
+            createTestPattern({
+              name: 'ShapeNoParams',
+              filePath: 'src/lint/types.ts',
+              extractedShapes: [
+                {
+                  name: 'ConfigType',
+                  kind: 'interface',
+                  sourceText: 'export interface ConfigType { timeout: number; }',
+                  jsDoc: 'Configuration type.',
+                  lineNumber: 1,
+                  exported: true,
+                },
+              ],
+            }),
+          ],
+        });
+      });
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then(
+        'the document does not have a table with column {string}',
+        (_ctx: unknown, colName: string) => {
+          const tables = findTables(state!.document!);
+          const match = tables.some((t) => t.columns.includes(colName));
+          expect(match).toBe(false);
+        }
+      );
+    });
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
   // Rule: Standard detail level includes narrative but omits rationale
   // ──────────────────────────────────────────────────────────────────────
 
