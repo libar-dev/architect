@@ -1001,8 +1001,9 @@ export function processExtractShapesTag(
  * @param jsDocText - Raw JSDoc text including delimiters
  */
 function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string } {
-  // Match tag with optional group name, excluding JSDoc delimiters (* and /)
-  const match = /libar-docs-shape(?:\s+([^\s*/]+))?/.exec(jsDocText);
+  // Match tag with optional group name, excluding JSDoc delimiters (* and /).
+  // Negative lookahead (?!-) prevents matching hypothetical libar-docs-shape-* tags.
+  const match = /libar-docs-shape(?!-)(?:\s+([^\s*/]+))?/.exec(jsDocText);
   if (!match) return { tagged: false };
   const group = match[1];
   if (group !== undefined) {

@@ -196,6 +196,9 @@ export function buildPattern(
     }
 
     // Path 2: Declaration-level @libar-docs-shape discovery
+    // Performance note: when both paths fire, sourceCode is parsed by typescript-estree
+    // twice (once in processExtractShapesTag, once in discoverTaggedShapes). Acceptable
+    // for v1 — future optimization could accept a pre-parsed AST.
     if (sourceContent?.includes('libar-docs-shape') === true) {
       const taggedResult = discoverTaggedShapes(sourceContent);
       if (taggedResult.ok && taggedResult.value.shapes.length > 0) {

@@ -136,6 +136,34 @@ Feature: Declaration-Level Shape Tagging - Extraction
       Then 0 shapes are returned
 
     @acceptance-criteria @edge-case
+    Scenario: Tag as last line before closing JSDoc delimiter
+      Given a TypeScript source file containing:
+        """typescript
+        /**
+         * Configuration options.
+         * @libar-docs-shape config-types
+         */
+        export interface AppConfig {
+          readonly debug: boolean;
+        }
+        """
+      When discoverTaggedShapes runs on the source
+      Then 1 shape is returned
+      And the shape has name "AppConfig" and group "config-types"
+
+    @acceptance-criteria @edge-case
+    Scenario: Hypothetical libar-docs-shape-extended tag is not matched
+      Given a TypeScript source file containing:
+        """typescript
+        /** @libar-docs-shape-extended */
+        export interface NotAShape {
+          readonly value: string;
+        }
+        """
+      When discoverTaggedShapes runs on the source
+      Then 0 shapes are returned
+
+    @acceptance-criteria @edge-case
     Scenario: Tag coexists with other JSDoc content
       Given a TypeScript source file containing:
         """typescript
