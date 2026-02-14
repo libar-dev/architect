@@ -52,11 +52,11 @@ Feature: Reference Document Showcase
       | Deep behavior rendering with parsed invariant/rationale | Complete | src/renderable/codecs/reference.ts |
       | JSDoc prose in shape sections at standard level | Complete | src/renderable/codecs/reference.ts |
       | archLayer filter in DiagramScope | Complete | src/renderable/codecs/reference.ts |
-      | Edge labels on diagram relationships | Pending | src/renderable/codecs/reference.ts |
-      | Custom node shapes per archRole | Pending | src/renderable/codecs/reference.ts |
-      | diagramType field in DiagramScope | Pending | src/renderable/codecs/reference.ts |
-      | Sequence diagram rendering | Pending | src/renderable/codecs/reference.ts |
-      | State machine diagram rendering | Pending | src/renderable/codecs/reference.ts |
+      | Edge labels on diagram relationships | Complete | src/renderable/codecs/reference.ts |
+      | Custom node shapes per archRole | Complete | src/renderable/codecs/reference.ts |
+      | diagramType field in DiagramScope | Complete | src/renderable/codecs/reference.ts |
+      | Sequence diagram rendering | Complete | src/renderable/codecs/reference.ts |
+      | State machine diagram rendering | Complete | src/renderable/codecs/reference.ts |
       | C4 diagram rendering | Pending | src/renderable/codecs/reference.ts |
       | Class diagram rendering | Pending | src/renderable/codecs/reference.ts |
       | List block usage for scenario names under rules | Complete | src/renderable/codecs/reference.ts |
@@ -67,7 +67,7 @@ Feature: Reference Document Showcase
       | Full property-level JSDoc without truncation | Complete | src/extractor/shape-extractor.ts |
       | Auto-shape discovery mode | Complete | src/extractor/shape-extractor.ts |
       | Convention content from TypeScript JSDoc | Pending | src/scanner/ast-parser.ts |
-      | CompositeCodec for multi-codec assembly | Pending | src/renderable/codecs/ |
+      | CompositeCodec for multi-codec assembly | Complete | src/renderable/codecs/ |
       | renderToClaudeContext renderer | Pending | src/renderable/ |
       | Data-driven Gherkin tag extraction | Pending | src/scanner/gherkin-ast-parser.ts |
       | Expanded sample config with all content sources | Pending | delivery-process.config.ts |
