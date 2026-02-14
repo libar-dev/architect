@@ -31,6 +31,9 @@ export default defineConfig({
       title: 'Reference Generation Sample',
       conventionTags: ['reference-sample', 'output-format'],
       shapeSources: ['src/taxonomy/risk-levels.ts', 'src/renderable/schema.ts'],
+      shapeSelectors: [
+        { source: 'src/taxonomy/risk-levels.ts', names: ['RiskLevel', 'RISK_LEVELS'] },
+      ],
       behaviorCategories: ['infra'],
       diagramScopes: [
         {

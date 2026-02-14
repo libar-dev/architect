@@ -141,6 +141,22 @@ const ReferenceDocConfigSchema = z
     claudeMdSection: z.string().min(1),
     docsFilename: z.string().min(1),
     claudeMdFilename: z.string().min(1),
+    // DD-6: Fine-grained shape selectors (structural discriminated union)
+    shapeSelectors: z
+      .array(
+        z.union([
+          z.object({ group: z.string().min(1) }).strict(),
+          z
+            .object({
+              source: GlobPatternSchema,
+              names: z.array(z.string().min(1)).readonly(),
+            })
+            .strict(),
+          z.object({ source: GlobPatternSchema }).strict(),
+        ])
+      )
+      .readonly()
+      .optional(),
   })
   .strict();
 

@@ -1,4 +1,4 @@
-# 📋 Reference Doc Showcase
+# 🚧 Reference Doc Showcase
 
 **Purpose:** Detailed requirements for the Reference Doc Showcase feature
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | active |
 | Product Area | DeliveryProcess |
 | Business Value | validates all content blocks via single integration document |
 | Phase | 30 |
@@ -396,21 +396,21 @@ _Verified by: CompositeCodec combines multiple codec outputs, renderToClaudeCont
 - diagramType field in DiagramScope (complete)
 - Sequence diagram rendering (complete)
 - State machine diagram rendering (complete)
-- C4 diagram rendering (pending)
-- Class diagram rendering (pending)
+- C4 diagram rendering (complete)
+- Class diagram rendering (complete)
 - List block usage for scenario names under rules (complete)
-- Collapsible block for progressive disclosure (pending)
-- Link-out block for cross-references (pending)
+- Collapsible block for progressive disclosure (complete)
+- Link-out block for cross-references (complete)
 - Function signature surfacing in ExportInfo (complete)
 - Param/returns/throws extraction from JSDoc (complete)
 - Full property-level JSDoc without truncation (complete)
 - Auto-shape discovery mode (complete)
-- Convention content from TypeScript JSDoc (pending)
+- Convention content from TypeScript JSDoc (complete)
 - CompositeCodec for multi-codec assembly (complete)
-- renderToClaudeContext renderer (pending)
-- Data-driven Gherkin tag extraction (pending)
-- Expanded sample config with all content sources (pending)
-- Sample convention decision with rich content (pending)
+- renderToClaudeContext renderer (complete)
+- Data-driven Gherkin tag extraction (complete)
+- Expanded sample config with all content sources (complete)
+- Sample convention decision with rich content (complete)
 
 ## Implementations
 

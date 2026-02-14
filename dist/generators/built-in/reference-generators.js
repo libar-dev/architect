@@ -9,7 +9,7 @@
  * Registers all reference document generators. Each config produces
  * TWO generators: detailed (docs/) and summary (_claude-md/).
  */
-import { renderToMarkdown } from '../../renderable/render.js';
+import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
 import { createReferenceCodec, } from '../../renderable/codecs/reference.js';
 // ============================================================================
 // Reference Document Configurations
@@ -196,7 +196,9 @@ class ReferenceDocGenerator {
         // Cast needed: Zod codec infers optional props as `T | undefined`,
         // but RenderableDocument uses exactOptionalPropertyTypes
         const doc = codec.decode(context.masterDataset);
-        const content = renderToMarkdown(doc);
+        // Summary-level output (for _claude-md/) uses token-efficient renderer
+        const render = this.detailLevel === 'summary' ? renderToClaudeContext : renderToMarkdown;
+        const content = render(doc);
         return Promise.resolve({
             files: [{ path: this.outputPath, content }],
         });
@@ -255,7 +257,7 @@ class ReferenceDocsGenerator {
             const summaryDoc = summaryCodec.decode(context.masterDataset);
             files.push({
                 path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
-                content: renderToMarkdown(summaryDoc),
+                content: renderToClaudeContext(summaryDoc),
             });
         }
         return Promise.resolve({ files });

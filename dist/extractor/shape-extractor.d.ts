@@ -50,10 +50,26 @@ export interface ProcessExtractShapesResult {
  * Called by the document extractor when processing TypeScript files
  * with @libar-docs-extract-shapes tags.
  *
+ * DD-4: Supports wildcard `*` for auto-discovery mode.
+ *
  * @param sourceCode - File content
- * @param extractShapesTag - Comma-separated shape names from tag
+ * @param extractShapesTag - Comma-separated shape names from tag, or `*` for auto-discovery
  * @returns Result with extracted shapes and any warnings
  */
 export declare function processExtractShapesTag(sourceCode: string, extractShapesTag: string): ProcessExtractShapesResult;
+/**
+ * Discover declarations tagged with @libar-docs-shape in source code.
+ *
+ * Scans all top-level declarations (exported and non-exported per DD-7)
+ * for @libar-docs-shape tags in their preceding JSDoc. Tagged declarations
+ * are extracted as shapes with an optional group from the tag value (DD-5).
+ *
+ * Reuses existing infrastructure: findDeclarations(), extractPrecedingJsDoc(),
+ * and extractShape() — no parser changes needed (DD-2).
+ *
+ * @param sourceCode - TypeScript source code to scan
+ * @returns Result containing discovered shapes and warnings
+ */
+export declare function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractShapesResult>;
 export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';
 //# sourceMappingURL=shape-extractor.d.ts.map

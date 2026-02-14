@@ -989,6 +989,95 @@ export function processExtractShapesTag(
 }
 
 // =============================================================================
+// Declaration-Level Shape Discovery (DD-1, DD-2, DD-4, DD-7)
+// =============================================================================
+
+/**
+ * Extract the @libar-docs-shape tag from JSDoc text.
+ *
+ * Returns `{ tagged: true, group }` if the tag is present,
+ * where `group` is `undefined` for bare tags and a string for valued tags.
+ *
+ * @param jsDocText - Raw JSDoc text including delimiters
+ */
+function extractShapeTag(jsDocText: string): { tagged: boolean; group?: string } {
+  // Match tag with optional group name, excluding JSDoc delimiters (* and /)
+  const match = /libar-docs-shape(?:\s+([^\s*/]+))?/.exec(jsDocText);
+  if (!match) return { tagged: false };
+  const group = match[1];
+  if (group !== undefined) {
+    return { tagged: true, group };
+  }
+  return { tagged: true };
+}
+
+/**
+ * Discover declarations tagged with @libar-docs-shape in source code.
+ *
+ * Scans all top-level declarations (exported and non-exported per DD-7)
+ * for @libar-docs-shape tags in their preceding JSDoc. Tagged declarations
+ * are extracted as shapes with an optional group from the tag value (DD-5).
+ *
+ * Reuses existing infrastructure: findDeclarations(), extractPrecedingJsDoc(),
+ * and extractShape() — no parser changes needed (DD-2).
+ *
+ * @param sourceCode - TypeScript source code to scan
+ * @returns Result containing discovered shapes and warnings
+ */
+export function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractShapesResult> {
+  // Validate input size
+  if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
+    return Result.err(
+      new Error(
+        `Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`
+      )
+    );
+  }
+
+  // Parse with same config as extractShapes (DD-2: stay on estree parser)
+  let ast: TSESTree.Program;
+  try {
+    ast = parse(sourceCode, {
+      loc: true,
+      range: true,
+      comment: true,
+      jsx: true,
+    });
+  } catch (error) {
+    return Result.err(
+      error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
+    );
+  }
+
+  // DD-7: Get ALL declarations (exported + non-exported)
+  const declarations = findDeclarations(ast);
+  const comments = ast.comments ?? [];
+  const shapes: ExtractedShape[] = [];
+  const warnings: string[] = [];
+
+  for (const [, declaration] of declarations) {
+    // Get JSDoc for this declaration (respects MAX_JSDOC_LINE_DISTANCE)
+    const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
+    if (jsDoc === undefined) continue;
+
+    // Check for @libar-docs-shape tag
+    const tagResult = extractShapeTag(jsDoc);
+    if (!tagResult.tagged) continue;
+
+    // Extract the shape using existing infrastructure
+    const shape = extractShape(sourceCode, declaration, comments, {
+      includeJsDoc: true,
+      preserveFormatting: true,
+    });
+
+    // DD-5: Add group field from tag value
+    shapes.push({ ...shape, group: tagResult.group });
+  }
+
+  return Result.ok({ shapes, warnings });
+}
+
+// =============================================================================
 // Re-export Rendering Helper (moved to codec layer)
 // =============================================================================
 

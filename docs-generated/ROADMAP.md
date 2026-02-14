@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [████████████░░░░░░░░] 104/175 (59%)
+**Patterns:** [████████████░░░░░░░░] 104/176 (59%)
 
-**Phases:** 2/14 complete
+**Phases:** 2/15 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 175 |
+| Total Patterns | 176 |
 | Completed | 104 |
-| Active | 34 |
-| Planned | 37 |
+| Active | 36 |
+| Planned | 36 |
 
 ---
 
@@ -31,7 +31,8 @@
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
 | 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 4/5 | 80% |
 | ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
-| 📋 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
+| 🚧 [ReferenceDocShowcase](phases/phase-30-reference-doc-showcase.md) | 0/1 | 0% |
+| 🚧 [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -131,13 +132,23 @@
 
 ---
 
-### 📋 ReferenceDocShowcase
+### 🚧 ReferenceDocShowcase
 
 [░░░░░░░░░░░░░░░] 0/1 0% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 📋 Reference Doc Showcase | planned | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+| 🚧 Reference Doc Showcase | active | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+
+---
+
+### 🚧 DeclarationLevelShapeTagging
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 🚧 Declaration Level Shape Tagging | active | The current shape extraction system operates at file granularity. |
 
 ---
 

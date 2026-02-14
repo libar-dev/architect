@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **52 metadata tags** | **3 aggregation tags**
+**3 categories** | **53 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@libar-docs-` prefix with `@libar-docs` file opt-in.
 
 | Component | Count | Description |
 | --- | --- | --- |
 | Categories | 3 | Pattern classification by domain |
-| Metadata Tags | 52 | Pattern enrichment and relationships |
+| Metadata Tags | 53 | Pattern enrichment and relationships |
 | Aggregation Tags | 3 | Document routing |
 
 ---
@@ -115,6 +115,7 @@ Tags for enriching patterns with additional metadata.
 | `discovered-risk` | value | Risk identified during session retrospective | No | `@libar-docs-discovered-risk data-loss-on-migration` |
 | `discovered-learning` | value | Learning captured during session retrospective | No | `@libar-docs-discovered-learning convex-mutation-limits` |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
+| `shape` | value | Marks declaration as documentable shape, optionally with group name | No | `@libar-docs-shape api-types` |
 | `target` | value | Target implementation path for stub files | No | `@libar-docs-target src/api/stub-resolver.ts` |
 | `since` | value | Design session that created this pattern | No | `@libar-docs-since DS-A` |
 | `convention` | csv | Convention domains for reference document generation from decision records | No | `@libar-docs-convention fsm-rules, testing-policy` |

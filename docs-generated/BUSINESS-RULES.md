@@ -5,7 +5,7 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 163 rules from 36 features across 1 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 166 rules from 37 features across 1 product areas.**
 
 ---
 
@@ -1280,6 +1280,40 @@ The warning collector replaces scattered console.warn calls with a
 
 
 *[reference-doc-showcase.feature](delivery-process/specs/reference-doc-showcase.feature)*
+
+---
+
+## Delivery Process / Phase 31
+
+### DeclarationLevelShapeTagging
+
+*The current shape extraction system operates at file granularity.*
+
+#### Declarations opt in via libar-docs-shape tag
+
+- **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes. Declarations without the tag are ignored even if they are exported. The tag value is optional -- bare libar-docs-shape opts in without a group, while libar-docs-shape group-name assigns the declaration to a named group. Tagged non-exported declarations are included (DD-7).
+
+- **Rationale:** Explicit opt-in prevents over-extraction of internal helpers. Unlike auto-discovery mode (extract-shapes *) which grabs all exports, declaration-level tagging gives precise control. This matches how TypeDoc uses public/internal tags -- the annotation lives next to the code it describes, surviving refactors without breaking extraction.
+
+
+
+#### Reference doc configs select shapes via shapeSelectors
+
+- **Invariant:** shapeSelectors provides three selection modes: by source path + specific names (DD-6 source+names variant), by group tag (DD-6 group variant), or by source path alone (DD-6 source-only variant). shapeSources remains for backward compatibility. When both are present, shapeSources provides the coarse file-level filter and shapeSelectors adds fine-grained name/group filtering on top.
+
+- **Rationale:** The reference doc system composes focused documents from cherry-picked content. Every other content axis (conventions, behaviors, diagrams) has content-level filtering. shapeSources was the only axis limited to file-level granularity. shapeSelectors closes this gap with the same explicitness as conventionTags.
+
+
+
+#### Discovery uses existing estree parser with JSDoc comment scanning
+
+- **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach. It does not require the TypeScript compiler API, ts-morph, or parseAndGenerateServices. Tag detection is a regex match on the JSDoc comment text already extracted by the existing infrastructure. The tag regex pattern is: /libar-docs-shape(?:\s+(\S+))?/ where capture group 1 is the optional group name.
+
+- **Rationale:** The shape extractor already traverses declarations and extracts their JSDoc. Adding libar-docs-shape detection is a string search on content that is already available -- approximately 15 lines of new logic. Switching parsers would introduce churn with no benefit for the v1 use case of tag detection on top-level declarations.
+
+
+
+*[declaration-level-shape-tagging.feature](delivery-process/specs/declaration-level-shape-tagging.feature)*
 
 ---
 

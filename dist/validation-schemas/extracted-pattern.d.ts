@@ -105,6 +105,7 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         archLayer: z.ZodOptional<z.ZodString>;
         archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     }, z.core.$strict>;
     code: z.ZodString;
     source: z.ZodObject<{
@@ -278,9 +279,23 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         exported: z.ZodDefault<z.ZodBoolean>;
+        group: z.ZodOptional<z.ZodString>;
         propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             jsDoc: z.ZodString;
+        }, z.core.$strip>>>>;
+        params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            type: z.ZodOptional<z.ZodString>;
+            description: z.ZodString;
+        }, z.core.$strip>>>>;
+        returns: z.ZodOptional<z.ZodObject<{
+            type: z.ZodOptional<z.ZodString>;
+            description: z.ZodString;
+        }, z.core.$strip>>;
+        throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            type: z.ZodOptional<z.ZodString>;
+            description: z.ZodString;
         }, z.core.$strip>>>>;
     }, z.core.$strip>>>>;
 }, z.core.$strict>;

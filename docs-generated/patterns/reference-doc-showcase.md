@@ -1,4 +1,4 @@
-# 📋 Reference Doc Showcase
+# 🚧 Reference Doc Showcase
 
 **Purpose:** Detailed documentation for the Reference Doc Showcase pattern
 
@@ -8,7 +8,7 @@
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | active |
 | Category | DDD |
 | Phase | 30 |
 

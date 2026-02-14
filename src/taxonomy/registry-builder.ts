@@ -164,7 +164,7 @@ export const METADATA_TAGS_BY_GROUP = {
     'discovered-learning',
   ] as const,
   architecture: ['arch-role', 'arch-context', 'arch-layer', 'arch-view'] as const,
-  extraction: ['extract-shapes'] as const,
+  extraction: ['extract-shapes', 'shape'] as const,
   stub: ['target', 'since'] as const,
   convention: ['convention'] as const,
 } as const;
@@ -496,6 +496,13 @@ export function buildRegistry(): TagRegistry {
         format: 'csv',
         purpose: 'TypeScript type names to extract from this file for documentation',
         example: '@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation',
+      },
+      // DD-1: Declaration-level shape tagging
+      {
+        tag: 'shape',
+        format: 'value',
+        purpose: 'Marks declaration as documentable shape, optionally with group name',
+        example: '@libar-docs-shape api-types',
       },
       // Architecture diagram generation tags
       {

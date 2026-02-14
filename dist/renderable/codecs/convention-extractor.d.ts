@@ -1,11 +1,19 @@
 /**
  * Convention Extractor
  *
- * Filters MasterDataset for decision records tagged with
- * `@libar-docs-convention` and extracts their Rule block content
- * as structured data for reference codec composition.
+ * Filters MasterDataset for patterns tagged with `@libar-docs-convention`
+ * and extracts convention content as structured data for reference codec
+ * composition. Supports two sources:
+ *
+ * - **Gherkin**: Extracts from `Rule:` blocks on the pattern's `rules` array
+ * - **TypeScript**: Decomposes JSDoc `directive.description` by `## Heading`
+ *   sections, parsing each section for structured annotations
+ *
+ * Both sources produce the same `ConventionRuleContent` output, enabling
+ * Gherkin and TypeScript convention content to merge in the same bundle.
  *
  * @see CodecDrivenReferenceGeneration spec
+ * @see ReferenceDocShowcase spec
  */
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { SectionBlock } from '../schema.js';
@@ -13,7 +21,7 @@ import type { SectionBlock } from '../schema.js';
  * Structured content extracted from a decision record Rule block.
  */
 export interface ConventionRuleContent {
-    /** Rule name from the Gherkin Rule: block */
+    /** Rule name (from Gherkin Rule: block or TypeScript ## heading) */
     readonly ruleName: string;
     /** Invariant statement if present */
     readonly invariant?: string;
@@ -49,9 +57,10 @@ export interface ConventionBundle {
 /**
  * Extracts convention content from MasterDataset.
  *
- * Filters patterns for decision records tagged with `@libar-docs-convention`
- * matching the requested tag values. Extracts Rule block content as
- * structured data.
+ * Filters patterns tagged with `@libar-docs-convention` matching the
+ * requested tag values. For Gherkin-sourced patterns, extracts from
+ * Rule: blocks. For TypeScript-sourced patterns (no rules array),
+ * decomposes the JSDoc description by ## headings.
  *
  * @param dataset - The MasterDataset containing all extracted patterns
  * @param conventionTags - Convention tag values to filter by

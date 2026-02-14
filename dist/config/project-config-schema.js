@@ -101,8 +101,11 @@ const DiagramScopeSchema = z
     archContext: z.array(z.string().min(1)).readonly().optional(),
     patterns: z.array(z.string().min(1)).readonly().optional(),
     archView: z.array(z.string().min(1)).readonly().optional(),
+    archLayer: z.array(z.string().min(1)).readonly().optional(),
     direction: z.enum(['TB', 'LR']).optional(),
     title: z.string().min(1).optional(),
+    diagramType: z.enum(['graph', 'sequenceDiagram', 'stateDiagram-v2']).optional(),
+    showEdgeLabels: z.boolean().optional(),
 })
     .strict();
 /**
@@ -120,6 +123,20 @@ const ReferenceDocConfigSchema = z
     claudeMdSection: z.string().min(1),
     docsFilename: z.string().min(1),
     claudeMdFilename: z.string().min(1),
+    // DD-6: Fine-grained shape selectors (structural discriminated union)
+    shapeSelectors: z
+        .array(z.union([
+        z.object({ group: z.string().min(1) }).strict(),
+        z
+            .object({
+            source: GlobPatternSchema,
+            names: z.array(z.string().min(1)).readonly(),
+        })
+            .strict(),
+        z.object({ source: GlobPatternSchema }).strict(),
+    ]))
+        .readonly()
+        .optional(),
 })
     .strict();
 /**

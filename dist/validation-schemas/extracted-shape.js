@@ -39,6 +39,38 @@ export const PropertyDocSchema = z.object({
     jsDoc: z.string(),
 });
 // =============================================================================
+// JSDoc Tag Documentation Schemas (DD-3)
+// =============================================================================
+/**
+ * JSDoc @param tag documentation for a function parameter.
+ */
+export const ParamDocSchema = z.object({
+    /** Parameter name */
+    name: z.string(),
+    /** Type annotation from JSDoc {Type} syntax (optional in TypeScript) */
+    type: z.string().optional(),
+    /** Parameter description */
+    description: z.string(),
+});
+/**
+ * JSDoc @returns tag documentation.
+ */
+export const ReturnsDocSchema = z.object({
+    /** Return type from JSDoc {Type} syntax (optional in TypeScript) */
+    type: z.string().optional(),
+    /** Return value description */
+    description: z.string(),
+});
+/**
+ * JSDoc @throws tag documentation.
+ */
+export const ThrowsDocSchema = z.object({
+    /** Exception type from JSDoc {Type} syntax */
+    type: z.string().optional(),
+    /** Description of when this exception is thrown */
+    description: z.string(),
+});
+// =============================================================================
 // Extracted Shape Schema
 // =============================================================================
 /**
@@ -66,8 +98,16 @@ export const ExtractedShapeSchema = z.object({
     overloads: z.array(z.string()).readonly().optional(),
     /** Whether this is an exported shape */
     exported: z.boolean().default(true),
+    /** DD-5: Optional group name from @libar-docs-shape tag value */
+    group: z.string().optional(),
     /** For interfaces: JSDoc documentation for each property */
     propertyDocs: z.array(PropertyDocSchema).readonly().optional(),
+    /** DD-3: For functions: documented @param tags from JSDoc */
+    params: z.array(ParamDocSchema).readonly().optional(),
+    /** DD-3: For functions: documented @returns tag from JSDoc */
+    returns: ReturnsDocSchema.optional(),
+    /** DD-3: For functions: documented @throws tags from JSDoc */
+    throws: z.array(ThrowsDocSchema).readonly().optional(),
 });
 // =============================================================================
 // Re-exported Shape Schema

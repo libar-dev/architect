@@ -23,6 +23,7 @@
  * ```
  */
 import { type BaseCodecOptions, type DetailLevel, type DocumentCodec } from './types/base.js';
+import type { ShapeSelector } from './shape-matcher.js';
 /**
  * Scoped diagram filter for dynamic mermaid generation from relationship metadata.
  *
@@ -36,10 +37,16 @@ export interface DiagramScope {
     readonly patterns?: readonly string[];
     /** Named architectural views to include (matches pattern.archView entries) */
     readonly archView?: readonly string[];
+    /** Architectural layers to include (matches pattern.archLayer) */
+    readonly archLayer?: readonly string[];
     /** Mermaid graph direction (default: 'TB') */
     readonly direction?: 'TB' | 'LR';
     /** Section heading for this diagram (default: 'Component Overview') */
     readonly title?: string;
+    /** Mermaid diagram type (default: 'graph' for flowchart) */
+    readonly diagramType?: 'graph' | 'sequenceDiagram' | 'stateDiagram-v2' | 'C4Context' | 'classDiagram';
+    /** Show relationship type labels on edges (default: true) */
+    readonly showEdgeLabels?: boolean;
 }
 /**
  * Configuration for a reference document type.
@@ -69,6 +76,8 @@ export interface ReferenceDocConfig {
     readonly docsFilename: string;
     /** Output filename for summary _claude-md module */
     readonly claudeMdFilename: string;
+    /** DD-3/DD-6: Fine-grained shape selectors for declaration-level filtering */
+    readonly shapeSelectors?: readonly ShapeSelector[];
 }
 export interface ReferenceCodecOptions extends BaseCodecOptions {
     /** Override detail level (default: 'standard') */

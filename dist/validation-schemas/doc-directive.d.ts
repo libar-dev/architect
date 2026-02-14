@@ -163,6 +163,7 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     archLayer: z.ZodOptional<z.ZodString>;
     archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+    convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
 }, z.core.$strict>;
 /**
  * Type alias inferred from schema

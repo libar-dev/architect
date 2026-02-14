@@ -41,4 +41,5 @@ export { DeliveryProcessProjectConfigSchema, SourcesConfigSchema, OutputConfigSc
 export { resolveProjectConfig, createDefaultResolvedConfig } from './resolve-config.js';
 export { mergeSourcesForGenerator } from './merge-sources.js';
 export type { ReferenceDocConfig, DiagramScope } from '../renderable/codecs/reference.js';
+export type { ShapeSelector } from '../renderable/codecs/shape-matcher.js';
 //# sourceMappingURL=index.d.ts.map

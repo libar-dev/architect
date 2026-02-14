@@ -133,6 +133,9 @@ export const ExtractedShapeSchema = z.object({
   /** Whether this is an exported shape */
   exported: z.boolean().default(true),
 
+  /** DD-5: Optional group name from @libar-docs-shape tag value */
+  group: z.string().optional(),
+
   /** For interfaces: JSDoc documentation for each property */
   propertyDocs: z.array(PropertyDocSchema).readonly().optional(),
 

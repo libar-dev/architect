@@ -34,7 +34,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { ScannedFile } from '../scanner/index.js';
-import { processExtractShapesTag } from './shape-extractor.js';
+import { processExtractShapesTag, discoverTaggedShapes } from './shape-extractor.js';
 import type {
   ExtractedPattern,
   DocDirective,
@@ -164,11 +164,51 @@ export function buildPattern(
   const name = inferPatternName(directive, exports, registry);
   const category = asCategoryName(inferCategory(directive.tags as readonly string[], registry));
 
-  // Extract shapes if @libar-docs-extract-shapes tag is present
-  // Read file lazily only when extraction is needed
+  // Shape extraction: both @libar-docs-extract-shapes (pattern-level) and
+  // @libar-docs-shape (declaration-level) contribute to extractedShapes.
+  // Read file once for both paths.
   let extractedShapes;
   const extractionWarnings: string[] = [];
-  if (directive.extractShapes && directive.extractShapes.length > 0) {
+
+  // Only TypeScript files can have shapes
+  if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+    let sourceContent: string | undefined;
+    try {
+      sourceContent = fs.readFileSync(filePath, 'utf-8');
+    } catch (error) {
+      extractionWarnings.push(
+        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+
+    // Path 1: Existing @libar-docs-extract-shapes tag processing
+    if (
+      sourceContent !== undefined &&
+      directive.extractShapes !== undefined &&
+      directive.extractShapes.length > 0
+    ) {
+      const shapeResult = processExtractShapesTag(
+        sourceContent,
+        directive.extractShapes.join(', ')
+      );
+      extractedShapes = shapeResult.shapes;
+      extractionWarnings.push(...shapeResult.warnings);
+    }
+
+    // Path 2: Declaration-level @libar-docs-shape discovery
+    if (sourceContent?.includes('libar-docs-shape') === true) {
+      const taggedResult = discoverTaggedShapes(sourceContent);
+      if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
+        const existingNames = new Set((extractedShapes ?? []).map((s) => s.name));
+        const newShapes = taggedResult.value.shapes.filter((s) => !existingNames.has(s.name));
+        extractedShapes = [...(extractedShapes ?? []), ...newShapes];
+        extractionWarnings.push(...taggedResult.value.warnings);
+      } else if (!taggedResult.ok) {
+        extractionWarnings.push(`[shape-discovery] ${taggedResult.error.message}`);
+      }
+    }
+  } else if (directive.extractShapes !== undefined && directive.extractShapes.length > 0) {
+    // Non-TS file with extract-shapes tag — legacy path
     try {
       const sourceContent = fs.readFileSync(filePath, 'utf-8');
       const shapeResult = processExtractShapesTag(
@@ -178,9 +218,8 @@ export function buildPattern(
       extractedShapes = shapeResult.shapes;
       extractionWarnings.push(...shapeResult.warnings);
     } catch (error) {
-      // File read error - collect warning but continue without shapes
       extractionWarnings.push(
-        `[shape-extraction] Failed to read file for shape extraction: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
+        `[shape-extraction] Failed to read file: ${filePath} - ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }

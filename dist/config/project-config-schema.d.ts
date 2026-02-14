@@ -100,25 +100,47 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             patterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            archLayer: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             direction: z.ZodOptional<z.ZodEnum<{
                 TB: "TB";
                 LR: "LR";
             }>>;
             title: z.ZodOptional<z.ZodString>;
+            diagramType: z.ZodOptional<z.ZodEnum<{
+                graph: "graph";
+                sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
+            }>>;
+            showEdgeLabels: z.ZodOptional<z.ZodBoolean>;
         }, z.core.$strict>>;
         diagramScopes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             patterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            archLayer: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             direction: z.ZodOptional<z.ZodEnum<{
                 TB: "TB";
                 LR: "LR";
             }>>;
             title: z.ZodOptional<z.ZodString>;
+            diagramType: z.ZodOptional<z.ZodEnum<{
+                graph: "graph";
+                sequenceDiagram: "sequenceDiagram";
+                "stateDiagram-v2": "stateDiagram-v2";
+            }>>;
+            showEdgeLabels: z.ZodOptional<z.ZodBoolean>;
         }, z.core.$strict>>>>;
         claudeMdSection: z.ZodString;
         docsFilename: z.ZodString;
         claudeMdFilename: z.ZodString;
+        shapeSelectors: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodUnion<readonly [z.ZodObject<{
+            group: z.ZodString;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodString;
+            names: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+        }, z.core.$strict>, z.ZodObject<{
+            source: z.ZodString;
+        }, z.core.$strict>]>>>>;
     }, z.core.$strict>>>>;
 }, z.core.$strict>;
 /**

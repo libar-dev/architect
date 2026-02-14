@@ -11,19 +11,19 @@
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 0 |
-| 🚧 Active | 0 |
-| 📋 Planned | 1 |
+| 🚧 Active | 1 |
+| 📋 Planned | 0 |
 | **Total** | 1 |
 
 ---
 
-## 📋 Planned Patterns
+## 🚧 Active Patterns
 
-### 📋 Reference Doc Showcase
+### 🚧 Reference Doc Showcase
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | active |
 | Effort | 13d |
 | Business Value | validates all content blocks via single integration document |
 

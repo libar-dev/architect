@@ -214,6 +214,8 @@ export {
   type ReferenceCodecOptions,
 } from './reference.js';
 
+export { type ShapeSelector } from './shape-matcher.js';
+
 // Composite (multi-codec assembly)
 export {
   createCompositeCodec,

@@ -77,6 +77,8 @@ export declare const MetadataTagDefinitionSchema: z.ZodObject<{
     values: z.ZodOptional<z.ZodArray<z.ZodString>>;
     default: z.ZodOptional<z.ZodString>;
     example: z.ZodOptional<z.ZodString>;
+    metadataKey: z.ZodOptional<z.ZodString>;
+    transform: z.ZodOptional<z.ZodFunction<z.core.$ZodFunctionArgs, z.core.$ZodFunctionOut>>;
 }, z.core.$strict>;
 export type MetadataTagDefinition = z.infer<typeof MetadataTagDefinitionSchema>;
 /**
@@ -151,6 +153,8 @@ export declare const TagRegistrySchema: z.ZodObject<{
         values: z.ZodOptional<z.ZodArray<z.ZodString>>;
         default: z.ZodOptional<z.ZodString>;
         example: z.ZodOptional<z.ZodString>;
+        metadataKey: z.ZodOptional<z.ZodString>;
+        transform: z.ZodOptional<z.ZodFunction<z.core.$ZodFunctionArgs, z.core.$ZodFunctionOut>>;
     }, z.core.$strict>>;
     aggregationTags: z.ZodArray<z.ZodObject<{
         tag: z.ZodString;

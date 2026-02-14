@@ -47,6 +47,10 @@ export interface MetadataTagDefinitionForRegistry {
     default?: string;
     /** Example usage showing tag syntax (e.g., "@libar-docs-pattern MyPattern") */
     example?: string;
+    /** Maps tag name to metadata object property name (defaults to kebab-to-camelCase) */
+    metadataKey?: string;
+    /** Post-parse value transformer applied after format-based parsing */
+    transform?: (value: string) => string;
 }
 export type TagDefinition = MetadataTagDefinitionForRegistry;
 interface AggregationTagDefinitionForRegistry {
@@ -69,6 +73,7 @@ interface AggregationTagDefinitionForRegistry {
  * - adr: Architecture decision records
  * - hierarchy: Epic/phase/task breakdown
  * - traceability: Two-tier spec architecture links
+ * - discovery: Session discovery findings (retrospective tags)
  * - architecture: Diagram generation tags
  * - extraction: Documentation extraction control
  * - stub: Design session stub metadata
@@ -79,10 +84,11 @@ export declare const METADATA_TAGS_BY_GROUP: {
     readonly process: readonly ["phase", "release", "quarter", "completed", "effort", "effort-actual", "team", "workflow", "risk", "priority"];
     readonly prd: readonly ["product-area", "user-role", "business-value", "constraint"];
     readonly adr: readonly ["adr", "adr-status", "adr-category", "adr-supersedes", "adr-superseded-by", "adr-theme", "adr-layer"];
-    readonly hierarchy: readonly ["level", "parent"];
-    readonly traceability: readonly ["executable-specs", "roadmap-spec"];
+    readonly hierarchy: readonly ["level", "parent", "title"];
+    readonly traceability: readonly ["executable-specs", "roadmap-spec", "behavior-file"];
+    readonly discovery: readonly ["discovered-gap", "discovered-improvement", "discovered-risk", "discovered-learning"];
     readonly architecture: readonly ["arch-role", "arch-context", "arch-layer", "arch-view"];
-    readonly extraction: readonly ["extract-shapes"];
+    readonly extraction: readonly ["extract-shapes", "shape"];
     readonly stub: readonly ["target", "since"];
     readonly convention: readonly ["convention"];
 };

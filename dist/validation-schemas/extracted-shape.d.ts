@@ -21,8 +21,8 @@ import { z } from 'zod';
  */
 export declare const ShapeKindSchema: z.ZodEnum<{
     function: "function";
-    enum: "enum";
     type: "type";
+    enum: "enum";
     const: "const";
     interface: "interface";
 }>;
@@ -39,6 +39,31 @@ export declare const PropertyDocSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type PropertyDoc = z.infer<typeof PropertyDocSchema>;
 /**
+ * JSDoc @param tag documentation for a function parameter.
+ */
+export declare const ParamDocSchema: z.ZodObject<{
+    name: z.ZodString;
+    type: z.ZodOptional<z.ZodString>;
+    description: z.ZodString;
+}, z.core.$strip>;
+export type ParamDoc = z.infer<typeof ParamDocSchema>;
+/**
+ * JSDoc @returns tag documentation.
+ */
+export declare const ReturnsDocSchema: z.ZodObject<{
+    type: z.ZodOptional<z.ZodString>;
+    description: z.ZodString;
+}, z.core.$strip>;
+export type ReturnsDoc = z.infer<typeof ReturnsDocSchema>;
+/**
+ * JSDoc @throws tag documentation.
+ */
+export declare const ThrowsDocSchema: z.ZodObject<{
+    type: z.ZodOptional<z.ZodString>;
+    description: z.ZodString;
+}, z.core.$strip>;
+export type ThrowsDoc = z.infer<typeof ThrowsDocSchema>;
+/**
  * A single extracted shape from TypeScript source.
  *
  * Represents an interface, type alias, enum, function signature, or const
@@ -48,8 +73,8 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     name: z.ZodString;
     kind: z.ZodEnum<{
         function: "function";
-        enum: "enum";
         type: "type";
+        enum: "enum";
         const: "const";
         interface: "interface";
     }>;
@@ -60,9 +85,23 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     exported: z.ZodDefault<z.ZodBoolean>;
+    group: z.ZodOptional<z.ZodString>;
     propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
         name: z.ZodString;
         jsDoc: z.ZodString;
+    }, z.core.$strip>>>>;
+    params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        type: z.ZodOptional<z.ZodString>;
+        description: z.ZodString;
+    }, z.core.$strip>>>>;
+    returns: z.ZodOptional<z.ZodObject<{
+        type: z.ZodOptional<z.ZodString>;
+        description: z.ZodString;
+    }, z.core.$strip>>;
+    throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+        type: z.ZodOptional<z.ZodString>;
+        description: z.ZodString;
     }, z.core.$strip>>>>;
 }, z.core.$strip>;
 /**
@@ -91,8 +130,8 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{
             function: "function";
-            enum: "enum";
             type: "type";
+            enum: "enum";
             const: "const";
             interface: "interface";
         }>;
@@ -103,9 +142,23 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         exported: z.ZodDefault<z.ZodBoolean>;
+        group: z.ZodOptional<z.ZodString>;
         propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             jsDoc: z.ZodString;
+        }, z.core.$strip>>>>;
+        params: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            type: z.ZodOptional<z.ZodString>;
+            description: z.ZodString;
+        }, z.core.$strip>>>>;
+        returns: z.ZodOptional<z.ZodObject<{
+            type: z.ZodOptional<z.ZodString>;
+            description: z.ZodString;
+        }, z.core.$strip>>;
+        throws: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+            type: z.ZodOptional<z.ZodString>;
+            description: z.ZodString;
         }, z.core.$strip>>>>;
     }, z.core.$strip>>>;
     notFound: z.ZodReadonly<z.ZodArray<z.ZodString>>;

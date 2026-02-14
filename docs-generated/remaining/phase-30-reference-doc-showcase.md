@@ -8,27 +8,25 @@
 
 **Progress:** [░░░░░░░░░░░░░░░░░░░░] 0/1 (0%)
 
-**Remaining:** 1 patterns (0 active, 1 planned)
+**Remaining:** 1 patterns (1 active, 0 planned)
 
 ---
 
-## ✅ Ready to Start
-
-These patterns can be started immediately:
+## 🚧 In Progress
 
 | Pattern | Effort | Business Value |
 | --- | --- | --- |
-| 📋 Reference Doc Showcase | 13d | validates all content blocks via single integration document |
+| 🚧 Reference Doc Showcase | 13d | validates all content blocks via single integration document |
 
 ---
 
 ## All Remaining Patterns
 
-### 📋 Reference Doc Showcase
+### 🚧 Reference Doc Showcase
 
 | Property | Value |
 | --- | --- |
-| Status | planned |
+| Status | active |
 | Effort | 13d |
 | Business Value | validates all content blocks via single integration document |
 | Dependencies | CodecDrivenReferenceGeneration, ScopedArchitecturalView, ShapeExtraction |

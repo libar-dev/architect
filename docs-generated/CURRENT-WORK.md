@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 104/175 (59%)
+**Overall Progress:** [████████████░░░░░░░░] 104/176 (59%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 175 |
+| Total Patterns | 176 |
 | Completed | 104 |
-| Active | 34 |
-| Planned | 37 |
-| Active Phases | 2 |
+| Active | 36 |
+| Planned | 36 |
+| Active Phases | 4 |
 
 ---
 
@@ -52,12 +52,75 @@
 
 ---
 
+### 🚧 ReferenceDocShowcase
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete (0 done, 1 active)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 Reference Doc Showcase | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+
+#### Deliverables
+
+- ✅ Remove 120-char rule description truncation
+- ✅ Deep behavior rendering with parsed invariant/rationale
+- ✅ JSDoc prose in shape sections at standard level
+- ✅ archLayer filter in DiagramScope
+- ✅ Edge labels on diagram relationships
+- ✅ Custom node shapes per archRole
+- ✅ diagramType field in DiagramScope
+- ✅ Sequence diagram rendering
+- ✅ State machine diagram rendering
+- ✅ C4 diagram rendering
+- ✅ Class diagram rendering
+- ✅ List block usage for scenario names under rules
+- ✅ Collapsible block for progressive disclosure
+- ✅ Link-out block for cross-references
+- ✅ Function signature surfacing in ExportInfo
+- ✅ Param/returns/throws extraction from JSDoc
+- ✅ Full property-level JSDoc without truncation
+- ✅ Auto-shape discovery mode
+- ✅ Convention content from TypeScript JSDoc
+- ✅ CompositeCodec for multi-codec assembly
+- ✅ renderToClaudeContext renderer
+- ✅ Data-driven Gherkin tag extraction
+- ✅ Expanded sample config with all content sources
+- ✅ Sample convention decision with rich content
+
+[View ReferenceDocShowcase details →](current/phase-30-reference-doc-showcase.md)
+
+---
+
+### 🚧 DeclarationLevelShapeTagging
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete (0 done, 1 active)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 Declaration Level Shape Tagging | The current shape extraction system operates at file granularity. |
+
+#### Deliverables
+
+- 📋 Registry entry for shape tag
+- 📋 Group field on ExtractedShapeSchema
+- 📋 discoverTaggedShapes function
+- 📋 Wire tagged discovery into doc extractor
+- 📋 ShapeSelector schema and shapeSelectors on ReferenceDocConfig
+- 📋 Selector-based filtering in shape matcher
+- 📋 Showcase config using declaration-level shapes
+
+[View DeclarationLevelShapeTagging details →](current/phase-31-declaration-level-shape-tagging.md)
+
+---
+
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
 | --- | --- | --- | --- |
 | 🚧 Process State API Relationship Queries | Phase 24 | 3d | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
+| 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+| 🚧 Declaration Level Shape Tagging | Phase 31 | 3d | The current shape extraction system operates at file granularity. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Composite Codec | - | - | Assembles reference documents from multiple codec outputs by concatenating RenderableDocument sections. |

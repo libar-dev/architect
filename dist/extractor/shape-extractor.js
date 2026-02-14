@@ -277,8 +277,17 @@ function extractShape(sourceCode, declaration, comments, options) {
     // Get the node's range for source extraction (guaranteed by parse options: range: true)
     let sourceText = sourceCode.slice(node.range[0], node.range[1]);
     // For functions, convert to signature only (remove body)
-    if (kind === 'function') {
-        sourceText = functionToSignature(sourceText);
+    // Uses AST body range for precise location — avoids brace-matching that
+    // fails on object parameter types like { timeout: number }
+    if (kind === 'function' && node.type === 'FunctionDeclaration') {
+        const funcNode = node;
+        const bodyStart = funcNode.body.range[0];
+        const declStart = node.range[0];
+        sourceText = sourceCode.slice(declStart, bodyStart).trim();
+        if (sourceText.startsWith('export ')) {
+            sourceText = sourceText.slice('export '.length);
+        }
+        sourceText = sourceText.trim() + ';';
     }
     // For const, extract just the type annotation if present
     if (kind === 'const' && node.type === 'VariableDeclarator') {
@@ -294,6 +303,11 @@ function extractShape(sourceCode, declaration, comments, options) {
     let jsDoc;
     if (options.includeJsDoc) {
         jsDoc = extractPrecedingJsDoc(sourceCode, node, comments);
+    }
+    // DD-3: Parse @param/@returns/@throws from JSDoc for function shapes
+    let parsedTags;
+    if (options.includeJsDoc && kind === 'function' && jsDoc) {
+        parsedTags = parseJsDocTags(jsDoc);
     }
     // Get line number (guaranteed by parse options: loc: true)
     const lineNumber = node.loc.start.line;
@@ -350,6 +364,10 @@ function extractShape(sourceCode, declaration, comments, options) {
         extends: extendsArr,
         exported,
         propertyDocs,
+        // DD-3: Include parsed JSDoc tags for function shapes
+        params: parsedTags !== undefined && parsedTags.params.length > 0 ? parsedTags.params : undefined,
+        returns: parsedTags?.returns,
+        throws: parsedTags !== undefined && parsedTags.throws.length > 0 ? parsedTags.throws : undefined,
     };
 }
 /**
@@ -495,6 +513,126 @@ function findStrictlyAdjacentPropertyJsDoc(sourceCode, member, sortedComments, i
     return undefined;
 }
 /**
+ * Parse @param, @returns, and @throws tags from raw JSDoc text.
+ *
+ * DD-3: Handles both TypeScript-style (`@param name - desc`) and
+ * JSDoc-style (`@param {Type} name desc`) formats. Multi-line tag
+ * descriptions are supported — lines not starting with `@` are
+ * continuations of the previous tag.
+ *
+ * @param rawJsDoc - Raw JSDoc text with delimiters (/** ... *\/)
+ * @returns Structured param/returns/throws data
+ */
+function parseJsDocTags(rawJsDoc) {
+    // Strip JSDoc delimiters and leading asterisks
+    let text = rawJsDoc.trim();
+    if (text.startsWith('/**')) {
+        text = text.slice(3);
+    }
+    if (text.endsWith('*/')) {
+        text = text.slice(0, -2);
+    }
+    const lines = text.split('\n').map((line) => {
+        let cleaned = line.trim();
+        if (cleaned.startsWith('*')) {
+            cleaned = cleaned.slice(1).trim();
+        }
+        return cleaned;
+    });
+    const params = [];
+    let returns;
+    const throws = [];
+    // Regex for @param with optional {Type}: @param {Type} name - description
+    const paramRegex = /^@param\s+(?:\{([^}]+)\}\s+)?([\w.]+)\s*(?:-\s*)?(.*)$/;
+    // Regex for @returns/@return with optional {Type}
+    const returnsRegex = /^@returns?\s+(?:\{([^}]+)\}\s+)?(.*)$/;
+    // Regex for @throws/@throw with optional {Type}
+    const throwsRegex = /^@throws?\s+(?:\{([^}]+)\}\s+)?(.*)$/;
+    let currentTag;
+    for (const line of lines) {
+        if (line.length === 0) {
+            currentTag = undefined;
+            continue;
+        }
+        // Try @param
+        const paramMatch = paramRegex.exec(line);
+        if (paramMatch) {
+            const paramName = paramMatch[2] ?? '';
+            const paramType = paramMatch[1];
+            const paramDesc = paramMatch[3] ?? '';
+            params.push({
+                name: paramName,
+                type: paramType ?? undefined,
+                description: paramDesc.trim(),
+            });
+            currentTag = { target: 'param', index: params.length - 1 };
+            continue;
+        }
+        // Try @returns
+        const returnsMatch = returnsRegex.exec(line);
+        if (returnsMatch) {
+            const retType = returnsMatch[1];
+            const retDesc = returnsMatch[2] ?? '';
+            returns = {
+                type: retType ?? undefined,
+                description: retDesc.trim(),
+            };
+            currentTag = { target: 'returns', index: 0 };
+            continue;
+        }
+        // Try @throws
+        const throwsMatch = throwsRegex.exec(line);
+        if (throwsMatch) {
+            const throwType = throwsMatch[1];
+            const throwDesc = throwsMatch[2] ?? '';
+            throws.push({
+                type: throwType ?? undefined,
+                description: throwDesc.trim(),
+            });
+            currentTag = { target: 'throws', index: throws.length - 1 };
+            continue;
+        }
+        // Any other @tag breaks the current continuation
+        if (line.startsWith('@')) {
+            currentTag = undefined;
+            continue;
+        }
+        // Continuation line for current tag
+        if (currentTag) {
+            const continuation = line.trim();
+            if (continuation.length === 0)
+                continue;
+            const paramEntry = currentTag.target === 'param' ? params[currentTag.index] : undefined;
+            const throwEntry = currentTag.target === 'throws' ? throws[currentTag.index] : undefined;
+            if (currentTag.target === 'param' && paramEntry !== undefined) {
+                params[currentTag.index] = {
+                    ...paramEntry,
+                    description: paramEntry.description.length > 0
+                        ? `${paramEntry.description} ${continuation}`
+                        : continuation,
+                };
+            }
+            else if (currentTag.target === 'returns' && returns !== undefined) {
+                returns = {
+                    ...returns,
+                    description: returns.description.length > 0
+                        ? `${returns.description} ${continuation}`
+                        : continuation,
+                };
+            }
+            else if (currentTag.target === 'throws' && throwEntry !== undefined) {
+                throws[currentTag.index] = {
+                    ...throwEntry,
+                    description: throwEntry.description.length > 0
+                        ? `${throwEntry.description} ${continuation}`
+                        : continuation,
+                };
+            }
+        }
+    }
+    return { params, returns, throws };
+}
+/**
  * Extract clean text content from a JSDoc comment.
  *
  * Removes the JSDoc delimiters (/** and *\/) and leading asterisks from each line.
@@ -521,63 +659,55 @@ function extractJsDocText(jsDoc) {
         return cleaned;
     })
         .filter((line) => line.length > 0 && !line.startsWith('@')); // Skip empty and tag lines
-    // Return first non-empty line as the description
-    return lines.length > 0 ? lines[0] : undefined;
+    // DD-2: Return all non-empty, non-tag lines joined with space (not just first line)
+    // Space-join because property JSDoc renders in table cells where newlines break formatting
+    return lines.length > 0 ? lines.join(' ') : undefined;
 }
 /**
- * Convert function declaration to signature-only form.
+ * DD-4: Extract all exported declarations from a file as shapes.
  *
- * Uses brace-matching to find the function body's opening brace,
- * correctly handling object types in parameters and return types.
+ * Auto-discovery mode: when `@libar-docs-extract-shapes *` is used,
+ * all exported types/interfaces/enums/functions/consts are extracted
+ * without requiring explicit names.
  *
- * @example
- * // Object params handled correctly:
- * functionToSignature('function f(o: { a: string }): void { }')
- * // Returns: 'function f(o: { a: string }): void;'
+ * @param sourceCode - File content
+ * @returns Result with all exported shapes
  */
-function functionToSignature(sourceText) {
-    // Find the function body's opening brace by tracking brace depth.
-    // Object types like { name: string } in params/return types increment
-    // depth to 1, then decrement back to 0. The function body's opening
-    // brace is the first { encountered when depth is 0.
-    let braceDepth = 0;
-    let bodyBraceIndex = -1;
-    for (let i = 0; i < sourceText.length; i++) {
-        const char = sourceText[i];
-        if (char === '{') {
-            if (braceDepth === 0) {
-                // This is the function body's opening brace
-                bodyBraceIndex = i;
-                break;
-            }
-            braceDepth++;
-        }
-        else if (char === '}') {
-            braceDepth--;
-        }
+function extractAllExportedShapes(sourceCode) {
+    // Validate input size
+    if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
+        return Result.err(new Error(`Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`));
     }
-    if (bodyBraceIndex === -1) {
-        // No function body found - already a signature
-        return sourceText;
+    let ast;
+    try {
+        ast = parse(sourceCode, {
+            loc: true,
+            range: true,
+            comment: true,
+            jsx: true,
+        });
     }
-    // Take everything before the body brace, trim, and add semicolon
-    let signature = sourceText.slice(0, bodyBraceIndex).trim();
-    // Handle edge case: arrow functions without proper formatting
-    if (!signature.endsWith(')') && !signature.endsWith('>')) {
-        // Might have a return type - find the last )
-        const lastParen = signature.lastIndexOf(')');
-        if (lastParen !== -1) {
-            // Check for return type after )
-            const afterParen = signature.slice(lastParen + 1).trim();
-            if (afterParen.startsWith(':')) {
-                // Has return type, keep it
-            }
-            else {
-                signature = signature.slice(0, lastParen + 1);
-            }
-        }
+    catch (error) {
+        return Result.err(error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`));
     }
-    return signature + ';';
+    const declarations = findDeclarations(ast);
+    const shapes = [];
+    const warnings = [];
+    // Extract only exported declarations
+    for (const [, declaration] of declarations) {
+        if (!declaration.exported)
+            continue;
+        const shape = extractShape(sourceCode, declaration, ast.comments ?? [], {
+            includeJsDoc: true,
+            preserveFormatting: true,
+        });
+        shapes.push(shape);
+    }
+    if (shapes.length > 50) {
+        warnings.push(`[extract-shapes] Auto-discovery extracted ${shapes.length} shapes. ` +
+            `This may indicate the file has too many exports for effective documentation.`);
+    }
+    return Result.ok({ shapes, notFound: [], imported: [], reExported: [], warnings });
 }
 /**
  * Process extract-shapes tag and return shapes for ExtractedPattern.
@@ -585,15 +715,40 @@ function functionToSignature(sourceText) {
  * Called by the document extractor when processing TypeScript files
  * with @libar-docs-extract-shapes tags.
  *
+ * DD-4: Supports wildcard `*` for auto-discovery mode.
+ *
  * @param sourceCode - File content
- * @param extractShapesTag - Comma-separated shape names from tag
+ * @param extractShapesTag - Comma-separated shape names from tag, or `*` for auto-discovery
  * @returns Result with extracted shapes and any warnings
  */
 export function processExtractShapesTag(sourceCode, extractShapesTag) {
+    // DD-4: Auto-shape discovery via wildcard
     const shapeNames = extractShapesTag
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
+    const hasWildcard = shapeNames.includes('*');
+    if (hasWildcard) {
+        // Wildcard must be sole value — reject mixed case
+        if (shapeNames.length > 1) {
+            const namedShapes = shapeNames.filter((n) => n !== '*');
+            return {
+                shapes: [],
+                warnings: [
+                    `[extract-shapes] Wildcard '*' must be the sole extract-shapes value. ` +
+                        `Ignoring named shapes: ${namedShapes.join(', ')}. Use '*' alone or list specific names.`,
+                ],
+            };
+        }
+        const result = extractAllExportedShapes(sourceCode);
+        if (!result.ok) {
+            return {
+                shapes: [],
+                warnings: [`[extract-shapes] ${result.error.message}`],
+            };
+        }
+        return { shapes: [...result.value.shapes], warnings: [...result.value.warnings] };
+    }
     const extractionResult = extractShapes(sourceCode, shapeNames);
     // If extraction failed (parse error), return empty shapes with error as warning
     if (!extractionResult.ok) {
@@ -620,6 +775,83 @@ export function processExtractShapesTag(sourceCode, extractShapesTag) {
             `Add @libar-docs-extract-shapes to ${reExport.sourceModule} instead.`);
     }
     return { shapes: [...result.shapes], warnings };
+}
+// =============================================================================
+// Declaration-Level Shape Discovery (DD-1, DD-2, DD-4, DD-7)
+// =============================================================================
+/**
+ * Extract the @libar-docs-shape tag from JSDoc text.
+ *
+ * Returns `{ tagged: true, group }` if the tag is present,
+ * where `group` is `undefined` for bare tags and a string for valued tags.
+ *
+ * @param jsDocText - Raw JSDoc text including delimiters
+ */
+function extractShapeTag(jsDocText) {
+    // Match tag with optional group name, excluding JSDoc delimiters (* and /)
+    const match = /libar-docs-shape(?:\s+([^\s*/]+))?/.exec(jsDocText);
+    if (!match)
+        return { tagged: false };
+    const group = match[1];
+    if (group !== undefined) {
+        return { tagged: true, group };
+    }
+    return { tagged: true };
+}
+/**
+ * Discover declarations tagged with @libar-docs-shape in source code.
+ *
+ * Scans all top-level declarations (exported and non-exported per DD-7)
+ * for @libar-docs-shape tags in their preceding JSDoc. Tagged declarations
+ * are extracted as shapes with an optional group from the tag value (DD-5).
+ *
+ * Reuses existing infrastructure: findDeclarations(), extractPrecedingJsDoc(),
+ * and extractShape() — no parser changes needed (DD-2).
+ *
+ * @param sourceCode - TypeScript source code to scan
+ * @returns Result containing discovered shapes and warnings
+ */
+export function discoverTaggedShapes(sourceCode) {
+    // Validate input size
+    if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
+        return Result.err(new Error(`Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`));
+    }
+    // Parse with same config as extractShapes (DD-2: stay on estree parser)
+    let ast;
+    try {
+        ast = parse(sourceCode, {
+            loc: true,
+            range: true,
+            comment: true,
+            jsx: true,
+        });
+    }
+    catch (error) {
+        return Result.err(error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`));
+    }
+    // DD-7: Get ALL declarations (exported + non-exported)
+    const declarations = findDeclarations(ast);
+    const comments = ast.comments ?? [];
+    const shapes = [];
+    const warnings = [];
+    for (const [, declaration] of declarations) {
+        // Get JSDoc for this declaration (respects MAX_JSDOC_LINE_DISTANCE)
+        const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
+        if (jsDoc === undefined)
+            continue;
+        // Check for @libar-docs-shape tag
+        const tagResult = extractShapeTag(jsDoc);
+        if (!tagResult.tagged)
+            continue;
+        // Extract the shape using existing infrastructure
+        const shape = extractShape(sourceCode, declaration, comments, {
+            includeJsDoc: true,
+            preserveFormatting: true,
+        });
+        // DD-5: Add group field from tag value
+        shapes.push({ ...shape, group: tagResult.group });
+    }
+    return Result.ok({ shapes, warnings });
 }
 // =============================================================================
 // Re-export Rendering Helper (moved to codec layer)

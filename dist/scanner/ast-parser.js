@@ -341,8 +341,8 @@ export function parseFileDirectives(content, filePath, registry) {
         const codeBlock = extractCodeBlockAfterComment(content, ast, comment);
         if (!codeBlock)
             continue;
-        // Extract exports from the code block
-        const exports = extractExportsFromBlock(ast, codeBlock);
+        // Extract exports from the code block (DD-1: thread content for signature slicing)
+        const exports = extractExportsFromBlock(ast, codeBlock, content);
         results.push({
             directive,
             code: codeBlock.code,
@@ -479,6 +479,8 @@ function parseDirective(commentText, loc, filePath, registry) {
     const since = metadataResults.get('since');
     // Shape extraction tags
     const extractShapes = metadataResults.get('extract-shapes');
+    // Convention tags for reference document generation
+    const convention = metadataResults.get('convention');
     // Extract "### When to Use" section or "**When to use:**" inline format
     // Returns array of bullet points, stopping at section boundaries
     // This is a special format that extracts from description, not a metadata tag
@@ -559,6 +561,8 @@ function parseDirective(commentText, loc, filePath, registry) {
         ...(archView && archView.length > 0 && { archView }),
         // Shape extraction fields
         ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
+        // Convention tags for reference document generation
+        ...(convention && convention.length > 0 && { convention }),
     };
     // Validate against schema (schema-first enforcement)
     const validation = DocDirectiveSchema.safeParse(directive);
@@ -604,7 +608,7 @@ function findNextNodeAfterPosition(ast, position) {
 /**
  * Extract export information from a code block
  */
-function extractExportsFromBlock(ast, block) {
+function extractExportsFromBlock(ast, block, sourceCode) {
     const exports = [];
     for (const node of ast.body) {
         if (!node.loc)
@@ -613,7 +617,7 @@ function extractExportsFromBlock(ast, block) {
             continue;
         if (node.type === 'ExportNamedDeclaration') {
             if (node.declaration) {
-                exports.push(...extractFromDeclaration(node.declaration));
+                exports.push(...extractFromDeclaration(node.declaration, sourceCode));
             }
             // Handle re-exports like: export { foo, bar } from './module'
             // or type exports: export type { Foo } from './module'
@@ -646,9 +650,33 @@ function extractExportsFromBlock(ast, block) {
     return exports;
 }
 /**
+ * Build a clean function signature from AST node and source code.
+ *
+ * DD-1: Uses AST body range to precisely locate the function body start,
+ * then slices everything before it as the signature. This avoids flawed
+ * brace-matching that fails on object parameter types like `{ timeout: number }`.
+ * Strips `export ` prefix but keeps `async` (semantically meaningful).
+ */
+function buildFunctionSignature(declaration, sourceCode) {
+    // Use AST body range for precise body location (no brace-matching needed)
+    if (declaration.body) {
+        const bodyStart = declaration.body.range[0];
+        const declStart = declaration.range[0];
+        const beforeBody = sourceCode.slice(declStart, bodyStart);
+        // Strip 'export ' prefix for clean display
+        const withoutExport = beforeBody.startsWith('export ')
+            ? beforeBody.slice('export '.length)
+            : beforeBody;
+        return withoutExport.trim() + ';';
+    }
+    // Fallback for declarations without body (ambient/abstract)
+    const fullText = sourceCode.slice(declaration.range[0], declaration.range[1]);
+    return fullText.startsWith('export ') ? fullText.slice('export '.length).trim() : fullText.trim();
+}
+/**
  * Extract exports from a declaration node
  */
-function extractFromDeclaration(declaration) {
+function extractFromDeclaration(declaration, sourceCode) {
     const exports = [];
     switch (declaration.type) {
         case 'FunctionDeclaration':
@@ -656,7 +684,7 @@ function extractFromDeclaration(declaration) {
                 exports.push({
                     name: declaration.id.name,
                     type: 'function',
-                    signature: `${declaration.id.name}(${declaration.params.map(() => '...').join(', ')})`,
+                    signature: buildFunctionSignature(declaration, sourceCode),
                 });
             }
             break;

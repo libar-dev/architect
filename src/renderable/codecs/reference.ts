@@ -52,7 +52,8 @@ import {
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { extractConventions, type ConventionBundle } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
-import { extractShapesFromDataset } from './shape-matcher.js';
+import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
+import type { ShapeSelector } from './shape-matcher.js';
 import {
   sanitizeNodeId,
   EDGE_STYLES,
@@ -141,6 +142,9 @@ export interface ReferenceDocConfig {
 
   /** Output filename for summary _claude-md module */
   readonly claudeMdFilename: string;
+
+  /** DD-3/DD-6: Fine-grained shape selectors for declaration-level filtering */
+  readonly shapeSelectors?: readonly ShapeSelector[];
 }
 
 // ============================================================================
@@ -202,11 +206,27 @@ export function createReferenceCodec(
         }
       }
 
-      // 3. Shape extraction from matching patterns (AD-6: in-memory glob matching)
-      if (config.shapeSources.length > 0) {
-        const shapes = extractShapesFromDataset(dataset, config.shapeSources);
-        if (shapes.length > 0) {
-          sections.push(...buildShapeSections(shapes, opts.detailLevel));
+      // 3. Shape extraction: combine shapeSources (coarse) + shapeSelectors (fine)
+      {
+        const allShapes =
+          config.shapeSources.length > 0
+            ? [...extractShapesFromDataset(dataset, config.shapeSources)]
+            : ([] as ExtractedShape[]);
+
+        // DD-3/DD-6: Fine-grained selector-based filtering
+        if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
+          const selectorShapes = filterShapesBySelectors(dataset, config.shapeSelectors);
+          const seenNames = new Set(allShapes.map((s) => s.name));
+          for (const shape of selectorShapes) {
+            if (!seenNames.has(shape.name)) {
+              seenNames.add(shape.name);
+              allShapes.push(shape);
+            }
+          }
+        }
+
+        if (allShapes.length > 0) {
+          sections.push(...buildShapeSections(allShapes, opts.detailLevel));
         }
       }
 

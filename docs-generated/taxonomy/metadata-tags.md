@@ -6,7 +6,7 @@
 
 ## Metadata Tag Definitions
 
-52 metadata tags with full details.
+53 metadata tags with full details.
 
 | Tag | Format | Purpose | Required | Repeatable | Values | Default |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -55,6 +55,7 @@
 | `see-also` | csv | Related patterns for cross-reference without dependency implication | No | No | - | - |
 | `api-ref` | csv | File paths to implementation APIs (replaces 'See:' Markdown text in Rules) | No | No | - | - |
 | `extract-shapes` | csv | TypeScript type names to extract from this file for documentation | No | No | - | - |
+| `shape` | value | Marks declaration as documentable shape, optionally with group name | No | No | - | - |
 | `arch-role` | enum | Architectural role for diagram generation (component type) | No | No | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model, service | - |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | No | - | - |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | No | domain, application, infrastructure | - |
@@ -525,6 +526,16 @@
 | Required | No |
 | Repeatable | No |
 | Example | `@libar-docs-extract-shapes DeciderInput, ValidationResult, ProcessViolation` |
+
+### `shape`
+
+| Property | Value |
+| --- | --- |
+| Format | value |
+| Purpose | Marks declaration as documentable shape, optionally with group name |
+| Required | No |
+| Repeatable | No |
+| Example | `@libar-docs-shape api-types` |
 
 ### `arch-role`
 

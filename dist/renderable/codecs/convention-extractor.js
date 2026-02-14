@@ -1,11 +1,19 @@
 /**
  * Convention Extractor
  *
- * Filters MasterDataset for decision records tagged with
- * `@libar-docs-convention` and extracts their Rule block content
- * as structured data for reference codec composition.
+ * Filters MasterDataset for patterns tagged with `@libar-docs-convention`
+ * and extracts convention content as structured data for reference codec
+ * composition. Supports two sources:
+ *
+ * - **Gherkin**: Extracts from `Rule:` blocks on the pattern's `rules` array
+ * - **TypeScript**: Decomposes JSDoc `directive.description` by `## Heading`
+ *   sections, parsing each section for structured annotations
+ *
+ * Both sources produce the same `ConventionRuleContent` output, enabling
+ * Gherkin and TypeScript convention content to merge in the same bundle.
  *
  * @see CodecDrivenReferenceGeneration spec
+ * @see ReferenceDocShowcase spec
  */
 import { parseBusinessRuleAnnotations } from './helpers.js';
 // ============================================================================
@@ -90,13 +98,16 @@ function parseTableLines(lines) {
 // Rule Content Extraction
 // ============================================================================
 /**
- * Extract structured convention content from a business rule.
+ * Build a ConventionRuleContent from raw text and a rule name.
+ *
+ * Shared helper used by both Gherkin Rule: block extraction and
+ * TypeScript JSDoc description decomposition.
  */
-function extractConventionRuleContent(rule) {
-    const annotations = parseBusinessRuleAnnotations(rule.description);
-    const tables = extractTablesFromDescription(rule.description);
+function buildRuleContentFromText(text, ruleName) {
+    const annotations = parseBusinessRuleAnnotations(text);
+    const tables = extractTablesFromDescription(text);
     return {
-        ruleName: rule.name,
+        ruleName,
         ...(annotations.invariant !== undefined && { invariant: annotations.invariant }),
         ...(annotations.rationale !== undefined && { rationale: annotations.rationale }),
         ...(annotations.verifiedBy !== undefined && {
@@ -110,15 +121,72 @@ function extractConventionRuleContent(rule) {
         narrative: annotations.remainingContent ?? '',
     };
 }
+/**
+ * Extract structured convention content from a Gherkin business rule.
+ */
+function extractConventionRuleContent(rule) {
+    return buildRuleContentFromText(rule.description, rule.name);
+}
+// ============================================================================
+// TypeScript JSDoc Description Decomposition
+// ============================================================================
+/**
+ * Extract convention rules from a TypeScript JSDoc description.
+ *
+ * Decomposes the description by `## Heading` sections into individual
+ * convention rules. Each heading becomes a rule name; the content below it
+ * (until the next `## ` or end) is parsed through `parseBusinessRuleAnnotations()`.
+ *
+ * If no `## ` headings exist, treats the entire description as a single rule.
+ *
+ * @param description - The JSDoc description text
+ * @param patternName - Fallback rule name when no ## headings exist
+ * @returns Array of ConventionRuleContent
+ */
+function extractConventionRulesFromDescription(description, patternName) {
+    if (!description || description.trim().length === 0)
+        return [];
+    // Split by ## headings (level 2 only, not ### or deeper)
+    // Allow optional leading whitespace for DocString content
+    const headingPattern = /^\s*## (?!#)(.+)$/gm;
+    const headings = [];
+    let match;
+    while ((match = headingPattern.exec(description)) !== null) {
+        const captured = match[1];
+        if (captured) {
+            headings.push({ name: captured.trim(), index: match.index });
+        }
+    }
+    if (headings.length === 0) {
+        // No headings: treat entire description as single rule
+        return [buildRuleContentFromText(description, patternName)];
+    }
+    const rules = [];
+    for (let i = 0; i < headings.length; i++) {
+        const heading = headings[i];
+        if (!heading)
+            continue;
+        const nextIndex = i + 1 < headings.length ? (headings[i + 1]?.index ?? description.length) : description.length;
+        // Content starts after the heading line
+        const headingLineEnd = description.indexOf('\n', heading.index);
+        const contentStart = headingLineEnd >= 0 ? headingLineEnd + 1 : description.length;
+        const content = description.slice(contentStart, nextIndex).trim();
+        if (content.length > 0) {
+            rules.push(buildRuleContentFromText(content, heading.name));
+        }
+    }
+    return rules;
+}
 // ============================================================================
 // Extraction Function
 // ============================================================================
 /**
  * Extracts convention content from MasterDataset.
  *
- * Filters patterns for decision records tagged with `@libar-docs-convention`
- * matching the requested tag values. Extracts Rule block content as
- * structured data.
+ * Filters patterns tagged with `@libar-docs-convention` matching the
+ * requested tag values. For Gherkin-sourced patterns, extracts from
+ * Rule: blocks. For TypeScript-sourced patterns (no rules array),
+ * decomposes the JSDoc description by ## headings.
  *
  * @param dataset - The MasterDataset containing all extracted patterns
  * @param conventionTags - Convention tag values to filter by
@@ -149,9 +217,22 @@ export function extractConventions(dataset, conventionTags) {
         const matchingTags = pattern.convention.filter((t) => conventionTags.includes(t));
         if (matchingTags.length === 0)
             continue;
-        // Extract rule content from this pattern's rules
-        const ruleContents = (pattern.rules ?? []).map(extractConventionRuleContent);
-        // Add to each matching bundle
+        // Extract rule content from Gherkin Rule: blocks or TypeScript JSDoc description
+        let ruleContents;
+        if (pattern.rules && pattern.rules.length > 0) {
+            // Gherkin source: extract from Rule: blocks
+            ruleContents = pattern.rules.map(extractConventionRuleContent);
+        }
+        else if (pattern.directive.description) {
+            // TypeScript source: decompose JSDoc description by ## headings
+            ruleContents = extractConventionRulesFromDescription(pattern.directive.description, pattern.name);
+        }
+        else {
+            ruleContents = [];
+        }
+        // Only add to bundles if rules were extracted
+        if (ruleContents.length === 0)
+            continue;
         for (const tag of matchingTags) {
             const bundle = bundles.get(tag);
             if (bundle) {

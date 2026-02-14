@@ -9,15 +9,18 @@
  *
  * ## Universal Renderer
  *
- * Converts RenderableDocument to Markdown. This is the "dumb printer" -
- * it knows nothing about patterns, phases, or domain concepts.
- * All logic lives in the codecs; this just renders blocks.
+ * Converts RenderableDocument to output strings. Two renderers:
+ * - `renderToMarkdown` — Full markdown for human documentation
+ * - `renderToClaudeContext` — Token-efficient format for LLM consumption
+ *
+ * Both are "dumb printers" — they know nothing about patterns, phases,
+ * or domain concepts. All logic lives in the codecs; these just render blocks.
  *
  * ### When to Use
  *
- * - When converting RenderableDocument to markdown output
- * - When generating output files with detail file support
- * - When customizing markdown rendering behavior
+ * - `renderToMarkdown` for human-readable docs (`docs/` output)
+ * - `renderToClaudeContext` for AI context (`_claude-md/` output)
+ * - `renderDocumentWithFiles` for multi-file output with detail files
  */
 import type { RenderableDocument } from './schema.js';
 /**
@@ -27,6 +30,18 @@ import type { RenderableDocument } from './schema.js';
  * @returns Markdown string
  */
 export declare function renderToMarkdown(doc: RenderableDocument): string;
+/**
+ * Render a RenderableDocument to token-efficient text for LLM consumption.
+ *
+ * Uses `=== SECTION ===` markers instead of markdown headers, omits
+ * mermaid diagrams (LLMs cannot render them), flattens collapsible blocks,
+ * and strips link-out URLs. Produces ~20-40% fewer tokens than markdown
+ * for the same document.
+ *
+ * @param doc - The document to render
+ * @returns Token-efficient string for AI context
+ */
+export declare function renderToClaudeContext(doc: RenderableDocument): string;
 /**
  * Output file descriptor
  */
@@ -39,7 +54,8 @@ export interface OutputFile {
  *
  * @param doc - The document to render
  * @param basePath - Base path for the main document
+ * @param renderer - Render function to use (defaults to renderToMarkdown)
  * @returns Array of output files
  */
-export declare function renderDocumentWithFiles(doc: RenderableDocument, basePath: string): OutputFile[];
+export declare function renderDocumentWithFiles(doc: RenderableDocument, basePath: string, renderer?: (d: RenderableDocument) => string): OutputFile[];
 //# sourceMappingURL=render.d.ts.map

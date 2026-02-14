@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [████████░░░░░░░░░░░░] 17/43 (40%)
+**Overall:** [████████░░░░░░░░░░░░] 17/44 (39%)
 
 | Metric | Value |
 | --- | --- |
-| Total Features | 43 |
+| Total Features | 44 |
 | Completed | 17 |
-| Active | 1 |
-| Planned | 25 |
+| Active | 3 |
+| Planned | 24 |
 | Product Areas | 2 |
 | User Roles | 1 |
 
@@ -24,7 +24,7 @@
 
 ### DeliveryProcess
 
-16/42 complete (38%)
+16/43 complete (37%)
 
 - [✅ Codec Driven Reference Generation - eliminates per document recipe features with config driven generation](requirements/phase-27-codec-driven-reference-generation.md)
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
@@ -42,7 +42,9 @@
 - [✅ Scoped Architectural View - enables selective pattern composition with architecture diagrams](requirements/phase-28-scoped-architectural-view.md)
 - [✅ Shape Extraction - eliminates type duplication in documentation](requirements/phase-26-shape-extraction.md)
 - [✅ Universal Doc Generator Robustness - enables monorepo scale doc generation](requirements/phase-28-universal-doc-generator-robustness.md)
+- [🚧 Declaration Level Shape Tagging - enables focused shape extraction without whole file dumping](requirements/phase-31-declaration-level-shape-tagging.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
+- [🚧 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
 - [📋 Architecture Delta - document release changes automatically](requirements/phase-100-architecture-delta.md)
 - [📋 Architecture Diagram Generation](requirements/phase-23-architecture-diagram-generation.md)
 - [📋 Business Rules Generator](requirements/phase-100-business-rules-generator.md)
@@ -60,7 +62,6 @@
 - [📋 Phase Numbering Conventions - prevent phase number conflicts and ensure consistent ordering](requirements/phase-100-phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](requirements/phase-99-prd-implementation-section.md)
 - [📋 Progressive Governance - filter work by risk and priority](requirements/phase-100-progressive-governance.md)
-- [📋 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
 - [📋 Release Association Rules - enforce separation of specs from release metadata](requirements/phase-100-release-association-rules.md)
 - [📋 Session File Cleanup - ensure session directory only contains active phase files](requirements/phase-100-session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](requirements/phase-99-status-aware-eslint-suppression.md)
@@ -111,7 +112,9 @@
 | ✅ Shape Extraction | DeliveryProcess | - | completed |
 | ✅ TypeScript Taxonomy Implementation | Taxonomy | Developer | completed |
 | ✅ Universal Doc Generator Robustness | DeliveryProcess | - | completed |
+| 🚧 Declaration Level Shape Tagging | DeliveryProcess | - | active |
 | 🚧 Process State API Relationship Queries | DeliveryProcess | - | active |
+| 🚧 Reference Doc Showcase | DeliveryProcess | - | active |
 | 📋 Architecture Delta | DeliveryProcess | - | planned |
 | 📋 Architecture Diagram Generation | DeliveryProcess | - | planned |
 | 📋 Business Rules Generator | DeliveryProcess | - | planned |
@@ -129,7 +132,6 @@
 | 📋 Phase Numbering Conventions | DeliveryProcess | - | planned |
 | 📋 Prd Implementation Section | DeliveryProcess | - | planned |
 | 📋 Progressive Governance | DeliveryProcess | - | planned |
-| 📋 Reference Doc Showcase | DeliveryProcess | - | planned |
 | 📋 Release Association Rules | DeliveryProcess | - | planned |
 | 📋 Session File Cleanup | DeliveryProcess | - | planned |
 | 📋 Status Aware Eslint Suppression | DeliveryProcess | - | planned |
