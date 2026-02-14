@@ -237,6 +237,9 @@ export function buildPattern(
       directive.archView.length > 0 && { archView: directive.archView }),
     // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
     ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
+    // Convention tags for reference document generation
+    ...(directive.convention !== undefined &&
+      directive.convention.length > 0 && { convention: directive.convention }),
   };
 
   // Validate against schema (schema-first enforcement)

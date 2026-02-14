@@ -264,6 +264,9 @@ export const DocDirectiveSchema = z
 
     /** Shape names to extract from this file (from @libar-docs-extract-shapes tag) */
     extractShapes: z.array(z.string()).readonly().optional(),
+
+    /** Convention domains for reference document generation (from @libar-docs-convention CSV tag) */
+    convention: z.array(z.string()).readonly().optional(),
   })
   .strict();
 

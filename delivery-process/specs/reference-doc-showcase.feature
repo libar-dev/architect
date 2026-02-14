@@ -66,10 +66,10 @@ Feature: Reference Document Showcase
       | Param/returns/throws extraction from JSDoc | Complete | src/extractor/shape-extractor.ts |
       | Full property-level JSDoc without truncation | Complete | src/extractor/shape-extractor.ts |
       | Auto-shape discovery mode | Complete | src/extractor/shape-extractor.ts |
-      | Convention content from TypeScript JSDoc | Pending | src/scanner/ast-parser.ts |
+      | Convention content from TypeScript JSDoc | Complete | src/scanner/ast-parser.ts |
       | CompositeCodec for multi-codec assembly | Complete | src/renderable/codecs/ |
       | renderToClaudeContext renderer | Pending | src/renderable/ |
-      | Data-driven Gherkin tag extraction | Pending | src/scanner/gherkin-ast-parser.ts |
+      | Data-driven Gherkin tag extraction | Complete | src/scanner/gherkin-ast-parser.ts |
       | Expanded sample config with all content sources | Pending | delivery-process.config.ts |
       | Sample convention decision with rich content | Pending | delivery-process/decisions/ |
 

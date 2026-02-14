@@ -592,6 +592,8 @@ function parseDirective(
   const since = metadataResults.get('since') as string | undefined;
   // Shape extraction tags
   const extractShapes = metadataResults.get('extract-shapes') as string[] | undefined;
+  // Convention tags for reference document generation
+  const convention = metadataResults.get('convention') as string[] | undefined;
 
   // Extract "### When to Use" section or "**When to use:**" inline format
   // Returns array of bullet points, stopping at section boundaries
@@ -679,6 +681,8 @@ function parseDirective(
     ...(archView && archView.length > 0 && { archView }),
     // Shape extraction fields
     ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
+    // Convention tags for reference document generation
+    ...(convention && convention.length > 0 && { convention }),
   };
 
   // Validate against schema (schema-first enforcement)
