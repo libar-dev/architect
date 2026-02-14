@@ -686,13 +686,13 @@ function buildSequenceDiagram(ctx: DiagramContext): string[] {
   const lines: string[] = ['sequenceDiagram'];
   const edgeTypes = ['uses', 'dependsOn', 'implementsPatterns'] as const;
 
-  // Emit participant declarations for scope patterns
+  // Emit participant declarations for scope patterns (sanitized for Mermaid syntax)
   for (const name of ctx.scopeNames) {
-    lines.push(`    participant ${name}`);
+    lines.push(`    participant ${sanitizeNodeId(name)} as ${name}`);
   }
   // Emit participant declarations for neighbor patterns
   for (const name of ctx.neighborNames) {
-    lines.push(`    participant ${name}`);
+    lines.push(`    participant ${sanitizeNodeId(name)} as ${name}`);
   }
 
   // Emit messages from relationships
@@ -704,14 +704,18 @@ function buildSequenceDiagram(ctx: DiagramContext): string[] {
       for (const target of rel[type]) {
         if (ctx.allNames.has(target)) {
           const arrow = SEQUENCE_ARROWS[type];
-          lines.push(`    ${sourceName} ${arrow} ${target}: ${EDGE_LABELS[type]}`);
+          lines.push(
+            `    ${sanitizeNodeId(sourceName)} ${arrow} ${sanitizeNodeId(target)}: ${EDGE_LABELS[type]}`
+          );
         }
       }
     }
 
     if (rel.extendsPattern !== undefined && ctx.allNames.has(rel.extendsPattern)) {
       const arrow = SEQUENCE_ARROWS.extendsPattern;
-      lines.push(`    ${sourceName} ${arrow} ${rel.extendsPattern}: ${EDGE_LABELS.extendsPattern}`);
+      lines.push(
+        `    ${sanitizeNodeId(sourceName)} ${arrow} ${sanitizeNodeId(rel.extendsPattern)}: ${EDGE_LABELS.extendsPattern}`
+      );
     }
   }
 

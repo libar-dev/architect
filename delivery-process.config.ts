@@ -25,6 +25,7 @@ export default defineConfig({
     directory: 'docs-generated',
     overwrite: true,
   },
+  // TODO: spread LIBAR_REFERENCE_CONFIGS to restore built-in reference docs after experiments
   referenceDocConfigs: [
     {
       title: 'Reference Generation Sample',

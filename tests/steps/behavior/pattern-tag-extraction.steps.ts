@@ -243,8 +243,8 @@ describeFeature(feature, ({ Scenario, Background, BeforeEachScenario }) => {
       expect(state!.metadata.categories).toContain('ddd');
     });
 
-    And('the metadata categories should contain "core"', () => {
-      expect(state!.metadata.categories).toContain('core');
+    And('the metadata core flag should be true', () => {
+      expect(state!.metadata.core).toBe(true);
     });
 
     And('the metadata categories should contain "event-sourcing"', () => {
@@ -272,8 +272,8 @@ describeFeature(feature, ({ Scenario, Background, BeforeEachScenario }) => {
       expect(state!.metadata.categories).toContain('ddd');
     });
 
-    And('the metadata categories should contain "core"', () => {
-      expect(state!.metadata.categories).toContain('core');
+    And('the metadata core flag should be true', () => {
+      expect(state!.metadata.core).toBe(true);
     });
 
     And('the metadata categories should not contain "libar-docs"', () => {
@@ -339,8 +339,8 @@ describeFeature(feature, ({ Scenario, Background, BeforeEachScenario }) => {
       expect(state!.metadata.categories).toContain('ddd');
     });
 
-    And('the metadata categories should contain "core"', () => {
-      expect(state!.metadata.categories).toContain('core');
+    And('the metadata core flag should be true', () => {
+      expect(state!.metadata.core).toBe(true);
     });
   });
 

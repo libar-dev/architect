@@ -217,7 +217,7 @@ function extractConventionRulesFromDescription(
 
   // Split by ## headings (level 2 only, not ### or deeper)
   // Allow optional leading whitespace for DocString content
-  const headingPattern = /^\s*## (.+)$/gm;
+  const headingPattern = /^\s*## (?!#)(.+)$/gm;
   const headings: Array<{ name: string; index: number }> = [];
   let match;
 

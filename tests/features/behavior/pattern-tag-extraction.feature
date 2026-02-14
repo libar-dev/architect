@@ -100,7 +100,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
     Given feature tags "ddd", "core", "event-sourcing", and "acceptance-criteria"
     When extracting pattern tags
     Then the metadata categories should contain "ddd"
-    And the metadata categories should contain "core"
+    And the metadata core flag should be true
     And the metadata categories should contain "event-sourcing"
     And the metadata categories should not contain "acceptance-criteria"
 
@@ -109,7 +109,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
     Given feature tags "libar-docs", "ddd", and "core"
     When extracting pattern tags
     Then the metadata categories should contain "ddd"
-    And the metadata categories should contain "core"
+    And the metadata core flag should be true
     And the metadata categories should not contain "libar-docs"
 
   # ==========================================================================
@@ -128,7 +128,7 @@ Feature: Pattern Tag Extraction from Gherkin Feature Tags
     And the metadata enables should contain "MultiEntityOps"
     And the metadata should have brief equal to "pattern-briefs/03-dcb.md"
     And the metadata categories should contain "ddd"
-    And the metadata categories should contain "core"
+    And the metadata core flag should be true
 
   # ==========================================================================
   # Edge Cases

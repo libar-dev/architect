@@ -578,7 +578,13 @@ export function extractPatternTags(tags: readonly string[]): {
     const colonIdx = normalized.indexOf(':');
 
     if (colonIdx === -1) {
-      // No colon: category tag (e.g., @ddd, @core, @event-sourcing)
+      // Check if this is a registered flag-type tag (e.g., 'core')
+      const flagDef = TAG_LOOKUP.get(normalized);
+      if (flagDef?.format === 'flag') {
+        metadata[kebabToCamel(normalized)] = true;
+        continue;
+      }
+      // No colon: category tag (e.g., @ddd, @event-sourcing)
       // Skip known non-category tags
       if (
         normalized !== 'acceptance-criteria' &&

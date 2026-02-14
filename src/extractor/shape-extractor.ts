@@ -359,8 +359,17 @@ function extractShape(
   let sourceText = sourceCode.slice(node.range[0], node.range[1]);
 
   // For functions, convert to signature only (remove body)
-  if (kind === 'function') {
-    sourceText = functionToSignature(sourceText);
+  // Uses AST body range for precise location — avoids brace-matching that
+  // fails on object parameter types like { timeout: number }
+  if (kind === 'function' && node.type === 'FunctionDeclaration') {
+    const funcNode = node as TSESTree.FunctionDeclaration;
+    const bodyStart = funcNode.body.range[0];
+    const declStart = node.range[0];
+    sourceText = sourceCode.slice(declStart, bodyStart).trim();
+    if (sourceText.startsWith('export ')) {
+      sourceText = sourceText.slice('export '.length);
+    }
+    sourceText = sourceText.trim() + ';';
   }
 
   // For const, extract just the type annotation if present
@@ -689,7 +698,7 @@ function parseJsDocTags(rawJsDoc: string): ParsedJsDocTags {
   const throws: ThrowsDoc[] = [];
 
   // Regex for @param with optional {Type}: @param {Type} name - description
-  const paramRegex = /^@param\s+(?:\{([^}]+)\}\s+)?(\w+)\s*(?:-\s*)?(.*)$/;
+  const paramRegex = /^@param\s+(?:\{([^}]+)\}\s+)?([\w.]+)\s*(?:-\s*)?(.*)$/;
   // Regex for @returns/@return with optional {Type}
   const returnsRegex = /^@returns?\s+(?:\{([^}]+)\}\s+)?(.*)$/;
   // Regex for @throws/@throw with optional {Type}
@@ -821,65 +830,6 @@ function extractJsDocText(jsDoc: string): string | undefined {
   // DD-2: Return all non-empty, non-tag lines joined with space (not just first line)
   // Space-join because property JSDoc renders in table cells where newlines break formatting
   return lines.length > 0 ? lines.join(' ') : undefined;
-}
-
-/**
- * Convert function declaration to signature-only form.
- *
- * Uses brace-matching to find the function body's opening brace,
- * correctly handling object types in parameters and return types.
- *
- * @example
- * // Object params handled correctly:
- * functionToSignature('function f(o: { a: string }): void { }')
- * // Returns: 'function f(o: { a: string }): void;'
- */
-function functionToSignature(sourceText: string): string {
-  // Find the function body's opening brace by tracking brace depth.
-  // Object types like { name: string } in params/return types increment
-  // depth to 1, then decrement back to 0. The function body's opening
-  // brace is the first { encountered when depth is 0.
-  let braceDepth = 0;
-  let bodyBraceIndex = -1;
-
-  for (let i = 0; i < sourceText.length; i++) {
-    const char = sourceText[i];
-    if (char === '{') {
-      if (braceDepth === 0) {
-        // This is the function body's opening brace
-        bodyBraceIndex = i;
-        break;
-      }
-      braceDepth++;
-    } else if (char === '}') {
-      braceDepth--;
-    }
-  }
-
-  if (bodyBraceIndex === -1) {
-    // No function body found - already a signature
-    return sourceText;
-  }
-
-  // Take everything before the body brace, trim, and add semicolon
-  let signature = sourceText.slice(0, bodyBraceIndex).trim();
-
-  // Handle edge case: arrow functions without proper formatting
-  if (!signature.endsWith(')') && !signature.endsWith('>')) {
-    // Might have a return type - find the last )
-    const lastParen = signature.lastIndexOf(')');
-    if (lastParen !== -1) {
-      // Check for return type after )
-      const afterParen = signature.slice(lastParen + 1).trim();
-      if (afterParen.startsWith(':')) {
-        // Has return type, keep it
-      } else {
-        signature = signature.slice(0, lastParen + 1);
-      }
-    }
-  }
-
-  return signature + ';';
 }
 
 // =============================================================================

@@ -63,7 +63,7 @@ export const NODE_SHAPES = {
   infrastructure: ['[/"', '"/]'],
   repository: ['[("', '")]'],
   decider: ['("', '")'],
-  'read-model': ['[/"', '"\\]'],
+  'read-model': ['[/"', '"/]'],
   service: ['("', '")'],
 } as const satisfies Record<ArchRole, readonly [string, string]>;
 
