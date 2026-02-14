@@ -9,9 +9,9 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 208 |
-| Completed Phases | 5 |
-| Total Phases | 18 |
+| Completed Patterns | 202 |
+| Completed Phases | 4 |
+| Total Phases | 17 |
 
 ---
 
@@ -58,33 +58,21 @@
 
 </details>
 
-<details>
-<summary>✅ ADR004GherkinOnlyTesting (4 patterns)</summary>
-
-| Pattern | Description |
-| --- | --- |
-| ADR 004 Gherkin Only Testing | The delivery-process package had dual test approaches creating inconsistency. |
-| ADR 003 Ephemeral Persistent Separation | Generated documentation mixed session-specific content with persistent docs. |
-| ADR 002 Progressive Disclosure Architecture | Single-file PRD documentation became unwieldy at scale. |
-| ADR 001 Problem Solution Descriptions | Feature descriptions in Gherkin files lacked consistent structure. |
-
-</details>
-
 ---
 
 ## Recent Completions
 
-- ✅ Arch Index Dataset
-- ✅ Arch Tag Extraction
-- ✅ Component Diagram Generation
-- ✅ Arch Generator Registration
-- ✅ Layered Diagram Generation
+- ✅ Handoff Generator Tests
+- ✅ Scope Validator Tests
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
 - ✅ Planning Codec Testing
 - ✅ Pr Changes Codec Testing
+- ✅ Reference Codec Testing
+- ✅ Reference Generator Testing
+- ✅ Reporting Codec Testing
 
-Showing 10 of 208 completed patterns. See quarterly files for full history.
+Showing 10 of 202 completed patterns. See quarterly files for full history.
 
 ---

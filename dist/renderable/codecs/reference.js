@@ -27,7 +27,7 @@ import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js
 import { heading, paragraph, separator, table, code, list, mermaid, collapsible, linkOut, document, } from '../schema.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
-import { extractConventions, extractConventionsFromPatterns } from './convention-extractor.js';
+import { extractConventions, extractConventionsFromPatterns, } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
 import { sanitizeNodeId, EDGE_STYLES, EDGE_LABELS, SEQUENCE_ARROWS, formatNodeDeclaration, } from './diagram-utils.js';
@@ -132,8 +132,7 @@ export function createReferenceCodec(config, options) {
                 const existingNames = new Set(behaviorPatterns.map((p) => p.name));
                 const includedBehaviors = dataset.patterns.filter((p) => !existingNames.has(p.name) &&
                     p.include?.some((v) => includeSet.has(v)) === true &&
-                    (p.directive.description.length > 0 ||
-                        (p.rules !== undefined && p.rules.length > 0)));
+                    (p.directive.description.length > 0 || (p.rules !== undefined && p.rules.length > 0)));
                 behaviorPatterns.push(...includedBehaviors);
             }
             if (behaviorPatterns.length > 0) {

@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall:** [██████████████░░░░░░] 121/167 (72%)
+**Overall:** [███████████████░░░░░] 113/153 (74%)
 
 | Metric         | Value |
 | -------------- | ----- |
-| Total Features | 167   |
-| Completed      | 121   |
-| Active         | 14    |
-| Planned        | 32    |
-| Product Areas  | 21    |
+| Total Features | 153   |
+| Completed      | 113   |
+| Active         | 13    |
+| Planned        | 27    |
+| Product Areas  | 19    |
 | User Roles     | 1     |
 
 ---
@@ -110,9 +110,8 @@
 
 ### DeliveryProcess
 
-20/52 complete (38%)
+17/45 complete (38%)
 
-- [✅ ADR 005 Configurable Tag Prefix](requirements/phase-44-adr-005-configurable-tag-prefix.md)
 - [✅ Codec Driven Reference Generation - eliminates per document recipe features with config driven generation](requirements/phase-27-codec-driven-reference-generation.md)
 - [✅ Cross Cutting Document Inclusion - enables universal content routing to any generated document](requirements/phase-32-cross-cutting-document-inclusion.md)
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
@@ -121,11 +120,9 @@
 - [✅ Data API Output Shaping - compact output for ai agents](requirements/phase-25-data-api-output-shaping.md)
 - [✅ Data API Stub Integration - unlock design session stub metadata](requirements/phase-25-data-api-stub-integration.md)
 - [✅ Declaration Level Shape Tagging - enables focused shape extraction without whole file dumping](requirements/phase-31-declaration-level-shape-tagging.md)
-- [✅ Doc Generation Proof Of Concept - eliminates manual documentation maintenance](requirements/phase-27-doc-generation-proof-of-concept.md)
 - [✅ Gherkin Rules Support - enable human readable documentation from feature files](requirements/phase-100-gherkin-rules-support.md)
 - [✅ Mvp Workflow Implementation - align package with pdr005 fsm](requirements/phase-99-mvp-workflow-implementation.md)
 - [✅ Pattern Relationship Model](requirements/phase-99-pattern-relationship-model.md)
-- [✅ PDR 001 Self Documentation](requirements/phase-00-pdr-001-self-documentation.md)
 - [✅ Phase State Machine Validation - ensure state machine rules are enforced programmatically](requirements/phase-100-phase-state-machine-validation.md)
 - [✅ Process Guard Linter - prevent accidental scope creep and locked file modifications](requirements/phase-99-process-guard-linter.md)
 - [✅ Process State API CLI - direct api queries for planning](requirements/phase-24-process-state-apicli.md)
@@ -135,8 +132,6 @@
 - [🚧 Pattern Helpers Tests](requirements/phase-25-pattern-helpers-tests.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
 - [🚧 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
-- [📋 ADR 011 Publishing Strategy](requirements/phase-99-adr-011-publishing-strategy.md)
-- [📋 ADR 013 Taxonomy Canonical Values](requirements/phase-00-adr-013-taxonomy-canonical-values.md)
 - [📋 Architecture Delta - document release changes automatically](requirements/phase-100-architecture-delta.md)
 - [📋 Architecture Diagram Generation](requirements/phase-23-architecture-diagram-generation.md)
 - [📋 Business Rules Generator](requirements/phase-100-business-rules-generator.md)
@@ -151,8 +146,6 @@
 - [📋 Effort Variance Tracking - track planned vs actual effort variance](requirements/phase-100-effort-variance-tracking.md)
 - [📋 Generator Infrastructure Testing - ensure generator orchestration works correctly](requirements/phase-104-generator-infrastructure-testing.md)
 - [📋 Living Roadmap CLI - query roadmap with natural language](requirements/phase-100-living-roadmap-cli.md)
-- [📋 PDR 002 Session Workflow Commands](requirements/phase-00-pdr-002-session-workflow-commands.md)
-- [📋 PDR 003 Source First Pattern Architecture](requirements/phase-00-pdr-003-source-first-pattern-architecture.md)
 - [📋 Phase Numbering Conventions - prevent phase number conflicts and ensure consistent ordering](requirements/phase-100-phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](requirements/phase-99-prd-implementation-section.md)
 - [📋 Progressive Governance - filter work by risk and priority](requirements/phase-100-progressive-governance.md)
@@ -203,14 +196,6 @@
 - [✅ Reference Generator Testing](requirements/phase-00-reference-generator-testing.md)
 - [✅ Table Extraction](requirements/phase-00-table-extraction.md)
 
-### Generators
-
-2/3 complete (67%)
-
-- [✅ ADR 002 Progressive Disclosure Architecture](requirements/phase-43-adr-002-progressive-disclosure-architecture.md)
-- [✅ ADR 003 Ephemeral Persistent Separation](requirements/phase-43-adr-003-ephemeral-persistent-separation.md)
-- [📋 ADR 009 Pipeline Architecture](requirements/phase-99-adr-009-pipeline-architecture.md)
-
 ### Lint
 
 2/2 complete (100%)
@@ -241,14 +226,6 @@
 
 - [✅ Context Inference](requirements/phase-00-context-inference.md)
 - [✅ Transform Dataset Testing](requirements/phase-00-transform-dataset-testing.md)
-
-### Process
-
-2/3 complete (67%)
-
-- [✅ ADR 001 Problem Solution Descriptions](requirements/phase-43-adr-001-problem-solution-descriptions.md)
-- [✅ ADR 004 Gherkin Only Testing](requirements/phase-43-adr-004-gherkin-only-testing.md)
-- [🚧 ADR 010 Pattern Naming Conventions](requirements/phase-99-adr-010-pattern-naming-conventions.md)
 
 ### Scanner
 
@@ -283,14 +260,13 @@
 
 ### Validation
 
-8/8 complete (100%)
+7/7 complete (100%)
 
 - [✅ Anti Pattern Detector Testing](requirements/phase-00-anti-pattern-detector-testing.md)
 - [✅ Config Schema Validation](requirements/phase-00-config-schema-validation.md)
 - [✅ Detect Changes Testing](requirements/phase-00-detect-changes-testing.md)
 - [✅ DoD Validator Testing](requirements/phase-00-do-d-validator-testing.md)
 - [✅ FSM Validator Testing](requirements/phase-00-fsm-validator-testing.md)
-- [✅ Process Guard](requirements/phase-99-process-guard.md)
 - [✅ Process Guard Testing](requirements/phase-00-process-guard-testing.md)
 - [✅ Status Transition Detection Testing](requirements/phase-00-status-transition-detection-testing.md)
 
@@ -311,174 +287,160 @@
 
 ## All Features
 
-| Feature                                        | Product Area        | User Role | Status    |
-| ---------------------------------------------- | ------------------- | --------- | --------- |
-| ✅ ADR 001 Problem Solution Descriptions       | Process             | -         | completed |
-| ✅ ADR 002 Progressive Disclosure Architecture | Generators          | -         | completed |
-| ✅ ADR 003 Ephemeral Persistent Separation     | Generators          | -         | completed |
-| ✅ ADR 004 Gherkin Only Testing                | Process             | -         | completed |
-| ✅ ADR 005 Configurable Tag Prefix             | DeliveryProcess     | -         | completed |
-| ✅ Anti Pattern Detector Testing               | Validation          | -         | completed |
-| ✅ Arch Generator Registration                 | Architecture        | -         | completed |
-| ✅ Arch Index Dataset                          | Architecture        | -         | completed |
-| ✅ Arch Tag Extraction                         | Architecture        | -         | completed |
-| ✅ Ast Parser                                  | Scanner             | -         | completed |
-| ✅ Business Rules Document Codec               | Generator           | -         | completed |
-| ✅ Codec Based Generator Testing               | Generator           | -         | completed |
-| ✅ Codec Driven Reference Generation           | DeliveryProcess     | -         | completed |
-| ✅ Component Diagram Generation                | Architecture        | -         | completed |
-| ✅ Composite Codec Testing                     | Codec               | -         | completed |
-| ✅ Config Loader Testing                       | Configuration       | -         | completed |
-| ✅ Config Resolution                           | Configuration       | -         | completed |
-| ✅ Config Schema Validation                    | Validation          | -         | completed |
-| ✅ Configuration API                           | Configuration       | -         | completed |
-| ✅ Content Deduplication                       | DocGeneration       | -         | completed |
-| ✅ Context Inference                           | Pipeline            | -         | completed |
-| ✅ Convention Extractor Testing                | Codec               | -         | completed |
-| ✅ Cross Cutting Document Inclusion            | DeliveryProcess     | -         | completed |
-| ✅ Data API Architecture Queries               | DeliveryProcess     | -         | completed |
-| ✅ Data API Context Assembly                   | DeliveryProcess     | -         | completed |
-| ✅ Data API Design Session Support             | DeliveryProcess     | -         | completed |
-| ✅ Data API Output Shaping                     | DeliveryProcess     | -         | completed |
-| ✅ Data API Stub Integration                   | DeliveryProcess     | -         | completed |
-| ✅ Decision Doc Codec Testing                  | DocGeneration       | -         | completed |
-| ✅ Decision Doc Generator Testing              | DocGeneration       | -         | completed |
-| ✅ Declaration Level Shape Tagging             | DeliveryProcess     | -         | completed |
-| ✅ Declaration Level Shape Tagging Testing     | Extractor           | -         | completed |
-| ✅ Dedent Helper                               | Codec               | -         | completed |
-| ✅ Define Config Testing                       | Configuration       | -         | completed |
-| ✅ Description Header Normalization            | Behavior            | -         | completed |
-| ✅ Description Quality Foundation              | Behavior            | -         | completed |
-| ✅ Detect Changes Testing                      | Validation          | -         | completed |
-| ✅ Directive Detection                         | Scanner             | -         | completed |
-| ✅ Doc Generation Proof Of Concept             | DeliveryProcess     | -         | completed |
-| ✅ Doc String Media Type                       | Scanner             | -         | completed |
-| ✅ Documentation Orchestrator                  | Generator           | -         | completed |
-| ✅ DoD Validator Testing                       | Validation          | -         | completed |
-| ✅ Dual Source Extractor Testing               | Extractor           | -         | completed |
-| ✅ Error Factories                             | Types               | -         | completed |
-| ✅ Error Handling Unification                  | Behavior            | -         | completed |
-| ✅ Extends Tag Testing                         | PatternRelationship | -         | completed |
-| ✅ Extraction Pipeline Enhancements Testing    | Extractor           | -         | completed |
-| ✅ Extract Summary                             | Behavior            | -         | completed |
-| ✅ File Discovery                              | Scanner             | -         | completed |
-| ✅ FSM Validator Testing                       | Validation          | -         | completed |
-| ✅ Generate Docs Cli                           | CLI                 | -         | completed |
-| ✅ Generate Tag Taxonomy Cli                   | CLI                 | -         | completed |
-| ✅ Generator Registry Testing                  | Generator           | -         | completed |
-| ✅ Gherkin Ast Parser                          | Scanner             | -         | completed |
-| ✅ Gherkin Rules Support                       | DeliveryProcess     | -         | completed |
-| ✅ Handoff Generator Tests                     | API                 | -         | completed |
-| ✅ Implementation Link Path Normalization      | Behavior            | -         | completed |
-| ✅ Implements Tag Processing                   | PatternRelationship | -         | completed |
-| ✅ Layered Diagram Generation                  | Architecture        | -         | completed |
-| ✅ Layer Inference Testing                     | Extractor           | -         | completed |
-| ✅ Lint Engine Testing                         | Lint                | -         | completed |
-| ✅ Linter Validation Testing                   | PatternRelationship | -         | completed |
-| ✅ Lint Patterns Cli                           | CLI                 | -         | completed |
-| ✅ Lint Process Cli                            | CLI                 | -         | completed |
-| ✅ Lint Rules Testing                          | Lint                | -         | completed |
-| ✅ Mermaid Relationship Rendering              | PatternRelationship | -         | completed |
-| ✅ Mvp Workflow Implementation                 | DeliveryProcess     | -         | completed |
-| ✅ Pattern Relationship Model                  | DeliveryProcess     | -         | completed |
-| ✅ Patterns Codec Testing                      | Codec               | -         | completed |
-| ✅ Pattern Tag Extraction                      | Scanner             | -         | completed |
-| ✅ PDR 001 Self Documentation                  | DeliveryProcess     | -         | completed |
-| ✅ Phase State Machine Validation              | DeliveryProcess     | -         | completed |
-| ✅ Planning Codec Testing                      | Codec               | -         | completed |
-| ✅ Poc Integration                             | DocGeneration       | -         | completed |
-| ✅ Pr Changes Codec Testing                    | Codec               | -         | completed |
-| ✅ Pr Changes Generation                       | Behavior            | -         | completed |
-| ✅ Pr Changes Options                          | Generator           | -         | completed |
-| ✅ Prd Implementation Section Testing          | Generator           | -         | completed |
-| ✅ Preset System                               | Configuration       | -         | completed |
-| ✅ Process Api Cli                             | CLI                 | -         | completed |
-| ✅ Process Guard                               | Validation          | -         | completed |
-| ✅ Process Guard Linter                        | DeliveryProcess     | -         | completed |
-| ✅ Process Guard Testing                       | Validation          | -         | completed |
-| ✅ Process State API CLI                       | DeliveryProcess     | -         | completed |
-| ✅ Process State API Testing                   | API                 | -         | completed |
-| ✅ Project Config Loader                       | Configuration       | -         | completed |
-| ✅ Reference Codec Testing                     | Codec               | -         | completed |
-| ✅ Reference Generator Testing                 | Generator           | -         | completed |
-| ✅ Remaining Work Enhancement                  | Behavior            | -         | completed |
-| ✅ Remaining Work Summary Accuracy             | Behavior            | -         | completed |
-| ✅ Reporting Codec Testing                     | Codec               | -         | completed |
-| ✅ Requirements Adr Codec Testing              | Codec               | -         | completed |
-| ✅ Result Monad                                | Types               | -         | completed |
-| ✅ Robustness Integration                      | DocGeneration       | -         | completed |
-| ✅ Rule Keyword Po C                           | POC                 | -         | completed |
-| ✅ Scanner Core                                | Scanner             | -         | completed |
-| ✅ Scoped Architectural View                   | DeliveryProcess     | -         | completed |
-| ✅ Scope Validator Tests                       | API                 | -         | completed |
-| ✅ Session Codec Testing                       | Codec               | -         | completed |
-| ✅ Session File Lifecycle                      | Behavior            | -         | completed |
-| ✅ Session Handoffs                            | Behavior            | -         | completed |
-| ✅ Shape Extraction                            | DeliveryProcess     | -         | completed |
-| ✅ Shape Extraction Testing                    | Extractor           | -         | completed |
-| ✅ Shape Matcher Testing                       | Codec               | -         | completed |
-| ✅ Shape Selector Testing                      | Codec               | -         | completed |
-| ✅ Source Mapper Testing                       | DocGeneration       | -         | completed |
-| ✅ Source Mapping Validator Testing            | DocGeneration       | -         | completed |
-| ✅ Source Merging                              | Configuration       | -         | completed |
-| ✅ Status Transition Detection Testing         | Validation          | -         | completed |
-| ✅ String Utils                                | Utils               | -         | completed |
-| ✅ Table Extraction                            | Generator           | -         | completed |
-| ✅ Taxonomy Codec Testing                      | DocGeneration       | -         | completed |
-| ✅ Timeline Codec Testing                      | Codec               | -         | completed |
-| ✅ Transform Dataset Testing                   | Pipeline            | -         | completed |
-| ✅ TypeScript Taxonomy Implementation          | Taxonomy            | Developer | completed |
-| ✅ Universal Doc Generator Robustness          | DeliveryProcess     | -         | completed |
-| ✅ Universal Markdown Renderer                 | Behavior            | -         | completed |
-| ✅ Validate Patterns Cli                       | CLI                 | -         | completed |
-| ✅ Validation Rules Codec Testing              | DocGeneration       | -         | completed |
-| ✅ Warning Collector Testing                   | DocGeneration       | -         | completed |
-| ✅ Zod Codec Migration                         | Behavior            | -         | completed |
-| 🚧 ADR 010 Pattern Naming Conventions          | Process             | -         | active    |
-| 🚧 Arch Queries Test                           | API                 | -         | active    |
-| 🚧 Context Assembler Tests                     | API                 | -         | active    |
-| 🚧 Context Formatter Tests                     | API                 | -         | active    |
-| 🚧 Depends On Tag Testing                      | PatternRelationship | -         | active    |
-| 🚧 Fuzzy Match Tests                           | API                 | -         | active    |
-| 🚧 Output Pipeline Tests                       | API                 | -         | active    |
-| 🚧 Pattern Helpers Tests                       | DeliveryProcess     | -         | active    |
-| 🚧 Pattern Summarize Tests                     | API                 | -         | active    |
-| 🚧 Process State API Relationship Queries      | DeliveryProcess     | -         | active    |
-| 🚧 Reference Doc Showcase                      | DeliveryProcess     | -         | active    |
-| 🚧 Stub Resolver Tests                         | API                 | -         | active    |
-| 🚧 Stub Taxonomy Tag Tests                     | API                 | -         | active    |
-| 🚧 Uses Tag Testing                            | PatternRelationship | -         | active    |
-| 📋 ADR 009 Pipeline Architecture               | Generators          | -         | planned   |
-| 📋 ADR 011 Publishing Strategy                 | DeliveryProcess     | -         | planned   |
-| 📋 ADR 013 Taxonomy Canonical Values           | DeliveryProcess     | -         | planned   |
-| 📋 Architecture Delta                          | DeliveryProcess     | -         | planned   |
-| 📋 Architecture Diagram Generation             | DeliveryProcess     | -         | planned   |
-| 📋 Business Rules Generator                    | DeliveryProcess     | -         | planned   |
-| 📋 Claude Module Generation                    | DeliveryProcess     | -         | planned   |
-| 📋 Cli Behavior Testing                        | DeliveryProcess     | -         | planned   |
-| 📋 Codec Behavior Testing                      | DeliveryProcess     | -         | planned   |
-| 📋 Cross Source Validation                     | DeliveryProcess     | -         | planned   |
-| 📋 Data API CLI Ergonomics                     | DeliveryProcess     | -         | planned   |
-| 📋 Data API Platform Integration               | DeliveryProcess     | -         | planned   |
-| 📋 Data API Relationship Graph                 | DeliveryProcess     | -         | planned   |
-| 📋 DoD Validation                              | DeliveryProcess     | -         | planned   |
-| 📋 Effort Variance Tracking                    | DeliveryProcess     | -         | planned   |
-| 📋 Generator Infrastructure Testing            | DeliveryProcess     | -         | planned   |
-| 📋 Kebab Case Slugs                            | Behavior            | -         | planned   |
-| 📋 Living Roadmap CLI                          | DeliveryProcess     | -         | planned   |
-| 📋 PDR 002 Session Workflow Commands           | DeliveryProcess     | -         | planned   |
-| 📋 PDR 003 Source First Pattern Architecture   | DeliveryProcess     | -         | planned   |
-| 📋 Phase Numbering Conventions                 | DeliveryProcess     | -         | planned   |
-| 📋 Prd Implementation Section                  | DeliveryProcess     | -         | planned   |
-| 📋 Progressive Governance                      | DeliveryProcess     | -         | planned   |
-| 📋 Release Association Rules                   | DeliveryProcess     | -         | planned   |
-| 📋 Rich Content Helpers Testing                | Behavior            | -         | planned   |
-| 📋 Session File Cleanup                        | DeliveryProcess     | -         | planned   |
-| 📋 Status Aware Eslint Suppression             | DeliveryProcess     | -         | planned   |
-| 📋 Step Definition Completion                  | DeliveryProcess     | -         | planned   |
-| 📋 Streaming Git Diff                          | DeliveryProcess     | -         | planned   |
-| 📋 Test Content Blocks                         | DeliveryProcess     | -         | planned   |
-| 📋 Traceability Enhancements                   | DeliveryProcess     | -         | planned   |
-| 📋 Traceability Generator                      | DeliveryProcess     | -         | planned   |
+| Feature                                     | Product Area        | User Role | Status    |
+| ------------------------------------------- | ------------------- | --------- | --------- |
+| ✅ Anti Pattern Detector Testing            | Validation          | -         | completed |
+| ✅ Arch Generator Registration              | Architecture        | -         | completed |
+| ✅ Arch Index Dataset                       | Architecture        | -         | completed |
+| ✅ Arch Tag Extraction                      | Architecture        | -         | completed |
+| ✅ Ast Parser                               | Scanner             | -         | completed |
+| ✅ Business Rules Document Codec            | Generator           | -         | completed |
+| ✅ Codec Based Generator Testing            | Generator           | -         | completed |
+| ✅ Codec Driven Reference Generation        | DeliveryProcess     | -         | completed |
+| ✅ Component Diagram Generation             | Architecture        | -         | completed |
+| ✅ Composite Codec Testing                  | Codec               | -         | completed |
+| ✅ Config Loader Testing                    | Configuration       | -         | completed |
+| ✅ Config Resolution                        | Configuration       | -         | completed |
+| ✅ Config Schema Validation                 | Validation          | -         | completed |
+| ✅ Configuration API                        | Configuration       | -         | completed |
+| ✅ Content Deduplication                    | DocGeneration       | -         | completed |
+| ✅ Context Inference                        | Pipeline            | -         | completed |
+| ✅ Convention Extractor Testing             | Codec               | -         | completed |
+| ✅ Cross Cutting Document Inclusion         | DeliveryProcess     | -         | completed |
+| ✅ Data API Architecture Queries            | DeliveryProcess     | -         | completed |
+| ✅ Data API Context Assembly                | DeliveryProcess     | -         | completed |
+| ✅ Data API Design Session Support          | DeliveryProcess     | -         | completed |
+| ✅ Data API Output Shaping                  | DeliveryProcess     | -         | completed |
+| ✅ Data API Stub Integration                | DeliveryProcess     | -         | completed |
+| ✅ Decision Doc Codec Testing               | DocGeneration       | -         | completed |
+| ✅ Decision Doc Generator Testing           | DocGeneration       | -         | completed |
+| ✅ Declaration Level Shape Tagging          | DeliveryProcess     | -         | completed |
+| ✅ Declaration Level Shape Tagging Testing  | Extractor           | -         | completed |
+| ✅ Dedent Helper                            | Codec               | -         | completed |
+| ✅ Define Config Testing                    | Configuration       | -         | completed |
+| ✅ Description Header Normalization         | Behavior            | -         | completed |
+| ✅ Description Quality Foundation           | Behavior            | -         | completed |
+| ✅ Detect Changes Testing                   | Validation          | -         | completed |
+| ✅ Directive Detection                      | Scanner             | -         | completed |
+| ✅ Doc String Media Type                    | Scanner             | -         | completed |
+| ✅ Documentation Orchestrator               | Generator           | -         | completed |
+| ✅ DoD Validator Testing                    | Validation          | -         | completed |
+| ✅ Dual Source Extractor Testing            | Extractor           | -         | completed |
+| ✅ Error Factories                          | Types               | -         | completed |
+| ✅ Error Handling Unification               | Behavior            | -         | completed |
+| ✅ Extends Tag Testing                      | PatternRelationship | -         | completed |
+| ✅ Extraction Pipeline Enhancements Testing | Extractor           | -         | completed |
+| ✅ Extract Summary                          | Behavior            | -         | completed |
+| ✅ File Discovery                           | Scanner             | -         | completed |
+| ✅ FSM Validator Testing                    | Validation          | -         | completed |
+| ✅ Generate Docs Cli                        | CLI                 | -         | completed |
+| ✅ Generate Tag Taxonomy Cli                | CLI                 | -         | completed |
+| ✅ Generator Registry Testing               | Generator           | -         | completed |
+| ✅ Gherkin Ast Parser                       | Scanner             | -         | completed |
+| ✅ Gherkin Rules Support                    | DeliveryProcess     | -         | completed |
+| ✅ Handoff Generator Tests                  | API                 | -         | completed |
+| ✅ Implementation Link Path Normalization   | Behavior            | -         | completed |
+| ✅ Implements Tag Processing                | PatternRelationship | -         | completed |
+| ✅ Layered Diagram Generation               | Architecture        | -         | completed |
+| ✅ Layer Inference Testing                  | Extractor           | -         | completed |
+| ✅ Lint Engine Testing                      | Lint                | -         | completed |
+| ✅ Linter Validation Testing                | PatternRelationship | -         | completed |
+| ✅ Lint Patterns Cli                        | CLI                 | -         | completed |
+| ✅ Lint Process Cli                         | CLI                 | -         | completed |
+| ✅ Lint Rules Testing                       | Lint                | -         | completed |
+| ✅ Mermaid Relationship Rendering           | PatternRelationship | -         | completed |
+| ✅ Mvp Workflow Implementation              | DeliveryProcess     | -         | completed |
+| ✅ Pattern Relationship Model               | DeliveryProcess     | -         | completed |
+| ✅ Patterns Codec Testing                   | Codec               | -         | completed |
+| ✅ Pattern Tag Extraction                   | Scanner             | -         | completed |
+| ✅ Phase State Machine Validation           | DeliveryProcess     | -         | completed |
+| ✅ Planning Codec Testing                   | Codec               | -         | completed |
+| ✅ Poc Integration                          | DocGeneration       | -         | completed |
+| ✅ Pr Changes Codec Testing                 | Codec               | -         | completed |
+| ✅ Pr Changes Generation                    | Behavior            | -         | completed |
+| ✅ Pr Changes Options                       | Generator           | -         | completed |
+| ✅ Prd Implementation Section Testing       | Generator           | -         | completed |
+| ✅ Preset System                            | Configuration       | -         | completed |
+| ✅ Process Api Cli                          | CLI                 | -         | completed |
+| ✅ Process Guard Linter                     | DeliveryProcess     | -         | completed |
+| ✅ Process Guard Testing                    | Validation          | -         | completed |
+| ✅ Process State API CLI                    | DeliveryProcess     | -         | completed |
+| ✅ Process State API Testing                | API                 | -         | completed |
+| ✅ Project Config Loader                    | Configuration       | -         | completed |
+| ✅ Reference Codec Testing                  | Codec               | -         | completed |
+| ✅ Reference Generator Testing              | Generator           | -         | completed |
+| ✅ Remaining Work Enhancement               | Behavior            | -         | completed |
+| ✅ Remaining Work Summary Accuracy          | Behavior            | -         | completed |
+| ✅ Reporting Codec Testing                  | Codec               | -         | completed |
+| ✅ Requirements Adr Codec Testing           | Codec               | -         | completed |
+| ✅ Result Monad                             | Types               | -         | completed |
+| ✅ Robustness Integration                   | DocGeneration       | -         | completed |
+| ✅ Rule Keyword Po C                        | POC                 | -         | completed |
+| ✅ Scanner Core                             | Scanner             | -         | completed |
+| ✅ Scoped Architectural View                | DeliveryProcess     | -         | completed |
+| ✅ Scope Validator Tests                    | API                 | -         | completed |
+| ✅ Session Codec Testing                    | Codec               | -         | completed |
+| ✅ Session File Lifecycle                   | Behavior            | -         | completed |
+| ✅ Session Handoffs                         | Behavior            | -         | completed |
+| ✅ Shape Extraction                         | DeliveryProcess     | -         | completed |
+| ✅ Shape Extraction Testing                 | Extractor           | -         | completed |
+| ✅ Shape Matcher Testing                    | Codec               | -         | completed |
+| ✅ Shape Selector Testing                   | Codec               | -         | completed |
+| ✅ Source Mapper Testing                    | DocGeneration       | -         | completed |
+| ✅ Source Mapping Validator Testing         | DocGeneration       | -         | completed |
+| ✅ Source Merging                           | Configuration       | -         | completed |
+| ✅ Status Transition Detection Testing      | Validation          | -         | completed |
+| ✅ String Utils                             | Utils               | -         | completed |
+| ✅ Table Extraction                         | Generator           | -         | completed |
+| ✅ Taxonomy Codec Testing                   | DocGeneration       | -         | completed |
+| ✅ Timeline Codec Testing                   | Codec               | -         | completed |
+| ✅ Transform Dataset Testing                | Pipeline            | -         | completed |
+| ✅ TypeScript Taxonomy Implementation       | Taxonomy            | Developer | completed |
+| ✅ Universal Doc Generator Robustness       | DeliveryProcess     | -         | completed |
+| ✅ Universal Markdown Renderer              | Behavior            | -         | completed |
+| ✅ Validate Patterns Cli                    | CLI                 | -         | completed |
+| ✅ Validation Rules Codec Testing           | DocGeneration       | -         | completed |
+| ✅ Warning Collector Testing                | DocGeneration       | -         | completed |
+| ✅ Zod Codec Migration                      | Behavior            | -         | completed |
+| 🚧 Arch Queries Test                        | API                 | -         | active    |
+| 🚧 Context Assembler Tests                  | API                 | -         | active    |
+| 🚧 Context Formatter Tests                  | API                 | -         | active    |
+| 🚧 Depends On Tag Testing                   | PatternRelationship | -         | active    |
+| 🚧 Fuzzy Match Tests                        | API                 | -         | active    |
+| 🚧 Output Pipeline Tests                    | API                 | -         | active    |
+| 🚧 Pattern Helpers Tests                    | DeliveryProcess     | -         | active    |
+| 🚧 Pattern Summarize Tests                  | API                 | -         | active    |
+| 🚧 Process State API Relationship Queries   | DeliveryProcess     | -         | active    |
+| 🚧 Reference Doc Showcase                   | DeliveryProcess     | -         | active    |
+| 🚧 Stub Resolver Tests                      | API                 | -         | active    |
+| 🚧 Stub Taxonomy Tag Tests                  | API                 | -         | active    |
+| 🚧 Uses Tag Testing                         | PatternRelationship | -         | active    |
+| 📋 Architecture Delta                       | DeliveryProcess     | -         | planned   |
+| 📋 Architecture Diagram Generation          | DeliveryProcess     | -         | planned   |
+| 📋 Business Rules Generator                 | DeliveryProcess     | -         | planned   |
+| 📋 Claude Module Generation                 | DeliveryProcess     | -         | planned   |
+| 📋 Cli Behavior Testing                     | DeliveryProcess     | -         | planned   |
+| 📋 Codec Behavior Testing                   | DeliveryProcess     | -         | planned   |
+| 📋 Cross Source Validation                  | DeliveryProcess     | -         | planned   |
+| 📋 Data API CLI Ergonomics                  | DeliveryProcess     | -         | planned   |
+| 📋 Data API Platform Integration            | DeliveryProcess     | -         | planned   |
+| 📋 Data API Relationship Graph              | DeliveryProcess     | -         | planned   |
+| 📋 DoD Validation                           | DeliveryProcess     | -         | planned   |
+| 📋 Effort Variance Tracking                 | DeliveryProcess     | -         | planned   |
+| 📋 Generator Infrastructure Testing         | DeliveryProcess     | -         | planned   |
+| 📋 Kebab Case Slugs                         | Behavior            | -         | planned   |
+| 📋 Living Roadmap CLI                       | DeliveryProcess     | -         | planned   |
+| 📋 Phase Numbering Conventions              | DeliveryProcess     | -         | planned   |
+| 📋 Prd Implementation Section               | DeliveryProcess     | -         | planned   |
+| 📋 Progressive Governance                   | DeliveryProcess     | -         | planned   |
+| 📋 Release Association Rules                | DeliveryProcess     | -         | planned   |
+| 📋 Rich Content Helpers Testing             | Behavior            | -         | planned   |
+| 📋 Session File Cleanup                     | DeliveryProcess     | -         | planned   |
+| 📋 Status Aware Eslint Suppression          | DeliveryProcess     | -         | planned   |
+| 📋 Step Definition Completion               | DeliveryProcess     | -         | planned   |
+| 📋 Streaming Git Diff                       | DeliveryProcess     | -         | planned   |
+| 📋 Test Content Blocks                      | DeliveryProcess     | -         | planned   |
+| 📋 Traceability Enhancements                | DeliveryProcess     | -         | planned   |
+| 📋 Traceability Generator                   | DeliveryProcess     | -         | planned   |
 
 ---

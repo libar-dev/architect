@@ -169,20 +169,23 @@ function buildPatternsDocument(dataset, options) {
     return document('Pattern Registry', sections, docOpts);
 }
 /**
- * Apply filters to dataset based on options
+ * Apply filters to dataset based on options.
+ * Always excludes ADR patterns (they belong to the ADR codec).
  */
 function applyPatternFilters(dataset, options) {
-    // No filters - return original dataset
-    if (options.filterCategories.length === 0) {
-        return dataset;
-    }
-    // Filter patterns by category
-    const filteredPatterns = dataset.patterns.filter((p) => options.filterCategories.includes(p.category));
-    // Rebuild byCategory with filtered patterns
+    // Always exclude ADR patterns — they belong to the ADR codec, not patterns
+    const nonAdrPatterns = dataset.patterns.filter((p) => p.adr === undefined);
+    // Apply category filter if specified
+    const filteredPatterns = options.filterCategories.length > 0
+        ? nonAdrPatterns.filter((p) => options.filterCategories.includes(p.category))
+        : nonAdrPatterns;
+    // Rebuild byCategory from filtered patterns
     const filteredByCategory = {};
-    for (const cat of options.filterCategories) {
-        if (dataset.byCategory[cat]) {
-            filteredByCategory[cat] = dataset.byCategory[cat];
+    for (const p of filteredPatterns) {
+        const cat = p.category;
+        if (cat) {
+            const existing = filteredByCategory[cat];
+            filteredByCategory[cat] = existing ? [...existing, p] : [p];
         }
     }
     return {

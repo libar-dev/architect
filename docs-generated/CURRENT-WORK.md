@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 208/304 (68%)
+**Overall Progress:** [██████████████░░░░░░] 202/292 (69%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 304 |
-| Completed | 208 |
-| Active | 47 |
-| Planned | 49 |
-| Active Phases | 5 |
+| Total Patterns | 292 |
+| Completed | 202 |
+| Active | 46 |
+| Planned | 44 |
+| Active Phases | 4 |
 
 ---
 
@@ -103,22 +103,6 @@
 
 ---
 
-### 🚧 ADR011PublishingStrategy
-
-[██████░░░░░░░░░] 5/12 42% complete (5 done, 1 active, 6 planned)
-
-| Pattern | Description |
-| --- | --- |
-| 🚧 ADR 010 Pattern Naming Conventions | The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation. |
-
-#### Deliverables
-
-- ✅ Pattern naming decision
-
-[View ADR011PublishingStrategy details →](current/phase-99-adr-011-publishing-strategy.md)
-
----
-
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
@@ -127,7 +111,6 @@
 | 🚧 Pattern Helpers Tests | Phase 25 | - | - |
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
-| 🚧 ADR 010 Pattern Naming Conventions | Phase 99 | - | The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Arch Queries Test | - | - | - |

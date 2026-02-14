@@ -66,6 +66,9 @@ export default defineConfig({
     'reference-docs': {
       additionalFeatures: ['delivery-process/decisions/*.feature'],
     },
+    adrs: {
+      outputDirectory: 'docs-live',
+    },
     requirements: {
       outputDirectory: 'docs-live',
     },

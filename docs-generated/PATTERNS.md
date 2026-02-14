@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 208/304 (68% complete)
+**Overall:** [██████████████░░░░░░] 200/287 (70% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 208 |
-| 🚧 Active | 47 |
-| 📋 Planned | 49 |
-| **Total** | 304 |
+| ✅ Completed | 200 |
+| 🚧 Active | 46 |
+| 📋 Planned | 41 |
+| **Total** | 287 |
 
 ---
 
@@ -25,7 +25,7 @@
 - [Cli](#cli) (12)
 - [Config](#config) (1)
 - [Core](#core) (72)
-- [DDD](#ddd) (99)
+- [DDD](#ddd) (82)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
 - [Generator](#generator) (3)
@@ -55,11 +55,6 @@
 
 | Pattern | Category | Status | Description |
 | --- | --- | --- | --- |
-| ✅ ADR 001 Problem Solution Descriptions | DDD | completed | Feature descriptions in Gherkin files lacked consistent structure. |
-| ✅ ADR 002 Progressive Disclosure Architecture | DDD | completed | Single-file PRD documentation became unwieldy at scale. |
-| ✅ ADR 003 Ephemeral Persistent Separation | DDD | completed | Generated documentation mixed session-specific content with persistent docs. |
-| ✅ ADR 004 Gherkin Only Testing | DDD | completed | The delivery-process package had dual test approaches creating inconsistency. |
-| ✅ ADR 005 Configurable Tag Prefix | DDD | completed | The delivery process uses `@libar-docs-*` as the default tag prefix for all metadata annotations. |
 | ✅ Adr Document Codec | Core | completed | Transforms MasterDataset into RenderableDocument for Architecture Decision Records. |
 | ✅ Anti Pattern Detector | Validation | completed | Detects violations of the dual-source documentation architecture and process hygiene issues that lead to... |
 | ✅ Anti Pattern Detector Testing | Behavior | completed | Detects violations of the dual-source documentation architecture and process hygiene issues that lead to... |
@@ -115,7 +110,6 @@
 | ✅ Detect Changes Testing | Behavior | completed | Tests for the detectDeliverableChanges function that parses git diff output. |
 | ✅ Directive Detection | Behavior | completed | Pure functions that detect @libar-docs directives in TypeScript source code. |
 | ✅ Doc Directive Schema | Validation | completed | Zod schemas for validating parsed @libar-docs-* directives from JSDoc comments. |
-| ✅ Doc Generation Proof Of Concept | DDD | completed | Status: SUPERSEDED - This POC has been implemented. |
 | ✅ Doc String Media Type | DDD | completed | DocString language hints (mediaType) should be preserved through the parsing pipeline from feature files to rendered... |
 | ✅ Document Extractor | Core | completed | Converts scanned file data into complete ExtractedPattern objects with unique IDs, inferred names, categories, and... |
 | ✅ Documentation Generation Orchestrator | Core | completed | Orchestrates the complete documentation generation pipeline: Scanner → Extractor → Generators → File Writer Extracts... |
@@ -178,7 +172,6 @@
 | ✅ Patterns Codec | Core | completed | Transforms MasterDataset into a RenderableDocument for pattern registry output. |
 | ✅ Patterns Codec Testing | Behavior | completed | The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument for generating PATTERNS.md and category... |
 | ✅ Pattern Tag Extraction | Behavior | completed | The extractPatternTags function parses Gherkin feature tags into structured metadata objects for pattern processing. |
-| ✅ PDR 001 Self Documentation | DDD | completed | - |
 | ✅ Phase State Machine Validation | DDD | completed | Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md. |
 | ✅ Pipeline Module | Infra | completed | Barrel export for the unified transformation pipeline components. |
 | ✅ Planning Codecs | Core | completed | Transforms MasterDataset into RenderableDocuments for planning outputs: - PLANNING-CHECKLIST.md (pre-planning... |
@@ -191,7 +184,6 @@
 | ✅ Prd Implementation Section Testing | DDD | completed | Tests the Implementations section rendering in pattern documents. |
 | ✅ Preset System | Behavior | completed | Presets provide pre-configured taxonomies for different project types. |
 | ✅ Process Api Cli | Cli | completed | Command-line interface for querying delivery process state via ProcessStateAPI. |
-| ✅ Process Guard | DDD | completed | The delivery workflow needs protection against accidental modifications: - Completed specs get modified without... |
 | ✅ Process Guard Linter | DDD | completed | During planning and implementation sessions, accidental modifications occur: - Specs outside the intended scope get... |
 | ✅ Process Guard Testing | Behavior | completed | Pure validation functions for enforcing delivery process rules per PDR-005. |
 | ✅ Process State API CLI | DDD | completed | The ProcessStateAPI provides 27 typed query methods for efficient state queries, but Claude Code sessions cannot use... |
@@ -263,7 +255,6 @@
 | ✅ Workflow Config Schema | Validation | completed | Zod schemas for validating workflow configuration files that define status models, phase definitions, and artifact... |
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | ✅ Zod Codec Migration | Behavior | completed | All JSON parsing and serialization uses type-safe Zod codec pattern, replacing raw JSON.parse/stringify with... |
-| 🚧 ADR 010 Pattern Naming Conventions | DDD | active | The annotation system uses a tag-based approach where TypeScript JSDoc and Gherkin tags drive documentation generation. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | Pattern | active | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Arch Queries Test | DDD | active | - |
@@ -310,9 +301,6 @@
 | 🚧 Stub Resolver Tests | DDD | active | Design session stubs need structured discovery and resolution to determine which stubs have been implemented and... |
 | 🚧 Stub Taxonomy Tag Tests | DDD | active | Stub metadata (target path, design session) was stored as plain text in JSDoc descriptions, invisible to structured... |
 | 🚧 Uses Tag Testing | Pattern Relationships | active | Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by relationship tags from TypeScript files. |
-| 📋 ADR 009 Pipeline Architecture | DDD | planned | The documentation generation system needs a clear, maintainable architecture that transforms annotated source code... |
-| 📋 ADR 011 Publishing Strategy | DDD | planned | Publishing the package to npm requires following specific versioning strategies, workflow steps, and troubleshooting... |
-| 📋 ADR 013 Taxonomy Canonical Values | DDD | planned | Several taxonomy tags use freeform `format: 'value'` with no defined canonical values. |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
 | 📋 ArchQueries — Neighborhood, Comparison, Tags, Sources, and CLI Context | Status | planned | Extends the existing `arch` subcommand with deeper analysis and adds new top-level discovery commands (tags, sources). |
@@ -337,13 +325,9 @@
 | 📋 Living Roadmap CLI | Opportunity 8 | planned | Roadmap is a static document that requires regeneration. |
 | 📋 OutputPipeline — CLI Output Shaping and Formatting | Status | planned | Post-processing pipeline that transforms raw API results into shaped CLI output. |
 | 📋 PatternSummarizer — Compact Pattern Projection | Status | planned | Projects the full ExtractedPattern (~3.5KB per pattern) down to a PatternSummary (~100 bytes) for list queries. |
-| 📋 PDR 002 Session Workflow Commands | DDD | planned | DataAPIDesignSessionSupport adds two CLI subcommands: `scope-validate` (pre-flight session readiness check) and... |
-| 📋 PDR 003 Source First Pattern Architecture | DDD | planned | The current annotation architecture (PDR-001) assumes pattern definitions live in tier 1 feature specs, with... |
 | 📋 Phase Numbering Conventions | DDD | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | 📋 Prd Implementation Section | DDD | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |
 | 📋 Progressive Governance | Opportunity 6 | planned | Enterprise governance patterns applied everywhere create overhead. |
-| 📋 Query Result Envelope Decision | DDD | planned | The ProcessStateAPI (27 methods) returns raw typed values (ExtractedPattern[], StatusCounts, PhaseProgress, etc.). |
-| 📋 Reference Sample Conventions | DDD | planned | The reference doc showcase needs convention content that exercises all renderable block types: tables, code examples,... |
 | 📋 Release Association Rules | DDD | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Rich Content Helpers Testing | DDD | planned | As a document codec author I need helpers to render Gherkin rich content So that DataTables, DocStrings, and... |
 | 📋 ScopeValidator — Pre-flight Session Readiness Checker | Status | planned | Pure function composition over ProcessStateAPI and MasterDataset. |
@@ -356,7 +340,6 @@
 | 📋 StubResolver — Design Stub Discovery and Resolution | Status | planned | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | ⏸️ Tag Taxonomy CLI | Cli | planned | by the codec-based TaxonomyCodec which: - Fits the MasterDataset pipeline architecture - Provides progressive... |
 | 📋 Test Content Blocks | DDD | planned | This feature demonstrates what content blocks are captured and rendered by the PRD generator. |
-| 📋 Text Output Path Decision | DDD | planned | The V1 process-api CLI outputs all results via JSON.stringify(). |
 | 📋 Traceability Enhancements | Opportunity 4 | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
 | 📋 Traceability Generator | DDD | planned | Business Value: Provide audit-ready traceability matrices that demonstrate test coverage for business rules without... |
 
@@ -530,13 +513,8 @@
 
 ### DDD
 
-58/99 complete (59%)
+50/82 complete (61%)
 
-- [✅ ADR 001 Problem Solution Descriptions](patterns/adr-001-problem-solution-descriptions.md)
-- [✅ ADR 002 Progressive Disclosure Architecture](patterns/adr-002-progressive-disclosure-architecture.md)
-- [✅ ADR 003 Ephemeral Persistent Separation](patterns/adr-003-ephemeral-persistent-separation.md)
-- [✅ ADR 004 Gherkin Only Testing](patterns/adr-004-gherkin-only-testing.md)
-- [✅ ADR 005 Configurable Tag Prefix](patterns/adr-005-configurable-tag-prefix.md)
 - [✅ Business Rules Document Codec](patterns/business-rules-document-codec.md)
 - [✅ Codec Based Generator Testing](patterns/codec-based-generator-testing.md)
 - [✅ Codec Driven Reference Generation](patterns/codec-driven-reference-generation.md)
@@ -553,7 +531,6 @@
 - [✅ Declaration Level Shape Tagging](patterns/declaration-level-shape-tagging.md)
 - [✅ Declaration Level Shape Tagging Testing](patterns/declaration-level-shape-tagging-testing.md)
 - [✅ Description Header Normalization](patterns/description-header-normalization.md)
-- [✅ Doc Generation Proof Of Concept](patterns/doc-generation-proof-of-concept.md)
 - [✅ Doc String Media Type](patterns/doc-string-media-type.md)
 - [✅ Documentation Orchestrator](patterns/documentation-orchestrator.md)
 - [✅ Extends Tag Testing](patterns/extends-tag-testing.md)
@@ -567,12 +544,10 @@
 - [✅ Mermaid Relationship Rendering](patterns/mermaid-relationship-rendering.md)
 - [✅ Mvp Workflow Implementation](patterns/mvp-workflow-implementation.md)
 - [✅ Pattern Relationship Model](patterns/pattern-relationship-model.md)
-- [✅ PDR 001 Self Documentation](patterns/pdr-001-self-documentation.md)
 - [✅ Phase State Machine Validation](patterns/phase-state-machine-validation.md)
 - [✅ Poc Integration](patterns/poc-integration.md)
 - [✅ Pr Changes Options](patterns/pr-changes-options.md)
 - [✅ Prd Implementation Section Testing](patterns/prd-implementation-section-testing.md)
-- [✅ Process Guard](patterns/process-guard.md)
 - [✅ Process Guard Linter](patterns/process-guard-linter.md)
 - [✅ Process State API CLI](patterns/process-state-apicli.md)
 - [✅ Remaining Work Summary Accuracy](patterns/remaining-work-summary-accuracy.md)
@@ -590,7 +565,6 @@
 - [✅ Universal Doc Generator Robustness](patterns/universal-doc-generator-robustness.md)
 - [✅ Validation Rules Codec Testing](patterns/validation-rules-codec-testing.md)
 - [✅ Warning Collector Testing](patterns/warning-collector-testing.md)
-- [🚧 ADR 010 Pattern Naming Conventions](patterns/adr-010-pattern-naming-conventions.md)
 - [🚧 Arch Queries Test](patterns/arch-queries-test.md)
 - [🚧 Context Assembler Tests](patterns/context-assembler-tests.md)
 - [🚧 Context Formatter Tests](patterns/context-formatter-tests.md)
@@ -602,9 +576,6 @@
 - [🚧 Reference Doc Showcase](patterns/reference-doc-showcase.md)
 - [🚧 Stub Resolver Tests](patterns/stub-resolver-tests.md)
 - [🚧 Stub Taxonomy Tag Tests](patterns/stub-taxonomy-tag-tests.md)
-- [📋 ADR 009 Pipeline Architecture](patterns/adr-009-pipeline-architecture.md)
-- [📋 ADR 011 Publishing Strategy](patterns/adr-011-publishing-strategy.md)
-- [📋 ADR 013 Taxonomy Canonical Values](patterns/adr-013-taxonomy-canonical-values.md)
 - [📋 Architecture Diagram Generation](patterns/architecture-diagram-generation.md)
 - [📋 Business Rules Generator](patterns/business-rules-generator.md)
 - [📋 Claude Module Generation](patterns/claude-module-generation.md)
@@ -616,12 +587,8 @@
 - [📋 Data API Relationship Graph](patterns/data-api-relationship-graph.md)
 - [📋 Generator Infrastructure Testing](patterns/generator-infrastructure-testing.md)
 - [📋 Kebab Case Slugs](patterns/kebab-case-slugs.md)
-- [📋 PDR 002 Session Workflow Commands](patterns/pdr-002-session-workflow-commands.md)
-- [📋 PDR 003 Source First Pattern Architecture](patterns/pdr-003-source-first-pattern-architecture.md)
 - [📋 Phase Numbering Conventions](patterns/phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](patterns/prd-implementation-section.md)
-- [📋 Query Result Envelope Decision](patterns/query-result-envelope-decision.md)
-- [📋 Reference Sample Conventions](patterns/reference-sample-conventions.md)
 - [📋 Release Association Rules](patterns/release-association-rules.md)
 - [📋 Rich Content Helpers Testing](patterns/rich-content-helpers-testing.md)
 - [📋 Session File Cleanup](patterns/session-file-cleanup.md)
@@ -629,7 +596,6 @@
 - [📋 Step Definition Completion](patterns/step-definition-completion.md)
 - [📋 Streaming Git Diff](patterns/streaming-git-diff.md)
 - [📋 Test Content Blocks](patterns/test-content-blocks.md)
-- [📋 Text Output Path Decision](patterns/text-output-path-decision.md)
 - [📋 Traceability Generator](patterns/traceability-generator.md)
 
 ---
@@ -868,6 +834,34 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
+    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
+    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    PatternSummarizer___Compact_Pattern_Projection --> ProcessStateAPI
+    PatternSummarizer___Compact_Pattern_Projection ..-> DataAPIOutputShaping
+    OutputPipeline___CLI_Output_Shaping_and_Formatting --> PatternSummarizer
+    OutputPipeline___CLI_Output_Shaping_and_Formatting ..-> DataAPIOutputShaping
+    FuzzyMatcher___Pattern_Name_Fuzzy_Search ..-> DataAPIOutputShaping
+    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles --> ContextAssembler
+    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles ..-> DataAPIContextAssembly
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> ProcessStateAPI
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> MasterDataset
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> PatternSummarizer
+    ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
+    ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
+    ScopeValidator___Pre_flight_Session_Readiness_Checker ..-> DataAPIDesignSessionSupport
+    HandoffGenerator___Session_End_State_Summary --> ProcessStateAPI
+    HandoffGenerator___Session_End_State_Summary --> MasterDataset
+    HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
+    HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
     DoDValidator --> DoDValidationTypes
@@ -901,26 +895,17 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    ConfigResolver --> ProjectConfigTypes
-    ConfigResolver --> DeliveryProcessFactory
-    ConfigResolver --> ConfigurationDefaults
-    RegexBuilders --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationPresets
-    ProjectConfigSchema --> ProjectConfigTypes
-    ConfigurationPresets --> ConfigurationTypes
-    ConfigurationPresets --> Categories
-    ConfigurationPresets --> RegistryBuilder
-    SourceMerger --> ProjectConfigTypes
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DeliveryProcessFactory --> TagRegistry
-    DefineConfig --> ProjectConfigTypes
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
+    ShapeExtractor --> typescript_estree
+    ShapeExtractor ..-> ShapeExtraction
+    GherkinExtractor --> GherkinTypes
+    GherkinExtractor --> GherkinASTParser
+    GherkinExtractor ..-> GherkinRulesSupport
+    DualSourceExtractor --> DocExtractor
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    Document_Extractor --> Tag_Registry
+    Document_Extractor --> Zod
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -947,17 +932,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    ShapeExtractor --> typescript_estree
-    ShapeExtractor ..-> ShapeExtraction
-    GherkinExtractor --> GherkinTypes
-    GherkinExtractor --> GherkinASTParser
-    GherkinExtractor ..-> GherkinRulesSupport
-    DualSourceExtractor --> DocExtractor
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    Document_Extractor --> Tag_Registry
-    Document_Extractor --> Zod
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -968,6 +942,26 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    ConfigResolver --> ProjectConfigTypes
+    ConfigResolver --> DeliveryProcessFactory
+    ConfigResolver --> ConfigurationDefaults
+    RegexBuilders --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationPresets
+    ProjectConfigSchema --> ProjectConfigTypes
+    ConfigurationPresets --> ConfigurationTypes
+    ConfigurationPresets --> Categories
+    ConfigurationPresets --> RegistryBuilder
+    SourceMerger --> ProjectConfigTypes
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DeliveryProcessFactory --> TagRegistry
+    DefineConfig --> ProjectConfigTypes
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -999,63 +993,32 @@ graph TD
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
     ArchQueriesImpl ..-> DataAPIArchitectureQueries
-    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
-    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
-    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles --> ContextAssembler
-    ContextFormatter___Plain_Text_Renderer_for_Context_Bundles ..-> DataAPIContextAssembly
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> ProcessStateAPI
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> MasterDataset
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder --> PatternSummarizer
-    ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
-    PatternSummarizer___Compact_Pattern_Projection --> ProcessStateAPI
-    PatternSummarizer___Compact_Pattern_Projection ..-> DataAPIOutputShaping
-    OutputPipeline___CLI_Output_Shaping_and_Formatting --> PatternSummarizer
-    OutputPipeline___CLI_Output_Shaping_and_Formatting ..-> DataAPIOutputShaping
-    FuzzyMatcher___Pattern_Name_Fuzzy_Search ..-> DataAPIOutputShaping
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
-    ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
-    ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
-    ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
-    ScopeValidator___Pre_flight_Session_Readiness_Checker ..-> DataAPIDesignSessionSupport
-    HandoffGenerator___Session_End_State_Summary --> ProcessStateAPI
-    HandoffGenerator___Session_End_State_Summary --> MasterDataset
-    HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
-    HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
-    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
-    PatternsCodec ..-> PatternRelationshipModel
-    CompositeCodec ..-> ReferenceDocShowcase
-    ArchitectureCodec --> MasterDataset
-    ArchitectureCodec --> ArchIndex
     ProcessGuardTypes ..-> ProcessGuardLinter
     ProcessGuardModule ..-> ProcessGuardLinter
     DetectChanges --> DeriveProcessState
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
+    ReferenceDocumentCodec ..-> CodecDrivenReferenceGeneration
+    PatternsCodec ..-> PatternRelationshipModel
+    CompositeCodec ..-> ReferenceDocShowcase
+    ArchitectureCodec --> MasterDataset
+    ArchitectureCodec --> ArchIndex
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
-    PDR002SessionWorkflowCommands -.-> DataAPIDesignSessionSupport
-    TextOutputPathDecision -.-> DataAPIContextAssembly
-    TextOutputPathDecision -.-> DataAPIArchitectureQueries
-    QueryResultEnvelopeDecision -.-> DataAPIOutputShaping
+    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
+    PDR001SessionWorkflowCommands -.-> DataAPIDesignSessionSupport
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     ScopedArchitecturalView -.-> ArchitectureDiagramGeneration
@@ -1076,12 +1039,6 @@ graph TD
     CodecDrivenReferenceGeneration -.-> DocGenerationProofOfConcept
     CodecDrivenReferenceGeneration -.-> ScopedArchitecturalView
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
-    StatusTransitionDetectionTesting ..-> DetectChanges
-    ProcessGuardTesting ..-> ProcessGuardLinter
-    FSMValidatorTesting ..-> PhaseStateMachineValidation
-    DoDValidatorTesting ..-> DoDValidation
-    DetectChangesTesting ..-> DetectChanges
-    AntiPatternDetectorTesting ..-> AntiPatternDetector
     LintRulesTesting ..-> LintRules
     LintEngineTesting ..-> LintEngine
     ShapeExtractionTesting ..-> ReferenceDocShowcase
@@ -1096,13 +1053,12 @@ graph TD
     CodecBasedGeneratorTesting ..-> CodecBasedGenerator
     CodecBasedGeneratorTesting ..-> GeneratorInfrastructureTesting
     BusinessRulesDocumentCodec ..-> BusinessRulesGenerator
-    DefineConfigTesting ..-> DefineConfig
-    ConfigLoaderTesting ..-> ConfigLoader
-    TransformDatasetTesting ..-> TransformDataset
-    RichContentHelpersTesting ..-> RichContentHelpers
-    PatternsCodecTesting ..-> PatternsCodec
-    LayerInferenceTesting ..-> LayerInference
-    ProcessStateAPITesting ..-> ProcessStateAPICLI
+    StatusTransitionDetectionTesting ..-> DetectChanges
+    ProcessGuardTesting ..-> ProcessGuardLinter
+    FSMValidatorTesting ..-> PhaseStateMachineValidation
+    DoDValidatorTesting ..-> DoDValidation
+    DetectChangesTesting ..-> DetectChanges
+    AntiPatternDetectorTesting ..-> AntiPatternDetector
     WarningCollectorTesting ..-> WarningCollector
     ValidationRulesCodecTesting ..-> ValidationRulesCodec
     TaxonomyCodecTesting ..-> TaxonomyCodec
@@ -1110,6 +1066,13 @@ graph TD
     SourceMapperTesting ..-> SourceMapper
     DecisionDocGeneratorTesting ..-> DecisionDocGenerator
     DecisionDocCodecTesting ..-> DecisionDocCodec
+    DefineConfigTesting ..-> DefineConfig
+    ConfigLoaderTesting ..-> ConfigLoader
+    TransformDatasetTesting ..-> TransformDataset
+    RichContentHelpersTesting ..-> RichContentHelpers
+    PatternsCodecTesting ..-> PatternsCodec
+    LayerInferenceTesting ..-> LayerInference
+    ProcessStateAPITesting ..-> ProcessStateAPICLI
     ValidatePatternsCli ..-> CliBehaviorTesting
     ProcessApiCli ..-> ProcessStateAPICLI
     LintProcessCli ..-> CliBehaviorTesting

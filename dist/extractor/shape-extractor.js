@@ -873,7 +873,11 @@ export function discoverTaggedShapes(sourceCode) {
         // DD-5: Add group field from tag value
         // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
         const includeValues = extractIncludeTag(jsDoc);
-        shapes.push({ ...shape, group: tagResult.group, ...(includeValues !== undefined && { includes: includeValues }) });
+        shapes.push({
+            ...shape,
+            group: tagResult.group,
+            ...(includeValues !== undefined && { includes: includeValues }),
+        });
     }
     return Result.ok({ shapes, warnings });
 }
