@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:CodecDrivenReferenceGeneration
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-unlock-reason:Retroactive-spec-for-completed-work
 @libar-docs-phase:27
 @libar-docs-effort:5d
