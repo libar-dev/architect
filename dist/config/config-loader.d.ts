@@ -37,6 +37,7 @@
  * export default createDeliveryProcess({ preset: "libar-generic" });
  * ```
  */
+import type { ResolvedConfig } from './project-config.js';
 import type { DeliveryProcessInstance } from './types.js';
 /**
  * Result of config file discovery
@@ -86,13 +87,10 @@ export type ConfigLoadResult = {
  */
 export declare function findConfigFile(startDir: string): Promise<string | null>;
 /**
- * Load configuration from file or use defaults
+ * Load configuration from file or use defaults.
  *
- * Discovery strategy:
- * 1. Search for `delivery-process.config.ts` starting from baseDir
- * 2. Walk up parent directories until repo root
- * 3. If found, import and return the configuration
- * 4. If not found, return default libar-generic preset configuration
+ * Delegates to {@link loadProjectConfig} for file discovery and parsing,
+ * then maps the result to the legacy {@link ConfigDiscoveryResult} shape.
  *
  * @param baseDir - Directory to start searching from (usually cwd or project root)
  * @returns Result with loaded configuration or error
@@ -122,4 +120,49 @@ export declare function loadConfig(baseDir: string): Promise<ConfigLoadResult>;
  * @returns Formatted error message
  */
 export declare function formatConfigError(error: ConfigLoadError): string;
+/**
+ * Result type for project config loading (discriminated union).
+ *
+ * Returns a `ResolvedConfig` on success (with all defaults applied),
+ * or a `ConfigLoadError` on failure.
+ */
+export type ProjectConfigLoadResult = {
+    /** Indicates successful config resolution */
+    readonly ok: true;
+    /** The fully resolved configuration */
+    readonly value: ResolvedConfig;
+} | {
+    /** Indicates config loading failure */
+    readonly ok: false;
+    /** Error details for the failed load */
+    readonly error: ConfigLoadError;
+};
+/**
+ * Load unified project configuration from file or use defaults.
+ *
+ * Supports both new-style `DeliveryProcessProjectConfig` (via `defineConfig()`)
+ * and legacy `DeliveryProcessInstance` (via `createDeliveryProcess()`) config files.
+ *
+ * Discovery strategy:
+ * 1. Search for `delivery-process.config.ts` starting from baseDir
+ * 2. Walk up parent directories until repo root
+ * 3. If found, import and resolve the configuration
+ * 4. If not found, return default resolved config
+ *
+ * @param baseDir - Directory to start searching from (usually cwd or project root)
+ * @returns Result with fully resolved configuration or error
+ */
+/**
+ * Apply project config sources as defaults to a mutable CLI config.
+ * Only fills in sources not already provided by CLI flags.
+ *
+ * @param config - Mutable config object with baseDir, input, and features arrays
+ * @returns true if a non-default project config was found and applied
+ */
+export declare function applyProjectSourceDefaults(config: {
+    readonly baseDir: string;
+    input: string[];
+    features: string[];
+}): Promise<boolean>;
+export declare function loadProjectConfig(baseDir: string): Promise<ProjectConfigLoadResult>;
 //# sourceMappingURL=config-loader.d.ts.map

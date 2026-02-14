@@ -12,18 +12,25 @@
 import type { GeneratorRegistry } from '../registry.js';
 import { type ReferenceDocConfig } from '../../renderable/codecs/reference.js';
 /**
- * All reference document configurations.
+ * Built-in reference document configurations for the delivery-process package.
  *
  * Each entry defines one reference document's convention sources and shape globs.
+ * Import this in your `delivery-process.config.ts` to use these configs,
+ * or define your own `ReferenceDocConfig[]` for downstream repos.
  */
-export declare const REFERENCE_CONFIGS: readonly ReferenceDocConfig[];
+export declare const LIBAR_REFERENCE_CONFIGS: readonly ReferenceDocConfig[];
 /**
- * Registers all reference generators in the GeneratorRegistry.
+ * Registers reference generators from the provided configs in the GeneratorRegistry.
  *
  * Registers:
  * - "reference-docs" meta-generator (produces all files at once)
  * - Individual generators for selective invocation:
  *   "{name}-reference" -> detailed, "{name}-reference-claude" -> summary
+ *
+ * @param registry - The generator registry to register into
+ * @param configs - Reference document configurations (from project config)
  */
-export declare function registerReferenceGenerators(registry: GeneratorRegistry): void;
+export declare function registerReferenceGenerators(registry: GeneratorRegistry, configs: readonly ReferenceDocConfig[]): void;
+/** @deprecated Use LIBAR_REFERENCE_CONFIGS instead */
+export declare const REFERENCE_CONFIGS: readonly ReferenceDocConfig[];
 //# sourceMappingURL=reference-generators.d.ts.map
