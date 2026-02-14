@@ -67,8 +67,21 @@ import {
   formatNodeDeclaration,
 } from './diagram-utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
+import { VALID_TRANSITIONS } from '../../validation/fsm/transitions.js';
+import { PROTECTION_LEVELS, type ProtectionLevel } from '../../validation/fsm/states.js';
+import type { ProcessStatusValue } from '../../taxonomy/index.js';
 import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
+
+// ============================================================================
+// Shared Constants
+// ============================================================================
+
+/** Content source identifiers for hardcoded domain diagrams */
+export const DIAGRAM_SOURCE_VALUES = ['fsm-lifecycle', 'generation-pipeline'] as const;
+
+/** Discriminated source type for DiagramScope.source */
+export type DiagramSource = (typeof DIAGRAM_SOURCE_VALUES)[number];
 
 // ============================================================================
 // Configuration Types
@@ -109,6 +122,13 @@ export interface DiagramScope {
 
   /** Show relationship type labels on edges (default: true) */
   readonly showEdgeLabels?: boolean;
+
+  /** Content source override. When set, uses hardcoded domain content
+   * instead of computing from pattern relationships.
+   * - 'fsm-lifecycle': FSM state transitions with protection levels
+   * - 'generation-pipeline': 4-stage generation pipeline temporal flow
+   */
+  readonly source?: DiagramSource;
 }
 
 /**
@@ -874,6 +894,88 @@ function buildStateDiagram(ctx: DiagramContext, scope: DiagramScope): string[] {
   return lines;
 }
 
+/** Presentation labels for FSM transitions (codec concern, not FSM domain) */
+const FSM_TRANSITION_LABELS: Readonly<
+  Partial<Record<ProcessStatusValue, Partial<Record<ProcessStatusValue, string>>>>
+> = {
+  roadmap: { active: 'Start work', deferred: 'Postpone', roadmap: 'Stay in planning' },
+  active: { completed: 'All deliverables done', roadmap: 'Blocked / regressed' },
+  deferred: { roadmap: 'Resume planning' },
+};
+
+/** Display names for protection levels in diagram notes */
+const PROTECTION_DISPLAY: Readonly<Record<ProtectionLevel, string>> = {
+  none: 'none',
+  scope: 'scope-locked',
+  hard: 'hard-locked',
+};
+
+/** Build FSM lifecycle state diagram from VALID_TRANSITIONS and PROTECTION_LEVELS */
+function buildFsmLifecycleStateDiagram(): string[] {
+  const lines: string[] = ['stateDiagram-v2'];
+  const states = Object.keys(VALID_TRANSITIONS);
+
+  // Entry point: first state is initial
+  const initialState = states[0];
+  if (initialState !== undefined) {
+    lines.push(`    [*] --> ${initialState}`);
+  }
+
+  // Transitions derived from the FSM transition matrix
+  for (const [from, targets] of Object.entries(VALID_TRANSITIONS)) {
+    if (targets.length === 0) {
+      // Terminal state
+      lines.push(`    ${from} --> [*]`);
+    } else {
+      for (const to of targets) {
+        const label = FSM_TRANSITION_LABELS[from as ProcessStatusValue]?.[to];
+        const suffix = label !== undefined ? ` : ${label}` : '';
+        lines.push(`    ${from} --> ${to}${suffix}`);
+      }
+    }
+  }
+
+  // Protection level notes derived from PROTECTION_LEVELS
+  for (const [state, level] of Object.entries(PROTECTION_LEVELS)) {
+    const display = PROTECTION_DISPLAY[level];
+    lines.push(`    note right of ${state}`);
+    lines.push(`        Protection: ${display}`);
+    lines.push('    end note');
+  }
+
+  return lines;
+}
+
+/** Build generation pipeline sequence diagram from hardcoded domain knowledge */
+function buildGenerationPipelineSequenceDiagram(): string[] {
+  return [
+    'sequenceDiagram',
+    '    participant CLI',
+    '    participant Orchestrator',
+    '    participant Scanner',
+    '    participant Extractor',
+    '    participant Transformer',
+    '    participant Codec',
+    '    participant Renderer',
+    '    CLI ->> Orchestrator: generate(config)',
+    '    Orchestrator ->> Scanner: scanPatterns(globs)',
+    '    Scanner -->> Orchestrator: TypeScript ASTs',
+    '    Orchestrator ->> Scanner: scanGherkinFiles(globs)',
+    '    Scanner -->> Orchestrator: Gherkin documents',
+    '    Orchestrator ->> Extractor: extractPatterns(files)',
+    '    Extractor -->> Orchestrator: ExtractedPattern[]',
+    '    Orchestrator ->> Extractor: extractFromGherkin(docs)',
+    '    Extractor -->> Orchestrator: ExtractedPattern[]',
+    '    Orchestrator ->> Orchestrator: mergePatterns(ts, gherkin)',
+    '    Orchestrator ->> Transformer: transformToMasterDataset(patterns)',
+    '    Transformer -->> Orchestrator: MasterDataset',
+    '    Orchestrator ->> Codec: codec.decode(dataset)',
+    '    Codec -->> Orchestrator: RenderableDocument',
+    '    Orchestrator ->> Renderer: render(document)',
+    '    Renderer -->> Orchestrator: markdown string',
+  ];
+}
+
 /** Build a Mermaid C4 context diagram with system boundaries */
 function buildC4Diagram(ctx: DiagramContext, scope: DiagramScope): string[] {
   const showLabels = scope.showEdgeLabels !== false;
@@ -1032,10 +1134,28 @@ function buildClassDiagram(ctx: DiagramContext): string[] {
  * rendered as participants/states (sequence/state diagrams).
  */
 function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[] {
+  const title = scope.title ?? 'Component Overview';
+
+  // Content source override: render hardcoded domain diagrams
+  if (scope.source === 'fsm-lifecycle') {
+    return [
+      heading(2, title),
+      paragraph('FSM lifecycle showing valid state transitions and protection levels:'),
+      mermaid(buildFsmLifecycleStateDiagram().join('\n')),
+      separator(),
+    ];
+  }
+  if (scope.source === 'generation-pipeline') {
+    return [
+      heading(2, title),
+      paragraph('Temporal flow of the documentation generation pipeline:'),
+      mermaid(buildGenerationPipelineSequenceDiagram().join('\n')),
+      separator(),
+    ];
+  }
+
   const ctx = prepareDiagramContext(dataset, scope);
   if (ctx === undefined) return [];
-
-  const title = scope.title ?? 'Component Overview';
 
   let diagramLines: string[];
   switch (scope.diagramType ?? 'graph') {

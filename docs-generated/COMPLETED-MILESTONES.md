@@ -62,16 +62,16 @@
 
 ## Recent Completions
 
-- ✅ Extends Tag Testing
-- ✅ Implements Tag Processing
-- ✅ Linter Validation Testing
-- ✅ Mermaid Relationship Rendering
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
 - ✅ Planning Codec Testing
 - ✅ Pr Changes Codec Testing
 - ✅ Reference Codec Testing
+- ✅ Reference Generator Testing
+- ✅ Reporting Codec Testing
+- ✅ Requirements Adr Codec Testing
+- ✅ Session Codec Testing
 
 Showing 10 of 202 completed patterns. See quarterly files for full history.
 

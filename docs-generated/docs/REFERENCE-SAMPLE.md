@@ -143,27 +143,35 @@ graph TB
 
 ---
 
-## Renderer Pipeline
+## Generation Pipeline
 
-Scoped architecture diagram showing component relationships:
+Temporal flow of the documentation generation pipeline:
 
 ```mermaid
 sequenceDiagram
-    participant RenderableDocument as RenderableDocument
-    participant UniversalRenderer as UniversalRenderer
-    participant DocumentGenerator as DocumentGenerator
-    participant SessionCodec as SessionCodec
-    participant PatternsCodec as PatternsCodec
-    participant Shared_Mermaid_Diagram_Utilities as Shared Mermaid Diagram Utilities
-    participant DecisionDocCodec as DecisionDocCodec
-    participant CompositeCodec as CompositeCodec
-    participant ArchitectureCodec as ArchitectureCodec
-    participant MasterDataset as MasterDataset
-    participant ReferenceDocShowcase as ReferenceDocShowcase
-    participant PatternRelationshipModel as PatternRelationshipModel
-    PatternsCodec --) PatternRelationshipModel: implements
-    CompositeCodec --) ReferenceDocShowcase: implements
-    ArchitectureCodec ->> MasterDataset: uses
+    participant CLI
+    participant Orchestrator
+    participant Scanner
+    participant Extractor
+    participant Transformer
+    participant Codec
+    participant Renderer
+    CLI ->> Orchestrator: generate(config)
+    Orchestrator ->> Scanner: scanPatterns(globs)
+    Scanner -->> Orchestrator: TypeScript ASTs
+    Orchestrator ->> Scanner: scanGherkinFiles(globs)
+    Scanner -->> Orchestrator: Gherkin documents
+    Orchestrator ->> Extractor: extractPatterns(files)
+    Extractor -->> Orchestrator: ExtractedPattern[]
+    Orchestrator ->> Extractor: extractFromGherkin(docs)
+    Extractor -->> Orchestrator: ExtractedPattern[]
+    Orchestrator ->> Orchestrator: mergePatterns(ts, gherkin)
+    Orchestrator ->> Transformer: transformToMasterDataset(patterns)
+    Transformer -->> Orchestrator: MasterDataset
+    Orchestrator ->> Codec: codec.decode(dataset)
+    Codec -->> Orchestrator: RenderableDocument
+    Orchestrator ->> Renderer: render(document)
+    Renderer -->> Orchestrator: markdown string
 ```
 
 ---
@@ -214,30 +222,32 @@ classDiagram
 
 ---
 
-## Validation State Model
+## Delivery Lifecycle FSM
 
-Scoped architecture diagram showing component relationships:
+FSM lifecycle showing valid state transitions and protection levels:
 
 ```mermaid
 stateDiagram-v2
-    state "DoDValidator" as DoDValidator
-    state "AntiPatternDetector" as AntiPatternDetector
-    state "FSMValidator" as FSMValidator
-    state "FSMTransitions" as FSMTransitions
-    state "FSMStates" as FSMStates
-    state "DoDValidationTypes" as DoDValidationTypes
-    state "DualSourceExtractor" as DualSourceExtractor
-    state "PhaseStateMachineValidation" as PhaseStateMachineValidation
-    [*] --> DoDValidator
-    [*] --> AntiPatternDetector
-    [*] --> FSMValidator
-    [*] --> FSMTransitions
-    [*] --> FSMStates
-    DoDValidator --> [*]
-    AntiPatternDetector --> [*]
-    FSMValidator --> [*]
-    FSMTransitions --> [*]
-    FSMStates --> [*]
+    [*] --> roadmap
+    roadmap --> active : Start work
+    roadmap --> deferred : Postpone
+    roadmap --> roadmap : Stay in planning
+    active --> completed : All deliverables done
+    active --> roadmap : Blocked / regressed
+    completed --> [*]
+    deferred --> roadmap : Resume planning
+    note right of roadmap
+        Protection: none
+    end note
+    note right of active
+        Protection: scope-locked
+    end note
+    note right of completed
+        Protection: hard-locked
+    end note
+    note right of deferred
+        Protection: none
+    end note
 ```
 
 ---
@@ -320,6 +330,21 @@ graph LR
 ---
 
 ## API Types
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ### normalizeStatus (function)
 
@@ -413,21 +438,6 @@ interface CategoryDefinition {
 | priority | Display order priority - lower values appear first in sorted output |
 | description | Brief description of the category's purpose and typical patterns |
 | aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ---
 

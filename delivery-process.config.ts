@@ -45,11 +45,9 @@ export default defineConfig({
           title: 'Configuration Components',
         },
         {
-          archContext: ['renderer'],
-          direction: 'LR',
-          title: 'Renderer Pipeline',
+          title: 'Generation Pipeline',
           diagramType: 'sequenceDiagram',
-          showEdgeLabels: true,
+          source: 'generation-pipeline',
         },
         {
           archContext: ['generator'],
@@ -57,10 +55,9 @@ export default defineConfig({
           diagramType: 'classDiagram',
         },
         {
-          archContext: ['validation'],
-          title: 'Validation State Model',
+          title: 'Delivery Lifecycle FSM',
           diagramType: 'stateDiagram-v2',
-          showEdgeLabels: false,
+          source: 'fsm-lifecycle',
         },
         {
           archContext: ['scanner', 'extractor'],
