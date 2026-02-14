@@ -203,7 +203,7 @@ export function internalImpl() {}
 - And the directive code should also contain "Object.keys(input)"
 - And the directive should have 1 export named "validate" of type "function"
 
-```markdown
+````markdown
 /** @libar-docs */
 
 /**
@@ -221,7 +221,7 @@ export function internalImpl() {}
 export function validate(input: Record<string, unknown>): boolean {
   return Object.keys(input).length > 0;
 }
-```
+````
 
 **Handle files with quick directive check optimization**
 

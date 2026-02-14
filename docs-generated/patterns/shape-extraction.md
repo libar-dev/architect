@@ -381,7 +381,7 @@ export function validate(input: unknown): boolean { return true; }
 - When generating claude module
 - Then the module contains:
 
-```markdown
+````markdown
 #### API Types
 
 ```typescript
@@ -393,7 +393,7 @@ interface Output {
   // ...
 }
 ```
-```
+````
 
 **Shapes render in detailed docs**
 
@@ -499,7 +499,7 @@ export interface Parser {
 - When generating markdown
 - Then output is:
 
-```markdown
+````markdown
 ```typescript
 interface Input { ... }
 
@@ -507,7 +507,7 @@ interface Output { ... }
 
 interface Options { ... }
 ```
-```
+````
 
 **Separate rendering for detailed output**
 
@@ -516,7 +516,7 @@ interface Options { ... }
 - When generating markdown
 - Then output is:
 
-```markdown
+````markdown
 ```typescript
 interface Input { ... }
 ```
@@ -524,7 +524,7 @@ interface Input { ... }
 ```typescript
 interface Output { ... }
 ```
-```
+````
 
 ## Business Rules
 

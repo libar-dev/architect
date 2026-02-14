@@ -392,7 +392,7 @@ export function second() {
 - And the directive should have 2 examples
 - And the examples should contain:
 
-```markdown
+````markdown
 /**
  * @libar-docs-core
  * Test function with examples
@@ -411,7 +411,7 @@ export function second() {
 export function test(input: string): string {
   return input.toUpperCase();
 }
-```
+````
 
 | value |
 | --- |
@@ -589,7 +589,7 @@ export function processRequest() {
 - And the directive should have tag "@libar-docs-core"
 - And the directive should not have any tags:
 
-```markdown
+````markdown
 /**
  * @libar-docs-core
  * Test function
@@ -603,7 +603,7 @@ export function processRequest() {
 export function hasTag(tag: string): boolean {
   return tag.startsWith('@libar-docs');
 }
-```
+````
 
 | value |
 | --- |

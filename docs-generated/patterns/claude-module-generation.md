@@ -202,11 +202,11 @@ Scenario Outline: Protection level from status
 - When generating the claude module
 - Then the code block should appear in output with language tag
 
-```markdown
+````markdown
 ```bash
 pnpm lint-process --staged
 ```
-```
+````
 
 **See-also link to full documentation is included**
 

@@ -288,14 +288,14 @@ Feature: Reference Document Codec
   Rule: Shape JSDoc prose renders at standard and detailed levels
 
     @happy-path
-    Scenario: Standard level includes JSDoc paragraph before code blocks
+    Scenario: Standard level includes JSDoc in code blocks
       Given a reference config with shapeSources "src/lint/*.ts"
       And a MasterDataset with a shape pattern with JSDoc
       When decoding at detail level "standard"
       Then the document contains text "Input to the process guard decider function"
 
     @happy-path
-    Scenario: Detailed level includes JSDoc paragraph and property table
+    Scenario: Detailed level includes JSDoc in code block and property table
       Given a reference config with shapeSources "src/lint/*.ts"
       And a MasterDataset with a shape pattern with JSDoc and property docs
       When decoding at detail level "detailed"

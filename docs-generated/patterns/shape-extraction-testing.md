@@ -389,6 +389,80 @@ export interface Input { data: string; }
 export interface Output { result: number; }
 ```
 
+**JSDoc with only annotation tags produces no jsDoc**
+
+- Given TypeScript source code:
+- When extracting shapes "OnlyTags"
+- Then the shape "OnlyTags" should have no jsDoc
+
+```markdown
+/**
+ * @libar-docs
+ * @libar-docs-pattern ShapeExtractor
+ * @libar-docs-status completed
+ */
+export interface OnlyTags {
+  value: string;
+}
+```
+
+**Mixed JSDoc preserves standard tags and strips annotation tags**
+
+- Given TypeScript source code:
+- When extracting shapes "MixedTags"
+- Then the shape "MixedTags" jsDoc should contain "Configuration for the pipeline"
+- And the shape "MixedTags" jsDoc should contain "@param timeout"
+- And the shape "MixedTags" jsDoc should contain "@returns"
+- And the shape "MixedTags" jsDoc should not contain "@libar-docs"
+
+```markdown
+/**
+ * @libar-docs
+ * @libar-docs-status active
+ *
+ * Configuration for the pipeline.
+ *
+ * @param timeout - Request timeout in ms
+ * @returns The configured instance
+ */
+export interface MixedTags {
+  timeout: number;
+}
+```
+
+**Single-line annotation-only JSDoc produces no jsDoc**
+
+- Given TypeScript source code:
+- When extracting shapes "SingleLine"
+- Then the shape "SingleLine" should have no jsDoc
+
+```markdown
+/** @libar-docs-shape Foo */
+export interface SingleLine {
+  id: string;
+}
+```
+
+**Consecutive empty lines after tag removal are collapsed**
+
+- Given TypeScript source code:
+- When extracting shapes "CollapsedLines"
+- Then the shape "CollapsedLines" jsDoc should contain "Useful description here"
+- And the shape "CollapsedLines" jsDoc should not contain consecutive empty JSDoc lines
+
+```markdown
+/**
+ * @libar-docs
+ * @libar-docs-status roadmap
+ *
+ *
+ * Useful description here.
+ */
+export interface CollapsedLines {
+  name: string;
+}
+```
+
 **Source code exceeding 5MB limit returns error**
 
 - Given TypeScript source code larger than 5MB
@@ -451,6 +525,15 @@ _Verified by: Extract non-exported interface, Re-export marks internal shape as 
 **Shape rendering supports grouping options**
 
 _Verified by: Grouped rendering in single code block, Separate rendering with multiple code blocks_
+
+**Annotation tags are stripped from extracted JSDoc while preserving standard tags**
+
+**Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+
+    **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata
+    for the extraction pipeline, not user-visible documentation content.
+
+_Verified by: JSDoc with only annotation tags produces no jsDoc, Mixed JSDoc preserves standard tags and strips annotation tags, Single-line annotation-only JSDoc produces no jsDoc, Consecutive empty lines after tag removal are collapsed_
 
 **Large source files are rejected to prevent memory exhaustion**
 

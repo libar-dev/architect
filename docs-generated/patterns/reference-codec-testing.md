@@ -269,14 +269,14 @@ Parameterized codec factory that creates reference document codecs
 - When decoding at detail level "detailed"
 - Then the document contains a verified-by list with 3 unique entries
 
-**Standard level includes JSDoc paragraph before code blocks**
+**Standard level includes JSDoc in code blocks**
 
 - Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a shape pattern with JSDoc
 - When decoding at detail level "standard"
 - Then the document contains text "Input to the process guard decider function"
 
-**Detailed level includes JSDoc paragraph and property table**
+**Detailed level includes JSDoc in code block and property table**
 
 - Given a reference config with shapeSources "src/lint/*.ts"
 - And a MasterDataset with a shape pattern with JSDoc and property docs
@@ -547,7 +547,7 @@ _Verified by: Detailed level renders structured behavior rules, Standard level r
 
 **Shape JSDoc prose renders at standard and detailed levels**
 
-_Verified by: Standard level includes JSDoc paragraph before code blocks, Detailed level includes JSDoc paragraph and property table, Shapes without JSDoc render code blocks only_
+_Verified by: Standard level includes JSDoc in code blocks, Detailed level includes JSDoc in code block and property table, Shapes without JSDoc render code blocks only_
 
 **Shape sections render param returns and throws documentation**
 

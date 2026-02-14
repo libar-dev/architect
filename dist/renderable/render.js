@@ -89,8 +89,11 @@ function renderBlock(block) {
             return renderTable(block);
         case 'list':
             return renderList(block);
-        case 'code':
-            return [`\`\`\`${block.language ?? ''}`, block.content, '\`\`\`', ''];
+        case 'code': {
+            // Use 4+ backtick fences when content contains triple backticks
+            const fence = block.content.includes('```') ? '````' : '```';
+            return [`${fence}${block.language ?? ''}`, block.content, fence, ''];
+        }
         case 'mermaid':
             return ['\`\`\`mermaid', block.content, '\`\`\`', ''];
         case 'collapsible':

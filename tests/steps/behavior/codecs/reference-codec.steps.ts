@@ -60,10 +60,14 @@ function makeConfig(conventionTags: string, behaviorCategories: string): Referen
 
 function getRenderedMarkdown(): string {
   const doc = state!.document!;
-  // Flatten all paragraph text for content assertions
-  return findParagraphs(doc)
+  // Flatten paragraph text and code block content for content assertions
+  const paragraphText = findParagraphs(doc)
     .map((p) => p.text)
     .join('\n');
+  const codeText = findBlocksByType(doc, 'code')
+    .map((c) => c.content)
+    .join('\n');
+  return `${paragraphText}\n${codeText}`;
 }
 
 // ============================================================================
@@ -1885,7 +1889,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Shape JSDoc prose renders at standard and detailed levels', ({ RuleScenario }) => {
     RuleScenario(
-      'Standard level includes JSDoc paragraph before code blocks',
+      'Standard level includes JSDoc in code blocks',
       ({ Given, And, When, Then }) => {
         Given(
           'a reference config with shapeSources {string}',
@@ -1938,7 +1942,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario(
-      'Detailed level includes JSDoc paragraph and property table',
+      'Detailed level includes JSDoc in code block and property table',
       ({ Given, And, When, Then }) => {
         Given(
           'a reference config with shapeSources {string}',

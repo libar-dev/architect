@@ -317,7 +317,7 @@ function buildShapeSections(shapes, detailLevel) {
         for (const shape of shapes) {
             sections.push(heading(3, `${shape.name} (${shape.kind})`));
             if (shape.jsDoc) {
-                sections.push(paragraph(shape.jsDoc));
+                sections.push(code(shape.jsDoc, 'typescript'));
             }
             sections.push(code(shape.sourceText, 'typescript'));
             // Property docs table for interfaces at detailed level

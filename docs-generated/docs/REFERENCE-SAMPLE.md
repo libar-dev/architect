@@ -65,8 +65,24 @@ sequenceDiagram
 
 ## API Types
 
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
+
 ### normalizeStatus (function)
 
+````typescript
 /**
  * Normalize any status string to a display bucket
  *
@@ -89,6 +105,7 @@ sequenceDiagram
  * normalizeStatus(undefined)     // → "planned"
  * ```
  */
+````
 
 ```typescript
 function normalizeStatus(status: string | undefined): NormalizedStatus;
@@ -102,6 +119,7 @@ function normalizeStatus(status: string | undefined): NormalizedStatus;
 
 ### DELIVERABLE_STATUS_VALUES (const)
 
+```typescript
 /**
  * Canonical deliverable status values
  *
@@ -117,6 +135,7 @@ function normalizeStatus(status: string | undefined): NormalizedStatus;
  * - n/a: Not applicable
  *
  */
+```
 
 ```typescript
 DELIVERABLE_STATUS_VALUES = [
@@ -153,21 +172,6 @@ interface CategoryDefinition {
 | priority | Display order priority - lower values appear first in sorted output |
 | description | Brief description of the category's purpose and typical patterns |
 | aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ---
 
