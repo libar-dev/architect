@@ -178,7 +178,8 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
         ...(directive.archRole !== undefined && { archRole: directive.archRole }),
         ...(directive.archContext !== undefined && { archContext: directive.archContext }),
         ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
-        ...(directive.archView !== undefined && directive.archView.length > 0 && { archView: directive.archView }),
+        ...(directive.archView !== undefined &&
+            directive.archView.length > 0 && { archView: directive.archView }),
         // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
         ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
     };

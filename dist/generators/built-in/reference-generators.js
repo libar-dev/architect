@@ -145,10 +145,7 @@ export const REFERENCE_CONFIGS = [
     {
         title: 'Codec Architecture',
         conventionTags: [],
-        shapeSources: [
-            'src/renderable/schema.ts',
-            'src/validation-schemas/master-dataset.ts',
-        ],
+        shapeSources: ['src/renderable/schema.ts', 'src/validation-schemas/master-dataset.ts'],
         behaviorCategories: [],
         diagramScopes: [
             { archView: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },

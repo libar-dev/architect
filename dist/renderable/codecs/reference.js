@@ -62,8 +62,7 @@ export function createReferenceCodec(config, options) {
             }
             // 2. Scoped relationship diagrams (normalize singular to array)
             if (opts.detailLevel !== 'summary') {
-                const scopes = config.diagramScopes ??
-                    (config.diagramScope !== undefined ? [config.diagramScope] : []);
+                const scopes = config.diagramScopes ?? (config.diagramScope !== undefined ? [config.diagramScope] : []);
                 for (const scope of scopes) {
                     const diagramSections = buildScopedDiagram(dataset, scope);
                     if (diagramSections.length > 0) {
