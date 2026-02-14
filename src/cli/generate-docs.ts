@@ -293,6 +293,10 @@ async function main(): Promise<void> {
   }
   const resolvedConfig = configResult.value;
 
+  if (resolvedConfig.isDefault) {
+    console.log('  (No delivery-process.config.ts found; using defaults)');
+  }
+
   // Determine generators to run (CLI -g overrides config)
   const effectiveGenerators = (
     opts.generatorsExplicit ? opts.generators : [...resolvedConfig.project.generators]

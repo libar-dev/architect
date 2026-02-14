@@ -55,24 +55,17 @@ export function mergeSourcesForGenerator(
     return base;
   }
 
-  // Resolve features: replaceFeatures takes precedence over additionalFeatures
-  const hasReplaceFeatures =
-    override.replaceFeatures !== undefined && override.replaceFeatures.length > 0;
-
-  const features: readonly string[] = hasReplaceFeatures
-    ? (override.replaceFeatures ?? [])
-    : [...base.features, ...(override.additionalFeatures ?? [])];
-
   // Resolve typescript: additionalInput is appended
   const typescript: readonly string[] =
     override.additionalInput !== undefined && override.additionalInput.length > 0
       ? [...base.typescript, ...override.additionalInput]
       : base.typescript;
 
-  // Exclude is always inherited from base
-  return {
-    typescript,
-    features,
-    exclude: base.exclude,
-  };
+  // replaceFeatures takes full precedence over base + additionalFeatures
+  if (override.replaceFeatures !== undefined && override.replaceFeatures.length > 0) {
+    return { typescript, features: override.replaceFeatures, exclude: base.exclude };
+  }
+
+  const features: readonly string[] = [...base.features, ...(override.additionalFeatures ?? [])];
+  return { typescript, features, exclude: base.exclude };
 }

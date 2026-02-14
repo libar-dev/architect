@@ -96,15 +96,27 @@ export interface OutputConfig {
  * - `replaceFeatures`: Used INSTEAD of base features (for generators needing a different set)
  * - `outputDirectory`: Override the base output directory for this generator
  *
- * `replaceFeatures` and `additionalFeatures` are mutually exclusive.
- * If both are set, `replaceFeatures` takes precedence.
+ * ### Mutual Exclusivity
+ *
+ * `replaceFeatures` and `additionalFeatures` are mutually exclusive when both are
+ * non-empty. This constraint is enforced at runtime by the Zod `.refine()` in
+ * {@link GeneratorSourceOverrideSchema} (in `project-config-schema.ts`).
+ *
+ * The TypeScript type intentionally permits both fields to coexist because
+ * `mergeSourcesForGenerator()` treats an empty `replaceFeatures: []` as "no replace",
+ * falling through to `additionalFeatures`. Encoding this length-dependent semantics
+ * via `never` would reject valid runtime states.
  */
 export interface GeneratorSourceOverride {
   /** Additional feature file globs appended to base features */
   readonly additionalFeatures?: readonly string[];
   /** Additional TypeScript globs appended to base TypeScript sources */
   readonly additionalInput?: readonly string[];
-  /** Feature globs used INSTEAD of base features (mutually exclusive with additionalFeatures) */
+  /**
+   * Feature globs used INSTEAD of base features.
+   * Mutually exclusive with non-empty `additionalFeatures`.
+   * @see GeneratorSourceOverrideSchema for runtime validation
+   */
   readonly replaceFeatures?: readonly string[];
   /** Override output directory for this generator */
   readonly outputDirectory?: string;
@@ -196,14 +208,29 @@ export interface ResolvedProjectConfig {
  * and the project-level config.
  *
  * This is the primary type consumed by the orchestrator and CLIs.
+ *
+ * Discriminated union on `isDefault`:
+ * - `isDefault: true` means no config file was found; `configPath` is `undefined`.
+ * - `isDefault: false` means a config file was loaded; `configPath` is a `string`.
  */
-export interface ResolvedConfig {
-  /** The taxonomy instance (registry + regexBuilders) */
-  readonly instance: DeliveryProcessInstance;
-  /** The resolved project config with defaults applied */
-  readonly project: ResolvedProjectConfig;
-  /** Whether the config was loaded from a file or generated from defaults */
-  readonly isDefault: boolean;
-  /** Path to the config file, if one was found */
-  readonly configPath: string | undefined;
-}
+export type ResolvedConfig =
+  | {
+      /** The taxonomy instance (registry + regexBuilders) */
+      readonly instance: DeliveryProcessInstance;
+      /** The resolved project config with defaults applied */
+      readonly project: ResolvedProjectConfig;
+      /** Config was generated from defaults (no config file found) */
+      readonly isDefault: true;
+      /** No config file path when using defaults */
+      readonly configPath?: undefined;
+    }
+  | {
+      /** The taxonomy instance (registry + regexBuilders) */
+      readonly instance: DeliveryProcessInstance;
+      /** The resolved project config with defaults applied */
+      readonly project: ResolvedProjectConfig;
+      /** Config was loaded from a file */
+      readonly isDefault: false;
+      /** Path to the config file that was loaded */
+      readonly configPath: string;
+    };

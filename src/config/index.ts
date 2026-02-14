@@ -53,6 +53,7 @@ export {
 export {
   loadConfig,
   loadProjectConfig,
+  applyProjectSourceDefaults,
   findConfigFile,
   formatConfigError,
   type ConfigDiscoveryResult,

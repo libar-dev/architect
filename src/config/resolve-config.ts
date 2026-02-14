@@ -61,7 +61,7 @@ import { createDeliveryProcess, type CreateDeliveryProcessOptions } from './fact
  */
 export function resolveProjectConfig(
   raw: DeliveryProcessProjectConfig,
-  options?: { readonly configPath?: string }
+  options: { readonly configPath: string }
 ): ResolvedConfig {
   // 1. Create taxonomy instance from preset/override fields
   const instanceOptions: CreateDeliveryProcessOptions = {};
@@ -126,7 +126,7 @@ export function resolveProjectConfig(
     instance,
     project,
     isDefault: false,
-    configPath: options?.configPath,
+    configPath: options.configPath,
   };
 }
 

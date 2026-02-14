@@ -21,6 +21,8 @@
  */
 
 import { z } from 'zod';
+import type { DeliveryProcessProjectConfig } from './project-config.js';
+import type { DeliveryProcessInstance } from './types.js';
 
 /**
  * Glob pattern validation — replicates the security rules from
@@ -69,7 +71,11 @@ export const GeneratorSourceOverrideSchema = z
   .object({
     additionalFeatures: GlobArraySchema.optional(),
     additionalInput: GlobArraySchema.optional(),
-    replaceFeatures: GlobArraySchema.optional(),
+    replaceFeatures: z
+      .array(GlobPatternSchema)
+      .min(1, 'replaceFeatures must have at least one pattern; omit the field to use base features')
+      .readonly()
+      .optional(),
     outputDirectory: z.string().min(1).optional(),
   })
   .strict()
@@ -154,7 +160,7 @@ export const DeliveryProcessProjectConfigSchema = z
  * - New-style `DeliveryProcessProjectConfig` (has `sources`, `preset`, `output`, etc.)
  * - Legacy `DeliveryProcessInstance` (has `registry` + `regexBuilders`)
  */
-export function isProjectConfig(value: unknown): boolean {
+export function isProjectConfig(value: unknown): value is DeliveryProcessProjectConfig {
   if (value === null || typeof value !== 'object') {
     return false;
   }
@@ -172,10 +178,49 @@ export function isProjectConfig(value: unknown): boolean {
 /**
  * Type guard for legacy DeliveryProcessInstance objects.
  */
-export function isLegacyInstance(value: unknown): boolean {
+export function isLegacyInstance(value: unknown): value is DeliveryProcessInstance {
   if (value === null || typeof value !== 'object') {
     return false;
   }
   const obj = value as Record<string, unknown>;
   return 'registry' in obj && 'regexBuilders' in obj;
 }
+
+// ---------------------------------------------------------------------------
+// Compile-time assertion: Zod schema output must be assignable to the interface.
+// If this line errors, the schema and interface have drifted out of sync.
+// ---------------------------------------------------------------------------
+
+type _ZodOutput = z.output<typeof DeliveryProcessProjectConfigSchema>;
+
+// Bidirectional key-set check: both types must have the same top-level keys.
+// This catches added/removed fields without fighting readonly/refine variance.
+type _AssertSameKeys = keyof _ZodOutput extends keyof DeliveryProcessProjectConfig
+  ? keyof DeliveryProcessProjectConfig extends keyof _ZodOutput
+    ? true
+    : {
+        error: 'Interface has keys not in Zod schema';
+        extra: Exclude<keyof DeliveryProcessProjectConfig, keyof _ZodOutput>;
+      }
+  : {
+      error: 'Zod schema has keys not in interface';
+      extra: Exclude<keyof _ZodOutput, keyof DeliveryProcessProjectConfig>;
+    };
+
+const _schemaKeyCheck: _AssertSameKeys = true;
+
+// Field-level assignability for simple scalar fields (preset, tagPrefix, etc.).
+// Complex fields (sources, output, generatorOverrides) have known readonly/refine
+// variance between Zod output and the interface — the `as DeliveryProcessProjectConfig`
+// cast in loadProjectConfig() bridges this gap safely since Zod validates at runtime.
+type _AssertScalarFields = _ZodOutput['preset'] extends DeliveryProcessProjectConfig['preset']
+  ? _ZodOutput['tagPrefix'] extends DeliveryProcessProjectConfig['tagPrefix']
+    ? _ZodOutput['fileOptInTag'] extends DeliveryProcessProjectConfig['fileOptInTag']
+      ? _ZodOutput['workflowPath'] extends DeliveryProcessProjectConfig['workflowPath']
+        ? true
+        : { error: 'workflowPath drift' }
+      : { error: 'fileOptInTag drift' }
+    : { error: 'tagPrefix drift' }
+  : { error: 'preset drift' };
+
+const _scalarCheck: _AssertScalarFields = true;

@@ -36,7 +36,11 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { loadConfig, loadProjectConfig, formatConfigError } from '../config/config-loader.js';
+import {
+  loadConfig,
+  applyProjectSourceDefaults,
+  formatConfigError,
+} from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { scanPatterns } from '../scanner/index.js';
 import { extractPatterns } from '../extractor/doc-extractor.js';
@@ -422,27 +426,12 @@ Available API Methods (for 'query'):
  * falls back to filesystem auto-detection for repos without one.
  */
 async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
-  // If user provided explicit flags, use them
-  if (config.input.length > 0 && config.features.length > 0) {
+  const applied = await applyProjectSourceDefaults(config);
+  if (applied) {
     return;
   }
 
-  // Try loading project config for source defaults
-  const configResult = await loadProjectConfig(config.baseDir);
-  if (configResult.ok && !configResult.value.isDefault) {
-    const resolved = configResult.value;
-
-    // Apply config sources as defaults (only if CLI didn't specify)
-    if (config.input.length === 0 && resolved.project.sources.typescript.length > 0) {
-      config.input.push(...resolved.project.sources.typescript);
-    }
-    if (config.features.length === 0 && resolved.project.sources.features.length > 0) {
-      config.features.push(...resolved.project.sources.features);
-    }
-    return;
-  }
-
-  // Fall back to existing auto-detection for repos without config
+  // Fall back to existing filesystem auto-detection for repos without config
   applyConfigDefaultsFallback(config);
 }
 
@@ -550,8 +539,10 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResul
   } else {
     try {
       workflow = await loadDefaultWorkflow();
-    } catch {
-      // Non-fatal: continue without workflow
+    } catch (err) {
+      console.error(
+        `Warning: Could not load default workflow: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 
@@ -1265,8 +1256,10 @@ function handleHandoff(ctx: RouteContext): string {
         .trim()
         .split('\n')
         .filter((line) => line.length > 0);
-    } catch {
-      // git not available or not a git repo — silently omit
+    } catch (err) {
+      console.error(
+        `Warning: git diff failed: ${err instanceof Error ? err.message : String(err)}. Handoff will not include modified files.`
+      );
       modifiedFiles = undefined;
     }
   }

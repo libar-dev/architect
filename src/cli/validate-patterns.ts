@@ -33,7 +33,11 @@ import { scanPatterns } from '../scanner/index.js';
 import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
 import { extractPatterns } from '../extractor/doc-extractor.js';
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
-import { loadConfig, loadProjectConfig, formatConfigError } from '../config/config-loader.js';
+import {
+  loadConfig,
+  applyProjectSourceDefaults,
+  formatConfigError,
+} from '../config/config-loader.js';
 import {
   ScannerConfigSchema,
   createJsonOutputCodec,
@@ -607,17 +611,10 @@ async function main(): Promise<void> {
   }
 
   // Apply config-based defaults if CLI flags not provided
-  if (config.input.length === 0 || config.features.length === 0) {
-    const projectConfigResult = await loadProjectConfig(config.baseDir);
-    if (projectConfigResult.ok && !projectConfigResult.value.isDefault) {
-      const resolved = projectConfigResult.value;
-      if (config.input.length === 0 && resolved.project.sources.typescript.length > 0) {
-        config.input = [...resolved.project.sources.typescript];
-      }
-      if (config.features.length === 0 && resolved.project.sources.features.length > 0) {
-        config.features = [...resolved.project.sources.features];
-      }
-    }
+  const configApplied = await applyProjectSourceDefaults(config);
+
+  if (!configApplied && config.input.length === 0) {
+    console.error('  (No delivery-process.config.ts found; provide -i/--input flags)');
   }
 
   // Validate that we have sources (from CLI or config)

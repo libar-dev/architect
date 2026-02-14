@@ -27,7 +27,7 @@ import type {
 interface ConfigResolutionState {
   rawConfig: DeliveryProcessProjectConfig | null;
   resolvedConfig: ResolvedConfig | null;
-  resolveOptions: { readonly configPath?: string } | undefined;
+  resolveOptions: { readonly configPath: string } | undefined;
 }
 
 // =============================================================================
@@ -108,7 +108,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('resolving the project config', () => {
-        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!);
+        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
+          configPath: '/test/config.ts',
+        });
       });
 
       Then('the instance should have 3 categories', () => {
@@ -137,7 +139,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('resolving the project config', () => {
-        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!);
+        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
+          configPath: '/test/config.ts',
+        });
       });
 
       Then('resolved typescript sources should contain both original and stub globs', () => {
@@ -160,7 +164,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('resolving the project config', () => {
-        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!);
+        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
+          configPath: '/test/config.ts',
+        });
       });
 
       Then('output directory should be "docs/architecture"', () => {
@@ -181,7 +187,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('resolving the project config', () => {
-        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!);
+        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
+          configPath: '/test/config.ts',
+        });
       });
 
       Then('output directory should be "custom-docs"', () => {
@@ -205,7 +213,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('resolving the project config', () => {
-        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!);
+        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
+          configPath: '/test/config.ts',
+        });
       });
 
       Then('generators should contain exactly "patterns"', () => {
@@ -228,7 +238,9 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
       });
 
       When('resolving the project config', () => {
-        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!);
+        state!.resolvedConfig = resolveProjectConfig(state!.rawConfig!, {
+          configPath: '/test/config.ts',
+        });
       });
 
       Then('the first context inference rule should be the user rule', () => {
