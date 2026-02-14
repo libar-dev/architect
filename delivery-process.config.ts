@@ -10,7 +10,6 @@
  * - @libar-docs-infra: Infrastructure and configuration
  */
 import { defineConfig } from './src/config/define-config.js';
-import { LIBAR_REFERENCE_CONFIGS } from './src/generators/built-in/reference-generators.js';
 
 export default defineConfig({
   preset: 'libar-generic',
@@ -26,7 +25,22 @@ export default defineConfig({
     directory: 'docs-generated',
     overwrite: true,
   },
-  referenceDocConfigs: LIBAR_REFERENCE_CONFIGS,
+  referenceDocConfigs: [
+    {
+      title: 'Reference Generation Sample',
+      conventionTags: ['reference-sample'],
+      shapeSources: ['src/taxonomy/risk-levels.ts'],
+      behaviorCategories: ['infra'],
+      diagramScope: {
+        archView: ['reference-sample'],
+        direction: 'TB',
+        title: 'Configuration Components',
+      },
+      claudeMdSection: 'architecture',
+      docsFilename: 'REFERENCE-SAMPLE.md',
+      claudeMdFilename: 'reference-sample.md',
+    },
+  ],
   generatorOverrides: {
     changelog: {
       additionalFeatures: ['delivery-process/decisions/*.feature'],

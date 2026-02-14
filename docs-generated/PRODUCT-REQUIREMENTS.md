@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [████████░░░░░░░░░░░░] 17/42 (40%)
+**Overall:** [████████░░░░░░░░░░░░] 17/43 (40%)
 
 | Metric | Value |
 | --- | --- |
-| Total Features | 42 |
+| Total Features | 43 |
 | Completed | 17 |
 | Active | 1 |
-| Planned | 24 |
+| Planned | 25 |
 | Product Areas | 2 |
 | User Roles | 1 |
 
@@ -24,7 +24,7 @@
 
 ### DeliveryProcess
 
-16/41 complete (39%)
+16/42 complete (38%)
 
 - [✅ Codec Driven Reference Generation - eliminates per document recipe features with config driven generation](requirements/phase-27-codec-driven-reference-generation.md)
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
@@ -60,6 +60,7 @@
 - [📋 Phase Numbering Conventions - prevent phase number conflicts and ensure consistent ordering](requirements/phase-100-phase-numbering-conventions.md)
 - [📋 Prd Implementation Section](requirements/phase-99-prd-implementation-section.md)
 - [📋 Progressive Governance - filter work by risk and priority](requirements/phase-100-progressive-governance.md)
+- [📋 Reference Doc Showcase - validates all content blocks via single integration document](requirements/phase-30-reference-doc-showcase.md)
 - [📋 Release Association Rules - enforce separation of specs from release metadata](requirements/phase-100-release-association-rules.md)
 - [📋 Session File Cleanup - ensure session directory only contains active phase files](requirements/phase-100-session-file-cleanup.md)
 - [📋 Status Aware Eslint Suppression](requirements/phase-99-status-aware-eslint-suppression.md)
@@ -128,6 +129,7 @@
 | 📋 Phase Numbering Conventions | DeliveryProcess | - | planned |
 | 📋 Prd Implementation Section | DeliveryProcess | - | planned |
 | 📋 Progressive Governance | DeliveryProcess | - | planned |
+| 📋 Reference Doc Showcase | DeliveryProcess | - | planned |
 | 📋 Release Association Rules | DeliveryProcess | - | planned |
 | 📋 Session File Cleanup | DeliveryProcess | - | planned |
 | 📋 Status Aware Eslint Suppression | DeliveryProcess | - | planned |

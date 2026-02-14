@@ -5,7 +5,7 @@
 @libar-docs-adr-status:accepted
 @libar-docs-adr-category:architecture
 @libar-docs-depends-on:DataAPIContextAssembly,DataAPIArchitectureQueries
-@libar-docs-convention:output-format,cli-patterns
+@libar-docs-convention:output-format,cli-patterns,reference-sample
 Feature: ADR-008 Text Output Path for Context and Discovery Commands
 
   **Context:**
@@ -63,6 +63,11 @@ Feature: ADR-008 Text Output Path for Context and Discovery Commands
 
   Rule: Text commands return string from router
 
+    **Invariant:** Commands returning structured text must bypass JSON.stringify.
+
+    **Rationale:** Context bundles use === section markers designed for AI parsing.
+    JSON wrapping provides no benefit and inflates token count by ~30%.
+
     @acceptance-criteria @happy-path
     Scenario: Context command outputs structured text
       Given the CLI receives "context MyPattern --session design"
@@ -78,6 +83,12 @@ Feature: ADR-008 Text Output Path for Context and Discovery Commands
       And the output format matches V1 behavior exactly
 
   Rule: SubcommandContext replaces narrow router parameters
+
+    **Invariant:** All subcommands receive context via SubcommandContext, not individual parameters.
+
+    **Rationale:** Coverage and unannotated commands need input globs and registry for
+    file discovery and opt-in detection. Threading multiple parameters through the router
+    creates fragile signatures.
 
     @acceptance-criteria @happy-path
     Scenario: Coverage command accesses CLI config via context
