@@ -13,7 +13,7 @@
 
 ## Description
 
-Registers all 11 reference document generators. Each config produces
+Registers all reference document generators. Each config produces
 TWO generators: detailed (docs/) and summary (_claude-md/).
 
 ---

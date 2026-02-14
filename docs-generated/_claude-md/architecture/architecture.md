@@ -183,6 +183,9 @@
 | PrChangesCodec | working/PR-CHANGES.md | (none) |
 | TraceabilityCodec | TRACEABILITY.md | (none) |
 | OverviewCodec | OVERVIEW.md | (none) |
+| PlanningChecklistCodec | PLANNING-CHECKLIST.md | (none) |
+| SessionPlanCodec | SESSION-PLAN.md | (none) |
+| SessionFindingsCodec | SESSION-FINDINGS.md | (none) |
 
 ---
 
@@ -458,6 +461,9 @@
 | PrChangesCodec | working/PR-CHANGES.md | (none) |
 | TraceabilityCodec | TRACEABILITY.md | (none) |
 | OverviewCodec | OVERVIEW.md | (none) |
+| PlanningChecklistCodec | PLANNING-CHECKLIST.md | (none) |
+| SessionPlanCodec | SESSION-PLAN.md | (none) |
+| SessionFindingsCodec | SESSION-FINDINGS.md | (none) |
 
 ---
 

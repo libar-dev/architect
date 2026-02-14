@@ -80,3 +80,23 @@ Feature: Convention Extractor
       When extracting conventions for tag "fsm-rules"
       Then the first rule has 1 table
       And the table has 3 data rows
+
+  Rule: Code examples in rule descriptions are preserved
+
+    @happy-path
+    Scenario: Mermaid diagram in rule description is extracted as code example
+      Given a convention pattern with a mermaid diagram in tag "fsm-rules"
+      When extracting conventions for tag "fsm-rules"
+      Then the first rule has 1 code example
+      And the code example has language "mermaid"
+
+    @happy-path
+    Scenario: Rule description without code examples has no code examples field
+      Given a pattern with convention "fsm-rules" and rule description:
+        """
+        **Invariant:** Only valid transitions allowed.
+
+        Plain narrative text without any diagrams.
+        """
+      When extracting conventions for tag "fsm-rules"
+      Then the first rule has no code examples

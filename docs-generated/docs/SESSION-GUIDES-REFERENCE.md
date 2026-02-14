@@ -89,6 +89,15 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
 | Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
 
+```text
+Starting from pattern brief?
+    |-- Yes --> Need code stubs now? --> Yes --> Planning + Design
+    |                                --> No  --> Planning
+    |-- No  --> Ready to code? --> Yes --> Complex decisions? --> Yes --> Design first
+                                                               --> No  --> Implementation
+                               --> No  --> Planning
+```
+
 ---
 
 ## Planning Session
@@ -159,6 +168,26 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Create implementation plans | Design focuses on architecture |
 | Transition spec to active | Requires implementation session |
 | Write full implementations | Stubs only |
+
+```typescript
+/**
+     * at-prefix
+     * at-prefix-status roadmap
+     * at-prefix-implements MyPattern
+     *
+     * MyPattern - Description
+     *
+     * Target: src/path/to/final/location.ts
+     * See: PDR-001 (Design Decision)
+     */
+    export interface MyResult {
+      id: string;
+    }
+
+    export function myFunction(args: MyArgs): Promise<MyResult> {
+      throw new Error('MyPattern not yet implemented - roadmap pattern');
+    }
+```
 
 ---
 
@@ -346,6 +375,25 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Files Modified | Track changes for review |
 | Next Session | Clear starting point |
 
+```markdown
+Session State
+
+    - Last completed: Phase 1 - Core types
+    - In progress: Phase 2 - Validation
+    - Blockers: None
+
+    Files Modified
+
+    - src/types.ts - Added core types
+    - src/validate.ts - Started validation (incomplete)
+
+    Next Session
+
+    1. FIRST: Complete validation in src/validate.ts
+    2. Add integration tests
+    3. Update deliverable statuses
+```
+
 ---
 
 ## Discovery Tags
@@ -365,6 +413,12 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | at-prefix-discovered-gap | Missing edge case or feature | Missing-validation-for-empty-input |
 | at-prefix-discovered-improvement | Performance or DX enhancement | Cache-parsed-results |
 | at-prefix-discovered-learning | Knowledge gained | Gherkin-requires-strict-indentation |
+
+```gherkin
+at-prefix-discovered-gap: Missing-edge-case-for-empty-input
+    at-prefix-discovered-improvement: Cache-parsed-results
+    at-prefix-discovered-learning: Gherkin-requires-strict-indentation
+```
 
 ---
 
@@ -464,6 +518,20 @@ Process Guard implements 7 validation rules:
 The FSM enforces valid state transitions. Protection levels and transitions
     are defined in TypeScript (extracted via @extract-shapes).
 
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress (blocked)
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Terminal state
+        note right of active : Scope-locked
+```
+
 ---
 
 ## Escape Hatches
@@ -490,7 +558,7 @@ Process Guard validates 7 rules (types extracted from TypeScript):
 | invalid-status-transition | error | Status transition must follow FSM |
 | scope-creep | error | Cannot add deliverables to active specs |
 | session-excluded | error | Cannot modify files excluded from session |
-| missing-relationship-target | warning | Relationship target pattern must exist |
+| missing-relationship-target | warning | Relationship target must exist |
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 
@@ -511,6 +579,7 @@ Process Guard validates 7 rules (types extracted from TypeScript):
     3. **scope-creep**: Remove new deliverable OR revert status to `roadmap` temporarily
     4. **session-scope**: Add file to session scope OR use `--ignore-session` flag
     5. **session-excluded**: Remove from exclusion list OR use `--ignore-session` flag
+    6. **missing-relationship-target**: Add target pattern OR remove the relationship
 
     For detailed fix examples with code snippets, see [PROCESS-GUARD.md](/docs/PROCESS-GUARD.md).
 
@@ -560,6 +629,7 @@ Process Guard is invoked via the lint-process CLI command.
 | `--ignore-session` | Skip session scope validation |
 | `--show-state` | Debug: show derived process state |
 | `--format json` | Machine-readable JSON output |
+| `--file <path>` | Validate a specific file |
 
 ---
 
@@ -584,6 +654,32 @@ Process Guard can be used programmatically for custom integrations.
 | Results | hasWarnings(result) | Check for warnings |
 | Results | summarizeResult(result) | Human-readable summary |
 
+```typescript
+import {
+      deriveProcessState,
+      detectStagedChanges,
+      validateChanges,
+      hasErrors,
+      summarizeResult,
+    } from '@libar-dev/delivery-process/lint';
+
+    const state = (await deriveProcessState({ baseDir: '.' })).value;
+    const changes = detectStagedChanges('.').value;
+    const { result } = validateChanges({
+      state,
+      changes,
+      options: { strict: false, ignoreSession: false },
+    });
+
+    if (hasErrors(result)) {
+      console.log(summarizeResult(result));
+      for (const v of result.violations) {
+        console.log(`[${v.rule}] ${v.file}: ${v.message}`);
+      }
+      process.exit(1);
+    }
+```
+
 ---
 
 ## Architecture
@@ -595,6 +691,22 @@ Process Guard uses the Decider pattern for testable validation.
     
 
     **Principle:** State is derived from file annotations - there is no separate state file to maintain.
+
+```mermaid
+flowchart LR
+        A[deriveProcessState] --> C[validateChanges]
+        B[detectChanges] --> C
+        C --> D[ValidationResult]
+
+        subgraph Pure Functions
+            C
+        end
+
+        subgraph I/O
+            A
+            B
+        end
+```
 
 ---
 

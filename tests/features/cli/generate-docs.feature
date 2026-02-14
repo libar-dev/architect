@@ -33,7 +33,7 @@ Feature: generate-docs CLI
     Scenario: Fail without --input flag
       When running "generate-docs -o docs"
       Then exit code is 1
-      And output contains "--input is required"
+      And output contains "No source files specified"
 
   # ============================================================================
   # RULE 3: List Generators

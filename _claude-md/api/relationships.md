@@ -21,6 +21,9 @@
 | `enables`          | ❌         | ✅      | What this unblocks    |
 | `implements`       | ✅         | ❌      | Behavior test links   |
 | `executable-specs` | ❌         | ✅      | Spec file location    |
+| `arch-role`        | ✅         | ❌      | Architecture role     |
+| `arch-context`     | ✅         | ❌      | Bounded context       |
+| `arch-layer`       | ✅         | ❌      | Architecture layer    |
 
 ### Workflow-Relationship Matrix
 

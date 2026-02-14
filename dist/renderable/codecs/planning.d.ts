@@ -137,6 +137,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -294,6 +295,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -397,6 +399,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -554,6 +557,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -620,6 +624,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -777,6 +782,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -843,6 +849,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -1000,6 +1007,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -1070,6 +1078,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -1227,6 +1236,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -1300,6 +1310,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -1457,6 +1468,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -1523,6 +1535,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -1680,6 +1693,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -1747,6 +1761,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -1904,6 +1919,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -1970,6 +1986,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -2127,6 +2144,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2193,6 +2211,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -2350,6 +2369,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2416,6 +2436,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -2573,6 +2594,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2665,6 +2687,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -2822,6 +2845,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -2888,6 +2912,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -3045,6 +3070,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3111,6 +3137,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -3268,6 +3295,232 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                kind: z.ZodEnum<{
+                    function: "function";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
+                    interface: "interface";
+                }>;
+                sourceText: z.ZodString;
+                jsDoc: z.ZodOptional<z.ZodString>;
+                lineNumber: z.ZodNumber;
+                typeParameters: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+            }, z.core.$strip>>>>;
+        }, z.core.$strict>>>;
+        byView: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
+            id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
+            name: z.ZodString;
+            category: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>, z.ZodTransform<import("../../index.js").CategoryName, string>>;
+            directive: z.ZodObject<{
+                tags: z.ZodReadonly<z.ZodArray<z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").DirectiveTag, string>>>>;
+                description: z.ZodDefault<z.ZodString>;
+                examples: z.ZodDefault<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                position: z.ZodObject<{
+                    startLine: z.ZodNumber;
+                    endLine: z.ZodNumber;
+                }, z.core.$strict>;
+                patternName: z.ZodOptional<z.ZodString>;
+                status: z.ZodOptional<z.ZodEnum<{
+                    roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
+                }>>;
+                isCore: z.ZodOptional<z.ZodBoolean>;
+                useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                whenToUse: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                uses: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                usedBy: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                phase: z.ZodOptional<z.ZodNumber>;
+                brief: z.ZodOptional<z.ZodString>;
+                dependsOn: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                implements: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extends: z.ZodOptional<z.ZodString>;
+                seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                quarter: z.ZodOptional<z.ZodString>;
+                completed: z.ZodOptional<z.ZodString>;
+                effort: z.ZodOptional<z.ZodString>;
+                team: z.ZodOptional<z.ZodString>;
+                workflow: z.ZodOptional<z.ZodString>;
+                risk: z.ZodOptional<z.ZodString>;
+                priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
+                archRole: z.ZodOptional<z.ZodString>;
+                archContext: z.ZodOptional<z.ZodString>;
+                archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            }, z.core.$strict>;
+            code: z.ZodString;
+            source: z.ZodObject<{
+                file: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").SourceFilePath, string>>;
+                lines: z.ZodReadonly<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
+            }, z.core.$strict>;
+            exports: z.ZodDefault<z.ZodReadonly<z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                type: z.ZodLiteral<"function">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"type">;
+                name: z.ZodString;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"const">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"interface">;
+                name: z.ZodString;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"class">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"enum">;
+                name: z.ZodString;
+            }, z.core.$strict>], "type">>>>;
+            extractedAt: z.ZodISODateTime;
+            patternName: z.ZodOptional<z.ZodString>;
+            status: z.ZodOptional<z.ZodEnum<{
+                roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
+            }>>;
+            isCore: z.ZodOptional<z.ZodBoolean>;
+            useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            whenToUse: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            uses: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            usedBy: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            scenarios: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                featureFile: z.ZodString;
+                featureName: z.ZodString;
+                featureDescription: z.ZodString;
+                scenarioName: z.ZodString;
+                semanticTags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                steps: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    keyword: z.ZodString;
+                    text: z.ZodString;
+                    dataTable: z.ZodOptional<z.ZodObject<{
+                        headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                        rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+                    }, z.core.$strict>>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
+                }, z.core.$strict>>>>;
+                layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
+                    timeline: "timeline";
+                    domain: "domain";
+                    integration: "integration";
+                    e2e: "e2e";
+                    component: "component";
+                }>>;
+                line: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strict>>>>;
+            phase: z.ZodOptional<z.ZodNumber>;
+            release: z.ZodOptional<z.ZodString>;
+            brief: z.ZodOptional<z.ZodString>;
+            dependsOn: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            quarter: z.ZodOptional<z.ZodString>;
+            completed: z.ZodOptional<z.ZodString>;
+            effort: z.ZodOptional<z.ZodString>;
+            team: z.ZodOptional<z.ZodString>;
+            productArea: z.ZodOptional<z.ZodString>;
+            userRole: z.ZodOptional<z.ZodString>;
+            businessValue: z.ZodOptional<z.ZodString>;
+            deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
+                tests: z.ZodNumber;
+                location: z.ZodString;
+                finding: z.ZodOptional<z.ZodString>;
+                release: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>>>>;
+            workflow: z.ZodOptional<z.ZodString>;
+            risk: z.ZodOptional<z.ZodString>;
+            priority: z.ZodOptional<z.ZodString>;
+            level: z.ZodOptional<z.ZodEnum<{
+                phase: "phase";
+                epic: "epic";
+                task: "task";
+            }>>;
+            parent: z.ZodOptional<z.ZodString>;
+            children: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredGaps: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredImprovements: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredRisks: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredLearnings: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            adr: z.ZodOptional<z.ZodString>;
+            adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
+                proposed: "proposed";
+                accepted: "accepted";
+                deprecated: "deprecated";
+            }>>;
+            adrCategory: z.ZodOptional<z.ZodString>;
+            adrSupersedes: z.ZodOptional<z.ZodString>;
+            adrSupersededBy: z.ZodOptional<z.ZodString>;
+            title: z.ZodOptional<z.ZodString>;
+            behaviorFile: z.ZodOptional<z.ZodString>;
+            behaviorFileVerified: z.ZodOptional<z.ZodBoolean>;
+            rules: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                description: z.ZodString;
+                scenarioCount: z.ZodNumber;
+                scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            }, z.core.$strip>>>>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
+            archContext: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3334,6 +3587,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -3491,6 +3745,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -3570,6 +3825,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -3727,6 +3983,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -3830,6 +4087,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -3987,6 +4245,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -4053,6 +4312,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -4210,6 +4470,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -4276,6 +4537,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -4433,6 +4695,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -4503,6 +4766,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -4660,6 +4924,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -4733,6 +4998,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -4890,6 +5156,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -4956,6 +5223,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -5113,6 +5381,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -5180,6 +5449,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -5337,6 +5607,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -5403,6 +5674,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -5560,6 +5832,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -5626,6 +5899,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -5783,6 +6057,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -5849,6 +6124,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -6006,6 +6282,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -6098,6 +6375,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -6255,6 +6533,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -6321,6 +6600,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -6478,6 +6758,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -6544,6 +6825,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -6701,6 +6983,232 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                kind: z.ZodEnum<{
+                    function: "function";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
+                    interface: "interface";
+                }>;
+                sourceText: z.ZodString;
+                jsDoc: z.ZodOptional<z.ZodString>;
+                lineNumber: z.ZodNumber;
+                typeParameters: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+            }, z.core.$strip>>>>;
+        }, z.core.$strict>>>;
+        byView: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
+            id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
+            name: z.ZodString;
+            category: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>, z.ZodTransform<import("../../index.js").CategoryName, string>>;
+            directive: z.ZodObject<{
+                tags: z.ZodReadonly<z.ZodArray<z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").DirectiveTag, string>>>>;
+                description: z.ZodDefault<z.ZodString>;
+                examples: z.ZodDefault<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                position: z.ZodObject<{
+                    startLine: z.ZodNumber;
+                    endLine: z.ZodNumber;
+                }, z.core.$strict>;
+                patternName: z.ZodOptional<z.ZodString>;
+                status: z.ZodOptional<z.ZodEnum<{
+                    roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
+                }>>;
+                isCore: z.ZodOptional<z.ZodBoolean>;
+                useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                whenToUse: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                uses: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                usedBy: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                phase: z.ZodOptional<z.ZodNumber>;
+                brief: z.ZodOptional<z.ZodString>;
+                dependsOn: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                implements: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extends: z.ZodOptional<z.ZodString>;
+                seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                quarter: z.ZodOptional<z.ZodString>;
+                completed: z.ZodOptional<z.ZodString>;
+                effort: z.ZodOptional<z.ZodString>;
+                team: z.ZodOptional<z.ZodString>;
+                workflow: z.ZodOptional<z.ZodString>;
+                risk: z.ZodOptional<z.ZodString>;
+                priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
+                archRole: z.ZodOptional<z.ZodString>;
+                archContext: z.ZodOptional<z.ZodString>;
+                archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            }, z.core.$strict>;
+            code: z.ZodString;
+            source: z.ZodObject<{
+                file: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").SourceFilePath, string>>;
+                lines: z.ZodReadonly<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
+            }, z.core.$strict>;
+            exports: z.ZodDefault<z.ZodReadonly<z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                type: z.ZodLiteral<"function">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"type">;
+                name: z.ZodString;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"const">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"interface">;
+                name: z.ZodString;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"class">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"enum">;
+                name: z.ZodString;
+            }, z.core.$strict>], "type">>>>;
+            extractedAt: z.ZodISODateTime;
+            patternName: z.ZodOptional<z.ZodString>;
+            status: z.ZodOptional<z.ZodEnum<{
+                roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
+            }>>;
+            isCore: z.ZodOptional<z.ZodBoolean>;
+            useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            whenToUse: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            uses: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            usedBy: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            scenarios: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                featureFile: z.ZodString;
+                featureName: z.ZodString;
+                featureDescription: z.ZodString;
+                scenarioName: z.ZodString;
+                semanticTags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                steps: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    keyword: z.ZodString;
+                    text: z.ZodString;
+                    dataTable: z.ZodOptional<z.ZodObject<{
+                        headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                        rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+                    }, z.core.$strict>>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
+                }, z.core.$strict>>>>;
+                layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
+                    timeline: "timeline";
+                    domain: "domain";
+                    integration: "integration";
+                    e2e: "e2e";
+                    component: "component";
+                }>>;
+                line: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strict>>>>;
+            phase: z.ZodOptional<z.ZodNumber>;
+            release: z.ZodOptional<z.ZodString>;
+            brief: z.ZodOptional<z.ZodString>;
+            dependsOn: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            quarter: z.ZodOptional<z.ZodString>;
+            completed: z.ZodOptional<z.ZodString>;
+            effort: z.ZodOptional<z.ZodString>;
+            team: z.ZodOptional<z.ZodString>;
+            productArea: z.ZodOptional<z.ZodString>;
+            userRole: z.ZodOptional<z.ZodString>;
+            businessValue: z.ZodOptional<z.ZodString>;
+            deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
+                tests: z.ZodNumber;
+                location: z.ZodString;
+                finding: z.ZodOptional<z.ZodString>;
+                release: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>>>>;
+            workflow: z.ZodOptional<z.ZodString>;
+            risk: z.ZodOptional<z.ZodString>;
+            priority: z.ZodOptional<z.ZodString>;
+            level: z.ZodOptional<z.ZodEnum<{
+                phase: "phase";
+                epic: "epic";
+                task: "task";
+            }>>;
+            parent: z.ZodOptional<z.ZodString>;
+            children: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredGaps: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredImprovements: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredRisks: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredLearnings: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            adr: z.ZodOptional<z.ZodString>;
+            adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
+                proposed: "proposed";
+                accepted: "accepted";
+                deprecated: "deprecated";
+            }>>;
+            adrCategory: z.ZodOptional<z.ZodString>;
+            adrSupersedes: z.ZodOptional<z.ZodString>;
+            adrSupersededBy: z.ZodOptional<z.ZodString>;
+            title: z.ZodOptional<z.ZodString>;
+            behaviorFile: z.ZodOptional<z.ZodString>;
+            behaviorFileVerified: z.ZodOptional<z.ZodBoolean>;
+            rules: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                description: z.ZodString;
+                scenarioCount: z.ZodNumber;
+                scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            }, z.core.$strip>>>>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
+            archContext: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -6767,6 +7275,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -6924,6 +7433,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -7003,6 +7513,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -7160,6 +7671,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -7263,6 +7775,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -7420,6 +7933,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -7486,6 +8000,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -7643,6 +8158,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -7709,6 +8225,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -7866,6 +8383,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -7936,6 +8454,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -8093,6 +8612,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -8166,6 +8686,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -8323,6 +8844,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -8389,6 +8911,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             archRole: z.ZodOptional<z.ZodString>;
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
         code: z.ZodString;
@@ -8546,6 +9069,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             infrastructure: "infrastructure";
             application: "application";
         }>>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
@@ -8613,6 +9137,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -8770,6 +9295,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -8836,6 +9362,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -8993,6 +9520,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -9059,6 +9587,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -9216,6 +9745,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -9282,6 +9812,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -9439,6 +9970,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -9531,6 +10063,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -9688,6 +10221,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -9754,6 +10288,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -9911,6 +10446,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -9977,6 +10513,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -10134,6 +10671,232 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                kind: z.ZodEnum<{
+                    function: "function";
+                    type: "type";
+                    enum: "enum";
+                    const: "const";
+                    interface: "interface";
+                }>;
+                sourceText: z.ZodString;
+                jsDoc: z.ZodOptional<z.ZodString>;
+                lineNumber: z.ZodNumber;
+                typeParameters: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extends: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                overloads: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                exported: z.ZodDefault<z.ZodBoolean>;
+                propertyDocs: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    name: z.ZodString;
+                    jsDoc: z.ZodString;
+                }, z.core.$strip>>>>;
+            }, z.core.$strip>>>>;
+        }, z.core.$strict>>>;
+        byView: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodObject<{
+            id: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").PatternId, string>>;
+            name: z.ZodString;
+            category: z.ZodPipe<z.ZodPipe<z.ZodString, z.ZodTransform<string, string>>, z.ZodTransform<import("../../index.js").CategoryName, string>>;
+            directive: z.ZodObject<{
+                tags: z.ZodReadonly<z.ZodArray<z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").DirectiveTag, string>>>>;
+                description: z.ZodDefault<z.ZodString>;
+                examples: z.ZodDefault<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                position: z.ZodObject<{
+                    startLine: z.ZodNumber;
+                    endLine: z.ZodNumber;
+                }, z.core.$strict>;
+                patternName: z.ZodOptional<z.ZodString>;
+                status: z.ZodOptional<z.ZodEnum<{
+                    roadmap: "roadmap";
+                    active: "active";
+                    completed: "completed";
+                    deferred: "deferred";
+                }>>;
+                isCore: z.ZodOptional<z.ZodBoolean>;
+                useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                whenToUse: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                uses: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                usedBy: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                phase: z.ZodOptional<z.ZodNumber>;
+                brief: z.ZodOptional<z.ZodString>;
+                dependsOn: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                implements: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extends: z.ZodOptional<z.ZodString>;
+                seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                quarter: z.ZodOptional<z.ZodString>;
+                completed: z.ZodOptional<z.ZodString>;
+                effort: z.ZodOptional<z.ZodString>;
+                team: z.ZodOptional<z.ZodString>;
+                workflow: z.ZodOptional<z.ZodString>;
+                risk: z.ZodOptional<z.ZodString>;
+                priority: z.ZodOptional<z.ZodString>;
+                target: z.ZodOptional<z.ZodString>;
+                since: z.ZodOptional<z.ZodString>;
+                archRole: z.ZodOptional<z.ZodString>;
+                archContext: z.ZodOptional<z.ZodString>;
+                archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            }, z.core.$strict>;
+            code: z.ZodString;
+            source: z.ZodObject<{
+                file: z.ZodPipe<z.ZodString, z.ZodTransform<import("../../index.js").SourceFilePath, string>>;
+                lines: z.ZodReadonly<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>>;
+            }, z.core.$strict>;
+            exports: z.ZodDefault<z.ZodReadonly<z.ZodArray<z.ZodDiscriminatedUnion<[z.ZodObject<{
+                type: z.ZodLiteral<"function">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"type">;
+                name: z.ZodString;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"const">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"interface">;
+                name: z.ZodString;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"class">;
+                name: z.ZodString;
+                signature: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>, z.ZodObject<{
+                type: z.ZodLiteral<"enum">;
+                name: z.ZodString;
+            }, z.core.$strict>], "type">>>>;
+            extractedAt: z.ZodISODateTime;
+            patternName: z.ZodOptional<z.ZodString>;
+            status: z.ZodOptional<z.ZodEnum<{
+                roadmap: "roadmap";
+                active: "active";
+                completed: "completed";
+                deferred: "deferred";
+            }>>;
+            isCore: z.ZodOptional<z.ZodBoolean>;
+            useCases: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            whenToUse: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            uses: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            usedBy: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            scenarios: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                featureFile: z.ZodString;
+                featureName: z.ZodString;
+                featureDescription: z.ZodString;
+                scenarioName: z.ZodString;
+                semanticTags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                tags: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                steps: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                    keyword: z.ZodString;
+                    text: z.ZodString;
+                    dataTable: z.ZodOptional<z.ZodObject<{
+                        headers: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+                        rows: z.ZodReadonly<z.ZodArray<z.ZodRecord<z.ZodString, z.ZodString>>>;
+                    }, z.core.$strict>>;
+                    docString: z.ZodOptional<z.ZodObject<{
+                        content: z.ZodString;
+                        mediaType: z.ZodOptional<z.ZodString>;
+                    }, z.core.$strict>>;
+                }, z.core.$strict>>>>;
+                layer: z.ZodOptional<z.ZodEnum<{
+                    unknown: "unknown";
+                    timeline: "timeline";
+                    domain: "domain";
+                    integration: "integration";
+                    e2e: "e2e";
+                    component: "component";
+                }>>;
+                line: z.ZodOptional<z.ZodNumber>;
+            }, z.core.$strict>>>>;
+            phase: z.ZodOptional<z.ZodNumber>;
+            release: z.ZodOptional<z.ZodString>;
+            brief: z.ZodOptional<z.ZodString>;
+            dependsOn: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            enables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            implementsPatterns: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            extendsPattern: z.ZodOptional<z.ZodString>;
+            targetPath: z.ZodOptional<z.ZodString>;
+            since: z.ZodOptional<z.ZodString>;
+            convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            seeAlso: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            apiRef: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            quarter: z.ZodOptional<z.ZodString>;
+            completed: z.ZodOptional<z.ZodString>;
+            effort: z.ZodOptional<z.ZodString>;
+            team: z.ZodOptional<z.ZodString>;
+            productArea: z.ZodOptional<z.ZodString>;
+            userRole: z.ZodOptional<z.ZodString>;
+            businessValue: z.ZodOptional<z.ZodString>;
+            deliverables: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                status: z.ZodEnum<{
+                    deferred: "deferred";
+                    complete: "complete";
+                    "in-progress": "in-progress";
+                    pending: "pending";
+                    superseded: "superseded";
+                    "n/a": "n/a";
+                }>;
+                tests: z.ZodNumber;
+                location: z.ZodString;
+                finding: z.ZodOptional<z.ZodString>;
+                release: z.ZodOptional<z.ZodString>;
+            }, z.core.$strict>>>>;
+            workflow: z.ZodOptional<z.ZodString>;
+            risk: z.ZodOptional<z.ZodString>;
+            priority: z.ZodOptional<z.ZodString>;
+            level: z.ZodOptional<z.ZodEnum<{
+                phase: "phase";
+                epic: "epic";
+                task: "task";
+            }>>;
+            parent: z.ZodOptional<z.ZodString>;
+            children: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredGaps: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredImprovements: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredRisks: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            discoveredLearnings: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            adr: z.ZodOptional<z.ZodString>;
+            adrStatus: z.ZodOptional<z.ZodEnum<{
+                superseded: "superseded";
+                proposed: "proposed";
+                accepted: "accepted";
+                deprecated: "deprecated";
+            }>>;
+            adrCategory: z.ZodOptional<z.ZodString>;
+            adrSupersedes: z.ZodOptional<z.ZodString>;
+            adrSupersededBy: z.ZodOptional<z.ZodString>;
+            title: z.ZodOptional<z.ZodString>;
+            behaviorFile: z.ZodOptional<z.ZodString>;
+            behaviorFileVerified: z.ZodOptional<z.ZodBoolean>;
+            rules: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                description: z.ZodString;
+                scenarioCount: z.ZodNumber;
+                scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
+            }, z.core.$strip>>>>;
+            archRole: z.ZodOptional<z.ZodEnum<{
+                "bounded-context": "bounded-context";
+                "command-handler": "command-handler";
+                projection: "projection";
+                saga: "saga";
+                "process-manager": "process-manager";
+                infrastructure: "infrastructure";
+                repository: "repository";
+                decider: "decider";
+                "read-model": "read-model";
+                service: "service";
+            }>>;
+            archContext: z.ZodOptional<z.ZodString>;
+            archLayer: z.ZodOptional<z.ZodEnum<{
+                domain: "domain";
+                infrastructure: "infrastructure";
+                application: "application";
+            }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
@@ -10200,6 +10963,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archRole: z.ZodOptional<z.ZodString>;
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
+                archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
             code: z.ZodString;
@@ -10357,6 +11121,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 infrastructure: "infrastructure";
                 application: "application";
             }>>;
+            archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{

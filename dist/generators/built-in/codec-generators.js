@@ -27,7 +27,7 @@
 import { generatorRegistry } from '../registry.js';
 import { createCodecGenerator } from '../codec-based.js';
 import { createDecisionDocGenerator } from './decision-doc-generator.js';
-import { registerReferenceGenerators } from './reference-generators.js';
+// registerReferenceGenerators is now called from orchestrator.ts with config-provided configs
 // ═══════════════════════════════════════════════════════════════════════════
 // Codec-Based Generators (RDM Architecture)
 // ═══════════════════════════════════════════════════════════════════════════
@@ -138,10 +138,8 @@ generatorRegistry.register(createDecisionDocGenerator());
 // ═══════════════════════════════════════════════════════════════════════════
 // Reference Document Generators (Convention-Based, Codec-Driven)
 // ═══════════════════════════════════════════════════════════════════════════
-/**
- * Reference Document Generators
- * 11 configs × 2 detail levels = 22 generators.
- * Each produces a detailed + summary reference document pair.
- */
-registerReferenceGenerators(generatorRegistry);
+//
+// Reference generators are registered at orchestration time from project config
+// (referenceDocConfigs field), not at import time. See generateFromConfig() in
+// orchestrator.ts for the registration call.
 //# sourceMappingURL=codec-generators.js.map

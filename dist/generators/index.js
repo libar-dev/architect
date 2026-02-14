@@ -38,6 +38,8 @@ export { CodecBasedGenerator, createCodecGenerator, DOCUMENT_TYPES, } from './co
 export { generateDocumentation, mergePatterns, } from './orchestrator.js';
 // Pipeline - MasterDataset transformation for ProcessStateAPI usage
 export { transformToMasterDataset, } from './pipeline/index.js';
+// Reference document config presets (for downstream repo configs)
+export { LIBAR_REFERENCE_CONFIGS } from './built-in/reference-generators.js';
 /**
  * NOTE: Built-in generators are NOT auto-registered.
  * Import './built-in/index.js' explicitly to register them:

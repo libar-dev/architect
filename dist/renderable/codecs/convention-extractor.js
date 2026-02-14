@@ -103,6 +103,10 @@ function extractConventionRuleContent(rule) {
             verifiedBy: annotations.verifiedBy,
         }),
         tables,
+        ...(annotations.codeExamples !== undefined &&
+            annotations.codeExamples.length > 0 && {
+            codeExamples: annotations.codeExamples,
+        }),
         narrative: annotations.remainingContent ?? '',
     };
 }

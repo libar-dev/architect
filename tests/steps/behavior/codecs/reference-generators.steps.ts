@@ -7,7 +7,10 @@ import { expect } from 'vitest';
 import type { MasterDataset } from '../../../../src/validation-schemas/master-dataset.js';
 import type { GeneratorOutput, GeneratorContext } from '../../../../src/generators/types.js';
 import { GeneratorRegistry } from '../../../../src/generators/registry.js';
-import { registerReferenceGenerators } from '../../../../src/generators/built-in/reference-generators.js';
+import {
+  registerReferenceGenerators,
+  LIBAR_REFERENCE_CONFIGS,
+} from '../../../../src/generators/built-in/reference-generators.js';
 import { createTestPattern, resetPatternCounter } from '../../../fixtures/pattern-factories.js';
 import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
 import { buildRegistry } from '../../../../src/taxonomy/registry-builder.js';
@@ -65,10 +68,10 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Registration produces the correct number of generators', ({ RuleScenario }) => {
     RuleScenario(
-      'All 23 generators are registered from 11 configs plus meta-generator',
+      'All 27 generators are registered from 13 configs plus meta-generator',
       ({ When, Then }) => {
         When('registering reference generators', () => {
-          registerReferenceGenerators(state!.registry);
+          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
         });
 
         Then('{int} generators are registered', (_ctx: unknown, count: number) => {
@@ -85,7 +88,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   Rule('Generator naming follows kebab-case convention', ({ RuleScenario }) => {
     RuleScenario('Detailed generator has name ending in "-reference"', ({ When, Then, And }) => {
       When('registering reference generators', () => {
-        registerReferenceGenerators(state!.registry);
+        registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
       });
 
       Then('a generator named {string} exists', (_ctx: unknown, name: string) => {
@@ -101,7 +104,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Summary generator has name ending in "-reference-claude"',
       ({ When, Then, And }) => {
         When('registering reference generators', () => {
-          registerReferenceGenerators(state!.registry);
+          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
         });
 
         Then('a generator named {string} exists', (_ctx: unknown, name: string) => {
@@ -146,7 +149,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         When('running the {string} generator', async (_ctx: unknown, generatorName: string) => {
-          registerReferenceGenerators(state!.registry);
+          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
           const generator = state!.registry.get(generatorName);
           expect(generator).toBeDefined();
           const context = makeMinimalContext(state!.dataset!);
@@ -175,7 +178,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         });
 
         When('running the {string} generator', async (_ctx: unknown, generatorName: string) => {
-          registerReferenceGenerators(state!.registry);
+          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
           const generator = state!.registry.get(generatorName);
           expect(generator).toBeDefined();
           const context = makeMinimalContext(state!.dataset!);

@@ -81,7 +81,7 @@ export declare const METADATA_TAGS_BY_GROUP: {
     readonly adr: readonly ["adr", "adr-status", "adr-category", "adr-supersedes", "adr-superseded-by", "adr-theme", "adr-layer"];
     readonly hierarchy: readonly ["level", "parent"];
     readonly traceability: readonly ["executable-specs", "roadmap-spec"];
-    readonly architecture: readonly ["arch-role", "arch-context", "arch-layer"];
+    readonly architecture: readonly ["arch-role", "arch-context", "arch-layer", "arch-view"];
     readonly extraction: readonly ["extract-shapes"];
     readonly stub: readonly ["target", "since"];
     readonly convention: readonly ["convention"];

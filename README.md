@@ -29,7 +29,7 @@ Make **code the single source of truth**:
 | **Freshness**      | Manual updates → drift       | Generated → always current          |
 | **Enforcement**    | Guidelines (ignored)         | FSM-validated transitions           |
 | **Traceability**   | Manual links                 | Auto-generated dependency graphs    |
-| **AI Integration** | Parse stale Markdown         | Typed ProcessStateAPI queries       |
+| **AI Integration** | Parse stale Markdown         | CLI queries with typed JSON output  |
 
 ---
 
@@ -37,23 +37,18 @@ Make **code the single source of truth**:
 
 Traditional docs optimize for human reading. This package optimizes for **AI agent consumption**.
 
-```typescript
-import { createProcessStateAPI } from '@libar-dev/delivery-process';
+```bash
+# Instead of: "Read ROADMAP.md and tell me what's active"
+pnpm process:query -- query getCurrentWork
 
-const api = createProcessStateAPI(masterDataset);
+# Instead of: "Can we start working on TransformDataset?"
+pnpm process:query -- query isValidTransition roadmap active
 
-// Instead of: "Read ROADMAP.md and tell me what's active"
-api.getCurrentWork(); // → [{ name: "ProcessStateAPI", status: "active" }, ...]
-
-// Instead of: "Can we start working on TransformDataset?"
-api.isValidTransition('roadmap', 'active'); // → true
-
-// Instead of: "What does DualSourceExtractor depend on?"
-api.getPatternDependencies('DualSourceExtractor');
-// → { uses: ["DocExtractor", "GherkinExtractor"], usedBy: ["Orchestrator"] }
+# Instead of: "What does DualSourceExtractor depend on?"
+pnpm process:query -- dep-tree DualSourceExtractor
 ```
 
-**Claude Code, Cursor, GitHub Copilot Workspace** — any AI that can execute TypeScript gets typed access to your delivery state. No Markdown parsing. No context drift.
+**Claude Code, Cursor, GitHub Copilot Workspace** — any AI that can run shell commands gets typed JSON access to your delivery state. No Markdown parsing. No context drift.
 
 ---
 
@@ -401,51 +396,31 @@ Invalid transitions are **rejected at commit time** — not discovered weeks lat
 
 ---
 
-## ProcessStateAPI
+## Data API CLI
 
-For AI coding sessions, use typed queries instead of parsing generated Markdown:
+For AI coding sessions, use the CLI to query delivery state directly from annotated sources:
 
-```typescript
-import {
-  scanPatterns,
-  extractPatterns,
-  generators,
-  api as apiModule,
-  createDefaultTagRegistry,
-} from '@libar-dev/delivery-process';
+```bash
+# Status overview
+pnpm process:query -- overview
 
-// 1. Scan and extract patterns
-const scanned = await scanPatterns({ include: ['src/**/*.ts'] });
-const extracted = await extractPatterns(scanned);
+# What's currently being worked on?
+pnpm process:query -- query getCurrentWork
 
-// 2. Build the dataset
-const tagRegistry = createDefaultTagRegistry();
-const dataset = generators.transformToMasterDataset({
-  patterns: extracted,
-  tagRegistry,
-});
+# Session context bundle for a pattern
+pnpm process:query -- context MyPattern --session design
 
-// 3. Create the API
-const api = apiModule.createProcessStateAPI(dataset);
+# FSM transition check
+pnpm process:query -- query isValidTransition roadmap active
 
-// Status queries
-api.getCurrentWork(); // Active patterns
-api.getRoadmapItems(); // Available to start
-api.getCompletionPercentage(); // Overall progress
-
-// FSM queries
-api.isValidTransition('roadmap', 'active');
-api.getProtectionInfo('completed'); // { level: 'hard', requiresUnlock: true }
-
-// Relationship queries
-api.getPatternDependencies('Orchestrator');
-api.getRelatedPatterns('PatternScanner');
+# Dependency tree
+pnpm process:query -- dep-tree Orchestrator
 ```
 
-| Approach                 | Context Cost | Accuracy                    | Speed   |
-| ------------------------ | ------------ | --------------------------- | ------- |
-| Parse generated Markdown | High         | Snapshot at generation time | Slow    |
-| **ProcessStateAPI**      | Low          | Real-time from source       | Instant |
+| Approach                 | Context Cost | Accuracy              | Speed   |
+| ------------------------ | ------------ | --------------------- | ------- |
+| Parse generated Markdown | High         | Snapshot at gen time  | Slow    |
+| **Data API CLI**         | Low          | Real-time from source | Instant |
 
 ---
 
@@ -469,7 +444,7 @@ graph TD
     Orchestrator --> GeneratorRegistry
     DualSourceExtractor --> DocExtractor
     DualSourceExtractor --> GherkinExtractor
-    ProcessStateAPI -.-> MasterDataset
+    DataAPICLI -.-> MasterDataset
 ```
 
 ---
@@ -489,7 +464,7 @@ graph TD
 
 - **FSM enforcement** — Not just docs; validated state machine transitions
 - **Dual-source** — TypeScript relationships + Gherkin planning = complete picture
-- **AI-native** — ProcessStateAPI provides typed queries, not string parsing
+- **AI-native** — CLI provides typed JSON queries, not string parsing
 - **Context efficient** — Structured specs use 50-65% context vs 100% for prose prompts
 - **Compaction resilient** — Specs survive context compression; prose doesn't
 
@@ -546,7 +521,7 @@ This hierarchy enables **documentation generation from durable sources** — dec
 | Scenario                       | How This Package Helps                    |
 | ------------------------------ | ----------------------------------------- |
 | **Multi-phase roadmaps**       | FSM-enforced status transitions           |
-| **AI coding sessions**         | ProcessStateAPI for typed context         |
+| **AI coding sessions**         | Data API CLI for typed context            |
 | **Documentation generation**   | Mermaid diagrams, pattern registries      |
 | **Traceability requirements**  | Two-tier specs link planning to code      |
 | **Pre-commit validation**      | `lint-process` blocks invalid transitions |
@@ -557,22 +532,27 @@ This hierarchy enables **documentation generation from durable sources** — dec
 ## Configuration
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+// delivery-process.config.ts
+import { defineConfig } from '@libar-dev/delivery-process/config';
 
 // Libar-generic preset (default) — this package uses it
-const dp = createDeliveryProcess();
-// Tag prefix: @libar-docs-*
-// Categories: core, api, infra
+export default defineConfig({
+  preset: 'libar-generic',
+  sources: { typescript: ['src/**/*.ts'], features: ['specs/*.feature'] },
+  output: { directory: 'docs-generated', overwrite: true },
+});
 
 // DDD-ES-CQRS preset — complex domain architectures
-const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
-// Tag prefix: @libar-docs-*
-// Categories: 21 domain-specific categories
+export default defineConfig({
+  preset: 'ddd-es-cqrs',
+  sources: { typescript: ['packages/*/src/**/*.ts'] },
+});
 
-// Generic preset — shorter tag names
-const dp = createDeliveryProcess({ preset: 'generic' });
-// Tag prefix: @docs-*
-// Categories: core, api, infra
+// Generic preset — shorter tag names (@docs-* prefix)
+export default defineConfig({
+  preset: 'generic',
+  sources: { typescript: ['src/**/*.ts'] },
+});
 ```
 
 | Preset                    | Tag Prefix      | Categories | Use Case                           |

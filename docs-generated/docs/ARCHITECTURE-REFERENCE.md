@@ -208,6 +208,17 @@
 | Implement decode | Transform MasterDataset to RenderableDocument | codecs/*-codec.ts |
 | Export defaults | Pre-configured default codec instance | codecs/index.ts |
 
+```typescript
+// Default codec with standard options
+    import { PatternsDocumentCodec } from './codecs';
+    const doc = PatternsDocumentCodec.decode(dataset);
+
+    // Factory for custom options
+    import { createPatternsCodec } from './codecs';
+    const codec = createPatternsCodec({ generateDetailFiles: false });
+    const doc = codec.decode(dataset);
+```
+
 ---
 
 ## Available Codecs
@@ -241,6 +252,9 @@
 | PrChangesCodec | working/PR-CHANGES.md | (none) |
 | TraceabilityCodec | TRACEABILITY.md | (none) |
 | OverviewCodec | OVERVIEW.md | (none) |
+| PlanningChecklistCodec | PLANNING-CHECKLIST.md | (none) |
+| SessionPlanCodec | SESSION-PLAN.md | (none) |
+| SessionFindingsCodec | SESSION-FINDINGS.md | (none) |
 
 ---
 
@@ -334,6 +348,10 @@
 | Partial success | Can return partial results with warnings |
 | Type-safe | Compiler enforces error handling at boundaries |
 | Composable | Results can be chained and transformed |
+
+```typescript
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+```
 
 ---
 
@@ -573,6 +591,17 @@
 | Implement decode | Transform MasterDataset to RenderableDocument | codecs/*-codec.ts |
 | Export defaults | Pre-configured default codec instance | codecs/index.ts |
 
+```typescript
+// Default codec with standard options
+    import { PatternsDocumentCodec } from './codecs';
+    const doc = PatternsDocumentCodec.decode(dataset);
+
+    // Factory for custom options
+    import { createPatternsCodec } from './codecs';
+    const codec = createPatternsCodec({ generateDetailFiles: false });
+    const doc = codec.decode(dataset);
+```
+
 ---
 
 ## Available Codecs
@@ -606,6 +635,9 @@
 | PrChangesCodec | working/PR-CHANGES.md | (none) |
 | TraceabilityCodec | TRACEABILITY.md | (none) |
 | OverviewCodec | OVERVIEW.md | (none) |
+| PlanningChecklistCodec | PLANNING-CHECKLIST.md | (none) |
+| SessionPlanCodec | SESSION-PLAN.md | (none) |
+| SessionFindingsCodec | SESSION-FINDINGS.md | (none) |
 
 ---
 
@@ -700,6 +732,10 @@
 | Type-safe | Compiler enforces error handling at boundaries |
 | Composable | Results can be chained and transformed |
 
+```typescript
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+```
+
 ---
 
 ## Orchestrator Pipeline
@@ -748,6 +784,53 @@
 ---
 
 ## ProcessStateAPI returns remain unchanged
+
+---
+
+## Component Overview
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+graph TB
+    subgraph generator["Generator"]
+        SourceMapper["SourceMapper[infrastructure]"]
+        Documentation_Generation_Orchestrator["Documentation Generation Orchestrator[service]"]
+        ContentDeduplicator["ContentDeduplicator[infrastructure]"]
+        CodecBasedGenerator["CodecBasedGenerator[service]"]
+        FileCache["FileCache[infrastructure]"]
+        TransformDataset["TransformDataset[service]"]
+        DecisionDocGenerator["DecisionDocGenerator[service]"]
+    end
+    subgraph renderer["Renderer"]
+        RenderableDocument["RenderableDocument[read-model]"]
+        UniversalRenderer["UniversalRenderer[service]"]
+        DocumentGenerator["DocumentGenerator[service]"]
+        SessionCodec["SessionCodec[projection]"]
+        PatternsCodec["PatternsCodec[projection]"]
+        Shared_Mermaid_Diagram_Utilities["Shared Mermaid Diagram Utilities"]
+        DecisionDocCodec["DecisionDocCodec[projection]"]
+        ArchitectureCodec["ArchitectureCodec[projection]"]
+    end
+    subgraph related["Related"]
+        MasterDataset["MasterDataset"]:::neighbor
+        Pattern_Scanner["Pattern Scanner"]:::neighbor
+        GherkinASTParser["GherkinASTParser"]:::neighbor
+        ShapeExtractor["ShapeExtractor"]:::neighbor
+        PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
+    end
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    PatternsCodec ..-> PatternRelationshipModel
+    ArchitectureCodec --> MasterDataset
+    TransformDataset --> MasterDataset
+    TransformDataset ..-> PatternRelationshipModel
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
+    classDef neighbor stroke-dasharray: 5 5
+```
 
 ---
 

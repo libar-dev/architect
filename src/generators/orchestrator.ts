@@ -38,6 +38,13 @@ import {
   createJsonOutputCodec,
   RegistryMetadataOutputSchema,
 } from '../validation-schemas/index.js';
+import type {
+  ResolvedConfig,
+  ResolvedSourcesConfig,
+  OutputConfig,
+  GeneratorSourceOverride,
+} from '../config/project-config.js';
+import { mergeSourcesForGenerator } from '../config/merge-sources.js';
 import { getPatternName } from '../api/pattern-helpers.js';
 import { loadConfig, formatConfigError } from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
@@ -60,6 +67,7 @@ import {
 import { transformToMasterDataset } from './pipeline/index.js';
 import { detectBranchChanges, getAllChangedFiles } from '../lint/process-guard/detect-changes.js';
 import type { CodecOptions } from '../renderable/generate.js';
+import { registerReferenceGenerators } from './built-in/reference-generators.js';
 
 /**
  * Codec for serializing registry metadata to JSON
@@ -789,4 +797,183 @@ export async function cleanupOrphanedSessionFiles(
   }
 
   return { deleted, errors };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Config-Based Generation
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Options for config-based generation
+ */
+export interface GenerateFromConfigOptions {
+  /** Override generator names (ignores config defaults) */
+  readonly generators?: readonly string[];
+  /** Git diff base branch for PR-scoped generators */
+  readonly gitDiffBase?: string;
+  /** Explicit changed file list for PR-scoped generators */
+  readonly changedFiles?: string[];
+  /** Release version filter for PR Changes generator */
+  readonly releaseFilter?: string;
+}
+
+/**
+ * A group of generators sharing the same effective sources and output directory.
+ * Generators in the same group are batched into a single `generateDocumentation()` call.
+ */
+interface GeneratorGroup {
+  readonly generators: string[];
+  readonly sources: ResolvedSourcesConfig;
+  readonly outputDirectory: string;
+}
+
+/**
+ * Groups generators by their effective source config and output directory.
+ *
+ * Generators that share the same resolved sources (after applying per-generator
+ * overrides) AND the same output directory are batched together to minimize
+ * redundant pipeline scans.
+ *
+ * @param generatorNames - Names of generators to group
+ * @param baseSources - Base resolved sources from project config
+ * @param baseOutput - Base resolved output config
+ * @param overrides - Per-generator source and output overrides
+ * @returns Array of generator groups, each runnable as a single pipeline call
+ */
+function groupGenerators(
+  generatorNames: readonly string[],
+  baseSources: ResolvedSourcesConfig,
+  baseOutput: Readonly<Required<OutputConfig>>,
+  overrides: Readonly<Record<string, GeneratorSourceOverride>>
+): GeneratorGroup[] {
+  const groupMap = new Map<string, GeneratorGroup>();
+
+  for (const name of generatorNames) {
+    const effective = mergeSourcesForGenerator(baseSources, name, overrides);
+    const outputDir = overrides[name]?.outputDirectory ?? baseOutput.directory;
+    const key = JSON.stringify({ sources: effective, outputDir });
+
+    const existing = groupMap.get(key);
+    if (existing !== undefined) {
+      existing.generators.push(name);
+    } else {
+      groupMap.set(key, { generators: [name], sources: effective, outputDirectory: outputDir });
+    }
+  }
+
+  return [...groupMap.values()];
+}
+
+/**
+ * Merges results from multiple pipeline runs into a single GenerateResult.
+ *
+ * Patterns and files are concatenated from all runs. The registry from
+ * the first run is used (all runs share the same config, so registries
+ * are identical). Errors and warnings are aggregated.
+ *
+ * @param results - Array of GenerateResult from individual pipeline runs
+ * @returns A single merged GenerateResult
+ */
+function mergeGenerateResults(results: GenerateResult[]): GenerateResult {
+  // Caller guarantees results.length >= 2, so first element always exists
+  const firstResult = results[0];
+  if (firstResult === undefined) {
+    // Unreachable: only called with 2+ results, but satisfies strictNullChecks
+    throw new Error('mergeGenerateResults called with empty results array');
+  }
+  return {
+    patterns: results.flatMap((r) => r.patterns),
+    files: results.flatMap((r) => r.files),
+    registry: firstResult.registry,
+    errors: results.flatMap((r) => r.errors),
+    warnings: results.flatMap((r) => r.warnings),
+  };
+}
+
+/**
+ * Generate documentation from a fully resolved config.
+ *
+ * Groups generators by their effective source config, then calls
+ * `generateDocumentation()` once per group. This reuses all existing
+ * pipeline logic while minimizing redundant file scans.
+ *
+ * @param config - Fully resolved configuration (from `loadProjectConfig()`)
+ * @param options - Optional overrides for generators, git diff, and release filter
+ * @returns Result with merged patterns, files, errors, and warnings from all groups
+ *
+ * @example
+ * ```typescript
+ * import { generateFromConfig } from '@libar-dev/delivery-process/generators';
+ * import { loadProjectConfig } from '@libar-dev/delivery-process/config';
+ *
+ * const config = await loadProjectConfig(process.cwd());
+ * const result = await generateFromConfig(config, {
+ *   generators: ['patterns', 'roadmap'],
+ * });
+ * ```
+ */
+export async function generateFromConfig(
+  config: ResolvedConfig,
+  options?: GenerateFromConfigOptions
+): Promise<Result<GenerateResult, string>> {
+  const generatorNames = options?.generators ?? config.project.generators;
+
+  if (generatorNames.length === 0) {
+    return R.err('No generators specified');
+  }
+
+  // Register reference generators from config (explicit opt-in).
+  // Done here (not at import time) because configs are user-provided.
+  if (config.project.referenceDocConfigs.length > 0 && !generatorRegistry.has('reference-docs')) {
+    registerReferenceGenerators(generatorRegistry, config.project.referenceDocConfigs);
+  }
+
+  // Group generators by effective source config to minimize scans.
+  // Generators sharing the same sources and output directory are batched
+  // into one generateDocumentation() call.
+  const groups = groupGenerators(
+    generatorNames,
+    config.project.sources,
+    config.project.output,
+    config.project.generatorOverrides
+  );
+
+  // Run each group through the existing pipeline
+  const allResults: GenerateResult[] = [];
+
+  for (const group of groups) {
+    const generateOptions: GenerateOptions = {
+      input: [...group.sources.typescript],
+      baseDir: process.cwd(),
+      outputDir: group.outputDirectory,
+      generators: [...group.generators],
+      overwrite: config.project.output.overwrite,
+      ...(group.sources.features.length > 0 && { features: [...group.sources.features] }),
+      ...(group.sources.exclude.length > 0 && { exclude: [...group.sources.exclude] }),
+      ...(config.project.workflowPath !== null && { workflowPath: config.project.workflowPath }),
+      contextInferenceRules: [...config.project.contextInferenceRules],
+      ...(options?.gitDiffBase !== undefined && { gitDiffBase: options.gitDiffBase }),
+      ...(options?.changedFiles !== undefined && { changedFiles: [...options.changedFiles] }),
+      ...(options?.releaseFilter !== undefined && { releaseFilter: options.releaseFilter }),
+    };
+
+    const result = await generateDocumentation(generateOptions);
+    if (!result.ok) {
+      return result;
+    }
+    allResults.push(result.value);
+  }
+
+  // Merge results from all groups
+  // allResults is guaranteed non-empty because generatorNames.length > 0
+  // and each group produces exactly one result (or we return early on error)
+  if (allResults.length === 1) {
+    const singleResult = allResults[0];
+    if (singleResult === undefined) {
+      return R.err('Unexpected empty results after successful generation');
+    }
+    return R.ok(singleResult);
+  }
+
+  return R.ok(mergeGenerateResults(allResults));
 }

@@ -28,7 +28,8 @@
  */
 import * as path from 'path';
 import { generatorRegistry } from '../generators/registry.js';
-import { generateDocumentation } from '../generators/orchestrator.js';
+import { generateDocumentation, generateFromConfig } from '../generators/orchestrator.js';
+import { loadProjectConfig } from '../config/config-loader.js';
 import { printVersionAndExit } from './version.js';
 // Import built-in generators (registers patterns, adrs, overview)
 import '../generators/built-in/index.js';
@@ -49,6 +50,7 @@ function parseArgs(argv = process.argv.slice(2)) {
         gitDiffBase: null,
         changedFiles: [],
         releaseFilter: null,
+        generatorsExplicit: false,
     };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
@@ -96,6 +98,7 @@ function parseArgs(argv = process.argv.slice(2)) {
                     config.generators = [];
                 }
                 config.generators.push(nextArg);
+                config.generatorsExplicit = true;
                 i++;
                 break;
             case '-f':
@@ -180,6 +183,9 @@ PR Changes Options (for -g pr-changes):
   --changed-files <file>       Explicit file list (repeatable, overrides git)
   --release-filter <version>   Filter by release version (e.g., v0.2.0)
 
+  When delivery-process.config.ts provides sources, --input is optional.
+  CLI flags override config when both are provided.
+
 Examples:
   generate-docs -i "src/**/*.ts" -o docs
   generate-docs -i "src/**/*.ts" -g patterns -g adrs -f
@@ -219,35 +225,63 @@ async function main() {
         }
         return;
     }
-    const input = opts.input;
-    const exclude = opts.exclude.length > 0 ? opts.exclude : undefined;
     const baseDir = path.resolve(opts.baseDir);
-    const features = opts.features.length > 0 ? opts.features : undefined;
-    if (input.length === 0) {
-        console.error('Error: --input is required');
-        console.error('');
-        console.error('Example:');
-        console.error('  generate-docs -i "src/**/*.ts" -o docs');
+    // Load project config
+    const configResult = await loadProjectConfig(baseDir);
+    if (!configResult.ok) {
+        console.error(`Error loading config: ${configResult.error.message}`);
         process.exit(1);
     }
-    // Determine generators to run
-    const effectiveGenerators = opts.generators.flatMap((g) => g.split(','));
-    // Use orchestrator for generation
-    console.log('Scanning source files...');
-    const result = await generateDocumentation({
-        input,
-        ...(exclude ? { exclude } : {}),
-        baseDir,
-        outputDir: opts.output,
-        generators: effectiveGenerators,
-        overwrite: opts.overwrite,
-        ...(features ? { features } : {}),
-        ...(opts.workflowPath ? { workflowPath: opts.workflowPath } : {}),
-        // PR Changes options
-        ...(opts.gitDiffBase ? { gitDiffBase: opts.gitDiffBase } : {}),
-        ...(opts.changedFiles.length > 0 ? { changedFiles: opts.changedFiles } : {}),
-        ...(opts.releaseFilter ? { releaseFilter: opts.releaseFilter } : {}),
-    });
+    const resolvedConfig = configResult.value;
+    if (resolvedConfig.isDefault) {
+        console.log('  (No delivery-process.config.ts found; using defaults)');
+    }
+    // Determine generators to run (CLI -g overrides config)
+    const effectiveGenerators = (opts.generatorsExplicit ? opts.generators : [...resolvedConfig.project.generators]).flatMap((g) => g.split(','));
+    const input = opts.input;
+    const exclude = opts.exclude.length > 0 ? opts.exclude : undefined;
+    const features = opts.features.length > 0 ? opts.features : undefined;
+    let result;
+    if (input.length > 0) {
+        // CLI flags provided — use legacy path (explicit overrides)
+        console.log('Scanning source files...');
+        result = await generateDocumentation({
+            input,
+            ...(exclude ? { exclude } : {}),
+            baseDir,
+            outputDir: opts.output,
+            generators: effectiveGenerators,
+            overwrite: opts.overwrite,
+            ...(features ? { features } : {}),
+            ...(opts.workflowPath ? { workflowPath: opts.workflowPath } : {}),
+            ...(opts.gitDiffBase ? { gitDiffBase: opts.gitDiffBase } : {}),
+            ...(opts.changedFiles.length > 0 ? { changedFiles: opts.changedFiles } : {}),
+            ...(opts.releaseFilter ? { releaseFilter: opts.releaseFilter } : {}),
+        });
+    }
+    else if (resolvedConfig.project.sources.typescript.length > 0) {
+        // No CLI input — use config-based sources
+        console.log('Using sources from delivery-process.config.ts...');
+        console.log('Scanning source files...');
+        result = await generateFromConfig(resolvedConfig, {
+            generators: effectiveGenerators,
+            ...(opts.gitDiffBase ? { gitDiffBase: opts.gitDiffBase } : {}),
+            ...(opts.changedFiles.length > 0 ? { changedFiles: opts.changedFiles } : {}),
+            ...(opts.releaseFilter ? { releaseFilter: opts.releaseFilter } : {}),
+        });
+    }
+    else {
+        console.error('Error: No source files specified.');
+        console.error('');
+        console.error('Either provide --input flags or configure sources in delivery-process.config.ts:');
+        console.error('');
+        console.error('  // delivery-process.config.ts');
+        console.error('  import { defineConfig } from "@libar-dev/delivery-process/config";');
+        console.error('  export default defineConfig({');
+        console.error('    sources: { typescript: ["src/**/*.ts"] }');
+        console.error('  });');
+        process.exit(1);
+    }
     if (!result.ok) {
         console.error(`Error: ${result.error}`);
         process.exit(1);

@@ -6,7 +6,7 @@
 
 ## Overview
 
-The `process-api` CLI exposes the 27-method ProcessStateAPI as shell-accessible subcommands with JSON output. It runs the full scan-extract-transform pipeline on annotated TypeScript and Gherkin sources, then routes queries to the API.
+The `process-api` CLI provides 27 query subcommands with JSON output. It runs the full scan-extract-transform pipeline on annotated TypeScript and Gherkin sources, then routes queries to the internal query layer.
 
 **Primary use case:** Claude Code sessions querying delivery state without regenerating markdown documentation.
 
@@ -54,7 +54,7 @@ pnpm process:query -- status
 
 ### `query <method> [args...]`
 
-Executes any ProcessStateAPI method by name.
+Executes any query API method by name.
 
 ```bash
 pnpm process:query -- query getStatusCounts

@@ -8,6 +8,7 @@
  * @see CodecDrivenReferenceGeneration spec
  */
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
+import type { SectionBlock } from '../schema.js';
 /**
  * Structured content extracted from a decision record Rule block.
  */
@@ -22,6 +23,8 @@ export interface ConventionRuleContent {
     readonly verifiedBy?: readonly string[];
     /** Tables found in the Rule block description */
     readonly tables: readonly ConventionTable[];
+    /** Code examples extracted from DocStrings in the rule description (includes mermaid diagrams) */
+    readonly codeExamples?: readonly SectionBlock[];
     /** Free-text content (non-table, non-structured) */
     readonly narrative: string;
 }

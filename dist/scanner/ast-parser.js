@@ -472,6 +472,8 @@ function parseDirective(commentText, loc, filePath, registry) {
     const archRole = metadataResults.get('arch-role');
     const archContext = metadataResults.get('arch-context');
     const archLayer = metadataResults.get('arch-layer');
+    const archViewRaw = metadataResults.get('arch-view');
+    const archView = Array.isArray(archViewRaw) ? archViewRaw : undefined;
     // Design session stub metadata tags
     const target = metadataResults.get('target');
     const since = metadataResults.get('since');
@@ -554,6 +556,7 @@ function parseDirective(commentText, loc, filePath, registry) {
         ...(archRole && { archRole }),
         ...(archContext && { archContext }),
         ...(archLayer && { archLayer }),
+        ...(archView && archView.length > 0 && { archView }),
         // Shape extraction fields
         ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
     };

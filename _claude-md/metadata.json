@@ -134,17 +134,6 @@
       ]
     },
     {
-      "title": "ProcessStateAPI",
-      "tags": ["api-reference"],
-      "subsections": [
-        {
-          "path": "api/process-state-api.md",
-          "tags": ["api-reference"],
-          "description": "Programmatic API usage and generated documentation"
-        }
-      ]
-    },
-    {
       "title": "Authoring",
       "tags": ["core"],
       "subsections": [

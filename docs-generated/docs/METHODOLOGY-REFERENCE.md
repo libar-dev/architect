@@ -89,6 +89,15 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
 | Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
 
+```text
+Starting from pattern brief?
+    |-- Yes --> Need code stubs now? --> Yes --> Planning + Design
+    |                                --> No  --> Planning
+    |-- No  --> Ready to code? --> Yes --> Complex decisions? --> Yes --> Design first
+                                                               --> No  --> Implementation
+                               --> No  --> Planning
+```
+
 ---
 
 ## Planning Session
@@ -159,6 +168,26 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Create implementation plans | Design focuses on architecture |
 | Transition spec to active | Requires implementation session |
 | Write full implementations | Stubs only |
+
+```typescript
+/**
+     * at-prefix
+     * at-prefix-status roadmap
+     * at-prefix-implements MyPattern
+     *
+     * MyPattern - Description
+     *
+     * Target: src/path/to/final/location.ts
+     * See: PDR-001 (Design Decision)
+     */
+    export interface MyResult {
+      id: string;
+    }
+
+    export function myFunction(args: MyArgs): Promise<MyResult> {
+      throw new Error('MyPattern not yet implemented - roadmap pattern');
+    }
+```
 
 ---
 
@@ -346,6 +375,25 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Files Modified | Track changes for review |
 | Next Session | Clear starting point |
 
+```markdown
+Session State
+
+    - Last completed: Phase 1 - Core types
+    - In progress: Phase 2 - Validation
+    - Blockers: None
+
+    Files Modified
+
+    - src/types.ts - Added core types
+    - src/validate.ts - Started validation (incomplete)
+
+    Next Session
+
+    1. FIRST: Complete validation in src/validate.ts
+    2. Add integration tests
+    3. Update deliverable statuses
+```
+
 ---
 
 ## Discovery Tags
@@ -365,6 +413,12 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | at-prefix-discovered-gap | Missing edge case or feature | Missing-validation-for-empty-input |
 | at-prefix-discovered-improvement | Performance or DX enhancement | Cache-parsed-results |
 | at-prefix-discovered-learning | Knowledge gained | Gherkin-requires-strict-indentation |
+
+```gherkin
+at-prefix-discovered-gap: Missing-edge-case-for-empty-input
+    at-prefix-discovered-improvement: Cache-parsed-results
+    at-prefix-discovered-learning: Gherkin-requires-strict-indentation
+```
 
 ---
 
@@ -660,6 +714,28 @@ Architecture diagram generation uses three tags to create Mermaid component diag
     Run pnpm docs:patterns and these annotations become a searchable pattern registry
     with dependency graphs.
 
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-pattern ProcessGuardDecider
+     * at-libar-docs-status completed
+     * at-libar-docs-uses FSMTransitions, FSMStates
+     * at-libar-docs-used-by LintModule
+     */
+    export function validateChanges(input: ValidationInput): ValidationOutput { ... }
+```
+
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-pattern PatternScanner
+     * at-libar-docs-status completed
+     * at-libar-docs-uses GherkinASTParser, TypeScriptASTParser
+     * at-libar-docs-used-by Orchestrator, DualSourceExtractor
+     */
+    export async function scanPatterns(config: ScanConfig): Promise<ScannedFile[]> { ... }
+```
+
 ---
 
 ## Four-Stage Workflow
@@ -738,6 +814,26 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     Note: Code stubs must NOT use at-prefix-pattern. The feature file is the canonical pattern definition.
 
+```gherkin
+at-libar-docs
+    at-libar-docs-pattern:EventStoreDurability
+    at-libar-docs-status:roadmap
+    at-libar-docs-phase:18
+    at-libar-docs-depends-on:EventStoreFoundation
+    at-libar-docs-enables:SagaEngine
+    Feature: Event Store Durability
+```
+
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-status roadmap
+     * at-libar-docs-event-sourcing
+     * at-libar-docs-uses EventStoreFoundation, Workpool
+     * at-libar-docs-used-by SagaEngine, CommandOrchestrator
+     */
+```
+
 ---
 
 ## Two-Tier Spec Architecture
@@ -774,6 +870,18 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | Interface | Types + stub functions | API contracts |
 | Partial | Working code + some stubs | Progressive implementation |
 
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-status roadmap
+     *
+     * Reservation Pattern - TTL-Based Pre-Creation Uniqueness
+     */
+    export function reserve(ctx: MutationCtx, args: ReserveArgs): Promise<ReservationResult> {
+      throw new Error('Not yet implemented - roadmap pattern');
+    }
+```
+
 ---
 
 ## Planning Stubs Architecture
@@ -794,6 +902,13 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | Planning | planning-stubs/ | throw new Error("Not implemented") |
 | Implementation | Move to steps/ | Replace with real logic |
 | Completed | steps/ | Fully executable |
+
+```text
+tests/
+      steps/              Planning executable (included in test runner)
+      planning-stubs/     Not yet implemented (excluded)
+      features/           Feature files
+```
 
 ---
 
@@ -1026,6 +1141,20 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | active | roadmap | Blocked or regressed |
 | deferred | roadmap | Ready to resume |
 
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress (blocked)
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Terminal state
+        note right of active : Scope-locked
+```
+
 ---
 
 ## ProcessStateAPI
@@ -1045,6 +1174,24 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | isValidTransition(from, to) | Boolean for FSM validation |
 | getPattern(id) | Single pattern by ID |
 | getPatternsByCategory(cat) | Patterns in a category |
+
+```typescript
+import { createProcessStateAPI } from '@libar-dev/delivery-process';
+
+    const api = createProcessStateAPI(dataset);
+
+    // Query current work
+    api.getCurrentWork();          // What is active now
+
+    // Query planning
+    api.getRoadmapItems();         // What can be started
+
+    // Validate transitions
+    api.isValidTransition('roadmap', 'active');
+
+    // Pattern lookup
+    api.getPattern('TransformDataset');
+```
 
 ---
 
@@ -1122,7 +1269,7 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
 **Context:** Category tags classify patterns by domain area.
 
-    The full category list (21 categories in ddd-es-cqrs preset) is extracted from
+    The full category list (ddd-es-cqrs preset) is extracted from
     `src/taxonomy/categories.ts`. Each category has: tag, domain, priority, description.
 
     **Simple Presets (generic, libar-generic):** Only core, api, infra categories.
@@ -1134,7 +1281,7 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 ## Metadata Tags
 
 **Context:** Metadata tags are extracted from `src/taxonomy/registry-builder.ts`.
-    The `METADATA_TAGS_BY_GROUP` constant organizes all 42 tags into functional groups:
+    The `METADATA_TAGS_BY_GROUP` constant organizes all tags into functional groups:
     core, relationship, process, prd, adr, hierarchy, traceability, architecture, extraction.
 
     Each tag definition includes: tag name, format, purpose, and example.
@@ -1379,6 +1526,17 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | File Opt-In | libar-docs |
 | Categories | 3 (core, api, infra) |
 
+```typescript
+/**
+     * libar-docs
+     * libar-docs-pattern PatternScanner
+     * libar-docs-status completed
+     * libar-docs-core
+     * libar-docs-uses FileDiscovery, ASTParser
+     */
+    export function scanPatterns(config: ScanConfig): Promise<ScanResult> {}
+```
+
 ---
 
 ## Generic Preset
@@ -1399,6 +1557,16 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | Tag Prefix | docs- |
 | File Opt-In | docs |
 | Categories | 3 (core, api, infra) |
+
+```typescript
+/**
+     * docs
+     * docs-pattern PatternScanner
+     * docs-status completed
+     * docs-core
+     */
+    export function scanPatterns(config: ScanConfig): Promise<ScanResult> {}
+```
 
 ---
 
@@ -1455,6 +1623,17 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     CLI tools use the nearest config file to the working directory.
 
+```typescript
+// delivery-process.config.ts
+    import { createDeliveryProcess } from 'delivery-process-pkg';
+
+    // Default preset
+    export default createDeliveryProcess();
+
+    // Or explicit preset
+    export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+```
+
 ---
 
 ## Custom Configuration
@@ -1476,6 +1655,26 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | fileOptInTag | string | Custom file opt-in marker |
 | categories | array | Custom category definitions (replaces preset categories) |
 
+```typescript
+const dp = createDeliveryProcess({
+      preset: 'libar-generic',
+      tagPrefix: 'team-',
+      fileOptInTag: 'team',
+    });
+```
+
+```typescript
+const dp = createDeliveryProcess({
+      tagPrefix: 'docs-',
+      fileOptInTag: 'docs',
+      categories: [
+        { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
+        { tag: 'extractor', domain: 'Extractor', priority: 2, description: 'Pattern extraction', aliases: [] },
+        { tag: 'generator', domain: 'Generator', priority: 3, description: 'Doc generation', aliases: [] },
+      ],
+    });
+```
+
 ---
 
 ## RegexBuilders API
@@ -1494,6 +1693,19 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | normalizeTag(tag) | string | Normalize tag for lookup (strip prefix) |
 | directivePattern | RegExp | Pattern to match documentation directives |
 
+```typescript
+const dp = createDeliveryProcess();
+
+    // Check if file should be scanned
+    dp.regexBuilders.hasFileOptIn(fileContent);
+
+    // Check for any documentation directives
+    dp.regexBuilders.hasDocDirectives(fileContent);
+
+    // Normalize tag for lookup
+    dp.regexBuilders.normalizeTag('libar-docs-pattern');
+```
+
 ---
 
 ## Programmatic Config Loading
@@ -1509,6 +1721,19 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | instance | DeliveryProcessInstance | The loaded configuration instance |
 | isDefault | boolean | True if no config file was found |
 | path | string or undefined | Path to config file (if found) |
+
+```typescript
+import { loadConfig, formatConfigError } from 'delivery-process-pkg/config';
+
+    const result = await loadConfig(process.cwd());
+
+    if (!result.ok) {
+      console.error(formatConfigError(result.error));
+      process.exit(1);
+    }
+
+    const { instance, isDefault, path } = result.value;
+```
 
 ---
 
@@ -1614,6 +1839,13 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | DDD/Event Sourcing systems | ddd-es-cqrs | All 21 categories |
 | Generic projects | generic | core, api, infra |
 
+```typescript
+// For libar-generic preset
+    // @libar-docs-core      - marks as core utility
+    // @libar-docs-api       - marks as public API
+    // @libar-docs-infra     - marks as infrastructure
+```
+
 ---
 
 ## Format Types
@@ -1668,6 +1900,20 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | active | roadmap | Regress (blocked) |
 | deferred | roadmap | Resume planning |
 
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Hard-locked
+        note right of active : Scope-locked
+```
+
 ---
 
 ## Normalized Status
@@ -1693,9 +1939,9 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
 | Preset | Categories | Tag Prefix | Use Case |
 | --- | --- | --- | --- |
-| libar-generic (default) | 3 | @libar-docs- | Simple projects (this package) |
-| ddd-es-cqrs | 21 | @libar-docs- | DDD/Event Sourcing architectures |
-| generic | 3 | @docs- | Simple projects with @docs- prefix |
+| libar-generic (default) | 3 | libar-docs- | Simple projects (this package) |
+| ddd-es-cqrs | 21 | libar-docs- | DDD/Event Sourcing architectures |
+| generic | 3 | docs- | Simple projects with docs- prefix |
 
 ---
 
@@ -1725,6 +1971,28 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     **Usage Example:**
 
+```text
+src/taxonomy/
+      registry-builder.ts   -- buildRegistry() - creates TagRegistry
+      categories.ts         -- Category definitions
+      status-values.ts      -- FSM state values (PDR-005)
+      normalized-status.ts  -- Display normalization (3 buckets)
+      format-types.ts       -- Tag value parsing rules
+      hierarchy-levels.ts   -- epic/phase/task
+      risk-levels.ts        -- low/medium/high
+      layer-types.ts        -- timeline/domain/integration/e2e
+```
+
+```typescript
+import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
+
+    const registry = buildRegistry();
+    // registry.tagPrefix       -> "@libar-docs-"
+    // registry.fileOptInTag    -> "@libar-docs"
+    // registry.categories      -> CategoryDefinition[]
+    // registry.metadataTags    -> MetadataTagDefinitionForRegistry[]
+```
+
 ---
 
 ## Tag Generation
@@ -1737,6 +2005,10 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     **Output:** A markdown file documenting all tags with their formats,
     valid values, and examples - generated from the TagRegistry.
+
+```bash
+npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+```
 
 ---
 

@@ -5,7 +5,7 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 149 rules from 33 features across 1 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 156 rules from 35 features across 1 product areas.**
 
 ---
 
@@ -804,6 +804,44 @@
 
 ## Delivery Process / Phase 27
 
+### CodecDrivenReferenceGeneration
+
+*Each reference document (Process Guard, Taxonomy, Validation, etc.) required a*
+
+#### Config-driven codec replaces per-document recipe features
+
+- **Invariant:** A single `ReferenceDocConfig` object is sufficient to produce a complete reference document. No per-document codec subclass or recipe feature is required.
+
+- **Rationale:** The codec composition logic is identical across all reference documents. Only the content sources differ. Extracting this into a config-driven factory eliminates N duplicated recipe features and makes adding new documents a one-line config addition.
+
+
+
+#### Four content sources compose in AD-5 order
+
+- **Invariant:** Reference documents always compose content in this order: conventions, then scoped diagrams, then shapes, then behaviors. Empty sources are omitted without placeholder sections.
+
+- **Rationale:** AD-5 established that conceptual context (conventions and architectural diagrams) should precede implementation details (shapes and behaviors). This reading order helps developers understand the "why" before the "what".
+
+
+
+#### Detail level controls output density
+
+- **Invariant:** Three detail levels produce progressively more content from the same config. Summary: type tables only, no diagrams, no narrative. Standard: narrative and code examples, no rationale. Detailed: full rationale, property documentation, and scoped diagrams.
+
+- **Rationale:** AI context windows need compact summaries. Human readers need full documentation. The same config serves both audiences by parameterizing the detail level at generation time.
+
+
+
+#### Generator registration produces paired detailed and summary outputs
+
+- **Invariant:** Each ReferenceDocConfig produces exactly two generators (detailed for `docs/`, summary for `_claude-md/`) plus a meta-generator that invokes all pairs. Total: N configs x 2 + 1 = 2N + 1 generators.
+
+- **Rationale:** Every reference document needs both a human-readable detailed version and an AI-optimized compact version. The meta-generator enables `pnpm docs:all` to produce every reference document in one pass.
+
+
+
+*[codec-driven-reference-generation.feature](delivery-process/specs/codec-driven-reference-generation.feature)*
+
 ### DocGenerationProofOfConcept
 
 *This decision establishes the pattern for generating technical documentation*
@@ -1054,6 +1092,36 @@ This POC demonstrates the doc-from-decision pattern by generating docs
 ---
 
 ## Delivery Process / Phase 28
+
+### ScopedArchitecturalView
+
+*Full architecture diagrams show every annotated pattern in the project.*
+
+#### Scope filtering selects patterns by context, view, or name
+
+- **Invariant:** A pattern matches a DiagramScope if ANY of three conditions hold: its name is in `scope.patterns`, its `archContext` is in `scope.archContext`, or any of its `archView` entries is in `scope.archView`. These dimensions are OR'd together -- a pattern need only match one.
+
+- **Rationale:** Three filter dimensions cover different authoring workflows. Explicit names for ad-hoc documents, archContext for bounded context views, archView for cross-cutting architectural perspectives.
+
+
+
+#### Neighbor discovery finds connected patterns outside scope
+
+- **Invariant:** Patterns connected to scope patterns via relationship edges (uses, dependsOn, implementsPatterns, extendsPattern) but NOT themselves in scope appear in a "Related" subgraph with dashed border styling.
+
+- **Rationale:** Scoped views need context. Showing only in-scope patterns without their dependencies loses critical relationship information. Neighbor patterns provide this context without cluttering the main view.
+
+
+
+#### Multiple diagram scopes compose in sequence
+
+- **Invariant:** When `diagramScopes` is an array, each scope produces its own Mermaid diagram section with independent title, direction, and pattern selection. At summary detail level, all diagrams are suppressed.
+
+- **Rationale:** A single reference document may need multiple architectural perspectives. Pipeline Overview shows both a codec transformation view (TB) and a pipeline data flow view (LR) in the same document.
+
+
+
+*[scoped-architectural-view.feature](delivery-process/specs/scoped-architectural-view.feature)*
 
 ### UniversalDocGeneratorRobustness
 

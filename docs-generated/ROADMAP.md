@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [████████████░░░░░░░░] 102/165 (62%)
+**Patterns:** [████████████░░░░░░░░] 104/173 (60%)
 
 **Phases:** 2/13 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 165 |
-| Completed | 102 |
-| Active | 28 |
-| Planned | 35 |
+| Total Patterns | 173 |
+| Completed | 104 |
+| Active | 33 |
+| Planned | 36 |
 
 ---
 
@@ -29,8 +29,8 @@
 | 🚧 [ProcessStateAPIRelationshipQueries](phases/phase-24-process-state-api-relationship-queries.md) | 1/2 | 50% |
 | 📋 [DataAPIStubIntegration](phases/phase-25-data-api-stub-integration.md) | 5/9 | 56% |
 | ✅ [ShapeExtractor](phases/phase-26-shape-extractor.md) | 2/2 | 100% |
-| 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 3/4 | 75% |
-| ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 4/4 | 100% |
+| 🚧 [SourceMapper](phases/phase-27-source-mapper.md) | 4/5 | 80% |
+| ✅ [WarningCollector](phases/phase-28-warning-collector.md) | 5/5 | 100% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/7 | 57% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -104,10 +104,11 @@
 
 ### 🚧 SourceMapper
 
-[███████████░░░░] 3/4 75% complete
+[████████████░░░] 4/5 80% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
+| ✅ Codec Driven Reference Generation | completed | Each reference document (Process Guard, Taxonomy, Validation, etc.) required a hand-coded recipe feature that... |
 | ✅ Decision Doc Generator | completed | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Doc Generation Proof Of Concept | completed | Status: SUPERSEDED - This POC has been implemented. |
 | 🚧 File Cache | active | Simple Map-based cache for file contents during a single generation run. |
@@ -117,11 +118,12 @@
 
 ### ✅ WarningCollector
 
-[███████████████] 4/4 100% complete
+[███████████████] 5/5 100% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
 | ✅ Content Deduplicator | completed | Identifies and merges duplicate sections extracted from multiple sources. |
+| ✅ Scoped Architectural View | completed | Full architecture diagrams show every annotated pattern in the project. |
 | ✅ Source Mapping Validator | completed | Performs pre-flight checks on source mapping tables before extraction begins. |
 | ✅ Universal Doc Generator Robustness | completed | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
 | ✅ Warning Collector | completed | Provides a unified system for capturing, categorizing, and reporting non-fatal issues during document generation. |

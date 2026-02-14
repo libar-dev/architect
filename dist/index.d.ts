@@ -83,29 +83,6 @@ export * as generators from './generators/index.js';
  */
 export * as renderable from './renderable/index.js';
 /**
- * ProcessStateAPI for programmatic access to delivery process state.
- *
- * Wraps MasterDataset with typed query methods for status, phase, FSM,
- * pattern, and timeline queries. Designed for Claude Code integration
- * and programmatic consumption.
- *
- * @example
- * ```typescript
- * import { createProcessStateAPI, type ProcessStateAPI } from '@libar-dev/delivery-process/api';
- *
- * const api = createProcessStateAPI(masterDataset);
- *
- * // Get current work
- * const activeWork = api.getCurrentWork();
- *
- * // Check transition validity
- * if (api.isValidTransition("roadmap", "active")) {
- *   console.log("Can start work");
- * }
- * ```
- */
-export * as api from './api/index.js';
-/**
  * Lint module for pattern annotation quality and process validation.
  *
  * Includes:

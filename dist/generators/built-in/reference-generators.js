@@ -6,7 +6,7 @@
  *
  * ## Reference Generator Registrations
  *
- * Registers all 11 reference document generators. Each config produces
+ * Registers all reference document generators. Each config produces
  * TWO generators: detailed (docs/) and summary (_claude-md/).
  */
 import { renderToMarkdown } from '../../renderable/render.js';
@@ -15,16 +15,19 @@ import { createReferenceCodec, } from '../../renderable/codecs/reference.js';
 // Reference Document Configurations
 // ============================================================================
 /**
- * All reference document configurations.
+ * Built-in reference document configurations for the delivery-process package.
  *
  * Each entry defines one reference document's convention sources and shape globs.
+ * Import this in your `delivery-process.config.ts` to use these configs,
+ * or define your own `ReferenceDocConfig[]` for downstream repos.
  */
-export const REFERENCE_CONFIGS = [
+export const LIBAR_REFERENCE_CONFIGS = [
     {
         title: 'Process Guard Reference',
         conventionTags: ['fsm-rules'],
         shapeSources: ['src/lint/*.ts', 'src/validation/*.ts'],
         behaviorCategories: ['process-guard'],
+        diagramScope: { archContext: ['lint', 'validation'] },
         // Note: Process Guard and Validation Reference share claudeMdSection 'validation'
         // — this is intentional as they use different filenames within the same directory.
         claudeMdSection: 'validation',
@@ -45,6 +48,7 @@ export const REFERENCE_CONFIGS = [
         conventionTags: ['pipeline-architecture', 'output-format'],
         shapeSources: ['src/generators/types.ts', 'src/generators/pipeline/*.ts'],
         behaviorCategories: ['architecture'],
+        diagramScope: { archContext: ['generator', 'renderer'] },
         claudeMdSection: 'architecture',
         docsFilename: 'ARCHITECTURE-REFERENCE.md',
         claudeMdFilename: 'architecture.md',
@@ -54,6 +58,7 @@ export const REFERENCE_CONFIGS = [
         conventionTags: ['config-presets', 'cli-patterns'],
         shapeSources: ['src/config/*.ts'],
         behaviorCategories: ['configuration'],
+        diagramScope: { archContext: ['config'] },
         claudeMdSection: 'config',
         docsFilename: 'CONFIGURATION-REFERENCE.md',
         claudeMdFilename: 'configuration.md',
@@ -121,6 +126,36 @@ export const REFERENCE_CONFIGS = [
         docsFilename: 'INDEX-REFERENCE.md',
         claudeMdFilename: 'index.md',
     },
+    {
+        title: 'Pipeline Overview',
+        conventionTags: ['pipeline-architecture'],
+        shapeSources: [
+            'src/renderable/schema.ts',
+            'src/generators/types.ts',
+            'src/validation-schemas/master-dataset.ts',
+            'src/config/types.ts',
+        ],
+        behaviorCategories: [],
+        diagramScopes: [
+            { archView: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
+            { archView: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
+        ],
+        claudeMdSection: 'architecture',
+        docsFilename: 'PIPELINE-OVERVIEW.md',
+        claudeMdFilename: 'pipeline-overview.md',
+    },
+    {
+        title: 'Codec Architecture',
+        conventionTags: [],
+        shapeSources: ['src/renderable/schema.ts', 'src/validation-schemas/master-dataset.ts'],
+        behaviorCategories: [],
+        diagramScopes: [
+            { archView: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
+        ],
+        claudeMdSection: 'architecture',
+        docsFilename: 'CODEC-ARCHITECTURE.md',
+        claudeMdFilename: 'codec-architecture.md',
+    },
 ];
 // ============================================================================
 // Reference Document Generator
@@ -180,12 +215,17 @@ function toGeneratorName(title) {
         .replace(/\s+/g, '-');
 }
 /**
- * Meta-generator that produces all 22 reference documents (11 detailed + 11 summary)
+ * Meta-generator that produces all reference documents (detailed + summary per config)
  * from a single `-g reference-docs` invocation.
  */
 class ReferenceDocsGenerator {
+    configs;
     name = 'reference-docs';
-    description = 'All reference documents (11 detailed + 11 summary)';
+    description;
+    constructor(configs) {
+        this.configs = configs;
+        this.description = `All reference documents (${configs.length} detailed + ${configs.length} summary)`;
+    }
     generate(_patterns, context) {
         if (!context.masterDataset) {
             return Promise.resolve({
@@ -199,7 +239,7 @@ class ReferenceDocsGenerator {
             });
         }
         const files = [];
-        for (const config of REFERENCE_CONFIGS) {
+        for (const config of this.configs) {
             // Detailed output -> docs/{docsFilename}
             const detailedCodec = createReferenceCodec(config, {
                 detailLevel: 'detailed',
@@ -222,21 +262,26 @@ class ReferenceDocsGenerator {
     }
 }
 /**
- * Registers all reference generators in the GeneratorRegistry.
+ * Registers reference generators from the provided configs in the GeneratorRegistry.
  *
  * Registers:
- * - "reference-docs" meta-generator (produces all 22 files at once)
- * - 22 individual generators for selective invocation:
+ * - "reference-docs" meta-generator (produces all files at once)
+ * - Individual generators for selective invocation:
  *   "{name}-reference" -> detailed, "{name}-reference-claude" -> summary
+ *
+ * @param registry - The generator registry to register into
+ * @param configs - Reference document configurations (from project config)
  */
-export function registerReferenceGenerators(registry) {
-    // Meta-generator: single -g reference-docs produces all 22 files
-    registry.register(new ReferenceDocsGenerator());
+export function registerReferenceGenerators(registry, configs) {
+    // Meta-generator: single -g reference-docs produces all files
+    registry.register(new ReferenceDocsGenerator(configs));
     // Individual generators: selective invocation per document
-    for (const config of REFERENCE_CONFIGS) {
+    for (const config of configs) {
         const kebabName = toGeneratorName(config.title);
         registry.register(new ReferenceDocGenerator(`${kebabName}-reference`, `${config.title} (detailed)`, config, 'detailed', `docs/${config.docsFilename}`));
         registry.register(new ReferenceDocGenerator(`${kebabName}-reference-claude`, `${config.title} (summary)`, config, 'summary', `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`));
     }
 }
+/** @deprecated Use LIBAR_REFERENCE_CONFIGS instead */
+export const REFERENCE_CONFIGS = LIBAR_REFERENCE_CONFIGS;
 //# sourceMappingURL=reference-generators.js.map

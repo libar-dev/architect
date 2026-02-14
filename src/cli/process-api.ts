@@ -36,7 +36,11 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import {
+  loadConfig,
+  applyProjectSourceDefaults,
+  formatConfigError,
+} from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { scanPatterns } from '../scanner/index.js';
 import { extractPatterns } from '../extractor/doc-extractor.js';
@@ -275,55 +279,85 @@ function parseArgs(argv: string[] = process.argv.slice(2)): ProcessAPICLIConfig 
 
 function showHelp(): void {
   console.log(`
-process-api - Query delivery process state via ProcessStateAPI
+process-api - Query delivery process state from annotated sources
+
+  Use this instead of reading generated markdown or launching explore agents.
+  Targeted queries use 5-10x less context than file reads.
 
 Usage: process-api [options] <subcommand> [args...]
 
-Options:
-  -i, --input <pattern>   Glob patterns for TypeScript files (repeatable)
-  -f, --features <pattern> Glob patterns for .feature files (repeatable)
-  -b, --base-dir <dir>    Base directory (default: cwd)
-  -w, --workflow <file>   Workflow config JSON file
-  -h, --help              Show this help message
-  -v, --version           Show version number
+Quick Start — Session Recipe:
 
-Output Modifiers:
-  --names-only            Return array of pattern name strings
-  --count                 Return count of matching patterns
-  --fields <f1,f2,...>    Return only specified fields per pattern
-  --full                  Bypass summarization, return raw patterns
-  --format <json|compact> Output format (default: json)
+  1. overview                              Project health (progress, blockers)
+  2. scope-validate <pattern> implement    Pre-flight check (FSM, deps, prereqs)
+  3. context <pattern> --session design    Curated context bundle for the session
 
-Subcommands:
+Session Workflow Commands (text output — use these first):
+
+  overview                          Executive summary: progress, active phases, blockers
+  scope-validate <pat> <type>       Pre-flight readiness check (PASS/BLOCKED/WARN verdict)
+                                      Catches FSM violations and missing deps BEFORE you start.
+                                      Types: implement, design
+  context <pat> --session <type>    Curated context bundle tailored to session type
+                                      planning  — minimal: pattern metadata and spec file
+                                      design    — full: metadata, stubs, deps, deliverables
+                                      implement — focused: deliverables, FSM state, test files
+  dep-tree <pat> [--depth N]        Dependency chain with status
+  files <pat> [--related]           File reading list with implementation paths
+  handoff --pattern <pat>           Session-end state: deliverables, blockers, date
+                                      Options: --git (include recent commits), --session <id>
+
+Pattern Discovery (JSON output):
+
   status                    Status counts and completion percentage
-  query <method> [args...]  Execute any ProcessStateAPI method
+  list [filters]            Filtered pattern listing (composable with modifiers below)
+  search <query>            Fuzzy name search with match scores
   pattern <name>            Full detail for one pattern
-  list [filters]            List patterns with composable filters
-  search <query>            Fuzzy search for pattern names
-  arch roles                List all arch-roles with counts
+                              Warning: ~66KB for completed patterns — prefer 'context --session'
+  stubs [pattern]           Design stubs with target paths and resolution status
+  stubs --unresolved        Only stubs with missing target files
+  decisions <pattern>       AD-N design decisions from stub descriptions
+  pdr <number>              Cross-reference patterns mentioning a PDR number
+
+Architecture Queries (JSON output):
+
+  arch neighborhood <pat>   What does this pattern touch? (uses/usedBy/sameContext)
+  arch blocking             What's stuck? Patterns blocked by incomplete deps
+  arch dangling             Broken references (pattern names that don't exist)
+  arch orphans              Isolated patterns with no relationships
+  arch coverage             Annotation completeness across input files
+  arch roles                All arch-roles with pattern counts
   arch context [name]       Patterns in bounded context (list all if no name)
   arch layer [name]         Patterns in architecture layer (list all if no name)
-  arch neighborhood <pat>   Uses, usedBy, same-context siblings for pattern
-  arch compare <c1> <c2>    Compare two bounded contexts (shared deps, integration)
-  arch coverage             Annotation coverage analysis across input files
-  arch dangling             Broken references (pattern names that don't exist)
-  arch orphans              Patterns with no relationships (isolated)
-  arch blocking             Patterns blocked by incomplete dependencies
-  context <pattern> [--session planning|design|implement]  Curated context bundle (text)
-  files <pattern> [--related]                             File reading list (text)
-  dep-tree <pattern> [--depth N]                          Dependency tree (text)
-  overview                                                Executive project summary (text)
-  scope-validate <pat> [implement|design] [--type ...] [--strict]  Pre-flight readiness (text)
-  handoff --pattern <pat> [--git] [--session ...]        Session-end handoff summary (text)
-  stubs [pattern]           List design stubs with implementation status
-  stubs --unresolved        Show only stubs with missing target files
-  decisions <pattern>       Show AD-N design decisions from stub descriptions
-  pdr <number>              Cross-reference patterns mentioning a PDR number
-  tags                      Tag usage report (counts per tag and value)
-  sources                   Source file inventory grouped by type
-  unannotated [--path dir]  Find TypeScript files without @libar-docs annotations
+  arch compare <c1> <c2>    Cross-context shared deps and integration points
 
-List Filters:
+Metadata & Inventory:
+
+  tags                      Tag usage report (counts per tag and value)
+  sources                   File inventory by type (TS, Gherkin, Stubs)
+  unannotated [--path dir]  TypeScript files missing @libar-docs annotations
+  query <method> [args...]  Execute any query API method directly
+
+Options:
+
+  -i, --input <pattern>     Glob patterns for TypeScript files (repeatable)
+  -f, --features <pattern>  Glob patterns for .feature files (repeatable)
+  -b, --base-dir <dir>      Base directory (default: cwd)
+  -w, --workflow <file>     Workflow config JSON file
+  -h, --help                Show this help message
+  -v, --version             Show version number
+
+Output Modifiers (composable with any list/query):
+
+  --names-only              Return array of pattern name strings
+  --count                   Return integer count
+  --fields <f1,f2,...>      Return only specified fields per pattern
+                              Valid: patternName, status, category, phase, file, source
+  --full                    Bypass summarization, return raw patterns
+  --format <json|compact>   Output format (default: pretty-printed json)
+
+List Filters (for 'list' subcommand):
+
   --status <status>         Filter by FSM status (roadmap, active, completed, deferred)
   --phase <number>          Filter by roadmap phase number
   --category <name>         Filter by category
@@ -331,17 +365,43 @@ List Filters:
   --limit <n>               Maximum results
   --offset <n>              Skip first n results
 
-Examples:
-  process-api -i "src/**/*.ts" -f "specs/*.feature" status
-  process-api -i "src/**/*.ts" query getCurrentWork
-  process-api -i "src/**/*.ts" query getCurrentWork --names-only
-  process-api -i "src/**/*.ts" list --status active
-  process-api -i "src/**/*.ts" list --status roadmap --category projection --count
-  process-api -i "src/**/*.ts" search ProcessState
-  process-api -i "src/**/*.ts" pattern ProcessGuardLinter
-  process-api -i "src/**/*.ts" arch roles
+Common Recipes:
+
+  Starting a session:
+    process-api overview
+    process-api scope-validate MyPattern implement
+    process-api context MyPattern --session implement
+
+  Finding what to work on:
+    process-api list --status roadmap --names-only
+    process-api arch blocking
+    process-api query getRoadmapItems --names-only
+
+  Investigating a pattern:
+    process-api search EventStore
+    process-api dep-tree EventStoreDurability --depth 2
+    process-api arch neighborhood EventStoreDurability
+    process-api stubs EventStoreDurability
+
+  Design session prep:
+    process-api context MyPattern --session design
+    process-api decisions MyPattern
+    process-api stubs --unresolved
+
+  Ending a session:
+    process-api handoff --pattern MyPattern
+
+Session Types (for --session flag):
+
+  planning    Minimal: pattern metadata and spec file only
+  design      Full: metadata, description, stubs, deps, deliverables
+  implement   Focused: deliverables, FSM state, test files
+
+  Which session? Start coding -> implement. Complex decisions -> design.
+                 New pattern -> planning. Not sure -> run 'overview' first.
 
 Available API Methods (for 'query'):
+
   Status:   getPatternsByNormalizedStatus, getPatternsByStatus, getStatusCounts,
             getStatusDistribution, getCompletionPercentage
   Phase:    getPatternsByPhase, getPhaseProgress, getActivePhases, getAllPhases
@@ -362,9 +422,24 @@ Available API Methods (for 'query'):
 
 /**
  * If --input and --features are not provided, try to load defaults from config.
- * When a delivery-process.config.ts exists, use conventional paths.
+ * Prefers loadProjectConfig() for repos with delivery-process.config.ts,
+ * falls back to filesystem auto-detection for repos without one.
  */
-function applyConfigDefaults(config: ProcessAPICLIConfig): void {
+async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
+  const applied = await applyProjectSourceDefaults(config);
+  if (applied) {
+    return;
+  }
+
+  // Fall back to existing filesystem auto-detection for repos without config
+  applyConfigDefaultsFallback(config);
+}
+
+/**
+ * Filesystem-based auto-detection fallback for repos without a config file.
+ * Checks for conventional directory structures and applies defaults.
+ */
+function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): void {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
@@ -464,8 +539,10 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResul
   } else {
     try {
       workflow = await loadDefaultWorkflow();
-    } catch {
-      // Non-fatal: continue without workflow
+    } catch (err) {
+      console.error(
+        `Warning: Could not load default workflow: ${err instanceof Error ? err.message : String(err)}`
+      );
     }
   }
 
@@ -1179,8 +1256,10 @@ function handleHandoff(ctx: RouteContext): string {
         .trim()
         .split('\n')
         .filter((line) => line.length > 0);
-    } catch {
-      // git not available or not a git repo — silently omit
+    } catch (err) {
+      console.error(
+        `Warning: git diff failed: ${err instanceof Error ? err.message : String(err)}. Handoff will not include modified files.`
+      );
       modifiedFiles = undefined;
     }
   }
@@ -1319,7 +1398,7 @@ async function main(): Promise<void> {
   validateModifiers(opts.modifiers);
 
   // Resolve config file defaults if --input and --features not provided
-  applyConfigDefaults(opts);
+  await applyConfigDefaults(opts);
 
   if (opts.input.length === 0) {
     console.error(

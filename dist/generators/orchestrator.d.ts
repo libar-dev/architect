@@ -31,6 +31,7 @@
  * - **Result Monad**: Returns detailed errors for partial failures
  */
 import type { TagRegistry, ExtractedPattern } from '../validation-schemas/index.js';
+import type { ResolvedConfig } from '../config/project-config.js';
 import type { Result } from '../types/index.js';
 /**
  * Options for documentation generation
@@ -217,4 +218,40 @@ export interface CleanupResult {
  * ```
  */
 export declare function cleanupOrphanedSessionFiles(outputDir: string, sessionsDir: string, preserveFiles: Set<string>): Promise<CleanupResult>;
+/**
+ * Options for config-based generation
+ */
+export interface GenerateFromConfigOptions {
+    /** Override generator names (ignores config defaults) */
+    readonly generators?: readonly string[];
+    /** Git diff base branch for PR-scoped generators */
+    readonly gitDiffBase?: string;
+    /** Explicit changed file list for PR-scoped generators */
+    readonly changedFiles?: string[];
+    /** Release version filter for PR Changes generator */
+    readonly releaseFilter?: string;
+}
+/**
+ * Generate documentation from a fully resolved config.
+ *
+ * Groups generators by their effective source config, then calls
+ * `generateDocumentation()` once per group. This reuses all existing
+ * pipeline logic while minimizing redundant file scans.
+ *
+ * @param config - Fully resolved configuration (from `loadProjectConfig()`)
+ * @param options - Optional overrides for generators, git diff, and release filter
+ * @returns Result with merged patterns, files, errors, and warnings from all groups
+ *
+ * @example
+ * ```typescript
+ * import { generateFromConfig } from '@libar-dev/delivery-process/generators';
+ * import { loadProjectConfig } from '@libar-dev/delivery-process/config';
+ *
+ * const config = await loadProjectConfig(process.cwd());
+ * const result = await generateFromConfig(config, {
+ *   generators: ['patterns', 'roadmap'],
+ * });
+ * ```
+ */
+export declare function generateFromConfig(config: ResolvedConfig, options?: GenerateFromConfigOptions): Promise<Result<GenerateResult, string>>;
 //# sourceMappingURL=orchestrator.d.ts.map

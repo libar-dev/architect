@@ -7,12 +7,12 @@
 
 ## Summary
 
-**Overall:** [████████░░░░░░░░░░░░] 15/40 (38%)
+**Overall:** [████████░░░░░░░░░░░░] 17/42 (40%)
 
 | Metric | Value |
 | --- | --- |
-| Total Features | 40 |
-| Completed | 15 |
+| Total Features | 42 |
+| Completed | 17 |
 | Active | 1 |
 | Planned | 24 |
 | Product Areas | 2 |
@@ -24,8 +24,9 @@
 
 ### DeliveryProcess
 
-14/39 complete (36%)
+16/41 complete (39%)
 
+- [✅ Codec Driven Reference Generation - eliminates per document recipe features with config driven generation](requirements/phase-27-codec-driven-reference-generation.md)
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
 - [✅ Data API Context Assembly - replace explore agents with one command](requirements/phase-25-data-api-context-assembly.md)
 - [✅ Data API Design Session Support - automate session context compilation](requirements/phase-25-data-api-design-session-support.md)
@@ -38,6 +39,7 @@
 - [✅ Phase State Machine Validation - ensure state machine rules are enforced programmatically](requirements/phase-100-phase-state-machine-validation.md)
 - [✅ Process Guard Linter - prevent accidental scope creep and locked file modifications](requirements/phase-99-process-guard-linter.md)
 - [✅ Process State API CLI - direct api queries for planning](requirements/phase-24-process-state-apicli.md)
+- [✅ Scoped Architectural View - enables selective pattern composition with architecture diagrams](requirements/phase-28-scoped-architectural-view.md)
 - [✅ Shape Extraction - eliminates type duplication in documentation](requirements/phase-26-shape-extraction.md)
 - [✅ Universal Doc Generator Robustness - enables monorepo scale doc generation](requirements/phase-28-universal-doc-generator-robustness.md)
 - [🚧 Process State API Relationship Queries](requirements/phase-24-process-state-api-relationship-queries.md)
@@ -91,6 +93,7 @@
 
 | Feature | Product Area | User Role | Status |
 | --- | --- | --- | --- |
+| ✅ Codec Driven Reference Generation | DeliveryProcess | - | completed |
 | ✅ Data API Architecture Queries | DeliveryProcess | - | completed |
 | ✅ Data API Context Assembly | DeliveryProcess | - | completed |
 | ✅ Data API Design Session Support | DeliveryProcess | - | completed |
@@ -103,6 +106,7 @@
 | ✅ Phase State Machine Validation | DeliveryProcess | - | completed |
 | ✅ Process Guard Linter | DeliveryProcess | - | completed |
 | ✅ Process State API CLI | DeliveryProcess | - | completed |
+| ✅ Scoped Architectural View | DeliveryProcess | - | completed |
 | ✅ Shape Extraction | DeliveryProcess | - | completed |
 | ✅ TypeScript Taxonomy Implementation | Taxonomy | Developer | completed |
 | ✅ Universal Doc Generator Robustness | DeliveryProcess | - | completed |

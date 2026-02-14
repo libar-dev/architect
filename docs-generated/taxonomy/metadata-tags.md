@@ -6,7 +6,7 @@
 
 ## Metadata Tag Definitions
 
-45 metadata tags with full details.
+46 metadata tags with full details.
 
 | Tag | Format | Purpose | Required | Repeatable | Values | Default |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -52,6 +52,7 @@
 | `arch-role` | enum | Architectural role for diagram generation (component type) | No | No | bounded-context, command-handler, projection, saga, process-manager, infrastructure, repository, decider, read-model, service | - |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | No | - | - |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | No | domain, application, infrastructure | - |
+| `arch-view` | csv | Named architectural views for scoped diagram generation | No | No | - | - |
 | `target` | value | Target implementation path for stub files | No | No | - | - |
 | `since` | value | Design session that created this pattern | No | No | - | - |
 | `convention` | csv | Convention domains for reference document generation from decision records | No | No | testing-policy, fsm-rules, cli-patterns, output-format, pattern-naming, session-workflow, config-presets, annotation-system, pipeline-architecture, publishing, doc-generation | - |
@@ -490,6 +491,16 @@
 | Repeatable | No |
 | Valid Values | domain, application, infrastructure |
 | Example | `@libar-docs-arch-layer application` |
+
+### `arch-view`
+
+| Property | Value |
+| --- | --- |
+| Format | csv |
+| Purpose | Named architectural views for scoped diagram generation |
+| Required | No |
+| Repeatable | No |
+| Example | `@libar-docs-arch-view codec-transformation,pipeline-overview` |
 
 ### `target`
 

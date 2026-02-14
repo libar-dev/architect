@@ -45,13 +45,13 @@ Feature: validate-patterns CLI
     Scenario: Fail without --input flag
       When running "validate-patterns -F features/*.feature"
       Then exit code is 1
-      And stderr contains "No TypeScript input patterns"
+      And stderr contains "No TypeScript sources specified"
 
     @validation
     Scenario: Fail without --features flag
       When running "validate-patterns -i src/*.ts"
       Then exit code is 1
-      And stderr contains "No Gherkin feature patterns"
+      And stderr contains "No feature files specified"
 
   # ============================================================================
   # RULE 3: Cross-Source Validation

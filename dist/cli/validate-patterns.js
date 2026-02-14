@@ -31,7 +31,7 @@ import { scanPatterns } from '../scanner/index.js';
 import { scanGherkinFiles } from '../scanner/gherkin-scanner.js';
 import { extractPatterns } from '../extractor/doc-extractor.js';
 import { extractProcessMetadata, extractDeliverables } from '../extractor/dual-source-extractor.js';
-import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { loadConfig, applyProjectSourceDefaults, formatConfigError, } from '../config/config-loader.js';
 import { ScannerConfigSchema, createJsonOutputCodec, ValidationSummaryOutputSchema, } from '../validation-schemas/index.js';
 import { normalizeStatus, isPatternComplete } from '../taxonomy/index.js';
 import { validateDoD, formatDoDSummary, detectAntiPatterns, formatAntiPatternReport, toValidationIssues, DEFAULT_THRESHOLDS, } from '../validation/index.js';
@@ -175,8 +175,8 @@ Usage:
   validate-patterns [options]
 
 Options:
-  -i, --input <pattern>       Glob pattern for TypeScript files (required, repeatable)
-  -F, --features <pattern>    Glob pattern for Gherkin feature files (required, repeatable)
+  -i, --input <pattern>       Glob pattern for TypeScript files (repeatable; falls back to config)
+  -F, --features <pattern>    Glob pattern for Gherkin feature files (repeatable; falls back to config)
   -e, --exclude <pattern>     Glob pattern to exclude (repeatable)
   -b, --base-dir <dir>        Base directory for paths (default: cwd)
   --strict                    Treat warnings as errors (exit 2 on warnings)
@@ -490,14 +490,20 @@ async function main() {
         printHelp();
         process.exit(0);
     }
+    // Apply config-based defaults if CLI flags not provided
+    const configApplied = await applyProjectSourceDefaults(config);
+    if (!configApplied && config.input.length === 0) {
+        console.error('  (No delivery-process.config.ts found; provide -i/--input flags)');
+    }
+    // Validate that we have sources (from CLI or config)
     if (config.input.length === 0) {
-        console.error('Error: No TypeScript input patterns specified. Use --input <pattern>');
-        printHelp();
+        console.error('Error: No TypeScript sources specified.');
+        console.error('Provide -i/--input flags or configure sources in delivery-process.config.ts');
         process.exit(1);
     }
     if (config.features.length === 0) {
-        console.error('Error: No Gherkin feature patterns specified. Use --features <pattern>');
-        printHelp();
+        console.error('Error: No feature files specified.');
+        console.error('Provide -F/--features flags or configure sources in delivery-process.config.ts');
         process.exit(1);
     }
     try {

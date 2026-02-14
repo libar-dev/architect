@@ -112,6 +112,17 @@
 | 5 | git push | Pushes code and tag to remote |
 | 6 | npm publish | Publishes to npm with pre tag |
 
+```bash
+npm version 1.0.0-pre.0 --no-git-tag-version
+    pnpm build
+    git add -A
+    git commit -m "chore: prepare 1.0.0-pre.0"
+    git tag v1.0.0-pre.0
+    git push && git push --tags
+
+    npm publish --tag pre --access public
+```
+
 ---
 
 ## Subsequent Pre-releases
@@ -129,6 +140,11 @@
     - Changes are committed and tagged automatically
 
     - Push to remote includes tags
+
+```bash
+pnpm release:pre
+    npm publish --tag pre --access public
+```
 
 ---
 
@@ -155,6 +171,21 @@
 | Patch | Bug fixes, documentation updates, no new features |
 | Minor | New features, backward-compatible changes |
 | Major | Breaking changes, API incompatibilities |
+
+```bash
+pnpm release:patch
+    npm publish --access public
+```
+
+```bash
+pnpm release:minor
+    npm publish --access public
+```
+
+```bash
+pnpm release:major
+    npm publish --access public
+```
 
 ---
 
@@ -269,6 +300,10 @@
 
     - Any publishing errors (without actually publishing)
 
+```bash
+npm publish --dry-run --tag pre --access public
+```
+
 ---
 
 ## Verification
@@ -286,6 +321,10 @@
 | npm view shows version | Correct version number |
 | Installation succeeds | No dependency errors |
 | Package size reasonable | Similar to previous releases |
+
+```bash
+npm view @libar-dev/delivery-process
+```
 
 ---
 

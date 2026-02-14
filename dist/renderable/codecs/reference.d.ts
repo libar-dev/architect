@@ -24,6 +24,24 @@
  */
 import { type BaseCodecOptions, type DetailLevel, type DocumentCodec } from './types/base.js';
 /**
+ * Scoped diagram filter for dynamic mermaid generation from relationship metadata.
+ *
+ * Patterns matching the filter become diagram nodes. Immediate neighbors
+ * (connected via relationship edges but not in scope) appear with a distinct style.
+ */
+export interface DiagramScope {
+    /** Bounded contexts to include (matches pattern.archContext) */
+    readonly archContext?: readonly string[];
+    /** Explicit pattern names to include */
+    readonly patterns?: readonly string[];
+    /** Named architectural views to include (matches pattern.archView entries) */
+    readonly archView?: readonly string[];
+    /** Mermaid graph direction (default: 'TB') */
+    readonly direction?: 'TB' | 'LR';
+    /** Section heading for this diagram (default: 'Component Overview') */
+    readonly title?: string;
+}
+/**
  * Configuration for a reference document type.
  *
  * Each config object defines one reference document's composition.
@@ -41,6 +59,10 @@ export interface ReferenceDocConfig {
     readonly shapeSources: readonly string[];
     /** Categories to filter behavior patterns from MasterDataset */
     readonly behaviorCategories: readonly string[];
+    /** Optional scoped diagram generation from relationship metadata */
+    readonly diagramScope?: DiagramScope;
+    /** Multiple scoped diagrams. Takes precedence over diagramScope. */
+    readonly diagramScopes?: readonly DiagramScope[];
     /** Target _claude-md/ directory for summary output */
     readonly claudeMdSection: string;
     /** Output filename for detailed docs (in docs/) */
@@ -55,10 +77,11 @@ export interface ReferenceCodecOptions extends BaseCodecOptions {
 /**
  * Creates a reference document codec from configuration.
  *
- * The codec composes a RenderableDocument from three sources:
+ * The codec composes a RenderableDocument from up to four sources:
  * 1. Convention content from convention-tagged decision records
- * 2. TypeScript shapes from patterns matching shapeSources globs
- * 3. Behavior content from category-tagged patterns
+ * 2. Scoped relationship diagram (if diagramScope configured)
+ * 3. TypeScript shapes from patterns matching shapeSources globs
+ * 4. Behavior content from category-tagged patterns
  *
  * @param config - Reference document configuration
  * @param options - Codec options including DetailLevel
