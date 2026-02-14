@@ -532,22 +532,27 @@ This hierarchy enables **documentation generation from durable sources** — dec
 ## Configuration
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+// delivery-process.config.ts
+import { defineConfig } from '@libar-dev/delivery-process/config';
 
 // Libar-generic preset (default) — this package uses it
-const dp = createDeliveryProcess();
-// Tag prefix: @libar-docs-*
-// Categories: core, api, infra
+export default defineConfig({
+  preset: 'libar-generic',
+  sources: { typescript: ['src/**/*.ts'], features: ['specs/*.feature'] },
+  output: { directory: 'docs-generated', overwrite: true },
+});
 
 // DDD-ES-CQRS preset — complex domain architectures
-const dp = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
-// Tag prefix: @libar-docs-*
-// Categories: 21 domain-specific categories
+export default defineConfig({
+  preset: 'ddd-es-cqrs',
+  sources: { typescript: ['packages/*/src/**/*.ts'] },
+});
 
-// Generic preset — shorter tag names
-const dp = createDeliveryProcess({ preset: 'generic' });
-// Tag prefix: @docs-*
-// Categories: core, api, infra
+// Generic preset — shorter tag names (@docs-* prefix)
+export default defineConfig({
+  preset: 'generic',
+  sources: { typescript: ['src/**/*.ts'] },
+});
 ```
 
 | Preset                    | Tag Prefix      | Categories | Use Case                           |

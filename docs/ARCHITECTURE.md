@@ -60,7 +60,7 @@ The tag prefix is configurable via presets or custom configuration (see [Configu
   └─────────────┘   └─────────────┘   └─────────────────┘   └─────────────┘
         ↑
   ┌─────────────┐
-  │   CONFIG    │  createDeliveryProcess() → registry + regexBuilders
+  │   CONFIG    │  defineConfig() → resolveProjectConfig() → ResolvedConfig
   └─────────────┘
 ```
 
@@ -73,10 +73,15 @@ The package supports configurable tag prefixes via the Configuration API.
 ### Entry Point
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+// delivery-process.config.ts
+import { defineConfig } from '@libar-dev/delivery-process/config';
 
-const dp = createDeliveryProcess(); // Uses libar-generic (default)
-// Returns: { registry: TagRegistry, regexBuilders: RegexBuilders }
+export default defineConfig({
+  preset: 'libar-generic',
+  sources: { typescript: ['src/**/*.ts'], features: ['specs/*.feature'] },
+  output: { directory: 'docs-generated', overwrite: true },
+});
+// Resolved to: ResolvedConfig { instance, project, isDefault, configPath }
 ```
 
 ### How Configuration Affects the Pipeline
@@ -91,48 +96,41 @@ const dp = createDeliveryProcess(); // Uses libar-generic (default)
 ### Configuration Resolution
 
 ```
-createDeliveryProcess(options)
+defineConfig(userConfig)
          │
          ▼
 ┌──────────────────────────────────────────┐
-│ 1. Select preset (or use default)        │
-│    - libar-generic: @libar-docs- (default)│
-│    - generic: @docs-                     │
-│    - ddd-es-cqrs: @libar-docs-           │
+│ 1. loadProjectConfig() discovers file    │
+│    and validates via Zod schema          │
 └──────────────────────────────────────────┘
          │
          ▼
-┌────────────────────────────────────┐
-│ 2. Apply explicit overrides        │
-│    - tagPrefix                     │
-│    - fileOptInTag                  │
-│    - categories                    │
-└────────────────────────────────────┘
+┌──────────────────────────────────────────┐
+│ 2. resolveProjectConfig()                │
+│    - Select preset (or use default)      │
+│    - Apply tagPrefix/fileOptInTag/cats   │
+│    - Build registry + RegexBuilders      │
+│    - Merge stubs into TypeScript sources │
+│    - Apply output defaults               │
+│    - Resolve generator overrides         │
+└──────────────────────────────────────────┘
          │
          ▼
-┌────────────────────────────────────┐
-│ 3. Build registry                  │
-│    buildRegistry(categories)       │
-└────────────────────────────────────┘
-         │
-         ▼
-┌────────────────────────────────────┐
-│ 4. Create RegexBuilders            │
-│    createRegexBuilders(prefix, tag)│
-└────────────────────────────────────┘
-         │
-         ▼
-    { registry, regexBuilders }
+    ResolvedConfig { instance, project, isDefault, configPath }
 ```
 
 ### Key Files
 
-| File                           | Purpose                                                  |
-| ------------------------------ | -------------------------------------------------------- |
-| `src/config/factory.ts`        | `createDeliveryProcess()` factory                        |
-| `src/config/presets.ts`        | GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET |
-| `src/config/types.ts`          | DeliveryProcessConfig, DeliveryProcessInstance           |
-| `src/config/regex-builders.ts` | RegexBuilders factory                                    |
+| File                                  | Purpose                                                    |
+| ------------------------------------- | ---------------------------------------------------------- |
+| `src/config/define-config.ts`         | `defineConfig()` identity function for type-safe authoring |
+| `src/config/project-config.ts`        | `DeliveryProcessProjectConfig`, `ResolvedConfig` types     |
+| `src/config/project-config-schema.ts` | Zod validation schema, `isProjectConfig()` type guard      |
+| `src/config/resolve-config.ts`        | `resolveProjectConfig()` — defaults + taxonomy resolution  |
+| `src/config/merge-sources.ts`         | `mergeSourcesForGenerator()` — per-generator sources       |
+| `src/config/config-loader.ts`         | `loadProjectConfig()` — file discovery + loading           |
+| `src/config/factory.ts`               | `createDeliveryProcess()` — taxonomy factory (internal)    |
+| `src/config/presets.ts`               | GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET   |
 
 > **See:** [CONFIGURATION.md](./CONFIGURATION.md) for usage examples and API reference.
 

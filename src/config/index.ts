@@ -1,30 +1,31 @@
 /**
  * Configuration Module
  *
- * Provides the factory pattern and presets for creating delivery process instances.
- * This module enables open-sourcing by allowing users to configure their own
- * tag prefixes and taxonomies.
+ * Unified project configuration for delivery-process. Use `defineConfig()` in
+ * `delivery-process.config.ts` to centralize taxonomy, sources, output, and
+ * generator overrides.
  *
  * @example
  * ```typescript
- * import {
- *   createDeliveryProcess,
- *   GENERIC_PRESET,
- *   DDD_ES_CQRS_PRESET
- * } from '@libar-dev/delivery-process/config';
+ * import { defineConfig } from '@libar-dev/delivery-process/config';
  *
- * // Use generic preset for non-DDD projects
- * const genericDp = createDeliveryProcess({ preset: "generic" });
- *
- * // Use DDD preset with custom prefix
- * const customDp = createDeliveryProcess({
- *   preset: "ddd-es-cqrs",
- *   tagPrefix: "@my-docs-",
- *   fileOptInTag: "@my-docs"
+ * // Unified config file
+ * export default defineConfig({
+ *   preset: 'ddd-es-cqrs',
+ *   sources: { typescript: ['src/** /*.ts'] },
+ *   output: { directory: 'docs-generated', overwrite: true },
  * });
+ * ```
  *
- * // Default: full DDD-ES-CQRS taxonomy
- * const defaultDp = createDeliveryProcess();
+ * @example
+ * ```typescript
+ * import { loadProjectConfig } from '@libar-dev/delivery-process/config';
+ *
+ * // Programmatic loading
+ * const result = await loadProjectConfig(process.cwd());
+ * if (result.ok) {
+ *   const { instance, project } = result.value;
+ * }
  * ```
  */
 

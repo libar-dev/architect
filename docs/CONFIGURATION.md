@@ -1,6 +1,6 @@
 # Configuration Guide
 
-Configure tag prefixes, presets, and custom taxonomies for `@libar-dev/delivery-process`.
+Configure tag prefixes, presets, sources, output, and custom taxonomies for `@libar-dev/delivery-process`.
 
 > **Prerequisites:** See [README.md](../README.md) for installation and basic usage.
 > **Tag Reference:** See [INSTRUCTIONS.md](../INSTRUCTIONS.md) for complete tag lists.
@@ -16,28 +16,42 @@ Configure tag prefixes, presets, and custom taxonomies for `@libar-dev/delivery-
 | `ddd-es-cqrs`                 | `@libar-docs-` | 21         | DDD/Event Sourcing architectures     |
 
 ```typescript
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+// delivery-process.config.ts
+import { defineConfig } from '@libar-dev/delivery-process/config';
 
 // Default: libar-generic preset (simple 3-category taxonomy)
-const dpDefault = createDeliveryProcess();
-// Tag prefix: @libar-docs-*
-// Categories: core, api, infra
+export default defineConfig({
+  preset: 'libar-generic',
+  sources: {
+    typescript: ['src/**/*.ts'],
+    features: ['specs/*.feature'],
+  },
+  output: { directory: 'docs-generated' },
+});
 
 // DDD-ES-CQRS preset (full 21-category taxonomy)
-const dpDDD = createDeliveryProcess({ preset: 'ddd-es-cqrs' });
-// Tag prefix: @libar-docs-*
-// Categories: 21 domain-specific categories
+export default defineConfig({
+  preset: 'ddd-es-cqrs',
+  sources: {
+    typescript: ['packages/*/src/**/*.ts'],
+    features: ['delivery-process/specs/**/*.feature'],
+    stubs: ['delivery-process/stubs/**/*.ts'],
+  },
+  output: { directory: 'docs-living', overwrite: true },
+});
 
 // Generic preset (simple taxonomy with @docs- prefix)
-const dpGeneric = createDeliveryProcess({ preset: 'generic' });
-// Tag prefix: @docs-*
-// Categories: core, api, infra
+export default defineConfig({
+  preset: 'generic',
+  sources: { typescript: ['src/**/*.ts'] },
+});
 
 // Custom prefix with any taxonomy
-const dpCustom = createDeliveryProcess({
+export default defineConfig({
   preset: 'libar-generic',
   tagPrefix: '@acme-',
   fileOptInTag: '@acme',
+  sources: { typescript: ['src/**/*.ts'] },
 });
 ```
 
@@ -53,17 +67,15 @@ When using a preset, the preset's categories **replace** the base taxonomy categ
 
 **Design decision:** If you need DDD categories (ddd, event-sourcing, cqrs, saga, projection, decider, etc.), use the `ddd-es-cqrs` preset. The `generic` and `libar-generic` presets provide a simpler 3-category taxonomy.
 
-**Note:** The `mergeTagRegistries()` function is exported for consumers who need custom merge behavior, but `createDeliveryProcess()` uses replacement semantics.
-
 ### Default Preset Selection
 
 All entry points use the same default:
 
-| Entry Point                       | Default Preset                 | Context                  |
-| --------------------------------- | ------------------------------ | ------------------------ |
-| `createDeliveryProcess()`         | `libar-generic` (3 categories) | Programmatic API         |
-| `loadConfig()` fallback (no file) | `libar-generic` (3 categories) | CLI tools                |
-| This package's config file        | `libar-generic` (3 categories) | Standalone package usage |
+| Entry Point                              | Default Preset                 | Context                  |
+| ---------------------------------------- | ------------------------------ | ------------------------ |
+| `defineConfig()`                         | `libar-generic` (3 categories) | Config file              |
+| `loadProjectConfig()` fallback (no file) | `libar-generic` (3 categories) | CLI tools                |
+| This package's config file               | `libar-generic` (3 categories) | Standalone package usage |
 
 **Rationale:** Simple defaults for most users. Use `preset: 'ddd-es-cqrs'` explicitly if you need the full 21-category DDD taxonomy.
 
@@ -139,9 +151,9 @@ export function transformToMasterDataset(input: TransformInput): MasterDataset {
 
 ---
 
-## Hierarchical Configuration
+## Unified Config File
 
-CLI tools discover `delivery-process.config.ts` files automatically.
+The `defineConfig()` function centralizes taxonomy, sources, output, and generator overrides in a single `delivery-process.config.ts` file. CLI tools discover this file automatically.
 
 ### Discovery Order
 
@@ -153,14 +165,71 @@ CLI tools discover `delivery-process.config.ts` files automatically.
 
 ```typescript
 // delivery-process.config.ts
-import { createDeliveryProcess } from '@libar-dev/delivery-process';
+import { defineConfig } from '@libar-dev/delivery-process/config';
 
-// Uses libar-generic preset (default)
-export default createDeliveryProcess();
-
-// Or explicitly specify a preset
-export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+export default defineConfig({
+  preset: 'libar-generic',
+  sources: {
+    typescript: ['src/**/*.ts'],
+    stubs: ['delivery-process/stubs/**/*.ts'],
+    features: ['delivery-process/specs/*.feature'],
+  },
+  output: {
+    directory: 'docs-generated',
+    overwrite: true,
+  },
+});
 ```
+
+### Sources Configuration
+
+| Field        | Type       | Description                                          |
+| ------------ | ---------- | ---------------------------------------------------- |
+| `typescript` | `string[]` | Glob patterns for TypeScript source files (required) |
+| `features`   | `string[]` | Glob patterns for Gherkin feature files              |
+| `stubs`      | `string[]` | Glob patterns for design stub files                  |
+| `exclude`    | `string[]` | Glob patterns to exclude from all scanning           |
+
+Stubs are merged into TypeScript sources at resolution time. No parent directory traversal (`..`) is allowed in globs.
+
+### Output Configuration
+
+| Field       | Type      | Default               | Description                         |
+| ----------- | --------- | --------------------- | ----------------------------------- |
+| `directory` | `string`  | `'docs/architecture'` | Output directory for generated docs |
+| `overwrite` | `boolean` | `false`               | Overwrite existing files            |
+
+### Generator Overrides
+
+Some generators need different sources than the base config. Use `generatorOverrides` for per-generator customization:
+
+```typescript
+export default defineConfig({
+  preset: 'libar-generic',
+  sources: {
+    typescript: ['src/**/*.ts'],
+    features: ['delivery-process/specs/*.feature'],
+  },
+  output: { directory: 'docs-generated', overwrite: true },
+  generatorOverrides: {
+    changelog: {
+      additionalFeatures: ['delivery-process/decisions/*.feature'],
+    },
+    'doc-from-decision': {
+      replaceFeatures: ['delivery-process/decisions/*.feature'],
+    },
+  },
+});
+```
+
+| Override Field       | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `additionalFeatures` | Feature globs appended to base features              |
+| `additionalInput`    | TypeScript globs appended to base TypeScript sources |
+| `replaceFeatures`    | Feature globs used INSTEAD of base features          |
+| `outputDirectory`    | Override output directory for this generator         |
+
+**Constraint:** `replaceFeatures` and `additionalFeatures` are mutually exclusive when both are non-empty.
 
 ### Monorepo Example
 
@@ -183,10 +252,11 @@ CLI tools use the nearest config file to the working directory.
 Keep a preset's taxonomy but change the prefix:
 
 ```typescript
-const dp = createDeliveryProcess({
+export default defineConfig({
   preset: 'libar-generic',
   tagPrefix: '@team-',
   fileOptInTag: '@team',
+  sources: { typescript: ['src/**/*.ts'] },
 });
 
 // Your annotations:
@@ -200,7 +270,7 @@ const dp = createDeliveryProcess({
 Define your own taxonomy:
 
 ```typescript
-const dp = createDeliveryProcess({
+export default defineConfig({
   tagPrefix: '@docs-',
   fileOptInTag: '@docs',
   categories: [
@@ -220,26 +290,8 @@ const dp = createDeliveryProcess({
       aliases: [],
     },
   ],
+  sources: { typescript: ['src/**/*.ts'] },
 });
-```
-
----
-
-## RegexBuilders API
-
-The `DeliveryProcessInstance` includes utilities for tag detection:
-
-```typescript
-const dp = createDeliveryProcess(); // Uses libar-generic (default)
-
-// Check if file should be scanned
-dp.regexBuilders.hasFileOptIn(fileContent); // true if contains /** @libar-docs */
-
-// Check for any documentation directives
-dp.regexBuilders.hasDocDirectives(fileContent); // true if contains @libar-docs-*
-
-// Normalize tag for lookup
-dp.regexBuilders.normalizeTag('@libar-docs-pattern'); // "pattern"
 ```
 
 ---
@@ -249,21 +301,48 @@ dp.regexBuilders.normalizeTag('@libar-docs-pattern'); // "pattern"
 For tools that need to load configuration files:
 
 ```typescript
-import { loadConfig, formatConfigError } from '@libar-dev/delivery-process/config';
+import { loadProjectConfig } from '@libar-dev/delivery-process/config';
 
-const result = await loadConfig(process.cwd());
+const result = await loadProjectConfig(process.cwd());
 
 if (!result.ok) {
-  console.error(formatConfigError(result.error));
+  console.error(result.error.message);
   process.exit(1);
 }
 
-const { instance, isDefault, path } = result.value;
-// instance.registry - TagRegistry for scanning/extraction
-// instance.regexBuilders - Regex utilities for detection
-// isDefault - true if no config file found
-// path - config file path (if found)
+const resolved = result.value;
+// resolved.instance    - DeliveryProcessInstance (registry + regexBuilders)
+// resolved.project     - ResolvedProjectConfig (sources, output, generators)
+// resolved.isDefault   - true if no config file found
+// resolved.configPath  - config file path (if found)
 ```
+
+For per-generator source resolution:
+
+```typescript
+import { mergeSourcesForGenerator } from '@libar-dev/delivery-process/config';
+
+const effectiveSources = mergeSourcesForGenerator(
+  resolved.project.sources,
+  resolved.project.generatorOverrides['changelog']
+);
+// effectiveSources.typescript - merged TypeScript globs
+// effectiveSources.features   - merged or replaced feature globs
+```
+
+---
+
+## Backward Compatibility
+
+The legacy `createDeliveryProcess()` API is still exported and supported. Config files using the old format are detected automatically by `loadProjectConfig()` and wrapped in a `ResolvedConfig` with default project settings.
+
+```typescript
+// Legacy format (still works)
+import { createDeliveryProcess } from '@libar-dev/delivery-process';
+export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+```
+
+New projects should use `defineConfig()` for the unified configuration experience.
 
 ---
 

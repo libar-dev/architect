@@ -20,7 +20,7 @@
 | If you want to...              | Read this                                    | Lines  |
 | ------------------------------ | -------------------------------------------- | ------ |
 | Get started quickly            | [README.md](../README.md)                    | 1-377  |
-| Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-215  |
+| Configure presets and tags     | [CONFIGURATION.md](./CONFIGURATION.md)       | 1-357  |
 | Understand the "why"           | [METHODOLOGY.md](./METHODOLOGY.md)           | 1-210  |
 | Learn the architecture         | [ARCHITECTURE.md](./ARCHITECTURE.md)         | 1-1312 |
 | Run AI coding sessions         | [SESSION-GUIDES.md](./SESSION-GUIDES.md)     | 1-338  |
@@ -78,16 +78,16 @@
 
 ---
 
-### CONFIGURATION.md (Lines 1-215)
+### CONFIGURATION.md (Lines 1-357)
 
-| Section                    | Lines   | Key Topics                            |
-| -------------------------- | ------- | ------------------------------------- |
-| Quick Reference            | 10-32   | Preset comparison, basic usage        |
-| Presets                    | 36-78   | Generic vs DDD-ES-CQRS preset details |
-| Hierarchical Configuration | 83-113  | Discovery order, monorepo example     |
-| Custom Configuration       | 116-161 | Custom tag prefix, custom categories  |
-| RegexBuilders API          | 165-180 | hasFileOptIn, hasDocDirectives        |
-| Programmatic Config        | 184-203 | loadConfig(), formatConfigError()     |
+| Section                | Lines   | Key Topics                                      |
+| ---------------------- | ------- | ----------------------------------------------- |
+| Quick Reference        | 10-56   | Preset comparison, defineConfig() examples      |
+| Presets                | 84-151  | Generic vs DDD-ES-CQRS preset details           |
+| Unified Config File    | 154-244 | defineConfig(), sources, output, gen overrides  |
+| Custom Configuration   | 248-295 | Custom tag prefix, custom categories            |
+| Programmatic Config    | 299-331 | loadProjectConfig(), mergeSourcesForGenerator() |
+| Backward Compatibility | 335-345 | Legacy createDeliveryProcess() support          |
 
 ---
 
