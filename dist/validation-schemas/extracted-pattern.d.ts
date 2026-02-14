@@ -103,6 +103,7 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         archRole: z.ZodOptional<z.ZodString>;
         archContext: z.ZodOptional<z.ZodString>;
         archLayer: z.ZodOptional<z.ZodString>;
+        archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     }, z.core.$strict>;
     code: z.ZodString;
@@ -260,6 +261,7 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         infrastructure: "infrastructure";
         application: "application";
     }>>;
+    archView: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     extractedShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{

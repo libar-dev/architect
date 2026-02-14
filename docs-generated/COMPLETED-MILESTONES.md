@@ -9,7 +9,7 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 102 |
+| Completed Patterns | 104 |
 | Completed Phases | 2 |
 | Total Phases | 13 |
 
@@ -28,7 +28,7 @@
 </details>
 
 <details>
-<summary>✅ WarningCollector (4 patterns)</summary>
+<summary>✅ WarningCollector (5 patterns)</summary>
 
 | Pattern | Description |
 | --- | --- |
@@ -36,6 +36,7 @@
 | Source Mapping Validator | Performs pre-flight checks on source mapping tables before extraction begins. |
 | Content Deduplicator | Identifies and merges duplicate sections extracted from multiple sources. |
 | Universal Doc Generator Robustness | This feature transforms the PoC document generator into a production-ready universal generator capable of operating... |
+| Scoped Architectural View | Full architecture diagrams show every annotated pattern in the project. |
 
 </details>
 
@@ -43,6 +44,7 @@
 
 ## Recent Completions
 
+- ✅ Codec Driven Reference Generation (Phase 27)
 - ✅ Data API Architecture Queries (Phase 25)
 - ✅ Data API Context Assembly (Phase 25)
 - ✅ Data API Output Shaping (Phase 25)
@@ -52,8 +54,7 @@
 - ✅ Gherkin Rules Support (Phase 100)
 - ✅ Mvp Workflow Implementation (Phase 99)
 - ✅ Pattern Relationship Model (Phase 99)
-- ✅ Phase State Machine Validation (Phase 100)
 
-Showing 10 of 102 completed patterns. See quarterly files for full history.
+Showing 10 of 104 completed patterns. See quarterly files for full history.
 
 ---

@@ -316,4 +316,103 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       }
     );
   });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Code examples in rule descriptions are preserved
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Code examples in rule descriptions are preserved', ({ RuleScenario }) => {
+    RuleScenario(
+      'Mermaid diagram in rule description is extracted as code example',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a convention pattern with a mermaid diagram in tag {string}',
+          (_ctx: unknown, tag: string) => {
+            // Build description with """mermaid""" DocString programmatically
+            // (cannot nest """ inside a Gherkin DocString)
+            const description = [
+              'The FSM enforces valid state transitions.',
+              '',
+              '"""mermaid',
+              'stateDiagram-v2',
+              '    [*] --> roadmap',
+              '    roadmap --> active',
+              '    active --> completed',
+              '"""',
+            ].join('\n');
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'MermaidADR',
+                  convention: [tag],
+                  rules: [
+                    {
+                      name: 'FSM Diagram Rule',
+                      description,
+                      scenarioCount: 0,
+                      scenarioNames: [],
+                    },
+                  ],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('extracting conventions for tag {string}', (_ctx: unknown, tag: string) => {
+          state!.result = extractConventions(state!.dataset!, [tag]);
+        });
+
+        Then('the first rule has {int} code example', (_ctx: unknown, count: number) => {
+          const rule = state!.result[0]!.rules[0]!;
+          expect(rule.codeExamples).toBeDefined();
+          expect(rule.codeExamples).toHaveLength(count);
+        });
+
+        And('the code example has language {string}', (_ctx: unknown, language: string) => {
+          const example = state!.result[0]!.rules[0]!.codeExamples![0]!;
+          expect(example.type).toBe('code');
+          if (example.type === 'code') {
+            expect(example.language).toBe(language);
+          }
+        });
+      }
+    );
+
+    RuleScenario(
+      'Rule description without code examples has no code examples field',
+      ({ Given, When, Then }) => {
+        Given(
+          'a pattern with convention {string} and rule description:',
+          (_ctx: unknown, tag: string, docString: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'PlainADR',
+                  convention: [tag],
+                  rules: [
+                    {
+                      name: 'Plain Rule',
+                      description: docString,
+                      scenarioCount: 0,
+                      scenarioNames: [],
+                    },
+                  ],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('extracting conventions for tag {string}', (_ctx: unknown, tag: string) => {
+          state!.result = extractConventions(state!.dataset!, [tag]);
+        });
+
+        Then('the first rule has no code examples', () => {
+          const rule = state!.result[0]!.rules[0]!;
+          expect(rule.codeExamples).toBeUndefined();
+        });
+      }
+    );
+  });
 });

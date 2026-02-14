@@ -246,6 +246,28 @@ Architecture diagram generation uses three tags to create Mermaid component diag
     Run pnpm docs:patterns and these annotations become a searchable pattern registry
     with dependency graphs.
 
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-pattern ProcessGuardDecider
+     * at-libar-docs-status completed
+     * at-libar-docs-uses FSMTransitions, FSMStates
+     * at-libar-docs-used-by LintModule
+     */
+    export function validateChanges(input: ValidationInput): ValidationOutput { ... }
+```
+
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-pattern PatternScanner
+     * at-libar-docs-status completed
+     * at-libar-docs-uses GherkinASTParser, TypeScriptASTParser
+     * at-libar-docs-used-by Orchestrator, DualSourceExtractor
+     */
+    export async function scanPatterns(config: ScanConfig): Promise<ScannedFile[]> { ... }
+```
+
 ---
 
 ## Four-Stage Workflow
@@ -324,6 +346,26 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 
     Note: Code stubs must NOT use at-prefix-pattern. The feature file is the canonical pattern definition.
 
+```gherkin
+at-libar-docs
+    at-libar-docs-pattern:EventStoreDurability
+    at-libar-docs-status:roadmap
+    at-libar-docs-phase:18
+    at-libar-docs-depends-on:EventStoreFoundation
+    at-libar-docs-enables:SagaEngine
+    Feature: Event Store Durability
+```
+
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-status roadmap
+     * at-libar-docs-event-sourcing
+     * at-libar-docs-uses EventStoreFoundation, Workpool
+     * at-libar-docs-used-by SagaEngine, CommandOrchestrator
+     */
+```
+
 ---
 
 ## Two-Tier Spec Architecture
@@ -360,6 +402,18 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | Interface | Types + stub functions | API contracts |
 | Partial | Working code + some stubs | Progressive implementation |
 
+```typescript
+/**
+     * at-libar-docs
+     * at-libar-docs-status roadmap
+     *
+     * Reservation Pattern - TTL-Based Pre-Creation Uniqueness
+     */
+    export function reserve(ctx: MutationCtx, args: ReserveArgs): Promise<ReservationResult> {
+      throw new Error('Not yet implemented - roadmap pattern');
+    }
+```
+
 ---
 
 ## Planning Stubs Architecture
@@ -380,6 +434,13 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | Planning | planning-stubs/ | throw new Error("Not implemented") |
 | Implementation | Move to steps/ | Replace with real logic |
 | Completed | steps/ | Fully executable |
+
+```text
+tests/
+      steps/              Planning executable (included in test runner)
+      planning-stubs/     Not yet implemented (excluded)
+      features/           Feature files
+```
 
 ---
 
@@ -612,6 +673,20 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | active | roadmap | Blocked or regressed |
 | deferred | roadmap | Ready to resume |
 
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress (blocked)
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Terminal state
+        note right of active : Scope-locked
+```
+
 ---
 
 ## ProcessStateAPI
@@ -631,6 +706,24 @@ Architecture diagram generation uses three tags to create Mermaid component diag
 | isValidTransition(from, to) | Boolean for FSM validation |
 | getPattern(id) | Single pattern by ID |
 | getPatternsByCategory(cat) | Patterns in a category |
+
+```typescript
+import { createProcessStateAPI } from '@libar-dev/delivery-process';
+
+    const api = createProcessStateAPI(dataset);
+
+    // Query current work
+    api.getCurrentWork();          // What is active now
+
+    // Query planning
+    api.getRoadmapItems();         // What can be started
+
+    // Validate transitions
+    api.isValidTransition('roadmap', 'active');
+
+    // Pattern lookup
+    api.getPattern('TransformDataset');
+```
 
 ---
 

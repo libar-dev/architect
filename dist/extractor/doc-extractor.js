@@ -6,6 +6,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context extractor
  * @libar-docs-arch-layer application
+ * @libar-docs-arch-view pipeline-stages
  * @libar-docs-uses Pattern Scanner, Tag Registry, Zod
  * @libar-docs-used-by Orchestrator, Generators
  * @libar-docs-usecase "When converting scanned files to ExtractedPattern objects"
@@ -177,6 +178,7 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
         ...(directive.archRole !== undefined && { archRole: directive.archRole }),
         ...(directive.archContext !== undefined && { archContext: directive.archContext }),
         ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
+        ...(directive.archView !== undefined && directive.archView.length > 0 && { archView: directive.archView }),
         // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
         ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
     };

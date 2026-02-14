@@ -3,9 +3,9 @@
 @libar-docs-product-area:Generator
 Feature: Reference Document Generator Registration
 
-  Registers all 11 reference document generators. Each config produces
+  Registers all 13 reference document generators. Each config produces
   TWO individual generators (detailed + summary) plus one meta-generator
-  ("reference-docs") that produces all 22 files at once, yielding 23 total.
+  ("reference-docs") that produces all 26 files at once, yielding 27 total.
   Generators implement DocumentGenerator directly, not via CodecBasedGenerator.
 
   Background:
@@ -14,9 +14,9 @@ Feature: Reference Document Generator Registration
   Rule: Registration produces the correct number of generators
 
     @happy-path
-    Scenario: All 23 generators are registered from 11 configs plus meta-generator
+    Scenario: All 27 generators are registered from 13 configs plus meta-generator
       When registering reference generators
-      Then 23 generators are registered
+      Then 27 generators are registered
 
   Rule: Generator naming follows kebab-case convention
 

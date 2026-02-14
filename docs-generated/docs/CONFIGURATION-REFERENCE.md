@@ -77,6 +77,17 @@
 | File Opt-In | libar-docs |
 | Categories | 3 (core, api, infra) |
 
+```typescript
+/**
+     * libar-docs
+     * libar-docs-pattern PatternScanner
+     * libar-docs-status completed
+     * libar-docs-core
+     * libar-docs-uses FileDiscovery, ASTParser
+     */
+    export function scanPatterns(config: ScanConfig): Promise<ScanResult> {}
+```
+
 ---
 
 ## Generic Preset
@@ -97,6 +108,16 @@
 | Tag Prefix | docs- |
 | File Opt-In | docs |
 | Categories | 3 (core, api, infra) |
+
+```typescript
+/**
+     * docs
+     * docs-pattern PatternScanner
+     * docs-status completed
+     * docs-core
+     */
+    export function scanPatterns(config: ScanConfig): Promise<ScanResult> {}
+```
 
 ---
 
@@ -153,6 +174,17 @@
 
     CLI tools use the nearest config file to the working directory.
 
+```typescript
+// delivery-process.config.ts
+    import { createDeliveryProcess } from 'delivery-process-pkg';
+
+    // Default preset
+    export default createDeliveryProcess();
+
+    // Or explicit preset
+    export default createDeliveryProcess({ preset: 'ddd-es-cqrs' });
+```
+
 ---
 
 ## Custom Configuration
@@ -174,6 +206,26 @@
 | fileOptInTag | string | Custom file opt-in marker |
 | categories | array | Custom category definitions (replaces preset categories) |
 
+```typescript
+const dp = createDeliveryProcess({
+      preset: 'libar-generic',
+      tagPrefix: 'team-',
+      fileOptInTag: 'team',
+    });
+```
+
+```typescript
+const dp = createDeliveryProcess({
+      tagPrefix: 'docs-',
+      fileOptInTag: 'docs',
+      categories: [
+        { tag: 'scanner', domain: 'Scanner', priority: 1, description: 'File scanning', aliases: [] },
+        { tag: 'extractor', domain: 'Extractor', priority: 2, description: 'Pattern extraction', aliases: [] },
+        { tag: 'generator', domain: 'Generator', priority: 3, description: 'Doc generation', aliases: [] },
+      ],
+    });
+```
+
 ---
 
 ## RegexBuilders API
@@ -192,6 +244,19 @@
 | normalizeTag(tag) | string | Normalize tag for lookup (strip prefix) |
 | directivePattern | RegExp | Pattern to match documentation directives |
 
+```typescript
+const dp = createDeliveryProcess();
+
+    // Check if file should be scanned
+    dp.regexBuilders.hasFileOptIn(fileContent);
+
+    // Check for any documentation directives
+    dp.regexBuilders.hasDocDirectives(fileContent);
+
+    // Normalize tag for lookup
+    dp.regexBuilders.normalizeTag('libar-docs-pattern');
+```
+
 ---
 
 ## Programmatic Config Loading
@@ -207,6 +272,19 @@
 | instance | DeliveryProcessInstance | The loaded configuration instance |
 | isDefault | boolean | True if no config file was found |
 | path | string or undefined | Path to config file (if found) |
+
+```typescript
+import { loadConfig, formatConfigError } from 'delivery-process-pkg/config';
+
+    const result = await loadConfig(process.cwd());
+
+    if (!result.ok) {
+      console.error(formatConfigError(result.error));
+      process.exit(1);
+    }
+
+    const { instance, isDefault, path } = result.value;
+```
 
 ---
 
@@ -312,6 +390,13 @@
 | DDD/Event Sourcing systems | ddd-es-cqrs | All 21 categories |
 | Generic projects | generic | core, api, infra |
 
+```typescript
+// For libar-generic preset
+    // @libar-docs-core      - marks as core utility
+    // @libar-docs-api       - marks as public API
+    // @libar-docs-infra     - marks as infrastructure
+```
+
 ---
 
 ## Format Types
@@ -366,6 +451,20 @@
 | active | roadmap | Regress (blocked) |
 | deferred | roadmap | Resume planning |
 
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Hard-locked
+        note right of active : Scope-locked
+```
+
 ---
 
 ## Normalized Status
@@ -391,9 +490,9 @@
 
 | Preset | Categories | Tag Prefix | Use Case |
 | --- | --- | --- | --- |
-| libar-generic (default) | 3 | @libar-docs- | Simple projects (this package) |
-| ddd-es-cqrs | 21 | @libar-docs- | DDD/Event Sourcing architectures |
-| generic | 3 | @docs- | Simple projects with @docs- prefix |
+| libar-generic (default) | 3 | libar-docs- | Simple projects (this package) |
+| ddd-es-cqrs | 21 | libar-docs- | DDD/Event Sourcing architectures |
+| generic | 3 | docs- | Simple projects with docs- prefix |
 
 ---
 
@@ -423,6 +522,28 @@
 
     **Usage Example:**
 
+```text
+src/taxonomy/
+      registry-builder.ts   -- buildRegistry() - creates TagRegistry
+      categories.ts         -- Category definitions
+      status-values.ts      -- FSM state values (PDR-005)
+      normalized-status.ts  -- Display normalization (3 buckets)
+      format-types.ts       -- Tag value parsing rules
+      hierarchy-levels.ts   -- epic/phase/task
+      risk-levels.ts        -- low/medium/high
+      layer-types.ts        -- timeline/domain/integration/e2e
+```
+
+```typescript
+import { buildRegistry } from '@libar-dev/delivery-process/taxonomy';
+
+    const registry = buildRegistry();
+    // registry.tagPrefix       -> "@libar-docs-"
+    // registry.fileOptInTag    -> "@libar-docs"
+    // registry.categories      -> CategoryDefinition[]
+    // registry.metadataTags    -> MetadataTagDefinitionForRegistry[]
+```
+
 ---
 
 ## Tag Generation
@@ -435,6 +556,10 @@
 
     **Output:** A markdown file documenting all tags with their formats,
     valid values, and examples - generated from the TagRegistry.
+
+```bash
+npx generate-tag-taxonomy -o TAG_TAXONOMY.md -f
+```
 
 ---
 
@@ -535,6 +660,15 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Implementation | Roadmap spec | Code + tests | roadmap to active to completed |
 | Planning + Design | Pattern brief | Spec + stubs | Creates roadmap |
 
+```text
+Starting from pattern brief?
+    |-- Yes --> Need code stubs now? --> Yes --> Planning + Design
+    |                                --> No  --> Planning
+    |-- No  --> Ready to code? --> Yes --> Complex decisions? --> Yes --> Design first
+                                                               --> No  --> Implementation
+                               --> No  --> Planning
+```
+
 ---
 
 ## Planning Session
@@ -605,6 +739,26 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Create implementation plans | Design focuses on architecture |
 | Transition spec to active | Requires implementation session |
 | Write full implementations | Stubs only |
+
+```typescript
+/**
+     * at-prefix
+     * at-prefix-status roadmap
+     * at-prefix-implements MyPattern
+     *
+     * MyPattern - Description
+     *
+     * Target: src/path/to/final/location.ts
+     * See: PDR-001 (Design Decision)
+     */
+    export interface MyResult {
+      id: string;
+    }
+
+    export function myFunction(args: MyArgs): Promise<MyResult> {
+      throw new Error('MyPattern not yet implemented - roadmap pattern');
+    }
+```
 
 ---
 
@@ -792,6 +946,25 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | Files Modified | Track changes for review |
 | Next Session | Clear starting point |
 
+```markdown
+Session State
+
+    - Last completed: Phase 1 - Core types
+    - In progress: Phase 2 - Validation
+    - Blockers: None
+
+    Files Modified
+
+    - src/types.ts - Added core types
+    - src/validate.ts - Started validation (incomplete)
+
+    Next Session
+
+    1. FIRST: Complete validation in src/validate.ts
+    2. Add integration tests
+    3. Update deliverable statuses
+```
+
 ---
 
 ## Discovery Tags
@@ -811,6 +984,12 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 | at-prefix-discovered-gap | Missing edge case or feature | Missing-validation-for-empty-input |
 | at-prefix-discovered-improvement | Performance or DX enhancement | Cache-parsed-results |
 | at-prefix-discovered-learning | Knowledge gained | Gherkin-requires-strict-indentation |
+
+```gherkin
+at-prefix-discovered-gap: Missing-edge-case-for-empty-input
+    at-prefix-discovered-improvement: Cache-parsed-results
+    at-prefix-discovered-learning: Gherkin-requires-strict-indentation
+```
 
 ---
 
@@ -878,6 +1057,33 @@ Each new module (scope-validator.ts, handoff-generator.ts) exports
 ---
 
 ## ProcessStateAPI returns remain unchanged
+
+---
+
+## Component Overview
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+graph TB
+    subgraph config["Config"]
+        DeliveryProcessFactory["DeliveryProcessFactory[service]"]
+        ConfigLoader["ConfigLoader[infrastructure]"]
+    end
+    subgraph related["Related"]
+        ConfigurationTypes["ConfigurationTypes"]:::neighbor
+        RegexBuilders["RegexBuilders"]:::neighbor
+        ConfigurationPresets["ConfigurationPresets"]:::neighbor
+    end
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
+    RegexBuilders --> ConfigurationTypes
+    ConfigurationPresets --> ConfigurationTypes
+    classDef neighbor stroke-dasharray: 5 5
+```
 
 ---
 

@@ -79,7 +79,7 @@ export const METADATA_TAGS_BY_GROUP = {
     ],
     hierarchy: ['level', 'parent'],
     traceability: ['executable-specs', 'roadmap-spec'],
-    architecture: ['arch-role', 'arch-context', 'arch-layer'],
+    architecture: ['arch-role', 'arch-context', 'arch-layer', 'arch-view'],
     extraction: ['extract-shapes'],
     stub: ['target', 'since'],
     convention: ['convention'],
@@ -378,6 +378,12 @@ export function buildRegistry() {
                 purpose: 'Architectural layer for layered diagrams',
                 values: ['domain', 'application', 'infrastructure'],
                 example: '@libar-docs-arch-layer application',
+            },
+            {
+                tag: 'arch-view',
+                format: 'csv',
+                purpose: 'Named architectural views for scoped diagram generation',
+                example: '@libar-docs-arch-view codec-transformation,pipeline-overview',
             },
             // Design session stub metadata tags (DataAPIStubIntegration Phase B)
             {

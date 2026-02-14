@@ -6,14 +6,14 @@
 
 ## Progress
 
-**Progress:** [███████████████░░░░░] 3/4 (75%)
+**Progress:** [████████████████░░░░] 4/5 (80%)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 3 |
+| ✅ Completed | 4 |
 | 🚧 Active | 1 |
 | 📋 Planned | 0 |
-| **Total** | 4 |
+| **Total** | 5 |
 
 ---
 
@@ -40,6 +40,7 @@ extraction and deduplication phases.
 
 | Pattern | Description |
 | --- | --- |
+| ✅ Codec Driven Reference Generation | Each reference document (Process Guard, Taxonomy, Validation, etc.) required a hand-coded recipe feature that... |
 | ✅ Decision Doc Generator | Orchestrates the full pipeline for generating documentation from decision documents (ADR/PDR in .feature format): 1. |
 | ✅ Doc Generation Proof Of Concept | Status: SUPERSEDED - This POC has been implemented. |
 | ✅ Source Mapper | Aggregates content from multiple source files based on source mapping tables parsed from decision documents. |

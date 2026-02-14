@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 102/165 (62%)
+**Overall Progress:** [████████████░░░░░░░░] 104/168 (62%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 165 |
-| Completed | 102 |
+| Total Patterns | 168 |
+| Completed | 104 |
 | Active | 28 |
-| Planned | 35 |
+| Planned | 36 |
 | Active Phases | 2 |
 
 ---
@@ -42,7 +42,7 @@
 
 ### 🚧 SourceMapper
 
-[███████████░░░░] 3/4 75% complete (3 done, 1 active)
+[████████████░░░] 4/5 80% complete (4 done, 1 active)
 
 | Pattern | Description |
 | --- | --- |
@@ -82,7 +82,7 @@
 | 🚧 Process State API | - | - | TypeScript interface for querying delivery process state. |
 | 🚧 Process State Types | - | - | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
 | 🚧 Reference Document Codec | - | - | A single codec factory that creates reference document codecs from configuration objects. |
-| 🚧 Reference Generator Registration | - | - | Registers all 11 reference document generators. |
+| 🚧 Reference Generator Registration | - | - | Registers all 13 reference document generators. |
 | 🚧 Stub Resolver Impl | - | - | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 
 ---

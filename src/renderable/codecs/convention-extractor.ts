@@ -10,6 +10,7 @@
 
 import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { BusinessRule } from '../../validation-schemas/extracted-pattern.js';
+import type { SectionBlock } from '../schema.js';
 import { parseBusinessRuleAnnotations } from './helpers.js';
 
 // ============================================================================
@@ -34,6 +35,9 @@ export interface ConventionRuleContent {
 
   /** Tables found in the Rule block description */
   readonly tables: readonly ConventionTable[];
+
+  /** Code examples extracted from DocStrings in the rule description (includes mermaid diagrams) */
+  readonly codeExamples?: readonly SectionBlock[];
 
   /** Free-text content (non-table, non-structured) */
   readonly narrative: string;
@@ -162,6 +166,10 @@ function extractConventionRuleContent(rule: BusinessRule): ConventionRuleContent
       verifiedBy: annotations.verifiedBy,
     }),
     tables,
+    ...(annotations.codeExamples !== undefined &&
+      annotations.codeExamples.length > 0 && {
+        codeExamples: annotations.codeExamples,
+      }),
     narrative: annotations.remainingContent ?? '',
   };
 }

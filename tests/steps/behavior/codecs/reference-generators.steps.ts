@@ -65,7 +65,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Registration produces the correct number of generators', ({ RuleScenario }) => {
     RuleScenario(
-      'All 23 generators are registered from 11 configs plus meta-generator',
+      'All 27 generators are registered from 13 configs plus meta-generator',
       ({ When, Then }) => {
         When('registering reference generators', () => {
           registerReferenceGenerators(state!.registry);

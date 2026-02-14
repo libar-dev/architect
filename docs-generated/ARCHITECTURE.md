@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 110 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 111 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 110 |
+| Total Components | 111 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -112,6 +112,7 @@ graph TB
         PatternsCodec["PatternsCodec[projection]"]
         DocumentCodecs["DocumentCodecs"]
         RichContentHelpers["RichContentHelpers"]
+        Shared_Mermaid_Diagram_Utilities["Shared Mermaid Diagram Utilities"]
         DecisionDocCodec["DecisionDocCodec[projection]"]
         BusinessRulesCodec["BusinessRulesCodec"]
         ArchitectureCodec["ArchitectureCodec[projection]"]
@@ -338,6 +339,7 @@ All components with architecture annotations:
 | 🚧 Process Guard Decider | lint | decider | application | src/lint/process-guard/decider.ts |
 | ✅ Lint Engine | lint | service | application | src/lint/engine.ts |
 | ✅ Lint Rules | lint | service | application | src/lint/rules.ts |
+|  Shared Mermaid Diagram Utilities | renderer | - | - | src/renderable/codecs/diagram-utils.ts |
 | ✅ Architecture Codec | renderer | projection | application | src/renderable/codecs/architecture.ts |
 | ✅ Decision Doc Codec | renderer | projection | application | src/renderable/codecs/decision-doc.ts |
 | ✅ Patterns Codec | renderer | projection | application | src/renderable/codecs/patterns.ts |

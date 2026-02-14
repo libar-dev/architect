@@ -7,14 +7,14 @@
 
 ## Overview
 
-**3 categories** | **45 metadata tags** | **3 aggregation tags**
+**3 categories** | **46 metadata tags** | **3 aggregation tags**
 
 Current configuration uses `@libar-docs-` prefix with `@libar-docs` file opt-in.
 
 | Component | Count | Description |
 | --- | --- | --- |
 | Categories | 3 | Pattern classification by domain |
-| Metadata Tags | 45 | Pattern enrichment and relationships |
+| Metadata Tags | 46 | Pattern enrichment and relationships |
 | Aggregation Tags | 3 | Document routing |
 
 ---
@@ -93,6 +93,7 @@ Tags for enriching patterns with additional metadata.
 | `arch-role` | enum | Architectural role for diagram generation (component type) | No | `@libar-docs-arch-role projection` |
 | `arch-context` | value | Bounded context this component belongs to (for subgraph grouping) | No | `@libar-docs-arch-context orders` |
 | `arch-layer` | enum | Architectural layer for layered diagrams | No | `@libar-docs-arch-layer application` |
+| `arch-view` | csv | Named architectural views for scoped diagram generation | No | `@libar-docs-arch-view codec-transformation,pipeline-overview` |
 
 ### Other Tags
 

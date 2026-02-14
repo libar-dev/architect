@@ -6,6 +6,7 @@
  * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
+ * @libar-docs-arch-view codec-transformation
  *
  * ## Session Document Codec
  *

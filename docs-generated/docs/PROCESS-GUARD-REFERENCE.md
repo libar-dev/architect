@@ -50,6 +50,20 @@ Process Guard implements 7 validation rules:
 The FSM enforces valid state transitions. Protection levels and transitions
     are defined in TypeScript (extracted via @extract-shapes).
 
+```mermaid
+stateDiagram-v2
+        [*] --> roadmap
+        roadmap --> active : Start work
+        roadmap --> deferred : Postpone
+        active --> completed : Finish
+        active --> roadmap : Regress (blocked)
+        deferred --> roadmap : Resume
+        completed --> [*]
+
+        note right of completed : Terminal state
+        note right of active : Scope-locked
+```
+
 ---
 
 ## Escape Hatches
@@ -76,7 +90,7 @@ Process Guard validates 7 rules (types extracted from TypeScript):
 | invalid-status-transition | error | Status transition must follow FSM |
 | scope-creep | error | Cannot add deliverables to active specs |
 | session-excluded | error | Cannot modify files excluded from session |
-| missing-relationship-target | warning | Relationship target pattern must exist |
+| missing-relationship-target | warning | Relationship target must exist |
 | session-scope | warning | File not in active session scope |
 | deliverable-removed | warning | Deliverable was removed (informational) |
 
@@ -97,6 +111,7 @@ Process Guard validates 7 rules (types extracted from TypeScript):
     3. **scope-creep**: Remove new deliverable OR revert status to `roadmap` temporarily
     4. **session-scope**: Add file to session scope OR use `--ignore-session` flag
     5. **session-excluded**: Remove from exclusion list OR use `--ignore-session` flag
+    6. **missing-relationship-target**: Add target pattern OR remove the relationship
 
     For detailed fix examples with code snippets, see [PROCESS-GUARD.md](/docs/PROCESS-GUARD.md).
 
@@ -146,6 +161,7 @@ Process Guard is invoked via the lint-process CLI command.
 | `--ignore-session` | Skip session scope validation |
 | `--show-state` | Debug: show derived process state |
 | `--format json` | Machine-readable JSON output |
+| `--file <path>` | Validate a specific file |
 
 ---
 
@@ -170,6 +186,32 @@ Process Guard can be used programmatically for custom integrations.
 | Results | hasWarnings(result) | Check for warnings |
 | Results | summarizeResult(result) | Human-readable summary |
 
+```typescript
+import {
+      deriveProcessState,
+      detectStagedChanges,
+      validateChanges,
+      hasErrors,
+      summarizeResult,
+    } from '@libar-dev/delivery-process/lint';
+
+    const state = (await deriveProcessState({ baseDir: '.' })).value;
+    const changes = detectStagedChanges('.').value;
+    const { result } = validateChanges({
+      state,
+      changes,
+      options: { strict: false, ignoreSession: false },
+    });
+
+    if (hasErrors(result)) {
+      console.log(summarizeResult(result));
+      for (const v of result.violations) {
+        console.log(`[${v.rule}] ${v.file}: ${v.message}`);
+      }
+      process.exit(1);
+    }
+```
+
 ---
 
 ## Architecture
@@ -181,6 +223,22 @@ Process Guard uses the Decider pattern for testable validation.
     
 
     **Principle:** State is derived from file annotations - there is no separate state file to maintain.
+
+```mermaid
+flowchart LR
+        A[deriveProcessState] --> C[validateChanges]
+        B[detectChanges] --> C
+        C --> D[ValidationResult]
+
+        subgraph Pure Functions
+            C
+        end
+
+        subgraph I/O
+            A
+            B
+        end
+```
 
 ---
 
@@ -194,6 +252,47 @@ Process Guard uses the Decider pattern for testable validation.
 | SESSION-GUIDES-REFERENCE.md | Prerequisite | Planning/Implementation workflows that Process Guard enforces |
 | CONFIGURATION-REFERENCE.md | Reference | Presets and tag configuration |
 | METHODOLOGY-REFERENCE.md | Background | Code-first documentation philosophy |
+
+---
+
+## Component Overview
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+graph TB
+    subgraph lint["Lint"]
+        LintRules["LintRules[service]"]
+        LintEngine["LintEngine[service]"]
+        ProcessGuardDecider["ProcessGuardDecider[decider]"]
+    end
+    subgraph validation["Validation"]
+        DoDValidator["DoDValidator[service]"]
+        AntiPatternDetector["AntiPatternDetector[service]"]
+        FSMValidator["FSMValidator[decider]"]
+        FSMTransitions["FSMTransitions[read-model]"]
+        FSMStates["FSMStates[read-model]"]
+    end
+    subgraph related["Related"]
+        CodecUtils["CodecUtils"]:::neighbor
+        DoDValidationTypes["DoDValidationTypes"]:::neighbor
+        DualSourceExtractor["DualSourceExtractor"]:::neighbor
+        ProcessGuardLinter["ProcessGuardLinter"]:::neighbor
+        PhaseStateMachineValidation["PhaseStateMachineValidation"]:::neighbor
+        PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
+    end
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    LintRules ..-> PatternRelationshipModel
+    LintEngine --> LintRules
+    LintEngine --> CodecUtils
+    FSMValidator ..-> PhaseStateMachineValidation
+    FSMTransitions ..-> PhaseStateMachineValidation
+    FSMStates ..-> PhaseStateMachineValidation
+    ProcessGuardDecider ..-> ProcessGuardLinter
+    classDef neighbor stroke-dasharray: 5 5
+```
 
 ---
 

@@ -7,6 +7,7 @@
  * @libar-docs-arch-role service
  * @libar-docs-arch-context generator
  * @libar-docs-arch-layer application
+ * @libar-docs-arch-view pipeline-stages
  * @libar-docs-uses MasterDataset, ExtractedPattern, TagRegistry, NormalizeStatus
  * @libar-docs-used-by Orchestrator
  * @libar-docs-usecase "When computing all pattern views in a single pass"
@@ -218,6 +219,7 @@ export function transformToMasterDatasetWithValidation(raw) {
         byRole: {},
         byContext: {},
         byLayer: {},
+        byView: {},
         all: [],
     };
     // ─────────────────────────────────────────────────────────────────────────
@@ -280,7 +282,8 @@ export function transformToMasterDatasetWithValidation(raw) {
         const inferredContext = pattern.archContext ?? inferContext(pattern.source.file, contextInferenceRules);
         const hasArchMetadata = pattern.archRole !== undefined ||
             inferredContext !== undefined ||
-            pattern.archLayer !== undefined;
+            pattern.archLayer !== undefined ||
+            (pattern.archView !== undefined && pattern.archView.length > 0);
         if (hasArchMetadata) {
             archIndex.all.push(p);
             // Group by role (bounded-context, projection, saga, etc.)
@@ -298,6 +301,15 @@ export function transformToMasterDatasetWithValidation(raw) {
             if (pattern.archLayer) {
                 const layerPatterns = (archIndex.byLayer[pattern.archLayer] ??= []);
                 layerPatterns.push(p);
+            }
+            // Group by view (patterns can appear in multiple named views)
+            if (pattern.archView) {
+                for (const view of pattern.archView) {
+                    if (view.length === 0)
+                        continue;
+                    const viewPatterns = (archIndex.byView[view] ??= []);
+                    viewPatterns.push(p);
+                }
             }
         }
     }

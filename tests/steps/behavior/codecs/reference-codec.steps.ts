@@ -724,6 +724,776 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   );
 
   // ──────────────────────────────────────────────────────────────────────
+  // Rule: Convention code examples render as mermaid blocks
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Convention code examples render as mermaid blocks', ({ RuleScenario }) => {
+    RuleScenario(
+      'Convention with mermaid content produces mermaid block in output',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And('a MasterDataset with a convention pattern with a mermaid diagram', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'MermaidConvention',
+                convention: ['fsm-rules'],
+                rules: [
+                  {
+                    name: 'FSM Diagram',
+                    description: [
+                      'The FSM enforces valid state transitions.',
+                      '',
+                      '"""mermaid',
+                      'stateDiagram-v2',
+                      '    [*] --> roadmap',
+                      '    roadmap --> active',
+                      '    active --> completed',
+                      '"""',
+                    ].join('\n'),
+                    scenarioCount: 0,
+                    scenarioNames: [],
+                  },
+                ],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+      }
+    );
+
+    RuleScenario('Summary level omits convention code examples', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with convention tags {string} and behavior tags {string}',
+        (_ctx: unknown, convTags: string, behTags: string) => {
+          state!.config = makeConfig(convTags, behTags);
+        }
+      );
+
+      And('a MasterDataset with a convention pattern with a mermaid diagram', () => {
+        state!.dataset = createTestMasterDataset({
+          patterns: [
+            createTestPattern({
+              name: 'MermaidConventionSummary',
+              convention: ['fsm-rules'],
+              rules: [
+                {
+                  name: 'FSM Diagram',
+                  description: [
+                    'The FSM enforces valid state transitions.',
+                    '',
+                    '"""mermaid',
+                    'stateDiagram-v2',
+                    '    [*] --> roadmap',
+                    '    roadmap --> active',
+                    '"""',
+                  ].join('\n'),
+                  scenarioCount: 0,
+                  scenarioNames: [],
+                },
+              ],
+            }),
+          ],
+        });
+      });
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document does not contain a mermaid block', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks).toHaveLength(0);
+      });
+    });
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Scoped diagrams are generated from diagramScope config
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Scoped diagrams are generated from diagramScope config', ({ RuleScenario }) => {
+    RuleScenario(
+      'Config with diagramScope produces mermaid block at detailed level',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archContext {string}',
+          (_ctx: unknown, context: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { archContext: [context] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And(
+          'a MasterDataset with arch-annotated patterns in context {string}',
+          (_ctx: unknown, context: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'LintRules',
+                  archContext: context,
+                  archRole: 'service',
+                }),
+                createTestPattern({
+                  name: 'ProcessGuard',
+                  archContext: context,
+                  archRole: 'decider',
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text.includes(headingText));
+          expect(match).toBe(true);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Neighbor patterns appear in diagram with distinct style',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archContext {string}',
+          (_ctx: unknown, context: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { archContext: [context] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with arch patterns where lint uses validation', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LintRules',
+                archContext: 'lint',
+                archRole: 'service',
+                uses: ['DoDValidator'],
+              }),
+              createTestPattern({
+                name: 'DoDValidator',
+                archContext: 'validation',
+                archRole: 'service',
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content contains {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text);
+        });
+
+        And('the mermaid diagram includes a Related subgraph', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain('Related');
+        });
+
+        And('the mermaid diagram includes dashed neighbor styling', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain('classDef neighbor');
+        });
+      }
+    );
+
+    RuleScenario(
+      'Config without diagramScope produces no diagram section',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with convention tags {string} and behavior tags {string}',
+          (_ctx: unknown, convTags: string, behTags: string) => {
+            state!.config = makeConfig(convTags, behTags);
+          }
+        );
+
+        And(
+          'a MasterDataset with arch-annotated patterns in context {string}',
+          (_ctx: unknown, context: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'ConventionADR',
+                  convention: ['fsm-rules'],
+                  archContext: context,
+                  rules: [
+                    {
+                      name: 'FSM Rule',
+                      description: '**Invariant:** Valid transitions only.',
+                      scenarioCount: 0,
+                      scenarioNames: [],
+                    },
+                  ],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then(
+          'the document does not have a heading {string}',
+          (_ctx: unknown, headingText: string) => {
+            const headings = findHeadings(state!.document!);
+            const match = headings.some((h) => h.text.includes(headingText));
+            expect(match).toBe(false);
+          }
+        );
+      }
+    );
+
+    RuleScenario('Summary level omits scoped diagram', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with diagramScope archContext {string}',
+        (_ctx: unknown, context: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            diagramScope: { archContext: [context] },
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
+
+      And(
+        'a MasterDataset with arch-annotated patterns in context {string}',
+        (_ctx: unknown, context: string) => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LintRules',
+                archContext: context,
+                archRole: 'service',
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document does not contain a mermaid block', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks).toHaveLength(0);
+      });
+    });
+
+    RuleScenario(
+      'archView filter selects patterns by view membership',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archView {string}',
+          (_ctx: unknown, viewName: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { archView: [viewName] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And(
+          'a MasterDataset with patterns in arch view {string}',
+          (_ctx: unknown, viewName: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'PatternScanner',
+                  archContext: 'scanner',
+                  archRole: 'infrastructure',
+                  archView: [viewName],
+                }),
+                createTestPattern({
+                  name: 'DocExtractor',
+                  archContext: 'extractor',
+                  archRole: 'service',
+                  archView: [viewName],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content contains {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text);
+        });
+      }
+    );
+
+    RuleScenario('Multiple filter dimensions OR together', ({ Given, And, When, Then }) => {
+      Given('a reference config with diagramScope combining archContext and archView', () => {
+        state!.config = {
+          title: 'Test Reference Document',
+          conventionTags: [],
+          shapeSources: [],
+          behaviorCategories: [],
+          diagramScope: { archContext: ['lint'], archView: ['pipeline-stages'] },
+          claudeMdSection: 'test',
+          docsFilename: 'TEST-REFERENCE.md',
+          claudeMdFilename: 'test.md',
+        };
+      });
+
+      And(
+        'a MasterDataset where one pattern matches archContext and another matches archView',
+        () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LintRules',
+                archContext: 'lint',
+                archRole: 'service',
+              }),
+              createTestPattern({
+                name: 'DocExtractor',
+                archContext: 'extractor',
+                archRole: 'service',
+                archView: ['pipeline-stages'],
+              }),
+            ],
+          });
+        }
+      );
+
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
+        });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
+
+      Then('the document contains a mermaid block', () => {
+        const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+        expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+      });
+
+      And(
+        'the mermaid content contains both {string} and {string}',
+        (_ctx: unknown, text1: string, text2: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text1);
+          expect(content).toContain(text2);
+        }
+      );
+    });
+
+    RuleScenario(
+      'Explicit pattern names filter selects named patterns',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope patterns {string}',
+          (_ctx: unknown, patternName: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { patterns: [patternName] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with multiple arch-annotated patterns', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LintRules',
+                archContext: 'lint',
+                archRole: 'service',
+              }),
+              createTestPattern({
+                name: 'DocExtractor',
+                archContext: 'extractor',
+                archRole: 'service',
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content contains {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text);
+        });
+
+        And('the mermaid content does not contain {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).not.toContain(text);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Self-contained scope produces no Related subgraph',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archContext {string}',
+          (_ctx: unknown, context: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { archContext: [context] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with self-contained lint patterns', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LintRules',
+                archContext: 'lint',
+                archRole: 'service',
+                uses: ['ProcessGuard'],
+              }),
+              createTestPattern({
+                name: 'ProcessGuard',
+                archContext: 'lint',
+                archRole: 'decider',
+                uses: ['LintRules'],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content does not contain {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).not.toContain(text);
+        });
+      }
+    );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
+  // Rule: Multiple diagram scopes produce multiple mermaid blocks
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Multiple diagram scopes produce multiple mermaid blocks', ({ RuleScenario }) => {
+    RuleScenario(
+      'Config with diagramScopes array produces multiple diagrams',
+      ({ Given, And, When, Then }) => {
+        Given('a reference config with two diagramScopes', () => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            diagramScopes: [
+              {
+                archView: ['codec-transformation'],
+                title: 'Codec Transformation',
+                direction: 'TB',
+              },
+              { archView: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
+            ],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        });
+
+        And('a MasterDataset with patterns in two different arch views', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'SessionCodec',
+                archContext: 'renderer',
+                archRole: 'projection',
+                archView: ['codec-transformation'],
+              }),
+              createTestPattern({
+                name: 'PatternScanner',
+                archContext: 'scanner',
+                archRole: 'infrastructure',
+                archView: ['pipeline-stages'],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains {int} mermaid blocks', (_ctx: unknown, count: number) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks).toHaveLength(count);
+        });
+
+        And(
+          'the document has headings {string} and {string}',
+          (_ctx: unknown, heading1: string, heading2: string) => {
+            const headings = findHeadings(state!.document!);
+            const has1 = headings.some((h) => h.text.includes(heading1));
+            const has2 = headings.some((h) => h.text.includes(heading2));
+            expect(has1).toBe(true);
+            expect(has2).toBe(true);
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Diagram direction is reflected in mermaid output',
+      ({ Given, And, When, Then }) => {
+        Given('a reference config with LR direction diagramScope', () => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            diagramScopes: [
+              { archView: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
+            ],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        });
+
+        And(
+          'a MasterDataset with patterns in arch view {string}',
+          (_ctx: unknown, viewName: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'PatternScanner',
+                  archContext: 'scanner',
+                  archRole: 'infrastructure',
+                  archView: [viewName],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the mermaid content contains {string}', (_ctx: unknown, text: string) => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+          const content = mermaidBlocks[0]!.content;
+          expect(content).toContain(text);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Legacy diagramScope still works when diagramScopes is absent',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with diagramScope archContext {string}',
+          (_ctx: unknown, context: string) => {
+            state!.config = {
+              title: 'Test Reference Document',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: [],
+              diagramScope: { archContext: [context] },
+              claudeMdSection: 'test',
+              docsFilename: 'TEST-REFERENCE.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And(
+          'a MasterDataset with arch-annotated patterns in context {string}',
+          (_ctx: unknown, context: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'LintRules',
+                  archContext: context,
+                  archRole: 'service',
+                }),
+                createTestPattern({
+                  name: 'ProcessGuard',
+                  archContext: context,
+                  archRole: 'decider',
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains a mermaid block', () => {
+          const mermaidBlocks = findBlocksByType(state!.document!, 'mermaid');
+          expect(mermaidBlocks.length).toBeGreaterThanOrEqual(1);
+        });
+
+        And('the document has a heading {string}', (_ctx: unknown, headingText: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text.includes(headingText));
+          expect(match).toBe(true);
+        });
+      }
+    );
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
   // Rule: Standard detail level includes narrative but omits rationale
   // ──────────────────────────────────────────────────────────────────────
 

@@ -802,9 +802,9 @@
 
 | Preset | Categories | Tag Prefix | Use Case |
 | --- | --- | --- | --- |
-| libar-generic (default) | 3 | @libar-docs- | Simple projects (this package) |
-| ddd-es-cqrs | 21 | @libar-docs- | DDD/Event Sourcing architectures |
-| generic | 3 | @docs- | Simple projects with @docs- prefix |
+| libar-generic (default) | 3 | libar-docs- | Simple projects (this package) |
+| ddd-es-cqrs | 21 | libar-docs- | DDD/Event Sourcing architectures |
+| generic | 3 | docs- | Simple projects with docs- prefix |
 
 ---
 

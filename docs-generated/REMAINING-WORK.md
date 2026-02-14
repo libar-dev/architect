@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [████████████░░░░░░░░] 102/165 (62%)
+**Overall Progress:** [████████████░░░░░░░░] 104/168 (62%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 28 |
-| 📋 Planned | 35 |
-| **Total Remaining** | 63 |
+| 📋 Planned | 36 |
+| **Total Remaining** | 64 |
 
 ---
 
@@ -25,14 +25,14 @@
 | 📋 [ArchitectureDiagramGeneration](remaining/phase-23-architecture-diagram-generation.md) | 1 | 0 | 0% |
 | 🚧 [ProcessStateAPIRelationshipQueries](remaining/phase-24-process-state-api-relationship-queries.md) | 1 | 1 | 50% |
 | 📋 [DataAPIStubIntegration](remaining/phase-25-data-api-stub-integration.md) | 4 | 0 | 56% |
-| 🚧 [FileCache](remaining/phase-27-file-cache.md) | 1 | 1 | 75% |
+| 🚧 [SourceMapper](remaining/phase-27-source-mapper.md) | 1 | 1 | 80% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 3 | 0 | 57% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 37 | 26 | 0% |
+| 🚧 Backlog (No Phase) | 38 | 26 | 0% |
 
 ---
 
@@ -41,7 +41,7 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 28 |
-| ✅ Ready to Start | 34 |
+| ✅ Ready to Start | 35 |
 | ⚠️ Blocked | 1 |
 
 ### Top Ready to Start
@@ -71,6 +71,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Data API Platform Integration (Phase 25) - 3d
 - 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 34 actionable items.
+Showing 5 of 35 actionable items.
 
 ---

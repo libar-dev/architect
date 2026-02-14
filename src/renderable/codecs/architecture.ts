@@ -6,6 +6,7 @@
  * @libar-docs-arch-role projection
  * @libar-docs-arch-context renderer
  * @libar-docs-arch-layer application
+ * @libar-docs-arch-view codec-transformation
  * @libar-docs-uses MasterDataset, ArchIndex
  *
  * ## Architecture Diagram Codec
@@ -58,6 +59,7 @@ import { getDisplayName, getStatusEmoji } from '../utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
 import { type BaseCodecOptions, DEFAULT_BASE_OPTIONS, mergeOptions } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
+import { sanitizeNodeId, EDGE_STYLES } from './diagram-utils.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Architecture Codec Options (co-located with codec)
@@ -254,10 +256,22 @@ function applyContextFilter(
     }
   }
 
+  // Filter byView similarly
+  const filteredByView: Record<string, ExtractedPattern[]> = {};
+  for (const [view, patterns] of Object.entries(archIndex.byView)) {
+    const filtered = patterns.filter(
+      (p) => p.archContext !== undefined && filterContexts.includes(p.archContext)
+    );
+    if (filtered.length > 0) {
+      filteredByView[view] = filtered;
+    }
+  }
+
   return {
     byContext: filteredByContext,
     byRole: filteredByRole,
     byLayer: filteredByLayer,
+    byView: filteredByView,
     all: filteredAll,
   };
 }
@@ -366,7 +380,7 @@ function buildComponentDiagram(
     for (const target of rel.uses) {
       const targetId = nodeIds.get(target);
       if (targetId) {
-        lines.push(`    ${sourceId} --> ${targetId}`);
+        lines.push(`    ${sourceId} ${EDGE_STYLES.uses} ${targetId}`);
       }
     }
 
@@ -374,7 +388,7 @@ function buildComponentDiagram(
     for (const target of rel.dependsOn) {
       const targetId = nodeIds.get(target);
       if (targetId) {
-        lines.push(`    ${sourceId} -.-> ${targetId}`);
+        lines.push(`    ${sourceId} ${EDGE_STYLES.dependsOn} ${targetId}`);
       }
     }
 
@@ -382,7 +396,7 @@ function buildComponentDiagram(
     for (const target of rel.implementsPatterns) {
       const targetId = nodeIds.get(target);
       if (targetId) {
-        lines.push(`    ${sourceId} ..-> ${targetId}`);
+        lines.push(`    ${sourceId} ${EDGE_STYLES.implementsPatterns} ${targetId}`);
       }
     }
 
@@ -390,7 +404,7 @@ function buildComponentDiagram(
     if (rel.extendsPattern) {
       const targetId = nodeIds.get(rel.extendsPattern);
       if (targetId) {
-        lines.push(`    ${sourceId} -->> ${targetId}`);
+        lines.push(`    ${sourceId} ${EDGE_STYLES.extendsPattern} ${targetId}`);
       }
     }
   }
@@ -467,14 +481,14 @@ function buildLayeredDiagram(
     for (const target of rel.uses) {
       const targetId = nodeIds.get(target);
       if (targetId) {
-        lines.push(`    ${sourceId} --> ${targetId}`);
+        lines.push(`    ${sourceId} ${EDGE_STYLES.uses} ${targetId}`);
       }
     }
 
     for (const target of rel.dependsOn) {
       const targetId = nodeIds.get(target);
       if (targetId) {
-        lines.push(`    ${sourceId} -.-> ${targetId}`);
+        lines.push(`    ${sourceId} ${EDGE_STYLES.dependsOn} ${targetId}`);
       }
     }
   }
@@ -548,14 +562,6 @@ function buildInventorySection(archIndex: NonNullable<MasterDataset['archIndex']
 // ═══════════════════════════════════════════════════════════════════════════
 // Utility Functions
 // ═══════════════════════════════════════════════════════════════════════════
-
-/**
- * Sanitize pattern name for Mermaid node ID
- * Mermaid requires alphanumeric + underscore only
- */
-function sanitizeNodeId(name: string): string {
-  return name.replace(/[^a-zA-Z0-9]/g, '_');
-}
 
 /**
  * Format context name for subgraph label

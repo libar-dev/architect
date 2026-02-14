@@ -597,6 +597,29 @@
 | DoD | hasAcceptanceCriteria(feature) | Check for @acceptance-criteria scenarios |
 | DoD | formatDoDSummary(summary) | Format DoD results for console output |
 
+```typescript
+// Pattern linting
+    import { lintFiles, hasFailures } from '@libar-dev/delivery-process/lint';
+
+    // Anti-patterns and DoD
+    import { detectAntiPatterns, validateDoD } from '@libar-dev/delivery-process/validation';
+```
+
+```typescript
+import { detectAntiPatterns } from '@libar-dev/delivery-process/validation';
+
+    const violations = detectAntiPatterns(tsFiles, features, {
+      thresholds: { scenarioBloatThreshold: 15 },
+    });
+```
+
+```typescript
+import { validateDoD, formatDoDSummary } from '@libar-dev/delivery-process/validation';
+
+    const summary = validateDoD(features);
+    console.log(formatDoDSummary(summary));
+```
+
 ---
 
 ## Related Documentation - Validation
