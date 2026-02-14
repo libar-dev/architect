@@ -9,7 +9,7 @@
 | Property       | Value                                                         |
 | -------------- | ------------------------------------------------------------- |
 | Status         | planned                                                       |
-| Product Area   | DeliveryProcess                                               |
+| Product Area   | Validation                                                    |
 | Business Value | prevent phase number conflicts and ensure consistent ordering |
 | Phase          | 100                                                           |
 

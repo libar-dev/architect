@@ -27,7 +27,7 @@ import { MasterDatasetSchema, } from '../../validation-schemas/master-dataset.js
 import { heading, paragraph, separator, table, code, list, mermaid, collapsible, linkOut, document, } from '../schema.js';
 import { DEFAULT_BASE_OPTIONS, mergeOptions, } from './types/base.js';
 import { RenderableDocumentOutputSchema } from './shared-schema.js';
-import { extractConventions, extractConventionsFromPatterns, } from './convention-extractor.js';
+import { extractConventions, extractConventionsFromPatterns, extractTablesFromDescription, } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset, filterShapesBySelectors } from './shape-matcher.js';
 import { sanitizeNodeId, EDGE_STYLES, EDGE_LABELS, SEQUENCE_ARROWS, formatNodeDeclaration, } from './diagram-utils.js';
@@ -256,6 +256,12 @@ function buildBehaviorSectionsFromPatterns(patterns, detailLevel) {
                     }
                     if (annotations.remainingContent) {
                         ruleBlocks.push(paragraph(annotations.remainingContent));
+                    }
+                    // Extract and render tables from Rule descriptions (Gherkin or markdown)
+                    const ruleTables = extractTablesFromDescription(rule.description);
+                    for (const tbl of ruleTables) {
+                        const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
+                        ruleBlocks.push(table([...tbl.headers], rows));
                     }
                     if (annotations.codeExamples && detailLevel === 'detailed') {
                         for (const example of annotations.codeExamples) {

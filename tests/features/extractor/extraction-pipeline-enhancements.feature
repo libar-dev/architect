@@ -2,7 +2,7 @@
 @libar-docs-pattern:ExtractionPipelineEnhancementsTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Extractor
+@libar-docs-product-area:Annotation
 Feature: Extraction Pipeline Enhancements
 
   Validates extraction pipeline capabilities for ReferenceDocShowcase:

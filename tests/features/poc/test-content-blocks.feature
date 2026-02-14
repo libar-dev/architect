@@ -2,7 +2,7 @@
 @libar-docs-pattern:TestContentBlocks
 @libar-docs-status:roadmap
 @libar-docs-phase:99
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-business-value:test-what-generators-capture
 Feature: Test Content Blocks
 

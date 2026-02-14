@@ -9,7 +9,7 @@
 | Property       | Value                                                        |
 | -------------- | ------------------------------------------------------------ |
 | Status         | active                                                       |
-| Product Area   | DeliveryProcess                                              |
+| Product Area   | Generation                                                   |
 | Business Value | validates all content blocks via single integration document |
 | Phase          | 30                                                           |
 

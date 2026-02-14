@@ -472,6 +472,29 @@ Parameterized codec factory that creates reference document codecs
 - When decoding at detail level "summary"
 - Then the document does not contain link-out blocks
 
+**Include-tagged pattern appears in behavior section**
+
+- Given a reference config with includeTags "reference-sample"
+- And a MasterDataset with a pattern that has include "reference-sample"
+- When decoding at detail level "standard"
+- Then the document has a heading "Behavior Specifications"
+- And the document contains text "IncludedPattern"
+
+**Include-tagged pattern is additive with category-selected patterns**
+
+- Given a reference config with behavior tags "lint" and includeTags "reference-sample"
+- And a MasterDataset with a category pattern and an include-tagged pattern
+- When decoding at detail level "standard"
+- Then the document contains text "LintPattern"
+- And the document contains text "IncludedPattern"
+
+**Pattern without matching include tag is excluded**
+
+- Given a reference config with includeTags "reference-sample"
+- And a MasterDataset with a pattern that has include "other-doc"
+- When decoding at detail level "standard"
+- Then the document does not have a heading "Behavior Specifications"
+
 ## Business Rules
 
 **Empty datasets produce fallback content**
@@ -599,6 +622,18 @@ _Verified by: Behavior pattern with many rules uses collapsible blocks at detail
     Summary level omits link-out
 
 _Verified by: Behavior pattern includes source file link-out at detailed level, Standard level includes source file link-out, Summary level omits link-out blocks_
+
+**Include tags route cross-cutting content into reference documents**
+
+**Invariant:** Patterns with matching include tags appear alongside
+    category-selected patterns in the behavior section. The merging
+    is additive (OR semantics).
+
+    **Verified by:** Include-tagged pattern appears in behavior section,
+    Include-tagged pattern is additive with category-selected patterns,
+    Pattern without matching include tag is excluded
+
+_Verified by: Include-tagged pattern appears in behavior section, Include-tagged pattern is additive with category-selected patterns, Pattern without matching include tag is excluded_
 
 ---
 

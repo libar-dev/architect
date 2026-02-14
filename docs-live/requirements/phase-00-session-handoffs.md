@@ -9,7 +9,7 @@
 | Property     | Value     |
 | ------------ | --------- |
 | Status       | completed |
-| Product Area | Behavior  |
+| Product Area | Process   |
 
 ## Description
 

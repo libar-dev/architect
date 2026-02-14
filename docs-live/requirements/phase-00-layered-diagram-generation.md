@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value        |
-| ------------ | ------------ |
-| Status       | completed    |
-| Product Area | Architecture |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
+| Product Area | Generation |
 
 ## Description
 

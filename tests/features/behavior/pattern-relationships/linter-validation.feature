@@ -2,7 +2,7 @@
 @libar-docs-pattern:LinterValidationTesting
 @libar-docs-status:completed
 @libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:PatternRelationship
+@libar-docs-product-area:Validation
 Feature: Linter Rules for Relationship Validation
 
   Tests for lint rules that validate relationship integrity, detect conflicts,

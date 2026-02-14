@@ -2,7 +2,7 @@
 @libar-docs-pattern:DeclarationLevelShapeTaggingTesting
 @libar-docs-status:completed
 @libar-docs-implements:DeclarationLevelShapeTagging
-@libar-docs-product-area:Extractor
+@libar-docs-product-area:Annotation
 Feature: Declaration-Level Shape Tagging - Extraction
 
   Tests the discoverTaggedShapes function that scans TypeScript source

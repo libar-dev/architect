@@ -1,7 +1,7 @@
 @libar-docs
 @scanner @libar-docs-pattern:GherkinAstParser @unit
 @libar-docs-status:completed
-@libar-docs-product-area:Scanner
+@libar-docs-product-area:Annotation
 Feature: Gherkin AST Parser
   The Gherkin AST parser extracts feature metadata, scenarios, and steps
   from .feature files for timeline generation and process documentation.

@@ -9,7 +9,7 @@
 | Property       | Value                                |
 | -------------- | ------------------------------------ |
 | Status         | completed                            |
-| Product Area   | DeliveryProcess                      |
+| Product Area   | DataAPI                              |
 | Business Value | automate session context compilation |
 | Phase          | 25                                   |
 

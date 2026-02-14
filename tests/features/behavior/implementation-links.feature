@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ImplementationLinkPathNormalization
 @libar-docs-status:completed
-@libar-docs-product-area:Behavior
+@libar-docs-product-area:Generation
 Feature: Implementation Link Path Normalization
 
   Links to implementation files in generated pattern documents should have

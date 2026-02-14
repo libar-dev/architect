@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ScannerCore
 @libar-docs-status:completed
-@libar-docs-product-area:Scanner
+@libar-docs-product-area:Annotation
 @behavior @scanner-core
 Feature: Scanner Core Integration
   The scanPatterns function orchestrates file discovery, directive detection,

@@ -9,7 +9,7 @@
 | Property       | Value                                      |
 | -------------- | ------------------------------------------ |
 | Status         | planned                                    |
-| Product Area   | DeliveryProcess                            |
+| Product Area   | DataAPI                                    |
 | Business Value | deep dependency analysis and health checks |
 | Phase          | 25                                         |
 

@@ -3513,4 +3513,177 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       });
     });
   });
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // Rule: Include tags route cross-cutting content into reference documents
+  // ──────────────────────────────────────────────────────────────────────────
+
+  Rule('Include tags route cross-cutting content into reference documents', ({ RuleScenario }) => {
+    RuleScenario(
+      'Include-tagged pattern appears in behavior section',
+      ({ Given, And, When, Then }) => {
+        Given('a reference config with includeTags {string}', (_ctx: unknown, tags: string) => {
+          state = initState();
+          state.config = {
+            title: 'Test Reference',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            includeTags: tags.split(',').map((t) => t.trim()),
+            claudeMdSection: 'test',
+            docsFilename: 'TEST.md',
+            claudeMdFilename: 'test.md',
+          };
+        });
+
+        And(
+          'a MasterDataset with a pattern that has include {string}',
+          (_ctx: unknown, includeTag: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'IncludedPattern',
+                  category: 'core',
+                  description: 'A pattern included via include tag.',
+                  include: [includeTag],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document has a heading {string}', (_ctx: unknown, heading: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text === heading);
+          expect(match).toBe(true);
+        });
+
+        And('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const paras = findParagraphs(state!.document!);
+          const match = paras.some((p) => p.text.includes(text));
+          const headings = findHeadings(state!.document!);
+          const headingMatch = headings.some((h) => h.text.includes(text));
+          expect(match || headingMatch).toBe(true);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Include-tagged pattern is additive with category-selected patterns',
+      ({ Given, And, When, Then }) => {
+        Given(
+          'a reference config with behavior tags {string} and includeTags {string}',
+          (_ctx: unknown, behTags: string, includeTags: string) => {
+            state = initState();
+            state.config = {
+              title: 'Test Reference',
+              conventionTags: [],
+              shapeSources: [],
+              behaviorCategories: behTags.split(',').map((t) => t.trim()),
+              includeTags: includeTags.split(',').map((t) => t.trim()),
+              claudeMdSection: 'test',
+              docsFilename: 'TEST.md',
+              claudeMdFilename: 'test.md',
+            };
+          }
+        );
+
+        And('a MasterDataset with a category pattern and an include-tagged pattern', () => {
+          state!.dataset = createTestMasterDataset({
+            patterns: [
+              createTestPattern({
+                name: 'LintPattern',
+                category: 'lint',
+                description: 'A pattern in the lint category.',
+              }),
+              createTestPattern({
+                name: 'IncludedPattern',
+                category: 'core',
+                description: 'A pattern included via include tag.',
+                include: ['reference-sample'],
+              }),
+            ],
+          });
+        });
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const paras = findParagraphs(state!.document!);
+          const match = paras.some((p) => p.text.includes(text));
+          const headings = findHeadings(state!.document!);
+          const headingMatch = headings.some((h) => h.text.includes(text));
+          expect(match || headingMatch).toBe(true);
+        });
+
+        And('the document contains text {string}', (_ctx: unknown, text: string) => {
+          const paras = findParagraphs(state!.document!);
+          const match = paras.some((p) => p.text.includes(text));
+          const headings = findHeadings(state!.document!);
+          const headingMatch = headings.some((h) => h.text.includes(text));
+          expect(match || headingMatch).toBe(true);
+        });
+      }
+    );
+
+    RuleScenario(
+      'Pattern without matching include tag is excluded',
+      ({ Given, And, When, Then }) => {
+        Given('a reference config with includeTags {string}', (_ctx: unknown, tags: string) => {
+          state = initState();
+          state.config = {
+            title: 'Test Reference',
+            conventionTags: [],
+            shapeSources: [],
+            behaviorCategories: [],
+            includeTags: tags.split(',').map((t) => t.trim()),
+            claudeMdSection: 'test',
+            docsFilename: 'TEST.md',
+            claudeMdFilename: 'test.md',
+          };
+        });
+
+        And(
+          'a MasterDataset with a pattern that has include {string}',
+          (_ctx: unknown, includeTag: string) => {
+            state!.dataset = createTestMasterDataset({
+              patterns: [
+                createTestPattern({
+                  name: 'NonMatchingPattern',
+                  category: 'core',
+                  description: 'A pattern with non-matching include.',
+                  include: [includeTag],
+                }),
+              ],
+            });
+          }
+        );
+
+        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+          const codec = createReferenceCodec(state!.config!, {
+            detailLevel: level as DetailLevel,
+          });
+          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+        });
+
+        Then('the document does not have a heading {string}', (_ctx: unknown, heading: string) => {
+          const headings = findHeadings(state!.document!);
+          const match = headings.some((h) => h.text === heading);
+          expect(match).toBe(false);
+        });
+      }
+    );
+  });
 });

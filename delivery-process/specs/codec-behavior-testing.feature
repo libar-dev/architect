@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:102
 @libar-docs-effort:5d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-business-value:ensure-all-document-codecs-produce-correct-output
 @libar-docs-priority:medium
 @libar-docs-executable-specs:tests/features/behavior/codecs

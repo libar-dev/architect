@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:99
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:enable-process-guard-on-large-repositories
 @libar-docs-priority:high
 @libar-docs-depends-on:ProcessGuardLinter

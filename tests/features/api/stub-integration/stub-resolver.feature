@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:StubResolverTests
 @libar-docs-status:active
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Stub Resolver - Design Stub Discovery and Resolution
 
   **Problem:**

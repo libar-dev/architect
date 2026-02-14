@@ -6,11 +6,11 @@
 
 ## Overview
 
-| Property     | Value           |
-| ------------ | --------------- |
-| Status       | active          |
-| Product Area | DeliveryProcess |
-| Phase        | 24              |
+| Property     | Value   |
+| ------------ | ------- |
+| Status       | active  |
+| Product Area | DataAPI |
+| Phase        | 24      |
 
 ## Description
 

@@ -5,6 +5,8 @@
 @libar-docs-pattern:ADR001TaxonomyCanonicalValues
 @libar-docs-status:roadmap
 @libar-docs-product-area:Process
+@libar-docs-convention:taxonomy-rules
+@libar-docs-include:reference-sample
 Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
 
   **Context:**
@@ -27,9 +29,9 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Decision spec | in-progress | delivery-process/decisions/adr-001 |
-      | Migrate executable spec product-area tags | pending | tests/features/**/*.feature |
-      | Migrate tier 1 spec product-area tags | pending | delivery-process/specs/*.feature |
+      | Decision spec | complete | delivery-process/decisions/adr-001 |
+      | Migrate executable spec product-area tags | complete | tests/features/**/*.feature |
+      | Migrate tier 1 spec product-area tags | complete | delivery-process/specs/*.feature |
       | Fix adr-category on existing decisions | pending | delivery-process/decisions/*.feature |
 
   Rule: Product area canonical values

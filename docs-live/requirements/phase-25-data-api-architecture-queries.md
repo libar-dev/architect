@@ -9,7 +9,7 @@
 | Property       | Value                                             |
 | -------------- | ------------------------------------------------- |
 | Status         | completed                                         |
-| Product Area   | DeliveryProcess                                   |
+| Product Area   | DataAPI                                           |
 | Business Value | deep architecture exploration for design sessions |
 | Phase          | 25                                                |
 

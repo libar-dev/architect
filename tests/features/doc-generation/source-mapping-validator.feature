@@ -2,7 +2,7 @@
 @libar-docs-pattern:SourceMappingValidatorTesting
 @libar-docs-implements:SourceMappingValidator
 @libar-docs-status:completed
-@libar-docs-product-area:DocGeneration
+@libar-docs-product-area:Generation
 Feature: Source Mapping Validator
 
   **Context:** Source mappings reference files that may not exist, use invalid

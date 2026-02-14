@@ -9,7 +9,7 @@
 | Property       | Value                                             |
 | -------------- | ------------------------------------------------- |
 | Status         | planned                                           |
-| Product Area   | DeliveryProcess                                   |
+| Product Area   | Generation                                        |
 | Business Value | ensure all document codecs produce correct output |
 | Phase          | 102                                               |
 

@@ -9,7 +9,7 @@
 | Property       | Value                                                             |
 | -------------- | ----------------------------------------------------------------- |
 | Status         | planned                                                           |
-| Product Area   | DeliveryProcess                                                   |
+| Product Area   | Process                                                           |
 | Business Value | ensure cli commands work correctly with all argument combinations |
 | Phase          | 101                                                               |
 

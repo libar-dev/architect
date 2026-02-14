@@ -9,7 +9,7 @@
 | Property       | Value                                             |
 | -------------- | ------------------------------------------------- |
 | Status         | planned                                           |
-| Product Area   | DeliveryProcess                                   |
+| Product Area   | Validation                                        |
 | Business Value | enforce separation of specs from release metadata |
 | Phase          | 100                                               |
 

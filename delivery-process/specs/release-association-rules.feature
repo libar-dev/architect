@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:3h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:enforce-separation-of-specs-from-release-metadata
 @libar-docs-priority:medium
 Feature: Release Association Rules Validation

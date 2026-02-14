@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:LintPatternsCli
 @libar-docs-status:completed
-@libar-docs-product-area:CLI
+@libar-docs-product-area:DataAPI
 @libar-docs-implements:CliBehaviorTesting
 @cli @lint-patterns
 Feature: lint-patterns CLI

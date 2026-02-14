@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:2h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:prevent-phase-number-conflicts-and-ensure-consistent-ordering
 @libar-docs-priority:medium
 Feature: Phase Numbering Conventions and Validation

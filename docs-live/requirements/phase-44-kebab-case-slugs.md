@@ -6,11 +6,11 @@
 
 ## Overview
 
-| Property     | Value    |
-| ------------ | -------- |
-| Status       | planned  |
-| Product Area | Behavior |
-| Phase        | 44       |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | planned   |
+| Product Area | CoreTypes |
+| Phase        | 44        |
 
 ## Description
 

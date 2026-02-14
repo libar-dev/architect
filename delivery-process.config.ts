@@ -31,12 +31,13 @@ export default defineConfig({
   referenceDocConfigs: [
     {
       title: 'Reference Generation Sample',
-      conventionTags: ['reference-sample', 'output-format'],
+      conventionTags: [],
       shapeSources: [],
       shapeSelectors: [
         { group: 'reference-sample' },
       ],
-      behaviorCategories: ['infra'],
+      behaviorCategories: [],
+      includeTags: ['reference-sample'],
       diagramScopes: [
         {
           include: ['reference-sample'],

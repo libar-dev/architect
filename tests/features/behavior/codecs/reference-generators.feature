@@ -3,7 +3,7 @@
 @libar-docs-pattern:ReferenceGeneratorTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Generator
+@libar-docs-product-area:Generation
 Feature: Reference Document Generator Registration
 
   Registers all 13 reference document generators. Each config produces

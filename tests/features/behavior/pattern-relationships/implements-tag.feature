@@ -2,7 +2,7 @@
 @libar-docs-pattern:ImplementsTagProcessing
 @libar-docs-status:completed
 @libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:PatternRelationship
+@libar-docs-product-area:Annotation
 Feature: Implements Tag Extraction and Processing
 
   Tests for the @libar-docs-implements tag which links implementation files

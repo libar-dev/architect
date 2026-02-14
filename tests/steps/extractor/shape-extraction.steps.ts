@@ -744,7 +744,126 @@ describeFeature(feature, ({ Background, Rule }) => {
   });
 
   // ===========================================================================
-  // RULE 11: Input Validation
+  // RULE 11: Annotation Tag Stripping from JSDoc
+  // ===========================================================================
+
+  Rule(
+    'Annotation tags are stripped from extracted JSDoc while preserving standard tags',
+    ({ RuleScenario }) => {
+      RuleScenario('JSDoc with only annotation tags produces no jsDoc', ({ Given, When, Then }) => {
+        Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+          state.sourceCode = docString;
+        });
+
+        When('extracting shapes "OnlyTags"', () => {
+          state.extractionResult = unwrapExtraction(state.sourceCode, ['OnlyTags']);
+        });
+
+        Then('the shape "OnlyTags" should have no jsDoc', () => {
+          const shape = state.extractionResult!.shapes.find((s) => s.name === 'OnlyTags');
+          expect(shape).toBeDefined();
+          expect(shape!.jsDoc).toBeUndefined();
+        });
+      });
+
+      RuleScenario(
+        'Mixed JSDoc preserves standard tags and strips annotation tags',
+        ({ Given, When, Then, And }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+
+          When('extracting shapes "MixedTags"', () => {
+            state.extractionResult = unwrapExtraction(state.sourceCode, ['MixedTags']);
+          });
+
+          Then(
+            'the shape "MixedTags" jsDoc should contain "Configuration for the pipeline"',
+            () => {
+              const shape = state.extractionResult!.shapes.find((s) => s.name === 'MixedTags');
+              expect(shape).toBeDefined();
+              expect(shape!.jsDoc).toContain('Configuration for the pipeline');
+            }
+          );
+
+          And('the shape "MixedTags" jsDoc should contain "@param timeout"', () => {
+            const shape = state.extractionResult!.shapes.find((s) => s.name === 'MixedTags');
+            expect(shape!.jsDoc).toContain('@param timeout');
+          });
+
+          And('the shape "MixedTags" jsDoc should contain "@returns"', () => {
+            const shape = state.extractionResult!.shapes.find((s) => s.name === 'MixedTags');
+            expect(shape!.jsDoc).toContain('@returns');
+          });
+
+          And('the shape "MixedTags" jsDoc should not contain "@libar-docs"', () => {
+            const shape = state.extractionResult!.shapes.find((s) => s.name === 'MixedTags');
+            expect(shape!.jsDoc).not.toContain('@libar-docs');
+          });
+        }
+      );
+
+      RuleScenario(
+        'Single-line annotation-only JSDoc produces no jsDoc',
+        ({ Given, When, Then }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+
+          When('extracting shapes "SingleLine"', () => {
+            state.extractionResult = unwrapExtraction(state.sourceCode, ['SingleLine']);
+          });
+
+          Then('the shape "SingleLine" should have no jsDoc', () => {
+            const shape = state.extractionResult!.shapes.find((s) => s.name === 'SingleLine');
+            expect(shape).toBeDefined();
+            expect(shape!.jsDoc).toBeUndefined();
+          });
+        }
+      );
+
+      RuleScenario(
+        'Consecutive empty lines after tag removal are collapsed',
+        ({ Given, When, Then, And }) => {
+          Given('TypeScript source code:', (_ctx: unknown, docString: string) => {
+            state.sourceCode = docString;
+          });
+
+          When('extracting shapes "CollapsedLines"', () => {
+            state.extractionResult = unwrapExtraction(state.sourceCode, ['CollapsedLines']);
+          });
+
+          Then('the shape "CollapsedLines" jsDoc should contain "Useful description here"', () => {
+            const shape = state.extractionResult!.shapes.find((s) => s.name === 'CollapsedLines');
+            expect(shape).toBeDefined();
+            expect(shape!.jsDoc).toContain('Useful description here');
+          });
+
+          And(
+            'the shape "CollapsedLines" jsDoc should not contain consecutive empty JSDoc lines',
+            () => {
+              const shape = state.extractionResult!.shapes.find((s) => s.name === 'CollapsedLines');
+              expect(shape).toBeDefined();
+              // Check for consecutive empty JSDoc continuation lines (` *` followed by ` *`)
+              // Skip the /** opener and */ closer — they are delimiters, not content lines
+              const lines = shape!.jsDoc!.split('\n');
+              let prevWasEmpty = false;
+              for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed === '/**' || trimmed === '*/') continue;
+                const isEmptyLine = trimmed === '*' || trimmed === '';
+                expect(isEmptyLine && prevWasEmpty).toBe(false);
+                prevWasEmpty = isEmptyLine;
+              }
+            }
+          );
+        }
+      );
+    }
+  );
+
+  // ===========================================================================
+  // RULE 12: Input Validation
   // ===========================================================================
 
   Rule('Large source files are rejected to prevent memory exhaustion', ({ RuleScenario }) => {

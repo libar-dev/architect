@@ -2,7 +2,7 @@
 @libar-docs-pattern:TransformDatasetTesting
 @libar-docs-implements:TransformDataset
 @libar-docs-status:completed
-@libar-docs-product-area:Pipeline
+@libar-docs-product-area:Generation
 @behavior @transform-dataset
 Feature: Transform Dataset Pipeline
   The transformToMasterDataset function transforms raw extracted patterns

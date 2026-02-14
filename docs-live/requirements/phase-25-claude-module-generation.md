@@ -9,7 +9,7 @@
 | Property       | Value                                   |
 | -------------- | --------------------------------------- |
 | Status         | planned                                 |
-| Product Area   | DeliveryProcess                         |
+| Product Area   | Generation                              |
 | Business Value | automated claude md modules from source |
 | Phase          | 25                                      |
 

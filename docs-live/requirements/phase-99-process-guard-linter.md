@@ -9,7 +9,7 @@
 | Property       | Value                                                        |
 | -------------- | ------------------------------------------------------------ |
 | Status         | completed                                                    |
-| Product Area   | DeliveryProcess                                              |
+| Product Area   | Validation                                                   |
 | Business Value | prevent accidental scope creep and locked file modifications |
 | Phase          | 99                                                           |
 

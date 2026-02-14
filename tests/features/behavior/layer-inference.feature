@@ -2,7 +2,7 @@
 @libar-docs-pattern:LayerInferenceTesting
 @libar-docs-implements:LayerInference
 @libar-docs-status:completed
-@libar-docs-product-area:Extractor
+@libar-docs-product-area:Annotation
 @behavior
 Feature: Layer Inference from Feature File Paths
   The layer inference module classifies feature files into testing layers

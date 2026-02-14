@@ -9,7 +9,7 @@
 | Property       | Value                                                         |
 | -------------- | ------------------------------------------------------------- |
 | Status         | planned                                                       |
-| Product Area   | DeliveryProcess                                               |
+| Product Area   | Annotation                                                    |
 | Business Value | detect inconsistencies between typescript and gherkin sources |
 | Phase          | 100                                                           |
 

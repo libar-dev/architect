@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ErrorFactories
 @libar-docs-status:completed
-@libar-docs-product-area:Types
+@libar-docs-product-area:CoreTypes
 @types @errors
 Feature: Error Factory Functions
   Error factories create structured, discriminated error types with consistent

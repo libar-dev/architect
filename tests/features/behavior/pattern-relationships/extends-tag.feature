@@ -2,7 +2,7 @@
 @libar-docs-pattern:ExtendsTagTesting
 @libar-docs-status:completed
 @libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:PatternRelationship
+@libar-docs-product-area:Annotation
 Feature: Extends Tag Extraction and Processing
 
   Tests for the @libar-docs-extends tag which establishes generalization

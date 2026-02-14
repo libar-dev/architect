@@ -5,7 +5,7 @@
 @libar-docs-phase:99
 @libar-docs-release:v1.0.0
 @libar-docs-effort:8h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Process
 @libar-docs-business-value:align-package-with-pdr005-fsm
 @libar-docs-priority:high
 Feature: MVP Workflow Implementation

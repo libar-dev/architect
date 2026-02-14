@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | Pipeline  |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
+| Product Area | Annotation |
 
 ## Description
 

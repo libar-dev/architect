@@ -2,7 +2,7 @@
 @libar-docs-pattern:ShapeSelectorTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 Feature: Shape Selector Filtering
 
   Tests the filterShapesBySelectors function that provides fine-grained

@@ -9,7 +9,7 @@
 | Property       | Value                                                    |
 | -------------- | -------------------------------------------------------- |
 | Status         | completed                                                |
-| Product Area   | DeliveryProcess                                          |
+| Product Area   | Validation                                               |
 | Business Value | ensure state machine rules are enforced programmatically |
 | Phase          | 100                                                      |
 

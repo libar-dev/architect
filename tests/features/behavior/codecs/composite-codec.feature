@@ -2,7 +2,7 @@
 @libar-docs-pattern:CompositeCodecTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 Feature: Composite Codec
 
   Assembles reference documents from multiple codec outputs by

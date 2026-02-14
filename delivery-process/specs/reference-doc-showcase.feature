@@ -3,7 +3,7 @@
 @libar-docs-status:active
 @libar-docs-phase:30
 @libar-docs-effort:13d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-depends-on:CodecDrivenReferenceGeneration,ScopedArchitecturalView,ShapeExtraction
 @libar-docs-business-value:validates-all-content-blocks-via-single-integration-document
 @libar-docs-priority:high

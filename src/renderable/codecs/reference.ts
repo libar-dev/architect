@@ -53,6 +53,7 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import {
   extractConventions,
   extractConventionsFromPatterns,
+  extractTablesFromDescription,
   type ConventionBundle,
 } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
@@ -445,6 +446,13 @@ function buildBehaviorSectionsFromPatterns(
 
           if (annotations.remainingContent) {
             ruleBlocks.push(paragraph(annotations.remainingContent));
+          }
+
+          // Extract and render tables from Rule descriptions (Gherkin or markdown)
+          const ruleTables = extractTablesFromDescription(rule.description);
+          for (const tbl of ruleTables) {
+            const rows = tbl.rows.map((row) => tbl.headers.map((h) => row[h] ?? ''));
+            ruleBlocks.push(table([...tbl.headers], rows));
           }
 
           if (annotations.codeExamples && detailLevel === 'detailed') {

@@ -9,7 +9,7 @@
 | Property       | Value                        |
 | -------------- | ---------------------------- |
 | Status         | completed                    |
-| Product Area   | DeliveryProcess              |
+| Product Area   | DataAPI                      |
 | Business Value | compact output for ai agents |
 | Phase          | 25                           |
 

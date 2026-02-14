@@ -5,7 +5,7 @@
 @libar-docs-phase:99
 @libar-docs-release:v1.0.0
 @libar-docs-effort:1d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:prevent-accidental-scope-creep-and-locked-file-modifications
 @libar-docs-priority:high
 Feature: Process Guard Linter

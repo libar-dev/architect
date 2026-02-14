@@ -1,7 +1,7 @@
 @libar-docs
 @scanner @libar-docs-pattern:AstParser
 @libar-docs-status:completed
-@libar-docs-product-area:Scanner
+@libar-docs-product-area:Annotation
 Feature: AST Parser
   The AST Parser extracts @libar-docs-* directives from TypeScript source files
   using the TypeScript compiler API. It identifies exports, extracts metadata,

@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:OutputPipelineTests
 @libar-docs-status:active
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Output Modifier Pipeline
 
   Validates the output pipeline transforms: summarization, modifiers,

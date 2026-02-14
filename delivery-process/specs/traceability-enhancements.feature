@@ -4,7 +4,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:3d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-business-value:detect-coverage-gaps-and-requirements-drift
 @libar-docs-priority:medium
 Feature: Traceability Enhancements - Requirements ↔ Tests Loop

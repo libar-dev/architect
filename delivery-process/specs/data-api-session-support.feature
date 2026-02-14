@@ -3,7 +3,7 @@
 @libar-docs-status:completed
 @libar-docs-unlock-reason:Normalize-deliverable-status-taxonomy
 @libar-docs-phase:25c
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:1d
 @libar-docs-priority:high
 @libar-docs-business-value:automate-session-context-compilation

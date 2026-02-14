@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:DescriptionQualityFoundation
 @libar-docs-status:completed
-@libar-docs-product-area:Behavior
+@libar-docs-product-area:Generation
 @behavior @description-quality
 Feature: Description Quality Foundation
   Enhanced documentation generation with human-readable names,

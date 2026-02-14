@@ -9,7 +9,7 @@
 | Property       | Value                                                       |
 | -------------- | ----------------------------------------------------------- |
 | Status         | completed                                                   |
-| Product Area   | DeliveryProcess                                             |
+| Product Area   | Generation                                                  |
 | Business Value | enables universal content routing to any generated document |
 | Phase          | 32                                                          |
 

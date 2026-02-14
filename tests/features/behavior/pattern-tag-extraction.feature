@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:PatternTagExtraction
 @libar-docs-status:completed
-@libar-docs-product-area:Scanner
+@libar-docs-product-area:Annotation
 @behavior @scanner @pattern-tags
 Feature: Pattern Tag Extraction from Gherkin Feature Tags
   The extractPatternTags function parses Gherkin feature tags

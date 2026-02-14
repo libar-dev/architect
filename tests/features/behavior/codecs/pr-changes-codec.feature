@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:PrChangesCodecTesting
 @libar-docs-status:completed
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @pr-changes-codec
 Feature: PR Changes Document Codec

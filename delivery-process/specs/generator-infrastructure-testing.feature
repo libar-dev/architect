@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:104
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-business-value:ensure-generator-orchestration-works-correctly
 @libar-docs-priority:high
 @libar-docs-executable-specs:tests/features/generators

@@ -2,7 +2,7 @@
 @libar-docs-pattern:MermaidRelationshipRendering
 @libar-docs-status:completed
 @libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:PatternRelationship
+@libar-docs-product-area:Generation
 Feature: Mermaid Graph Rendering for Relationships
 
   Tests for rendering all relationship types in Mermaid dependency graphs

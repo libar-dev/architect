@@ -9,7 +9,7 @@
 | Property     | Value     |
 | ------------ | --------- |
 | Status       | completed |
-| Product Area | CLI       |
+| Product Area | DataAPI   |
 
 ## Description
 

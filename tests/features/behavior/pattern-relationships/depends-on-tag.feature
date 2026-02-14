@@ -2,7 +2,7 @@
 @libar-docs-pattern:DependsOnTagTesting
 @libar-docs-status:active
 @libar-docs-implements:PatternRelationshipModel
-@libar-docs-product-area:PatternRelationship
+@libar-docs-product-area:Annotation
 @pattern-relationships
 Feature: Planning Dependency Tags
 

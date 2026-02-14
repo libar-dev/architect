@@ -3,7 +3,7 @@
 @libar-docs-implements:RichContentHelpers
 @libar-docs-status:roadmap
 @libar-docs-phase:44
-@libar-docs-product-area:Behavior
+@libar-docs-product-area:Generation
 
 Feature: Rich Content Rendering Helpers
   As a document codec author

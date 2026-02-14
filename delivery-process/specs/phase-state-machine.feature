@@ -5,7 +5,7 @@
 @libar-docs-phase:100
 @libar-docs-release:v1.0.0
 @libar-docs-effort:4h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Validation
 @libar-docs-business-value:ensure-state-machine-rules-are-enforced-programmatically
 @libar-docs-priority:high
 Feature: Phase State Machine Validation

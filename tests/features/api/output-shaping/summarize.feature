@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:PatternSummarizeTests
 @libar-docs-status:active
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Pattern Summarization
 
   Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to

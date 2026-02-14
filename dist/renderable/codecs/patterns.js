@@ -182,11 +182,8 @@ function applyPatternFilters(dataset, options) {
     // Rebuild byCategory from filtered patterns
     const filteredByCategory = {};
     for (const p of filteredPatterns) {
-        const cat = p.category;
-        if (cat) {
-            const existing = filteredByCategory[cat];
-            filteredByCategory[cat] = existing ? [...existing, p] : [p];
-        }
+        const existing = filteredByCategory[p.category];
+        filteredByCategory[p.category] = existing ? [...existing, p] : [p];
     }
     return {
         ...dataset,

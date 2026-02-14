@@ -9,7 +9,7 @@
 | Property       | Value                                     |
 | -------------- | ----------------------------------------- |
 | Status         | planned                                   |
-| Product Area   | DeliveryProcess                           |
+| Product Area   | Validation                                |
 | Business Value | enable machine checkable phase completion |
 | Phase          | 100                                       |
 

@@ -4,7 +4,7 @@
 @libar-docs-unlock-reason:Fix-code-fence-formatting-per-PR-review
 @libar-docs-phase:26
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Annotation
 @libar-docs-enables:DocGenerationProofOfConcept
 @libar-docs-business-value:eliminates-type-duplication-in-documentation
 @libar-docs-priority:high

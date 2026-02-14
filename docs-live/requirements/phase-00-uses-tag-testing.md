@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value               |
-| ------------ | ------------------- |
-| Status       | active              |
-| Product Area | PatternRelationship |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | active     |
+| Product Area | Annotation |
 
 ## Description
 

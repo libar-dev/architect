@@ -3,7 +3,7 @@
 @libar-docs-status:completed
 @libar-docs-phase:31
 @libar-docs-effort:3d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Annotation
 @libar-docs-depends-on:ShapeExtraction,ReferenceDocShowcase
 @libar-docs-business-value:enables-focused-shape-extraction-without-whole-file-dumping
 @libar-docs-priority:high

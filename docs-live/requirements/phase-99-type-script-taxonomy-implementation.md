@@ -9,7 +9,7 @@
 | Property       | Value                            |
 | -------------- | -------------------------------- |
 | Status         | completed                        |
-| Product Area   | Taxonomy                         |
+| Product Area   | Annotation                       |
 | User Role      | Developer                        |
 | Business Value | compile time taxonomy protection |
 | Phase          | 99                               |

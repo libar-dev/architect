@@ -3,7 +3,7 @@
 @libar-docs-pattern:ShapeMatcherTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase,DeclarationLevelShapeTagging
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 Feature: Shape Source Pattern Matching
 
   Matches file paths against glob patterns for TypeScript shape extraction.

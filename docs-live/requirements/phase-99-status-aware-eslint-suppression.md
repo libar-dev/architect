@@ -6,11 +6,11 @@
 
 ## Overview
 
-| Property     | Value           |
-| ------------ | --------------- |
-| Status       | planned         |
-| Product Area | DeliveryProcess |
-| Phase        | 99              |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | planned    |
+| Product Area | Validation |
+| Phase        | 99         |
 
 ## Description
 

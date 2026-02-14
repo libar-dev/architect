@@ -9,7 +9,7 @@
 | Property       | Value                            |
 | -------------- | -------------------------------- |
 | Status         | planned                          |
-| Product Area   | DeliveryProcess                  |
+| Product Area   | Validation                       |
 | Business Value | filter work by risk and priority |
 | Phase          | 100                              |
 

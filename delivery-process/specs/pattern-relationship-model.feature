@@ -5,7 +5,7 @@
 @libar-docs-phase:99
 @libar-docs-release:v1.0.0
 @libar-docs-effort:2w
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Annotation
 @libar-docs-level:epic
 @libar-docs-executable-specs:tests/features/behavior/pattern-relationships
 Feature: Pattern Relationship Model

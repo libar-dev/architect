@@ -9,7 +9,7 @@
 | Property       | Value                               |
 | -------------- | ----------------------------------- |
 | Status         | planned                             |
-| Product Area   | DeliveryProcess                     |
+| Product Area   | Process                             |
 | Business Value | query roadmap with natural language |
 | Phase          | 100                                 |
 

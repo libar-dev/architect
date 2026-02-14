@@ -2,7 +2,7 @@
 @libar-docs-pattern:SourceMapperTesting
 @libar-docs-implements:SourceMapper
 @libar-docs-status:completed
-@libar-docs-product-area:DocGeneration
+@libar-docs-product-area:Generation
 Feature: Source Mapper
 
   The Source Mapper aggregates content from multiple source files based on

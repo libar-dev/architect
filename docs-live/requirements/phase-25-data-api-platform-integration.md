@@ -9,7 +9,7 @@
 | Property       | Value                                               |
 | -------------- | --------------------------------------------------- |
 | Status         | planned                                             |
-| Product Area   | DeliveryProcess                                     |
+| Product Area   | DataAPI                                             |
 | Business Value | native claude code integration and monorepo support |
 | Phase          | 25                                                  |
 

@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | Scanner   |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
+| Product Area | Annotation |
 
 ## Description
 

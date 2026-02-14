@@ -9,7 +9,7 @@
 | Property       | Value                                   |
 | -------------- | --------------------------------------- |
 | Status         | completed                               |
-| Product Area   | DeliveryProcess                         |
+| Product Area   | DataAPI                                 |
 | Business Value | replace explore agents with one command |
 | Phase          | 25                                      |
 

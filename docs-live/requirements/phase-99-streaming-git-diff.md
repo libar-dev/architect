@@ -9,7 +9,7 @@
 | Property       | Value                                      |
 | -------------- | ------------------------------------------ |
 | Status         | planned                                    |
-| Product Area   | DeliveryProcess                            |
+| Product Area   | Validation                                 |
 | Business Value | enable process guard on large repositories |
 | Phase          | 99                                         |
 

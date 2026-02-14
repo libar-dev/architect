@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:GenerateDocsCli
 @libar-docs-status:completed
-@libar-docs-product-area:CLI
+@libar-docs-product-area:DataAPI
 @libar-docs-implements:CliBehaviorTesting
 @cli @generate-docs
 Feature: generate-docs CLI

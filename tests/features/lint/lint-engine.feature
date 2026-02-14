@@ -2,7 +2,7 @@
 @lint @libar-docs-pattern:LintEngineTesting
 @libar-docs-implements:LintEngine
 @libar-docs-status:completed
-@libar-docs-product-area:Lint
+@libar-docs-product-area:Validation
 Feature: Lint Engine
   The lint engine orchestrates rule execution, aggregates violations,
   and formats output for human and machine consumption.

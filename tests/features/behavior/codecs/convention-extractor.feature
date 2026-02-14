@@ -3,7 +3,7 @@
 @libar-docs-pattern:ConventionExtractorTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 Feature: Convention Extractor
 
   Extracts convention content from MasterDataset decision records

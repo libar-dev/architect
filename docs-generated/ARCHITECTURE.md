@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 119 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 121 annotated source files across 10 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 119 |
+| Total Components | 121 |
 | Bounded Contexts | 10 |
 | Component Roles | 5 |
 
@@ -72,7 +72,6 @@ graph TB
         Document_Extractor["Document Extractor[service]"]
     end
     subgraph generator["Generator BC"]
-        FileCache["FileCache[infrastructure]"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
         SourceMappingValidator["SourceMappingValidator"]
@@ -81,6 +80,7 @@ graph TB
         Documentation_Generation_Orchestrator["Documentation Generation Orchestrator[service]"]
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
+        FileCache["FileCache[infrastructure]"]
         TransformDataset["TransformDataset[service]"]
         PipelineModule["PipelineModule"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
@@ -185,6 +185,10 @@ graph TB
         SectionBlock["SectionBlock"]
         RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
         CLIVersionHelper["CLIVersionHelper"]
@@ -194,9 +198,6 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        ProcessStateTypes["ProcessStateTypes"]
-        StubResolverImpl["StubResolverImpl"]
-        APIModule["APIModule"]
         WorkflowLoader["WorkflowLoader"]
         ConfigurationTypes["ConfigurationTypes"]
         ConfigResolver["ConfigResolver"]
@@ -207,10 +208,9 @@ graph TB
         SourceMerger["SourceMerger"]
         DefineConfig["DefineConfig"]
         ConfigurationDefaults["ConfigurationDefaults"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
+        ProcessStateTypes["ProcessStateTypes"]
+        StubResolverImpl["StubResolverImpl"]
+        APIModule["APIModule"]
         FSMModule["FSMModule"]
         ValidationRulesCodec["ValidationRulesCodec"]
         TimelineCodec["TimelineCodec"]
@@ -234,17 +234,24 @@ graph TB
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
+        ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
+        ProcessGuardTesting["ProcessGuardTesting"]
     end
     ExtractedPatternSchema --> DocDirectiveSchema
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
@@ -263,6 +270,23 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    ConfigResolver --> ProjectConfigTypes
+    ConfigResolver --> DeliveryProcessFactory
+    ConfigResolver --> ConfigurationDefaults
+    RegexBuilders --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationPresets
+    ProjectConfigSchema --> ProjectConfigTypes
+    ConfigurationPresets --> ConfigurationTypes
+    SourceMerger --> ProjectConfigTypes
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DefineConfig --> ProjectConfigTypes
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -283,28 +307,6 @@ graph TB
     ContextAssemblerImpl --> StubResolverImpl
     ArchQueriesImpl --> ProcessStateAPI
     ArchQueriesImpl --> MasterDataset
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    ConfigResolver --> ProjectConfigTypes
-    ConfigResolver --> DeliveryProcessFactory
-    ConfigResolver --> ConfigurationDefaults
-    RegexBuilders --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationPresets
-    ProjectConfigSchema --> ProjectConfigTypes
-    ConfigurationPresets --> ConfigurationTypes
-    SourceMerger --> ProjectConfigTypes
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DefineConfig --> ProjectConfigTypes
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
     TransformDataset --> MasterDataset
@@ -382,6 +384,7 @@ All components with architecture annotations:
 | 🚧 FSM Transitions | validation | read-model | domain | src/validation/fsm/transitions.ts |
 | ✅ Anti Pattern Detector | validation | service | application | src/validation/anti-patterns.ts |
 | ✅ DoD Validator | validation | service | application | src/validation/dod-validator.ts |
+| 📋 ADR 001 Taxonomy Canonical Values | - | - | - | delivery-process/decisions/adr-001-taxonomy-canonical-values.feature |
 | ✅ Adr Document Codec | - | - | - | src/renderable/codecs/adr.ts |
 | 🚧 API Module | - | - | - | src/api/index.ts |
 | ✅ Built In Generators | - | - | - | src/generators/built-in/index.ts |
@@ -423,6 +426,7 @@ All components with architecture annotations:
 | ✅ Planning Codecs | - | - | - | src/renderable/codecs/planning.ts |
 | ✅ Pr Changes Codec | - | - | - | src/renderable/codecs/pr-changes.ts |
 | 🚧 Process Guard Module | - | - | - | src/lint/process-guard/index.ts |
+| ✅ Process Guard Testing | - | - | - | tests/features/validation/process-guard.feature |
 | 🚧 Process Guard Types | - | - | - | src/lint/process-guard/types.ts |
 | 🚧 Process State Types | - | - | - | src/api/types.ts |
 | 🚧 Project Config Schema | - | - | - | src/config/project-config-schema.ts |

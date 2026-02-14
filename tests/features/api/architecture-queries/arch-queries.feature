@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ArchQueriesTest
 @libar-docs-status:active
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
 
   Background: Deliverables

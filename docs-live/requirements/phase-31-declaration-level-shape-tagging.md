@@ -9,7 +9,7 @@
 | Property       | Value                                                       |
 | -------------- | ----------------------------------------------------------- |
 | Status         | completed                                                   |
-| Product Area   | DeliveryProcess                                             |
+| Product Area   | Annotation                                                  |
 | Business Value | enables focused shape extraction without whole file dumping |
 | Phase          | 31                                                          |
 

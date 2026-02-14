@@ -9,7 +9,7 @@
 | Property       | Value                               |
 | -------------- | ----------------------------------- |
 | Status         | completed                           |
-| Product Area   | DeliveryProcess                     |
+| Product Area   | DataAPI                             |
 | Business Value | unlock design session stub metadata |
 | Phase          | 25                                  |
 

@@ -3,7 +3,7 @@
 @libar-docs-pattern:DualSourceExtractorTesting
 @libar-docs-implements:DualSourceExtractor
 @libar-docs-status:completed
-@libar-docs-product-area:Extractor
+@libar-docs-product-area:Annotation
 Feature: Dual-Source Extraction
   Extracts and combines pattern metadata from both TypeScript code stubs
   (@libar-docs-*) and Gherkin feature files (@libar-process-*), validates
@@ -206,3 +206,45 @@ Feature: Dual-Source Extraction
       When validating dual-source
       Then validation passes
       And 1 warning about missing code stub exists
+
+  # ==========================================================================
+  # Include Tag Extraction
+  # ==========================================================================
+
+  Rule: Include tags are extracted from Gherkin feature tags
+
+    @happy-path
+    Scenario: Single include tag is extracted
+      Given a feature with process tags:
+        | tag                                           |
+        | libar-docs                     |
+        | pattern:IncludeTest            |
+        | status:roadmap                 |
+        | phase:01                       |
+        | include:reference-sample       |
+      When extracting Gherkin patterns
+      Then the extracted pattern has include "reference-sample"
+
+    @happy-path
+    Scenario: CSV include tag produces multiple values
+      Given a feature with process tags:
+        | tag                                               |
+        | libar-docs                      |
+        | pattern:MultiInclude            |
+        | status:roadmap                  |
+        | phase:01                        |
+        | include:doc-a,doc-b             |
+      When extracting Gherkin patterns
+      Then the extracted pattern has include "doc-a"
+      And the extracted pattern has include "doc-b"
+
+    @edge-case
+    Scenario: Feature without include tag has no include field
+      Given a feature with process tags:
+        | tag                                      |
+        | libar-docs                |
+        | pattern:NoInclude         |
+        | status:roadmap            |
+        | phase:01                  |
+      When extracting Gherkin patterns
+      Then the extracted pattern has no include field

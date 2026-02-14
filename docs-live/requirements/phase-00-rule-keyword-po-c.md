@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | POC       |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
+| Product Area | Generation |
 
 ## Description
 

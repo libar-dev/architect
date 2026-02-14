@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ProcessApiCli
 @libar-docs-status:completed
-@libar-docs-product-area:CLI
+@libar-docs-product-area:DataAPI
 @libar-docs-implements:ProcessStateAPICLI
 @cli @process-api
 Feature: process-api CLI

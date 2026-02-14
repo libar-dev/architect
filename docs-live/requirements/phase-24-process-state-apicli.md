@@ -9,7 +9,7 @@
 | Property       | Value                           |
 | -------------- | ------------------------------- |
 | Status         | completed                       |
-| Product Area   | DeliveryProcess                 |
+| Product Area   | DataAPI                         |
 | Business Value | direct api queries for planning |
 | Phase          | 24                              |
 

@@ -9,7 +9,7 @@
 | Property       | Value                                   |
 | -------------- | --------------------------------------- |
 | Status         | planned                                 |
-| Product Area   | DeliveryProcess                         |
+| Product Area   | Process                                 |
 | Business Value | make existing behavior specs executable |
 | Phase          | 103                                     |
 

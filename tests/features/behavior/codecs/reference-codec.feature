@@ -3,7 +3,7 @@
 @libar-docs-pattern:ReferenceCodecTesting
 @libar-docs-status:completed
 @libar-docs-implements:ReferenceDocShowcase
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 Feature: Reference Document Codec
 
   Parameterized codec factory that creates reference document codecs
@@ -553,3 +553,36 @@ Feature: Reference Document Codec
       And a MasterDataset with a behavior pattern in category "process-guard"
       When decoding at detail level "summary"
       Then the document does not contain link-out blocks
+
+  Rule: Include tags route cross-cutting content into reference documents
+
+    **Invariant:** Patterns with matching include tags appear alongside
+    category-selected patterns in the behavior section. The merging
+    is additive (OR semantics).
+
+    **Verified by:** Include-tagged pattern appears in behavior section,
+    Include-tagged pattern is additive with category-selected patterns,
+    Pattern without matching include tag is excluded
+
+    @acceptance-criteria @happy-path
+    Scenario: Include-tagged pattern appears in behavior section
+      Given a reference config with includeTags "reference-sample"
+      And a MasterDataset with a pattern that has include "reference-sample"
+      When decoding at detail level "standard"
+      Then the document has a heading "Behavior Specifications"
+      And the document contains text "IncludedPattern"
+
+    @acceptance-criteria @happy-path
+    Scenario: Include-tagged pattern is additive with category-selected patterns
+      Given a reference config with behavior tags "lint" and includeTags "reference-sample"
+      And a MasterDataset with a category pattern and an include-tagged pattern
+      When decoding at detail level "standard"
+      Then the document contains text "LintPattern"
+      And the document contains text "IncludedPattern"
+
+    @acceptance-criteria @edge-case
+    Scenario: Pattern without matching include tag is excluded
+      Given a reference config with includeTags "reference-sample"
+      And a MasterDataset with a pattern that has include "other-doc"
+      When decoding at detail level "standard"
+      Then the document does not have a heading "Behavior Specifications"

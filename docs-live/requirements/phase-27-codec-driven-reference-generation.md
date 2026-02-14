@@ -9,7 +9,7 @@
 | Property       | Value                                                                 |
 | -------------- | --------------------------------------------------------------------- |
 | Status         | completed                                                             |
-| Product Area   | DeliveryProcess                                                       |
+| Product Area   | Generation                                                            |
 | Business Value | eliminates per document recipe features with config driven generation |
 | Phase          | 27                                                                    |
 

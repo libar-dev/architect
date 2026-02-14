@@ -3,7 +3,7 @@
 @libar-docs-status:completed
 @libar-docs-phase:32
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-depends-on:DeclarationLevelShapeTagging,ReferenceDocShowcase
 @libar-docs-business-value:enables-universal-content-routing-to-any-generated-document
 @libar-docs-priority:high

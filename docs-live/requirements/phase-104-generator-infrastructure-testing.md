@@ -9,7 +9,7 @@
 | Property       | Value                                          |
 | -------------- | ---------------------------------------------- |
 | Status         | planned                                        |
-| Product Area   | DeliveryProcess                                |
+| Product Area   | Generation                                     |
 | Business Value | ensure generator orchestration works correctly |
 | Phase          | 104                                            |
 

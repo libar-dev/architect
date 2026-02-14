@@ -498,7 +498,20 @@ export function parseBusinessRuleAnnotations(description) {
     let textWithoutCode = normalized;
     textWithoutCode = textWithoutCode.replace(/"""(\w*)\n[\s\S]*?"""/g, '');
     textWithoutCode = textWithoutCode.replace(/```(\w*)\n[\s\S]*?```/g, '');
-    // Step 2.5: Protect backtick-quoted content from regex matching
+    // Step 2a: Remove table lines (| ... |) from text before parsing annotations.
+    // Tables are extracted separately by extractTablesFromDescription() upstream.
+    // Without this, annotation regexes over-capture table content and whitespace
+    // normalization collapses tables into single-line text inside invariant/rationale.
+    // Note: stripMarkdownTables() also strips these downstream in remainingContent;
+    // the early strip here prevents annotation regex over-capture before that point.
+    textWithoutCode = textWithoutCode
+        .split('\n')
+        .filter((line) => {
+        const trimmed = line.trim();
+        return !(trimmed.startsWith('|') && trimmed.endsWith('|'));
+    })
+        .join('\n');
+    // Step 2b: Protect backtick-quoted content from regex matching
     // This prevents `**Verified by:**` inside backticks from being treated as annotation boundary
     // e.g., "Scenario names in `**Verified by:**` are matched" should not truncate at `**V`
     const { processed: protectedText, restore } = protectBacktickContent(textWithoutCode);

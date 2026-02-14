@@ -9,7 +9,7 @@
 | Property       | Value                                                  |
 | -------------- | ------------------------------------------------------ |
 | Status         | completed                                              |
-| Product Area   | DeliveryProcess                                        |
+| Product Area   | Annotation                                             |
 | Business Value | enable human readable documentation from feature files |
 | Phase          | 100                                                    |
 

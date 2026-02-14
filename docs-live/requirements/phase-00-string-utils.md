@@ -9,7 +9,7 @@
 | Property     | Value     |
 | ------------ | --------- |
 | Status       | completed |
-| Product Area | Utils     |
+| Product Area | CoreTypes |
 
 ## Description
 

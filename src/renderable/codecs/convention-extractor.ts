@@ -83,7 +83,7 @@ export interface ConventionBundle {
  * Identifies lines starting and ending with `|` as table rows,
  * groups consecutive table lines, and parses headers + data rows.
  */
-function extractTablesFromDescription(description: string): ConventionTable[] {
+export function extractTablesFromDescription(description: string): ConventionTable[] {
   if (!description) return [];
 
   const lines = description.split('\n');
@@ -112,14 +112,15 @@ function extractTablesFromDescription(description: string): ConventionTable[] {
 }
 
 /**
- * Parse a group of markdown table lines into structured data.
+ * Parse a group of table lines into structured data.
  *
- * Expects: header row, separator row (---), then data rows.
- * Returns null if insufficient rows.
+ * Supports both markdown tables (header + separator + data rows) and
+ * Gherkin-style tables (header + data rows, no separator). Returns null
+ * if insufficient rows.
  */
 function parseTableLines(lines: string[]): ConventionTable | null {
-  // Need at least header + separator + 1 data row
-  if (lines.length < 3) return null;
+  // Need at least header + 1 data row
+  if (lines.length < 2) return null;
 
   const parseRow = (line: string): string[] =>
     line
@@ -131,14 +132,17 @@ function parseTableLines(lines: string[]): ConventionTable | null {
   if (!headerLine) return null;
   const headers = parseRow(headerLine);
 
-  const separatorLine = lines[1];
-  if (!separatorLine) return null;
-  const separatorCells = separatorLine.split('|').slice(1, -1);
-  const isSeparator = separatorCells.every((cell) => /^[\s:-]+$/.test(cell));
-  if (!isSeparator) return null;
+  // Detect whether line 2 is a markdown separator row (| --- | --- |)
+  const secondLine = lines[1];
+  if (!secondLine) return null;
+  const secondCells = secondLine.split('|').slice(1, -1);
+  const hasSeparator = secondCells.every((cell) => /^[\s:-]+$/.test(cell));
+
+  // Data rows start after separator (markdown) or immediately after header (Gherkin)
+  const dataStart = hasSeparator ? 2 : 1;
 
   const rows: Array<Record<string, string>> = [];
-  for (let i = 2; i < lines.length; i++) {
+  for (let i = dataStart; i < lines.length; i++) {
     const dataLine = lines[i];
     if (!dataLine) continue;
     const cells = parseRow(dataLine);

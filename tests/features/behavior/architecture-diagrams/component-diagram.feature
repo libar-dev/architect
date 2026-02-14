@@ -2,7 +2,7 @@
 @libar-docs-pattern:ComponentDiagramGeneration
 @libar-docs-status:completed
 @libar-docs-implements:ArchitectureDiagramGeneration
-@libar-docs-product-area:Architecture
+@libar-docs-product-area:Generation
 @architecture
 Feature: Component Diagram Generation
 

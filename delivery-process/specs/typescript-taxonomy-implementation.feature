@@ -6,7 +6,7 @@
 @libar-docs-release:v1.0.0
 @libar-docs-effort:4h
 @libar-docs-business-value:compile-time-taxonomy-protection
-@libar-docs-product-area:Taxonomy
+@libar-docs-product-area:Annotation
 @libar-docs-user-role:Developer
 Feature: TypeScript Taxonomy Implementation
 

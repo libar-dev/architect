@@ -4,7 +4,7 @@
 @libar-docs-unlock-reason:Retroactive-spec-for-completed-work
 @libar-docs-phase:28
 @libar-docs-effort:3d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-depends-on:ArchitectureDiagramGeneration,ShapeExtraction
 @libar-docs-business-value:enables-selective-pattern-composition-with-architecture-diagrams
 @libar-docs-priority:high

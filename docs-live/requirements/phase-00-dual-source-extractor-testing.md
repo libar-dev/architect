@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value     |
-| ------------ | --------- |
-| Status       | completed |
-| Product Area | Extractor |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
+| Product Area | Annotation |
 
 ## Description
 
@@ -217,6 +217,48 @@ consistency, and composes unified pattern data for documentation.
 | FeatureOnlyA | 10    | roadmap |
 | FeatureOnlyB | 20    | active  |
 
+**Single include tag is extracted**
+
+- Given a feature with process tags:
+- When extracting Gherkin patterns
+- Then the extracted pattern has include "reference-sample"
+
+| tag                      |
+| ------------------------ |
+| libar-docs               |
+| pattern:IncludeTest      |
+| status:roadmap           |
+| phase:01                 |
+| include:reference-sample |
+
+**CSV include tag produces multiple values**
+
+- Given a feature with process tags:
+- When extracting Gherkin patterns
+- Then the extracted pattern has include "doc-a"
+- And the extracted pattern has include "doc-b"
+
+| tag                  |
+| -------------------- |
+| libar-docs           |
+| pattern:MultiInclude |
+| status:roadmap       |
+| phase:01             |
+| include:doc-a,doc-b  |
+
+**Feature without include tag has no include field**
+
+- Given a feature with process tags:
+- When extracting Gherkin patterns
+- Then the extracted pattern has no include field
+
+| tag               |
+| ----------------- |
+| libar-docs        |
+| pattern:NoInclude |
+| status:roadmap    |
+| phase:01          |
+
 ## Business Rules
 
 **Process metadata is extracted from feature tags**
@@ -234,6 +276,10 @@ _Verified by: Matching code and feature are combined, Code-only pattern has no m
 **Dual-source results are validated for consistency**
 
 _Verified by: Clean results have no errors, Cross-validation errors are reported, Orphaned roadmap code stubs produce warnings, Feature-only roadmap patterns produce warnings_
+
+**Include tags are extracted from Gherkin feature tags**
+
+_Verified by: Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field_
 
 ---
 

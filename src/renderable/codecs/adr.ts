@@ -508,7 +508,9 @@ function buildAdrIndexTable(
 function adrToSlug(pattern: ExtractedPattern): string {
   const adrNum = pattern.adr ?? '000';
   const displayName = getDisplayName(pattern);
-  const sluggedName = displayName
+  // Strip leading "ADR NNN" or "PDR NNN" prefix to avoid duplication (e.g., adr-001-adr-001-...)
+  const stripped = displayName.replace(/^(?:ADR|PDR)\s*\d+\s*/i, '');
+  const sluggedName = stripped
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
@@ -653,6 +655,17 @@ function renderPartitionedAdrSections(
   if (options.includeConsequences && partitioned.consequences.length > 0) {
     sections.push(heading(headingLevel, 'Consequences'));
     for (const rule of partitioned.consequences) {
+      if (rule.description) {
+        sections.push(...parseDescriptionWithDocStrings(rule.description));
+      }
+    }
+  }
+
+  // Render rules that don't match ADR prefixes (e.g., "DD-1 - ...", invariants)
+  if (partitioned.other.length > 0) {
+    sections.push(heading(headingLevel, 'Rules'));
+    for (const rule of partitioned.other) {
+      sections.push(heading(headingLevel === 2 ? 3 : 6, rule.name));
       if (rule.description) {
         sections.push(...parseDescriptionWithDocStrings(rule.description));
       }

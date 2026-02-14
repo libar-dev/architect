@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:FuzzyMatchTests
 @libar-docs-status:active
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Fuzzy Pattern Matching
 
   Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.

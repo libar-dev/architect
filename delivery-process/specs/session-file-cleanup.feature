@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:2h
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Process
 @libar-docs-business-value:ensure-session-directory-only-contains-active-phase-files
 @libar-docs-priority:low
 Feature: Session File Cleanup Behavior

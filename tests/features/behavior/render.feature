@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:UniversalMarkdownRenderer
 @libar-docs-status:completed
-@libar-docs-product-area:Behavior
+@libar-docs-product-area:Generation
 @behavior @render
 Feature: Universal Markdown Renderer
   The universal renderer converts RenderableDocument to markdown.

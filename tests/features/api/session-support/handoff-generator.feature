@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:HandoffGeneratorTests
 @libar-docs-status:completed
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Handoff Generator - Session-End State Summary
 
   **Problem:**

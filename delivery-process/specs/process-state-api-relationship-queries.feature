@@ -3,7 +3,7 @@
 @libar-docs-status:active
 @libar-docs-unlock-reason:Relationships-available-via-getPatternRelationships-superseded-by-DataAPIRelationshipGraph
 @libar-docs-phase:24
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:DataAPI
 @libar-docs-effort:3d
 Feature: ProcessStateAPI Relationship Queries
 

@@ -4,7 +4,7 @@
 @libar-docs-unlock-reason:All-deliverables-implemented-and-tested
 @libar-docs-phase:28
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-depends-on:DocGenerationProofOfConcept
 @libar-docs-business-value:enables-monorepo-scale-doc-generation
 @libar-docs-priority:high

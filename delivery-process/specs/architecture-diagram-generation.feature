@@ -3,7 +3,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:23
 @libar-docs-effort:1w
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-executable-specs:tests/features/behavior/architecture-diagrams
 Feature: Architecture Diagram Generation
 

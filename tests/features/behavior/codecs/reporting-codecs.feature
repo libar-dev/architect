@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ReportingCodecTesting
 @libar-docs-status:completed
-@libar-docs-product-area:Codec
+@libar-docs-product-area:Generation
 @libar-docs-implements:CodecBehaviorTesting
 @behavior @reporting-codecs
 Feature: Reporting Document Codecs

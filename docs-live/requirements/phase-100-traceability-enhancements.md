@@ -9,7 +9,7 @@
 | Property       | Value                                       |
 | -------------- | ------------------------------------------- |
 | Status         | planned                                     |
-| Product Area   | DeliveryProcess                             |
+| Product Area   | Generation                                  |
 | Business Value | detect coverage gaps and requirements drift |
 | Phase          | 100                                         |
 

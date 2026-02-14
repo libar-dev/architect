@@ -9,7 +9,7 @@
 | Property       | Value                                                     |
 | -------------- | --------------------------------------------------------- |
 | Status         | planned                                                   |
-| Product Area   | DeliveryProcess                                           |
+| Product Area   | Process                                                   |
 | Business Value | ensure session directory only contains active phase files |
 | Phase          | 100                                                       |
 

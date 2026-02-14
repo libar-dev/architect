@@ -273,6 +273,120 @@ export function extractShapes(
     | docs/SESSION-GUIDES.md | ADR for session workflows |
     | _claude-md/**/*.md | Corresponding decisions with compact extraction |
 
+## Rules
+
+### Proof of Concept - Self-documentation validates the pattern
+
+This POC demonstrates the doc-from-decision pattern by generating docs
+about ITSELF. The DocGenerationProofOfConcept pattern produces:
+
+    | Output | Purpose | Detail Level |
+    | docs/DOC-GENERATION-PROOF-OF-CONCEPT.md | Detailed reference | detailed |
+    | _claude-md/generated/doc-generation-proof-of-concept.md | AI context | summary |
+
+    **Process Guard docs are generated separately from `adr-006-process-guard.feature`.**
+
+    **Source Mapping for POC Self-Documentation:**
+
+    This source mapping demonstrates all extraction methods by extracting content
+    from this POC's own sources. The table serves as both documentation AND test data.
+
+    | Section | Source File | Extraction Method |
+    | Intro & Context | THIS DECISION (Rule: Context above) | Decision rule description |
+    | How It Works | THIS DECISION (Rule: Decision above) | Decision rule description |
+    | Validation Rules | tests/features/validation/process-guard.feature | Rule blocks |
+    | Protection Levels | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
+    | Valid Transitions | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples |
+    | API Types | src/lint/process-guard/types.ts | @extract-shapes tag |
+    | Decider API | src/lint/process-guard/decider.ts | @extract-shapes tag |
+    | CLI Options | src/cli/lint-process.ts | JSDoc section |
+    | Error Messages | src/lint/process-guard/decider.ts | createViolation() patterns |
+    | Pre-commit Setup | THIS DECISION (DocString) | Fenced code block |
+    | Programmatic API | THIS DECISION (DocString) | Fenced code block |
+
+    **Pre-commit Hook Setup:**
+
+    File: `.husky/pre-commit`
+
+```bash
+npx lint-process --staged
+```
+
+**Package.json Scripts:**
+
+```json
+{
+  "scripts": {
+    "lint:process": "lint-process --staged",
+    "lint:process:ci": "lint-process --all --strict"
+  }
+}
+```
+
+**Programmatic API Example:**
+
+```typescript
+import {
+  deriveProcessState,
+  detectStagedChanges,
+  validateChanges,
+  hasErrors,
+  summarizeResult,
+} from '@libar-dev/delivery-process/lint';
+
+// 1. Derive state from annotations
+const state = (await deriveProcessState({ baseDir: '.' })).value;
+
+// 2. Detect changes
+const changes = detectStagedChanges('.').value;
+
+// 3. Validate
+const { result } = validateChanges({
+  state,
+  changes,
+  options: { strict: false, ignoreSession: false },
+});
+
+// 4. Handle results
+if (hasErrors(result)) {
+  console.log(summarizeResult(result));
+  process.exit(1);
+}
+```
+
+**Escape Hatches:**
+
+    | Situation | Solution | Example |
+    | Fix bug in completed spec | Add unlock reason tag | `@libar-docs-unlock-reason:'Fix-typo'` |
+    | Modify outside session scope | Use ignore flag | `lint-process --staged --ignore-session` |
+    | CI treats warnings as errors | Use strict flag | `lint-process --all --strict` |
+    | Skip workflow (legacy import) | Multiple transitions | Set roadmap then completed in same commit |
+
+### Expected Output - Compact claude module structure
+
+**File:** `_claude-md/validation/process-guard.md`
+
+    The compact module extracts only essential content for AI context.
+    Output size depends on source mapping entries - there is no artificial line limit.
+
+    **Expected Sections:**
+
+    | Section | Content |
+    | Header + Intro | Pattern name, problem/solution summary |
+    | API Types | Core interface definitions (DeciderInput, ValidationResult) |
+    | 7 Validation Rules | Rule table with severity and description |
+    | Protection Levels | Status-to-protection mapping table |
+    | CLI | Essential command examples |
+    | Link | Reference to full documentation |
+
+    **Key Characteristics:**
+
+    - Summary detail level (essential tables only)
+    - No JSDoc comments or implementation details
+    - Tables for structured data (rules, protection levels)
+    - Inline code blocks for CLI examples
+    - Cross-reference to detailed documentation
+
 ---
 
 [← Back to All Decisions](../DECISIONS.md)

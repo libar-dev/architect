@@ -1,7 +1,7 @@
 @libar-docs
 @libar-docs-pattern:ContextAssemblerTests
 @libar-docs-status:active
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Context Assembler - Session-Oriented Context Bundle Builder
 
   Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and

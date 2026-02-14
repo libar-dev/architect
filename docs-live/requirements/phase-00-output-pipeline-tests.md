@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property     | Value  |
-| ------------ | ------ |
-| Status       | active |
-| Product Area | API    |
+| Property     | Value   |
+| ------------ | ------- |
+| Status       | active  |
+| Product Area | DataAPI |
 
 ## Description
 

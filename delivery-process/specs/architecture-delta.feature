@@ -4,7 +4,7 @@
 @libar-docs-status:roadmap
 @libar-docs-phase:100
 @libar-docs-effort:2d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-business-value:document-release-changes-automatically
 @libar-docs-priority:medium
 Feature: Architecture Delta Generation - ADRs as Release Notes

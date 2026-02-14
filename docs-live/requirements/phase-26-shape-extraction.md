@@ -9,7 +9,7 @@
 | Property       | Value                                        |
 | -------------- | -------------------------------------------- |
 | Status         | completed                                    |
-| Product Area   | DeliveryProcess                              |
+| Product Area   | Annotation                                   |
 | Business Value | eliminates type duplication in documentation |
 | Phase          | 26                                           |
 

@@ -2,7 +2,7 @@
 @lint @libar-docs-pattern:LintRulesTesting
 @libar-docs-implements:LintRules
 @libar-docs-status:completed
-@libar-docs-product-area:Lint
+@libar-docs-product-area:Validation
 Feature: Pattern Annotation Lint Rules
   The lint system validates @libar-docs-* documentation annotations for quality.
 

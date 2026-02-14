@@ -9,7 +9,7 @@
 | Property       | Value                                     |
 | -------------- | ----------------------------------------- |
 | Status         | planned                                   |
-| Product Area   | DeliveryProcess                           |
+| Product Area   | DataAPI                                   |
 | Business Value | fast interactive cli for repeated queries |
 | Phase          | 25                                        |
 

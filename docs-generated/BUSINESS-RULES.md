@@ -5,1190 +5,564 @@
 
 ---
 
-**Domain constraints and invariants extracted from feature specifications. 607 rules from 128 features across 17 product areas.**
+**Domain constraints and invariants extracted from feature specifications. 609 rules from 128 features across 7 product areas.**
 
 ---
 
-## API / Uncategorized
+## Annotation / Phase 26
 
-### ArchQueriesTest
+### ShapeExtraction
 
-#### Neighborhood and comparison views
+*Documentation comments duplicate type definitions that exist in the same file.*
 
+#### extract-shapes tag is defined in registry
 
+- **Invariant:** The `extract-shapes` tag must exist with CSV format to list multiple type names for extraction.
 
-#### Taxonomy discovery via tags and sources
 
 
+#### Interfaces are extracted from TypeScript AST
 
-#### Coverage analysis reports annotation completeness
+- **Invariant:** When `@libar-docs-extract-shapes` lists an interface name, the extractor must find and extract the complete interface definition including JSDoc comments, generics, and extends clauses.
 
 
 
-*[arch-queries.feature](tests/features/api/architecture-queries/arch-queries.feature)*
+#### Type aliases are extracted from TypeScript AST
 
-### ContextAssemblerTests
+- **Invariant:** Type aliases (including union types, intersection types, and mapped types) are extracted when listed in extract-shapes.
 
-*Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and*
 
-#### assembleContext produces session-tailored context bundles
 
+#### Enums are extracted from TypeScript AST
 
+- **Invariant:** Both string and numeric enums are extracted with their complete member definitions.
 
-#### buildDepTree walks dependency chains with cycle detection
 
 
+#### Function signatures are extracted (body omitted)
 
-#### buildOverview provides executive project summary
+- **Invariant:** When a function name is listed in extract-shapes, only the signature (parameters, return type, generics) is extracted. The function body is replaced with ellipsis for documentation purposes.
 
 
 
-#### buildFileReadingList returns paths by relevance
+#### Multiple shapes are extracted in specified order
 
+- **Invariant:** When multiple shapes are listed, they appear in the documentation in the order specified in the tag, not source order.
 
 
-*[context-assembler.feature](tests/features/api/context-assembly/context-assembler.feature)*
 
-### ContextFormatterTests
+#### Extracted shapes render as fenced code blocks
 
-*Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),*
+- **Invariant:** Codecs render extracted shapes as TypeScript fenced code blocks, grouped under an "API Types" or similar section.
 
-#### formatContextBundle renders section markers
 
 
+#### Shapes can reference types from imports
 
-#### formatDepTree renders indented tree
+- **Invariant:** Extracted shapes may reference types from imports. The extractor does NOT resolve imports - it extracts the shape as-is. Consumers understand that referenced types are defined elsewhere.
 
 
 
-#### formatOverview renders progress summary
+#### Overloaded function signatures are all extracted
 
+- **Invariant:** When a function has multiple overload signatures, all signatures are extracted together as they represent the complete API.
 
 
-#### formatFileReadingList renders categorized file paths
 
+#### Shape rendering supports grouping options
 
+- **Invariant:** Codecs can render shapes grouped in a single code block or as separate code blocks, depending on detail level.
 
-*[context-formatter.feature](tests/features/api/context-assembly/context-formatter.feature)*
 
-### FuzzyMatchTests
 
-*Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.*
-
-#### Fuzzy matching uses tiered scoring
-
-
-
-#### findBestMatch returns single suggestion
-
-
-
-#### Levenshtein distance computation
-
-
-
-*[fuzzy-match.feature](tests/features/api/output-shaping/fuzzy-match.feature)*
-
-### HandoffGeneratorTests
-
-*Multi-session work loses critical state between sessions when handoff*
-
-#### Handoff generates compact session state summary
-
-
-
-#### Formatter produces structured text output
-
-
-
-*[handoff-generator.feature](tests/features/api/session-support/handoff-generator.feature)*
-
-### OutputPipelineTests
-
-*Validates the output pipeline transforms: summarization, modifiers,*
-
-#### Output modifiers apply with correct precedence
-
-
-
-#### Modifier conflicts are rejected
-
-
-
-#### List filters compose via AND logic
-
-
-
-#### Empty stripping removes noise
-
-
-
-*[output-pipeline.feature](tests/features/api/output-shaping/output-pipeline.feature)*
-
-### PatternSummarizeTests
-
-*Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to*
-
-#### summarizePattern projects to compact summary
-
-
-
-#### summarizePatterns batch processes arrays
-
-
-
-*[summarize.feature](tests/features/api/output-shaping/summarize.feature)*
-
-### ProcessStateAPITesting
-
-*- Markdown generation is not ideal for programmatic access*
-
-#### Status queries return correct patterns
-
-
-
-#### Phase queries return correct phase data
-
-
-
-#### FSM queries expose transition validation
-
-
-
-#### Pattern queries find and retrieve pattern data
-
-
-
-#### Timeline queries group patterns by time
-
-
-
-*[process-state-api.feature](tests/features/api/process-state-api.feature)*
-
-### ScopeValidatorTests
-
-*Starting an implementation or design session without checking prerequisites*
-
-#### Implementation scope validation checks all prerequisites
-
-
-
-#### Design scope validation checks dependency stubs
-
-
-
-#### Formatter produces structured text output
-
-
-
-*[scope-validator.feature](tests/features/api/session-support/scope-validator.feature)*
-
-### StubResolverTests
-
-*Design session stubs need structured discovery and resolution*
-
-#### Stubs are identified by path or target metadata
-
-
-
-#### Stubs are resolved against the filesystem
-
-
-
-#### Decision items are extracted from descriptions
-
-
-
-#### PDR references are found across patterns
-
-
-
-*[stub-resolver.feature](tests/features/api/stub-integration/stub-resolver.feature)*
-
-### StubTaxonomyTagTests
-
-*Stub metadata (target path, design session) was stored as plain text*
-
-#### Taxonomy tags are registered in the registry
-
-
-
-#### Tags are part of the stub metadata group
-
-
-
-*[taxonomy-tags.feature](tests/features/api/stub-integration/taxonomy-tags.feature)*
+*[shape-extraction.feature](delivery-process/specs/shape-extraction.feature)*
 
 ---
 
-## Architecture / Uncategorized
+## Annotation / Phase 31
 
-### ArchGeneratorRegistration
+### DeclarationLevelShapeTagging
 
-*I want an architecture generator registered in the generator registry*
+*The current shape extraction system operates at file granularity.*
 
-#### Architecture generator is registered in the registry
+#### Declarations opt in via libar-docs-shape tag
 
-The architecture generator must be registered like other built-in
-    generators so it can be invoked via CLI.
+- **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes. Declarations without the tag are ignored even if they are exported. The tag value is optional -- bare libar-docs-shape opts in without a group, while libar-docs-shape group-name assigns the declaration to a named group. Tagged non-exported declarations are included (DD-7).
 
+- **Rationale:** Explicit opt-in prevents over-extraction of internal helpers. Unlike auto-discovery mode (extract-shapes *) which grabs all exports, declaration-level tagging gives precise control. This matches how TypeDoc uses public/internal tags -- the annotation lives next to the code it describes, surviving refactors without breaking extraction.
 
 
-#### Architecture generator produces component diagram by default
-
-Running the architecture generator without options produces
-    a component diagram (bounded context view).
-
-
-
-#### Architecture generator supports diagram type options
-
-The generator accepts options to specify diagram type
-    (component or layered).
-
-
-
-#### Architecture generator supports context filtering
-
-The generator can filter to specific bounded contexts
-    for focused diagram output.
-
-
-
-*[generator-registration.feature](tests/features/behavior/architecture-diagrams/generator-registration.feature)*
-
-### ArchIndexDataset
-
-*As a documentation generator*
-
-#### archIndex groups patterns by arch-role
-
-The archIndex.byRole map groups patterns by their architectural role
-    (command-handler, projection, saga, etc.) for efficient lookup.
-
-
-
-#### archIndex groups patterns by arch-context
-
-The archIndex.byContext map groups patterns by bounded context
-    for subgraph rendering in component diagrams.
-
-
-
-#### archIndex groups patterns by arch-layer
-
-The archIndex.byLayer map groups patterns by architectural layer
-    (domain, application, infrastructure) for layered diagram rendering.
-
-
-
-#### archIndex.all contains all patterns with any arch tag
-
-The archIndex.all array contains all patterns that have at least
-    one arch tag (role, context, or layer).
-
-
-
-#### Patterns without arch tags are excluded from archIndex
-
-Patterns that have no arch-role, arch-context, or arch-layer are
-    not included in the archIndex at all.
-
-
-
-*[arch-index.feature](tests/features/behavior/architecture-diagrams/arch-index.feature)*
-
-### ArchTagExtraction
-
-*As a documentation generator*
-
-#### arch-role tag is defined in the registry
-
-Architecture roles classify components for diagram rendering.
-
-
-
-#### arch-context tag is defined in the registry
-
-Context tags group components into bounded context subgraphs.
-
-
-
-#### arch-layer tag is defined in the registry
-
-Layer tags enable layered architecture diagrams.
-
-
-
-#### AST parser extracts arch-role from TypeScript annotations
-
-The AST parser must extract arch-role alongside other pattern metadata.
-
-
-
-#### AST parser extracts arch-context from TypeScript annotations
-
-Context values are free-form strings naming the bounded context.
-
-
-
-#### AST parser extracts arch-layer from TypeScript annotations
-
-Layer tags classify components by architectural layer.
-
-
-
-#### AST parser handles multiple arch tags together
-
-Components often have role + context + layer together.
-
-
-
-#### Missing arch tags yield undefined values
-
-Components without arch tags should have undefined (not null or empty).
-
-
-
-*[arch-tag-extraction.feature](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)*
-
-### ComponentDiagramGeneration
-
-*As a documentation generator*
-
-#### Component diagrams group patterns by bounded context
-
-Patterns with arch-context are grouped into Mermaid subgraphs.
-
-
-
-#### Context-less patterns go to Shared Infrastructure
-
-Patterns without arch-context are grouped into a
-    "Shared Infrastructure" subgraph.
-
-
-
-#### Relationship types render with distinct arrow styles
-
-Arrow styles follow UML conventions:
-    - uses: solid arrow (-->)
-    - depends-on: dashed arrow (-.->)
-    - implements: dotted arrow (..->)
-    - extends: open arrow (-->>)
-
-
-
-#### Arrows only connect annotated components
-
-Relationships pointing to non-annotated patterns
-    are not rendered (target would not exist in diagram).
-
-
-
-#### Component diagram includes summary section
-
-The generated document starts with an overview section
-    showing component counts and bounded context statistics.
-
-
-
-#### Component diagram includes legend when enabled
-
-The legend explains arrow style meanings for readers.
-
-
-
-#### Component diagram includes inventory table when enabled
-
-The inventory lists all components with their metadata.
-
-
-
-#### Empty architecture data shows guidance message
-
-If no patterns have architecture annotations,
-    the document explains how to add them.
-
-
-
-*[component-diagram.feature](tests/features/behavior/architecture-diagrams/component-diagram.feature)*
-
-### LayeredDiagramGeneration
-
-*As a documentation generator*
-
-#### Layered diagrams group patterns by arch-layer
-
-Patterns with arch-layer are grouped into Mermaid subgraphs.
-
-
-
-#### Layer order is domain to infrastructure (top to bottom)
-
-The layer subgraphs are rendered in Clean Architecture order:
-    domain at top, then application, then infrastructure at bottom.
-
-
-
-#### Context labels included in layered diagram nodes
-
-Unlike component diagrams which group by context, layered diagrams
-    include the context as a label in each node name.
-
-
-
-#### Patterns without layer go to Other subgraph
-
-Patterns that have arch-role or arch-context but no arch-layer
-    are grouped into an "Other" subgraph.
-
-
-
-#### Layered diagram includes summary section
-
-The generated document starts with an overview section
-    specific to layered architecture visualization.
-
-
-
-*[layered-diagram.feature](tests/features/behavior/architecture-diagrams/layered-diagram.feature)*
-
----
-
-## Behavior / Phase 44
-
-### KebabCaseSlugs
-
-*As a documentation generator*
-
-#### CamelCase names convert to kebab-case
-
-
-
-#### Edge cases are handled correctly
-
-
-
-#### Requirements include phase prefix
-
-
-
-#### Phase slugs use kebab-case for names
-
-
-
-*[kebab-case-slugs.feature](tests/features/behavior/kebab-case-slugs.feature)*
-
-### RichContentHelpersTesting
-
-*As a document codec author*
-
-#### DocString parsing handles edge cases
-
-
-
-#### DataTable rendering produces valid markdown
-
-
-
-#### Scenario content rendering respects options
-
-
-
-#### Business rule rendering handles descriptions
-
-
-
-#### DocString content is dedented when parsed
-
-
-
-*[rich-content-helpers.feature](tests/features/behavior/rich-content-helpers.feature)*
-
----
-
-## Behavior / Uncategorized
-
-### DescriptionHeaderNormalization
-
-*Pattern descriptions should not create duplicate headers when rendered.*
-
-#### Leading headers are stripped from pattern descriptions
-
-
-
-#### Edge cases are handled correctly
-
-
-
-#### stripLeadingHeaders removes only leading headers
-
-
-
-*[description-headers.feature](tests/features/behavior/description-headers.feature)*
-
-### ExtractSummary
-
-*The extractSummary function transforms multi-line pattern descriptions into*
-
-#### Single-line descriptions are returned as-is when complete
-
-
-
-#### Multi-line descriptions are combined until sentence ending
-
-
-
-#### Long descriptions are truncated at sentence or word boundaries
-
-
-
-#### Tautological and header lines are skipped
-
-
-
-#### Edge cases are handled gracefully
-
-
-
-*[extract-summary.feature](tests/features/behavior/extract-summary.feature)*
-
-### ImplementationLinkPathNormalization
-
-*Links to implementation files in generated pattern documents should have*
-
-#### Repository prefixes are stripped from implementation paths
-
-
-
-#### All implementation links in a pattern are normalized
-
-
-
-#### normalizeImplPath strips known prefixes
-
-
-
-*[implementation-links.feature](tests/features/behavior/implementation-links.feature)*
-
-### RemainingWorkSummaryAccuracy
-
-*Summary totals in REMAINING-WORK.md must match the sum of phase table rows.*
-
-#### Summary totals equal sum of phase table rows
-
-
-
-#### Patterns without phases appear in Backlog row
-
-
-
-#### Patterns without patternName are counted using id
-
-
-
-#### All phases with incomplete patterns are shown
-
-
-
-*[remaining-work-totals.feature](tests/features/behavior/remaining-work-totals.feature)*
-
----
-
-## CLI / Uncategorized
-
-### GenerateDocsCli
-
-*Command-line interface for generating documentation from annotated TypeScript.*
-
-#### CLI displays help and version information
-
-
-
-#### CLI requires input patterns
-
-
-
-#### CLI lists available generators
-
-
-
-#### CLI generates documentation from source files
-
-
-
-#### CLI rejects unknown options
-
-
-
-*[generate-docs.feature](tests/features/cli/generate-docs.feature)*
-
-### GenerateTagTaxonomyCli
-
-*Command-line interface for generating TAG_TAXONOMY.md from tag registry configuration.*
-
-#### CLI displays help and version information
-
-
-
-#### CLI generates taxonomy at specified output path
-
-
-
-#### CLI respects overwrite flag for existing files
-
-
-
-#### Generated taxonomy contains expected sections
-
-
-
-#### CLI warns about unknown flags
-
-
-
-*[generate-tag-taxonomy.feature](tests/features/cli/generate-tag-taxonomy.feature)*
-
-### LintPatternsCli
-
-*Command-line interface for validating pattern annotation quality.*
-
-#### CLI displays help and version information
-
-
-
-#### CLI requires input patterns
-
-
-
-#### Lint passes for valid patterns
-
-
-
-#### Lint detects violations in incomplete patterns
-
-
-
-#### CLI supports multiple output formats
-
-
-
-#### Strict mode treats warnings as errors
-
-
-
-*[lint-patterns.feature](tests/features/cli/lint-patterns.feature)*
-
-### LintProcessCli
-
-*Command-line interface for validating changes against delivery process rules.*
-
-#### CLI displays help and version information
-
-
-
-#### CLI requires git repository for validation
-
-
-
-#### CLI validates file mode input
-
-
-
-#### CLI handles no changes gracefully
-
-
-
-#### CLI supports multiple output formats
-
-
-
-#### CLI supports debug options
-
-
-
-#### CLI warns about unknown flags
-
-
-
-*[lint-process.feature](tests/features/cli/lint-process.feature)*
-
-### ProcessApiCli
-
-*Command-line interface for querying delivery process state via ProcessStateAPI.*
-
-#### CLI displays help and version information
-
-
-
-#### CLI requires input flag for subcommands
-
-
-
-#### CLI status subcommand shows delivery state
-
-
-
-#### CLI query subcommand executes API methods
-
-
-
-#### CLI pattern subcommand shows pattern detail
-
-
-
-#### CLI arch subcommand queries architecture
-
-
-
-#### CLI shows errors for missing subcommand arguments
-
-
-
-#### CLI handles argument edge cases
-
-
-
-#### CLI list subcommand filters patterns
-
-
-
-#### CLI search subcommand finds patterns by fuzzy match
-
-
-
-#### CLI context assembly subcommands return text output
-
-
-
-#### CLI tags and sources subcommands return JSON
-
-
-
-#### CLI extended arch subcommands query architecture relationships
-
-
-
-#### CLI unannotated subcommand finds files without annotations
-
-
-
-#### Output modifiers work when placed after the subcommand
-
-- **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
-
-- **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
-
-
-
-#### CLI arch health subcommands detect graph quality issues
-
-- **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
-
-- **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
-
-
-
-*[process-api.feature](tests/features/cli/process-api.feature)*
-
-### ValidatePatternsCli
-
-*Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.*
-
-#### CLI displays help and version information
-
-
-
-#### CLI requires input and feature patterns
-
-
-
-#### CLI validates patterns across TypeScript and Gherkin sources
-
-
-
-#### CLI supports multiple output formats
-
-
-
-#### Strict mode treats warnings as errors
-
-
-
-#### CLI warns about unknown flags
-
-
-
-*[validate-patterns.feature](tests/features/cli/validate-patterns.feature)*
-
----
-
-## Codec / Uncategorized
-
-### CompositeCodecTesting
-
-*Assembles reference documents from multiple codec outputs by*
-
-#### CompositeCodec concatenates sections in codec array order
-
-- **Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
-
-
-
-#### Separators between codec outputs are configurable
-
-- **Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
-
-
-
-#### additionalFiles merge with last-wins semantics
-
-- **Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
-
-
-
-#### composeDocuments works at document level without codecs
-
-- **Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
-
-
-
-#### Empty codec outputs are handled gracefully
-
-- **Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
-
-
-
-*[composite-codec.feature](tests/features/behavior/codecs/composite-codec.feature)*
-
-### ConventionExtractorTesting
-
-*Extracts convention content from MasterDataset decision records*
-
-#### Empty and missing inputs produce empty results
-
-
-
-#### Convention bundles are extracted from matching patterns
-
-
-
-#### Structured content is extracted from rule descriptions
-
-
-
-#### Code examples in rule descriptions are preserved
-
-
-
-#### TypeScript JSDoc conventions are extracted alongside Gherkin
-
-
-
-*[convention-extractor.feature](tests/features/behavior/codecs/convention-extractor.feature)*
-
-### DedentHelper
-
-*- DocStrings in Gherkin files have consistent indentation for alignment*
-
-#### Tabs are normalized to spaces before dedent
-
-
-
-#### Empty lines are handled correctly
-
-
-
-#### Single line input is handled
-
-
-
-#### Unicode whitespace is handled
-
-
-
-#### Relative indentation is preserved
-
-
-
-*[dedent.feature](tests/features/behavior/codecs/dedent.feature)*
-
-### PlanningCodecTesting
-
-*- Need to generate planning checklists, session plans, and findings documents from patterns*
-
-#### PlanningChecklistCodec prepares for implementation sessions
-
-
-
-#### SessionPlanCodec generates implementation plans
-
-
-
-#### SessionFindingsCodec captures retrospective discoveries
-
-
-
-*[planning-codecs.feature](tests/features/behavior/codecs/planning-codecs.feature)*
-
-### PrChangesCodecTesting
-
-*- Need to generate PR-specific documentation from patterns*
-
-#### PrChangesCodec handles empty results gracefully
-
-
-
-#### PrChangesCodec generates summary with filter information
-
-
-
-#### PrChangesCodec groups changes by phase when sortBy is "phase"
-
-
-
-#### PrChangesCodec groups changes by priority when sortBy is "priority"
-
-
-
-#### PrChangesCodec shows flat list when sortBy is "workflow"
-
-
-
-#### PrChangesCodec renders pattern details with metadata and description
-
-
-
-#### PrChangesCodec renders deliverables when includeDeliverables is enabled
-
-
-
-#### PrChangesCodec renders acceptance criteria from scenarios
-
-
-
-#### PrChangesCodec renders business rules from Gherkin Rule keyword
-
-
-
-#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
-
-
-
-#### PrChangesCodec generates dependencies section when includeDependencies is enabled
-
-
-
-#### PrChangesCodec filters patterns by changedFiles
-
-
-
-#### PrChangesCodec filters patterns by releaseFilter
-
-
-
-#### PrChangesCodec uses OR logic for combined filters
-
-
-
-#### PrChangesCodec only includes active and completed patterns
-
-
-
-*[pr-changes-codec.feature](tests/features/behavior/codecs/pr-changes-codec.feature)*
-
-### ReferenceCodecTesting
-
-*Parameterized codec factory that creates reference document codecs*
-
-#### Empty datasets produce fallback content
-
-
-
-#### Convention content is rendered as sections
-
-
-
-#### Detail level controls output density
-
-
-
-#### Behavior sections are rendered from category-matching patterns
-
-
-
-#### Shape sources are extracted from matching patterns
-
-
-
-#### Convention and behavior content compose in a single document
-
-
-
-#### Composition order follows AD-5: conventions then shapes then behaviors
-
-
-
-#### Convention code examples render as mermaid blocks
-
-
-
-#### Scoped diagrams are generated from diagramScope config
-
-
-
-#### Multiple diagram scopes produce multiple mermaid blocks
-
-
-
-#### Standard detail level includes narrative but omits rationale
-
-
-
-#### Deep behavior rendering with structured annotations
-
-
-
-#### Shape JSDoc prose renders at standard and detailed levels
-
-
-
-#### Shape sections render param returns and throws documentation
-
-
-
-#### Diagram type controls Mermaid output format
-
-- **Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
-
-- **Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
-
-
-
-#### Edge labels and custom node shapes enrich diagram readability
-
-- **Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
-
-- **Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
-
-
-
-#### Collapsible blocks wrap behavior rules for progressive disclosure
-
-- **Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
-
-- **Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
-
-
-
-#### Link-out blocks provide source file cross-references
-
-- **Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
-
-- **Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
-
-
-
-*[reference-codec.feature](tests/features/behavior/codecs/reference-codec.feature)*
-
-### ReportingCodecTesting
-
-*- Need to generate changelog, traceability, and overview documents*
-
-#### ChangelogCodec follows Keep a Changelog format
-
-
-
-#### TraceabilityCodec maps timeline patterns to behavior tests
-
-
-
-#### OverviewCodec provides project architecture summary
-
-
-
-*[reporting-codecs.feature](tests/features/behavior/codecs/reporting-codecs.feature)*
-
-### RequirementsAdrCodecTesting
-
-*- Need to generate product requirements documents with flexible groupings*
-
-#### RequirementsDocumentCodec generates PRD-style documentation from patterns
-
-
-
-#### AdrDocumentCodec documents architecture decisions
-
-
-
-*[requirements-adr-codecs.feature](tests/features/behavior/codecs/requirements-adr-codecs.feature)*
-
-### SessionCodecTesting
-
-*- Need to generate session context and remaining work documents from patterns*
-
-#### SessionContextCodec provides working context for AI sessions
-
-
-
-#### RemainingWorkCodec aggregates incomplete work by phase
-
-
-
-*[session-codecs.feature](tests/features/behavior/codecs/session-codecs.feature)*
-
-### ShapeMatcherTesting
-
-*Matches file paths against glob patterns for TypeScript shape extraction.*
-
-#### Exact paths match without wildcards
-
-
-
-#### Single-level globs match one directory level
-
-
-
-#### Recursive globs match any depth
-
-
-
-#### Dataset shape extraction deduplicates by name
-
-
-
-*[shape-matcher.feature](tests/features/behavior/codecs/shape-matcher.feature)*
-
-### ShapeSelectorTesting
-
-*Tests the filterShapesBySelectors function that provides fine-grained*
 
 #### Reference doc configs select shapes via shapeSelectors
 
-- **Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
+- **Invariant:** shapeSelectors provides three selection modes: by source path + specific names (DD-6 source+names variant), by group tag (DD-6 group variant), or by source path alone (DD-6 source-only variant). shapeSources remains for backward compatibility. When both are present, shapeSources provides the coarse file-level filter and shapeSelectors adds fine-grained name/group filtering on top.
+
+- **Rationale:** The reference doc system composes focused documents from cherry-picked content. Every other content axis (conventions, behaviors, diagrams) has content-level filtering. shapeSources was the only axis limited to file-level granularity. shapeSelectors closes this gap with the same explicitness as conventionTags.
 
 
 
-*[shape-selector.feature](tests/features/behavior/codecs/shape-selector.feature)*
+#### Discovery uses existing estree parser with JSDoc comment scanning
 
-### TimelineCodecTesting
+- **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach. It does not require the TypeScript compiler API, ts-morph, or parseAndGenerateServices. Tag detection is a regex match on the JSDoc comment text already extracted by the existing infrastructure. The tag regex pattern is: /libar-docs-shape(?:\s+(\S+))?/ where capture group 1 is the optional group name.
 
-*- Need to generate roadmap, milestones, and current work documents from patterns*
-
-#### RoadmapDocumentCodec groups patterns by phase with progress tracking
+- **Rationale:** The shape extractor already traverses declarations and extracts their JSDoc. Adding libar-docs-shape detection is a string search on content that is already available -- approximately 15 lines of new logic. Switching parsers would introduce churn with no benefit for the v1 use case of tag detection on top-level declarations.
 
 
 
-#### CompletedMilestonesCodec shows only completed patterns grouped by quarter
+*[declaration-level-shape-tagging.feature](delivery-process/specs/declaration-level-shape-tagging.feature)*
+
+---
+
+## Annotation / Phase 99
+
+### PatternRelationshipModel
+
+*The delivery process lacks a comprehensive relationship model between artifacts.*
+
+#### Code files declare pattern realization via implements tag
+
+- **Invariant:** Files with `@libar-docs-implements:PatternName,OtherPattern` are linked to the specified patterns without causing conflicts. Pattern definitions remain in roadmap specs; implementation files provide supplementary metadata. Multiple files can implement the same pattern, and one file can implement multiple patterns.
+
+- **Rationale:** This mirrors UML's "realization" relationship where a class implements an interface. Code realizes the specification. Direction is code→spec (backward link). CSV format allows a single implementation file to realize multiple patterns when implementing a pattern family (e.g., durability primitives).
+
+**Implementation:** `src/taxonomy/registry-builder.ts`
 
 
 
-#### CurrentWorkCodec shows only active patterns with deliverables
+#### Pattern inheritance uses extends relationship tag
+
+- **Invariant:** Files with `@libar-docs-extends:BasePattern` declare that they extend another pattern's capabilities. This is a generalization relationship where the extending pattern is a specialization of the base pattern.
+
+- **Rationale:** Pattern families exist where specialized patterns build on base patterns. For example, `ReactiveProjections` extends `ProjectionCategories`. The extends relationship enables inheritance-based documentation and validates pattern hierarchy.
+
+**Implementation:** `src/taxonomy/registry-builder.ts`
 
 
 
-*[timeline-codecs.feature](tests/features/behavior/codecs/timeline-codecs.feature)*
+#### Technical dependencies use directed relationship tags
+
+- **Invariant:** `@libar-docs-uses` declares outbound dependencies (what this pattern depends on). `@libar-docs-used-by` declares inbound dependencies (what depends on this pattern). Both are CSV format.
+
+- **Rationale:** These represent technical coupling between patterns. The distinction matters for impact analysis: changing a pattern affects its `used-by` consumers but not its `uses` dependencies.
+
+
+
+#### Roadmap sequencing uses ordering relationship tags
+
+- **Invariant:** `@libar-docs-depends-on` declares what must be completed first (roadmap sequencing). `@libar-docs-enables` declares what this unlocks when completed. These are planning relationships, not technical dependencies.
+
+- **Rationale:** Sequencing is about order of work, not runtime coupling. A pattern may depend on another being complete without using its code.
+
+
+
+#### Cross-tier linking uses traceability tags (PDR-007)
+
+- **Invariant:** `@libar-docs-executable-specs` on roadmap specs points to test locations. `@libar-docs-roadmap-spec` on package specs points back to the pattern. These create bidirectional traceability.
+
+- **Rationale:** Two-tier architecture (PDR-007) separates planning specs from executable tests. Traceability tags maintain the connection for navigation and completeness checking.
+
+
+
+#### Epic/Phase/Task hierarchy uses parent-child relationships
+
+- **Invariant:** `@libar-docs-level` declares the hierarchy tier (epic, phase, task). `@libar-docs-parent` links to the containing pattern. This enables rollup progress tracking.
+
+- **Rationale:** Large initiatives decompose into phases and tasks. The hierarchy allows progress aggregation (e.g., "Epic 80% complete based on child phases").
+
+
+
+#### All relationships appear in generated documentation
+
+- **Invariant:** The PATTERNS.md dependency graph renders all relationship types with distinct visual styles. Pattern detail pages list all related artifacts grouped by relationship type.
+
+- **Rationale:** Visualization makes the relationship model accessible. Different arrow styles distinguish relationship semantics at a glance.
+
+| Relationship | Arrow Style | Direction | Description |
+| --- | --- | --- | --- |
+| uses | --> (solid) | OUT | Technical dependency |
+| depends-on | -.-> (dashed) | OUT | Roadmap sequencing |
+| implements | ..-> (dotted) | CODE→SPEC | Realization |
+| extends | -->> (solid open) | CHILD→PARENT | Generalization |
+
+
+
+#### Linter detects relationship violations
+
+- **Invariant:** The pattern linter validates that all relationship targets exist, implements files don't have pattern tags, and bidirectional links are consistent.
+
+- **Rationale:** Broken relationships cause confusion and incorrect generated docs. Early detection during linting prevents propagation of errors.
+
+
+
+*[pattern-relationship-model.feature](delivery-process/specs/pattern-relationship-model.feature)*
+
+---
+
+## Annotation / Phase 100
+
+### CrossSourceValidation
+
+*The delivery process uses dual sources (TypeScript phase files and Gherkin*
+
+#### Pattern names must be consistent across sources
+
+
+
+#### Circular dependencies are detected
+
+
+
+#### Dependency references must resolve
+
+
+
+*[cross-source-validation.feature](delivery-process/specs/cross-source-validation.feature)*
+
+### GherkinRulesSupport
+
+*Feature files were limited to flat scenario lists.*
+
+#### Rules flow through the entire pipeline without data loss
+
+The @cucumber/gherkin parser extracts Rules natively.
+
+
+
+#### Generators can render rules as business documentation
+
+Business stakeholders see rule names and descriptions as "Business Rules"
+    sections, not Given/When/Then syntax.
+
+
+
+#### Custom content blocks render in acceptance criteria
+
+DataTables and DocStrings in steps should appear in generated documentation,
+    providing structured data and code examples alongside step descriptions.
+
+
+
+#### vitest-cucumber executes scenarios inside Rules
+
+Test execution must work for scenarios inside Rule blocks.
+
+
+
+*[gherkin-rules-support.feature](delivery-process/specs/gherkin-rules-support.feature)*
+
+---
+
+## Annotation / Uncategorized
+
+### ContextInference
+
+*Patterns in standard directories (src/validation/, src/scanner/) should*
+
+#### matchPattern supports recursive wildcard **
+
+
+
+#### matchPattern supports single-level wildcard /*
+
+
+
+#### matchPattern supports prefix matching
+
+
+
+#### inferContext returns undefined when no rules match
+
+
+
+#### inferContext applies first matching rule
+
+
+
+#### Explicit archContext is not overridden
+
+
+
+#### Inference works independently of archLayer
+
+
+
+#### Default rules map standard directories
+
+
+
+*[context-inference.feature](tests/features/behavior/context-inference.feature)*
+
+### DeclarationLevelShapeTaggingTesting
+
+*Tests the discoverTaggedShapes function that scans TypeScript source*
+
+#### Declarations opt in via libar-docs-shape tag
+
+- **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
+
+
+
+#### Discovery uses existing estree parser with JSDoc comment scanning
+
+- **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach.
+
+
+
+*[declaration-level-shape-tagging.feature](tests/features/extractor/declaration-level-shape-tagging.feature)*
+
+### DependsOnTagTesting
+
+*Tests extraction of @libar-docs-depends-on and @libar-docs-enables*
+
+#### Depends-on tag is defined in taxonomy registry
+
+
+
+#### Depends-on tag is extracted from Gherkin files
+
+
+
+#### Depends-on in TypeScript triggers anti-pattern warning
+
+The depends-on tag is for planning dependencies and belongs in feature
+    files, not TypeScript code.
+
+
+
+#### Enables tag is extracted from Gherkin files
+
+
+
+#### Planning dependencies are stored in relationship index
+
+The relationship index stores dependsOn and enables relationships
+    directly from pattern metadata.
+
+
+
+*[depends-on-tag.feature](tests/features/behavior/pattern-relationships/depends-on-tag.feature)*
+
+### DocStringMediaType
+
+*DocString language hints (mediaType) should be preserved through the parsing*
+
+#### Parser preserves DocString mediaType during extraction
+
+
+
+#### MediaType is used when rendering code blocks
+
+
+
+#### renderDocString handles both string and object formats
+
+
+
+*[docstring-mediatype.feature](tests/features/scanner/docstring-mediatype.feature)*
+
+### DualSourceExtractorTesting
+
+*- Pattern data split across code stubs and feature files*
+
+#### Process metadata is extracted from feature tags
+
+
+
+#### Deliverables are extracted from Background tables
+
+
+
+#### Code and feature patterns are combined into dual-source patterns
+
+
+
+#### Dual-source results are validated for consistency
+
+
+
+#### Include tags are extracted from Gherkin feature tags
+
+
+
+*[dual-source-extraction.feature](tests/features/extractor/dual-source-extraction.feature)*
+
+### ExtendsTagTesting
+
+*Tests for the @libar-docs-extends tag which establishes generalization*
+
+#### Extends tag is defined in taxonomy registry
+
+
+
+#### Patterns can extend exactly one base pattern
+
+Extends uses single-value format because pattern inheritance should be
+    single-inheritance to avoid diamond problems.
+
+
+
+#### Transform builds extendedBy reverse lookup
+
+
+
+#### Linter detects circular inheritance chains
+
+
+
+*[extends-tag.feature](tests/features/behavior/pattern-relationships/extends-tag.feature)*
+
+### ExtractionPipelineEnhancementsTesting
+
+*Validates extraction pipeline capabilities for ReferenceDocShowcase:*
+
+#### Function signatures surface full parameter types in ExportInfo
+
+- **Invariant:** ExportInfo.signature shows full parameter types and return type instead of the placeholder value.
+
+
+
+#### Property-level JSDoc preserves full multi-line content
+
+- **Invariant:** Property-level JSDoc preserves full multi-line content without first-line truncation.
+
+
+
+#### Param returns and throws tags are extracted from function JSDoc
+
+- **Invariant:** JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape for function-kind shapes.
+
+
+
+#### Auto-shape discovery extracts all exported types via wildcard
+
+- **Invariant:** When extract-shapes tag value is the wildcard character, all exported declarations are extracted without listing names.
+
+
+
+*[extraction-pipeline-enhancements.feature](tests/features/extractor/extraction-pipeline-enhancements.feature)*
+
+### ImplementsTagProcessing
+
+*Tests for the @libar-docs-implements tag which links implementation files*
+
+#### Implements tag is defined in taxonomy registry
+
+The tag registry defines `implements` with CSV format, enabling the
+    data-driven AST parser to automatically extract it.
+
+
+
+#### Files can implement a single pattern
+
+
+
+#### Files can implement multiple patterns using CSV format
+
+
+
+#### Transform builds implementedBy reverse lookup
+
+
+
+#### Schemas validate implements field correctly
+
+
+
+*[implements-tag.feature](tests/features/behavior/pattern-relationships/implements-tag.feature)*
+
+### ShapeExtractionTesting
+
+*Validates the shape extraction system that extracts TypeScript type*
+
+#### extract-shapes tag exists in registry with CSV format
+
+
+
+#### Interfaces are extracted from TypeScript AST
+
+
+
+#### Property-level JSDoc is extracted for interface properties
+
+The extractor uses strict adjacency (gap = 1 line) to prevent
+    interface-level JSDoc from being misattributed to the first property.
+
+
+
+#### Type aliases are extracted from TypeScript AST
+
+
+
+#### Enums are extracted from TypeScript AST
+
+
+
+#### Function signatures are extracted with body omitted
+
+
+
+#### Multiple shapes are extracted in specified order
+
+
+
+#### Extracted shapes render as fenced code blocks
+
+
+
+#### Imported and re-exported shapes are tracked separately
+
+
+
+#### Const declarations are extracted from TypeScript AST
+
+
+
+#### Invalid TypeScript produces error result
+
+
+
+#### Non-exported shapes are extractable
+
+
+
+#### Shape rendering supports grouping options
+
+
+
+#### Large source files are rejected to prevent memory exhaustion
+
+
+
+*[shape-extraction.feature](tests/features/extractor/shape-extraction.feature)*
+
+### UsesTagTesting
+
+*Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by*
+
+#### Uses tag is defined in taxonomy registry
+
+
+
+#### Uses tag is extracted from TypeScript files
+
+
+
+#### Used-by tag is extracted from TypeScript files
+
+
+
+#### Uses relationships are stored in relationship index
+
+The relationship index stores uses and usedBy relationships directly
+    from pattern metadata.
+
+
+
+#### Schemas validate uses field correctly
+
+
+
+*[uses-tag.feature](tests/features/behavior/pattern-relationships/uses-tag.feature)*
 
 ---
 
@@ -1366,185 +740,33 @@ The generated document starts with an overview section
 
 ---
 
-## DataAPI / Uncategorized
+## CoreTypes / Phase 44
 
-### PDR001SessionWorkflowCommands
+### KebabCaseSlugs
 
-*DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session*
+*As a documentation generator*
 
-#### DD-1 - Text output with section markers
-
-Both scope-validate and handoff return string from the router, using
-    === SECTION === markers.
+#### CamelCase names convert to kebab-case
 
 
 
-#### DD-2 - Git integration is opt-in via --git flag
-
-The handoff command accepts an optional --git flag.
+#### Edge cases are handled correctly
 
 
 
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-
-| Status | Inferred Session |
-| --- | --- |
-| roadmap | design |
-| active | implement |
-| completed | review |
-| deferred | design |
+#### Requirements include phase prefix
 
 
 
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning |
-| --- | --- |
-| PASS | Check passed |
-| BLOCKED | Hard prerequisite missing |
-| WARN | Recommendation not met |
+#### Phase slugs use kebab-case for names
 
 
 
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date.
-
-
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-    and --type flag.
-
-
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-    both the data builder and the text formatter.
-
-
-
-*[pdr-001-session-workflow-commands.feature](delivery-process/decisions/pdr-001-session-workflow-commands.feature)*
+*[kebab-case-slugs.feature](tests/features/behavior/kebab-case-slugs.feature)*
 
 ---
 
-## Delivery Process / Phase 18
-
-### TraceabilityGenerator
-
-*Provide audit-ready traceability matrices that demonstrate*
-
-#### Parses Verified by annotations to extract scenario references
-
-- **Invariant:** Scenario names in `**Verified by:**` are matched against actual scenarios in feature files. Unmatched references are reported as warnings.
-
-- **Rationale:** Verified by annotations create explicit traceability. Validating references ensures the traceability matrix reflects actual test coverage.
-
-
-
-#### Generates Rule-to-Scenario traceability matrix
-
-- **Invariant:** Every Rule appears in the matrix with its verification status. Scenarios are linked by name and file location.
-
-- **Rationale:** A matrix format enables quick scanning of coverage status and supports audit requirements for bidirectional traceability.
-
-
-
-#### Detects and reports coverage gaps
-
-- **Invariant:** Orphan scenarios (not referenced by any Rule) and unverified rules are listed in dedicated sections.
-
-- **Rationale:** Coverage gaps indicate either missing traceability annotations or actual missing test coverage. Surfacing them enables remediation.
-
-
-
-#### Supports filtering by phase and domain
-
-- **Invariant:** CLI flags allow filtering the matrix by phase number or domain category to generate focused traceability reports.
-
-- **Rationale:** Large codebases have many rules. Filtering enables relevant subset extraction for specific audits or reviews.
-
-
-
-*[traceability-generator.feature](delivery-process/specs/traceability-generator.feature)*
-
----
-
-## Delivery Process / Phase 23
-
-### ArchitectureDiagramGeneration
-
-*Architecture documentation requires manually maintaining mermaid diagrams*
-
-#### Architecture tags exist in the tag registry
-
-- **Invariant:** Three architecture-specific tags (`arch-role`, `arch-context`, `arch-layer`) must exist in the tag registry with correct format and enum values.
-
-- **Rationale:** Architecture diagram generation requires metadata to classify source files into diagram components. Standard tag infrastructure enables consistent extraction via the existing AST parser.
-
-
-
-#### AST parser extracts architecture tags from TypeScript
-
-- **Invariant:** The AST parser must extract `arch-role`, `arch-context`, and `arch-layer` tags from TypeScript JSDoc comments into DocDirective objects.
-
-- **Rationale:** Source code annotations are the single source of truth for architectural metadata. Parser must extract them alongside existing pattern metadata.
-
-
-
-#### MasterDataset builds archIndex during transformation
-
-- **Invariant:** The `transformToMasterDataset` function must build an `archIndex` that groups patterns by role, context, and layer for efficient diagram generation.
-
-- **Rationale:** Single-pass extraction during dataset transformation avoids expensive re-traversal. Index structure enables O(1) lookup by each dimension.
-
-
-
-#### Component diagrams group patterns by bounded context
-
-- **Invariant:** Component diagrams must render patterns as nodes grouped into bounded context subgraphs, with relationship arrows using UML-inspired styles.
-
-- **Rationale:** Component diagrams visualize system architecture showing how bounded contexts isolate components. Subgraphs enforce visual separation.
-
-
-
-#### Layered diagrams group patterns by architectural layer
-
-- **Invariant:** Layered diagrams must render patterns grouped by architectural layer (domain, application, infrastructure) with top-to-bottom flow.
-
-- **Rationale:** Layered architecture visualization shows dependency direction - infrastructure at top, domain at bottom - following conventional layer ordering.
-
-
-
-#### Architecture generator is registered with generator registry
-
-- **Invariant:** An "architecture" generator must be registered with the generator registry to enable `pnpm docs:architecture` via the existing `generate-docs.js` CLI.
-
-- **Rationale:** The delivery-process uses a generator registry pattern. New generators register with the orchestrator rather than creating separate CLI commands.
-
-
-
-#### Sequence diagrams render interaction flows
-
-- **Invariant:** Sequence diagrams must render interaction flows (command flow, saga flow) showing step-by-step message passing between components.
-
-- **Rationale:** Component diagrams show structure but not behavior. Sequence diagrams show runtime flow - essential for understanding command/saga execution.
-
-
-
-*[architecture-diagram-generation.feature](delivery-process/specs/architecture-diagram-generation.feature)*
-
----
-
-## Delivery Process / Phase 24
+## DataAPI / Phase 24
 
 ### ProcessStateAPICLI
 
@@ -1554,7 +776,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Every ProcessStateAPI status query method is accessible via CLI.
 
-- **Rationale:** The most common planning question is "what's the current state?" Status queries (active, roadmap, completed) answer this directly without reading docs. Without CLI access, Claude Code must regenerate markdown and parse unstructured text. | Flag | API Method | Use Case | | --status active | getCurrentWork() | "What am I working on?" | | --status roadmap | getRoadmapItems() | "What can I start next?" | | --status completed | getRecentlyCompleted() | "What's done recently?" | | --current-work | getCurrentWork() | Shorthand for active | | --roadmap-items | getRoadmapItems() | Shorthand for roadmap |
+- **Rationale:** The most common planning question is "what's the current state?" Status queries (active, roadmap, completed) answer this directly without reading docs. Without CLI access, Claude Code must regenerate markdown and parse unstructured text.
 
 | Flag | API Method | Use Case |
 | --- | --- | --- |
@@ -1572,7 +794,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Patterns can be filtered by phase number.
 
-- **Rationale:** Phase 18 (Event Durability) is the current focus per roadmap priorities. Quick phase queries help assess progress and remaining work within a phase. Phase-based planning is the primary organization method for roadmap work. | Flag | API Method | Use Case | | --phase N | getPatternsByPhase(N) | "What's in Phase 18?" | | --phase N --progress | getPhaseProgress(N) | "How complete is Phase 18?" | | --phases | getAllPhases() | "List all phases with counts" |
+- **Rationale:** Phase 18 (Event Durability) is the current focus per roadmap priorities. Quick phase queries help assess progress and remaining work within a phase. Phase-based planning is the primary organization method for roadmap work.
 
 | Flag | API Method | Use Case |
 | --- | --- | --- |
@@ -1588,7 +810,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Overall and per-phase progress is queryable in a single command.
 
-- **Rationale:** Planning sessions need quick answers to "where are we?" without reading the full PATTERNS.md generated file. Progress metrics drive prioritization and help identify where to focus effort. | Flag | API Method | Use Case | | --progress | getStatusCounts() + getCompletionPercentage() | Overall progress | | --distribution | getStatusDistribution() | Detailed status breakdown |
+- **Rationale:** Planning sessions need quick answers to "where are we?" without reading the full PATTERNS.md generated file. Progress metrics drive prioritization and help identify where to focus effort.
 
 | Flag | API Method | Use Case |
 | --- | --- | --- |
@@ -1603,7 +825,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** JSON output is parseable by AI agents without transformation.
 
-- **Rationale:** Claude Code can parse JSON directly. Text format is for human reading. JSON format enables scripting and integration with other tools. The primary use case is AI agent parsing where structured output reduces context and errors. | Flag | Output | Use Case | | --format text | Human-readable tables | Terminal usage | | --format json | Structured JSON | AI agent parsing, scripting |
+- **Rationale:** Claude Code can parse JSON directly. Text format is for human reading. JSON format enables scripting and integration with other tools. The primary use case is AI agent parsing where structured output reduces context and errors.
 
 | Flag | Output | Use Case |
 | --- | --- | --- |
@@ -1618,7 +840,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Any pattern can be queried by name with full details.
 
-- **Rationale:** During implementation, Claude Code needs to check specific pattern status, deliverables, and dependencies without reading the full spec file. Pattern lookup is essential for focused implementation work. | Flag | API Method | Use Case | | --pattern NAME | getPattern(name) | "Show DCB pattern details" | | --pattern NAME --deliverables | getPatternDeliverables(name) | "What needs to be built?" | | --pattern NAME --deps | getPatternDependencies(name) | "What does this depend on?" |
+- **Rationale:** During implementation, Claude Code needs to check specific pattern status, deliverables, and dependencies without reading the full spec file. Pattern lookup is essential for focused implementation work.
 
 | Flag | API Method | Use Case |
 | --- | --- | --- |
@@ -1650,7 +872,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Every pattern with `implementedBy` entries is discoverable via the API.
 
-- **Rationale:** Claude Code needs to navigate from abstract patterns to concrete code. Without this, exploration requires manual grep + file reading, wasting context tokens. | Query | Returns | Use Case | | getImplementations(pattern) | File paths implementing the pattern | "Show me the code for EventStoreDurability" | | getImplementedPatterns(file) | Patterns the file implements | "What patterns does outbox.ts implement?" | | hasImplementations(pattern) | boolean | Filter patterns with/without implementations |
+- **Rationale:** Claude Code needs to navigate from abstract patterns to concrete code. Without this, exploration requires manual grep + file reading, wasting context tokens.
 
 | Query | Returns | Use Case |
 | --- | --- | --- |
@@ -1664,7 +886,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Pattern inheritance chains are fully navigable in both directions.
 
-- **Rationale:** Patterns form specialization hierarchies (e.g., ReactiveProjections extends ProjectionCategories). Claude Code needs to understand what specializes a base pattern and what a specialized pattern inherits from. | Query | Returns | Use Case | | getExtensions(pattern) | Patterns extending this one | "What specializes ProjectionCategories?" | | getBasePattern(pattern) | Pattern this extends (or null) | "What does ReactiveProjections inherit from?" | | getInheritanceChain(pattern) | Full chain to root | "Show full hierarchy for CachedProjections" |
+- **Rationale:** Patterns form specialization hierarchies (e.g., ReactiveProjections extends ProjectionCategories). Claude Code needs to understand what specializes a base pattern and what a specialized pattern inherits from.
 
 | Query | Returns | Use Case |
 | --- | --- | --- |
@@ -1688,7 +910,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 - **Invariant:** Navigation from spec to code and code to spec is symmetric.
 
-- **Rationale:** Traceability is bidirectional by definition. If a spec links to code, the code should link back to the spec. The API should surface broken links. | Query | Returns | Use Case | | getTraceabilityStatus(pattern) | {hasSpecs, hasImplementations, isSymmetric} | Audit traceability completeness | | getBrokenLinks() | Patterns with asymmetric traceability | Find missing back-links |
+- **Rationale:** Traceability is bidirectional by definition. If a spec links to code, the code should link back to the spec. The API should surface broken links.
 
 | Query | Returns | Use Case |
 | --- | --- | --- |
@@ -1701,69 +923,7 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 ---
 
-## Delivery Process / Phase 25
-
-### ClaudeModuleGeneration
-
-*CLAUDE.md modules are hand-written markdown files that drift from source*
-
-#### Claude module tags exist in the tag registry
-
-- **Invariant:** Three claude-specific tags (`claude-module`, `claude-section`, `claude-tags`) must exist in the tag registry with correct format and values.
-
-- **Rationale:** Module generation requires metadata to determine output path, section placement, and variation filtering. Standard tag infrastructure enables consistent extraction via the existing Gherkin parser.
-
-
-
-#### Gherkin parser extracts claude module tags from feature files
-
-- **Invariant:** The Gherkin extractor must extract `claude-module`, `claude-section`, and `claude-tags` from feature file tags into ExtractedPattern objects.
-
-- **Rationale:** Behavior specs are the source of truth for CLAUDE.md module content. Parser must extract module metadata alongside existing pattern metadata.
-
-
-
-#### Module content is extracted from feature file structure
-
-- **Invariant:** The codec must extract content from standard feature file elements: Feature description (Problem/Solution), Rule blocks, and Scenario Outline Examples.
-
-- **Rationale:** Behavior specs already contain well-structured, prescriptive content. The extraction preserves structure rather than flattening to prose.
-
-
-
-#### ClaudeModuleCodec produces compact markdown modules
-
-- **Invariant:** The codec transforms patterns with claude tags into markdown files suitable for the `_claude-md/` directory structure.
-
-- **Rationale:** CLAUDE.md modules must be compact and actionable. The codec produces ready-to-use markdown without truncation (let modular-claude-md handle token budget warnings).
-
-
-
-#### Claude module generator writes files to correct locations
-
-- **Invariant:** The generator must write module files to `{outputDir}/{section}/{module}.md` based on the `claude-section` and `claude-module` tags.
-
-- **Rationale:** Output path structure must match modular-claude-md expectations. The `claude-section` determines the subdirectory, `claude-module` determines filename.
-
-
-
-#### Claude module generator is registered with generator registry
-
-- **Invariant:** A "claude-modules" generator must be registered with the generator registry to enable `pnpm docs:claude-modules` via the existing CLI.
-
-- **Rationale:** Consistent with architecture-diagram-generation pattern. New generators register with the orchestrator rather than creating separate commands.
-
-
-
-#### Same source generates detailed docs with progressive disclosure
-
-- **Invariant:** When running with `detailLevel: "detailed"`, the codec produces expanded documentation including all Rule content, code examples, and scenario details.
-
-- **Rationale:** Single source generates both compact modules (AI context) and detailed docs (human reference). Progressive disclosure is already a codec capability.
-
-
-
-*[claude-module-generation.feature](delivery-process/specs/claude-module-generation.feature)*
+## DataAPI / Phase 25
 
 ### DataAPIArchitectureQueries
 
@@ -2179,77 +1339,683 @@ Each module (scope-validator.ts, handoff-generator.ts) exports
 
 ---
 
-## Delivery Process / Phase 26
+## DataAPI / Uncategorized
 
-### ShapeExtraction
+### ArchQueriesTest
 
-*Documentation comments duplicate type definitions that exist in the same file.*
-
-#### extract-shapes tag is defined in registry
-
-- **Invariant:** The `extract-shapes` tag must exist with CSV format to list multiple type names for extraction.
+#### Neighborhood and comparison views
 
 
 
-#### Interfaces are extracted from TypeScript AST
-
-- **Invariant:** When `@libar-docs-extract-shapes` lists an interface name, the extractor must find and extract the complete interface definition including JSDoc comments, generics, and extends clauses.
+#### Taxonomy discovery via tags and sources
 
 
 
-#### Type aliases are extracted from TypeScript AST
-
-- **Invariant:** Type aliases (including union types, intersection types, and mapped types) are extracted when listed in extract-shapes.
+#### Coverage analysis reports annotation completeness
 
 
 
-#### Enums are extracted from TypeScript AST
+*[arch-queries.feature](tests/features/api/architecture-queries/arch-queries.feature)*
 
-- **Invariant:** Both string and numeric enums are extracted with their complete member definitions.
+### ContextAssemblerTests
 
+*Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and*
 
-
-#### Function signatures are extracted (body omitted)
-
-- **Invariant:** When a function name is listed in extract-shapes, only the signature (parameters, return type, generics) is extracted. The function body is replaced with ellipsis for documentation purposes.
+#### assembleContext produces session-tailored context bundles
 
 
 
-#### Multiple shapes are extracted in specified order
-
-- **Invariant:** When multiple shapes are listed, they appear in the documentation in the order specified in the tag, not source order.
+#### buildDepTree walks dependency chains with cycle detection
 
 
 
-#### Extracted shapes render as fenced code blocks
-
-- **Invariant:** Codecs render extracted shapes as TypeScript fenced code blocks, grouped under an "API Types" or similar section.
+#### buildOverview provides executive project summary
 
 
 
-#### Shapes can reference types from imports
-
-- **Invariant:** Extracted shapes may reference types from imports. The extractor does NOT resolve imports - it extracts the shape as-is. Consumers understand that referenced types are defined elsewhere.
+#### buildFileReadingList returns paths by relevance
 
 
 
-#### Overloaded function signatures are all extracted
+*[context-assembler.feature](tests/features/api/context-assembly/context-assembler.feature)*
 
-- **Invariant:** When a function has multiple overload signatures, all signatures are extracted together as they represent the complete API.
+### ContextFormatterTests
 
+*Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),*
 
-
-#### Shape rendering supports grouping options
-
-- **Invariant:** Codecs can render shapes grouped in a single code block or as separate code blocks, depending on detail level.
+#### formatContextBundle renders section markers
 
 
 
-*[shape-extraction.feature](delivery-process/specs/shape-extraction.feature)*
+#### formatDepTree renders indented tree
+
+
+
+#### formatOverview renders progress summary
+
+
+
+#### formatFileReadingList renders categorized file paths
+
+
+
+*[context-formatter.feature](tests/features/api/context-assembly/context-formatter.feature)*
+
+### FuzzyMatchTests
+
+*Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.*
+
+#### Fuzzy matching uses tiered scoring
+
+
+
+#### findBestMatch returns single suggestion
+
+
+
+#### Levenshtein distance computation
+
+
+
+*[fuzzy-match.feature](tests/features/api/output-shaping/fuzzy-match.feature)*
+
+### GenerateDocsCli
+
+*Command-line interface for generating documentation from annotated TypeScript.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input patterns
+
+
+
+#### CLI lists available generators
+
+
+
+#### CLI generates documentation from source files
+
+
+
+#### CLI rejects unknown options
+
+
+
+*[generate-docs.feature](tests/features/cli/generate-docs.feature)*
+
+### GenerateTagTaxonomyCli
+
+*Command-line interface for generating TAG_TAXONOMY.md from tag registry configuration.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI generates taxonomy at specified output path
+
+
+
+#### CLI respects overwrite flag for existing files
+
+
+
+#### Generated taxonomy contains expected sections
+
+
+
+#### CLI warns about unknown flags
+
+
+
+*[generate-tag-taxonomy.feature](tests/features/cli/generate-tag-taxonomy.feature)*
+
+### HandoffGeneratorTests
+
+*Multi-session work loses critical state between sessions when handoff*
+
+#### Handoff generates compact session state summary
+
+
+
+#### Formatter produces structured text output
+
+
+
+*[handoff-generator.feature](tests/features/api/session-support/handoff-generator.feature)*
+
+### LintPatternsCli
+
+*Command-line interface for validating pattern annotation quality.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input patterns
+
+
+
+#### Lint passes for valid patterns
+
+
+
+#### Lint detects violations in incomplete patterns
+
+
+
+#### CLI supports multiple output formats
+
+
+
+#### Strict mode treats warnings as errors
+
+
+
+*[lint-patterns.feature](tests/features/cli/lint-patterns.feature)*
+
+### LintProcessCli
+
+*Command-line interface for validating changes against delivery process rules.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires git repository for validation
+
+
+
+#### CLI validates file mode input
+
+
+
+#### CLI handles no changes gracefully
+
+
+
+#### CLI supports multiple output formats
+
+
+
+#### CLI supports debug options
+
+
+
+#### CLI warns about unknown flags
+
+
+
+*[lint-process.feature](tests/features/cli/lint-process.feature)*
+
+### OutputPipelineTests
+
+*Validates the output pipeline transforms: summarization, modifiers,*
+
+#### Output modifiers apply with correct precedence
+
+
+
+#### Modifier conflicts are rejected
+
+
+
+#### List filters compose via AND logic
+
+
+
+#### Empty stripping removes noise
+
+
+
+*[output-pipeline.feature](tests/features/api/output-shaping/output-pipeline.feature)*
+
+### PatternSummarizeTests
+
+*Validates that summarizePattern() projects ExtractedPattern (~3.5KB) to*
+
+#### summarizePattern projects to compact summary
+
+
+
+#### summarizePatterns batch processes arrays
+
+
+
+*[summarize.feature](tests/features/api/output-shaping/summarize.feature)*
+
+### PDR001SessionWorkflowCommands
+
+*DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session*
+
+#### DD-1 - Text output with section markers
+
+Both scope-validate and handoff return string from the router, using
+    === SECTION === markers.
+
+
+
+#### DD-2 - Git integration is opt-in via --git flag
+
+The handoff command accepts an optional --git flag.
+
+
+
+#### DD-3 - Session type inferred from FSM status
+
+Handoff infers session type from pattern's current FSM status.
+
+| Status | Inferred Session |
+| --- | --- |
+| roadmap | design |
+| active | implement |
+| completed | review |
+| deferred | design |
+
+
+
+#### DD-4 - Severity levels match Process Guard model
+
+Scope validation uses three severity levels:
+
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning |
+| --- | --- |
+| PASS | Check passed |
+| BLOCKED | Hard prerequisite missing |
+| WARN | Recommendation not met |
+
+
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date.
+
+
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+    and --type flag.
+
+
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+    both the data builder and the text formatter.
+
+
+
+*[pdr-001-session-workflow-commands.feature](delivery-process/decisions/pdr-001-session-workflow-commands.feature)*
+
+### ProcessApiCli
+
+*Command-line interface for querying delivery process state via ProcessStateAPI.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input flag for subcommands
+
+
+
+#### CLI status subcommand shows delivery state
+
+
+
+#### CLI query subcommand executes API methods
+
+
+
+#### CLI pattern subcommand shows pattern detail
+
+
+
+#### CLI arch subcommand queries architecture
+
+
+
+#### CLI shows errors for missing subcommand arguments
+
+
+
+#### CLI handles argument edge cases
+
+
+
+#### CLI list subcommand filters patterns
+
+
+
+#### CLI search subcommand finds patterns by fuzzy match
+
+
+
+#### CLI context assembly subcommands return text output
+
+
+
+#### CLI tags and sources subcommands return JSON
+
+
+
+#### CLI extended arch subcommands query architecture relationships
+
+
+
+#### CLI unannotated subcommand finds files without annotations
+
+
+
+#### Output modifiers work when placed after the subcommand
+
+- **Invariant:** Output modifiers (--count, --names-only, --fields) produce identical results regardless of position relative to the subcommand and its filters.
+
+- **Rationale:** Users should not need to memorize argument ordering rules; the CLI should be forgiving.
+
+
+
+#### CLI arch health subcommands detect graph quality issues
+
+- **Invariant:** Health subcommands (dangling, orphans, blocking) operate on the relationship index, not the architecture index, and return results without requiring arch annotations.
+
+- **Rationale:** Graph quality issues (broken references, isolated patterns, blocked dependencies) are relationship-level concerns that should be queryable even when no architecture metadata exists.
+
+
+
+*[process-api.feature](tests/features/cli/process-api.feature)*
+
+### ProcessStateAPITesting
+
+*- Markdown generation is not ideal for programmatic access*
+
+#### Status queries return correct patterns
+
+
+
+#### Phase queries return correct phase data
+
+
+
+#### FSM queries expose transition validation
+
+
+
+#### Pattern queries find and retrieve pattern data
+
+
+
+#### Timeline queries group patterns by time
+
+
+
+*[process-state-api.feature](tests/features/api/process-state-api.feature)*
+
+### ScopeValidatorTests
+
+*Starting an implementation or design session without checking prerequisites*
+
+#### Implementation scope validation checks all prerequisites
+
+
+
+#### Design scope validation checks dependency stubs
+
+
+
+#### Formatter produces structured text output
+
+
+
+*[scope-validator.feature](tests/features/api/session-support/scope-validator.feature)*
+
+### StubResolverTests
+
+*Design session stubs need structured discovery and resolution*
+
+#### Stubs are identified by path or target metadata
+
+
+
+#### Stubs are resolved against the filesystem
+
+
+
+#### Decision items are extracted from descriptions
+
+
+
+#### PDR references are found across patterns
+
+
+
+*[stub-resolver.feature](tests/features/api/stub-integration/stub-resolver.feature)*
+
+### StubTaxonomyTagTests
+
+*Stub metadata (target path, design session) was stored as plain text*
+
+#### Taxonomy tags are registered in the registry
+
+
+
+#### Tags are part of the stub metadata group
+
+
+
+*[taxonomy-tags.feature](tests/features/api/stub-integration/taxonomy-tags.feature)*
+
+### ValidatePatternsCli
+
+*Command-line interface for cross-validating TypeScript patterns vs Gherkin feature files.*
+
+#### CLI displays help and version information
+
+
+
+#### CLI requires input and feature patterns
+
+
+
+#### CLI validates patterns across TypeScript and Gherkin sources
+
+
+
+#### CLI supports multiple output formats
+
+
+
+#### Strict mode treats warnings as errors
+
+
+
+#### CLI warns about unknown flags
+
+
+
+*[validate-patterns.feature](tests/features/cli/validate-patterns.feature)*
 
 ---
 
-## Delivery Process / Phase 27
+## Generation / Phase 18
+
+### TraceabilityGenerator
+
+*Provide audit-ready traceability matrices that demonstrate*
+
+#### Parses Verified by annotations to extract scenario references
+
+- **Invariant:** Scenario names in `**Verified by:**` are matched against actual scenarios in feature files. Unmatched references are reported as warnings.
+
+- **Rationale:** Verified by annotations create explicit traceability. Validating references ensures the traceability matrix reflects actual test coverage.
+
+
+
+#### Generates Rule-to-Scenario traceability matrix
+
+- **Invariant:** Every Rule appears in the matrix with its verification status. Scenarios are linked by name and file location.
+
+- **Rationale:** A matrix format enables quick scanning of coverage status and supports audit requirements for bidirectional traceability.
+
+
+
+#### Detects and reports coverage gaps
+
+- **Invariant:** Orphan scenarios (not referenced by any Rule) and unverified rules are listed in dedicated sections.
+
+- **Rationale:** Coverage gaps indicate either missing traceability annotations or actual missing test coverage. Surfacing them enables remediation.
+
+
+
+#### Supports filtering by phase and domain
+
+- **Invariant:** CLI flags allow filtering the matrix by phase number or domain category to generate focused traceability reports.
+
+- **Rationale:** Large codebases have many rules. Filtering enables relevant subset extraction for specific audits or reviews.
+
+
+
+*[traceability-generator.feature](delivery-process/specs/traceability-generator.feature)*
+
+---
+
+## Generation / Phase 23
+
+### ArchitectureDiagramGeneration
+
+*Architecture documentation requires manually maintaining mermaid diagrams*
+
+#### Architecture tags exist in the tag registry
+
+- **Invariant:** Three architecture-specific tags (`arch-role`, `arch-context`, `arch-layer`) must exist in the tag registry with correct format and enum values.
+
+- **Rationale:** Architecture diagram generation requires metadata to classify source files into diagram components. Standard tag infrastructure enables consistent extraction via the existing AST parser.
+
+
+
+#### AST parser extracts architecture tags from TypeScript
+
+- **Invariant:** The AST parser must extract `arch-role`, `arch-context`, and `arch-layer` tags from TypeScript JSDoc comments into DocDirective objects.
+
+- **Rationale:** Source code annotations are the single source of truth for architectural metadata. Parser must extract them alongside existing pattern metadata.
+
+
+
+#### MasterDataset builds archIndex during transformation
+
+- **Invariant:** The `transformToMasterDataset` function must build an `archIndex` that groups patterns by role, context, and layer for efficient diagram generation.
+
+- **Rationale:** Single-pass extraction during dataset transformation avoids expensive re-traversal. Index structure enables O(1) lookup by each dimension.
+
+
+
+#### Component diagrams group patterns by bounded context
+
+- **Invariant:** Component diagrams must render patterns as nodes grouped into bounded context subgraphs, with relationship arrows using UML-inspired styles.
+
+- **Rationale:** Component diagrams visualize system architecture showing how bounded contexts isolate components. Subgraphs enforce visual separation.
+
+
+
+#### Layered diagrams group patterns by architectural layer
+
+- **Invariant:** Layered diagrams must render patterns grouped by architectural layer (domain, application, infrastructure) with top-to-bottom flow.
+
+- **Rationale:** Layered architecture visualization shows dependency direction - infrastructure at top, domain at bottom - following conventional layer ordering.
+
+
+
+#### Architecture generator is registered with generator registry
+
+- **Invariant:** An "architecture" generator must be registered with the generator registry to enable `pnpm docs:architecture` via the existing `generate-docs.js` CLI.
+
+- **Rationale:** The delivery-process uses a generator registry pattern. New generators register with the orchestrator rather than creating separate CLI commands.
+
+
+
+#### Sequence diagrams render interaction flows
+
+- **Invariant:** Sequence diagrams must render interaction flows (command flow, saga flow) showing step-by-step message passing between components.
+
+- **Rationale:** Component diagrams show structure but not behavior. Sequence diagrams show runtime flow - essential for understanding command/saga execution.
+
+
+
+*[architecture-diagram-generation.feature](delivery-process/specs/architecture-diagram-generation.feature)*
+
+---
+
+## Generation / Phase 25
+
+### ClaudeModuleGeneration
+
+*CLAUDE.md modules are hand-written markdown files that drift from source*
+
+#### Claude module tags exist in the tag registry
+
+- **Invariant:** Three claude-specific tags (`claude-module`, `claude-section`, `claude-tags`) must exist in the tag registry with correct format and values.
+
+- **Rationale:** Module generation requires metadata to determine output path, section placement, and variation filtering. Standard tag infrastructure enables consistent extraction via the existing Gherkin parser.
+
+
+
+#### Gherkin parser extracts claude module tags from feature files
+
+- **Invariant:** The Gherkin extractor must extract `claude-module`, `claude-section`, and `claude-tags` from feature file tags into ExtractedPattern objects.
+
+- **Rationale:** Behavior specs are the source of truth for CLAUDE.md module content. Parser must extract module metadata alongside existing pattern metadata.
+
+
+
+#### Module content is extracted from feature file structure
+
+- **Invariant:** The codec must extract content from standard feature file elements: Feature description (Problem/Solution), Rule blocks, and Scenario Outline Examples.
+
+- **Rationale:** Behavior specs already contain well-structured, prescriptive content. The extraction preserves structure rather than flattening to prose.
+
+
+
+#### ClaudeModuleCodec produces compact markdown modules
+
+- **Invariant:** The codec transforms patterns with claude tags into markdown files suitable for the `_claude-md/` directory structure.
+
+- **Rationale:** CLAUDE.md modules must be compact and actionable. The codec produces ready-to-use markdown without truncation (let modular-claude-md handle token budget warnings).
+
+
+
+#### Claude module generator writes files to correct locations
+
+- **Invariant:** The generator must write module files to `{outputDir}/{section}/{module}.md` based on the `claude-section` and `claude-module` tags.
+
+- **Rationale:** Output path structure must match modular-claude-md expectations. The `claude-section` determines the subdirectory, `claude-module` determines filename.
+
+
+
+#### Claude module generator is registered with generator registry
+
+- **Invariant:** A "claude-modules" generator must be registered with the generator registry to enable `pnpm docs:claude-modules` via the existing CLI.
+
+- **Rationale:** Consistent with architecture-diagram-generation pattern. New generators register with the orchestrator rather than creating separate commands.
+
+
+
+#### Same source generates detailed docs with progressive disclosure
+
+- **Invariant:** When running with `detailLevel: "detailed"`, the codec produces expanded documentation including all Rule content, code examples, and scenario details.
+
+- **Rationale:** Single source generates both compact modules (AI context) and detailed docs (human reference). Progressive disclosure is already a codec capability.
+
+
+
+*[claude-module-generation.feature](delivery-process/specs/claude-module-generation.feature)*
+
+---
+
+## Generation / Phase 27
 
 ### CodecDrivenReferenceGeneration
 
@@ -2538,7 +2304,7 @@ This POC demonstrates the doc-from-decision pattern by generating docs
 
 ---
 
-## Delivery Process / Phase 28
+## Generation / Phase 28
 
 ### ScopedArchitecturalView
 
@@ -2664,7 +2430,7 @@ The warning collector replaces scattered console.warn calls with a
 
 ---
 
-## Delivery Process / Phase 30
+## Generation / Phase 30
 
 ### ReferenceDocShowcase
 
@@ -2730,41 +2496,7 @@ The warning collector replaces scattered console.warn calls with a
 
 ---
 
-## Delivery Process / Phase 31
-
-### DeclarationLevelShapeTagging
-
-*The current shape extraction system operates at file granularity.*
-
-#### Declarations opt in via libar-docs-shape tag
-
-- **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes. Declarations without the tag are ignored even if they are exported. The tag value is optional -- bare libar-docs-shape opts in without a group, while libar-docs-shape group-name assigns the declaration to a named group. Tagged non-exported declarations are included (DD-7).
-
-- **Rationale:** Explicit opt-in prevents over-extraction of internal helpers. Unlike auto-discovery mode (extract-shapes *) which grabs all exports, declaration-level tagging gives precise control. This matches how TypeDoc uses public/internal tags -- the annotation lives next to the code it describes, surviving refactors without breaking extraction.
-
-
-
-#### Reference doc configs select shapes via shapeSelectors
-
-- **Invariant:** shapeSelectors provides three selection modes: by source path + specific names (DD-6 source+names variant), by group tag (DD-6 group variant), or by source path alone (DD-6 source-only variant). shapeSources remains for backward compatibility. When both are present, shapeSources provides the coarse file-level filter and shapeSelectors adds fine-grained name/group filtering on top.
-
-- **Rationale:** The reference doc system composes focused documents from cherry-picked content. Every other content axis (conventions, behaviors, diagrams) has content-level filtering. shapeSources was the only axis limited to file-level granularity. shapeSelectors closes this gap with the same explicitness as conventionTags.
-
-
-
-#### Discovery uses existing estree parser with JSDoc comment scanning
-
-- **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach. It does not require the TypeScript compiler API, ts-morph, or parseAndGenerateServices. Tag detection is a regex match on the JSDoc comment text already extracted by the existing infrastructure. The tag regex pattern is: /libar-docs-shape(?:\s+(\S+))?/ where capture group 1 is the optional group name.
-
-- **Rationale:** The shape extractor already traverses declarations and extracts their JSDoc. Adding libar-docs-shape detection is a string search on content that is already available -- approximately 15 lines of new logic. Switching parsers would introduce churn with no benefit for the v1 use case of tag detection on top-level declarations.
-
-
-
-*[declaration-level-shape-tagging.feature](delivery-process/specs/declaration-level-shape-tagging.feature)*
-
----
-
-## Delivery Process / Phase 32
+## Generation / Phase 32
 
 ### CrossCuttingDocumentInclusion
 
@@ -2806,102 +2538,37 @@ The warning collector replaces scattered console.warn calls with a
 
 ---
 
-## Delivery Process / Phase 99
+## Generation / Phase 44
 
-### MvpWorkflowImplementation
+### RichContentHelpersTesting
 
-*PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`)*
+*As a document codec author*
 
-#### PDR-005 status values are recognized
-
-
-
-#### Generators map statuses to documents
+#### DocString parsing handles edge cases
 
 
 
-*[mvp-workflow-implementation.feature](delivery-process/specs/mvp-workflow-implementation.feature)*
-
-### PatternRelationshipModel
-
-*The delivery process lacks a comprehensive relationship model between artifacts.*
-
-#### Code files declare pattern realization via implements tag
-
-- **Invariant:** Files with `@libar-docs-implements:PatternName,OtherPattern` are linked to the specified patterns without causing conflicts. Pattern definitions remain in roadmap specs; implementation files provide supplementary metadata. Multiple files can implement the same pattern, and one file can implement multiple patterns.
-
-- **Rationale:** This mirrors UML's "realization" relationship where a class implements an interface. Code realizes the specification. Direction is code→spec (backward link). CSV format allows a single implementation file to realize multiple patterns when implementing a pattern family (e.g., durability primitives).
-
-**Implementation:** `src/taxonomy/registry-builder.ts`
+#### DataTable rendering produces valid markdown
 
 
 
-#### Pattern inheritance uses extends relationship tag
-
-- **Invariant:** Files with `@libar-docs-extends:BasePattern` declare that they extend another pattern's capabilities. This is a generalization relationship where the extending pattern is a specialization of the base pattern.
-
-- **Rationale:** Pattern families exist where specialized patterns build on base patterns. For example, `ReactiveProjections` extends `ProjectionCategories`. The extends relationship enables inheritance-based documentation and validates pattern hierarchy.
-
-**Implementation:** `src/taxonomy/registry-builder.ts`
+#### Scenario content rendering respects options
 
 
 
-#### Technical dependencies use directed relationship tags
-
-- **Invariant:** `@libar-docs-uses` declares outbound dependencies (what this pattern depends on). `@libar-docs-used-by` declares inbound dependencies (what depends on this pattern). Both are CSV format.
-
-- **Rationale:** These represent technical coupling between patterns. The distinction matters for impact analysis: changing a pattern affects its `used-by` consumers but not its `uses` dependencies.
+#### Business rule rendering handles descriptions
 
 
 
-#### Roadmap sequencing uses ordering relationship tags
-
-- **Invariant:** `@libar-docs-depends-on` declares what must be completed first (roadmap sequencing). `@libar-docs-enables` declares what this unlocks when completed. These are planning relationships, not technical dependencies.
-
-- **Rationale:** Sequencing is about order of work, not runtime coupling. A pattern may depend on another being complete without using its code.
+#### DocString content is dedented when parsed
 
 
 
-#### Cross-tier linking uses traceability tags (PDR-007)
+*[rich-content-helpers.feature](tests/features/behavior/rich-content-helpers.feature)*
 
-- **Invariant:** `@libar-docs-executable-specs` on roadmap specs points to test locations. `@libar-docs-roadmap-spec` on package specs points back to the pattern. These create bidirectional traceability.
+---
 
-- **Rationale:** Two-tier architecture (PDR-007) separates planning specs from executable tests. Traceability tags maintain the connection for navigation and completeness checking.
-
-
-
-#### Epic/Phase/Task hierarchy uses parent-child relationships
-
-- **Invariant:** `@libar-docs-level` declares the hierarchy tier (epic, phase, task). `@libar-docs-parent` links to the containing pattern. This enables rollup progress tracking.
-
-- **Rationale:** Large initiatives decompose into phases and tasks. The hierarchy allows progress aggregation (e.g., "Epic 80% complete based on child phases").
-
-
-
-#### All relationships appear in generated documentation
-
-- **Invariant:** The PATTERNS.md dependency graph renders all relationship types with distinct visual styles. Pattern detail pages list all related artifacts grouped by relationship type.
-
-- **Rationale:** Visualization makes the relationship model accessible. Different arrow styles distinguish relationship semantics at a glance. | Relationship | Arrow Style | Direction | Description | | uses | --> (solid) | OUT | Technical dependency | | depends-on | -.-> (dashed) | OUT | Roadmap sequencing | | implements | ..-> (dotted) | CODE→SPEC | Realization | | extends | -->> (solid open) | CHILD→PARENT | Generalization |
-
-| Relationship | Arrow Style | Direction | Description |
-| --- | --- | --- | --- |
-| uses | --> (solid) | OUT | Technical dependency |
-| depends-on | -.-> (dashed) | OUT | Roadmap sequencing |
-| implements | ..-> (dotted) | CODE→SPEC | Realization |
-| extends | -->> (solid open) | CHILD→PARENT | Generalization |
-
-
-
-#### Linter detects relationship violations
-
-- **Invariant:** The pattern linter validates that all relationship targets exist, implements files don't have pattern tags, and bidirectional links are consistent.
-
-- **Rationale:** Broken relationships cause confusion and incorrect generated docs. Early detection during linting prevents propagation of errors.
-
-
-
-*[pattern-relationship-model.feature](delivery-process/specs/pattern-relationship-model.feature)*
+## Generation / Phase 99
 
 ### PrdImplementationSection
 
@@ -2933,132 +2600,6 @@ The warning collector replaces scattered console.warn calls with a
 
 *[prd-generator-code-annotations-inclusion.feature](delivery-process/specs/prd-generator-code-annotations-inclusion.feature)*
 
-### ProcessGuardLinter
-
-*During planning and implementation sessions, accidental modifications occur:*
-
-#### Protection levels determine modification restrictions
-
-Files inherit protection from their `@libar-docs-status` tag.
-
-
-
-#### Session definition files scope what can be modified
-
-Optional session files (`delivery-process/sessions/*.feature`) explicitly
-    declare which specs are in-scope for modification during a work session.
-
-
-
-#### Status transitions follow PDR-005 FSM
-
-When a file's status changes, the transition must be valid per PDR-005.
-
-
-
-#### Active specs cannot add new deliverables
-
-Once a spec transitions to `active`, its deliverables table is
-    considered scope-locked.
-
-
-
-#### CLI provides flexible validation modes
-
-
-
-#### Integrates with existing lint infrastructure
-
-
-
-#### New tags support process guard functionality
-
-The following tags are defined in the TypeScript taxonomy to support process guard:
-
-
-
-*[process-guard-linter.feature](delivery-process/specs/process-guard-linter.feature)*
-
-### StatusAwareEslintSuppression
-
-*Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused*
-
-#### File status determines unused-vars enforcement
-
-- **Invariant:** Files with `@libar-docs-status roadmap` or `deferred` have relaxed unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.
-
-- **Rationale:** Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked. | Status | Protection Level | unused-vars Behavior | | roadmap | none | Relaxed (warn, ignore args) | | deferred | none | Relaxed (warn, ignore args) | | active | scope | Strict (error) | | complete | hard | Strict (error) | | (no status) | N/A | Strict (error) |
-
-| Status | Protection Level | unused-vars Behavior |
-| --- | --- | --- |
-| roadmap | none | Relaxed (warn, ignore args) |
-| deferred | none | Relaxed (warn, ignore args) |
-| active | scope | Strict (error) |
-| complete | hard | Strict (error) |
-| (no status) | N/A | Strict (error) |
-
-
-
-#### Reuses deriveProcessState for status extraction
-
-- **Invariant:** Status extraction logic must be shared with Process Guard Linter. No duplicate parsing or status-to-protection mapping.
-
-- **Rationale:** DRY principle - the Process Guard already has battle-tested status extraction from JSDoc comments. Duplicating this logic creates maintenance burden and potential inconsistencies between tools.
-
-
-
-#### ESLint Processor filters messages based on status
-
-- **Invariant:** The processor uses ESLint's postprocess hook to filter or downgrade messages. Source code is never modified. No eslint-disable comments are injected.
-
-- **Rationale:** ESLint processors can inspect and filter linting messages after rules run. This approach: - Requires no source code modification - Works with any ESLint rule (not just no-unused-vars) - Can be extended to other status-based behaviors
-
-
-
-#### CLI can generate static ESLint ignore list
-
-- **Invariant:** Running `pnpm lint:process --eslint-ignores` outputs a list of files that should have relaxed linting, suitable for inclusion in eslint.config.js.
-
-- **Rationale:** For CI environments or users preferring static configuration, a generated list provides an alternative to runtime processing. The list can be regenerated whenever status annotations change.
-
-
-
-#### Replaces directory-based ESLint exclusions
-
-- **Invariant:** After implementation, the directory-based exclusions in eslint.config.js (lines 30-57) are removed. All suppression is driven by @libar-docs-status annotations.
-
-- **Rationale:** Directory-based exclusions are tech debt: - They don't account for file lifecycle (roadmap -> completed) - They require manual updates when new roadmap directories are added - They persist even after files are implemented
-
-
-
-#### Rule relaxation is configurable
-
-- **Invariant:** The set of rules relaxed for roadmap/deferred files is configurable, defaulting to `@typescript-eslint/no-unused-vars`.
-
-- **Rationale:** Different projects may want to relax different rules for design artifacts. The default covers the common case (unused exports in API stubs).
-
-
-
-*[status-aware-eslint-suppression.feature](delivery-process/specs/status-aware-eslint-suppression.feature)*
-
-### StreamingGitDiff
-
-*The process guard (`lint-process --all`) fails with `ENOBUFS` error on large*
-
-#### Git commands stream output instead of buffering
-
-
-
-#### Diff content is parsed as it streams
-
-
-
-#### Streaming errors are handled gracefully
-
-
-
-*[streaming-git-diff.feature](delivery-process/specs/streaming-git-diff.feature)*
-
 ### TestContentBlocks
 
 *This feature demonstrates what content blocks are captured and rendered*
@@ -3079,7 +2620,7 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 ---
 
-## Delivery Process / Phase 100
+## Generation / Phase 100
 
 ### BusinessRulesGenerator
 
@@ -3119,171 +2660,9 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 *[business-rules-generator.feature](delivery-process/specs/business-rules-generator.feature)*
 
-### CrossSourceValidation
-
-*The delivery process uses dual sources (TypeScript phase files and Gherkin*
-
-#### Pattern names must be consistent across sources
-
-
-
-#### Circular dependencies are detected
-
-
-
-#### Dependency references must resolve
-
-
-
-*[cross-source-validation.feature](delivery-process/specs/cross-source-validation.feature)*
-
-### GherkinRulesSupport
-
-*Feature files were limited to flat scenario lists.*
-
-#### Rules flow through the entire pipeline without data loss
-
-The @cucumber/gherkin parser extracts Rules natively.
-
-
-
-#### Generators can render rules as business documentation
-
-Business stakeholders see rule names and descriptions as "Business Rules"
-    sections, not Given/When/Then syntax.
-
-
-
-#### Custom content blocks render in acceptance criteria
-
-DataTables and DocStrings in steps should appear in generated documentation,
-    providing structured data and code examples alongside step descriptions.
-
-
-
-#### vitest-cucumber executes scenarios inside Rules
-
-Test execution must work for scenarios inside Rule blocks.
-
-
-
-*[gherkin-rules-support.feature](delivery-process/specs/gherkin-rules-support.feature)*
-
-### PhaseNumberingConventions
-
-*Phase numbers are assigned manually without validation, leading to*
-
-#### Phase numbers must be unique within a release
-
-
-
-#### Phase number gaps are detected
-
-
-
-#### CLI suggests next available phase number
-
-
-
-*[phase-numbering-conventions.feature](delivery-process/specs/phase-numbering-conventions.feature)*
-
-### PhaseStateMachineValidation
-
-*Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.*
-
-#### Valid status values are enforced
-
-
-
-#### Status transitions follow state machine rules
-
-
-
-#### Terminal states require completion metadata
-
-
-
-*[phase-state-machine.feature](delivery-process/specs/phase-state-machine.feature)*
-
-### ReleaseAssociationRules
-
-*PDR-002 and PDR-003 define conventions for separating specs from release*
-
-#### Spec files must not contain release columns
-
-
-
-#### TypeScript phase files must have required annotations
-
-
-
-#### Release version follows semantic versioning
-
-
-
-*[release-association-rules.feature](delivery-process/specs/release-association-rules.feature)*
-
-### SessionFileCleanup
-
-*Session files (docs-living/sessions/phase-*.md) are ephemeral working*
-
-#### Cleanup triggers during session-context generation
-
-
-
-#### Only phase-*.md files are candidates for cleanup
-
-
-
-#### Cleanup failures are non-fatal
-
-
-
-*[session-file-cleanup.feature](delivery-process/specs/session-file-cleanup.feature)*
-
 ---
 
-## Delivery Process / Phase 101
-
-### CliBehaviorTesting
-
-*All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns,*
-
-#### generate-docs handles all argument combinations correctly
-
-- **Invariant:** Invalid arguments produce clear error messages with usage hints. Valid arguments produce expected output files.
-
-**Implementation:** `src/cli/generate-docs.ts`
-
-
-
-#### lint-patterns validates annotation quality with configurable strictness
-
-- **Invariant:** Lint violations are reported with file, line, and severity. Exit codes reflect violation presence based on strictness setting.
-
-**Implementation:** `src/cli/lint-patterns.ts`
-
-
-
-#### validate-patterns performs cross-source validation with DoD checks
-
-- **Invariant:** DoD and anti-pattern violations are reported per phase. Exit codes reflect validation state.
-
-**Implementation:** `src/cli/validate-patterns.ts`
-
-
-
-#### All CLIs handle errors consistently with DocError pattern
-
-- **Invariant:** Errors include type, file, line (when applicable), and reason. Unknown errors are caught and formatted safely.
-
-
-
-*[cli-behavior-testing.feature](delivery-process/specs/cli-behavior-testing.feature)*
-
----
-
-## Delivery Process / Phase 102
+## Generation / Phase 102
 
 ### CodecBehaviorTesting
 
@@ -3333,52 +2712,7 @@ Test execution must work for scenarios inside Rule blocks.
 
 ---
 
-## Delivery Process / Phase 103
-
-### StepDefinitionCompletion
-
-*7 feature files in tests/features/behavior/ have complete Gherkin specs*
-
-#### Generator-related specs need step definitions for output validation
-
-- **Invariant:** Step definitions test actual codec output against expected structure. Factory functions from tests/fixtures/ should be used for test data.
-
-
-
-#### Renderable helper specs need step definitions for utility functions
-
-- **Invariant:** Helper functions are pure and easy to unit test. Step definitions should test edge cases identified in specs.
-
-
-
-#### Remaining specs in other directories need step definitions
-
-**Existing Specs:**
-    - `tests/features/generators/table-extraction.feature`
-    - `tests/features/scanner/docstring-mediatype.feature`
-
-
-
-#### Step definition implementation follows project patterns
-
-**Pattern:** All step definitions should follow the established patterns in
-    existing .steps.ts files for consistency.
-
-    **Template:**
-    
-
-    **File Locations:**
-    - Behavior steps: tests/steps/behavior/{feature-name}.steps.ts
-    - Generator steps: tests/steps/generators/{feature-name}.steps.ts
-    - Scanner steps: tests/steps/scanner/{feature-name}.steps.ts
-
-
-
-*[step-definition-completion.feature](delivery-process/specs/step-definition-completion.feature)*
-
----
-
-## Delivery Process / Phase 104
+## Generation / Phase 104
 
 ### GeneratorInfrastructureTesting
 
@@ -3420,7 +2754,270 @@ Test execution must work for scenarios inside Rule blocks.
 
 ---
 
-## DocGeneration / Uncategorized
+## Generation / Uncategorized
+
+### ArchGeneratorRegistration
+
+*I want an architecture generator registered in the generator registry*
+
+#### Architecture generator is registered in the registry
+
+The architecture generator must be registered like other built-in
+    generators so it can be invoked via CLI.
+
+
+
+#### Architecture generator produces component diagram by default
+
+Running the architecture generator without options produces
+    a component diagram (bounded context view).
+
+
+
+#### Architecture generator supports diagram type options
+
+The generator accepts options to specify diagram type
+    (component or layered).
+
+
+
+#### Architecture generator supports context filtering
+
+The generator can filter to specific bounded contexts
+    for focused diagram output.
+
+
+
+*[generator-registration.feature](tests/features/behavior/architecture-diagrams/generator-registration.feature)*
+
+### ArchIndexDataset
+
+*As a documentation generator*
+
+#### archIndex groups patterns by arch-role
+
+The archIndex.byRole map groups patterns by their architectural role
+    (command-handler, projection, saga, etc.) for efficient lookup.
+
+
+
+#### archIndex groups patterns by arch-context
+
+The archIndex.byContext map groups patterns by bounded context
+    for subgraph rendering in component diagrams.
+
+
+
+#### archIndex groups patterns by arch-layer
+
+The archIndex.byLayer map groups patterns by architectural layer
+    (domain, application, infrastructure) for layered diagram rendering.
+
+
+
+#### archIndex.all contains all patterns with any arch tag
+
+The archIndex.all array contains all patterns that have at least
+    one arch tag (role, context, or layer).
+
+
+
+#### Patterns without arch tags are excluded from archIndex
+
+Patterns that have no arch-role, arch-context, or arch-layer are
+    not included in the archIndex at all.
+
+
+
+*[arch-index.feature](tests/features/behavior/architecture-diagrams/arch-index.feature)*
+
+### ArchTagExtraction
+
+*As a documentation generator*
+
+#### arch-role tag is defined in the registry
+
+Architecture roles classify components for diagram rendering.
+
+
+
+#### arch-context tag is defined in the registry
+
+Context tags group components into bounded context subgraphs.
+
+
+
+#### arch-layer tag is defined in the registry
+
+Layer tags enable layered architecture diagrams.
+
+
+
+#### AST parser extracts arch-role from TypeScript annotations
+
+The AST parser must extract arch-role alongside other pattern metadata.
+
+
+
+#### AST parser extracts arch-context from TypeScript annotations
+
+Context values are free-form strings naming the bounded context.
+
+
+
+#### AST parser extracts arch-layer from TypeScript annotations
+
+Layer tags classify components by architectural layer.
+
+
+
+#### AST parser handles multiple arch tags together
+
+Components often have role + context + layer together.
+
+
+
+#### Missing arch tags yield undefined values
+
+Components without arch tags should have undefined (not null or empty).
+
+
+
+*[arch-tag-extraction.feature](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)*
+
+### BusinessRulesDocumentCodec
+
+*Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.*
+
+#### Extracts Rule blocks with Invariant and Rationale
+
+
+
+#### Organizes rules by product area and phase
+
+
+
+#### Summary mode generates compact output
+
+
+
+#### Preserves code examples and tables in detailed mode
+
+
+
+#### Generates scenario traceability links
+
+
+
+*[business-rules-codec.feature](tests/features/generators/business-rules-codec.feature)*
+
+### CodecBasedGeneratorTesting
+
+*Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)*
+
+#### CodecBasedGenerator adapts codecs to generator interface
+
+
+
+*[codec-based.feature](tests/features/generators/codec-based.feature)*
+
+### ComponentDiagramGeneration
+
+*As a documentation generator*
+
+#### Component diagrams group patterns by bounded context
+
+Patterns with arch-context are grouped into Mermaid subgraphs.
+
+
+
+#### Context-less patterns go to Shared Infrastructure
+
+Patterns without arch-context are grouped into a
+    "Shared Infrastructure" subgraph.
+
+
+
+#### Relationship types render with distinct arrow styles
+
+Arrow styles follow UML conventions:
+    - uses: solid arrow (-->)
+    - depends-on: dashed arrow (-.->)
+    - implements: dotted arrow (..->)
+    - extends: open arrow (-->>)
+
+
+
+#### Arrows only connect annotated components
+
+Relationships pointing to non-annotated patterns
+    are not rendered (target would not exist in diagram).
+
+
+
+#### Component diagram includes summary section
+
+The generated document starts with an overview section
+    showing component counts and bounded context statistics.
+
+
+
+#### Component diagram includes legend when enabled
+
+The legend explains arrow style meanings for readers.
+
+
+
+#### Component diagram includes inventory table when enabled
+
+The inventory lists all components with their metadata.
+
+
+
+#### Empty architecture data shows guidance message
+
+If no patterns have architecture annotations,
+    the document explains how to add them.
+
+
+
+*[component-diagram.feature](tests/features/behavior/architecture-diagrams/component-diagram.feature)*
+
+### CompositeCodecTesting
+
+*Assembles reference documents from multiple codec outputs by*
+
+#### CompositeCodec concatenates sections in codec array order
+
+- **Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
+
+
+
+#### Separators between codec outputs are configurable
+
+- **Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
+
+
+
+#### additionalFiles merge with last-wins semantics
+
+- **Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
+
+
+
+#### composeDocuments works at document level without codecs
+
+- **Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
+
+
+
+#### Empty codec outputs are handled gracefully
+
+- **Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
+
+
+
+*[composite-codec.feature](tests/features/behavior/codecs/composite-codec.feature)*
 
 ### ContentDeduplication
 
@@ -3459,6 +3056,32 @@ Test execution must work for scenarios inside Rule blocks.
 
 
 *[content-deduplication.feature](tests/features/doc-generation/content-deduplication.feature)*
+
+### ConventionExtractorTesting
+
+*Extracts convention content from MasterDataset decision records*
+
+#### Empty and missing inputs produce empty results
+
+
+
+#### Convention bundles are extracted from matching patterns
+
+
+
+#### Structured content is extracted from rule descriptions
+
+
+
+#### Code examples in rule descriptions are preserved
+
+
+
+#### TypeScript JSDoc conventions are extracted alongside Gherkin
+
+
+
+*[convention-extractor.feature](tests/features/behavior/codecs/convention-extractor.feature)*
 
 ### DecisionDocCodecTesting
 
@@ -3559,6 +3182,190 @@ Decision documents with source mapping tables trigger content aggregation
 
 *[decision-doc-generator.feature](tests/features/doc-generation/decision-doc-generator.feature)*
 
+### DedentHelper
+
+*- DocStrings in Gherkin files have consistent indentation for alignment*
+
+#### Tabs are normalized to spaces before dedent
+
+
+
+#### Empty lines are handled correctly
+
+
+
+#### Single line input is handled
+
+
+
+#### Unicode whitespace is handled
+
+
+
+#### Relative indentation is preserved
+
+
+
+*[dedent.feature](tests/features/behavior/codecs/dedent.feature)*
+
+### DescriptionHeaderNormalization
+
+*Pattern descriptions should not create duplicate headers when rendered.*
+
+#### Leading headers are stripped from pattern descriptions
+
+
+
+#### Edge cases are handled correctly
+
+
+
+#### stripLeadingHeaders removes only leading headers
+
+
+
+*[description-headers.feature](tests/features/behavior/description-headers.feature)*
+
+### DocumentationOrchestrator
+
+*Tests the orchestrator's pattern merging, conflict detection, and generator*
+
+#### Orchestrator coordinates full documentation generation pipeline
+
+
+
+*[orchestrator.feature](tests/features/generators/orchestrator.feature)*
+
+### ExtractSummary
+
+*The extractSummary function transforms multi-line pattern descriptions into*
+
+#### Single-line descriptions are returned as-is when complete
+
+
+
+#### Multi-line descriptions are combined until sentence ending
+
+
+
+#### Long descriptions are truncated at sentence or word boundaries
+
+
+
+#### Tautological and header lines are skipped
+
+
+
+#### Edge cases are handled gracefully
+
+
+
+*[extract-summary.feature](tests/features/behavior/extract-summary.feature)*
+
+### GeneratorRegistryTesting
+
+*Tests the GeneratorRegistry registration, lookup, and listing capabilities.*
+
+#### Registry manages generator registration and retrieval
+
+
+
+*[registry.feature](tests/features/generators/registry.feature)*
+
+### ImplementationLinkPathNormalization
+
+*Links to implementation files in generated pattern documents should have*
+
+#### Repository prefixes are stripped from implementation paths
+
+
+
+#### All implementation links in a pattern are normalized
+
+
+
+#### normalizeImplPath strips known prefixes
+
+
+
+*[implementation-links.feature](tests/features/behavior/implementation-links.feature)*
+
+### LayeredDiagramGeneration
+
+*As a documentation generator*
+
+#### Layered diagrams group patterns by arch-layer
+
+Patterns with arch-layer are grouped into Mermaid subgraphs.
+
+
+
+#### Layer order is domain to infrastructure (top to bottom)
+
+The layer subgraphs are rendered in Clean Architecture order:
+    domain at top, then application, then infrastructure at bottom.
+
+
+
+#### Context labels included in layered diagram nodes
+
+Unlike component diagrams which group by context, layered diagrams
+    include the context as a label in each node name.
+
+
+
+#### Patterns without layer go to Other subgraph
+
+Patterns that have arch-role or arch-context but no arch-layer
+    are grouped into an "Other" subgraph.
+
+
+
+#### Layered diagram includes summary section
+
+The generated document starts with an overview section
+    specific to layered architecture visualization.
+
+
+
+*[layered-diagram.feature](tests/features/behavior/architecture-diagrams/layered-diagram.feature)*
+
+### MermaidRelationshipRendering
+
+*Tests for rendering all relationship types in Mermaid dependency graphs*
+
+#### Each relationship type has a distinct arrow style
+
+
+
+#### Pattern names are sanitized for Mermaid node IDs
+
+
+
+#### All relationship types appear in single graph
+
+
+
+*[mermaid-rendering.feature](tests/features/behavior/pattern-relationships/mermaid-rendering.feature)*
+
+### PlanningCodecTesting
+
+*- Need to generate planning checklists, session plans, and findings documents from patterns*
+
+#### PlanningChecklistCodec prepares for implementation sessions
+
+
+
+#### SessionPlanCodec generates implementation plans
+
+
+
+#### SessionFindingsCodec captures retrospective discoveries
+
+
+
+*[planning-codecs.feature](tests/features/behavior/codecs/planning-codecs.feature)*
+
 ### PocIntegration
 
 *End-to-end integration tests that exercise the full documentation generation*
@@ -3600,6 +3407,276 @@ Decision documents with source mapping tables trigger content aggregation
 
 
 *[poc-integration.feature](tests/features/doc-generation/poc-integration.feature)*
+
+### PrChangesCodecTesting
+
+*- Need to generate PR-specific documentation from patterns*
+
+#### PrChangesCodec handles empty results gracefully
+
+
+
+#### PrChangesCodec generates summary with filter information
+
+
+
+#### PrChangesCodec groups changes by phase when sortBy is "phase"
+
+
+
+#### PrChangesCodec groups changes by priority when sortBy is "priority"
+
+
+
+#### PrChangesCodec shows flat list when sortBy is "workflow"
+
+
+
+#### PrChangesCodec renders pattern details with metadata and description
+
+
+
+#### PrChangesCodec renders deliverables when includeDeliverables is enabled
+
+
+
+#### PrChangesCodec renders acceptance criteria from scenarios
+
+
+
+#### PrChangesCodec renders business rules from Gherkin Rule keyword
+
+
+
+#### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
+
+
+
+#### PrChangesCodec generates dependencies section when includeDependencies is enabled
+
+
+
+#### PrChangesCodec filters patterns by changedFiles
+
+
+
+#### PrChangesCodec filters patterns by releaseFilter
+
+
+
+#### PrChangesCodec uses OR logic for combined filters
+
+
+
+#### PrChangesCodec only includes active and completed patterns
+
+
+
+*[pr-changes-codec.feature](tests/features/behavior/codecs/pr-changes-codec.feature)*
+
+### PrChangesOptions
+
+*Tests the PrChangesCodec filtering capabilities for generating PR-scoped*
+
+#### Orchestrator supports PR changes generation options
+
+
+
+*[pr-changes-options.feature](tests/features/generators/pr-changes-options.feature)*
+
+### PrdImplementationSectionTesting
+
+*Tests the Implementations section rendering in pattern documents.*
+
+#### Implementation files appear in pattern docs via @libar-docs-implements
+
+
+
+#### Multiple implementations are listed alphabetically
+
+
+
+#### Patterns without implementations omit the section
+
+
+
+#### Implementation references use relative file links
+
+
+
+*[prd-implementation-section.feature](tests/features/generators/prd-implementation-section.feature)*
+
+### ReferenceCodecTesting
+
+*Parameterized codec factory that creates reference document codecs*
+
+#### Empty datasets produce fallback content
+
+
+
+#### Convention content is rendered as sections
+
+
+
+#### Detail level controls output density
+
+
+
+#### Behavior sections are rendered from category-matching patterns
+
+
+
+#### Shape sources are extracted from matching patterns
+
+
+
+#### Convention and behavior content compose in a single document
+
+
+
+#### Composition order follows AD-5: conventions then shapes then behaviors
+
+
+
+#### Convention code examples render as mermaid blocks
+
+
+
+#### Scoped diagrams are generated from diagramScope config
+
+
+
+#### Multiple diagram scopes produce multiple mermaid blocks
+
+
+
+#### Standard detail level includes narrative but omits rationale
+
+
+
+#### Deep behavior rendering with structured annotations
+
+
+
+#### Shape JSDoc prose renders at standard and detailed levels
+
+
+
+#### Shape sections render param returns and throws documentation
+
+
+
+#### Diagram type controls Mermaid output format
+
+- **Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+
+- **Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
+
+
+
+#### Edge labels and custom node shapes enrich diagram readability
+
+- **Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+
+- **Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
+
+
+
+#### Collapsible blocks wrap behavior rules for progressive disclosure
+
+- **Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
+
+- **Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
+
+
+
+#### Link-out blocks provide source file cross-references
+
+- **Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
+
+- **Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
+
+
+
+#### Include tags route cross-cutting content into reference documents
+
+- **Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
+
+
+
+*[reference-codec.feature](tests/features/behavior/codecs/reference-codec.feature)*
+
+### ReferenceGeneratorTesting
+
+*Registers all 13 reference document generators.*
+
+#### Registration produces the correct number of generators
+
+
+
+#### Generator naming follows kebab-case convention
+
+
+
+#### Generator execution produces markdown output
+
+
+
+*[reference-generators.feature](tests/features/behavior/codecs/reference-generators.feature)*
+
+### RemainingWorkSummaryAccuracy
+
+*Summary totals in REMAINING-WORK.md must match the sum of phase table rows.*
+
+#### Summary totals equal sum of phase table rows
+
+
+
+#### Patterns without phases appear in Backlog row
+
+
+
+#### Patterns without patternName are counted using id
+
+
+
+#### All phases with incomplete patterns are shown
+
+
+
+*[remaining-work-totals.feature](tests/features/behavior/remaining-work-totals.feature)*
+
+### ReportingCodecTesting
+
+*- Need to generate changelog, traceability, and overview documents*
+
+#### ChangelogCodec follows Keep a Changelog format
+
+
+
+#### TraceabilityCodec maps timeline patterns to behavior tests
+
+
+
+#### OverviewCodec provides project architecture summary
+
+
+
+*[reporting-codecs.feature](tests/features/behavior/codecs/reporting-codecs.feature)*
+
+### RequirementsAdrCodecTesting
+
+*- Need to generate product requirements documents with flexible groupings*
+
+#### RequirementsDocumentCodec generates PRD-style documentation from patterns
+
+
+
+#### AdrDocumentCodec documents architecture decisions
+
+
+
+*[requirements-adr-codecs.feature](tests/features/behavior/codecs/requirements-adr-codecs.feature)*
 
 ### RobustnessIntegration
 
@@ -3646,6 +3723,74 @@ Decision documents with source mapping tables trigger content aggregation
 
 
 *[robustness-integration.feature](tests/features/doc-generation/robustness-integration.feature)*
+
+### RuleKeywordPoC
+
+*This feature tests whether vitest-cucumber supports the Rule keyword*
+
+#### Basic arithmetic operations work correctly
+
+The calculator should perform standard math operations
+    with correct results.
+
+
+
+#### Division has special constraints
+
+Division by zero must be handled gracefully to prevent
+    system errors.
+
+
+
+*[rule-keyword-poc.feature](tests/features/poc/rule-keyword-poc.feature)*
+
+### SessionCodecTesting
+
+*- Need to generate session context and remaining work documents from patterns*
+
+#### SessionContextCodec provides working context for AI sessions
+
+
+
+#### RemainingWorkCodec aggregates incomplete work by phase
+
+
+
+*[session-codecs.feature](tests/features/behavior/codecs/session-codecs.feature)*
+
+### ShapeMatcherTesting
+
+*Matches file paths against glob patterns for TypeScript shape extraction.*
+
+#### Exact paths match without wildcards
+
+
+
+#### Single-level globs match one directory level
+
+
+
+#### Recursive globs match any depth
+
+
+
+#### Dataset shape extraction deduplicates by name
+
+
+
+*[shape-matcher.feature](tests/features/behavior/codecs/shape-matcher.feature)*
+
+### ShapeSelectorTesting
+
+*Tests the filterShapesBySelectors function that provides fine-grained*
+
+#### Reference doc configs select shapes via shapeSelectors
+
+- **Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
+
+
+
+*[shape-selector.feature](tests/features/behavior/codecs/shape-selector.feature)*
 
 ### SourceMapperTesting
 
@@ -3740,6 +3885,24 @@ The extraction method column can be written in various formats
 
 *[source-mapping-validator.feature](tests/features/doc-generation/source-mapping-validator.feature)*
 
+### TableExtraction
+
+*Tables in business rule descriptions should appear exactly once in output.*
+
+#### Tables in rule descriptions render exactly once
+
+
+
+#### Multiple tables in description each render exactly once
+
+
+
+#### stripMarkdownTables removes table syntax from text
+
+
+
+*[table-extraction.feature](tests/features/generators/table-extraction.feature)*
+
 ### TaxonomyCodecTesting
 
 *Validates the Taxonomy Codec that transforms MasterDataset into a*
@@ -3794,6 +3957,24 @@ The Format Types section documents all supported tag value formats
 
 
 *[taxonomy-codec.feature](tests/features/doc-generation/taxonomy-codec.feature)*
+
+### TimelineCodecTesting
+
+*- Need to generate roadmap, milestones, and current work documents from patterns*
+
+#### RoadmapDocumentCodec groups patterns by phase with progress tracking
+
+
+
+#### CompletedMilestonesCodec shows only completed patterns grouped by quarter
+
+
+
+#### CurrentWorkCodec shows only active patterns with deliverables
+
+
+
+*[timeline-codecs.feature](tests/features/behavior/codecs/timeline-codecs.feature)*
 
 ### ValidationRulesCodecTesting
 
@@ -3893,499 +4074,128 @@ All console.warn calls in the source mapper and related modules
 
 ---
 
-## Extractor / Uncategorized
+## Process / Phase 99
 
-### DeclarationLevelShapeTaggingTesting
+### MvpWorkflowImplementation
 
-*Tests the discoverTaggedShapes function that scans TypeScript source*
+*PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`)*
 
-#### Declarations opt in via libar-docs-shape tag
+#### PDR-005 status values are recognized
 
-- **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
 
 
+#### Generators map statuses to documents
 
-#### Discovery uses existing estree parser with JSDoc comment scanning
 
-- **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach.
 
-
-
-*[declaration-level-shape-tagging.feature](tests/features/extractor/declaration-level-shape-tagging.feature)*
-
-### DualSourceExtractorTesting
-
-*- Pattern data split across code stubs and feature files*
-
-#### Process metadata is extracted from feature tags
-
-
-
-#### Deliverables are extracted from Background tables
-
-
-
-#### Code and feature patterns are combined into dual-source patterns
-
-
-
-#### Dual-source results are validated for consistency
-
-
-
-*[dual-source-extraction.feature](tests/features/extractor/dual-source-extraction.feature)*
-
-### ExtractionPipelineEnhancementsTesting
-
-*Validates extraction pipeline capabilities for ReferenceDocShowcase:*
-
-#### Function signatures surface full parameter types in ExportInfo
-
-- **Invariant:** ExportInfo.signature shows full parameter types and return type instead of the placeholder value.
-
-
-
-#### Property-level JSDoc preserves full multi-line content
-
-- **Invariant:** Property-level JSDoc preserves full multi-line content without first-line truncation.
-
-
-
-#### Param returns and throws tags are extracted from function JSDoc
-
-- **Invariant:** JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape for function-kind shapes.
-
-
-
-#### Auto-shape discovery extracts all exported types via wildcard
-
-- **Invariant:** When extract-shapes tag value is the wildcard character, all exported declarations are extracted without listing names.
-
-
-
-*[extraction-pipeline-enhancements.feature](tests/features/extractor/extraction-pipeline-enhancements.feature)*
-
-### ShapeExtractionTesting
-
-*Validates the shape extraction system that extracts TypeScript type*
-
-#### extract-shapes tag exists in registry with CSV format
-
-
-
-#### Interfaces are extracted from TypeScript AST
-
-
-
-#### Property-level JSDoc is extracted for interface properties
-
-The extractor uses strict adjacency (gap = 1 line) to prevent
-    interface-level JSDoc from being misattributed to the first property.
-
-
-
-#### Type aliases are extracted from TypeScript AST
-
-
-
-#### Enums are extracted from TypeScript AST
-
-
-
-#### Function signatures are extracted with body omitted
-
-
-
-#### Multiple shapes are extracted in specified order
-
-
-
-#### Extracted shapes render as fenced code blocks
-
-
-
-#### Imported and re-exported shapes are tracked separately
-
-
-
-#### Const declarations are extracted from TypeScript AST
-
-
-
-#### Invalid TypeScript produces error result
-
-
-
-#### Non-exported shapes are extractable
-
-
-
-#### Shape rendering supports grouping options
-
-
-
-#### Large source files are rejected to prevent memory exhaustion
-
-
-
-*[shape-extraction.feature](tests/features/extractor/shape-extraction.feature)*
+*[mvp-workflow-implementation.feature](delivery-process/specs/mvp-workflow-implementation.feature)*
 
 ---
 
-## Generator / Uncategorized
+## Process / Phase 100
 
-### BusinessRulesDocumentCodec
+### SessionFileCleanup
 
-*Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.*
+*Session files (docs-living/sessions/phase-*.md) are ephemeral working*
 
-#### Extracts Rule blocks with Invariant and Rationale
+#### Cleanup triggers during session-context generation
 
 
 
-#### Organizes rules by product area and phase
+#### Only phase-*.md files are candidates for cleanup
 
 
 
-#### Summary mode generates compact output
+#### Cleanup failures are non-fatal
 
 
 
-#### Preserves code examples and tables in detailed mode
-
-
-
-#### Generates scenario traceability links
-
-
-
-*[business-rules-codec.feature](tests/features/generators/business-rules-codec.feature)*
-
-### CodecBasedGeneratorTesting
-
-*Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)*
-
-#### CodecBasedGenerator adapts codecs to generator interface
-
-
-
-*[codec-based.feature](tests/features/generators/codec-based.feature)*
-
-### DocumentationOrchestrator
-
-*Tests the orchestrator's pattern merging, conflict detection, and generator*
-
-#### Orchestrator coordinates full documentation generation pipeline
-
-
-
-*[orchestrator.feature](tests/features/generators/orchestrator.feature)*
-
-### GeneratorRegistryTesting
-
-*Tests the GeneratorRegistry registration, lookup, and listing capabilities.*
-
-#### Registry manages generator registration and retrieval
-
-
-
-*[registry.feature](tests/features/generators/registry.feature)*
-
-### PrChangesOptions
-
-*Tests the PrChangesCodec filtering capabilities for generating PR-scoped*
-
-#### Orchestrator supports PR changes generation options
-
-
-
-*[pr-changes-options.feature](tests/features/generators/pr-changes-options.feature)*
-
-### PrdImplementationSectionTesting
-
-*Tests the Implementations section rendering in pattern documents.*
-
-#### Implementation files appear in pattern docs via @libar-docs-implements
-
-
-
-#### Multiple implementations are listed alphabetically
-
-
-
-#### Patterns without implementations omit the section
-
-
-
-#### Implementation references use relative file links
-
-
-
-*[prd-implementation-section.feature](tests/features/generators/prd-implementation-section.feature)*
-
-### ReferenceGeneratorTesting
-
-*Registers all 13 reference document generators.*
-
-#### Registration produces the correct number of generators
-
-
-
-#### Generator naming follows kebab-case convention
-
-
-
-#### Generator execution produces markdown output
-
-
-
-*[reference-generators.feature](tests/features/behavior/codecs/reference-generators.feature)*
-
-### TableExtraction
-
-*Tables in business rule descriptions should appear exactly once in output.*
-
-#### Tables in rule descriptions render exactly once
-
-
-
-#### Multiple tables in description each render exactly once
-
-
-
-#### stripMarkdownTables removes table syntax from text
-
-
-
-*[table-extraction.feature](tests/features/generators/table-extraction.feature)*
+*[session-file-cleanup.feature](delivery-process/specs/session-file-cleanup.feature)*
 
 ---
 
-## PatternRelationship / Uncategorized
+## Process / Phase 101
 
-### DependsOnTagTesting
+### CliBehaviorTesting
 
-*Tests extraction of @libar-docs-depends-on and @libar-docs-enables*
+*All 5 CLI commands (generate-docs, lint-patterns, lint-process, validate-patterns,*
 
-#### Depends-on tag is defined in taxonomy registry
+#### generate-docs handles all argument combinations correctly
 
+- **Invariant:** Invalid arguments produce clear error messages with usage hints. Valid arguments produce expected output files.
 
+**Implementation:** `src/cli/generate-docs.ts`
 
-#### Depends-on tag is extracted from Gherkin files
 
 
+#### lint-patterns validates annotation quality with configurable strictness
 
-#### Depends-on in TypeScript triggers anti-pattern warning
+- **Invariant:** Lint violations are reported with file, line, and severity. Exit codes reflect violation presence based on strictness setting.
 
-The depends-on tag is for planning dependencies and belongs in feature
-    files, not TypeScript code.
+**Implementation:** `src/cli/lint-patterns.ts`
 
 
 
-#### Enables tag is extracted from Gherkin files
+#### validate-patterns performs cross-source validation with DoD checks
 
+- **Invariant:** DoD and anti-pattern violations are reported per phase. Exit codes reflect validation state.
 
+**Implementation:** `src/cli/validate-patterns.ts`
 
-#### Planning dependencies are stored in relationship index
 
-The relationship index stores dependsOn and enables relationships
-    directly from pattern metadata.
 
+#### All CLIs handle errors consistently with DocError pattern
 
+- **Invariant:** Errors include type, file, line (when applicable), and reason. Unknown errors are caught and formatted safely.
 
-*[depends-on-tag.feature](tests/features/behavior/pattern-relationships/depends-on-tag.feature)*
 
-### ExtendsTagTesting
 
-*Tests for the @libar-docs-extends tag which establishes generalization*
-
-#### Extends tag is defined in taxonomy registry
-
-
-
-#### Patterns can extend exactly one base pattern
-
-Extends uses single-value format because pattern inheritance should be
-    single-inheritance to avoid diamond problems.
-
-
-
-#### Transform builds extendedBy reverse lookup
-
-
-
-#### Linter detects circular inheritance chains
-
-
-
-*[extends-tag.feature](tests/features/behavior/pattern-relationships/extends-tag.feature)*
-
-### ImplementsTagProcessing
-
-*Tests for the @libar-docs-implements tag which links implementation files*
-
-#### Implements tag is defined in taxonomy registry
-
-The tag registry defines `implements` with CSV format, enabling the
-    data-driven AST parser to automatically extract it.
-
-
-
-#### Files can implement a single pattern
-
-
-
-#### Files can implement multiple patterns using CSV format
-
-
-
-#### Transform builds implementedBy reverse lookup
-
-
-
-#### Schemas validate implements field correctly
-
-
-
-*[implements-tag.feature](tests/features/behavior/pattern-relationships/implements-tag.feature)*
-
-### LinterValidationTesting
-
-*Tests for lint rules that validate relationship integrity, detect conflicts,*
-
-#### Pattern cannot implement itself (circular reference)
-
-A file cannot define a pattern that implements itself.
-
-
-
-#### Relationship targets should exist (strict mode)
-
-In strict mode, all relationship targets are validated against known patterns.
-
-
-
-#### Bidirectional traceability links should be consistent
-
-
-
-#### Parent references must be valid
-
-
-
-*[linter-validation.feature](tests/features/behavior/pattern-relationships/linter-validation.feature)*
-
-### MermaidRelationshipRendering
-
-*Tests for rendering all relationship types in Mermaid dependency graphs*
-
-#### Each relationship type has a distinct arrow style
-
-
-
-#### Pattern names are sanitized for Mermaid node IDs
-
-
-
-#### All relationship types appear in single graph
-
-
-
-*[mermaid-rendering.feature](tests/features/behavior/pattern-relationships/mermaid-rendering.feature)*
-
-### UsesTagTesting
-
-*Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by*
-
-#### Uses tag is defined in taxonomy registry
-
-
-
-#### Uses tag is extracted from TypeScript files
-
-
-
-#### Used-by tag is extracted from TypeScript files
-
-
-
-#### Uses relationships are stored in relationship index
-
-The relationship index stores uses and usedBy relationships directly
-    from pattern metadata.
-
-
-
-#### Schemas validate uses field correctly
-
-
-
-*[uses-tag.feature](tests/features/behavior/pattern-relationships/uses-tag.feature)*
+*[cli-behavior-testing.feature](delivery-process/specs/cli-behavior-testing.feature)*
 
 ---
 
-## Pipeline / Uncategorized
+## Process / Phase 103
 
-### ContextInference
+### StepDefinitionCompletion
 
-*Patterns in standard directories (src/validation/, src/scanner/) should*
+*7 feature files in tests/features/behavior/ have complete Gherkin specs*
 
-#### matchPattern supports recursive wildcard **
+#### Generator-related specs need step definitions for output validation
 
-
-
-#### matchPattern supports single-level wildcard /*
+- **Invariant:** Step definitions test actual codec output against expected structure. Factory functions from tests/fixtures/ should be used for test data.
 
 
 
-#### matchPattern supports prefix matching
+#### Renderable helper specs need step definitions for utility functions
+
+- **Invariant:** Helper functions are pure and easy to unit test. Step definitions should test edge cases identified in specs.
 
 
 
-#### inferContext returns undefined when no rules match
+#### Remaining specs in other directories need step definitions
+
+**Existing Specs:**
+    - `tests/features/generators/table-extraction.feature`
+    - `tests/features/scanner/docstring-mediatype.feature`
 
 
 
-#### inferContext applies first matching rule
+#### Step definition implementation follows project patterns
+
+**Pattern:** All step definitions should follow the established patterns in
+    existing .steps.ts files for consistency.
+
+    **Template:**
+    
+
+    **File Locations:**
+    - Behavior steps: tests/steps/behavior/{feature-name}.steps.ts
+    - Generator steps: tests/steps/generators/{feature-name}.steps.ts
+    - Scanner steps: tests/steps/scanner/{feature-name}.steps.ts
 
 
 
-#### Explicit archContext is not overridden
-
-
-
-#### Inference works independently of archLayer
-
-
-
-#### Default rules map standard directories
-
-
-
-*[context-inference.feature](tests/features/behavior/context-inference.feature)*
-
----
-
-## POC / Uncategorized
-
-### RuleKeywordPoC
-
-*This feature tests whether vitest-cucumber supports the Rule keyword*
-
-#### Basic arithmetic operations work correctly
-
-The calculator should perform standard math operations
-    with correct results.
-
-
-
-#### Division has special constraints
-
-Division by zero must be handled gracefully to prevent
-    system errors.
-
-
-
-*[rule-keyword-poc.feature](tests/features/poc/rule-keyword-poc.feature)*
+*[step-definition-completion.feature](delivery-process/specs/step-definition-completion.feature)*
 
 ---
 
@@ -4397,7 +4207,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Product area canonical values
 
-- **Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module. | Value | Reader Question | Covers | | Annotation | How do I annotate code? | Scanning, extraction, tag parsing, dual-source | | Configuration | How do I configure the tool? | Config loading, presets, resolution | | Generation | How does code become docs? | Codecs, generators, rendering, diagrams | | Validation | How is the workflow enforced? | FSM, DoD, anti-patterns, process guard, lint | | DataAPI | How do I query process state? | Process state API, stubs, context assembly, CLI | | CoreTypes | What foundational types exist? | Result monad, error factories, string utils | | Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
+- **Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
 
 | Value | Reader Question | Covers |
 | --- | --- | --- |
@@ -4413,7 +4223,7 @@ Division by zero must be handled gracefully to prevent
 
 #### ADR category canonical values
 
-- **Invariant:** The adr-category tag uses one of 4 values. | Value | Purpose | | architecture | System structure, component design, data flow | | process | Workflow, conventions, annotation rules | | testing | Test strategy, verification approach | | documentation | Documentation generation, content structure |
+- **Invariant:** The adr-category tag uses one of 4 values.
 
 | Value | Purpose |
 | --- | --- |
@@ -4426,7 +4236,7 @@ Division by zero must be handled gracefully to prevent
 
 #### FSM status values and protection levels
 
-- **Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time. | Status | Protection | Can Add Deliverables | Allowed Actions | | roadmap | None | Yes | Full editing | | active | Scope-locked | No | Edit existing deliverables only | | completed | Hard-locked | No | Requires unlock-reason tag | | deferred | None | Yes | Full editing |
+- **Invariant:** Pattern status uses exactly 4 values with defined protection levels. These are enforced by Process Guard at commit time.
 
 | Status | Protection | Can Add Deliverables | Allowed Actions |
 | --- | --- | --- | --- |
@@ -4439,7 +4249,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Valid FSM transitions
 
-- **Invariant:** Only these transitions are valid. All others are rejected by Process Guard. | From | To | Trigger | | roadmap | active | Start work | | roadmap | deferred | Postpone | | active | completed | All deliverables done | | active | roadmap | Blocked/regressed | | deferred | roadmap | Resume planning | Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
+- **Invariant:** Only these transitions are valid. All others are rejected by Process Guard. Completed is a terminal state. Modifications require `@libar-docs-unlock-reason` escape hatch.
 
 | From | To | Trigger |
 | --- | --- | --- |
@@ -4453,7 +4263,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Tag format types
 
-- **Invariant:** Every tag has one of 6 format types that determines how its value is parsed. | Format | Parsing | Example | | flag | Boolean presence, no value | @libar-docs-core | | value | Simple string | @libar-docs-pattern MyPattern | | enum | Constrained to predefined list | @libar-docs-status completed | | csv | Comma-separated values | @libar-docs-uses A, B, C | | number | Numeric value | @libar-docs-phase 15 | | quoted-value | Preserves spaces | @libar-docs-brief:'Multi word' |
+- **Invariant:** Every tag has one of 6 format types that determines how its value is parsed.
 
 | Format | Parsing | Example |
 | --- | --- | --- |
@@ -4468,7 +4278,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Source ownership
 
-- **Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries. | Tag | Correct Source | Wrong Source | Rationale | | uses | TypeScript | Feature files | TS owns runtime dependencies | | depends-on | Feature files | TypeScript | Gherkin owns planning dependencies | | quarter | Feature files | TypeScript | Gherkin owns timeline metadata | | team | Feature files | TypeScript | Gherkin owns ownership metadata |
+- **Invariant:** Relationship tags have defined ownership by source type. Anti-pattern detection enforces these boundaries.
 
 | Tag | Correct Source | Wrong Source | Rationale |
 | --- | --- | --- | --- |
@@ -4487,7 +4297,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Deliverable status canonical values
 
-- **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time. | Value | Meaning | | complete | Work is done | | in-progress | Work is ongoing | | pending | Work has not started | | deferred | Work postponed | | superseded | Replaced by another | | n/a | Not applicable |
+- **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
 
 | Value | Meaning |
 | --- | --- |
@@ -4508,7 +4318,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Source-driven process benefit
 
-- **Invariant:** Feature files serve as both executable specs and documentation source. This dual purpose is the primary benefit of Gherkin-only testing for this package. | Artifact | Without Gherkin-Only | With Gherkin-Only | | Tests | .test.ts (hidden from docs) | .feature (visible in docs) | | Business rules | Manually maintained | Extracted from Rule blocks | | Acceptance criteria | Implicit in test code | Explicit @acceptance-criteria tags | | Traceability | Manual cross-referencing | @libar-docs-implements links |
+- **Invariant:** Feature files serve as both executable specs and documentation source. This dual purpose is the primary benefit of Gherkin-only testing for this package.
 
 | Artifact | Without Gherkin-Only | With Gherkin-Only |
 | --- | --- | --- |
@@ -4551,7 +4361,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Three durable artifact types
 
-- **Invariant:** The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral. | Artifact | Purpose | Owns | | Annotated TypeScript | Pattern identity, architecture graph | Name, status, uses, categories | | Executable specs | Behavior verification, invariants | Rules, rationale, acceptance criteria | | Decision specs (ADR/PDR) | Architectural choices, rationale | Why decisions were made |
+- **Invariant:** The delivery process produces three artifact types with long-term value. All other artifacts are projections or ephemeral.
 
 | Artifact | Purpose | Owns |
 | --- | --- | --- |
@@ -4563,7 +4373,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Implements is UML Realization (many-to-one)
 
-- **Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format). | Relationship | Tag | Cardinality | | Definition | `@libar-docs-pattern` | Exactly one per pattern | | Realization | `@libar-docs-implements` | Many-to-one |
+- **Invariant:** `@libar-docs-implements` declares a realization relationship. Multiple files can implement the same pattern. One file can implement multiple patterns (CSV format).
 
 | Relationship | Tag | Cardinality |
 | --- | --- | --- |
@@ -4587,7 +4397,7 @@ Division by zero must be handled gracefully to prevent
 
 #### Reverse links preferred over forward links
 
-- **Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required. | Mechanism | Usage | Reliability | | `@implements` (reverse) | 14 patterns (32%) | Self-maintaining, lives in test | | `@executable-specs` (forward) | 9 patterns (20%) | Requires tier 1 spec maintenance |
+- **Invariant:** `@libar-docs-implements` (reverse: "I verify this pattern") is the primary traceability mechanism. `@libar-docs-executable-specs` (forward: "my tests live here") is retained but not required.
 
 | Mechanism | Usage | Reliability |
 | --- | --- | --- |
@@ -4600,25 +4410,191 @@ Division by zero must be handled gracefully to prevent
 
 ---
 
-## Scanner / Uncategorized
+## Validation / Phase 99
 
-### DocStringMediaType
+### ProcessGuardLinter
 
-*DocString language hints (mediaType) should be preserved through the parsing*
+*During planning and implementation sessions, accidental modifications occur:*
 
-#### Parser preserves DocString mediaType during extraction
+#### Protection levels determine modification restrictions
 
-
-
-#### MediaType is used when rendering code blocks
+Files inherit protection from their `@libar-docs-status` tag.
 
 
 
-#### renderDocString handles both string and object formats
+#### Session definition files scope what can be modified
+
+Optional session files (`delivery-process/sessions/*.feature`) explicitly
+    declare which specs are in-scope for modification during a work session.
 
 
 
-*[docstring-mediatype.feature](tests/features/scanner/docstring-mediatype.feature)*
+#### Status transitions follow PDR-005 FSM
+
+When a file's status changes, the transition must be valid per PDR-005.
+
+
+
+#### Active specs cannot add new deliverables
+
+Once a spec transitions to `active`, its deliverables table is
+    considered scope-locked.
+
+
+
+#### CLI provides flexible validation modes
+
+
+
+#### Integrates with existing lint infrastructure
+
+
+
+#### New tags support process guard functionality
+
+The following tags are defined in the TypeScript taxonomy to support process guard:
+
+
+
+*[process-guard-linter.feature](delivery-process/specs/process-guard-linter.feature)*
+
+### StatusAwareEslintSuppression
+
+*Design artifacts (code stubs with `@libar-docs-status roadmap`) intentionally have unused*
+
+#### File status determines unused-vars enforcement
+
+- **Invariant:** Files with `@libar-docs-status roadmap` or `deferred` have relaxed unused-vars rules. Files with `active`, `completed`, or no status have strict enforcement.
+
+- **Rationale:** Design artifacts (roadmap stubs) define API shapes that are intentionally unused until implementation. Relaxing rules for these files prevents false positives while ensuring implemented code (active/completed) remains strictly checked.
+
+| Status | Protection Level | unused-vars Behavior |
+| --- | --- | --- |
+| roadmap | none | Relaxed (warn, ignore args) |
+| deferred | none | Relaxed (warn, ignore args) |
+| active | scope | Strict (error) |
+| complete | hard | Strict (error) |
+| (no status) | N/A | Strict (error) |
+
+
+
+#### Reuses deriveProcessState for status extraction
+
+- **Invariant:** Status extraction logic must be shared with Process Guard Linter. No duplicate parsing or status-to-protection mapping.
+
+- **Rationale:** DRY principle - the Process Guard already has battle-tested status extraction from JSDoc comments. Duplicating this logic creates maintenance burden and potential inconsistencies between tools.
+
+
+
+#### ESLint Processor filters messages based on status
+
+- **Invariant:** The processor uses ESLint's postprocess hook to filter or downgrade messages. Source code is never modified. No eslint-disable comments are injected.
+
+- **Rationale:** ESLint processors can inspect and filter linting messages after rules run. This approach: - Requires no source code modification - Works with any ESLint rule (not just no-unused-vars) - Can be extended to other status-based behaviors
+
+
+
+#### CLI can generate static ESLint ignore list
+
+- **Invariant:** Running `pnpm lint:process --eslint-ignores` outputs a list of files that should have relaxed linting, suitable for inclusion in eslint.config.js.
+
+- **Rationale:** For CI environments or users preferring static configuration, a generated list provides an alternative to runtime processing. The list can be regenerated whenever status annotations change.
+
+
+
+#### Replaces directory-based ESLint exclusions
+
+- **Invariant:** After implementation, the directory-based exclusions in eslint.config.js (lines 30-57) are removed. All suppression is driven by @libar-docs-status annotations.
+
+- **Rationale:** Directory-based exclusions are tech debt: - They don't account for file lifecycle (roadmap -> completed) - They require manual updates when new roadmap directories are added - They persist even after files are implemented
+
+
+
+#### Rule relaxation is configurable
+
+- **Invariant:** The set of rules relaxed for roadmap/deferred files is configurable, defaulting to `@typescript-eslint/no-unused-vars`.
+
+- **Rationale:** Different projects may want to relax different rules for design artifacts. The default covers the common case (unused exports in API stubs).
+
+
+
+*[status-aware-eslint-suppression.feature](delivery-process/specs/status-aware-eslint-suppression.feature)*
+
+### StreamingGitDiff
+
+*The process guard (`lint-process --all`) fails with `ENOBUFS` error on large*
+
+#### Git commands stream output instead of buffering
+
+
+
+#### Diff content is parsed as it streams
+
+
+
+#### Streaming errors are handled gracefully
+
+
+
+*[streaming-git-diff.feature](delivery-process/specs/streaming-git-diff.feature)*
+
+---
+
+## Validation / Phase 100
+
+### PhaseNumberingConventions
+
+*Phase numbers are assigned manually without validation, leading to*
+
+#### Phase numbers must be unique within a release
+
+
+
+#### Phase number gaps are detected
+
+
+
+#### CLI suggests next available phase number
+
+
+
+*[phase-numbering-conventions.feature](delivery-process/specs/phase-numbering-conventions.feature)*
+
+### PhaseStateMachineValidation
+
+*Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md.*
+
+#### Valid status values are enforced
+
+
+
+#### Status transitions follow state machine rules
+
+
+
+#### Terminal states require completion metadata
+
+
+
+*[phase-state-machine.feature](delivery-process/specs/phase-state-machine.feature)*
+
+### ReleaseAssociationRules
+
+*PDR-002 and PDR-003 define conventions for separating specs from release*
+
+#### Spec files must not contain release columns
+
+
+
+#### TypeScript phase files must have required annotations
+
+
+
+#### Release version follows semantic versioning
+
+
+
+*[release-association-rules.feature](delivery-process/specs/release-association-rules.feature)*
 
 ---
 
@@ -4735,6 +4711,32 @@ Division by zero must be handled gracefully to prevent
 
 
 *[fsm-validator.feature](tests/features/validation/fsm-validator.feature)*
+
+### LinterValidationTesting
+
+*Tests for lint rules that validate relationship integrity, detect conflicts,*
+
+#### Pattern cannot implement itself (circular reference)
+
+A file cannot define a pattern that implements itself.
+
+
+
+#### Relationship targets should exist (strict mode)
+
+In strict mode, all relationship targets are validated against known patterns.
+
+
+
+#### Bidirectional traceability links should be consistent
+
+
+
+#### Parent references must be valid
+
+
+
+*[linter-validation.feature](tests/features/behavior/pattern-relationships/linter-validation.feature)*
 
 ### ProcessGuardTesting
 

@@ -3,7 +3,7 @@
 @libar-docs-status:completed
 @behavior @process-state-api
 @libar-docs-pattern:ProcessStateAPITesting
-@libar-docs-product-area:API
+@libar-docs-product-area:DataAPI
 Feature: Process State API
   Programmatic interface for querying delivery process state.
   Designed for Claude Code integration and tool automation.

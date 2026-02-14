@@ -9,7 +9,7 @@
 | Property     | Value     |
 | ------------ | --------- |
 | Status       | completed |
-| Product Area | API       |
+| Product Area | DataAPI   |
 
 ## Description
 

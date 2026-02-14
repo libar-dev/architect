@@ -299,10 +299,11 @@ function extractShape(sourceCode, declaration, comments, options) {
             sourceText = `const ${sourceCode.slice(idRange[0], typeRange[1])};`;
         }
     }
-    // Get JSDoc if requested
+    // Get JSDoc if requested, stripping @libar-docs-* annotation lines
     let jsDoc;
     if (options.includeJsDoc) {
-        jsDoc = extractPrecedingJsDoc(sourceCode, node, comments);
+        const rawJsDoc = extractPrecedingJsDoc(sourceCode, node, comments);
+        jsDoc = rawJsDoc !== undefined ? stripLibarDocsTags(rawJsDoc) : undefined;
     }
     // DD-3: Parse @param/@returns/@throws from JSDoc for function shapes
     let parsedTags;
@@ -369,6 +370,41 @@ function extractShape(sourceCode, declaration, comments, options) {
         returns: parsedTags?.returns,
         throws: parsedTags !== undefined && parsedTags.throws.length > 0 ? parsedTags.throws : undefined,
     };
+}
+/**
+ * Strip @libar-docs-* annotation lines from a JSDoc comment.
+ *
+ * Preserves standard JSDoc tags (@param, @returns, @example, etc.) and
+ * all non-annotation content. Returns undefined if all content lines were
+ * annotation tags (empty JSDoc after stripping).
+ */
+function extractJsDocLineContent(line) {
+    return line
+        .trim()
+        .replace(/^\/\*\*\s*/, '') // strip leading /**
+        .replace(/\*\/\s*$/, '') // strip trailing */
+        .replace(/^\*\s?/, '') // strip leading * (JSDoc continuation)
+        .trim();
+}
+function stripLibarDocsTags(jsDoc) {
+    const lines = jsDoc.split('\n');
+    const filtered = lines.filter((line) => !extractJsDocLineContent(line).startsWith('@libar-docs'));
+    // Check if anything meaningful remains (not just /** and */)
+    const hasContent = filtered.some((line) => extractJsDocLineContent(line).length > 0);
+    if (!hasContent)
+        return undefined;
+    // Clean up consecutive empty JSDoc lines left by tag removal
+    const result = [];
+    let prevWasEmptyJsDocLine = false;
+    for (const line of filtered) {
+        const trimmed = line.trim();
+        const isEmptyJsDocLine = trimmed === '*' || trimmed === '';
+        if (isEmptyJsDocLine && prevWasEmptyJsDocLine)
+            continue;
+        result.push(line);
+        prevWasEmptyJsDocLine = isEmptyJsDocLine;
+    }
+    return result.join('\n');
 }
 /**
  * Extract JSDoc comment preceding a node.

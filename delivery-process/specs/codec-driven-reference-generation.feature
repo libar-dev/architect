@@ -4,7 +4,7 @@
 @libar-docs-unlock-reason:Retroactive-spec-for-completed-work
 @libar-docs-phase:27
 @libar-docs-effort:5d
-@libar-docs-product-area:DeliveryProcess
+@libar-docs-product-area:Generation
 @libar-docs-depends-on:DocGenerationProofOfConcept,ScopedArchitecturalView
 @libar-docs-business-value:eliminates-per-document-recipe-features-with-config-driven-generation
 @libar-docs-priority:high

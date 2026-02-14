@@ -56,6 +56,13 @@ export interface ConventionBundle {
     readonly rules: readonly ConventionRuleContent[];
 }
 /**
+ * Extract markdown tables from description text.
+ *
+ * Identifies lines starting and ending with `|` as table rows,
+ * groups consecutive table lines, and parses headers + data rows.
+ */
+export declare function extractTablesFromDescription(description: string): ConventionTable[];
+/**
  * Extracts convention content from MasterDataset.
  *
  * Filters patterns tagged with `@libar-docs-convention` matching the

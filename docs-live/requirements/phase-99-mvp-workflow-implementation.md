@@ -9,7 +9,7 @@
 | Property       | Value                         |
 | -------------- | ----------------------------- |
 | Status         | completed                     |
-| Product Area   | DeliveryProcess               |
+| Product Area   | Process                       |
 | Business Value | align package with pdr005 fsm |
 | Phase          | 99                            |
 
