@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ScopedArchitecturalView
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-unlock-reason:Retroactive-spec-for-completed-work
 @libar-docs-phase:28
 @libar-docs-effort:3d
