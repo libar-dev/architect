@@ -436,8 +436,8 @@ export function parseFileDirectives(
     const codeBlock = extractCodeBlockAfterComment(content, ast, comment);
     if (!codeBlock) continue;
 
-    // Extract exports from the code block
-    const exports = extractExportsFromBlock(ast, codeBlock);
+    // Extract exports from the code block (DD-1: thread content for signature slicing)
+    const exports = extractExportsFromBlock(ast, codeBlock, content);
 
     results.push({
       directive,
@@ -743,7 +743,8 @@ function findNextNodeAfterPosition(ast: TSESTree.Program, position: number): TSE
  */
 function extractExportsFromBlock(
   ast: TSESTree.Program,
-  block: { code: string; startLine: number; endLine: number }
+  block: { code: string; startLine: number; endLine: number },
+  sourceCode: string
 ): readonly ExportInfo[] {
   const exports: ExportInfo[] = [];
 
@@ -753,7 +754,7 @@ function extractExportsFromBlock(
 
     if (node.type === 'ExportNamedDeclaration') {
       if (node.declaration) {
-        exports.push(...extractFromDeclaration(node.declaration));
+        exports.push(...extractFromDeclaration(node.declaration, sourceCode));
       }
 
       // Handle re-exports like: export { foo, bar } from './module'
@@ -790,9 +791,40 @@ function extractExportsFromBlock(
 }
 
 /**
+ * Build a clean function signature from AST node and source code.
+ *
+ * DD-1: Uses AST body range to precisely locate the function body start,
+ * then slices everything before it as the signature. This avoids flawed
+ * brace-matching that fails on object parameter types like `{ timeout: number }`.
+ * Strips `export ` prefix but keeps `async` (semantically meaningful).
+ */
+function buildFunctionSignature(
+  declaration: TSESTree.FunctionDeclaration,
+  sourceCode: string
+): string {
+  // Use AST body range for precise body location (no brace-matching needed)
+  if (declaration.body) {
+    const bodyStart = declaration.body.range[0];
+    const declStart = declaration.range[0];
+    const beforeBody = sourceCode.slice(declStart, bodyStart);
+
+    // Strip 'export ' prefix for clean display
+    const withoutExport = beforeBody.startsWith('export ')
+      ? beforeBody.slice('export '.length)
+      : beforeBody;
+
+    return withoutExport.trim() + ';';
+  }
+
+  // Fallback for declarations without body (ambient/abstract)
+  const fullText = sourceCode.slice(declaration.range[0], declaration.range[1]);
+  return fullText.startsWith('export ') ? fullText.slice('export '.length).trim() : fullText.trim();
+}
+
+/**
  * Extract exports from a declaration node
  */
-function extractFromDeclaration(declaration: TSESTree.Node): ExportInfo[] {
+function extractFromDeclaration(declaration: TSESTree.Node, sourceCode: string): ExportInfo[] {
   const exports: ExportInfo[] = [];
 
   switch (declaration.type) {
@@ -801,7 +833,7 @@ function extractFromDeclaration(declaration: TSESTree.Node): ExportInfo[] {
         exports.push({
           name: declaration.id.name,
           type: 'function',
-          signature: `${declaration.id.name}(${declaration.params.map(() => '...').join(', ')})`,
+          signature: buildFunctionSignature(declaration, sourceCode),
         });
       }
       break;

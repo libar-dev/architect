@@ -50,6 +50,52 @@ export const PropertyDocSchema = z.object({
 export type PropertyDoc = z.infer<typeof PropertyDocSchema>;
 
 // =============================================================================
+// JSDoc Tag Documentation Schemas (DD-3)
+// =============================================================================
+
+/**
+ * JSDoc @param tag documentation for a function parameter.
+ */
+export const ParamDocSchema = z.object({
+  /** Parameter name */
+  name: z.string(),
+
+  /** Type annotation from JSDoc {Type} syntax (optional in TypeScript) */
+  type: z.string().optional(),
+
+  /** Parameter description */
+  description: z.string(),
+});
+
+export type ParamDoc = z.infer<typeof ParamDocSchema>;
+
+/**
+ * JSDoc @returns tag documentation.
+ */
+export const ReturnsDocSchema = z.object({
+  /** Return type from JSDoc {Type} syntax (optional in TypeScript) */
+  type: z.string().optional(),
+
+  /** Return value description */
+  description: z.string(),
+});
+
+export type ReturnsDoc = z.infer<typeof ReturnsDocSchema>;
+
+/**
+ * JSDoc @throws tag documentation.
+ */
+export const ThrowsDocSchema = z.object({
+  /** Exception type from JSDoc {Type} syntax */
+  type: z.string().optional(),
+
+  /** Description of when this exception is thrown */
+  description: z.string(),
+});
+
+export type ThrowsDoc = z.infer<typeof ThrowsDocSchema>;
+
+// =============================================================================
 // Extracted Shape Schema
 // =============================================================================
 
@@ -89,6 +135,15 @@ export const ExtractedShapeSchema = z.object({
 
   /** For interfaces: JSDoc documentation for each property */
   propertyDocs: z.array(PropertyDocSchema).readonly().optional(),
+
+  /** DD-3: For functions: documented @param tags from JSDoc */
+  params: z.array(ParamDocSchema).readonly().optional(),
+
+  /** DD-3: For functions: documented @returns tag from JSDoc */
+  returns: ReturnsDocSchema.optional(),
+
+  /** DD-3: For functions: documented @throws tags from JSDoc */
+  throws: z.array(ThrowsDocSchema).readonly().optional(),
 });
 
 /**
