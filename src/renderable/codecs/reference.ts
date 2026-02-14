@@ -51,7 +51,13 @@ import { RenderableDocumentOutputSchema } from './shared-schema.js';
 import { extractConventions, type ConventionBundle } from './convention-extractor.js';
 import { parseBusinessRuleAnnotations, truncateText } from './helpers.js';
 import { extractShapesFromDataset } from './shape-matcher.js';
-import { sanitizeNodeId, EDGE_STYLES } from './diagram-utils.js';
+import {
+  sanitizeNodeId,
+  EDGE_STYLES,
+  EDGE_LABELS,
+  SEQUENCE_ARROWS,
+  formatNodeDeclaration,
+} from './diagram-utils.js';
 import { getPatternName } from '../../api/pattern-helpers.js';
 import type { ExtractedPattern } from '../../validation-schemas/extracted-pattern.js';
 import type { ExtractedShape } from '../../validation-schemas/extracted-shape.js';
@@ -84,6 +90,12 @@ export interface DiagramScope {
 
   /** Section heading for this diagram (default: 'Component Overview') */
   readonly title?: string;
+
+  /** Mermaid diagram type (default: 'graph' for flowchart) */
+  readonly diagramType?: 'graph' | 'sequenceDiagram' | 'stateDiagram-v2';
+
+  /** Show relationship type labels on edges (default: true) */
+  readonly showEdgeLabels?: boolean;
 }
 
 /**
@@ -482,29 +494,48 @@ function collectNeighborPatterns(
   return dataset.patterns.filter((p) => neighborNames.has(getPatternName(p)));
 }
 
-/**
- * Build a scoped relationship diagram from DiagramScope config.
- *
- * Scope patterns are grouped by archContext in subgraphs.
- * Neighbor patterns (connected but not in scope) appear in a "Related" subgraph
- * with a dashed border style. Relationship edges use the same arrow conventions
- * as the architecture codec.
- */
-function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[] {
+// ============================================================================
+// Diagram Context & Strategy Builders (DD-6)
+// ============================================================================
+
+/** Pre-computed diagram context shared by all diagram type builders */
+interface DiagramContext {
+  readonly scopePatterns: readonly ExtractedPattern[];
+  readonly neighborPatterns: readonly ExtractedPattern[];
+  readonly scopeNames: ReadonlySet<string>;
+  readonly neighborNames: ReadonlySet<string>;
+  readonly nodeIds: ReadonlyMap<string, string>;
+  readonly relationships: Readonly<
+    Record<
+      string,
+      {
+        uses: readonly string[];
+        dependsOn: readonly string[];
+        implementsPatterns: readonly string[];
+        extendsPattern?: string | undefined;
+      }
+    >
+  >;
+  readonly allNames: ReadonlySet<string>;
+}
+
+/** Extract shared setup from scope + dataset into a reusable context */
+function prepareDiagramContext(
+  dataset: MasterDataset,
+  scope: DiagramScope
+): DiagramContext | undefined {
   const scopePatterns = collectScopePatterns(dataset, scope);
-  if (scopePatterns.length === 0) return [];
+  if (scopePatterns.length === 0) return undefined;
 
   const nodeIds = new Map<string, string>();
   const scopeNames = new Set<string>();
 
-  // Register scope pattern node IDs
   for (const pattern of scopePatterns) {
     const name = getPatternName(pattern);
     scopeNames.add(name);
     nodeIds.set(name, sanitizeNodeId(name));
   }
 
-  // Collect and register neighbor patterns
   const neighborPatterns = collectNeighborPatterns(dataset, scopeNames);
   const neighborNames = new Set<string>();
   for (const pattern of neighborPatterns) {
@@ -513,14 +544,66 @@ function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): Sectio
     nodeIds.set(name, sanitizeNodeId(name));
   }
 
+  const relationships = dataset.relationshipIndex ?? {};
+  const allNames = new Set([...scopeNames, ...neighborNames]);
+
+  return {
+    scopePatterns,
+    neighborPatterns,
+    scopeNames,
+    neighborNames,
+    nodeIds,
+    relationships,
+    allNames,
+  };
+}
+
+/** Emit relationship edges for flowchart diagrams (DD-4, DD-7) */
+function emitFlowchartEdges(ctx: DiagramContext, showLabels: boolean): string[] {
+  const lines: string[] = [];
+  const edgeTypes = ['uses', 'dependsOn', 'implementsPatterns'] as const;
+
+  for (const sourceName of ctx.allNames) {
+    const sourceId = ctx.nodeIds.get(sourceName);
+    if (sourceId === undefined) continue;
+
+    const rel = ctx.relationships[sourceName];
+    if (!rel) continue;
+
+    for (const type of edgeTypes) {
+      for (const target of rel[type]) {
+        const targetId = ctx.nodeIds.get(target);
+        if (targetId !== undefined) {
+          const arrow = EDGE_STYLES[type];
+          const label = showLabels ? `|${EDGE_LABELS[type]}|` : '';
+          lines.push(`    ${sourceId} ${arrow}${label} ${targetId}`);
+        }
+      }
+    }
+
+    if (rel.extendsPattern !== undefined) {
+      const targetId = ctx.nodeIds.get(rel.extendsPattern);
+      if (targetId !== undefined) {
+        const arrow = EDGE_STYLES.extendsPattern;
+        const label = showLabels ? `|${EDGE_LABELS.extendsPattern}|` : '';
+        lines.push(`    ${sourceId} ${arrow}${label} ${targetId}`);
+      }
+    }
+  }
+
+  return lines;
+}
+
+/** Build a Mermaid flowchart diagram with custom shapes and edge labels (DD-1, DD-4) */
+function buildFlowchartDiagram(ctx: DiagramContext, scope: DiagramScope): string[] {
   const direction = scope.direction ?? 'TB';
-  const title = scope.title ?? 'Component Overview';
+  const showLabels = scope.showEdgeLabels !== false;
   const lines: string[] = [`graph ${direction}`];
 
   // Group scope patterns by archContext for subgraphs
   const byContext = new Map<string, ExtractedPattern[]>();
   const noContext: ExtractedPattern[] = [];
-  for (const pattern of scopePatterns) {
+  for (const pattern of ctx.scopePatterns) {
     if (pattern.archContext !== undefined) {
       const group = byContext.get(pattern.archContext) ?? [];
       group.push(pattern);
@@ -538,9 +621,8 @@ function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): Sectio
     lines.push(`    subgraph ${sanitizeNodeId(context)}["${contextLabel}"]`);
     for (const pattern of patterns) {
       const name = getPatternName(pattern);
-      const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
-      const roleLabel = pattern.archRole !== undefined ? `[${pattern.archRole}]` : '';
-      lines.push(`        ${nodeId}["${name}${roleLabel}"]`);
+      const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+      lines.push(`        ${formatNodeDeclaration(nodeId, name, pattern.archRole)}`);
     }
     lines.push('    end');
   }
@@ -548,67 +630,156 @@ function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): Sectio
   // Emit scope patterns without context
   for (const pattern of noContext) {
     const name = getPatternName(pattern);
-    const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
-    lines.push(`    ${nodeId}["${name}"]`);
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    ${formatNodeDeclaration(nodeId, name, pattern.archRole)}`);
   }
 
   // Emit neighbor subgraph
-  if (neighborPatterns.length > 0) {
+  if (ctx.neighborPatterns.length > 0) {
     lines.push('    subgraph related["Related"]');
-    for (const pattern of neighborPatterns) {
+    for (const pattern of ctx.neighborPatterns) {
       const name = getPatternName(pattern);
-      const nodeId = nodeIds.get(name) ?? sanitizeNodeId(name);
+      const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
       lines.push(`        ${nodeId}["${name}"]:::neighbor`);
     }
     lines.push('    end');
   }
 
-  // Emit relationship edges (only between nodes in the diagram)
-  const relationships = dataset.relationshipIndex ?? {};
-  const allNames = new Set([...scopeNames, ...neighborNames]);
+  // Emit edges
+  lines.push(...emitFlowchartEdges(ctx, showLabels));
 
-  for (const sourceName of allNames) {
-    const sourceId = nodeIds.get(sourceName);
-    if (sourceId === undefined) continue;
+  // Add neighbor class definition
+  if (ctx.neighborPatterns.length > 0) {
+    lines.push('    classDef neighbor stroke-dasharray: 5 5');
+  }
 
-    const rel = relationships[sourceName];
+  return lines;
+}
+
+/** Build a Mermaid sequence diagram with participants and messages (DD-2) */
+function buildSequenceDiagram(ctx: DiagramContext): string[] {
+  const lines: string[] = ['sequenceDiagram'];
+  const edgeTypes = ['uses', 'dependsOn', 'implementsPatterns'] as const;
+
+  // Emit participant declarations for scope patterns
+  for (const name of ctx.scopeNames) {
+    lines.push(`    participant ${name}`);
+  }
+  // Emit participant declarations for neighbor patterns
+  for (const name of ctx.neighborNames) {
+    lines.push(`    participant ${name}`);
+  }
+
+  // Emit messages from relationships
+  for (const sourceName of ctx.allNames) {
+    const rel = ctx.relationships[sourceName];
     if (!rel) continue;
 
-    for (const target of rel.uses) {
-      const targetId = nodeIds.get(target);
-      if (targetId !== undefined) {
-        lines.push(`    ${sourceId} ${EDGE_STYLES.uses} ${targetId}`);
+    for (const type of edgeTypes) {
+      for (const target of rel[type]) {
+        if (ctx.allNames.has(target)) {
+          const arrow = SEQUENCE_ARROWS[type];
+          lines.push(`    ${sourceName} ${arrow} ${target}: ${EDGE_LABELS[type]}`);
+        }
       }
     }
-    for (const target of rel.dependsOn) {
-      const targetId = nodeIds.get(target);
-      if (targetId !== undefined) {
-        lines.push(`    ${sourceId} ${EDGE_STYLES.dependsOn} ${targetId}`);
-      }
-    }
-    for (const target of rel.implementsPatterns) {
-      const targetId = nodeIds.get(target);
-      if (targetId !== undefined) {
-        lines.push(`    ${sourceId} ${EDGE_STYLES.implementsPatterns} ${targetId}`);
-      }
-    }
-    if (rel.extendsPattern !== undefined) {
-      const targetId = nodeIds.get(rel.extendsPattern);
-      if (targetId !== undefined) {
-        lines.push(`    ${sourceId} ${EDGE_STYLES.extendsPattern} ${targetId}`);
-      }
+
+    if (rel.extendsPattern !== undefined && ctx.allNames.has(rel.extendsPattern)) {
+      const arrow = SEQUENCE_ARROWS.extendsPattern;
+      lines.push(`    ${sourceName} ${arrow} ${rel.extendsPattern}: ${EDGE_LABELS.extendsPattern}`);
     }
   }
 
-  // Add neighbor class definition
-  if (neighborPatterns.length > 0) {
-    lines.push('    classDef neighbor stroke-dasharray: 5 5');
+  return lines;
+}
+
+/** Build a Mermaid state diagram with transitions and pseudo-states (DD-3) */
+function buildStateDiagram(ctx: DiagramContext, scope: DiagramScope): string[] {
+  const showLabels = scope.showEdgeLabels !== false;
+  const lines: string[] = ['stateDiagram-v2'];
+
+  // Track incoming/outgoing dependsOn edges for pseudo-states
+  const hasIncoming = new Set<string>();
+  const hasOutgoing = new Set<string>();
+
+  // Emit state declarations for scope patterns
+  for (const name of ctx.scopeNames) {
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    state "${name}" as ${nodeId}`);
+  }
+
+  // Emit state declarations for neighbor patterns
+  for (const name of ctx.neighborNames) {
+    const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+    lines.push(`    state "${name}" as ${nodeId}`);
+  }
+
+  // Emit transitions from dependsOn relationships
+  for (const sourceName of ctx.allNames) {
+    const rel = ctx.relationships[sourceName];
+    if (!rel) continue;
+
+    for (const target of rel.dependsOn) {
+      if (!ctx.allNames.has(target)) continue;
+      const sourceId = ctx.nodeIds.get(sourceName) ?? sanitizeNodeId(sourceName);
+      const targetId = ctx.nodeIds.get(target) ?? sanitizeNodeId(target);
+      const label = showLabels ? ` : ${EDGE_LABELS.dependsOn}` : '';
+      lines.push(`    ${targetId} --> ${sourceId}${label}`);
+      hasIncoming.add(sourceName);
+      hasOutgoing.add(target);
+    }
+  }
+
+  // Add start pseudo-states for patterns with no incoming edges
+  for (const name of ctx.scopeNames) {
+    if (!hasIncoming.has(name)) {
+      const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+      lines.push(`    [*] --> ${nodeId}`);
+    }
+  }
+
+  // Add end pseudo-states for patterns with no outgoing edges
+  for (const name of ctx.scopeNames) {
+    if (!hasOutgoing.has(name)) {
+      const nodeId = ctx.nodeIds.get(name) ?? sanitizeNodeId(name);
+      lines.push(`    ${nodeId} --> [*]`);
+    }
+  }
+
+  return lines;
+}
+
+/**
+ * Build a scoped relationship diagram from DiagramScope config.
+ *
+ * Dispatches to type-specific builders based on scope.diagramType (DD-6).
+ * Scope patterns are grouped by archContext in subgraphs (flowchart) or
+ * rendered as participants/states (sequence/state diagrams).
+ */
+function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[] {
+  const ctx = prepareDiagramContext(dataset, scope);
+  if (ctx === undefined) return [];
+
+  const title = scope.title ?? 'Component Overview';
+
+  let diagramLines: string[];
+  switch (scope.diagramType ?? 'graph') {
+    case 'sequenceDiagram':
+      diagramLines = buildSequenceDiagram(ctx);
+      break;
+    case 'stateDiagram-v2':
+      diagramLines = buildStateDiagram(ctx, scope);
+      break;
+    case 'graph':
+    default:
+      diagramLines = buildFlowchartDiagram(ctx, scope);
+      break;
   }
 
   return [
     heading(2, title),
     paragraph('Scoped architecture diagram showing component relationships:'),
-    mermaid(lines.join('\n')),
+    mermaid(diagramLines.join('\n')),
     separator(),
   ];
 }
