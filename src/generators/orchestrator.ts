@@ -67,6 +67,7 @@ import {
 import { transformToMasterDataset } from './pipeline/index.js';
 import { detectBranchChanges, getAllChangedFiles } from '../lint/process-guard/detect-changes.js';
 import type { CodecOptions } from '../renderable/generate.js';
+import { registerReferenceGenerators } from './built-in/reference-generators.js';
 
 /**
  * Codec for serializing registry metadata to JSON
@@ -919,6 +920,12 @@ export async function generateFromConfig(
 
   if (generatorNames.length === 0) {
     return R.err('No generators specified');
+  }
+
+  // Register reference generators from config (explicit opt-in).
+  // Done here (not at import time) because configs are user-provided.
+  if (config.project.referenceDocConfigs.length > 0 && !generatorRegistry.has('reference-docs')) {
+    registerReferenceGenerators(generatorRegistry, config.project.referenceDocConfigs);
   }
 
   // Group generators by effective source config to minimize scans.

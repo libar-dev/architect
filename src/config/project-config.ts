@@ -35,6 +35,7 @@
 import type { PresetName } from './presets.js';
 import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
 import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
+import type { ReferenceDocConfig } from '../renderable/codecs/reference.js';
 
 /**
  * Source glob configuration for the project.
@@ -183,6 +184,19 @@ export interface DeliveryProcessProjectConfig {
 
   /** Path to custom workflow config JSON (relative to config file) */
   readonly workflowPath?: string;
+
+  // --- Reference Documents ---
+
+  /**
+   * Reference document configurations for convention-based doc generation.
+   * Each config defines one reference document's content composition via
+   * convention tags, shape sources, behavior categories, and diagram scopes.
+   *
+   * When not specified, no reference generators are registered.
+   * Import `LIBAR_REFERENCE_CONFIGS` from the generators module
+   * to use the built-in set.
+   */
+  readonly referenceDocConfigs?: readonly ReferenceDocConfig[];
 }
 
 /**
@@ -201,6 +215,8 @@ export interface ResolvedProjectConfig {
   readonly contextInferenceRules: readonly ContextInferenceRule[];
   /** Workflow config path (null if not specified) */
   readonly workflowPath: string | null;
+  /** Reference document configurations (empty array if none) */
+  readonly referenceDocConfigs: readonly ReferenceDocConfig[];
 }
 
 /**

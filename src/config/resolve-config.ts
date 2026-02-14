@@ -113,6 +113,9 @@ export function resolveProjectConfig(
     raw.generatorOverrides ?? {};
   const workflowPath: string | null = raw.workflowPath ?? null;
 
+  // 7. Reference document configs (explicit opt-in, empty by default)
+  const referenceDocConfigs = raw.referenceDocConfigs ?? [];
+
   const project: ResolvedProjectConfig = {
     sources,
     output,
@@ -120,6 +123,7 @@ export function resolveProjectConfig(
     generatorOverrides,
     contextInferenceRules,
     workflowPath,
+    referenceDocConfigs,
   };
 
   return {
@@ -158,6 +162,7 @@ export function createDefaultResolvedConfig(): ResolvedConfig {
     generatorOverrides: {},
     contextInferenceRules: [...DEFAULT_CONTEXT_INFERENCE_RULES],
     workflowPath: null,
+    referenceDocConfigs: [],
   };
 
   return {

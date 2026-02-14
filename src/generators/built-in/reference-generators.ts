@@ -26,11 +26,13 @@ import {
 // ============================================================================
 
 /**
- * All reference document configurations.
+ * Built-in reference document configurations for the delivery-process package.
  *
  * Each entry defines one reference document's convention sources and shape globs.
+ * Import this in your `delivery-process.config.ts` to use these configs,
+ * or define your own `ReferenceDocConfig[]` for downstream repos.
  */
-export const REFERENCE_CONFIGS: readonly ReferenceDocConfig[] = [
+export const LIBAR_REFERENCE_CONFIGS: readonly ReferenceDocConfig[] = [
   {
     title: 'Process Guard Reference',
     conventionTags: ['fsm-rules'],
@@ -236,7 +238,11 @@ function toGeneratorName(title: string): string {
  */
 class ReferenceDocsGenerator implements DocumentGenerator {
   readonly name = 'reference-docs';
-  readonly description = `All reference documents (${REFERENCE_CONFIGS.length} detailed + ${REFERENCE_CONFIGS.length} summary)`;
+  readonly description: string;
+
+  constructor(private readonly configs: readonly ReferenceDocConfig[]) {
+    this.description = `All reference documents (${configs.length} detailed + ${configs.length} summary)`;
+  }
 
   generate(
     _patterns: readonly ExtractedPattern[],
@@ -256,7 +262,7 @@ class ReferenceDocsGenerator implements DocumentGenerator {
 
     const files: Array<{ path: string; content: string }> = [];
 
-    for (const config of REFERENCE_CONFIGS) {
+    for (const config of this.configs) {
       // Detailed output -> docs/{docsFilename}
       const detailedCodec = createReferenceCodec(config, {
         detailLevel: 'detailed',
@@ -282,19 +288,25 @@ class ReferenceDocsGenerator implements DocumentGenerator {
 }
 
 /**
- * Registers all reference generators in the GeneratorRegistry.
+ * Registers reference generators from the provided configs in the GeneratorRegistry.
  *
  * Registers:
  * - "reference-docs" meta-generator (produces all files at once)
  * - Individual generators for selective invocation:
  *   "{name}-reference" -> detailed, "{name}-reference-claude" -> summary
+ *
+ * @param registry - The generator registry to register into
+ * @param configs - Reference document configurations (from project config)
  */
-export function registerReferenceGenerators(registry: GeneratorRegistry): void {
+export function registerReferenceGenerators(
+  registry: GeneratorRegistry,
+  configs: readonly ReferenceDocConfig[]
+): void {
   // Meta-generator: single -g reference-docs produces all files
-  registry.register(new ReferenceDocsGenerator());
+  registry.register(new ReferenceDocsGenerator(configs));
 
   // Individual generators: selective invocation per document
-  for (const config of REFERENCE_CONFIGS) {
+  for (const config of configs) {
     const kebabName = toGeneratorName(config.title);
 
     registry.register(
@@ -318,3 +330,6 @@ export function registerReferenceGenerators(registry: GeneratorRegistry): void {
     );
   }
 }
+
+/** @deprecated Use LIBAR_REFERENCE_CONFIGS instead */
+export const REFERENCE_CONFIGS = LIBAR_REFERENCE_CONFIGS;

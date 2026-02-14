@@ -110,6 +110,38 @@ const ContextInferenceRuleSchema = z
 const PresetNameSchema = z.enum(['generic', 'libar-generic', 'ddd-es-cqrs']);
 
 /**
+ * Schema for scoped diagram filter configuration.
+ * Patterns matching the filter become diagram nodes; neighbors appear with distinct style.
+ */
+const DiagramScopeSchema = z
+  .object({
+    archContext: z.array(z.string().min(1)).readonly().optional(),
+    patterns: z.array(z.string().min(1)).readonly().optional(),
+    archView: z.array(z.string().min(1)).readonly().optional(),
+    direction: z.enum(['TB', 'LR']).optional(),
+    title: z.string().min(1).optional(),
+  })
+  .strict();
+
+/**
+ * Schema for reference document configuration.
+ * Each config defines one reference document's content composition.
+ */
+const ReferenceDocConfigSchema = z
+  .object({
+    title: z.string().min(1),
+    conventionTags: z.array(z.string().min(1)).readonly(),
+    shapeSources: z.array(GlobPatternSchema).readonly(),
+    behaviorCategories: z.array(z.string().min(1)).readonly(),
+    diagramScope: DiagramScopeSchema.optional(),
+    diagramScopes: z.array(DiagramScopeSchema).readonly().optional(),
+    claudeMdSection: z.string().min(1),
+    docsFilename: z.string().min(1),
+    claudeMdFilename: z.string().min(1),
+  })
+  .strict();
+
+/**
  * Full project configuration schema.
  *
  * Validated at config load time by `loadProjectConfig()`.
@@ -150,6 +182,9 @@ export const DeliveryProcessProjectConfigSchema = z
     // Advanced
     contextInferenceRules: z.array(ContextInferenceRuleSchema).readonly().optional(),
     workflowPath: z.string().min(1).optional(),
+
+    // Reference Documents
+    referenceDocConfigs: z.array(ReferenceDocConfigSchema).readonly().optional(),
   })
   .strict();
 

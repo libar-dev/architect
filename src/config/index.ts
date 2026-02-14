@@ -96,3 +96,6 @@ export {
 // Config resolution and source merging
 export { resolveProjectConfig, createDefaultResolvedConfig } from './resolve-config.js';
 export { mergeSourcesForGenerator } from './merge-sources.js';
+
+// Reference document configuration types (for downstream repos)
+export type { ReferenceDocConfig, DiagramScope } from '../renderable/codecs/reference.js';
