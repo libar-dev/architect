@@ -42,6 +42,13 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { pathToFileURL } from 'url';
 import { createDeliveryProcess } from './factory.js';
+import type { DeliveryProcessProjectConfig, ResolvedConfig } from './project-config.js';
+import {
+  isProjectConfig,
+  isLegacyInstance,
+  DeliveryProcessProjectConfigSchema,
+} from './project-config-schema.js';
+import { resolveProjectConfig, createDefaultResolvedConfig } from './resolve-config.js';
 import type { DeliveryProcessInstance } from './types.js';
 
 /**
@@ -189,16 +196,31 @@ async function importConfigFile(configPath: string): Promise<DeliveryProcessInst
     throw new Error(`Config file must have a default export: ${configPath}`);
   }
 
-  const config = module.default as Record<string, unknown>;
+  const exported = module.default;
 
-  // Validate that it's a DeliveryProcessInstance (has required properties)
-  if (typeof config !== 'object' || !('registry' in config) || !('regexBuilders' in config)) {
-    throw new Error(
-      `Config file must export a DeliveryProcessInstance (use createDeliveryProcess()): ${configPath}`
-    );
+  // New-style project config (defineConfig) — resolve to get instance
+  if (isProjectConfig(exported)) {
+    const parseResult = DeliveryProcessProjectConfigSchema.safeParse(exported);
+    if (!parseResult.success) {
+      const zodMessage = parseResult.error.issues
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+        .join('; ');
+      throw new Error(`Invalid project config: ${zodMessage}`);
+    }
+    const resolved = resolveProjectConfig(parseResult.data as DeliveryProcessProjectConfig, {
+      configPath,
+    });
+    return resolved.instance;
   }
 
-  return config as unknown as DeliveryProcessInstance;
+  // Legacy DeliveryProcessInstance (createDeliveryProcess)
+  if (isLegacyInstance(exported)) {
+    return exported as unknown as DeliveryProcessInstance;
+  }
+
+  throw new Error(
+    `Config file must export a DeliveryProcessProjectConfig (use defineConfig()) or DeliveryProcessInstance (use createDeliveryProcess()): ${configPath}`
+  );
 }
 
 /**
@@ -285,4 +307,132 @@ export function formatConfigError(error: ConfigLoadError): string {
   }
 
   return lines.join('\n');
+}
+
+/**
+ * Result type for project config loading (discriminated union).
+ *
+ * Returns a `ResolvedConfig` on success (with all defaults applied),
+ * or a `ConfigLoadError` on failure.
+ */
+export type ProjectConfigLoadResult =
+  | {
+      /** Indicates successful config resolution */
+      readonly ok: true;
+      /** The fully resolved configuration */
+      readonly value: ResolvedConfig;
+    }
+  | {
+      /** Indicates config loading failure */
+      readonly ok: false;
+      /** Error details for the failed load */
+      readonly error: ConfigLoadError;
+    };
+
+/**
+ * Load unified project configuration from file or use defaults.
+ *
+ * Supports both new-style `DeliveryProcessProjectConfig` (via `defineConfig()`)
+ * and legacy `DeliveryProcessInstance` (via `createDeliveryProcess()`) config files.
+ *
+ * Discovery strategy:
+ * 1. Search for `delivery-process.config.ts` starting from baseDir
+ * 2. Walk up parent directories until repo root
+ * 3. If found, import and resolve the configuration
+ * 4. If not found, return default resolved config
+ *
+ * @param baseDir - Directory to start searching from (usually cwd or project root)
+ * @returns Result with fully resolved configuration or error
+ */
+export async function loadProjectConfig(baseDir: string): Promise<ProjectConfigLoadResult> {
+  const configPath = await findConfigFile(baseDir);
+
+  // No config found — return defaults
+  if (configPath === null) {
+    return {
+      ok: true,
+      value: createDefaultResolvedConfig(),
+    };
+  }
+
+  // Try to import the config file
+  let module: { default?: unknown };
+  try {
+    const fileUrl = pathToFileURL(configPath).href;
+    module = (await import(fileUrl)) as { default?: unknown };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      ok: false,
+      error: {
+        type: 'config-load-error',
+        path: configPath,
+        message: `Failed to import config: ${message}`,
+        cause: error instanceof Error ? error : undefined,
+      },
+    };
+  }
+
+  const exported = module.default;
+
+  // No default export
+  if (exported === undefined || exported === null) {
+    return {
+      ok: false,
+      error: {
+        type: 'config-load-error',
+        path: configPath,
+        message: `Config file must have a default export: ${configPath}`,
+      },
+    };
+  }
+
+  // New-style project config (defineConfig)
+  if (isProjectConfig(exported)) {
+    const parseResult = DeliveryProcessProjectConfigSchema.safeParse(exported);
+    if (!parseResult.success) {
+      const zodMessage = parseResult.error.issues
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+        .join('; ');
+      return {
+        ok: false,
+        error: {
+          type: 'config-load-error',
+          path: configPath,
+          message: `Invalid project config: ${zodMessage}`,
+        },
+      };
+    }
+    const resolved = resolveProjectConfig(parseResult.data as DeliveryProcessProjectConfig, {
+      configPath,
+    });
+    return {
+      ok: true,
+      value: resolved,
+    };
+  }
+
+  // Legacy DeliveryProcessInstance (createDeliveryProcess)
+  if (isLegacyInstance(exported)) {
+    const defaultResolved = createDefaultResolvedConfig();
+    return {
+      ok: true,
+      value: {
+        ...defaultResolved,
+        instance: exported as ResolvedConfig['instance'],
+        isDefault: false,
+        configPath,
+      },
+    };
+  }
+
+  // Unknown export shape
+  return {
+    ok: false,
+    error: {
+      type: 'config-load-error',
+      path: configPath,
+      message: `Config file must export a DeliveryProcessProjectConfig (use defineConfig()) or DeliveryProcessInstance (use createDeliveryProcess()): ${configPath}`,
+    },
+  };
 }

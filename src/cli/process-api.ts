@@ -36,7 +36,7 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { loadConfig, formatConfigError } from '../config/config-loader.js';
+import { loadConfig, loadProjectConfig, formatConfigError } from '../config/config-loader.js';
 import { DEFAULT_CONTEXT_INFERENCE_RULES } from '../config/defaults.js';
 import { scanPatterns } from '../scanner/index.js';
 import { extractPatterns } from '../extractor/doc-extractor.js';
@@ -418,9 +418,39 @@ Available API Methods (for 'query'):
 
 /**
  * If --input and --features are not provided, try to load defaults from config.
- * When a delivery-process.config.ts exists, use conventional paths.
+ * Prefers loadProjectConfig() for repos with delivery-process.config.ts,
+ * falls back to filesystem auto-detection for repos without one.
  */
-function applyConfigDefaults(config: ProcessAPICLIConfig): void {
+async function applyConfigDefaults(config: ProcessAPICLIConfig): Promise<void> {
+  // If user provided explicit flags, use them
+  if (config.input.length > 0 && config.features.length > 0) {
+    return;
+  }
+
+  // Try loading project config for source defaults
+  const configResult = await loadProjectConfig(config.baseDir);
+  if (configResult.ok && !configResult.value.isDefault) {
+    const resolved = configResult.value;
+
+    // Apply config sources as defaults (only if CLI didn't specify)
+    if (config.input.length === 0 && resolved.project.sources.typescript.length > 0) {
+      config.input.push(...resolved.project.sources.typescript);
+    }
+    if (config.features.length === 0 && resolved.project.sources.features.length > 0) {
+      config.features.push(...resolved.project.sources.features);
+    }
+    return;
+  }
+
+  // Fall back to existing auto-detection for repos without config
+  applyConfigDefaultsFallback(config);
+}
+
+/**
+ * Filesystem-based auto-detection fallback for repos without a config file.
+ * Checks for conventional directory structures and applies defaults.
+ */
+function applyConfigDefaultsFallback(config: ProcessAPICLIConfig): void {
   const baseDir = path.resolve(config.baseDir);
 
   if (config.input.length === 0) {
@@ -1375,7 +1405,7 @@ async function main(): Promise<void> {
   validateModifiers(opts.modifiers);
 
   // Resolve config file defaults if --input and --features not provided
-  applyConfigDefaults(opts);
+  await applyConfigDefaults(opts);
 
   if (opts.input.length === 0) {
     console.error(

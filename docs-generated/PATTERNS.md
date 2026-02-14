@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [████████████░░░░░░░░] 104/168 (62% complete)
+**Overall:** [████████████░░░░░░░░] 104/173 (60% complete)
 
 | Status | Count |
 | --- | --- |
 | ✅ Completed | 104 |
-| 🚧 Active | 28 |
+| 🚧 Active | 33 |
 | 📋 Planned | 36 |
-| **Total** | 168 |
+| **Total** | 173 |
 
 ---
 
@@ -22,7 +22,7 @@
 
 - [Cli](#cli) (6)
 - [Config](#config) (1)
-- [Core](#core) (66)
+- [Core](#core) (71)
 - [DDD](#ddd) (36)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
@@ -153,9 +153,11 @@
 | ✅ Workflow Loader | Config | completed | Loads and validates workflow configuration from JSON files in the catalogue. |
 | 🚧 API Module | Core | active | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | Pattern | active | Pure functions over MasterDataset for deep architecture exploration. |
+| 🚧 Config Resolver | Core | active | Resolves a raw `DeliveryProcessProjectConfig` into a fully-resolved `ResolvedConfig` with all defaults applied, stubs... |
 | 🚧 Context Assembler Impl | Pattern | active | Pure function composition over MasterDataset. |
 | 🚧 Context Formatter Impl | Pattern | active | First plain-text formatter in the codebase. |
 | 🚧 Coverage Analyzer Impl | Pattern | active | Reports annotation completeness by comparing scannable files (from glob) against annotated patterns in MasterDataset. |
+| 🚧 Define Config | Core | active | Identity function for type-safe project configuration. |
 | 🚧 Deliverable Status Taxonomy | Core | active | Canonical status values for deliverables in Gherkin Background tables. |
 | 🚧 Derive Process State | Lint | active | :GherkinScanner,FSMValidator Derives process state from @libar-docs-* annotations in files. |
 | 🚧 Detect Changes | Lint | active | Detects changes from git diff including: - Modified, added, deleted files - Status transitions (@libar-docs-status... |
@@ -176,8 +178,11 @@
 | 🚧 Process State API | Core | active | TypeScript interface for querying delivery process state. |
 | 🚧 Process State API Relationship Queries | DDD | active | Problem: ProcessStateAPI currently supports dependency queries (`uses`, `usedBy`, `dependsOn`, `enables`) but lacks... |
 | 🚧 Process State Types | Core | active | :MasterDataset Type definitions for the ProcessStateAPI query interface. |
+| 🚧 Project Config Schema | Core | active | Zod validation schema for `DeliveryProcessProjectConfig`. |
+| 🚧 Project Config Types | Core | active | Unified project configuration for the delivery-process package. |
 | 🚧 Reference Document Codec | Pattern | active | A single codec factory that creates reference document codecs from configuration objects. |
 | 🚧 Reference Generator Registration | Pattern | active | Registers all reference document generators. |
+| 🚧 Source Merger | Core | active | Computes effective sources for a specific generator by applying per-generator overrides to the base resolved sources. |
 | 🚧 Stub Resolver Impl | Pattern | active | Identifies design session stubs in the MasterDataset and resolves them against the filesystem to determine... |
 | 📋 Architecture Delta | Opportunity 5 | planned | Architecture evolution is not visible between releases. |
 | 📋 Architecture Diagram Generation | DDD | planned | Problem: Architecture documentation requires manually maintaining mermaid diagrams that duplicate information already... |
@@ -241,7 +246,7 @@
 
 ### Core
 
-58/66 complete (88%)
+58/71 complete (82%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -302,6 +307,8 @@
 - [✅ Validation Rules Codec](patterns/validation-rules-codec.md)
 - [✅ Warning Collector](patterns/warning-collector.md)
 - [🚧 API Module](patterns/api-module.md)
+- [🚧 Config Resolver](patterns/config-resolver.md)
+- [🚧 Define Config](patterns/define-config.md)
 - [🚧 Deliverable Status Taxonomy](patterns/deliverable-status-taxonomy.md)
 - [🚧 Fuzzy Matcher Impl](patterns/fuzzy-matcher-impl.md)
 - [🚧 Output Pipeline Impl](patterns/output-pipeline-impl.md)
@@ -309,6 +316,9 @@
 - [🚧 Process API CLI Impl](patterns/process-apicli-impl.md)
 - [🚧 Process State API](patterns/process-state-api.md)
 - [🚧 Process State Types](patterns/process-state-types.md)
+- [🚧 Project Config Schema](patterns/project-config-schema.md)
+- [🚧 Project Config Types](patterns/project-config-types.md)
+- [🚧 Source Merger](patterns/source-merger.md)
 
 ---
 
@@ -577,16 +587,7 @@ graph TD
     AntiPatternDetector --> GherkinTypes
     UtilsModule --> StringUtilities
     UtilsModule --> CollectionUtilities
-    Pattern_Scanner --> glob
-    Pattern_Scanner --> AST_Parser
-    GherkinScanner --> GherkinASTParser
-    GherkinScanner --> GherkinTypes
-    GherkinScanner ..-> GherkinRulesSupport
-    GherkinASTParser --> GherkinTypes
-    GherkinASTParser ..-> GherkinRulesSupport
-    TypeScript_AST_Parser --> TagRegistry
-    TypeScript_AST_Parser --> DocDirectiveSchema
-    TypeScript_AST_Parser --> typescript_estree
+    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     LintRules ..-> PatternRelationshipModel
     LintModule --> LintRules
     LintModule --> LintEngine
@@ -603,6 +604,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    Pattern_Scanner --> glob
+    Pattern_Scanner --> AST_Parser
+    GherkinScanner --> GherkinASTParser
+    GherkinScanner --> GherkinTypes
+    GherkinScanner ..-> GherkinRulesSupport
+    GherkinASTParser --> GherkinTypes
+    GherkinASTParser ..-> GherkinRulesSupport
+    TypeScript_AST_Parser --> TagRegistry
+    TypeScript_AST_Parser --> DocDirectiveSchema
+    TypeScript_AST_Parser --> typescript_estree
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -613,17 +624,24 @@ graph TD
     Documentation_Generation_Orchestrator --> Gherkin_Extractor
     Documentation_Generation_Orchestrator --> Generator_Registry
     Documentation_Generation_Orchestrator --> JSON_Output_Codec
-    TagRegistryBuilder ..-> TypeScriptTaxonomyImplementation
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
+    ConfigResolver --> ProjectConfigTypes
+    ConfigResolver --> DeliveryProcessFactory
+    ConfigResolver --> ConfigurationDefaults
     RegexBuilders --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationPresets
+    ProjectConfigSchema --> ProjectConfigTypes
     ConfigurationPresets --> ConfigurationTypes
     ConfigurationPresets --> Categories
     ConfigurationPresets --> RegistryBuilder
+    SourceMerger --> ProjectConfigTypes
     DeliveryProcessFactory --> ConfigurationTypes
     DeliveryProcessFactory --> ConfigurationPresets
     DeliveryProcessFactory --> RegexBuilders
     DeliveryProcessFactory --> TagRegistry
+    DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
     ValidatePatternsCLI --> PatternScanner
@@ -696,17 +714,17 @@ graph TD
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     ScopedArchitecturalView -.-> ArchitectureDiagramGeneration
