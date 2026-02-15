@@ -1,0 +1,1478 @@
+# Validation Overview
+
+**Purpose:** Validation product area overview
+**Detail Level:** Full reference
+
+---
+
+**How is the workflow enforced?** Validation enforces delivery workflow rules at commit time using a Decider pattern. Process Guard derives state from annotations (no separate state store), validates proposed changes against FSM rules, and blocks invalid transitions. Protection levels escalate with status: roadmap allows free editing, active locks scope, completed requires explicit unlock.
+
+## Key Invariants
+
+- Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@libar-docs-unlock-reason`)
+- Valid FSM transitions: Only roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap. Completed is terminal
+- Decider pattern: All validation is (state, changes, options) → result. State is derived from annotations, not maintained separately
+
+---
+
+## Validation Components
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+graph TB
+    subgraph lint["Lint"]
+        LintRules("LintRules")
+        LintEngine("LintEngine")
+        ProcessGuardDecider("ProcessGuardDecider")
+    end
+    subgraph validation["Validation"]
+        DoDValidator("DoDValidator")
+        AntiPatternDetector("AntiPatternDetector")
+        FSMValidator("FSMValidator")
+        FSMTransitions[/"FSMTransitions"/]
+        FSMStates[/"FSMStates"/]
+    end
+    subgraph related["Related"]
+        CodecUtils["CodecUtils"]:::neighbor
+        DoDValidationTypes["DoDValidationTypes"]:::neighbor
+        DualSourceExtractor["DualSourceExtractor"]:::neighbor
+    end
+    DoDValidator -->|uses| DoDValidationTypes
+    DoDValidator -->|uses| DualSourceExtractor
+    AntiPatternDetector -->|uses| DoDValidationTypes
+    LintEngine -->|uses| LintRules
+    LintEngine -->|uses| CodecUtils
+    classDef neighbor stroke-dasharray: 5 5
+```
+
+---
+
+## API Types
+
+### AntiPatternDetectionOptions (interface)
+
+```typescript
+/**
+ * Configuration options for anti-pattern detection
+ */
+```
+
+```typescript
+interface AntiPatternDetectionOptions extends WithTagRegistry {
+  /** Thresholds for warning triggers */
+  readonly thresholds?: Partial<AntiPatternThresholds>;
+}
+```
+
+| Property   | Description                     |
+| ---------- | ------------------------------- |
+| thresholds | Thresholds for warning triggers |
+
+### LintRule (interface)
+
+```typescript
+/**
+ * A lint rule that checks a parsed directive
+ */
+```
+
+```typescript
+interface LintRule {
+  /** Unique rule ID */
+  readonly id: string;
+  /** Default severity level */
+  readonly severity: LintSeverity;
+  /** Human-readable rule description */
+  readonly description: string;
+  /**
+   * Check function that returns violation(s) or null if rule passes
+   *
+   * @param directive - Parsed directive to check
+   * @param file - Source file path
+   * @param line - Line number in source
+   * @param context - Optional context with pattern registry for relationship validation
+   * @returns Violation(s) if rule fails, null if passes. Array for rules that can detect multiple issues.
+   */
+  check: (
+    directive: DocDirective,
+    file: string,
+    line: number,
+    context?: LintContext
+  ) => LintViolation | LintViolation[] | null;
+}
+```
+
+| Property    | Description                                                     |
+| ----------- | --------------------------------------------------------------- |
+| id          | Unique rule ID                                                  |
+| severity    | Default severity level                                          |
+| description | Human-readable rule description                                 |
+| check       | Check function that returns violation(s) or null if rule passes |
+
+### LintContext (interface)
+
+```typescript
+/**
+ * Context for lint rules that need access to the full pattern registry.
+ * Used for "strict mode" validation where relationships are checked
+ * against known patterns.
+ */
+```
+
+```typescript
+interface LintContext {
+  /** Set of known pattern names for relationship validation */
+  readonly knownPatterns: ReadonlySet<string>;
+  /** Tag registry for prefix-aware error messages (optional) */
+  readonly registry?: TagRegistry;
+}
+```
+
+| Property      | Description                                             |
+| ------------- | ------------------------------------------------------- |
+| knownPatterns | Set of known pattern names for relationship validation  |
+| registry      | Tag registry for prefix-aware error messages (optional) |
+
+### ProtectionLevel (type)
+
+```typescript
+/**
+ * Protection level types for FSM states
+ *
+ * - `none`: Fully editable, no restrictions
+ * - `scope`: Scope-locked, prevents adding new deliverables
+ * - `hard`: Hard-locked, requires explicit unlock-reason annotation
+ */
+```
+
+```typescript
+type ProtectionLevel = 'none' | 'scope' | 'hard';
+```
+
+### isDeliverableComplete (function)
+
+```typescript
+/**
+ * Check if a deliverable status indicates completion
+ *
+ * Uses canonical deliverable status taxonomy. Status must be 'complete'.
+ *
+ * @param deliverable - The deliverable to check
+ * @returns True if the deliverable is complete
+ */
+```
+
+```typescript
+function isDeliverableComplete(deliverable: Deliverable): boolean;
+```
+
+| Parameter   | Type | Description              |
+| ----------- | ---- | ------------------------ |
+| deliverable |      | The deliverable to check |
+
+**Returns:** True if the deliverable is complete
+
+### hasAcceptanceCriteria (function)
+
+```typescript
+/**
+ * Check if a feature has @acceptance-criteria scenarios
+ *
+ * Scans scenarios for the @acceptance-criteria tag, which indicates
+ * BDD-driven acceptance tests.
+ *
+ * @param feature - The scanned feature file to check
+ * @returns True if at least one @acceptance-criteria scenario exists
+ */
+```
+
+```typescript
+function hasAcceptanceCriteria(feature: ScannedGherkinFile): boolean;
+```
+
+| Parameter | Type | Description                       |
+| --------- | ---- | --------------------------------- |
+| feature   |      | The scanned feature file to check |
+
+**Returns:** True if at least one @acceptance-criteria scenario exists
+
+### extractAcceptanceCriteriaScenarios (function)
+
+```typescript
+/**
+ * Extract acceptance criteria scenario names from a feature
+ *
+ * @param feature - The scanned feature file
+ * @returns Array of scenario names with @acceptance-criteria tag
+ */
+```
+
+```typescript
+function extractAcceptanceCriteriaScenarios(feature: ScannedGherkinFile): readonly string[];
+```
+
+| Parameter | Type | Description              |
+| --------- | ---- | ------------------------ |
+| feature   |      | The scanned feature file |
+
+**Returns:** Array of scenario names with @acceptance-criteria tag
+
+### validateDoDForPhase (function)
+
+```typescript
+/**
+ * Validate DoD for a single phase/pattern
+ *
+ * Checks:
+ * 1. All deliverables have "complete" status
+ * 2. At least one @acceptance-criteria scenario exists
+ *
+ * @param patternName - Name of the pattern being validated
+ * @param phase - Phase number being validated
+ * @param feature - The scanned feature file with deliverables and scenarios
+ * @returns DoD validation result
+ */
+```
+
+```typescript
+function validateDoDForPhase(
+  patternName: string,
+  phase: number,
+  feature: ScannedGherkinFile
+): DoDValidationResult;
+```
+
+| Parameter   | Type | Description                                              |
+| ----------- | ---- | -------------------------------------------------------- |
+| patternName |      | Name of the pattern being validated                      |
+| phase       |      | Phase number being validated                             |
+| feature     |      | The scanned feature file with deliverables and scenarios |
+
+**Returns:** DoD validation result
+
+### validateDoD (function)
+
+````typescript
+/**
+ * Validate DoD across multiple phases
+ *
+ * Filters to completed phases and validates each against DoD criteria.
+ * Optionally filter to specific phases using phaseFilter.
+ *
+ * @param features - Array of scanned feature files
+ * @param phaseFilter - Optional array of phase numbers to validate (validates all if empty)
+ * @returns Aggregate DoD validation summary
+ *
+ * @example
+ * ```typescript
+ * // Validate all completed phases
+ * const summary = validateDoD(features);
+ *
+ * // Validate specific phase
+ * const summary = validateDoD(features, [14]);
+ * ```
+ */
+````
+
+```typescript
+function validateDoD(
+  features: readonly ScannedGherkinFile[],
+  phaseFilter: readonly number[] = []
+): DoDValidationSummary;
+```
+
+| Parameter   | Type | Description                                                          |
+| ----------- | ---- | -------------------------------------------------------------------- |
+| features    |      | Array of scanned feature files                                       |
+| phaseFilter |      | Optional array of phase numbers to validate (validates all if empty) |
+
+**Returns:** Aggregate DoD validation summary
+
+### formatDoDSummary (function)
+
+```typescript
+/**
+ * Format DoD validation summary for console output
+ *
+ * @param summary - DoD validation summary to format
+ * @returns Multi-line string for pretty printing
+ */
+```
+
+```typescript
+function formatDoDSummary(summary: DoDValidationSummary): string;
+```
+
+| Parameter | Type | Description                      |
+| --------- | ---- | -------------------------------- |
+| summary   |      | DoD validation summary to format |
+
+**Returns:** Multi-line string for pretty printing
+
+### detectAntiPatterns (function)
+
+````typescript
+/**
+ * Detect all anti-patterns
+ *
+ * Runs all anti-pattern detectors and returns combined violations.
+ *
+ * @param scannedFiles - Array of scanned TypeScript files
+ * @param features - Array of scanned feature files
+ * @param options - Optional configuration (registry for prefix, thresholds)
+ * @returns Array of all detected anti-pattern violations
+ *
+ * @example
+ * ```typescript
+ * // With default prefix (@libar-docs-)
+ * const violations = detectAntiPatterns(tsFiles, featureFiles);
+ *
+ * // With custom prefix
+ * const registry = createDefaultTagRegistry();
+ * registry.tagPrefix = "@docs-";
+ * const customViolations = detectAntiPatterns(tsFiles, featureFiles, { registry });
+ *
+ * for (const v of violations) {
+ *   console.log(`[${v.severity.toUpperCase()}] ${v.id}: ${v.message}`);
+ * }
+ * ```
+ */
+````
+
+```typescript
+function detectAntiPatterns(
+  scannedFiles: readonly ScannedFile[],
+  features: readonly ScannedGherkinFile[],
+  options: AntiPatternDetectionOptions = {}
+): AntiPatternViolation[];
+```
+
+| Parameter    | Type | Description                                              |
+| ------------ | ---- | -------------------------------------------------------- |
+| scannedFiles |      | Array of scanned TypeScript files                        |
+| features     |      | Array of scanned feature files                           |
+| options      |      | Optional configuration (registry for prefix, thresholds) |
+
+**Returns:** Array of all detected anti-pattern violations
+
+### detectProcessInCode (function)
+
+```typescript
+/**
+ * Detect process metadata in code anti-pattern
+ *
+ * Finds process tracking annotations (e.g., @docs-quarter, @docs-team, etc.)
+ * in TypeScript files. Process metadata belongs in feature files.
+ *
+ * @param scannedFiles - Array of scanned TypeScript files
+ * @param registry - Optional tag registry for prefix-aware detection (defaults to @libar-docs-)
+ * @returns Array of anti-pattern violations
+ */
+```
+
+```typescript
+function detectProcessInCode(
+  scannedFiles: readonly ScannedFile[],
+  registry?: TagRegistry
+): AntiPatternViolation[];
+```
+
+| Parameter    | Type | Description                                                                 |
+| ------------ | ---- | --------------------------------------------------------------------------- |
+| scannedFiles |      | Array of scanned TypeScript files                                           |
+| registry     |      | Optional tag registry for prefix-aware detection (defaults to @libar-docs-) |
+
+**Returns:** Array of anti-pattern violations
+
+### detectMagicComments (function)
+
+```typescript
+/**
+ * Detect magic comments anti-pattern
+ *
+ * Finds generator hints like "# GENERATOR:", "# PARSER:" in feature files.
+ * These create tight coupling between features and generators.
+ *
+ * @param features - Array of scanned feature files
+ * @param threshold - Maximum magic comments before warning (default: 5)
+ * @returns Array of anti-pattern violations
+ */
+```
+
+```typescript
+function detectMagicComments(
+  features: readonly ScannedGherkinFile[],
+  threshold: number = DEFAULT_THRESHOLDS.magicCommentThreshold
+): AntiPatternViolation[];
+```
+
+| Parameter | Type | Description                                        |
+| --------- | ---- | -------------------------------------------------- |
+| features  |      | Array of scanned feature files                     |
+| threshold |      | Maximum magic comments before warning (default: 5) |
+
+**Returns:** Array of anti-pattern violations
+
+### detectScenarioBloat (function)
+
+```typescript
+/**
+ * Detect scenario bloat anti-pattern
+ *
+ * Finds feature files with too many scenarios, which indicates poor
+ * organization and slows test suites.
+ *
+ * @param features - Array of scanned feature files
+ * @param threshold - Maximum scenarios before warning (default: 20)
+ * @returns Array of anti-pattern violations
+ */
+```
+
+```typescript
+function detectScenarioBloat(
+  features: readonly ScannedGherkinFile[],
+  threshold: number = DEFAULT_THRESHOLDS.scenarioBloatThreshold
+): AntiPatternViolation[];
+```
+
+| Parameter | Type | Description                                    |
+| --------- | ---- | ---------------------------------------------- |
+| features  |      | Array of scanned feature files                 |
+| threshold |      | Maximum scenarios before warning (default: 20) |
+
+**Returns:** Array of anti-pattern violations
+
+### detectMegaFeature (function)
+
+```typescript
+/**
+ * Detect mega-feature anti-pattern
+ *
+ * Finds feature files that are too large, which makes them hard to
+ * maintain and review.
+ *
+ * @param features - Array of scanned feature files
+ * @param threshold - Maximum lines before warning (default: 500)
+ * @returns Array of anti-pattern violations
+ */
+```
+
+```typescript
+function detectMegaFeature(
+  features: readonly ScannedGherkinFile[],
+  threshold: number = DEFAULT_THRESHOLDS.megaFeatureLineThreshold
+): AntiPatternViolation[];
+```
+
+| Parameter | Type | Description                                 |
+| --------- | ---- | ------------------------------------------- |
+| features  |      | Array of scanned feature files              |
+| threshold |      | Maximum lines before warning (default: 500) |
+
+**Returns:** Array of anti-pattern violations
+
+### formatAntiPatternReport (function)
+
+```typescript
+/**
+ * Format anti-pattern violations for console output
+ *
+ * @param violations - Array of violations to format
+ * @returns Multi-line string for pretty printing
+ */
+```
+
+```typescript
+function formatAntiPatternReport(violations: AntiPatternViolation[]): string;
+```
+
+| Parameter  | Type | Description                   |
+| ---------- | ---- | ----------------------------- |
+| violations |      | Array of violations to format |
+
+**Returns:** Multi-line string for pretty printing
+
+### toValidationIssues (function)
+
+```typescript
+/**
+ * Convert anti-pattern violations to ValidationIssue format
+ *
+ * For integration with the existing validate-patterns CLI.
+ */
+```
+
+```typescript
+function toValidationIssues(violations: readonly AntiPatternViolation[]): Array<{
+  severity: 'error' | 'warning' | 'info';
+  message: string;
+  source: 'typescript' | 'gherkin' | 'cross-source';
+  pattern?: string;
+  file?: string;
+}>;
+```
+
+### filterRulesBySeverity (function)
+
+```typescript
+/**
+ * Get rules filtered by minimum severity
+ *
+ * @param rules - Rules to filter
+ * @param minSeverity - Minimum severity to include
+ * @returns Filtered rules
+ */
+```
+
+```typescript
+function filterRulesBySeverity(rules: readonly LintRule[], minSeverity: LintSeverity): LintRule[];
+```
+
+| Parameter   | Type | Description                 |
+| ----------- | ---- | --------------------------- |
+| rules       |      | Rules to filter             |
+| minSeverity |      | Minimum severity to include |
+
+**Returns:** Filtered rules
+
+### isValidTransition (function)
+
+````typescript
+/**
+ * Check if a transition between two states is valid
+ *
+ * @param from - Current status
+ * @param to - Target status
+ * @returns true if the transition is allowed
+ *
+ * @example
+ * ```typescript
+ * isValidTransition("roadmap", "active"); // → true
+ * isValidTransition("roadmap", "completed"); // → false (must go through active)
+ * isValidTransition("completed", "active"); // → false (terminal state)
+ * ```
+ */
+````
+
+```typescript
+function isValidTransition(from: ProcessStatusValue, to: ProcessStatusValue): boolean;
+```
+
+| Parameter | Type | Description    |
+| --------- | ---- | -------------- |
+| from      |      | Current status |
+| to        |      | Target status  |
+
+**Returns:** true if the transition is allowed
+
+### getValidTransitionsFrom (function)
+
+````typescript
+/**
+ * Get all valid transitions from a given state
+ *
+ * @param status - Current status
+ * @returns Array of valid target states (empty for terminal states)
+ *
+ * @example
+ * ```typescript
+ * getValidTransitionsFrom("roadmap"); // → ["active", "deferred", "roadmap"]
+ * getValidTransitionsFrom("completed"); // → []
+ * ```
+ */
+````
+
+```typescript
+function getValidTransitionsFrom(status: ProcessStatusValue): readonly ProcessStatusValue[];
+```
+
+| Parameter | Type | Description    |
+| --------- | ---- | -------------- |
+| status    |      | Current status |
+
+**Returns:** Array of valid target states (empty for terminal states)
+
+### getTransitionErrorMessage (function)
+
+````typescript
+/**
+ * Get a human-readable description of why a transition is invalid
+ *
+ * @param from - Current status
+ * @param to - Attempted target status
+ * @param options - Optional message options with registry for prefix
+ * @returns Error message describing the violation
+ *
+ * @example
+ * ```typescript
+ * getTransitionErrorMessage("roadmap", "completed");
+ * // → "Cannot transition from 'roadmap' to 'completed'. Must go through 'active' first."
+ *
+ * getTransitionErrorMessage("completed", "active");
+ * // → "Cannot transition from 'completed' (terminal state). Use unlock-reason tag to modify."
+ * ```
+ */
+````
+
+```typescript
+function getTransitionErrorMessage(
+  from: ProcessStatusValue,
+  to: ProcessStatusValue,
+  options?: TransitionMessageOptions
+): string;
+```
+
+| Parameter | Type | Description                                       |
+| --------- | ---- | ------------------------------------------------- |
+| from      |      | Current status                                    |
+| to        |      | Attempted target status                           |
+| options   |      | Optional message options with registry for prefix |
+
+**Returns:** Error message describing the violation
+
+### getProtectionLevel (function)
+
+````typescript
+/**
+ * Get the protection level for a status
+ *
+ * @param status - Process status value
+ * @returns Protection level for the status
+ *
+ * @example
+ * ```typescript
+ * getProtectionLevel("active"); // → "scope"
+ * getProtectionLevel("completed"); // → "hard"
+ * ```
+ */
+````
+
+```typescript
+function getProtectionLevel(status: ProcessStatusValue): ProtectionLevel;
+```
+
+| Parameter | Type | Description          |
+| --------- | ---- | -------------------- |
+| status    |      | Process status value |
+
+**Returns:** Protection level for the status
+
+### isTerminalState (function)
+
+````typescript
+/**
+ * Check if a status is a terminal state (cannot transition out)
+ *
+ * Terminal states require explicit unlock to modify.
+ *
+ * @param status - Process status value
+ * @returns true if the status is terminal
+ *
+ * @example
+ * ```typescript
+ * isTerminalState("completed"); // → true
+ * isTerminalState("active"); // → false
+ * ```
+ */
+````
+
+```typescript
+function isTerminalState(status: ProcessStatusValue): boolean;
+```
+
+| Parameter | Type | Description          |
+| --------- | ---- | -------------------- |
+| status    |      | Process status value |
+
+**Returns:** true if the status is terminal
+
+### isFullyEditable (function)
+
+```typescript
+/**
+ * Check if a status is fully editable (no protection)
+ *
+ * @param status - Process status value
+ * @returns true if the status has no protection
+ */
+```
+
+```typescript
+function isFullyEditable(status: ProcessStatusValue): boolean;
+```
+
+| Parameter | Type | Description          |
+| --------- | ---- | -------------------- |
+| status    |      | Process status value |
+
+**Returns:** true if the status has no protection
+
+### isScopeLocked (function)
+
+```typescript
+/**
+ * Check if a status is scope-locked
+ *
+ * @param status - Process status value
+ * @returns true if the status prevents scope changes
+ */
+```
+
+```typescript
+function isScopeLocked(status: ProcessStatusValue): boolean;
+```
+
+| Parameter | Type | Description          |
+| --------- | ---- | -------------------- |
+| status    |      | Process status value |
+
+**Returns:** true if the status prevents scope changes
+
+### validateChanges (function)
+
+````typescript
+/**
+ * Validate changes against process rules.
+ *
+ * Pure function following the Decider pattern:
+ * - Takes all inputs explicitly (no hidden state)
+ * - Returns result without side effects
+ * - Emits events for observability
+ *
+ * @param input - Complete input including state, changes, and options
+ * @returns DeciderOutput with validation result and events
+ *
+ * @example
+ * ```typescript
+ * const output = validateChanges({
+ *   state: processState,
+ *   changes: changeDetection,
+ *   options: { strict: false, ignoreSession: false },
+ * });
+ *
+ * if (!output.result.valid) {
+ *   console.log('Violations:', output.result.violations);
+ * }
+ * ```
+ */
+````
+
+```typescript
+function validateChanges(input: DeciderInput): DeciderOutput;
+```
+
+| Parameter | Type | Description                                          |
+| --------- | ---- | ---------------------------------------------------- |
+| input     |      | Complete input including state, changes, and options |
+
+**Returns:** DeciderOutput with validation result and events
+
+### defaultRules (const)
+
+```typescript
+/**
+ * All default lint rules
+ *
+ * Order matters for output - errors first, then warnings, then info.
+ */
+```
+
+```typescript
+const defaultRules: readonly LintRule[];
+```
+
+### severityOrder (const)
+
+```typescript
+/**
+ * Severity ordering for sorting and filtering
+ * Exported for use by lint engine to avoid duplication
+ */
+```
+
+```typescript
+const severityOrder: Record<LintSeverity, number>;
+```
+
+### missingPatternName (const)
+
+```typescript
+/**
+ * Rule: missing-pattern-name
+ *
+ * Patterns must have an explicit name via the pattern tag.
+ * Without a name, the pattern can't be referenced in relationships
+ * or indexed properly.
+ */
+```
+
+```typescript
+const missingPatternName: LintRule;
+```
+
+### missingStatus (const)
+
+```typescript
+/**
+ * Rule: missing-status
+ *
+ * Patterns should have an explicit status (completed, active, roadmap).
+ * This helps readers understand if the pattern is ready for use.
+ */
+```
+
+```typescript
+const missingStatus: LintRule;
+```
+
+---
+
+## Behavior Specifications
+
+### StatusTransitionDetectionTesting
+
+[View StatusTransitionDetectionTesting source](tests/features/validation/status-transition-detection.feature)
+
+Tests for the detectStatusTransitions function that parses git diff output.
+Verifies that status tags inside docstrings are ignored and only file-level
+tags are used for FSM transition validation.
+
+<details>
+<summary>Status transitions are detected from file-level tags (3 scenarios)</summary>
+
+#### Status transitions are detected from file-level tags
+
+**Verified by:**
+
+- New file with status tag is detected as transition from roadmap
+- Modified file with status change is detected
+- No transition when status unchanged
+
+</details>
+
+<details>
+<summary>Status tags inside docstrings are ignored (3 scenarios)</summary>
+
+#### Status tags inside docstrings are ignored
+
+**Verified by:**
+
+- Status tag inside docstring is not used for transition
+- Multiple docstring status tags are all ignored
+- Only docstring status tags results in no transition
+
+</details>
+
+<details>
+<summary>First valid status tag outside docstrings is used (1 scenarios)</summary>
+
+#### First valid status tag outside docstrings is used
+
+**Verified by:**
+
+- First file-level tag wins over subsequent tags
+
+</details>
+
+<details>
+<summary>Line numbers are tracked from hunk headers (1 scenarios)</summary>
+
+#### Line numbers are tracked from hunk headers
+
+**Verified by:**
+
+- Transition location includes correct line number
+
+</details>
+
+<details>
+<summary>Generated documentation directories are excluded (2 scenarios)</summary>
+
+#### Generated documentation directories are excluded
+
+**Verified by:**
+
+- Status in docs-generated directory is ignored
+- Status in docs-living directory is ignored
+
+</details>
+
+### ProcessGuardTesting
+
+[View ProcessGuardTesting source](tests/features/validation/process-guard.feature)
+
+Pure validation functions for enforcing delivery process rules per PDR-005.
+All validation follows the Decider pattern: (state, changes, options) => result.
+
+**Problem:**
+
+- Completed specs modified without explicit unlock reason
+- Invalid status transitions bypass FSM rules
+- Active specs expand scope unexpectedly with new deliverables
+- Changes occur outside session boundaries
+
+**Solution:**
+
+- checkProtectionLevel() enforces unlock-reason for completed (hard) files
+- checkStatusTransitions() validates transitions against FSM matrix
+- checkScopeCreep() prevents deliverable addition to active (scope) specs
+- checkSessionScope() warns about files outside session scope
+- checkSessionExcluded() errors on explicitly excluded files
+
+<details>
+<summary>Completed files require unlock-reason to modify (4 scenarios)</summary>
+
+#### Completed files require unlock-reason to modify
+
+**Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+
+**Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
+
+**Verified by:**
+
+- Completed file with unlock-reason passes validation
+- Completed file without unlock-reason fails validation
+- Protection levels and unlock requirement
+- File transitioning to completed does not require unlock-reason
+
+</details>
+
+<details>
+<summary>Status transitions must follow PDR-005 FSM (2 scenarios)</summary>
+
+#### Status transitions must follow PDR-005 FSM
+
+**Invariant:** Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred, active->roadmap.
+
+**Rationale:** The FSM prevents skipping required stages (e.g., roadmap->completed bypasses implementation).
+
+**Verified by:**
+
+- Valid transitions pass validation
+- Invalid transitions fail validation
+
+</details>
+
+<details>
+<summary>Active specs cannot add new deliverables (6 scenarios)</summary>
+
+#### Active specs cannot add new deliverables
+
+**Invariant:** A spec in active status cannot have deliverables added that were not present when it entered active.
+
+**Rationale:** Scope-locking active work prevents mid-sprint scope creep that derails delivery commitments.
+
+**Verified by:**
+
+- Active spec with no deliverable changes passes
+- Active spec adding deliverable fails validation
+- Roadmap spec can add deliverables freely
+- Removing deliverable produces warning
+- Deliverable status change does not trigger scope-creep
+- Multiple deliverable status changes pass validation
+
+</details>
+
+<details>
+<summary>Files outside active session scope trigger warnings (4 scenarios)</summary>
+
+#### Files outside active session scope trigger warnings
+
+**Invariant:** Files modified outside the active session's declared scope produce a session-scope warning.
+
+**Rationale:** Session scoping keeps focus on planned work and makes accidental cross-cutting changes visible.
+
+**Verified by:**
+
+- File in session scope passes validation
+- File outside session scope triggers warning
+- No active session means all files in scope
+- ignoreSession flag suppresses session warnings
+
+</details>
+
+<details>
+<summary>Explicitly excluded files trigger errors (3 scenarios)</summary>
+
+#### Explicitly excluded files trigger errors
+
+**Invariant:** Files explicitly excluded from a session cannot be modified, producing a session-excluded error.
+
+**Rationale:** Exclusion is stronger than scope — it marks files that must NOT be touched during this session.
+
+**Verified by:**
+
+- Excluded file triggers error
+- Non-excluded file passes validation
+- ignoreSession flag suppresses excluded errors
+
+</details>
+
+<details>
+<summary>Multiple rules validate independently (3 scenarios)</summary>
+
+#### Multiple rules validate independently
+
+**Invariant:** Each validation rule evaluates independently — a single file can produce violations from multiple rules.
+
+**Rationale:** Independent evaluation ensures no rule masks another, giving complete diagnostic output.
+
+**Verified by:**
+
+- Multiple violations from different rules
+- Strict mode promotes warnings to errors
+- Clean change produces empty violations
+
+</details>
+
+### FSMValidatorTesting
+
+[View FSMValidatorTesting source](tests/features/validation/fsm-validator.feature)
+
+Pure validation functions for the 4-state FSM defined in PDR-005.
+All validation follows the Decider pattern: no I/O, no side effects.
+
+**Problem:**
+
+- Status values must conform to PDR-005 FSM states
+- Status transitions must follow valid paths in the state machine
+- Completed patterns should have proper metadata (date, effort)
+
+**Solution:**
+
+- validateStatus() checks status values against allowed enum
+- validateTransition() validates transitions against FSM matrix
+- validateCompletionMetadata() warns about missing completion info
+
+<details>
+<summary>Status values must be valid PDR-005 FSM states (3 scenarios)</summary>
+
+#### Status values must be valid PDR-005 FSM states
+
+**Verified by:**
+
+- Valid status values are accepted
+- Invalid status values are rejected
+- Terminal state returns warning
+
+</details>
+
+<details>
+<summary>Status transitions must follow FSM rules (5 scenarios)</summary>
+
+#### Status transitions must follow FSM rules
+
+**Verified by:**
+
+- Valid transitions are accepted
+- Invalid transitions are rejected with alternatives
+- Terminal state has no valid transitions
+- Invalid source status in transition
+- Invalid target status in transition
+
+</details>
+
+<details>
+<summary>Completed patterns should have proper metadata (4 scenarios)</summary>
+
+#### Completed patterns should have proper metadata
+
+**Verified by:**
+
+- Completed pattern with full metadata has no warnings
+- Completed pattern without date shows warning
+- Completed pattern with planned but no actual effort shows warning
+- Non-completed pattern skips metadata validation
+
+</details>
+
+<details>
+<summary>Protection levels match FSM state definitions (4 scenarios)</summary>
+
+#### Protection levels match FSM state definitions
+
+**Verified by:**
+
+- Roadmap status has no protection
+- Active status has scope protection
+- Completed status has hard protection
+- Deferred status has no protection
+
+</details>
+
+<details>
+<summary>Combined validation provides complete results (1 scenarios)</summary>
+
+#### Combined validation provides complete results
+
+**Verified by:**
+
+- Valid completed pattern returns combined results
+
+</details>
+
+### DoDValidatorTesting
+
+[View DoDValidatorTesting source](tests/features/validation/dod-validator.feature)
+
+Validates that completed phases meet Definition of Done criteria:
+
+1. All deliverables must have "complete" status
+2. At least one @acceptance-criteria scenario must exist
+
+**Problem:**
+
+- Phases marked "completed" without all deliverables done
+- Missing acceptance criteria means no BDD tests
+- Manual review burden without automated validation
+
+**Solution:**
+
+- isDeliverableComplete() detects completion via status patterns
+- hasAcceptanceCriteria() checks for AC scenarios
+- validateDoDForPhase() validates single phase
+- validateDoD() validates across multiple phases
+- formatDoDSummary() renders console-friendly output
+
+<details>
+<summary>Deliverable completion uses canonical status taxonomy (2 scenarios)</summary>
+
+#### Deliverable completion uses canonical status taxonomy
+
+**Verified by:**
+
+- Complete status is detected as complete
+- Non-complete canonical statuses are correctly identified
+
+</details>
+
+<details>
+<summary>Acceptance criteria must be tagged with @acceptance-criteria (3 scenarios)</summary>
+
+#### Acceptance criteria must be tagged with @acceptance-criteria
+
+**Verified by:**
+
+- Feature with @acceptance-criteria scenario passes
+- Feature without @acceptance-criteria fails
+- Tag matching is case-insensitive
+
+</details>
+
+<details>
+<summary>Acceptance criteria scenarios can be extracted by name (2 scenarios)</summary>
+
+#### Acceptance criteria scenarios can be extracted by name
+
+**Verified by:**
+
+- Extract multiple AC scenario names
+- No AC scenarios returns empty list
+
+</details>
+
+<details>
+<summary>DoD requires all deliverables complete and AC present (4 scenarios)</summary>
+
+#### DoD requires all deliverables complete and AC present
+
+**Verified by:**
+
+- Phase with all deliverables complete and AC passes
+- Phase with incomplete deliverables fails
+- Phase without acceptance criteria fails
+- Phase without deliverables fails
+
+</details>
+
+<details>
+<summary>DoD can be validated across multiple completed phases (4 scenarios)</summary>
+
+#### DoD can be validated across multiple completed phases
+
+**Verified by:**
+
+- All completed phases passing DoD
+- Mixed pass/fail results
+- Only completed phases are validated by default
+- Filter to specific phases
+
+</details>
+
+<details>
+<summary>Summary can be formatted for console output (3 scenarios)</summary>
+
+#### Summary can be formatted for console output
+
+**Verified by:**
+
+- Empty summary shows no completed phases message
+- Summary with passed phases shows details
+- Summary with failed phases shows details
+
+</details>
+
+### DetectChangesTesting
+
+[View DetectChangesTesting source](tests/features/validation/detect-changes.feature)
+
+Tests for the detectDeliverableChanges function that parses git diff output.
+Verifies that status changes are correctly identified as modifications,
+not as additions or removals.
+
+<details>
+<summary>Status changes are detected as modifications not additions (2 scenarios)</summary>
+
+#### Status changes are detected as modifications not additions
+
+**Verified by:**
+
+- Single deliverable status change is detected as modification
+- Multiple deliverable status changes are all modifications
+
+</details>
+
+<details>
+<summary>New deliverables are detected as additions (1 scenarios)</summary>
+
+#### New deliverables are detected as additions
+
+**Verified by:**
+
+- New deliverable is detected as addition
+
+</details>
+
+<details>
+<summary>Removed deliverables are detected as removals (1 scenarios)</summary>
+
+#### Removed deliverables are detected as removals
+
+**Verified by:**
+
+- Removed deliverable is detected as removal
+
+</details>
+
+<details>
+<summary>Mixed changes are correctly categorized (1 scenarios)</summary>
+
+#### Mixed changes are correctly categorized
+
+**Verified by:**
+
+- Mixed additions, removals, and modifications are handled correctly
+
+</details>
+
+<details>
+<summary>Non-deliverable tables are ignored (1 scenarios)</summary>
+
+#### Non-deliverable tables are ignored
+
+**Verified by:**
+
+- Changes in Examples tables are not detected as deliverable changes
+
+</details>
+
+### ConfigSchemaValidation
+
+[View ConfigSchemaValidation source](tests/features/validation/config-schemas.feature)
+
+Configuration schemas validate scanner and generator inputs with security
+constraints to prevent path traversal attacks and ensure safe file operations.
+
+**Security focus:**
+
+- Parent directory traversal (..) is blocked in glob patterns
+- Output directories must be within project bounds
+- Registry files must be .json format
+- Symlink bypass attempts are prevented
+
+### AntiPatternDetectorTesting
+
+[View AntiPatternDetectorTesting source](tests/features/validation/anti-patterns.feature)
+
+Detects violations of the dual-source documentation architecture and
+process hygiene issues that lead to documentation drift.
+
+**Problem:**
+
+- Dependencies in features (should be code-only) cause drift
+- Process metadata in code (should be features-only) violates separation
+- Generator hints in features create tight coupling
+- Large feature files are hard to maintain
+
+**Solution:**
+
+- detectProcessInCode() finds feature-only tags in code
+- detectMagicComments() finds generator hints in features
+- detectScenarioBloat() warns about too many scenarios
+- detectMegaFeature() warns about large feature files
+
+<details>
+<summary>Process metadata should not appear in TypeScript code (2 scenarios)</summary>
+
+#### Process metadata should not appear in TypeScript code
+
+**Verified by:**
+
+- Code without process tags passes
+- Feature-only process tags in code are flagged
+
+</details>
+
+<details>
+<summary>Generator hints should not appear in feature files (3 scenarios)</summary>
+
+#### Generator hints should not appear in feature files
+
+**Verified by:**
+
+- Feature without magic comments passes
+- Features with excessive magic comments are flagged
+- Magic comments within threshold pass
+
+</details>
+
+<details>
+<summary>Feature files should not have excessive scenarios (2 scenarios)</summary>
+
+#### Feature files should not have excessive scenarios
+
+**Verified by:**
+
+- Feature with few scenarios passes
+- Feature exceeding scenario threshold is flagged
+
+</details>
+
+<details>
+<summary>Feature files should not exceed size thresholds (2 scenarios)</summary>
+
+#### Feature files should not exceed size thresholds
+
+**Verified by:**
+
+- Normal-sized feature passes
+- Oversized feature is flagged
+
+</details>
+
+<details>
+<summary>All anti-patterns can be detected in one pass (1 scenarios)</summary>
+
+#### All anti-patterns can be detected in one pass
+
+**Verified by:**
+
+- Combined detection finds process-in-code issues
+
+</details>
+
+<details>
+<summary>Violations can be formatted for console output (2 scenarios)</summary>
+
+#### Violations can be formatted for console output
+
+**Verified by:**
+
+- Empty violations produce clean report
+- Violations are grouped by severity
+
+</details>
+
+### LintRulesTesting
+
+[View LintRulesTesting source](tests/features/lint/lint-rules.feature)
+
+The lint system validates @libar-docs-\* documentation annotations for quality.
+
+Rules check parsed directives for completeness and quality, enabling
+CI enforcement of documentation standards.
+
+Each rule has a severity level:
+
+- error: Must fix before merge
+- warning: Should fix for quality
+- info: Suggestions for improvement
+
+### LintEngineTesting
+
+[View LintEngineTesting source](tests/features/lint/lint-engine.feature)
+
+The lint engine orchestrates rule execution, aggregates violations,
+and formats output for human and machine consumption.
+
+The engine provides:
+
+- Single directive linting
+- Multi-file batch linting
+- Failure detection (with strict mode)
+- Violation sorting
+- Pretty and JSON output formats
+
+### LinterValidationTesting
+
+[View LinterValidationTesting source](tests/features/behavior/pattern-relationships/linter-validation.feature)
+
+Tests for lint rules that validate relationship integrity, detect conflicts,
+and ensure bidirectional traceability consistency.
+
+<details>
+<summary>Pattern cannot implement itself (circular reference) (2 scenarios)</summary>
+
+#### Pattern cannot implement itself (circular reference)
+
+A file cannot define a pattern that implements itself. This creates a
+circular reference. Different patterns are allowed (sub-pattern hierarchy).
+
+**Verified by:**
+
+- Pattern tag with implements tag causes error
+- Implements without pattern tag is valid
+
+</details>
+
+<details>
+<summary>Relationship targets should exist (strict mode) (3 scenarios)</summary>
+
+#### Relationship targets should exist (strict mode)
+
+In strict mode, all relationship targets are validated against known patterns.
+
+**Verified by:**
+
+- Uses referencing non-existent pattern warns
+- Implements referencing non-existent pattern warns
+- Valid relationship target passes
+
+</details>
+
+<details>
+<summary>Bidirectional traceability links should be consistent (2 scenarios)</summary>
+
+#### Bidirectional traceability links should be consistent
+
+**Verified by:**
+
+- Missing back-link detected
+- Orphan executable spec detected
+
+</details>
+
+<details>
+<summary>Parent references must be valid (2 scenarios)</summary>
+
+#### Parent references must be valid
+
+**Verified by:**
+
+- Invalid parent reference detected
+- Valid parent reference passes
+
+</details>
+
+---

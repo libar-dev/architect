@@ -163,6 +163,8 @@ const ReferenceDocConfigSchema = z
       .optional(),
     // DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing
     includeTags: z.array(z.string().min(1)).readonly().optional(),
+    // Product area filter (ADR-001): pre-filters all content sources by product area
+    productArea: z.string().min(1).optional(),
   })
   .strict();
 
@@ -203,6 +205,9 @@ export const DeliveryProcessProjectConfigSchema = z
     // Generators
     generators: z.array(z.string().min(1)).readonly().optional(),
     generatorOverrides: z.record(z.string(), GeneratorSourceOverrideSchema).optional(),
+
+    // Codec Options
+    codecOptions: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
 
     // Advanced
     contextInferenceRules: z.array(ContextInferenceRuleSchema).readonly().optional(),

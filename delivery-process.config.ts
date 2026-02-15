@@ -10,6 +10,7 @@
  * - @libar-docs-infra: Infrastructure and configuration
  */
 import { defineConfig } from './src/config/define-config.js';
+import { createProductAreaConfigs } from './src/generators/built-in/reference-generators.js';
 
 export default defineConfig({
   preset: 'libar-generic',
@@ -27,8 +28,10 @@ export default defineConfig({
     directory: 'docs-generated',
     overwrite: true,
   },
-  // TODO: spread LIBAR_REFERENCE_CONFIGS to restore built-in reference docs after experiments
   referenceDocConfigs: [
+    // Product area overview docs (ADR-001 canonical values)
+    // Output redirected to docs-live/ via product-area-docs generatorOverride
+    ...createProductAreaConfigs(),
     {
       title: 'Reference Generation Sample',
       conventionTags: ['taxonomy-rules'],
@@ -76,6 +79,9 @@ export default defineConfig({
     },
   ],
   generatorOverrides: {
+    'business-rules': {
+      replaceFeatures: ['tests/features/**/*.feature'],
+    },
     changelog: {
       additionalFeatures: ['delivery-process/decisions/*.feature'],
     },
@@ -84,6 +90,10 @@ export default defineConfig({
     },
     'reference-docs': {
       additionalFeatures: ['delivery-process/decisions/*.feature'],
+    },
+    'product-area-docs': {
+      outputDirectory: 'docs-live',
+      replaceFeatures: ['tests/features/**/*.feature'],
     },
     adrs: {
       outputDirectory: 'docs-live',

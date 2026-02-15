@@ -10,153 +10,54 @@
  * TWO generators: detailed (docs/) and summary (_claude-md/).
  */
 import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
-import { createReferenceCodec, } from '../../renderable/codecs/reference.js';
+import { createReferenceCodec, PRODUCT_AREA_META, } from '../../renderable/codecs/reference.js';
+import { toKebabCase } from '../../utils/string-utils.js';
 // ============================================================================
 // Reference Document Configurations
 // ============================================================================
+// ============================================================================
+// Product Area Configs (ADR-001)
+// ============================================================================
 /**
- * Built-in reference document configurations for the delivery-process package.
- *
- * Each entry defines one reference document's convention sources and shape globs.
- * Import this in your `delivery-process.config.ts` to use these configs,
- * or define your own `ReferenceDocConfig[]` for downstream repos.
+ * Canonical product area values from ADR-001.
+ * Each generates a composite overview document scoped to that area.
  */
-export const LIBAR_REFERENCE_CONFIGS = [
-    {
-        title: 'Process Guard Reference',
-        conventionTags: ['fsm-rules'],
-        shapeSources: ['src/lint/*.ts', 'src/validation/*.ts'],
-        behaviorCategories: ['process-guard'],
-        diagramScope: { archContext: ['lint', 'validation'] },
-        // Note: Process Guard and Validation Reference share claudeMdSection 'validation'
-        // — this is intentional as they use different filenames within the same directory.
-        claudeMdSection: 'validation',
-        docsFilename: 'PROCESS-GUARD-REFERENCE.md',
-        claudeMdFilename: 'process-guard.md',
-    },
-    {
-        title: 'Session Guides Reference',
-        conventionTags: ['session-workflow', 'fsm-rules'],
-        shapeSources: [],
-        behaviorCategories: ['session-guides'],
-        claudeMdSection: 'sessions',
-        docsFilename: 'SESSION-GUIDES-REFERENCE.md',
-        claudeMdFilename: 'session-guides.md',
-    },
-    {
-        title: 'Architecture Reference',
-        conventionTags: ['pipeline-architecture', 'output-format'],
-        shapeSources: ['src/generators/types.ts', 'src/generators/pipeline/*.ts'],
-        behaviorCategories: ['architecture'],
-        diagramScope: { archContext: ['generator', 'renderer'] },
-        claudeMdSection: 'architecture',
-        docsFilename: 'ARCHITECTURE-REFERENCE.md',
-        claudeMdFilename: 'architecture.md',
-    },
-    {
-        title: 'Configuration Reference',
-        conventionTags: ['config-presets', 'cli-patterns'],
-        shapeSources: ['src/config/*.ts'],
-        behaviorCategories: ['configuration'],
-        diagramScope: { archContext: ['config'] },
-        claudeMdSection: 'config',
-        docsFilename: 'CONFIGURATION-REFERENCE.md',
-        claudeMdFilename: 'configuration.md',
-    },
-    {
-        title: 'Instructions Reference',
-        conventionTags: ['annotation-system', 'pattern-naming', 'cli-patterns'],
-        shapeSources: ['src/taxonomy/*.ts', 'src/cli/*.ts'],
-        behaviorCategories: ['instructions'],
-        claudeMdSection: 'reference',
-        docsFilename: 'INSTRUCTIONS-REFERENCE.md',
-        claudeMdFilename: 'instructions.md',
-    },
-    {
-        title: 'Methodology Reference',
-        conventionTags: ['session-workflow', 'annotation-system'],
-        shapeSources: [],
-        behaviorCategories: ['methodology'],
-        claudeMdSection: 'methodology',
-        docsFilename: 'METHODOLOGY-REFERENCE.md',
-        claudeMdFilename: 'methodology.md',
-    },
-    {
-        title: 'Gherkin Patterns Reference',
-        conventionTags: ['testing-policy'],
-        shapeSources: [],
-        behaviorCategories: ['gherkin-patterns'],
-        claudeMdSection: 'gherkin',
-        docsFilename: 'GHERKIN-PATTERNS-REFERENCE.md',
-        claudeMdFilename: 'gherkin-patterns.md',
-    },
-    {
-        title: 'Taxonomy Reference',
-        conventionTags: ['annotation-system'],
-        shapeSources: ['src/taxonomy/*.ts'],
-        behaviorCategories: ['taxonomy'],
-        claudeMdSection: 'taxonomy',
-        docsFilename: 'TAXONOMY-REFERENCE.md',
-        claudeMdFilename: 'taxonomy.md',
-    },
-    {
-        title: 'Validation Reference',
-        conventionTags: ['fsm-rules', 'testing-policy'],
-        shapeSources: ['src/validation/*.ts'],
-        behaviorCategories: ['validation'],
-        claudeMdSection: 'validation',
-        docsFilename: 'VALIDATION-REFERENCE.md',
-        claudeMdFilename: 'validation.md',
-    },
-    {
-        title: 'Publishing Reference',
-        conventionTags: ['publishing'],
-        shapeSources: [],
-        behaviorCategories: ['publishing'],
-        claudeMdSection: 'publishing',
-        docsFilename: 'PUBLISHING-REFERENCE.md',
-        claudeMdFilename: 'publishing.md',
-    },
-    {
-        title: 'Index Reference',
-        conventionTags: ['doc-generation'],
-        shapeSources: [],
-        behaviorCategories: ['index'],
-        claudeMdSection: 'index',
-        docsFilename: 'INDEX-REFERENCE.md',
-        claudeMdFilename: 'index.md',
-    },
-    {
-        title: 'Pipeline Overview',
-        conventionTags: ['pipeline-architecture'],
-        shapeSources: [
-            'src/renderable/schema.ts',
-            'src/generators/types.ts',
-            'src/validation-schemas/master-dataset.ts',
-            'src/config/types.ts',
-        ],
-        behaviorCategories: [],
-        diagramScopes: [
-            { include: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
-            { include: ['pipeline-stages'], title: 'Pipeline Data Flow', direction: 'LR' },
-        ],
-        claudeMdSection: 'architecture',
-        docsFilename: 'PIPELINE-OVERVIEW.md',
-        claudeMdFilename: 'pipeline-overview.md',
-    },
-    {
-        title: 'Codec Architecture',
-        conventionTags: [],
-        shapeSources: ['src/renderable/schema.ts', 'src/validation-schemas/master-dataset.ts'],
-        behaviorCategories: [],
-        diagramScopes: [
-            { include: ['codec-transformation'], title: 'Codec Transformation', direction: 'TB' },
-        ],
-        claudeMdSection: 'architecture',
-        docsFilename: 'CODEC-ARCHITECTURE.md',
-        claudeMdFilename: 'codec-architecture.md',
-    },
+export const PRODUCT_AREA_VALUES = [
+    'Annotation',
+    'Configuration',
+    'Generation',
+    'Validation',
+    'DataAPI',
+    'CoreTypes',
+    'Process',
 ];
+/**
+ * Creates reference document configs for all canonical product areas.
+ *
+ * Each config uses `productArea` as the primary filter — the codec
+ * auto-derives all content sources from the filtered pattern set.
+ * Explicit `conventionTags`, `shapeSources`, and `behaviorCategories`
+ * are left empty because the product-area decode path ignores them.
+ *
+ * @param options - Optional customization for output filenames
+ */
+export function createProductAreaConfigs(options) {
+    const suffix = options?.docsFilenameSuffix ?? '.md';
+    return PRODUCT_AREA_VALUES.map((area) => {
+        const kebab = toKebabCase(area);
+        return {
+            title: `${area} Overview`,
+            productArea: area,
+            conventionTags: [],
+            shapeSources: [],
+            shapeSelectors: [],
+            behaviorCategories: [],
+            claudeMdSection: kebab,
+            docsFilename: `${kebab.toUpperCase()}${suffix}`,
+            claudeMdFilename: `${kebab}-overview.md`,
+        };
+    });
+}
 // ============================================================================
 // Reference Document Generator
 // ============================================================================
@@ -219,6 +120,9 @@ function toGeneratorName(title) {
 /**
  * Meta-generator that produces all reference documents (detailed + summary per config)
  * from a single `-g reference-docs` invocation.
+ *
+ * Only handles configs WITHOUT `productArea` set. Product-area configs
+ * are handled by `ProductAreaDocsGenerator` instead.
  */
 class ReferenceDocsGenerator {
     configs;
@@ -264,26 +168,167 @@ class ReferenceDocsGenerator {
     }
 }
 /**
+ * Meta-generator for product area overview documents.
+ *
+ * Handles configs WITH `productArea` set. Outputs detailed docs to
+ * `product-areas/{docsFilename}` and also generates a progressive
+ * disclosure index at `PRODUCT-AREAS.md`.
+ */
+class ProductAreaDocsGenerator {
+    configs;
+    name = 'product-area-docs';
+    description;
+    constructor(configs) {
+        this.configs = configs;
+        this.description = `Product area overview documents (${configs.length} areas)`;
+    }
+    generate(_patterns, context) {
+        if (!context.masterDataset) {
+            return Promise.resolve({
+                files: [],
+                errors: [
+                    {
+                        type: 'generator',
+                        message: `Generator "${this.name}" requires MasterDataset but none was provided.`,
+                    },
+                ],
+            });
+        }
+        const files = [];
+        for (const config of this.configs) {
+            // Detailed output -> product-areas/{docsFilename}
+            const detailedCodec = createReferenceCodec(config, {
+                detailLevel: 'detailed',
+                generateDetailFiles: false,
+            });
+            const detailedDoc = detailedCodec.decode(context.masterDataset);
+            files.push({
+                path: `product-areas/${config.docsFilename}`,
+                content: renderToMarkdown(detailedDoc),
+            });
+            // Summary output -> _claude-md/{section}/{filename}
+            const summaryCodec = createReferenceCodec(config, {
+                detailLevel: 'summary',
+                generateDetailFiles: false,
+            });
+            const summaryDoc = summaryCodec.decode(context.masterDataset);
+            files.push({
+                path: `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`,
+                content: renderToClaudeContext(summaryDoc),
+            });
+        }
+        // Progressive disclosure index
+        files.push({
+            path: 'PRODUCT-AREAS.md',
+            content: buildProductAreaIndex(this.configs),
+        });
+        return Promise.resolve({ files });
+    }
+}
+/**
+ * Builds a progressive disclosure index for product area documents.
+ *
+ * Includes per-area intros from PRODUCT_AREA_META and two cross-area
+ * Mermaid diagrams showing pipeline data flow and dependency layers.
+ */
+function buildProductAreaIndex(configs) {
+    const lines = [
+        '# Product Areas',
+        '',
+        '**Purpose:** Product area overview index',
+        '',
+        '---',
+        '',
+    ];
+    // Per-area sections with intro prose
+    for (const config of configs) {
+        const area = config.productArea;
+        if (area === undefined)
+            continue;
+        const meta = PRODUCT_AREA_META[area];
+        if (meta === undefined)
+            continue;
+        lines.push(`## [${area}](product-areas/${config.docsFilename})`);
+        lines.push('');
+        lines.push(`> **${meta.question}**`);
+        lines.push('');
+        lines.push(meta.intro);
+        lines.push('');
+    }
+    // Cross-area relationship diagrams
+    lines.push('---');
+    lines.push('');
+    lines.push('## Pipeline Data Flow');
+    lines.push('');
+    lines.push('Shows the 4-stage transformation pipeline and which product areas participate at each stage:');
+    lines.push('');
+    lines.push('```mermaid');
+    lines.push('graph LR');
+    lines.push('    CFG[Configuration] --> ANN');
+    lines.push('    subgraph ANN[Annotation]');
+    lines.push('        S[Scanner] -->|ScannedFile| E[Extractor]');
+    lines.push('    end');
+    lines.push('    E -->|ExtractedPattern| GEN');
+    lines.push('    subgraph GEN[Generation]');
+    lines.push('        P[Pipeline] -->|MasterDataset| C[Codecs]');
+    lines.push('    end');
+    lines.push('    C --> MD((Markdown))');
+    lines.push('    CT[CoreTypes] -.-> S & E & P');
+    lines.push('    VAL[Validation] -.-> P');
+    lines.push('    API[DataAPI] -.-> C');
+    lines.push('```');
+    lines.push('');
+    lines.push('## Product Area Dependency Layers');
+    lines.push('');
+    lines.push('Shows the layered architecture — arrows mean "depends on" (bottom-up):');
+    lines.push('');
+    lines.push('```mermaid');
+    lines.push('graph BT');
+    lines.push('    CT[CoreTypes] --> CFG[Configuration]');
+    lines.push('    CT --> ANN[Annotation]');
+    lines.push('    CT --> VAL[Validation]');
+    lines.push('    CT --> GEN[Generation]');
+    lines.push('    CFG --> ANN');
+    lines.push('    CFG --> GEN');
+    lines.push('    CFG --> VAL');
+    lines.push('    ANN --> GEN');
+    lines.push('    ANN --> VAL');
+    lines.push('    VAL -.->|FSM rules| GEN');
+    lines.push('    API[DataAPI] -.->|queries| GEN');
+    lines.push('    PRO[Process] -.->|sessions| API');
+    lines.push('```');
+    lines.push('');
+    return lines.join('\n');
+}
+/**
  * Registers reference generators from the provided configs in the GeneratorRegistry.
  *
- * Registers:
- * - "reference-docs" meta-generator (produces all files at once)
- * - Individual generators for selective invocation:
- *   "{name}-reference" -> detailed, "{name}-reference-claude" -> summary
+ * Partitions configs by `productArea` presence:
+ * - Configs WITH `productArea` -> "product-area-docs" meta-generator
+ * - Configs WITHOUT `productArea` -> "reference-docs" meta-generator
+ * - Individual generators registered for all configs
  *
  * @param registry - The generator registry to register into
  * @param configs - Reference document configurations (from project config)
  */
 export function registerReferenceGenerators(registry, configs) {
-    // Meta-generator: single -g reference-docs produces all files
-    registry.register(new ReferenceDocsGenerator(configs));
+    // Partition configs by productArea presence
+    const productAreaConfigs = configs.filter((c) => c.productArea !== undefined);
+    const referenceConfigs = configs.filter((c) => c.productArea === undefined);
+    // Product area meta-generator
+    if (productAreaConfigs.length > 0) {
+        registry.register(new ProductAreaDocsGenerator(productAreaConfigs));
+    }
+    // Standard reference-docs meta-generator
+    if (referenceConfigs.length > 0) {
+        registry.register(new ReferenceDocsGenerator(referenceConfigs));
+    }
     // Individual generators: selective invocation per document
     for (const config of configs) {
         const kebabName = toGeneratorName(config.title);
-        registry.register(new ReferenceDocGenerator(`${kebabName}-reference`, `${config.title} (detailed)`, config, 'detailed', `docs/${config.docsFilename}`));
+        const docsPrefix = config.productArea !== undefined ? 'product-areas' : 'docs';
+        registry.register(new ReferenceDocGenerator(`${kebabName}-reference`, `${config.title} (detailed)`, config, 'detailed', `${docsPrefix}/${config.docsFilename}`));
         registry.register(new ReferenceDocGenerator(`${kebabName}-reference-claude`, `${config.title} (summary)`, config, 'summary', `_claude-md/${config.claudeMdSection}/${config.claudeMdFilename}`));
     }
 }
-/** @deprecated Use LIBAR_REFERENCE_CONFIGS instead */
-export const REFERENCE_CONFIGS = LIBAR_REFERENCE_CONFIGS;
 //# sourceMappingURL=reference-generators.js.map

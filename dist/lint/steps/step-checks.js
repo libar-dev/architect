@@ -74,9 +74,6 @@ export function checkPhraseUsage(content, filePath) {
  * Run all step-only checks on a single file.
  */
 export function runStepChecks(content, filePath) {
-    return [
-        ...checkRegexStepPatterns(content, filePath),
-        ...checkPhraseUsage(content, filePath),
-    ];
+    return [...checkRegexStepPatterns(content, filePath), ...checkPhraseUsage(content, filePath)];
 }
 //# sourceMappingURL=step-checks.js.map

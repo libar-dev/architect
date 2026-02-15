@@ -123,6 +123,8 @@ export interface TestPatternOptions {
   archContext?: string;
   /** Architecture layer (default: none) */
   archLayer?: string;
+  /** Product area for PRD grouping (default: none) */
+  productArea?: string;
   /** Cross-cutting include tags for content routing and diagram scoping (default: none) */
   include?: string[];
   /** Convention domains for reference doc generation (default: none) */
@@ -223,6 +225,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     archRole,
     archContext,
     archLayer,
+    productArea,
     include,
     // Convention and rules fields
     convention,
@@ -302,6 +305,7 @@ export function createTestPattern(options: TestPatternOptions = {}): ExtractedPa
     ...(archRole ? { archRole } : {}),
     ...(archContext ? { archContext } : {}),
     ...(archLayer ? { archLayer } : {}),
+    ...(productArea ? { productArea } : {}),
     ...(include && include.length > 0 ? { include } : {}),
     // Convention and rules fields
     ...(convention && convention.length > 0 ? { convention } : {}),

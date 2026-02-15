@@ -3,6 +3,7 @@
  * @libar-docs-core
  * @libar-docs-pattern BusinessRulesCodec
  * @libar-docs-status completed
+ * @libar-docs-unlock-reason:Progressive-disclosure-by-product-area
  *
  * ## Business Rules Document Codec
  *
@@ -75,6 +76,8 @@ export interface BusinessRulesCodecOptions extends BaseCodecOptions {
     includeVerifiedBy?: boolean;
     /** Maximum description length in characters for standard mode (default: 150, 0 = no limit) */
     maxDescriptionLength?: number;
+    /** Exclude patterns whose source.file starts with any of these prefixes (default: []) */
+    excludeSourcePaths?: string[];
 }
 /**
  * Default options for BusinessRulesCodec

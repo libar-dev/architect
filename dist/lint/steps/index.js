@@ -16,7 +16,7 @@ export { runStepLint } from './runner.js';
 // Feature checks (for targeted use)
 export { checkHashInDescription, checkDuplicateAndSteps, checkDollarInStepText, runFeatureChecks, } from './feature-checks.js';
 // Step checks (for targeted use)
-export { checkRegexStepPatterns, checkPhraseUsage, runStepChecks, } from './step-checks.js';
+export { checkRegexStepPatterns, checkPhraseUsage, runStepChecks } from './step-checks.js';
 // Cross-file checks (for targeted use)
 export { checkScenarioOutlineFunctionParams, checkMissingAndDestructuring, checkMissingRuleWrapper, runCrossChecks, } from './cross-checks.js';
 // Pair resolver (for targeted use)

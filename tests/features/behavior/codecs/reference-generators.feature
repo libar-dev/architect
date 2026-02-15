@@ -6,10 +6,10 @@
 @libar-docs-product-area:Generation
 Feature: Reference Document Generator Registration
 
-  Registers all 13 reference document generators. Each config produces
-  TWO individual generators (detailed + summary) plus one meta-generator
-  ("reference-docs") that produces all 26 files at once, yielding 27 total.
-  Generators implement DocumentGenerator directly, not via CodecBasedGenerator.
+  Registers reference document generators from project config. Configs with
+  `productArea` set are routed to a "product-area-docs" meta-generator;
+  configs without `productArea` go to "reference-docs". Each config also
+  produces TWO individual generators (detailed + summary).
 
   Background:
     Given a reference generator test context
@@ -17,37 +17,45 @@ Feature: Reference Document Generator Registration
   Rule: Registration produces the correct number of generators
 
     @happy-path
-    Scenario: All 27 generators are registered from 13 configs plus meta-generator
+    Scenario: Generators are registered from configs plus meta-generators
       When registering reference generators
-      Then 27 generators are registered
+      Then 18 generators are registered
+
+  Rule: Product area configs produce a separate meta-generator
+
+    @happy-path
+    Scenario: Product area meta-generator is registered
+      When registering reference generators
+      Then a generator named "product-area-docs" exists
+      And a generator named "reference-docs" exists
 
   Rule: Generator naming follows kebab-case convention
 
     @happy-path
     Scenario: Detailed generator has name ending in "-reference"
       When registering reference generators
-      Then a generator named "process-guard-reference" exists
-      And a generator named "session-guides-reference" exists
+      Then a generator named "annotation-overview-reference" exists
+      And a generator named "reference-generation-sample-reference" exists
 
     @happy-path
     Scenario: Summary generator has name ending in "-reference-claude"
       When registering reference generators
-      Then a generator named "process-guard-reference-claude" exists
-      And a generator named "architecture-reference-claude" exists
+      Then a generator named "annotation-overview-reference-claude" exists
+      And a generator named "reference-generation-sample-reference-claude" exists
 
   Rule: Generator execution produces markdown output
 
     @happy-path
-    Scenario: Generator with matching data produces non-empty output
-      Given a MasterDataset with a convention-tagged pattern for "testing-policy"
-      When running the "gherkin-patterns-reference" generator
+    Scenario: Product area generator with matching data produces non-empty output
+      Given a MasterDataset with a pattern in product area "Annotation"
+      When running the "annotation-overview-reference" generator
       Then the output has 1 file
-      And the output file path starts with "docs/"
+      And the output file path starts with "product-areas/"
       And the output file content is non-empty
 
     @happy-path
-    Scenario: Generator with no matching data produces minimal output
+    Scenario: Product area generator with no patterns still produces intro
       Given an empty MasterDataset
-      When running the "process-guard-reference" generator
+      When running the "annotation-overview-reference" generator
       Then the output has 1 file
-      And the output file content contains "No content found"
+      And the output file content contains "How do I annotate code?"

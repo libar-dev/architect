@@ -7,16 +7,16 @@
 
 ## Summary
 
-**Overall:** [███████████████░░░░░] 113/153 (74%)
+**Overall:** [███████████████░░░░░] 113/155 (73%)
 
-| Metric | Value |
-| --- | --- |
-| Total Features | 153 |
-| Completed | 113 |
-| Active | 13 |
-| Planned | 27 |
-| Product Areas | 7 |
-| User Roles | 1 |
+| Metric         | Value |
+| -------------- | ----- |
+| Total Features | 155   |
+| Completed      | 113   |
+| Active         | 14    |
+| Planned        | 28    |
+| Product Areas  | 7     |
+| User Roles     | 1     |
 
 ---
 
@@ -189,7 +189,7 @@
 
 ### Validation
 
-12/18 complete (67%)
+12/20 complete (60%)
 
 - [✅ Anti Pattern Detector Testing](requirements/phase-00-anti-pattern-detector-testing.md)
 - [✅ Config Schema Validation](requirements/phase-00-config-schema-validation.md)
@@ -203,11 +203,13 @@
 - [✅ Process Guard Linter - prevent accidental scope creep and locked file modifications](requirements/phase-99-process-guard-linter.md)
 - [✅ Process Guard Testing](requirements/phase-00-process-guard-testing.md)
 - [✅ Status Transition Detection Testing](requirements/phase-00-status-transition-detection-testing.md)
+- [🚧 Step Lint Vitest Cucumber - prevent hours lost debugging vitest cucumber traps](requirements/phase-50-step-lint-vitest-cucumber.md)
 - [📋 DoD Validation - enable machine checkable phase completion](requirements/phase-100-do-d-validation.md)
 - [📋 Phase Numbering Conventions - prevent phase number conflicts and ensure consistent ordering](requirements/phase-100-phase-numbering-conventions.md)
 - [📋 Progressive Governance - filter work by risk and priority](requirements/phase-100-progressive-governance.md)
 - [📋 Release Association Rules - enforce separation of specs from release metadata](requirements/phase-100-release-association-rules.md)
 - [📋 Status Aware Eslint Suppression](requirements/phase-99-status-aware-eslint-suppression.md)
+- [📋 Step Lint Extended Rules - catch remaining vitest cucumber traps statically](requirements/phase-51-step-lint-extended-rules.md)
 - [📋 Streaming Git Diff - enable process guard on large repositories](requirements/phase-99-streaming-git-diff.md)
 
 ---
@@ -217,9 +219,9 @@
 <details>
 <summary>Developer (1 features, 1 complete)</summary>
 
-| Feature | Product Area | Status |
-| --- | --- | --- |
-| ✅ TypeScript Taxonomy Implementation | Annotation | completed |
+| Feature                               | Product Area | Status    |
+| ------------------------------------- | ------------ | --------- |
+| ✅ TypeScript Taxonomy Implementation | Annotation   | completed |
 
 </details>
 
@@ -227,160 +229,162 @@
 
 ## All Features
 
-| Feature | Product Area | User Role | Status |
-| --- | --- | --- | --- |
-| ✅ Anti Pattern Detector Testing | Validation | - | completed |
-| ✅ Arch Generator Registration | Generation | - | completed |
-| ✅ Arch Index Dataset | Generation | - | completed |
-| ✅ Arch Tag Extraction | Generation | - | completed |
-| ✅ Ast Parser | Annotation | - | completed |
-| ✅ Business Rules Document Codec | Generation | - | completed |
-| ✅ Codec Based Generator Testing | Generation | - | completed |
-| ✅ Codec Driven Reference Generation | Generation | - | completed |
-| ✅ Component Diagram Generation | Generation | - | completed |
-| ✅ Composite Codec Testing | Generation | - | completed |
-| ✅ Config Loader Testing | Configuration | - | completed |
-| ✅ Config Resolution | Configuration | - | completed |
-| ✅ Config Schema Validation | Validation | - | completed |
-| ✅ Configuration API | Configuration | - | completed |
-| ✅ Content Deduplication | Generation | - | completed |
-| ✅ Context Inference | Annotation | - | completed |
-| ✅ Convention Extractor Testing | Generation | - | completed |
-| ✅ Cross Cutting Document Inclusion | Generation | - | completed |
-| ✅ Data API Architecture Queries | DataAPI | - | completed |
-| ✅ Data API Context Assembly | DataAPI | - | completed |
-| ✅ Data API Design Session Support | DataAPI | - | completed |
-| ✅ Data API Output Shaping | DataAPI | - | completed |
-| ✅ Data API Stub Integration | DataAPI | - | completed |
-| ✅ Decision Doc Codec Testing | Generation | - | completed |
-| ✅ Decision Doc Generator Testing | Generation | - | completed |
-| ✅ Declaration Level Shape Tagging | Annotation | - | completed |
-| ✅ Declaration Level Shape Tagging Testing | Annotation | - | completed |
-| ✅ Dedent Helper | Generation | - | completed |
-| ✅ Define Config Testing | Configuration | - | completed |
-| ✅ Description Header Normalization | Generation | - | completed |
-| ✅ Description Quality Foundation | Generation | - | completed |
-| ✅ Detect Changes Testing | Validation | - | completed |
-| ✅ Directive Detection | Annotation | - | completed |
-| ✅ Doc String Media Type | Annotation | - | completed |
-| ✅ Documentation Orchestrator | Generation | - | completed |
-| ✅ DoD Validator Testing | Validation | - | completed |
-| ✅ Dual Source Extractor Testing | Annotation | - | completed |
-| ✅ Error Factories | CoreTypes | - | completed |
-| ✅ Error Handling Unification | CoreTypes | - | completed |
-| ✅ Extends Tag Testing | Annotation | - | completed |
-| ✅ Extraction Pipeline Enhancements Testing | Annotation | - | completed |
-| ✅ Extract Summary | Generation | - | completed |
-| ✅ File Discovery | Annotation | - | completed |
-| ✅ FSM Validator Testing | Validation | - | completed |
-| ✅ Generate Docs Cli | DataAPI | - | completed |
-| ✅ Generate Tag Taxonomy Cli | DataAPI | - | completed |
-| ✅ Generator Registry Testing | Generation | - | completed |
-| ✅ Gherkin Ast Parser | Annotation | - | completed |
-| ✅ Gherkin Rules Support | Annotation | - | completed |
-| ✅ Handoff Generator Tests | DataAPI | - | completed |
-| ✅ Implementation Link Path Normalization | Generation | - | completed |
-| ✅ Implements Tag Processing | Annotation | - | completed |
-| ✅ Layered Diagram Generation | Generation | - | completed |
-| ✅ Layer Inference Testing | Annotation | - | completed |
-| ✅ Lint Engine Testing | Validation | - | completed |
-| ✅ Linter Validation Testing | Validation | - | completed |
-| ✅ Lint Patterns Cli | DataAPI | - | completed |
-| ✅ Lint Process Cli | DataAPI | - | completed |
-| ✅ Lint Rules Testing | Validation | - | completed |
-| ✅ Mermaid Relationship Rendering | Generation | - | completed |
-| ✅ Mvp Workflow Implementation | Process | - | completed |
-| ✅ Pattern Relationship Model | Annotation | - | completed |
-| ✅ Patterns Codec Testing | Generation | - | completed |
-| ✅ Pattern Tag Extraction | Annotation | - | completed |
-| ✅ Phase State Machine Validation | Validation | - | completed |
-| ✅ Planning Codec Testing | Generation | - | completed |
-| ✅ Poc Integration | Generation | - | completed |
-| ✅ Pr Changes Codec Testing | Generation | - | completed |
-| ✅ Pr Changes Generation | Generation | - | completed |
-| ✅ Pr Changes Options | Generation | - | completed |
-| ✅ Prd Implementation Section Testing | Generation | - | completed |
-| ✅ Preset System | Configuration | - | completed |
-| ✅ Process Api Cli | DataAPI | - | completed |
-| ✅ Process Guard Linter | Validation | - | completed |
-| ✅ Process Guard Testing | Validation | - | completed |
-| ✅ Process State API CLI | DataAPI | - | completed |
-| ✅ Process State API Testing | DataAPI | - | completed |
-| ✅ Project Config Loader | Configuration | - | completed |
-| ✅ Reference Codec Testing | Generation | - | completed |
-| ✅ Reference Generator Testing | Generation | - | completed |
-| ✅ Remaining Work Enhancement | Generation | - | completed |
-| ✅ Remaining Work Summary Accuracy | Generation | - | completed |
-| ✅ Reporting Codec Testing | Generation | - | completed |
-| ✅ Requirements Adr Codec Testing | Generation | - | completed |
-| ✅ Result Monad | CoreTypes | - | completed |
-| ✅ Robustness Integration | Generation | - | completed |
-| ✅ Rule Keyword Po C | Generation | - | completed |
-| ✅ Scanner Core | Annotation | - | completed |
-| ✅ Scoped Architectural View | Generation | - | completed |
-| ✅ Scope Validator Tests | DataAPI | - | completed |
-| ✅ Session Codec Testing | Generation | - | completed |
-| ✅ Session File Lifecycle | Process | - | completed |
-| ✅ Session Handoffs | Process | - | completed |
-| ✅ Shape Extraction | Annotation | - | completed |
-| ✅ Shape Extraction Testing | Annotation | - | completed |
-| ✅ Shape Matcher Testing | Generation | - | completed |
-| ✅ Shape Selector Testing | Generation | - | completed |
-| ✅ Source Mapper Testing | Generation | - | completed |
-| ✅ Source Mapping Validator Testing | Generation | - | completed |
-| ✅ Source Merging | Configuration | - | completed |
-| ✅ Status Transition Detection Testing | Validation | - | completed |
-| ✅ String Utils | CoreTypes | - | completed |
-| ✅ Table Extraction | Generation | - | completed |
-| ✅ Taxonomy Codec Testing | Generation | - | completed |
-| ✅ Timeline Codec Testing | Generation | - | completed |
-| ✅ Transform Dataset Testing | Generation | - | completed |
-| ✅ TypeScript Taxonomy Implementation | Annotation | Developer | completed |
-| ✅ Universal Doc Generator Robustness | Generation | - | completed |
-| ✅ Universal Markdown Renderer | Generation | - | completed |
-| ✅ Validate Patterns Cli | DataAPI | - | completed |
-| ✅ Validation Rules Codec Testing | Generation | - | completed |
-| ✅ Warning Collector Testing | Generation | - | completed |
-| ✅ Zod Codec Migration | Generation | - | completed |
-| 🚧 Arch Queries Test | DataAPI | - | active |
-| 🚧 Context Assembler Tests | DataAPI | - | active |
-| 🚧 Context Formatter Tests | DataAPI | - | active |
-| 🚧 Depends On Tag Testing | Annotation | - | active |
-| 🚧 Fuzzy Match Tests | DataAPI | - | active |
-| 🚧 Output Pipeline Tests | DataAPI | - | active |
-| 🚧 Pattern Helpers Tests | DataAPI | - | active |
-| 🚧 Pattern Summarize Tests | DataAPI | - | active |
-| 🚧 Process State API Relationship Queries | DataAPI | - | active |
-| 🚧 Reference Doc Showcase | Generation | - | active |
-| 🚧 Stub Resolver Tests | DataAPI | - | active |
-| 🚧 Stub Taxonomy Tag Tests | DataAPI | - | active |
-| 🚧 Uses Tag Testing | Annotation | - | active |
-| 📋 Architecture Delta | Generation | - | planned |
-| 📋 Architecture Diagram Generation | Generation | - | planned |
-| 📋 Business Rules Generator | Generation | - | planned |
-| 📋 Claude Module Generation | Generation | - | planned |
-| 📋 Cli Behavior Testing | Process | - | planned |
-| 📋 Codec Behavior Testing | Generation | - | planned |
-| 📋 Cross Source Validation | Annotation | - | planned |
-| 📋 Data API CLI Ergonomics | DataAPI | - | planned |
-| 📋 Data API Platform Integration | DataAPI | - | planned |
-| 📋 Data API Relationship Graph | DataAPI | - | planned |
-| 📋 DoD Validation | Validation | - | planned |
-| 📋 Effort Variance Tracking | Process | - | planned |
-| 📋 Generator Infrastructure Testing | Generation | - | planned |
-| 📋 Kebab Case Slugs | CoreTypes | - | planned |
-| 📋 Living Roadmap CLI | Process | - | planned |
-| 📋 Phase Numbering Conventions | Validation | - | planned |
-| 📋 Prd Implementation Section | Generation | - | planned |
-| 📋 Progressive Governance | Validation | - | planned |
-| 📋 Release Association Rules | Validation | - | planned |
-| 📋 Rich Content Helpers Testing | Generation | - | planned |
-| 📋 Session File Cleanup | Process | - | planned |
-| 📋 Status Aware Eslint Suppression | Validation | - | planned |
-| 📋 Step Definition Completion | Process | - | planned |
-| 📋 Streaming Git Diff | Validation | - | planned |
-| 📋 Test Content Blocks | Generation | - | planned |
-| 📋 Traceability Enhancements | Generation | - | planned |
-| 📋 Traceability Generator | Generation | - | planned |
+| Feature                                     | Product Area  | User Role | Status    |
+| ------------------------------------------- | ------------- | --------- | --------- |
+| ✅ Anti Pattern Detector Testing            | Validation    | -         | completed |
+| ✅ Arch Generator Registration              | Generation    | -         | completed |
+| ✅ Arch Index Dataset                       | Generation    | -         | completed |
+| ✅ Arch Tag Extraction                      | Generation    | -         | completed |
+| ✅ Ast Parser                               | Annotation    | -         | completed |
+| ✅ Business Rules Document Codec            | Generation    | -         | completed |
+| ✅ Codec Based Generator Testing            | Generation    | -         | completed |
+| ✅ Codec Driven Reference Generation        | Generation    | -         | completed |
+| ✅ Component Diagram Generation             | Generation    | -         | completed |
+| ✅ Composite Codec Testing                  | Generation    | -         | completed |
+| ✅ Config Loader Testing                    | Configuration | -         | completed |
+| ✅ Config Resolution                        | Configuration | -         | completed |
+| ✅ Config Schema Validation                 | Validation    | -         | completed |
+| ✅ Configuration API                        | Configuration | -         | completed |
+| ✅ Content Deduplication                    | Generation    | -         | completed |
+| ✅ Context Inference                        | Annotation    | -         | completed |
+| ✅ Convention Extractor Testing             | Generation    | -         | completed |
+| ✅ Cross Cutting Document Inclusion         | Generation    | -         | completed |
+| ✅ Data API Architecture Queries            | DataAPI       | -         | completed |
+| ✅ Data API Context Assembly                | DataAPI       | -         | completed |
+| ✅ Data API Design Session Support          | DataAPI       | -         | completed |
+| ✅ Data API Output Shaping                  | DataAPI       | -         | completed |
+| ✅ Data API Stub Integration                | DataAPI       | -         | completed |
+| ✅ Decision Doc Codec Testing               | Generation    | -         | completed |
+| ✅ Decision Doc Generator Testing           | Generation    | -         | completed |
+| ✅ Declaration Level Shape Tagging          | Annotation    | -         | completed |
+| ✅ Declaration Level Shape Tagging Testing  | Annotation    | -         | completed |
+| ✅ Dedent Helper                            | Generation    | -         | completed |
+| ✅ Define Config Testing                    | Configuration | -         | completed |
+| ✅ Description Header Normalization         | Generation    | -         | completed |
+| ✅ Description Quality Foundation           | Generation    | -         | completed |
+| ✅ Detect Changes Testing                   | Validation    | -         | completed |
+| ✅ Directive Detection                      | Annotation    | -         | completed |
+| ✅ Doc String Media Type                    | Annotation    | -         | completed |
+| ✅ Documentation Orchestrator               | Generation    | -         | completed |
+| ✅ DoD Validator Testing                    | Validation    | -         | completed |
+| ✅ Dual Source Extractor Testing            | Annotation    | -         | completed |
+| ✅ Error Factories                          | CoreTypes     | -         | completed |
+| ✅ Error Handling Unification               | CoreTypes     | -         | completed |
+| ✅ Extends Tag Testing                      | Annotation    | -         | completed |
+| ✅ Extraction Pipeline Enhancements Testing | Annotation    | -         | completed |
+| ✅ Extract Summary                          | Generation    | -         | completed |
+| ✅ File Discovery                           | Annotation    | -         | completed |
+| ✅ FSM Validator Testing                    | Validation    | -         | completed |
+| ✅ Generate Docs Cli                        | DataAPI       | -         | completed |
+| ✅ Generate Tag Taxonomy Cli                | DataAPI       | -         | completed |
+| ✅ Generator Registry Testing               | Generation    | -         | completed |
+| ✅ Gherkin Ast Parser                       | Annotation    | -         | completed |
+| ✅ Gherkin Rules Support                    | Annotation    | -         | completed |
+| ✅ Handoff Generator Tests                  | DataAPI       | -         | completed |
+| ✅ Implementation Link Path Normalization   | Generation    | -         | completed |
+| ✅ Implements Tag Processing                | Annotation    | -         | completed |
+| ✅ Layered Diagram Generation               | Generation    | -         | completed |
+| ✅ Layer Inference Testing                  | Annotation    | -         | completed |
+| ✅ Lint Engine Testing                      | Validation    | -         | completed |
+| ✅ Linter Validation Testing                | Validation    | -         | completed |
+| ✅ Lint Patterns Cli                        | DataAPI       | -         | completed |
+| ✅ Lint Process Cli                         | DataAPI       | -         | completed |
+| ✅ Lint Rules Testing                       | Validation    | -         | completed |
+| ✅ Mermaid Relationship Rendering           | Generation    | -         | completed |
+| ✅ Mvp Workflow Implementation              | Process       | -         | completed |
+| ✅ Pattern Relationship Model               | Annotation    | -         | completed |
+| ✅ Patterns Codec Testing                   | Generation    | -         | completed |
+| ✅ Pattern Tag Extraction                   | Annotation    | -         | completed |
+| ✅ Phase State Machine Validation           | Validation    | -         | completed |
+| ✅ Planning Codec Testing                   | Generation    | -         | completed |
+| ✅ Poc Integration                          | Generation    | -         | completed |
+| ✅ Pr Changes Codec Testing                 | Generation    | -         | completed |
+| ✅ Pr Changes Generation                    | Generation    | -         | completed |
+| ✅ Pr Changes Options                       | Generation    | -         | completed |
+| ✅ Prd Implementation Section Testing       | Generation    | -         | completed |
+| ✅ Preset System                            | Configuration | -         | completed |
+| ✅ Process Api Cli                          | DataAPI       | -         | completed |
+| ✅ Process Guard Linter                     | Validation    | -         | completed |
+| ✅ Process Guard Testing                    | Validation    | -         | completed |
+| ✅ Process State API CLI                    | DataAPI       | -         | completed |
+| ✅ Process State API Testing                | DataAPI       | -         | completed |
+| ✅ Project Config Loader                    | Configuration | -         | completed |
+| ✅ Reference Codec Testing                  | Generation    | -         | completed |
+| ✅ Reference Generator Testing              | Generation    | -         | completed |
+| ✅ Remaining Work Enhancement               | Generation    | -         | completed |
+| ✅ Remaining Work Summary Accuracy          | Generation    | -         | completed |
+| ✅ Reporting Codec Testing                  | Generation    | -         | completed |
+| ✅ Requirements Adr Codec Testing           | Generation    | -         | completed |
+| ✅ Result Monad                             | CoreTypes     | -         | completed |
+| ✅ Robustness Integration                   | Generation    | -         | completed |
+| ✅ Rule Keyword Po C                        | Generation    | -         | completed |
+| ✅ Scanner Core                             | Annotation    | -         | completed |
+| ✅ Scoped Architectural View                | Generation    | -         | completed |
+| ✅ Scope Validator Tests                    | DataAPI       | -         | completed |
+| ✅ Session Codec Testing                    | Generation    | -         | completed |
+| ✅ Session File Lifecycle                   | Process       | -         | completed |
+| ✅ Session Handoffs                         | Process       | -         | completed |
+| ✅ Shape Extraction                         | Annotation    | -         | completed |
+| ✅ Shape Extraction Testing                 | Annotation    | -         | completed |
+| ✅ Shape Matcher Testing                    | Generation    | -         | completed |
+| ✅ Shape Selector Testing                   | Generation    | -         | completed |
+| ✅ Source Mapper Testing                    | Generation    | -         | completed |
+| ✅ Source Mapping Validator Testing         | Generation    | -         | completed |
+| ✅ Source Merging                           | Configuration | -         | completed |
+| ✅ Status Transition Detection Testing      | Validation    | -         | completed |
+| ✅ String Utils                             | CoreTypes     | -         | completed |
+| ✅ Table Extraction                         | Generation    | -         | completed |
+| ✅ Taxonomy Codec Testing                   | Generation    | -         | completed |
+| ✅ Timeline Codec Testing                   | Generation    | -         | completed |
+| ✅ Transform Dataset Testing                | Generation    | -         | completed |
+| ✅ TypeScript Taxonomy Implementation       | Annotation    | Developer | completed |
+| ✅ Universal Doc Generator Robustness       | Generation    | -         | completed |
+| ✅ Universal Markdown Renderer              | Generation    | -         | completed |
+| ✅ Validate Patterns Cli                    | DataAPI       | -         | completed |
+| ✅ Validation Rules Codec Testing           | Generation    | -         | completed |
+| ✅ Warning Collector Testing                | Generation    | -         | completed |
+| ✅ Zod Codec Migration                      | Generation    | -         | completed |
+| 🚧 Arch Queries Test                        | DataAPI       | -         | active    |
+| 🚧 Context Assembler Tests                  | DataAPI       | -         | active    |
+| 🚧 Context Formatter Tests                  | DataAPI       | -         | active    |
+| 🚧 Depends On Tag Testing                   | Annotation    | -         | active    |
+| 🚧 Fuzzy Match Tests                        | DataAPI       | -         | active    |
+| 🚧 Output Pipeline Tests                    | DataAPI       | -         | active    |
+| 🚧 Pattern Helpers Tests                    | DataAPI       | -         | active    |
+| 🚧 Pattern Summarize Tests                  | DataAPI       | -         | active    |
+| 🚧 Process State API Relationship Queries   | DataAPI       | -         | active    |
+| 🚧 Reference Doc Showcase                   | Generation    | -         | active    |
+| 🚧 Step Lint Vitest Cucumber                | Validation    | -         | active    |
+| 🚧 Stub Resolver Tests                      | DataAPI       | -         | active    |
+| 🚧 Stub Taxonomy Tag Tests                  | DataAPI       | -         | active    |
+| 🚧 Uses Tag Testing                         | Annotation    | -         | active    |
+| 📋 Architecture Delta                       | Generation    | -         | planned   |
+| 📋 Architecture Diagram Generation          | Generation    | -         | planned   |
+| 📋 Business Rules Generator                 | Generation    | -         | planned   |
+| 📋 Claude Module Generation                 | Generation    | -         | planned   |
+| 📋 Cli Behavior Testing                     | Process       | -         | planned   |
+| 📋 Codec Behavior Testing                   | Generation    | -         | planned   |
+| 📋 Cross Source Validation                  | Annotation    | -         | planned   |
+| 📋 Data API CLI Ergonomics                  | DataAPI       | -         | planned   |
+| 📋 Data API Platform Integration            | DataAPI       | -         | planned   |
+| 📋 Data API Relationship Graph              | DataAPI       | -         | planned   |
+| 📋 DoD Validation                           | Validation    | -         | planned   |
+| 📋 Effort Variance Tracking                 | Process       | -         | planned   |
+| 📋 Generator Infrastructure Testing         | Generation    | -         | planned   |
+| 📋 Kebab Case Slugs                         | CoreTypes     | -         | planned   |
+| 📋 Living Roadmap CLI                       | Process       | -         | planned   |
+| 📋 Phase Numbering Conventions              | Validation    | -         | planned   |
+| 📋 Prd Implementation Section               | Generation    | -         | planned   |
+| 📋 Progressive Governance                   | Validation    | -         | planned   |
+| 📋 Release Association Rules                | Validation    | -         | planned   |
+| 📋 Rich Content Helpers Testing             | Generation    | -         | planned   |
+| 📋 Session File Cleanup                     | Process       | -         | planned   |
+| 📋 Status Aware Eslint Suppression          | Validation    | -         | planned   |
+| 📋 Step Definition Completion               | Process       | -         | planned   |
+| 📋 Step Lint Extended Rules                 | Validation    | -         | planned   |
+| 📋 Streaming Git Diff                       | Validation    | -         | planned   |
+| 📋 Test Content Blocks                      | Generation    | -         | planned   |
+| 📋 Traceability Enhancements                | Generation    | -         | planned   |
+| 📋 Traceability Generator                   | Generation    | -         | planned   |
 
 ---

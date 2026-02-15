@@ -143,9 +143,9 @@ Detail Level: Compact summary
 
 | Rule | Description |
 | --- | --- |
-| Completed files require unlock-reason to modify |  |
-| Status transitions must follow PDR-005 FSM |  |
-| Active specs cannot add new deliverables |  |
-| Files outside active session scope trigger warnings |  |
-| Explicitly excluded files trigger errors |  |
-| Multiple rules validate independently |  |
+| Completed files require unlock-reason to modify | **Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.... |
+| Status transitions must follow PDR-005 FSM | **Invariant:** Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred,... |
+| Active specs cannot add new deliverables | **Invariant:** A spec in active status cannot have deliverables added that were not present when it entered active.... |
+| Files outside active session scope trigger warnings | **Invariant:** Files modified outside the active session's declared scope produce a session-scope warning.... |
+| Explicitly excluded files trigger errors | **Invariant:** Files explicitly excluded from a session cannot be modified, producing a session-excluded error.... |
+| Multiple rules validate independently | **Invariant:** Each validation rule evaluates independently — a single file can produce violations from multiple... |

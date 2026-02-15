@@ -18,9 +18,7 @@ const DEFAULT_FEATURE_GLOBS = [
     'delivery-process/specs/**/*.feature',
     'delivery-process/decisions/**/*.feature',
 ];
-const DEFAULT_STEP_GLOBS = [
-    'tests/steps/**/*.steps.ts',
-];
+const DEFAULT_STEP_GLOBS = ['tests/steps/**/*.steps.ts'];
 /**
  * Run all step lint checks and return a LintSummary.
  *

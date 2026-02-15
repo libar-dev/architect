@@ -154,6 +154,17 @@ export interface GenerateOptions {
    * ]
    */
   contextInferenceRules?: ReadonlyArray<{ pattern: string; context: string }>;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Codec Options (per-codec configuration)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Per-codec options passed through to codec factories.
+   * Merged with any options the orchestrator computes (e.g., PR changes).
+   * Computed options take precedence over user-provided options.
+   */
+  codecOptions?: CodecOptions;
 }
 
 /**
@@ -424,9 +435,11 @@ export async function generateDocumentation(
     contextInferenceRules: mergedContextRules,
   });
 
-  // Step 9: Build codec options for PR-scoped generators
-  // Only compute if PR Changes generator is requested
-  let codecOptions: CodecOptions | undefined;
+  // Step 9: Build codec options
+  // Start with user-provided options, then overlay computed options
+  let codecOptions: CodecOptions | undefined = options.codecOptions;
+
+  // Compute PR Changes options if that generator is requested
   if (options.generators.some((g) => g.trim() === 'pr-changes')) {
     // Use explicit changedFiles if provided, otherwise detect from git
     let changedFiles = options.changedFiles;
@@ -451,6 +464,7 @@ export async function generateDocumentation(
     }
 
     codecOptions = {
+      ...codecOptions,
       'pr-changes': {
         changedFiles: changedFiles ?? [],
         releaseFilter: options.releaseFilter ?? '',
@@ -815,6 +829,8 @@ export interface GenerateFromConfigOptions {
   readonly changedFiles?: string[];
   /** Release version filter for PR Changes generator */
   readonly releaseFilter?: string;
+  /** Per-codec options (merged with config-level codecOptions, CLI takes precedence) */
+  readonly codecOptions?: CodecOptions;
 }
 
 /**
@@ -924,7 +940,12 @@ export async function generateFromConfig(
 
   // Register reference generators from config (explicit opt-in).
   // Done here (not at import time) because configs are user-provided.
-  if (config.project.referenceDocConfigs.length > 0 && !generatorRegistry.has('reference-docs')) {
+  // Check both meta-generators: configs are partitioned by productArea presence.
+  if (
+    config.project.referenceDocConfigs.length > 0 &&
+    !generatorRegistry.has('reference-docs') &&
+    !generatorRegistry.has('product-area-docs')
+  ) {
     registerReferenceGenerators(generatorRegistry, config.project.referenceDocConfigs);
   }
 
@@ -942,6 +963,12 @@ export async function generateFromConfig(
   const allResults: GenerateResult[] = [];
 
   for (const group of groups) {
+    // Merge codec options: config-level → runtime options (runtime takes precedence)
+    const mergedCodecOptions: CodecOptions | undefined =
+      config.project.codecOptions !== undefined || options?.codecOptions !== undefined
+        ? { ...config.project.codecOptions, ...options?.codecOptions }
+        : undefined;
+
     const generateOptions: GenerateOptions = {
       input: [...group.sources.typescript],
       baseDir: process.cwd(),
@@ -955,6 +982,7 @@ export async function generateFromConfig(
       ...(options?.gitDiffBase !== undefined && { gitDiffBase: options.gitDiffBase }),
       ...(options?.changedFiles !== undefined && { changedFiles: [...options.changedFiles] }),
       ...(options?.releaseFilter !== undefined && { releaseFilter: options.releaseFilter }),
+      ...(mergedCodecOptions !== undefined && { codecOptions: mergedCodecOptions }),
     };
 
     const result = await generateDocumentation(generateOptions);

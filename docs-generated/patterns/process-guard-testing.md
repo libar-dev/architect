@@ -232,25 +232,49 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 
 **Completed files require unlock-reason to modify**
 
+**Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+    **Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
+    **Verified by:** Completed file with unlock-reason passes validation, Completed file without unlock-reason fails validation, Protection levels and unlock requirement, File transitioning to completed does not require unlock-reason
+
 _Verified by: Completed file with unlock-reason passes validation, Completed file without unlock-reason fails validation, Protection levels and unlock requirement, File transitioning to completed does not require unlock-reason_
 
 **Status transitions must follow PDR-005 FSM**
+
+**Invariant:** Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred, active->roadmap.
+    **Rationale:** The FSM prevents skipping required stages (e.g., roadmap->completed bypasses implementation).
+    **Verified by:** Valid transitions pass validation, Invalid transitions fail validation
 
 _Verified by: Valid transitions pass validation, Invalid transitions fail validation_
 
 **Active specs cannot add new deliverables**
 
+**Invariant:** A spec in active status cannot have deliverables added that were not present when it entered active.
+    **Rationale:** Scope-locking active work prevents mid-sprint scope creep that derails delivery commitments.
+    **Verified by:** Active spec with no deliverable changes passes, Active spec adding deliverable fails validation, Roadmap spec can add deliverables freely, Removing deliverable produces warning, Deliverable status change does not trigger scope-creep, Multiple deliverable status changes pass validation
+
 _Verified by: Active spec with no deliverable changes passes, Active spec adding deliverable fails validation, Roadmap spec can add deliverables freely, Removing deliverable produces warning, Deliverable status change does not trigger scope-creep, Multiple deliverable status changes pass validation_
 
 **Files outside active session scope trigger warnings**
+
+**Invariant:** Files modified outside the active session's declared scope produce a session-scope warning.
+    **Rationale:** Session scoping keeps focus on planned work and makes accidental cross-cutting changes visible.
+    **Verified by:** File in session scope passes validation, File outside session scope triggers warning, No active session means all files in scope, ignoreSession flag suppresses session warnings
 
 _Verified by: File in session scope passes validation, File outside session scope triggers warning, No active session means all files in scope, ignoreSession flag suppresses session warnings_
 
 **Explicitly excluded files trigger errors**
 
+**Invariant:** Files explicitly excluded from a session cannot be modified, producing a session-excluded error.
+    **Rationale:** Exclusion is stronger than scope — it marks files that must NOT be touched during this session.
+    **Verified by:** Excluded file triggers error, Non-excluded file passes validation, ignoreSession flag suppresses excluded errors
+
 _Verified by: Excluded file triggers error, Non-excluded file passes validation, ignoreSession flag suppresses excluded errors_
 
 **Multiple rules validate independently**
+
+**Invariant:** Each validation rule evaluates independently — a single file can produce violations from multiple rules.
+    **Rationale:** Independent evaluation ensures no rule masks another, giving complete diagnostic output.
+    **Verified by:** Multiple violations from different rules, Strict mode promotes warnings to errors, Clean change produces empty violations
 
 _Verified by: Multiple violations from different rules, Strict mode promotes warnings to errors, Clean change produces empty violations_
 

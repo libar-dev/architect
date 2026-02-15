@@ -9,11 +9,35 @@ import type { GeneratorOutput, GeneratorContext } from '../../../../src/generato
 import { GeneratorRegistry } from '../../../../src/generators/registry.js';
 import {
   registerReferenceGenerators,
-  LIBAR_REFERENCE_CONFIGS,
+  createProductAreaConfigs,
 } from '../../../../src/generators/built-in/reference-generators.js';
+import type { ReferenceDocConfig } from '../../../../src/renderable/codecs/reference.js';
 import { createTestPattern, resetPatternCounter } from '../../../fixtures/pattern-factories.js';
 import { createTestMasterDataset } from '../../../fixtures/dataset-factories.js';
 import { buildRegistry } from '../../../../src/taxonomy/registry-builder.js';
+
+// ============================================================================
+// Test Configs
+// ============================================================================
+
+/**
+ * Test configs: 7 product area configs + 1 manual reference config.
+ * Mirrors the shape of delivery-process.config.ts.
+ */
+const TEST_CONFIGS: readonly ReferenceDocConfig[] = [
+  ...createProductAreaConfigs(),
+  {
+    title: 'Reference Generation Sample',
+    conventionTags: ['taxonomy-rules'],
+    shapeSources: [],
+    shapeSelectors: [{ group: 'reference-sample' }],
+    behaviorCategories: [],
+    includeTags: ['reference-sample'],
+    claudeMdSection: 'architecture',
+    docsFilename: 'REFERENCE-SAMPLE.md',
+    claudeMdFilename: 'reference-sample.md',
+  },
+];
 
 // ============================================================================
 // State
@@ -68,10 +92,10 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Registration produces the correct number of generators', ({ RuleScenario }) => {
     RuleScenario(
-      'All 27 generators are registered from 13 configs plus meta-generator',
+      'Generators are registered from configs plus meta-generators',
       ({ When, Then }) => {
         When('registering reference generators', () => {
-          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
+          registerReferenceGenerators(state!.registry, TEST_CONFIGS);
         });
 
         Then('{int} generators are registered', (_ctx: unknown, count: number) => {
@@ -82,13 +106,33 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   });
 
   // ──────────────────────────────────────────────────────────────────────
+  // Rule: Product area configs produce a separate meta-generator
+  // ──────────────────────────────────────────────────────────────────────
+
+  Rule('Product area configs produce a separate meta-generator', ({ RuleScenario }) => {
+    RuleScenario('Product area meta-generator is registered', ({ When, Then, And }) => {
+      When('registering reference generators', () => {
+        registerReferenceGenerators(state!.registry, TEST_CONFIGS);
+      });
+
+      Then('a generator named {string} exists', (_ctx: unknown, name: string) => {
+        expect(state!.registry.has(name)).toBe(true);
+      });
+
+      And('a generator named {string} exists', (_ctx: unknown, name: string) => {
+        expect(state!.registry.has(name)).toBe(true);
+      });
+    });
+  });
+
+  // ──────────────────────────────────────────────────────────────────────
   // Rule: Generator naming follows kebab-case convention
   // ──────────────────────────────────────────────────────────────────────
 
   Rule('Generator naming follows kebab-case convention', ({ RuleScenario }) => {
     RuleScenario('Detailed generator has name ending in "-reference"', ({ When, Then, And }) => {
       When('registering reference generators', () => {
-        registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
+        registerReferenceGenerators(state!.registry, TEST_CONFIGS);
       });
 
       Then('a generator named {string} exists', (_ctx: unknown, name: string) => {
@@ -104,7 +148,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
       'Summary generator has name ending in "-reference-claude"',
       ({ When, Then, And }) => {
         When('registering reference generators', () => {
-          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
+          registerReferenceGenerators(state!.registry, TEST_CONFIGS);
         });
 
         Then('a generator named {string} exists', (_ctx: unknown, name: string) => {
@@ -124,19 +168,19 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
 
   Rule('Generator execution produces markdown output', ({ RuleScenario }) => {
     RuleScenario(
-      'Generator with matching data produces non-empty output',
+      'Product area generator with matching data produces non-empty output',
       ({ Given, When, Then, And }) => {
         Given(
-          'a MasterDataset with a convention-tagged pattern for {string}',
-          (_ctx: unknown, conventionTag: string) => {
+          'a MasterDataset with a pattern in product area {string}',
+          (_ctx: unknown, area: string) => {
             state!.dataset = createTestMasterDataset({
               patterns: [
                 createTestPattern({
-                  name: 'TestDecision',
-                  convention: [conventionTag],
+                  name: 'TestAnnotationPattern',
+                  productArea: area,
                   rules: [
                     {
-                      name: 'Test Convention Rule',
+                      name: 'Test Rule',
                       description: '**Invariant:** Tests must pass.',
                       scenarioCount: 0,
                       scenarioNames: [],
@@ -149,7 +193,7 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         );
 
         When('running the {string} generator', async (_ctx: unknown, generatorName: string) => {
-          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
+          registerReferenceGenerators(state!.registry, TEST_CONFIGS);
           const generator = state!.registry.get(generatorName);
           expect(generator).toBeDefined();
           const context = makeMinimalContext(state!.dataset!);
@@ -171,14 +215,14 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
     );
 
     RuleScenario(
-      'Generator with no matching data produces minimal output',
+      'Product area generator with no patterns still produces intro',
       ({ Given, When, Then, And }) => {
         Given('an empty MasterDataset', () => {
           state!.dataset = createTestMasterDataset({ patterns: [] });
         });
 
         When('running the {string} generator', async (_ctx: unknown, generatorName: string) => {
-          registerReferenceGenerators(state!.registry, LIBAR_REFERENCE_CONFIGS);
+          registerReferenceGenerators(state!.registry, TEST_CONFIGS);
           const generator = state!.registry.get(generatorName);
           expect(generator).toBeDefined();
           const context = makeMinimalContext(state!.dataset!);

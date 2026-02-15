@@ -36,6 +36,7 @@ import type { PresetName } from './presets.js';
 import type { DeliveryProcessConfig, DeliveryProcessInstance } from './types.js';
 import type { ContextInferenceRule } from '../generators/pipeline/transform-dataset.js';
 import type { ReferenceDocConfig } from '../renderable/codecs/reference.js';
+import type { CodecOptions } from '../renderable/generate.js';
 
 /**
  * Source glob configuration for the project.
@@ -185,6 +186,15 @@ export interface DeliveryProcessProjectConfig {
   /** Path to custom workflow config JSON (relative to config file) */
   readonly workflowPath?: string;
 
+  // --- Codec Options ---
+
+  /**
+   * Per-codec options for fine-tuning document generation.
+   * Keys match codec names (e.g., 'business-rules', 'patterns').
+   * Passed through to codec factories at generation time.
+   */
+  readonly codecOptions?: CodecOptions;
+
   // --- Reference Documents ---
 
   /**
@@ -215,6 +225,8 @@ export interface ResolvedProjectConfig {
   readonly contextInferenceRules: readonly ContextInferenceRule[];
   /** Workflow config path (null if not specified) */
   readonly workflowPath: string | null;
+  /** Per-codec options for document generation (empty if none) */
+  readonly codecOptions?: CodecOptions;
   /** Reference document configurations (empty array if none) */
   readonly referenceDocConfigs: readonly ReferenceDocConfig[];
 }

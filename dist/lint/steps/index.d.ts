@@ -15,7 +15,7 @@ export { STEP_LINT_RULES } from './types.js';
 export { runStepLint } from './runner.js';
 export type { StepLintOptions } from './runner.js';
 export { checkHashInDescription, checkDuplicateAndSteps, checkDollarInStepText, runFeatureChecks, } from './feature-checks.js';
-export { checkRegexStepPatterns, checkPhraseUsage, runStepChecks, } from './step-checks.js';
+export { checkRegexStepPatterns, checkPhraseUsage, runStepChecks } from './step-checks.js';
 export { checkScenarioOutlineFunctionParams, checkMissingAndDestructuring, checkMissingRuleWrapper, runCrossChecks, } from './cross-checks.js';
 export { extractFeaturePath, resolveFeatureStepPairs } from './pair-resolver.js';
 //# sourceMappingURL=index.d.ts.map

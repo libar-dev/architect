@@ -12,25 +12,38 @@
 import type { GeneratorRegistry } from '../registry.js';
 import { type ReferenceDocConfig } from '../../renderable/codecs/reference.js';
 /**
- * Built-in reference document configurations for the delivery-process package.
- *
- * Each entry defines one reference document's convention sources and shape globs.
- * Import this in your `delivery-process.config.ts` to use these configs,
- * or define your own `ReferenceDocConfig[]` for downstream repos.
+ * Canonical product area values from ADR-001.
+ * Each generates a composite overview document scoped to that area.
  */
-export declare const LIBAR_REFERENCE_CONFIGS: readonly ReferenceDocConfig[];
+export declare const PRODUCT_AREA_VALUES: readonly ["Annotation", "Configuration", "Generation", "Validation", "DataAPI", "CoreTypes", "Process"];
+/**
+ * Options for customizing product area config generation.
+ */
+export interface ProductAreaConfigOptions {
+    /** Filename suffix for docs output (default: '.md') */
+    readonly docsFilenameSuffix?: string;
+}
+/**
+ * Creates reference document configs for all canonical product areas.
+ *
+ * Each config uses `productArea` as the primary filter — the codec
+ * auto-derives all content sources from the filtered pattern set.
+ * Explicit `conventionTags`, `shapeSources`, and `behaviorCategories`
+ * are left empty because the product-area decode path ignores them.
+ *
+ * @param options - Optional customization for output filenames
+ */
+export declare function createProductAreaConfigs(options?: ProductAreaConfigOptions): ReferenceDocConfig[];
 /**
  * Registers reference generators from the provided configs in the GeneratorRegistry.
  *
- * Registers:
- * - "reference-docs" meta-generator (produces all files at once)
- * - Individual generators for selective invocation:
- *   "{name}-reference" -> detailed, "{name}-reference-claude" -> summary
+ * Partitions configs by `productArea` presence:
+ * - Configs WITH `productArea` -> "product-area-docs" meta-generator
+ * - Configs WITHOUT `productArea` -> "reference-docs" meta-generator
+ * - Individual generators registered for all configs
  *
  * @param registry - The generator registry to register into
  * @param configs - Reference document configurations (from project config)
  */
 export declare function registerReferenceGenerators(registry: GeneratorRegistry, configs: readonly ReferenceDocConfig[]): void;
-/** @deprecated Use LIBAR_REFERENCE_CONFIGS instead */
-export declare const REFERENCE_CONFIGS: readonly ReferenceDocConfig[];
 //# sourceMappingURL=reference-generators.d.ts.map

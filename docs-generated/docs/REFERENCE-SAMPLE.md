@@ -206,9 +206,9 @@ classDiagram
         <<service>>
     }
     class MasterDataset
-    class ShapeExtractor
     class Pattern_Scanner
     class GherkinASTParser
+    class ShapeExtractor
     class DecisionDocCodec
     class PatternRelationshipModel
     SourceMapper ..> DecisionDocCodec : depends on
@@ -273,15 +273,15 @@ C4Context
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
     System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
+    Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
+    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
     Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
-    Rel(GherkinScanner, GherkinASTParser, "uses")
-    Rel(GherkinScanner, GherkinRulesSupport, "implements")
-    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
-    Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
 ```
 
 ---
@@ -821,6 +821,10 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 
 #### Completed files require unlock-reason to modify
 
+**Invariant:** A completed spec file cannot be modified unless it carries an @libar-docs-unlock-reason tag.
+
+**Rationale:** Completed work represents validated, shipped functionality — accidental modification risks regression.
+
 **Verified by:**
 
 - Completed file with unlock-reason passes validation
@@ -835,6 +839,10 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 
 #### Status transitions must follow PDR-005 FSM
 
+**Invariant:** Status changes must follow the directed graph: roadmap->active->completed, roadmap<->deferred, active->roadmap.
+
+**Rationale:** The FSM prevents skipping required stages (e.g., roadmap->completed bypasses implementation).
+
 **Verified by:**
 
 - Valid transitions pass validation
@@ -846,6 +854,10 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 <summary>Active specs cannot add new deliverables (6 scenarios)</summary>
 
 #### Active specs cannot add new deliverables
+
+**Invariant:** A spec in active status cannot have deliverables added that were not present when it entered active.
+
+**Rationale:** Scope-locking active work prevents mid-sprint scope creep that derails delivery commitments.
 
 **Verified by:**
 
@@ -863,6 +875,10 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 
 #### Files outside active session scope trigger warnings
 
+**Invariant:** Files modified outside the active session's declared scope produce a session-scope warning.
+
+**Rationale:** Session scoping keeps focus on planned work and makes accidental cross-cutting changes visible.
+
 **Verified by:**
 
 - File in session scope passes validation
@@ -877,6 +893,10 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 
 #### Explicitly excluded files trigger errors
 
+**Invariant:** Files explicitly excluded from a session cannot be modified, producing a session-excluded error.
+
+**Rationale:** Exclusion is stronger than scope — it marks files that must NOT be touched during this session.
+
 **Verified by:**
 
 - Excluded file triggers error
@@ -889,6 +909,10 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
 <summary>Multiple rules validate independently (3 scenarios)</summary>
 
 #### Multiple rules validate independently
+
+**Invariant:** Each validation rule evaluates independently — a single file can produce violations from multiple rules.
+
+**Rationale:** Independent evaluation ensures no rule masks another, giving complete diagnostic output.
 
 **Verified by:**
 

@@ -86,6 +86,7 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
         replaceFeatures: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         outputDirectory: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>>>;
+    codecOptions: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodUnknown>>>;
     contextInferenceRules: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodObject<{
         pattern: z.ZodString;
         context: z.ZodString;
@@ -154,6 +155,7 @@ export declare const DeliveryProcessProjectConfigSchema: z.ZodObject<{
             source: z.ZodString;
         }, z.core.$strict>]>>>>;
         includeTags: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+        productArea: z.ZodOptional<z.ZodString>;
     }, z.core.$strict>>>>;
 }, z.core.$strict>;
 /**

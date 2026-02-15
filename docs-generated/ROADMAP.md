@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 203/293 (69%)
+**Patterns:** [██████████████░░░░░░] 203/295 (69%)
 
-**Phases:** 4/17 complete
+**Phases:** 4/19 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 293 |
+| Total Patterns | 295 |
 | Completed | 203 |
-| Active | 46 |
-| Planned | 44 |
+| Active | 47 |
+| Planned | 45 |
 
 ---
 
@@ -35,6 +35,8 @@
 | ✅ [DeclarationLevelShapeTagging](phases/phase-31-declaration-level-shape-tagging.md) | 1/1 | 100% |
 | ✅ [CrossCuttingDocumentInclusion](phases/phase-32-cross-cutting-document-inclusion.md) | 1/1 | 100% |
 | 📋 [RichContentHelpersTesting](phases/phase-44-rich-content-helpers-testing.md) | 0/2 | 0% |
+| 🚧 [StepLintVitestCucumber](phases/phase-50-step-lint-vitest-cucumber.md) | 0/1 | 0% |
+| 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/8 | 50% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
@@ -173,6 +175,26 @@
 | --- | --- | --- |
 | 📋 Kebab Case Slugs | planned | As a documentation generator I need to generate readable, URL-safe slugs from pattern names So that generated file... |
 | 📋 Rich Content Helpers Testing | planned | As a document codec author I need helpers to render Gherkin rich content So that DataTables, DocStrings, and... |
+
+---
+
+### 🚧 StepLintVitestCucumber
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 🚧 Step Lint Vitest Cucumber | active | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
+
+---
+
+### 📋 StepLintExtendedRules
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete
+
+| Pattern | Status | Description |
+| --- | --- | --- |
+| 📋 Step Lint Extended Rules | planned | The initial lint-steps CLI catches 8 vitest-cucumber traps, but 4 documented traps from... |
 
 ---
 

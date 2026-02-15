@@ -64,7 +64,7 @@ Files that implement this pattern:
 - [`composite-codec.feature`](../../tests/features/behavior/codecs/composite-codec.feature) - Assembles reference documents from multiple codec outputs by
 - [`convention-extractor.feature`](../../tests/features/behavior/codecs/convention-extractor.feature) - Extracts convention content from MasterDataset decision records
 - [`reference-codec.feature`](../../tests/features/behavior/codecs/reference-codec.feature) - Parameterized codec factory that creates reference document codecs
-- [`reference-generators.feature`](../../tests/features/behavior/codecs/reference-generators.feature) - Registers all 13 reference document generators. Each config produces
+- [`reference-generators.feature`](../../tests/features/behavior/codecs/reference-generators.feature) - Registers reference document generators from project config. Configs with
 - [`shape-matcher.feature`](../../tests/features/behavior/codecs/shape-matcher.feature) - Matches file paths against glob patterns for TypeScript shape extraction.
 - [`shape-selector.feature`](../../tests/features/behavior/codecs/shape-selector.feature) - Tests the filterShapesBySelectors function that provides fine-grained
 - [`extraction-pipeline-enhancements.feature`](../../tests/features/extractor/extraction-pipeline-enhancements.feature) - Validates extraction pipeline capabilities for ReferenceDocShowcase:

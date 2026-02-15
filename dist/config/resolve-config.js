@@ -99,6 +99,7 @@ export function resolveProjectConfig(raw, options) {
         generatorOverrides,
         contextInferenceRules,
         workflowPath,
+        ...(raw.codecOptions !== undefined && { codecOptions: raw.codecOptions }),
         referenceDocConfigs,
     };
     return {

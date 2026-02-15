@@ -11,7 +11,7 @@
 | --- | --- |
 | Completed Patterns | 203 |
 | Completed Phases | 4 |
-| Total Phases | 17 |
+| Total Phases | 19 |
 
 ---
 
@@ -62,6 +62,8 @@
 
 ## Recent Completions
 
+- ✅ Handoff Generator Tests
+- ✅ Scope Validator Tests
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
@@ -70,8 +72,6 @@
 - ✅ Reference Codec Testing
 - ✅ Reference Generator Testing
 - ✅ Reporting Codec Testing
-- ✅ Requirements Adr Codec Testing
-- ✅ Session Codec Testing
 
 Showing 10 of 203 completed patterns. See quarterly files for full history.
 

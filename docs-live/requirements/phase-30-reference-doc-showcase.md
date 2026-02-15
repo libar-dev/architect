@@ -6,50 +6,50 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | active |
-| Product Area | Generation |
+| Property       | Value                                                        |
+| -------------- | ------------------------------------------------------------ |
+| Status         | active                                                       |
+| Product Area   | Generation                                                   |
 | Business Value | validates all content blocks via single integration document |
-| Phase | 30 |
+| Phase          | 30                                                           |
 
 ## Description
 
 **Problem:**
-  The Reference Generation Sample document exercises a small fraction of the
-  reference codec's capabilities: 2 convention rules, 1 flowchart diagram,
-  2 shapes from a single file, and 1 shallow behavior pattern. Of the 9
-  renderable block types (heading, paragraph, separator, table, list, code,
-  mermaid, collapsible, link-out), only 6 are used. Behavior rendering truncates
-  rule descriptions to 120 characters, discarding invariants, rationale, and
-  verified-by content that is already extracted. Shape rendering omits JSDoc
-  prose at standard detail level. Diagrams support only flowcharts with no
-  edge labels, layer filtering, or alternative diagram types. The extraction
-  pipeline drops function signatures, param/returns/throws documentation, and
-  full property-level JSDoc.
+The Reference Generation Sample document exercises a small fraction of the
+reference codec's capabilities: 2 convention rules, 1 flowchart diagram,
+2 shapes from a single file, and 1 shallow behavior pattern. Of the 9
+renderable block types (heading, paragraph, separator, table, list, code,
+mermaid, collapsible, link-out), only 6 are used. Behavior rendering truncates
+rule descriptions to 120 characters, discarding invariants, rationale, and
+verified-by content that is already extracted. Shape rendering omits JSDoc
+prose at standard detail level. Diagrams support only flowcharts with no
+edge labels, layer filtering, or alternative diagram types. The extraction
+pipeline drops function signatures, param/returns/throws documentation, and
+full property-level JSDoc.
 
-  **Solution:**
-  Expand the reference sample into a comprehensive showcase that exercises every
-  content block type across all three detail levels. This requires three tiers
-  of work: codec rendering enhancements (deep behavior, full shapes, rich
-  diagrams), extraction pipeline improvements (function signatures, param docs,
-  auto-shape discovery), and infrastructure enablers (codec composition,
-  AI-optimized rendering, data-driven tag extraction).
+**Solution:**
+Expand the reference sample into a comprehensive showcase that exercises every
+content block type across all three detail levels. This requires three tiers
+of work: codec rendering enhancements (deep behavior, full shapes, rich
+diagrams), extraction pipeline improvements (function signatures, param docs,
+auto-shape discovery), and infrastructure enablers (codec composition,
+AI-optimized rendering, data-driven tag extraction).
 
-  The sample document serves as the integration test: if REFERENCE-SAMPLE.md
-  renders every block type correctly at every detail level, the codec system
-  works end-to-end.
+The sample document serves as the integration test: if REFERENCE-SAMPLE.md
+renders every block type correctly at every detail level, the codec system
+works end-to-end.
 
-  **Why It Matters:**
-  | Benefit | How |
-  | Integration validation | Single document tests all 9 renderable block types |
-  | Deep behavior content | Full rule descriptions with invariant/rationale replace 120-char truncation |
-  | Complete shape documentation | JSDoc prose at standard level, property tables at detailed |
-  | Rich diagram vocabulary | Sequence, state, C4, and class diagrams alongside flowcharts |
-  | Progressive disclosure | Collapsible sections for large content blocks |
-  | Complete API surface | Function signatures and param docs without source navigation |
-  | Token-efficient AI context | Dedicated renderer for LLM consumption |
-  | Flexible composition | CompositeCodec assembles docs from multiple codec outputs |
+**Why It Matters:**
+| Benefit | How |
+| Integration validation | Single document tests all 9 renderable block types |
+| Deep behavior content | Full rule descriptions with invariant/rationale replace 120-char truncation |
+| Complete shape documentation | JSDoc prose at standard level, property tables at detailed |
+| Rich diagram vocabulary | Sequence, state, C4, and class diagrams alongside flowcharts |
+| Progressive disclosure | Collapsible sections for large content blocks |
+| Complete API surface | Function signatures and param docs without source navigation |
+| Token-efficient AI context | Dedicated renderer for LLM consumption |
+| Flexible composition | CompositeCodec assembles docs from multiple codec outputs |
 
 ## Acceptance Criteria
 
@@ -235,10 +235,10 @@
 **Deep behavior rendering replaces shallow truncation**
 
 **Invariant:** At standard and detailed levels, behavior sections render full
-    rule descriptions with parsed invariant, rationale, and verified-by content.
-    At summary level, the 120-character truncation is preserved for compact output.
-    Behavior rendering reuses parseBusinessRuleAnnotations from the convention
-    extractor rather than reimplementing structured content parsing.
+rule descriptions with parsed invariant, rationale, and verified-by content.
+At summary level, the 120-character truncation is preserved for compact output.
+Behavior rendering reuses parseBusinessRuleAnnotations from the convention
+extractor rather than reimplementing structured content parsing.
 
     **Rationale:** The current 120-character truncation discards invariants,
     rationale, and verified-by content that is already extracted and available
@@ -256,9 +256,9 @@ _Verified by: Detailed level renders full rule descriptions with structured cont
 **Shape sections include JSDoc prose and property documentation**
 
 **Invariant:** At standard level, shape code blocks are preceded by JSDoc
-    prose when available. At detailed level, interface shapes additionally render
-    a property documentation table. At summary level, only the type-kind table
-    appears. Shapes without JSDoc render code blocks without preceding paragraph.
+prose when available. At detailed level, interface shapes additionally render
+a property documentation table. At summary level, only the type-kind table
+appears. Shapes without JSDoc render code blocks without preceding paragraph.
 
     **Rationale:** JSDoc on shapes contains design rationale and usage guidance
     that is already extracted by the shape extractor. Gating it behind detailed
@@ -275,12 +275,12 @@ _Verified by: Standard level includes JSDoc prose above code blocks, Detailed le
 **Diagram scope supports archLayer filtering and multiple diagram types**
 
 **Invariant:** DiagramScope gains optional archLayer and diagramType fields.
-    The archLayer filter selects patterns by their architectural layer (domain,
-    application, infrastructure) and composes with archContext and archView via
-    OR logic, consistent with existing filter dimensions. The diagramType field
-    controls Mermaid output format: graph (default), sequenceDiagram,
-    stateDiagram-v2, C4Context, classDiagram. Each diagram type has its own
-    node and edge syntax appropriate to the Mermaid specification.
+The archLayer filter selects patterns by their architectural layer (domain,
+application, infrastructure) and composes with archContext and archView via
+OR logic, consistent with existing filter dimensions. The diagramType field
+controls Mermaid output format: graph (default), sequenceDiagram,
+stateDiagram-v2, C4Context, classDiagram. Each diagram type has its own
+node and edge syntax appropriate to the Mermaid specification.
 
     **Rationale:** Layer-based views are fundamental to layered architecture
     documentation -- a developer reviewing the domain layer wants only deciders
@@ -300,10 +300,10 @@ _Verified by: archLayer filter selects patterns by layer, archLayer and archCont
 **Every renderable block type appears in the showcase document**
 
 **Invariant:** The generated REFERENCE-SAMPLE.md at detailed level must
-    contain at least one instance of each of the 9 block types: heading,
-    paragraph, separator, table, list, code, mermaid, collapsible, link-out.
-    At summary level, progressive disclosure blocks (collapsible, link-out)
-    are omitted for compact output.
+contain at least one instance of each of the 9 block types: heading,
+paragraph, separator, table, list, code, mermaid, collapsible, link-out.
+At summary level, progressive disclosure blocks (collapsible, link-out)
+are omitted for compact output.
 
     **Rationale:** The sample document is the integration test for the reference
     codec. If any block type is missing, there is no automated verification that
@@ -318,11 +318,11 @@ _Verified by: Detailed output contains all 9 block types, Summary output uses co
 **Edge labels and custom node shapes enrich diagram readability**
 
 **Invariant:** Relationship edges in scoped diagrams display labels
-    describing the relationship semantics (uses, dependsOn, implements, extends).
-    Edge labels are enabled by default and can be disabled via a showEdgeLabels
-    option for compact diagrams. Node shapes vary by archRole value -- services
-    use rounded rectangles, bounded contexts use subgraphs, projections use
-    cylinders, and sagas use hexagons.
+describing the relationship semantics (uses, dependsOn, implements, extends).
+Edge labels are enabled by default and can be disabled via a showEdgeLabels
+option for compact diagrams. Node shapes vary by archRole value -- services
+use rounded rectangles, bounded contexts use subgraphs, projections use
+cylinders, and sagas use hexagons.
 
     **Rationale:** Unlabeled edges are ambiguous -- a reader seeing a solid
     arrow cannot distinguish "uses" from "implements" without consulting an
@@ -339,11 +339,11 @@ _Verified by: Relationship edges display type labels by default, Edge labels can
 **Extraction pipeline surfaces complete API documentation**
 
 **Invariant:** ExportInfo.signature shows full function parameter types and
-    return type instead of the placeholder value. JSDoc param, returns, and
-    throws tags are extracted and stored on ExtractedShape. Property-level JSDoc
-    preserves full multi-line content without first-line truncation. Auto-shape
-    discovery mode extracts all exported types from files matching shapeSources
-    globs without requiring explicit extract-shapes annotations.
+return type instead of the placeholder value. JSDoc param, returns, and
+throws tags are extracted and stored on ExtractedShape. Property-level JSDoc
+preserves full multi-line content without first-line truncation. Auto-shape
+discovery mode extracts all exported types from files matching shapeSources
+globs without requiring explicit extract-shapes annotations.
 
     **Rationale:** Function signatures are the most valuable API surface -- they
     show what a pattern exports without source navigation. The ExportInfo.signature
@@ -362,13 +362,13 @@ _Verified by: Function signatures populate ExportInfo, JSDoc param and returns t
 **Infrastructure enables flexible document composition and AI-optimized output**
 
 **Invariant:** CompositeCodec assembles reference documents from multiple
-    codec outputs by concatenating RenderableDocument sections. The
-    renderToClaudeContext renderer produces token-efficient output using section
-    markers optimized for LLM consumption. The Gherkin tag extractor uses
-    TagRegistry metadata instead of hardcoded if/else branches, making new tag
-    addition a zero-code-change operation. Convention content can be extracted
-    from TypeScript JSDoc blocks containing structured Invariant/Rationale
-    annotations, not only from Gherkin Rule blocks.
+codec outputs by concatenating RenderableDocument sections. The
+renderToClaudeContext renderer produces token-efficient output using section
+markers optimized for LLM consumption. The Gherkin tag extractor uses
+TagRegistry metadata instead of hardcoded if/else branches, making new tag
+addition a zero-code-change operation. Convention content can be extracted
+from TypeScript JSDoc blocks containing structured Invariant/Rationale
+annotations, not only from Gherkin Rule blocks.
 
     **Rationale:** CompositeCodec enables referenceDocConfigs to include content
     from any codec, not just the current 4 sources. The renderToClaudeContext
@@ -420,7 +420,7 @@ Files that implement this pattern:
 - [`composite-codec.feature`](../../tests/features/behavior/codecs/composite-codec.feature) - Assembles reference documents from multiple codec outputs by
 - [`convention-extractor.feature`](../../tests/features/behavior/codecs/convention-extractor.feature) - Extracts convention content from MasterDataset decision records
 - [`reference-codec.feature`](../../tests/features/behavior/codecs/reference-codec.feature) - Parameterized codec factory that creates reference document codecs
-- [`reference-generators.feature`](../../tests/features/behavior/codecs/reference-generators.feature) - Registers all 13 reference document generators. Each config produces
+- [`reference-generators.feature`](../../tests/features/behavior/codecs/reference-generators.feature) - Registers reference document generators from project config. Configs with
 - [`shape-matcher.feature`](../../tests/features/behavior/codecs/shape-matcher.feature) - Matches file paths against glob patterns for TypeScript shape extraction.
 - [`shape-selector.feature`](../../tests/features/behavior/codecs/shape-selector.feature) - Tests the filterShapesBySelectors function that provides fine-grained
 - [`extraction-pipeline-enhancements.feature`](../../tests/features/extractor/extraction-pipeline-enhancements.feature) - Validates extraction pipeline capabilities for ReferenceDocShowcase:

@@ -173,7 +173,222 @@ export interface ReferenceDocConfig {
 
   /** DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing */
   readonly includeTags?: readonly string[];
+
+  /**
+   * Product area filter (ADR-001 canonical values).
+   * When set, pre-filters all content sources to patterns with matching productArea.
+   * Auto-generates diagram scopes from productArea→archContext mapping if no
+   * explicit diagramScopes are provided.
+   */
+  readonly productArea?: string;
+
+  /**
+   * Exclude patterns whose source.file starts with any of these prefixes.
+   * Used to filter ephemeral planning specs from behavior sections.
+   * @example ['delivery-process/specs/']
+   */
+  readonly excludeSourcePaths?: readonly string[];
 }
+
+// ============================================================================
+// Product Area → archContext Mapping (ADR-001)
+// ============================================================================
+
+/**
+ * Maps canonical product area values to their associated archContext values.
+ * Product areas are Gherkin-side tags; archContexts are TypeScript-side tags.
+ * This mapping bridges the two tagging domains for diagram scoping.
+ */
+export const PRODUCT_AREA_ARCH_CONTEXT_MAP: Readonly<Record<string, readonly string[]>> = {
+  Annotation: ['scanner', 'extractor', 'taxonomy'],
+  Configuration: ['config'],
+  Generation: ['generator', 'renderer'],
+  Validation: ['validation', 'lint'],
+  DataAPI: ['api', 'cli'],
+  CoreTypes: [],
+  Process: [],
+};
+
+/**
+ * Product area metadata for intro sections and index generation.
+ *
+ * Each area has a reader-facing question (from ADR-001), a coverage summary,
+ * an intro paragraph synthesized from executable specs, key invariants
+ * curated from business rules, and the most important patterns in the area.
+ */
+export interface ProductAreaMeta {
+  /** Reader-facing question (from ADR-001 canonical values) */
+  readonly question: string;
+  /** Comma-separated coverage summary */
+  readonly covers: string;
+  /** 2-4 sentence intro explaining what this area does and why it matters */
+  readonly intro: string;
+  /** Live diagram scopes generated from annotation data (overrides auto-generated diagram) */
+  readonly diagramScopes?: readonly DiagramScope[];
+  /** Key invariants to surface prominently (curated from executable specs) */
+  readonly keyInvariants: readonly string[];
+  /** Key patterns in this area */
+  readonly keyPatterns: readonly string[];
+}
+
+/**
+ * ADR-001 canonical product area metadata for intro sections.
+ */
+export const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>> = {
+  Annotation: {
+    question: 'How do I annotate code?',
+    covers: 'Scanning, extraction, tag parsing, dual-source',
+    intro:
+      'The annotation system is the ingestion boundary — it transforms annotated TypeScript ' +
+      'and Gherkin files into `ExtractedPattern[]` objects that feed the entire downstream ' +
+      'pipeline. Two parallel scanning paths (TypeScript AST + Gherkin parser) converge ' +
+      'through dual-source merging. The system is fully data-driven: the `TagRegistry` ' +
+      'defines all tags, formats, and categories — adding a new annotation requires only ' +
+      'a registry entry, zero parser changes.',
+    diagramScopes: [
+      {
+        archContext: ['scanner', 'extractor'],
+        diagramType: 'C4Context',
+        title: 'Scanning & Extraction Boundary',
+      },
+      {
+        archContext: ['scanner', 'extractor', 'taxonomy'],
+        direction: 'LR',
+        title: 'Annotation Pipeline',
+      },
+    ],
+    keyInvariants: [
+      'Source ownership enforced: `uses`/`used-by`/`category` belong in TypeScript only; `depends-on`/`quarter`/`team`/`phase` belong in Gherkin only. Anti-pattern detector validates at lint time',
+      'Data-driven tag dispatch: Both AST parser and Gherkin parser use `TagRegistry.metadataTags` to determine extraction. 6 format types (`value`/`enum`/`csv`/`number`/`flag`/`quoted-value`) cover all tag shapes — zero parser changes for new tags',
+      'Pipeline data preservation: Gherkin `Rule:` blocks, deliverables, scenarios, and all metadata flow through scanner → extractor → `ExtractedPattern` → generators without data loss',
+      'Dual-source merge with conflict detection: Same pattern name in both TypeScript and Gherkin produces a merge conflict error. Phase mismatches between sources produce validation errors',
+    ],
+    keyPatterns: [
+      'PatternRelationshipModel',
+      'ShapeExtraction',
+      'DualSourceExtraction',
+      'GherkinRulesSupport',
+      'DeclarationLevelShapeTagging',
+      'CrossSourceValidation',
+    ],
+  },
+  Configuration: {
+    question: 'How do I configure the tool?',
+    covers: 'Config loading, presets, resolution',
+    intro:
+      'Configuration controls what gets scanned, which tags are recognized, and how output is organized. ' +
+      'Three presets define escalating taxonomy complexity — from 3 categories for simple projects to 21 ' +
+      'for full DDD/ES/CQRS architectures. The `defineConfig()` function provides type-safe configuration ' +
+      'following the Vite convention.',
+    keyInvariants: [
+      'Preset-based taxonomy: `generic` (3 categories, `@docs-`), `libar-generic` (3 categories, `@libar-docs-`), `ddd-es-cqrs` (21 categories, full DDD)',
+      'Stubs merged at resolution time: Stub directory globs are appended to typescript sources, making stubs transparent to the downstream pipeline',
+    ],
+    keyPatterns: ['PresetSystem', 'ConfigResolution', 'DefineConfig', 'ProjectConfigLoader'],
+  },
+  Generation: {
+    question: 'How does code become docs?',
+    covers: 'Codecs, generators, rendering, diagrams',
+    intro:
+      'The generation pipeline transforms annotated source code into markdown documents. ' +
+      'It follows a four-stage architecture: Scanner → Extractor → Transformer → Codec. ' +
+      'Codecs are pure functions — given a MasterDataset, they produce a RenderableDocument ' +
+      'without side effects. CompositeCodec composes multiple codecs into a single document.',
+    keyInvariants: [
+      'Codec purity: Every codec is a pure function (dataset in, document out). No side effects, no filesystem access. Same input always produces same output',
+      'Config-driven generation: A single `ReferenceDocConfig` produces a complete document. Content sources compose in fixed order: conventions, diagrams, shapes, behaviors',
+      'RenderableDocument IR: Codecs express intent ("this is a table"), the renderer handles syntax ("pipe-delimited markdown"). Switching output format requires only a new renderer',
+    ],
+    keyPatterns: [
+      'ADR005CodecBasedMarkdownRendering',
+      'CodecDrivenReferenceGeneration',
+      'CrossCuttingDocumentInclusion',
+      'ArchitectureDiagramGeneration',
+      'ScopedArchitecturalView',
+    ],
+  },
+  Validation: {
+    question: 'How is the workflow enforced?',
+    covers: 'FSM, DoD, anti-patterns, process guard, lint',
+    intro:
+      'Validation enforces delivery workflow rules at commit time using a Decider pattern. ' +
+      'Process Guard derives state from annotations (no separate state store), validates ' +
+      'proposed changes against FSM rules, and blocks invalid transitions. Protection levels ' +
+      'escalate with status: roadmap allows free editing, active locks scope, completed requires explicit unlock.',
+    keyInvariants: [
+      'Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@libar-docs-unlock-reason`)',
+      'Valid FSM transitions: Only roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap. Completed is terminal',
+      'Decider pattern: All validation is (state, changes, options) → result. State is derived from annotations, not maintained separately',
+    ],
+    keyPatterns: [
+      'ProcessGuardLinter',
+      'PhaseStateMachineValidation',
+      'DoDValidation',
+      'StepLintVitestCucumber',
+      'ProgressiveGovernance',
+    ],
+  },
+  DataAPI: {
+    question: 'How do I query process state?',
+    covers: 'Process state API, stubs, context assembly, CLI',
+    intro:
+      'The Data API provides direct terminal access to delivery process state. ' +
+      'It replaces reading generated markdown or launching explore agents — targeted queries ' +
+      'use 5-10x less context. The `context` command assembles curated bundles tailored to ' +
+      'session type (planning, design, implement).',
+    keyInvariants: [
+      'One-command context assembly: `context <pattern> --session <type>` returns metadata + file paths + dependency status + architecture position in ~1.5KB',
+      'Session type tailoring: `planning` (~500B, brief + deps), `design` (~1.5KB, spec + stubs + deps), `implement` (deliverables + FSM + tests)',
+      'Direct API queries replace doc reading: JSON output is 5-10x smaller than generated docs',
+    ],
+    keyPatterns: [
+      'DataAPIContextAssembly',
+      'ProcessStateAPICLI',
+      'DataAPIDesignSessionSupport',
+      'DataAPIRelationshipGraph',
+      'DataAPIOutputShaping',
+    ],
+  },
+  CoreTypes: {
+    question: 'What foundational types exist?',
+    covers: 'Result monad, error factories, string utils',
+    intro:
+      'Foundation types used across all other areas. The Result monad replaces try/catch ' +
+      'with explicit error handling — functions return `Result.ok(value)` or `Result.err(error)` ' +
+      'instead of throwing. DocError provides structured error context with type, file, line, and reason fields.',
+    keyInvariants: [
+      'Result over try/catch: All functions return `Result<T, E>` instead of throwing. Compile-time verification that errors are handled',
+      'DocError discriminated union: Structured errors with type, file, line, reason. `isDocError` type guard for safe classification',
+    ],
+    keyPatterns: [
+      'ResultMonad',
+      'ErrorHandlingUnification',
+      'ErrorFactories',
+      'StringUtils',
+      'KebabCaseSlugs',
+    ],
+  },
+  Process: {
+    question: 'How does the session workflow work?',
+    covers: 'Session lifecycle, handoffs, conventions',
+    intro:
+      'Process defines the session workflow and canonical taxonomy. Git is the event store; ' +
+      'documentation artifacts are projections; feature files are the single source of truth. ' +
+      'TypeScript source owns pattern identity (ADR-003), while Tier 1 specs are ephemeral ' +
+      'planning documents that lose value after completion.',
+    keyInvariants: [
+      'TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents',
+      '7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules',
+      'Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains',
+    ],
+    keyPatterns: [
+      'ADR001TaxonomyCanonicalValues',
+      'ADR003SourceFirstPatternArchitecture',
+      'MvpWorkflowImplementation',
+      'SessionHandoffs',
+    ],
+  },
+};
 
 // ============================================================================
 // Reference Codec Options
@@ -214,6 +429,11 @@ export function createReferenceCodec(
   return z.codec(MasterDatasetSchema, RenderableDocumentOutputSchema, {
     decode: (dataset: MasterDataset): RenderableDocument => {
       const sections: SectionBlock[] = [];
+
+      // Product area filtering: when set, pre-filter and auto-derive content sources
+      if (config.productArea !== undefined) {
+        return decodeProductArea(dataset, config, opts);
+      }
 
       // DD-1 (CrossCuttingDocumentInclusion): Pre-compute include set for additive merging
       const includeSet =
@@ -350,6 +570,187 @@ export function createReferenceCodec(
     encode: (): never => {
       throw new Error('ReferenceDocumentCodec is decode-only');
     },
+  });
+}
+
+// ============================================================================
+// Product Area Decode Path
+// ============================================================================
+
+/**
+ * Decode a product-area-scoped reference document.
+ *
+ * When `config.productArea` is set, this function replaces the standard decode
+ * path. It pre-filters all patterns by product area and auto-derives content
+ * sources from the filtered set rather than relying on explicit config arrays.
+ *
+ * Document structure:
+ * 1. Intro (reader question + coverage from ADR-001 metadata)
+ * 2. Invariant rules from executable specs (conventions + behavior rules)
+ * 3. Architecture diagrams (auto-scoped via productArea→archContext mapping)
+ * 4. Key API types (shapes from TypeScript patterns in this area)
+ * 5. Behavior specifications (all patterns with rules/descriptions)
+ */
+function decodeProductArea(
+  dataset: MasterDataset,
+  config: ReferenceDocConfig,
+  opts: Required<ReferenceCodecOptions>
+): RenderableDocument {
+  const area = config.productArea;
+  if (area === undefined) {
+    return document('Error', [paragraph('No product area specified.')], {});
+  }
+  const sections: SectionBlock[] = [];
+
+  // Pre-filter patterns by product area
+  const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
+
+  // Also collect TypeScript patterns by archContext mapping (for shapes + diagrams)
+  const archContexts = PRODUCT_AREA_ARCH_CONTEXT_MAP[area] ?? [];
+  const contextSet = new Set(archContexts);
+  const tsPatterns =
+    contextSet.size > 0
+      ? dataset.patterns.filter((p) => p.archContext !== undefined && contextSet.has(p.archContext))
+      : [];
+
+  // Combined set of all relevant patterns (deduplicated)
+  const allRelevantNames = new Set([
+    ...areaPatterns.map((p) => p.name),
+    ...tsPatterns.map((p) => p.name),
+  ]);
+
+  // 1. Intro section from ADR-001 metadata with key invariants
+  const meta = PRODUCT_AREA_META[area];
+  if (meta !== undefined) {
+    sections.push(paragraph(`**${meta.question}** ${meta.intro}`));
+
+    if (meta.keyInvariants.length > 0) {
+      sections.push(heading(2, 'Key Invariants'));
+      sections.push(list([...meta.keyInvariants]));
+    }
+    sections.push(separator());
+  }
+
+  // 2. Convention/invariant content from area patterns with convention tags
+  const conventionPatterns = areaPatterns.filter(
+    (p) => p.convention !== undefined && p.convention.length > 0
+  );
+  if (conventionPatterns.length > 0) {
+    const conventions = extractConventionsFromPatterns(conventionPatterns);
+    if (conventions.length > 0) {
+      sections.push(...buildConventionSections(conventions, opts.detailLevel));
+    }
+  }
+
+  // 3. Architecture diagrams — priority: config > meta > auto-generate
+  if (opts.detailLevel !== 'summary' && contextSet.size > 0) {
+    const scopes: readonly DiagramScope[] =
+      config.diagramScopes ??
+      (config.diagramScope !== undefined ? [config.diagramScope] : undefined) ??
+      meta?.diagramScopes ??
+      [];
+
+    if (scopes.length > 0) {
+      for (const scope of scopes) {
+        const diagramSections = buildScopedDiagram(dataset, scope);
+        if (diagramSections.length > 0) {
+          sections.push(...diagramSections);
+        }
+      }
+    } else {
+      // Auto-generate a single scoped diagram from archContext mapping
+      const autoScope: DiagramScope = {
+        archContext: archContexts,
+        direction: 'TB',
+        title: `${area} Components`,
+      };
+      const diagramSections = buildScopedDiagram(dataset, autoScope);
+      if (diagramSections.length > 0) {
+        sections.push(...diagramSections);
+      }
+    }
+  }
+
+  // 4. Shapes from TypeScript patterns in this product area
+  {
+    const allShapes: ExtractedShape[] = [];
+    const seenNames = new Set<string>();
+
+    // Collect shapes from all patterns associated with this area
+    for (const pattern of dataset.patterns) {
+      if (!allRelevantNames.has(pattern.name)) continue;
+      if (pattern.extractedShapes === undefined || pattern.extractedShapes.length === 0) continue;
+      for (const shape of pattern.extractedShapes) {
+        if (!seenNames.has(shape.name)) {
+          seenNames.add(shape.name);
+          allShapes.push(shape);
+        }
+      }
+    }
+
+    // Also include shapes matched by explicit config (if any)
+    if (config.shapeSources.length > 0) {
+      for (const shape of extractShapesFromDataset(dataset, config.shapeSources)) {
+        if (!seenNames.has(shape.name)) {
+          seenNames.add(shape.name);
+          allShapes.push(shape);
+        }
+      }
+    }
+    if (config.shapeSelectors !== undefined && config.shapeSelectors.length > 0) {
+      for (const shape of filterShapesBySelectors(dataset, config.shapeSelectors)) {
+        if (!seenNames.has(shape.name)) {
+          seenNames.add(shape.name);
+          allShapes.push(shape);
+        }
+      }
+    }
+
+    if (allShapes.length > 0) {
+      // Prioritize interfaces and types over functions/variables to keep
+      // product area docs focused on key API types, not implementation details.
+      const kindOrder: Readonly<Record<string, number>> = {
+        interface: 0,
+        type: 1,
+        enum: 2,
+        function: 3,
+        const: 4,
+      };
+      const sorted = [...allShapes].sort(
+        (a, b) => (kindOrder[a.kind] ?? 5) - (kindOrder[b.kind] ?? 5)
+      );
+      const maxShapes = opts.detailLevel === 'detailed' ? 30 : 20;
+      const limited = sorted.slice(0, maxShapes);
+      sections.push(...buildShapeSections(limited, opts.detailLevel));
+    }
+  }
+
+  // 5. Behavior specifications from area patterns with rules or descriptions
+  // Optionally exclude source paths (e.g., Tier 1 specs) via config
+  const behaviorPatterns = areaPatterns.filter(
+    (p) =>
+      (config.excludeSourcePaths === undefined ||
+        config.excludeSourcePaths.length === 0 ||
+        !config.excludeSourcePaths.some((prefix) => p.source.file.startsWith(prefix))) &&
+      (p.directive.description.length > 0 || (p.rules !== undefined && p.rules.length > 0))
+  );
+  if (behaviorPatterns.length > 0) {
+    sections.push(...buildBehaviorSectionsFromPatterns(behaviorPatterns, opts.detailLevel));
+  }
+
+  if (sections.length === 0) {
+    sections.push(
+      paragraph(
+        `No content found for product area "${area}". ` +
+          `Checked ${areaPatterns.length} patterns by productArea tag, ` +
+          `${tsPatterns.length} patterns by archContext [${archContexts.join(', ')}].`
+      )
+    );
+  }
+
+  return document(config.title, sections, {
+    purpose: `${area} product area overview`,
+    detailLevel: opts.detailLevel === 'summary' ? 'Compact summary' : 'Full reference',
   });
 }
 

@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 203/293 (69%)
+**Overall Progress:** [██████████████░░░░░░] 203/295 (69%)
 
 | Status | Count |
 | --- | --- |
-| 🚧 Active | 46 |
-| 📋 Planned | 44 |
-| **Total Remaining** | 90 |
+| 🚧 Active | 47 |
+| 📋 Planned | 45 |
+| **Total Remaining** | 92 |
 
 ---
 
@@ -28,6 +28,8 @@
 | 🚧 [SourceMapper](remaining/phase-27-source-mapper.md) | 1 | 1 | 80% |
 | 🚧 [ReferenceDocShowcase](remaining/phase-30-reference-doc-showcase.md) | 1 | 1 | 0% |
 | 📋 [RichContentHelpersTesting](remaining/phase-44-rich-content-helpers-testing.md) | 2 | 0 | 0% |
+| 🚧 [StepLintVitestCucumber](remaining/phase-50-step-lint-vitest-cucumber.md) | 1 | 1 | 0% |
+| 📋 [StepLintExtendedRules](remaining/phase-51-step-lint-extended-rules.md) | 1 | 0 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 50% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
@@ -42,9 +44,9 @@
 
 | Priority | Count |
 | --- | --- |
-| 🚧 In Progress | 46 |
+| 🚧 In Progress | 47 |
 | ✅ Ready to Start | 43 |
-| ⚠️ Blocked | 1 |
+| ⚠️ Blocked | 2 |
 
 ### Top Ready to Start
 

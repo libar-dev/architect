@@ -130,13 +130,15 @@ export function checkMissingAndDestructuring(featureContent, stepContent, stepFi
             break;
         }
     }
-    return [{
+    return [
+        {
             rule: STEP_LINT_RULES.missingAndDestructuring.id,
             severity: STEP_LINT_RULES.missingAndDestructuring.severity,
             message: `Feature has And steps but step definition does not destructure And — add And to the destructuring pattern ({ Given, When, Then, And })`,
             file: stepFilePath,
             line: describeLine,
-        }];
+        },
+    ];
 }
 /**
  * Check 3: Detect missing Rule() wrapper.
@@ -169,13 +171,15 @@ export function checkMissingRuleWrapper(featureContent, stepContent, stepFilePat
             break;
         }
     }
-    return [{
+    return [
+        {
             rule: STEP_LINT_RULES.missingRuleWrapper.id,
             severity: STEP_LINT_RULES.missingRuleWrapper.severity,
             message: `Feature has Rule: blocks but step definition does not destructure Rule from describeFeature — use Rule('name', ({ RuleScenario }) => { ... })`,
             file: stepFilePath,
             line: describeLine,
-        }];
+        },
+    ];
 }
 /**
  * Run all cross-file checks on a paired feature + step file.

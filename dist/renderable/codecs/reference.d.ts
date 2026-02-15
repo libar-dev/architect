@@ -90,7 +90,51 @@ export interface ReferenceDocConfig {
     readonly shapeSelectors?: readonly ShapeSelector[];
     /** DD-1 (CrossCuttingDocumentInclusion): Include-tag values for cross-cutting content routing */
     readonly includeTags?: readonly string[];
+    /**
+     * Product area filter (ADR-001 canonical values).
+     * When set, pre-filters all content sources to patterns with matching productArea.
+     * Auto-generates diagram scopes from productArea→archContext mapping if no
+     * explicit diagramScopes are provided.
+     */
+    readonly productArea?: string;
+    /**
+     * Exclude patterns whose source.file starts with any of these prefixes.
+     * Used to filter ephemeral planning specs from behavior sections.
+     * @example ['delivery-process/specs/']
+     */
+    readonly excludeSourcePaths?: readonly string[];
 }
+/**
+ * Maps canonical product area values to their associated archContext values.
+ * Product areas are Gherkin-side tags; archContexts are TypeScript-side tags.
+ * This mapping bridges the two tagging domains for diagram scoping.
+ */
+export declare const PRODUCT_AREA_ARCH_CONTEXT_MAP: Readonly<Record<string, readonly string[]>>;
+/**
+ * Product area metadata for intro sections and index generation.
+ *
+ * Each area has a reader-facing question (from ADR-001), a coverage summary,
+ * an intro paragraph synthesized from executable specs, key invariants
+ * curated from business rules, and the most important patterns in the area.
+ */
+export interface ProductAreaMeta {
+    /** Reader-facing question (from ADR-001 canonical values) */
+    readonly question: string;
+    /** Comma-separated coverage summary */
+    readonly covers: string;
+    /** 2-4 sentence intro explaining what this area does and why it matters */
+    readonly intro: string;
+    /** Live diagram scopes generated from annotation data (overrides auto-generated diagram) */
+    readonly diagramScopes?: readonly DiagramScope[];
+    /** Key invariants to surface prominently (curated from executable specs) */
+    readonly keyInvariants: readonly string[];
+    /** Key patterns in this area */
+    readonly keyPatterns: readonly string[];
+}
+/**
+ * ADR-001 canonical product area metadata for intro sections.
+ */
+export declare const PRODUCT_AREA_META: Readonly<Record<string, ProductAreaMeta>>;
 export interface ReferenceCodecOptions extends BaseCodecOptions {
     /** Override detail level (default: 'standard') */
     readonly detailLevel?: DetailLevel;

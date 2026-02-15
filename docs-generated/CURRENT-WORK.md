@@ -7,15 +7,15 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 203/293 (69%)
+**Overall Progress:** [██████████████░░░░░░] 203/295 (69%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 293 |
+| Total Patterns | 295 |
 | Completed | 203 |
-| Active | 46 |
-| Planned | 44 |
-| Active Phases | 4 |
+| Active | 47 |
+| Planned | 45 |
+| Active Phases | 5 |
 
 ---
 
@@ -103,6 +103,30 @@
 
 ---
 
+### 🚧 StepLintVitestCucumber
+
+[░░░░░░░░░░░░░░░] 0/1 0% complete (0 done, 1 active)
+
+| Pattern | Description |
+| --- | --- |
+| 🚧 Step Lint Vitest Cucumber | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
+
+#### Deliverables
+
+- ✅ Step lint types and rule definitions
+- ✅ Feature-only checks (3 rules)
+- ✅ Step-only checks (2 rules)
+- ✅ Cross-file checks (3 rules)
+- ✅ Feature-to-step pair resolver
+- ✅ Lint runner orchestrator
+- ✅ Barrel exports
+- ✅ CLI entry point
+- ✅ Gherkin executable specs
+
+[View StepLintVitestCucumber details →](current/phase-50-step-lint-vitest-cucumber.md)
+
+---
+
 ## All Active Patterns
 
 | Pattern | Phase | Effort | Description |
@@ -111,6 +135,7 @@
 | 🚧 Pattern Helpers Tests | Phase 25 | - | - |
 | 🚧 File Cache | Phase 27 | - | Simple Map-based cache for file contents during a single generation run. |
 | 🚧 Reference Doc Showcase | Phase 30 | 13d | The Reference Generation Sample document exercises a small fraction of the reference codec's capabilities: 2... |
+| 🚧 Step Lint Vitest Cucumber | Phase 50 | 1d | Hours are lost debugging vitest-cucumber-specific issues that only surface at test runtime. |
 | 🚧 API Module | - | - | Central export for the Process State API, providing a TypeScript interface for querying delivery process state. |
 | 🚧 Arch Queries Impl | - | - | Pure functions over MasterDataset for deep architecture exploration. |
 | 🚧 Arch Queries Test | - | - | - |
