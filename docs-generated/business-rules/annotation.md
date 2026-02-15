@@ -14,37 +14,63 @@
 
 *Patterns in standard directories (src/validation/, src/scanner/) should*
 
+---
+
 #### matchPattern supports recursive wildcard **
 
-_Verified by: Recursive wildcard matches nested paths_
+**Verified by:**
+- Recursive wildcard matches nested paths
+
+---
 
 #### matchPattern supports single-level wildcard /*
 
-_Verified by: Single-level wildcard matches direct children only_
+**Verified by:**
+- Single-level wildcard matches direct children only
+
+---
 
 #### matchPattern supports prefix matching
 
-_Verified by: Prefix matching behavior_
+**Verified by:**
+- Prefix matching behavior
+
+---
 
 #### inferContext returns undefined when no rules match
 
-_Verified by: Empty rules array returns undefined, File path does not match any rule_
+**Verified by:**
+- Empty rules array returns undefined
+- File path does not match any rule
+
+---
 
 #### inferContext applies first matching rule
 
-_Verified by: Single matching rule infers context, First matching rule wins when multiple could match_
+**Verified by:**
+- Single matching rule infers context
+- First matching rule wins when multiple could match
+
+---
 
 #### Explicit archContext is not overridden
 
-_Verified by: Explicit context takes precedence over inference_
+**Verified by:**
+- Explicit context takes precedence over inference
+
+---
 
 #### Inference works independently of archLayer
 
-_Verified by: Pattern without archLayer is still added to byContext if context is inferred_
+**Verified by:**
+- Pattern without archLayer is still added to byContext if context is inferred
+
+---
 
 #### Default rules map standard directories
 
-_Verified by: Default directory mappings_
+**Verified by:**
+- Default directory mappings
 
 *context-inference.feature*
 
@@ -52,17 +78,37 @@ _Verified by: Default directory mappings_
 
 *Tests the discoverTaggedShapes function that scans TypeScript source*
 
+---
+
 #### Declarations opt in via libar-docs-shape tag
 
-**Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
+> **Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes.
 
-_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted, Tagged declaration is extracted, Untagged export is ignored, Bare tag works without group_
+**Verified by:**
+- Tagged declaration is extracted as shape
+- Untagged exported declaration is not extracted
+- Group name is captured from tag value
+- Bare tag works without group name
+- Non-exported tagged declaration is extracted
+- Tagged declaration is extracted
+- Untagged export is ignored
+- Bare tag works without group
+
+---
 
 #### Discovery uses existing estree parser with JSDoc comment scanning
 
-**Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach.
+> **Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach.
 
-_Verified by: All five declaration kinds are discoverable, JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched, Tag as last line before closing JSDoc delimiter, Hypothetical libar-docs-shape-extended tag is not matched, Tag coexists with other JSDoc content, All 5 declaration kinds supported, JSDoc gap enforcement, Tag with other JSDoc content_
+**Verified by:**
+- All five declaration kinds are discoverable
+- JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched
+- Tag as last line before closing JSDoc delimiter
+- Hypothetical libar-docs-shape-extended tag is not matched
+- Tag coexists with other JSDoc content
+- All 5 declaration kinds supported
+- JSDoc gap enforcement
+- Tag with other JSDoc content
 
 *declaration-level-shape-tagging.feature*
 
@@ -70,31 +116,50 @@ _Verified by: All five declaration kinds are discoverable, JSDoc with gap larger
 
 *Tests extraction of @libar-docs-depends-on and @libar-docs-enables*
 
+---
+
 #### Depends-on tag is defined in taxonomy registry
 
-_Verified by: Depends-on tag exists in registry, Enables tag exists in registry_
+**Verified by:**
+- Depends-on tag exists in registry
+- Enables tag exists in registry
+
+---
 
 #### Depends-on tag is extracted from Gherkin files
 
-_Verified by: Depends-on extracted from feature file, Multiple depends-on values extracted as CSV_
+**Verified by:**
+- Depends-on extracted from feature file
+- Multiple depends-on values extracted as CSV
+
+---
 
 #### Depends-on in TypeScript triggers anti-pattern warning
 
 The depends-on tag is for planning dependencies and belongs in feature
     files, not TypeScript code.
 
-_Verified by: Depends-on in TypeScript is detected by lint rule_
+**Verified by:**
+- Depends-on in TypeScript is detected by lint rule
+
+---
 
 #### Enables tag is extracted from Gherkin files
 
-_Verified by: Enables extracted from feature file, Multiple enables values extracted as CSV_
+**Verified by:**
+- Enables extracted from feature file
+- Multiple enables values extracted as CSV
+
+---
 
 #### Planning dependencies are stored in relationship index
 
 The relationship index stores dependsOn and enables relationships
     directly from pattern metadata.
 
-_Verified by: DependsOn relationships stored in relationship index, Enables relationships stored explicitly_
+**Verified by:**
+- DependsOn relationships stored in relationship index
+- Enables relationships stored explicitly
 
 *depends-on-tag.feature*
 
@@ -102,21 +167,43 @@ _Verified by: DependsOn relationships stored in relationship index, Enables rela
 
 *- Full AST parsing of every TypeScript file is expensive and slow*
 
+---
+
 #### hasDocDirectives detects @libar-docs-* section directives
 
-**Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix} directive (case-sensitive, @ required, suffix required).
+> **Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix} directive (case-sensitive, @ required, suffix required).
+>
+> **Rationale:** This is the first-pass filter in the scanner pipeline; false negatives cause patterns to be silently missed, while false positives only waste AST parsing time.
 
-**Rationale:** This is the first-pass filter in the scanner pipeline; false negatives cause patterns to be silently missed, while false positives only waste AST parsing time.
+**Verified by:**
+- Detect @libar-docs-core directive in JSDoc block
+- Detect various @libar-docs-* directives
+- Detect directive anywhere in file content
+- Detect multiple directives on same line
+- Detect directive in inline comment
+- Return false for content without directives
+- Return false for empty content in hasDocDirectives
+- Reject similar but non-matching patterns
 
-_Verified by: Detect @libar-docs-core directive in JSDoc block, Detect various @libar-docs-* directives, Detect directive anywhere in file content, Detect multiple directives on same line, Detect directive in inline comment, Return false for content without directives, Return false for empty content in hasDocDirectives, Reject similar but non-matching patterns_
+---
 
 #### hasFileOptIn detects file-level @libar-docs marker
 
-**Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @libar-docs-* suffixed tags must not match.
+> **Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @libar-docs-* suffixed tags must not match.
+>
+> **Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @libar-docs-core (a section tag) with @libar-docs (file opt-in) would either miss files or over-include them.
 
-**Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @libar-docs-core (a section tag) with @libar-docs (file opt-in) would either miss files or over-include them.
-
-_Verified by: Detect @libar-docs in JSDoc block comment, Detect @libar-docs with description on same line, Detect @libar-docs in multi-line JSDoc, Detect @libar-docs anywhere in file, Detect @libar-docs combined with section tags, Return false when only section tags present, Return false for multiple section tags without opt-in, Return false for empty content in hasFileOptIn, Return false for @libar-docs in line comment, Not confuse @libar-docs-* with @libar-docs opt-in_
+**Verified by:**
+- Detect @libar-docs in JSDoc block comment
+- Detect @libar-docs with description on same line
+- Detect @libar-docs in multi-line JSDoc
+- Detect @libar-docs anywhere in file
+- Detect @libar-docs combined with section tags
+- Return false when only section tags present
+- Return false for multiple section tags without opt-in
+- Return false for empty content in hasFileOptIn
+- Return false for @libar-docs in line comment
+- Not confuse @libar-docs-* with @libar-docs opt-in
 
 *directive-detection.feature*
 
@@ -124,17 +211,32 @@ _Verified by: Detect @libar-docs in JSDoc block comment, Detect @libar-docs with
 
 *DocString language hints (mediaType) should be preserved through the parsing*
 
+---
+
 #### Parser preserves DocString mediaType during extraction
 
-_Verified by: Parse DocString with typescript mediaType, Parse DocString with json mediaType, Parse DocString with jsdoc mediaType, DocString without mediaType has undefined mediaType_
+**Verified by:**
+- Parse DocString with typescript mediaType
+- Parse DocString with json mediaType
+- Parse DocString with jsdoc mediaType
+- DocString without mediaType has undefined mediaType
+
+---
 
 #### MediaType is used when rendering code blocks
 
-_Verified by: TypeScript mediaType renders as typescript code block, JSDoc mediaType prevents asterisk escaping, Missing mediaType falls back to default language_
+**Verified by:**
+- TypeScript mediaType renders as typescript code block
+- JSDoc mediaType prevents asterisk escaping
+- Missing mediaType falls back to default language
+
+---
 
 #### renderDocString handles both string and object formats
 
-_Verified by: String docString renders correctly (legacy format), Object docString with mediaType takes precedence_
+**Verified by:**
+- String docString renders correctly (legacy format)
+- Object docString with mediaType takes precedence
 
 *docstring-mediatype.feature*
 
@@ -142,25 +244,55 @@ _Verified by: String docString renders correctly (legacy format), Object docStri
 
 *- Pattern data split across code stubs and feature files*
 
+---
+
 #### Process metadata is extracted from feature tags
 
-_Verified by: Complete process metadata extraction, Minimal required tags extraction, Missing pattern tag returns null, Missing phase tag returns null_
+**Verified by:**
+- Complete process metadata extraction
+- Minimal required tags extraction
+- Missing pattern tag returns null
+- Missing phase tag returns null
+
+---
 
 #### Deliverables are extracted from Background tables
 
-_Verified by: Standard deliverables table extraction, Extended deliverables with Finding and Release, Feature without background returns empty, Tests column handles various formats_
+**Verified by:**
+- Standard deliverables table extraction
+- Extended deliverables with Finding and Release
+- Feature without background returns empty
+- Tests column handles various formats
+
+---
 
 #### Code and feature patterns are combined into dual-source patterns
 
-_Verified by: Matching code and feature are combined, Code-only pattern has no matching feature, Feature-only pattern has no matching code, Phase mismatch creates validation error, Pattern name collision merges sources_
+**Verified by:**
+- Matching code and feature are combined
+- Code-only pattern has no matching feature
+- Feature-only pattern has no matching code
+- Phase mismatch creates validation error
+- Pattern name collision merges sources
+
+---
 
 #### Dual-source results are validated for consistency
 
-_Verified by: Clean results have no errors, Cross-validation errors are reported, Orphaned roadmap code stubs produce warnings, Feature-only roadmap patterns produce warnings_
+**Verified by:**
+- Clean results have no errors
+- Cross-validation errors are reported
+- Orphaned roadmap code stubs produce warnings
+- Feature-only roadmap patterns produce warnings
+
+---
 
 #### Include tags are extracted from Gherkin feature tags
 
-_Verified by: Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field_
+**Verified by:**
+- Single include tag is extracted
+- CSV include tag produces multiple values
+- Feature without include tag has no include field
 
 *dual-source-extraction.feature*
 
@@ -168,24 +300,38 @@ _Verified by: Single include tag is extracted, CSV include tag produces multiple
 
 *Tests for the @libar-docs-extends tag which establishes generalization*
 
+---
+
 #### Extends tag is defined in taxonomy registry
 
-_Verified by: Extends tag exists in registry_
+**Verified by:**
+- Extends tag exists in registry
+
+---
 
 #### Patterns can extend exactly one base pattern
 
 Extends uses single-value format because pattern inheritance should be
     single-inheritance to avoid diamond problems.
 
-_Verified by: Parse extends from feature file, Extends preserved through extraction pipeline_
+**Verified by:**
+- Parse extends from feature file
+- Extends preserved through extraction pipeline
+
+---
 
 #### Transform builds extendedBy reverse lookup
 
-_Verified by: Extended pattern knows its extensions_
+**Verified by:**
+- Extended pattern knows its extensions
+
+---
 
 #### Linter detects circular inheritance chains
 
-_Verified by: Direct circular inheritance detected, Transitive circular inheritance detected_
+**Verified by:**
+- Direct circular inheritance detected
+- Transitive circular inheritance detected
 
 *extends-tag.feature*
 
@@ -193,29 +339,62 @@ _Verified by: Direct circular inheritance detected, Transitive circular inherita
 
 *Validates extraction pipeline capabilities for ReferenceDocShowcase:*
 
+---
+
 #### Function signatures surface full parameter types in ExportInfo
 
-**Invariant:** ExportInfo.signature shows full parameter types and return type instead of the placeholder value.
+> **Invariant:** ExportInfo.signature shows full parameter types and return type instead of the placeholder value.
 
-_Verified by: Simple function signature is extracted with full types, Async function keeps async prefix in signature, Multi-parameter function has all types in signature, Function with object parameter type preserves braces, Simple function signature, Async function keeps async prefix, Multi-parameter function, Function with object parameter type_
+**Verified by:**
+- Simple function signature is extracted with full types
+- Async function keeps async prefix in signature
+- Multi-parameter function has all types in signature
+- Function with object parameter type preserves braces
+- Simple function signature
+- Async function keeps async prefix
+- Multi-parameter function
+- Function with object parameter type
+
+---
 
 #### Property-level JSDoc preserves full multi-line content
 
-**Invariant:** Property-level JSDoc preserves full multi-line content without first-line truncation.
+> **Invariant:** Property-level JSDoc preserves full multi-line content without first-line truncation.
 
-_Verified by: Multi-line property JSDoc is fully preserved, Single-line property JSDoc still works, Multi-line property JSDoc preserved, Single-line property JSDoc unchanged_
+**Verified by:**
+- Multi-line property JSDoc is fully preserved
+- Single-line property JSDoc still works
+- Multi-line property JSDoc preserved
+- Single-line property JSDoc unchanged
+
+---
 
 #### Param returns and throws tags are extracted from function JSDoc
 
-**Invariant:** JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape for function-kind shapes.
+> **Invariant:** JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape for function-kind shapes.
 
-_Verified by: Param tags are extracted from function JSDoc, Returns tag is extracted from function JSDoc, Throws tags are extracted from function JSDoc, JSDoc params with braces type syntax are parsed, Param tags extracted, Returns tag extracted, Throws tags extracted, TypeScript-style params without braces_
+**Verified by:**
+- Param tags are extracted from function JSDoc
+- Returns tag is extracted from function JSDoc
+- Throws tags are extracted from function JSDoc
+- JSDoc params with braces type syntax are parsed
+- Param tags extracted
+- Returns tag extracted
+- Throws tags extracted
+- TypeScript-style params without braces
+
+---
 
 #### Auto-shape discovery extracts all exported types via wildcard
 
-**Invariant:** When extract-shapes tag value is the wildcard character, all exported declarations are extracted without listing names.
+> **Invariant:** When extract-shapes tag value is the wildcard character, all exported declarations are extracted without listing names.
 
-_Verified by: Wildcard extracts all exported declarations, Mixed wildcard and names produces warning, Wildcard extracts all exports, Non-exported declarations excluded, Mixed wildcard and names rejected_
+**Verified by:**
+- Wildcard extracts all exported declarations
+- Mixed wildcard and names produces warning
+- Wildcard extracts all exports
+- Non-exported declarations excluded
+- Mixed wildcard and names rejected
 
 *extraction-pipeline-enhancements.feature*
 
@@ -223,27 +402,43 @@ _Verified by: Wildcard extracts all exported declarations, Mixed wildcard and na
 
 *The file discovery system uses glob patterns to find TypeScript files*
 
+---
+
 #### Glob patterns match TypeScript source files
 
-**Invariant:** findFilesToScan must return absolute paths for all files matching the configured glob patterns.
+> **Invariant:** findFilesToScan must return absolute paths for all files matching the configured glob patterns.
+>
+> **Rationale:** Downstream pipeline stages (AST parser, extractor) require absolute paths to read file contents; relative paths would break when baseDir differs from cwd.
 
-**Rationale:** Downstream pipeline stages (AST parser, extractor) require absolute paths to read file contents; relative paths would break when baseDir differs from cwd.
+**Verified by:**
+- Find TypeScript files matching glob patterns
+- Return absolute paths
+- Support multiple glob patterns
 
-_Verified by: Find TypeScript files matching glob patterns, Return absolute paths, Support multiple glob patterns_
+---
 
 #### Default exclusions filter non-source files
 
-**Invariant:** node_modules, dist, .test.ts, .spec.ts, and .d.ts files must be excluded by default without explicit configuration.
+> **Invariant:** node_modules, dist, .test.ts, .spec.ts, and .d.ts files must be excluded by default without explicit configuration.
+>
+> **Rationale:** Scanning generated output (dist), third-party code (node_modules), or test files would produce false positives in the pattern registry and waste processing time.
 
-**Rationale:** Scanning generated output (dist), third-party code (node_modules), or test files would produce false positives in the pattern registry and waste processing time.
+**Verified by:**
+- Exclude node_modules by default
+- Exclude dist directory by default
+- Exclude test files by default
+- Exclude .d.ts declaration files
 
-_Verified by: Exclude node_modules by default, Exclude dist directory by default, Exclude test files by default, Exclude .d.ts declaration files_
+---
 
 #### Custom configuration extends discovery behavior
 
-**Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.
+> **Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.
 
-_Verified by: Respect custom exclude patterns, Return empty array when no files match, Handle nested directory structures_
+**Verified by:**
+- Respect custom exclude patterns
+- Return empty array when no files match
+- Handle nested directory structures
 
 *file-discovery.feature*
 
@@ -251,21 +446,30 @@ _Verified by: Respect custom exclude patterns, Return empty array when no files 
 
 *The Gherkin AST parser extracts feature metadata, scenarios, and steps*
 
+---
+
 #### Successful feature file parsing extracts complete metadata
 
-**Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all nested scenarios with their steps.
+> **Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all nested scenarios with their steps.
+>
+> **Rationale:** Downstream generators (timeline, business rules) depend on complete AST extraction; missing fields cause silent gaps in generated documentation.
 
-**Rationale:** Downstream generators (timeline, business rules) depend on complete AST extraction; missing fields cause silent gaps in generated documentation.
+**Verified by:**
+- Parse valid feature file with pattern metadata
+- Parse multiple scenarios
+- Handle feature without tags
 
-_Verified by: Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags_
+---
 
 #### Invalid Gherkin produces structured errors
 
-**Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a descriptive error message.
+> **Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a descriptive error message.
+>
+> **Rationale:** The scanner processes many feature files in batch; structured errors allow graceful degradation and per-file error reporting rather than aborting the entire scan.
 
-**Rationale:** The scanner processes many feature files in batch; structured errors allow graceful degradation and per-file error reporting rather than aborting the entire scan.
-
-_Verified by: Return error for malformed Gherkin, Return error for file without feature_
+**Verified by:**
+- Return error for malformed Gherkin
+- Return error for file without feature
 
 *gherkin-parser.feature*
 
@@ -273,28 +477,47 @@ _Verified by: Return error for malformed Gherkin, Return error for file without 
 
 *Tests for the @libar-docs-implements tag which links implementation files*
 
+---
+
 #### Implements tag is defined in taxonomy registry
 
 The tag registry defines `implements` with CSV format, enabling the
     data-driven AST parser to automatically extract it.
 
-_Verified by: Implements tag exists in registry_
+**Verified by:**
+- Implements tag exists in registry
+
+---
 
 #### Files can implement a single pattern
 
-_Verified by: Parse implements with single pattern, Implements preserved through extraction pipeline_
+**Verified by:**
+- Parse implements with single pattern
+- Implements preserved through extraction pipeline
+
+---
 
 #### Files can implement multiple patterns using CSV format
 
-_Verified by: Parse implements with multiple patterns, CSV values are trimmed_
+**Verified by:**
+- Parse implements with multiple patterns
+- CSV values are trimmed
+
+---
 
 #### Transform builds implementedBy reverse lookup
 
-_Verified by: Single implementation creates reverse lookup, Multiple implementations aggregate_
+**Verified by:**
+- Single implementation creates reverse lookup
+- Multiple implementations aggregate
+
+---
 
 #### Schemas validate implements field correctly
 
-_Verified by: DocDirective schema accepts implements, RelationshipEntry schema accepts implementedBy_
+**Verified by:**
+- DocDirective schema accepts implements
+- RelationshipEntry schema accepts implementedBy
 
 *implements-tag.feature*
 
@@ -302,35 +525,55 @@ _Verified by: DocDirective schema accepts implements, RelationshipEntry schema a
 
 *- Need to scan entire codebases for documentation directives efficiently*
 
+---
+
 #### scanPatterns extracts directives from TypeScript files
 
-**Invariant:** Every file with a valid opt-in marker and JSDoc directives produces a complete ScannedFile with tags, description, examples, and exports.
+> **Invariant:** Every file with a valid opt-in marker and JSDoc directives produces a complete ScannedFile with tags, description, examples, and exports.
+>
+> **Rationale:** Downstream generators depend on complete directive data; partial extraction causes silent documentation gaps across the monorepo.
 
-**Rationale:** Downstream generators depend on complete directive data; partial extraction causes silent documentation gaps across the monorepo.
+**Verified by:**
+- Scan files and extract directives
+- Skip files without directives
+- Extract complete directive information
 
-_Verified by: Scan files and extract directives, Skip files without directives, Extract complete directive information_
+---
 
 #### scanPatterns collects errors without aborting
 
-**Invariant:** A parse failure in one file never prevents other files from being scanned; the result is always Ok with errors collected separately.
+> **Invariant:** A parse failure in one file never prevents other files from being scanned; the result is always Ok with errors collected separately.
+>
+> **Rationale:** In a monorepo with hundreds of files, a single syntax error must not block the entire documentation pipeline.
 
-**Rationale:** In a monorepo with hundreds of files, a single syntax error must not block the entire documentation pipeline.
+**Verified by:**
+- Collect errors for files that fail to parse
+- Always return Ok result even with broken files
 
-_Verified by: Collect errors for files that fail to parse, Always return Ok result even with broken files_
+---
 
 #### Pattern matching and exclusion filtering
 
-**Invariant:** Glob patterns control file discovery and exclusion patterns remove matched files before scanning.
+> **Invariant:** Glob patterns control file discovery and exclusion patterns remove matched files before scanning.
 
-_Verified by: Return empty results when no patterns match, Respect exclusion patterns, Handle multiple files with multiple directives each_
+**Verified by:**
+- Return empty results when no patterns match
+- Respect exclusion patterns
+- Handle multiple files with multiple directives each
+
+---
 
 #### File opt-in requirement gates scanning
 
-**Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-*) are eligible for directive extraction.
+> **Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-*) are eligible for directive extraction.
+>
+> **Rationale:** Without opt-in gating, every TypeScript file in the monorepo would be parsed, wasting processing time on files that have no documentation directives.
 
-**Rationale:** Without opt-in gating, every TypeScript file in the monorepo would be parsed, wasting processing time on files that have no documentation directives.
-
-_Verified by: Handle files with quick directive check optimization, Skip files without @libar-docs file-level opt-in, Not confuse @libar-docs-* with @libar-docs opt-in, Detect @libar-docs opt-in combined with section tags_
+**Verified by:**
+- Handle files with quick directive check optimization
+- Skip files without @libar-docs file-level opt-in
+- Not confuse @libar-docs-* with @libar-docs opt-in
+- Detect @libar-docs opt-in combined with section tags
 
 *scanner-core.feature*
 
@@ -338,72 +581,135 @@ _Verified by: Handle files with quick directive check optimization, Skip files w
 
 *Validates the shape extraction system that extracts TypeScript type*
 
+---
+
 #### extract-shapes tag exists in registry with CSV format
 
-_Verified by: Tag registry contains extract-shapes with correct format_
+**Verified by:**
+- Tag registry contains extract-shapes with correct format
+
+---
 
 #### Interfaces are extracted from TypeScript AST
 
-_Verified by: Extract simple interface, Extract interface with JSDoc, Extract interface with generics, Extract interface with extends, Non-existent shape produces not-found entry_
+**Verified by:**
+- Extract simple interface
+- Extract interface with JSDoc
+- Extract interface with generics
+- Extract interface with extends
+- Non-existent shape produces not-found entry
+
+---
 
 #### Property-level JSDoc is extracted for interface properties
 
 The extractor uses strict adjacency (gap = 1 line) to prevent
     interface-level JSDoc from being misattributed to the first property.
 
-_Verified by: Extract properties with adjacent JSDoc, Interface JSDoc not attributed to first property, Mixed documented and undocumented properties_
+**Verified by:**
+- Extract properties with adjacent JSDoc
+- Interface JSDoc not attributed to first property
+- Mixed documented and undocumented properties
+
+---
 
 #### Type aliases are extracted from TypeScript AST
 
-_Verified by: Extract union type alias, Extract mapped type, Extract conditional type_
+**Verified by:**
+- Extract union type alias
+- Extract mapped type
+- Extract conditional type
+
+---
 
 #### Enums are extracted from TypeScript AST
 
-_Verified by: Extract string enum, Extract const enum_
+**Verified by:**
+- Extract string enum
+- Extract const enum
+
+---
 
 #### Function signatures are extracted with body omitted
 
-_Verified by: Extract function signature, Extract async function signature_
+**Verified by:**
+- Extract function signature
+- Extract async function signature
+
+---
 
 #### Multiple shapes are extracted in specified order
 
-_Verified by: Shapes appear in tag order not source order, Mixed shape types in specified order_
+**Verified by:**
+- Shapes appear in tag order not source order
+- Mixed shape types in specified order
+
+---
 
 #### Extracted shapes render as fenced code blocks
 
-_Verified by: Render shapes as markdown_
+**Verified by:**
+- Render shapes as markdown
+
+---
 
 #### Imported and re-exported shapes are tracked separately
 
-_Verified by: Imported shape produces warning, Re-exported shape produces re-export entry_
+**Verified by:**
+- Imported shape produces warning
+- Re-exported shape produces re-export entry
+
+---
 
 #### Const declarations are extracted from TypeScript AST
 
-_Verified by: Extract const with type annotation, Extract const without type annotation_
+**Verified by:**
+- Extract const with type annotation
+- Extract const without type annotation
+
+---
 
 #### Invalid TypeScript produces error result
 
-_Verified by: Malformed TypeScript returns error_
+**Verified by:**
+- Malformed TypeScript returns error
+
+---
 
 #### Non-exported shapes are extractable
 
-_Verified by: Extract non-exported interface, Re-export marks internal shape as exported_
+**Verified by:**
+- Extract non-exported interface
+- Re-export marks internal shape as exported
+
+---
 
 #### Shape rendering supports grouping options
 
-_Verified by: Grouped rendering in single code block, Separate rendering with multiple code blocks_
+**Verified by:**
+- Grouped rendering in single code block
+- Separate rendering with multiple code blocks
+
+---
 
 #### Annotation tags are stripped from extracted JSDoc while preserving standard tags
 
-**Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+> **Invariant:** Extracted shapes never contain @libar-docs-* annotation lines in their jsDoc field.
+>
+> **Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata for the extraction pipeline, not user-visible documentation content.
 
-**Rationale:** Shape JSDoc is rendered in documentation output. Annotation tags are metadata for the extraction pipeline, not user-visible documentation content.
+**Verified by:**
+- JSDoc with only annotation tags produces no jsDoc
+- Mixed JSDoc preserves standard tags and strips annotation tags
+- Single-line annotation-only JSDoc produces no jsDoc
+- Consecutive empty lines after tag removal are collapsed
 
-_Verified by: JSDoc with only annotation tags produces no jsDoc, Mixed JSDoc preserves standard tags and strips annotation tags, Single-line annotation-only JSDoc produces no jsDoc, Consecutive empty lines after tag removal are collapsed_
+---
 
 #### Large source files are rejected to prevent memory exhaustion
 
-_Verified by: Source code exceeding 5MB limit returns error_
+**Verified by:**
+- Source code exceeding 5MB limit returns error
 
 *shape-extraction.feature*
 
@@ -411,28 +717,48 @@ _Verified by: Source code exceeding 5MB limit returns error_
 
 *Tests extraction and processing of @libar-docs-uses and @libar-docs-used-by*
 
+---
+
 #### Uses tag is defined in taxonomy registry
 
-_Verified by: Uses tag exists in registry, Used-by tag exists in registry_
+**Verified by:**
+- Uses tag exists in registry
+- Used-by tag exists in registry
+
+---
 
 #### Uses tag is extracted from TypeScript files
 
-_Verified by: Single uses value extracted, Multiple uses values extracted as CSV_
+**Verified by:**
+- Single uses value extracted
+- Multiple uses values extracted as CSV
+
+---
 
 #### Used-by tag is extracted from TypeScript files
 
-_Verified by: Single used-by value extracted, Multiple used-by values extracted as CSV_
+**Verified by:**
+- Single used-by value extracted
+- Multiple used-by values extracted as CSV
+
+---
 
 #### Uses relationships are stored in relationship index
 
 The relationship index stores uses and usedBy relationships directly
     from pattern metadata.
 
-_Verified by: Uses relationships stored in relationship index, UsedBy relationships stored explicitly_
+**Verified by:**
+- Uses relationships stored in relationship index
+- UsedBy relationships stored explicitly
+
+---
 
 #### Schemas validate uses field correctly
 
-_Verified by: DocDirective schema accepts uses, RelationshipEntry schema accepts usedBy_
+**Verified by:**
+- DocDirective schema accepts uses
+- RelationshipEntry schema accepts usedBy
 
 *uses-tag.feature*
 

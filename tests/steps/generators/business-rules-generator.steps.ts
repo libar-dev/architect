@@ -865,8 +865,8 @@ const example = "code";
   // Rule 10: Verified-by renders as compact italic line
   // ===========================================================================
 
-  Rule('Verified-by renders as compact italic line at standard level', ({ RuleScenario }) => {
-    RuleScenario('Rules with scenarios show compact verified-by line', ({ Given, When, Then }) => {
+  Rule('Verified-by renders as checkbox list at standard level', ({ RuleScenario }) => {
+    RuleScenario('Rules with scenarios show verified-by checklist', ({ Given, When, Then }) => {
       Given(
         'a pattern with a rule having scenarios {string} and {string}',
         (_ctx: unknown, scenario1: string, scenario2: string) => {
@@ -918,14 +918,11 @@ const example = "code";
         runGenerator({ detailLevel: 'standard', generateDetailFiles: false });
       });
 
-      Then('the verified-by line contains each scenario name only once', () => {
-        // Count occurrences of "Scenario Alpha" in the verified-by line
-        const verifiedByMatch = /_Verified by:.*_/.exec(state!.markdown);
-        expect(verifiedByMatch).not.toBeNull();
-        const line = verifiedByMatch![0];
-        const alphaCount = (line.match(/Scenario Alpha/g) ?? []).length;
+      Then('the verified-by list contains each scenario name only once', () => {
+        // Count occurrences of "Scenario Alpha" as bullet items
+        const alphaCount = (state!.markdown.match(/- Scenario Alpha/g) ?? []).length;
         expect(alphaCount, 'Scenario Alpha should appear exactly once').toBe(1);
-        expect(line).toContain('Scenario Beta');
+        expect(state!.markdown).toContain('- Scenario Beta');
       });
     });
   });

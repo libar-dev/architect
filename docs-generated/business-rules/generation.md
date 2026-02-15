@@ -14,25 +14,54 @@
 
 *As a document codec author*
 
+---
+
 #### DocString parsing handles edge cases
 
-_Verified by: Empty description returns empty array, Description with no DocStrings returns single paragraph, Single DocString parses correctly, DocString without language hint uses text, Unclosed DocString returns plain paragraph fallback, Windows CRLF line endings are normalized_
+**Verified by:**
+- Empty description returns empty array
+- Description with no DocStrings returns single paragraph
+- Single DocString parses correctly
+- DocString without language hint uses text
+- Unclosed DocString returns plain paragraph fallback
+- Windows CRLF line endings are normalized
+
+---
 
 #### DataTable rendering produces valid markdown
 
-_Verified by: Single row DataTable renders correctly, Multi-row DataTable renders correctly, Missing cell values become empty strings_
+**Verified by:**
+- Single row DataTable renders correctly
+- Multi-row DataTable renders correctly
+- Missing cell values become empty strings
+
+---
 
 #### Scenario content rendering respects options
 
-_Verified by: Render scenario with steps, Skip steps when includeSteps is false, Render scenario with DataTable in step_
+**Verified by:**
+- Render scenario with steps
+- Skip steps when includeSteps is false
+- Render scenario with DataTable in step
+
+---
 
 #### Business rule rendering handles descriptions
 
-_Verified by: Rule with simple description, Rule with no description, Rule with embedded DocString in description_
+**Verified by:**
+- Rule with simple description
+- Rule with no description
+- Rule with embedded DocString in description
+
+---
 
 #### DocString content is dedented when parsed
 
-_Verified by: Code block preserves internal relative indentation, Empty lines in code block are preserved, Trailing whitespace is trimmed from each line, Code with mixed indentation is preserved_
+**Verified by:**
+- Code block preserves internal relative indentation
+- Empty lines in code block are preserved
+- Trailing whitespace is trimmed from each line
+- Code with mixed indentation is preserved
 
 *rich-content-helpers.feature*
 
@@ -44,17 +73,25 @@ _Verified by: Code block preserves internal relative indentation, Empty lines in
 
 *This feature demonstrates what content blocks are captured and rendered*
 
+---
+
 #### Business rules appear as a separate section
 
 Rule descriptions provide context for why this business rule exists.
 
-_Verified by: Scenario with DocString for rich content, Scenario with DataTable for structured data_
+**Verified by:**
+- Scenario with DocString for rich content
+- Scenario with DataTable for structured data
+
+---
 
 #### Multiple rules create multiple Business Rule entries
 
 Each Rule keyword creates a separate entry in the Business Rules section.
 
-_Verified by: Simple scenario under second rule, Scenario with examples table_
+**Verified by:**
+- Simple scenario under second rule
+- Scenario with examples table
 
 *test-content-blocks.feature*
 
@@ -66,33 +103,45 @@ _Verified by: Simple scenario under second rule, Scenario with examples table_
 
 *I want an architecture generator registered in the generator registry*
 
+---
+
 #### Architecture generator is registered in the registry
 
 The architecture generator must be registered like other built-in
     generators so it can be invoked via CLI.
 
-_Verified by: Generator is available in registry_
+**Verified by:**
+- Generator is available in registry
+
+---
 
 #### Architecture generator produces component diagram by default
 
 Running the architecture generator without options produces
     a component diagram (bounded context view).
 
-_Verified by: Default generation produces component diagram_
+**Verified by:**
+- Default generation produces component diagram
+
+---
 
 #### Architecture generator supports diagram type options
 
 The generator accepts options to specify diagram type
     (component or layered).
 
-_Verified by: Generate layered diagram with options_
+**Verified by:**
+- Generate layered diagram with options
+
+---
 
 #### Architecture generator supports context filtering
 
 The generator can filter to specific bounded contexts
     for focused diagram output.
 
-_Verified by: Filter to specific contexts_
+**Verified by:**
+- Filter to specific contexts
 
 *generator-registration.feature*
 
@@ -100,40 +149,55 @@ _Verified by: Filter to specific contexts_
 
 *As a documentation generator*
 
+---
+
 #### archIndex groups patterns by arch-role
 
 The archIndex.byRole map groups patterns by their architectural role
     (command-handler, projection, saga, etc.) for efficient lookup.
 
-_Verified by: Group patterns by role_
+**Verified by:**
+- Group patterns by role
+
+---
 
 #### archIndex groups patterns by arch-context
 
 The archIndex.byContext map groups patterns by bounded context
     for subgraph rendering in component diagrams.
 
-_Verified by: Group patterns by context_
+**Verified by:**
+- Group patterns by context
+
+---
 
 #### archIndex groups patterns by arch-layer
 
 The archIndex.byLayer map groups patterns by architectural layer
     (domain, application, infrastructure) for layered diagram rendering.
 
-_Verified by: Group patterns by layer_
+**Verified by:**
+- Group patterns by layer
+
+---
 
 #### archIndex.all contains all patterns with any arch tag
 
 The archIndex.all array contains all patterns that have at least
     one arch tag (role, context, or layer).
 
-_Verified by: archIndex.all includes all annotated patterns_
+**Verified by:**
+- archIndex.all includes all annotated patterns
+
+---
 
 #### Patterns without arch tags are excluded from archIndex
 
 Patterns that have no arch-role, arch-context, or arch-layer are
     not included in the archIndex at all.
 
-_Verified by: Non-annotated patterns excluded_
+**Verified by:**
+- Non-annotated patterns excluded
 
 *arch-index.feature*
 
@@ -141,53 +205,82 @@ _Verified by: Non-annotated patterns excluded_
 
 *As a documentation generator*
 
+---
+
 #### arch-role tag is defined in the registry
 
 Architecture roles classify components for diagram rendering.
 
-_Verified by: arch-role tag exists with enum format, arch-role has required enum values_
+**Verified by:**
+- arch-role tag exists with enum format
+- arch-role has required enum values
+
+---
 
 #### arch-context tag is defined in the registry
 
 Context tags group components into bounded context subgraphs.
 
-_Verified by: arch-context tag exists with value format_
+**Verified by:**
+- arch-context tag exists with value format
+
+---
 
 #### arch-layer tag is defined in the registry
 
 Layer tags enable layered architecture diagrams.
 
-_Verified by: arch-layer tag exists with enum format, arch-layer has exactly three values_
+**Verified by:**
+- arch-layer tag exists with enum format
+- arch-layer has exactly three values
+
+---
 
 #### AST parser extracts arch-role from TypeScript annotations
 
 The AST parser must extract arch-role alongside other pattern metadata.
 
-_Verified by: Extract arch-role projection, Extract arch-role command-handler_
+**Verified by:**
+- Extract arch-role projection
+- Extract arch-role command-handler
+
+---
 
 #### AST parser extracts arch-context from TypeScript annotations
 
 Context values are free-form strings naming the bounded context.
 
-_Verified by: Extract arch-context orders, Extract arch-context inventory_
+**Verified by:**
+- Extract arch-context orders
+- Extract arch-context inventory
+
+---
 
 #### AST parser extracts arch-layer from TypeScript annotations
 
 Layer tags classify components by architectural layer.
 
-_Verified by: Extract arch-layer application, Extract arch-layer infrastructure_
+**Verified by:**
+- Extract arch-layer application
+- Extract arch-layer infrastructure
+
+---
 
 #### AST parser handles multiple arch tags together
 
 Components often have role + context + layer together.
 
-_Verified by: Extract all three arch tags_
+**Verified by:**
+- Extract all three arch tags
+
+---
 
 #### Missing arch tags yield undefined values
 
 Components without arch tags should have undefined (not null or empty).
 
-_Verified by: Missing arch tags are undefined_
+**Verified by:**
+- Missing arch tags are undefined
 
 *arch-tag-extraction.feature*
 
@@ -195,49 +288,91 @@ _Verified by: Missing arch tags are undefined_
 
 *Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.*
 
+---
+
 #### Extracts Rule blocks with Invariant and Rationale
 
-_Verified by: Extracts annotated Rule with Invariant and Rationale, Extracts unannotated Rule without showing not specified_
+**Verified by:**
+- Extracts annotated Rule with Invariant and Rationale
+- Extracts unannotated Rule without showing not specified
+
+---
 
 #### Organizes rules by product area and phase
 
-_Verified by: Groups rules by product area and phase, Orders rules by phase within domain_
+**Verified by:**
+- Groups rules by product area and phase
+- Orders rules by phase within domain
+
+---
 
 #### Summary mode generates compact output
 
-_Verified by: Summary mode includes statistics line, Summary mode excludes detailed sections_
+**Verified by:**
+- Summary mode includes statistics line
+- Summary mode excludes detailed sections
+
+---
 
 #### Preserves code examples and tables in detailed mode
 
-_Verified by: Code examples included in detailed mode, Code examples excluded in standard mode_
+**Verified by:**
+- Code examples included in detailed mode
+- Code examples excluded in standard mode
+
+---
 
 #### Generates scenario traceability links
 
-_Verified by: Verification links include file path_
+**Verified by:**
+- Verification links include file path
+
+---
 
 #### Progressive disclosure generates detail files per product area
 
-_Verified by: Detail files are generated per product area, Main document has product area index table with links, Detail files have back-link to main document_
+**Verified by:**
+- Detail files are generated per product area
+- Main document has product area index table with links
+- Detail files have back-link to main document
+
+---
 
 #### Empty rules show placeholder instead of blank content
 
-_Verified by: Rule without invariant or description or scenarios shows placeholder, Rule without invariant but with scenarios shows verified-by instead_
+**Verified by:**
+- Rule without invariant or description or scenarios shows placeholder
+- Rule without invariant but with scenarios shows verified-by instead
+
+---
 
 #### Rules always render flat for full visibility
 
-_Verified by: Features with many rules render flat without collapsible blocks_
+**Verified by:**
+- Features with many rules render flat without collapsible blocks
+
+---
 
 #### Source file shown as filename text
 
-_Verified by: Source file rendered as plain text not link_
+**Verified by:**
+- Source file rendered as plain text not link
 
-#### Verified-by renders as compact italic line at standard level
+---
 
-_Verified by: Rules with scenarios show compact verified-by line, Duplicate scenario names are deduplicated_
+#### Verified-by renders as checkbox list at standard level
+
+**Verified by:**
+- Rules with scenarios show verified-by checklist
+- Duplicate scenario names are deduplicated
+
+---
 
 #### Feature names are humanized from camelCase pattern names
 
-_Verified by: CamelCase pattern name becomes spaced heading, Testing suffix is stripped from feature names_
+**Verified by:**
+- CamelCase pattern name becomes spaced heading
+- Testing suffix is stripped from feature names
 
 *business-rules-codec.feature*
 
@@ -245,9 +380,14 @@ _Verified by: CamelCase pattern name becomes spaced heading, Testing suffix is s
 
 *Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)*
 
+---
+
 #### CodecBasedGenerator adapts codecs to generator interface
 
-_Verified by: Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through_
+**Verified by:**
+- Generator delegates to codec
+- Missing MasterDataset returns error
+- Codec options are passed through
 
 *codec-based.feature*
 
@@ -255,18 +395,26 @@ _Verified by: Generator delegates to codec, Missing MasterDataset returns error,
 
 *As a documentation generator*
 
+---
+
 #### Component diagrams group patterns by bounded context
 
 Patterns with arch-context are grouped into Mermaid subgraphs.
 
-_Verified by: Generate subgraphs for bounded contexts_
+**Verified by:**
+- Generate subgraphs for bounded contexts
+
+---
 
 #### Context-less patterns go to Shared Infrastructure
 
 Patterns without arch-context are grouped into a
     "Shared Infrastructure" subgraph.
 
-_Verified by: Shared infrastructure subgraph for context-less patterns_
+**Verified by:**
+- Shared infrastructure subgraph for context-less patterns
+
+---
 
 #### Relationship types render with distinct arrow styles
 
@@ -276,40 +424,56 @@ Arrow styles follow UML conventions:
     - implements: dotted arrow (..->)
     - extends: open arrow (-->>)
 
-_Verified by: Arrow styles for relationship types_
+**Verified by:**
+- Arrow styles for relationship types
+
+---
 
 #### Arrows only connect annotated components
 
 Relationships pointing to non-annotated patterns
     are not rendered (target would not exist in diagram).
 
-_Verified by: Skip arrows to non-annotated targets_
+**Verified by:**
+- Skip arrows to non-annotated targets
+
+---
 
 #### Component diagram includes summary section
 
 The generated document starts with an overview section
     showing component counts and bounded context statistics.
 
-_Verified by: Summary section with counts_
+**Verified by:**
+- Summary section with counts
+
+---
 
 #### Component diagram includes legend when enabled
 
 The legend explains arrow style meanings for readers.
 
-_Verified by: Legend section with arrow explanations_
+**Verified by:**
+- Legend section with arrow explanations
+
+---
 
 #### Component diagram includes inventory table when enabled
 
 The inventory lists all components with their metadata.
 
-_Verified by: Inventory table with component details_
+**Verified by:**
+- Inventory table with component details
+
+---
 
 #### Empty architecture data shows guidance message
 
 If no patterns have architecture annotations,
     the document explains how to add them.
 
-_Verified by: No architecture data message_
+**Verified by:**
+- No architecture data message
 
 *component-diagram.feature*
 
@@ -317,35 +481,53 @@ _Verified by: No architecture data message_
 
 *Assembles reference documents from multiple codec outputs by*
 
+---
+
 #### CompositeCodec concatenates sections in codec array order
 
-**Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
+> **Invariant:** Sections from child codecs appear in the composite output in the same order as the codecs array.
 
-_Verified by: Sections from two codecs appear in order, Three codecs produce sections in array order_
+**Verified by:**
+- Sections from two codecs appear in order
+- Three codecs produce sections in array order
+
+---
 
 #### Separators between codec outputs are configurable
 
-**Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
+> **Invariant:** By default, a separator block is inserted between each child codec's sections. When separateSections is false, no separators are added.
 
-_Verified by: Default separator between sections, No separator when disabled_
+**Verified by:**
+- Default separator between sections
+- No separator when disabled
+
+---
 
 #### additionalFiles merge with last-wins semantics
 
-**Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
+> **Invariant:** additionalFiles from all children are merged into a single record. When keys collide, the later codec's value wins.
 
-_Verified by: Non-overlapping files merged, Colliding keys use last-wins_
+**Verified by:**
+- Non-overlapping files merged
+- Colliding keys use last-wins
+
+---
 
 #### composeDocuments works at document level without codecs
 
-**Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
+> **Invariant:** composeDocuments accepts RenderableDocument array and produces a composed RenderableDocument without requiring codecs.
 
-_Verified by: Direct document composition_
+**Verified by:**
+- Direct document composition
+
+---
 
 #### Empty codec outputs are handled gracefully
 
-**Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
+> **Invariant:** Codecs producing empty sections arrays contribute nothing to the output. No separator is emitted for empty outputs.
 
-_Verified by: Empty codec skipped without separator_
+**Verified by:**
+- Empty codec skipped without separator
 
 *composite-codec.feature*
 
@@ -353,49 +535,72 @@ _Verified by: Empty codec skipped without separator_
 
 *Multiple sources may extract identical content, leading to*
 
+---
+
 #### Duplicate detection uses content fingerprinting
 
-**Invariant:** Content with identical normalized text must produce identical fingerprints.
+> **Invariant:** Content with identical normalized text must produce identical fingerprints.
+>
+> **Rationale:** Fingerprinting enables efficient duplicate detection without full text comparison.
 
-**Rationale:** Fingerprinting enables efficient duplicate detection without full text comparison.
+**Verified by:**
+- Identical content produces same fingerprint
+- Whitespace differences are normalized
+- Different content produces different fingerprints
+- Similar headers with different content are preserved
+- @acceptance-criteria scenarios below.
 
-_Verified by: Identical content produces same fingerprint, Whitespace differences are normalized, Different content produces different fingerprints, Similar headers with different content are preserved, @acceptance-criteria scenarios below.
+    Content fingerprints are computed from normalized text
+- ignoring whitespace
+    differences and minor formatting variations.
 
-    Content fingerprints are computed from normalized text, ignoring whitespace
-    differences and minor formatting variations._
+---
 
 #### Duplicates are merged based on source priority
 
-**Invariant:** Higher-priority sources take precedence when merging duplicate content.
+> **Invariant:** Higher-priority sources take precedence when merging duplicate content.
+>
+> **Rationale:** TypeScript sources have richer JSDoc; feature files provide behavioral context.
 
-**Rationale:** TypeScript sources have richer JSDoc; feature files provide behavioral context.
-
-_Verified by: TypeScript source takes priority over feature file, Richer content takes priority when sources equal, Source attribution is added to merged content, @acceptance-criteria scenarios below.
+**Verified by:**
+- TypeScript source takes priority over feature file
+- Richer content takes priority when sources equal
+- Source attribution is added to merged content
+- @acceptance-criteria scenarios below.
 
     The merge strategy determines which content to keep based on source file
-    priority and content richness once duplicates are detected._
+    priority and content richness once duplicates are detected.
+
+---
 
 #### Section order is preserved after deduplication
 
-**Invariant:** Section order matches the source mapping table order after deduplication.
+> **Invariant:** Section order matches the source mapping table order after deduplication.
+>
+> **Rationale:** Predictable ordering ensures consistent documentation structure.
 
-**Rationale:** Predictable ordering ensures consistent documentation structure.
-
-_Verified by: Original order maintained after dedup, Empty sections after dedup are removed, @acceptance-criteria scenarios below.
+**Verified by:**
+- Original order maintained after dedup
+- Empty sections after dedup are removed
+- @acceptance-criteria scenarios below.
 
     The order of sections in the source mapping table is preserved even
-    after duplicates are removed._
+    after duplicates are removed.
+
+---
 
 #### Deduplicator integrates with source mapper pipeline
 
-**Invariant:** Deduplication runs after extraction and before document assembly.
+> **Invariant:** Deduplication runs after extraction and before document assembly.
+>
+> **Rationale:** All content must be extracted before duplicates can be identified.
 
-**Rationale:** All content must be extracted before duplicates can be identified.
-
-_Verified by: Deduplication happens in pipeline, @acceptance-criteria scenarios below.
+**Verified by:**
+- Deduplication happens in pipeline
+- @acceptance-criteria scenarios below.
 
     The deduplicator is called after all extractions complete but before
-    the RenderableDocument is assembled._
+    the RenderableDocument is assembled.
 
 *content-deduplication.feature*
 
@@ -403,25 +608,50 @@ _Verified by: Deduplication happens in pipeline, @acceptance-criteria scenarios 
 
 *Extracts convention content from MasterDataset decision records*
 
+---
+
 #### Empty and missing inputs produce empty results
 
-_Verified by: Empty convention tags returns empty array, No matching patterns returns empty array_
+**Verified by:**
+- Empty convention tags returns empty array
+- No matching patterns returns empty array
+
+---
 
 #### Convention bundles are extracted from matching patterns
 
-_Verified by: Single pattern with one convention tag produces one bundle, Pattern with CSV conventions contributes to multiple bundles, Multiple patterns with same convention merge into one bundle_
+**Verified by:**
+- Single pattern with one convention tag produces one bundle
+- Pattern with CSV conventions contributes to multiple bundles
+- Multiple patterns with same convention merge into one bundle
+
+---
 
 #### Structured content is extracted from rule descriptions
 
-_Verified by: Invariant and rationale are extracted from rule description, Tables in rule descriptions are extracted as structured data_
+**Verified by:**
+- Invariant and rationale are extracted from rule description
+- Tables in rule descriptions are extracted as structured data
+
+---
 
 #### Code examples in rule descriptions are preserved
 
-_Verified by: Mermaid diagram in rule description is extracted as code example, Rule description without code examples has no code examples field_
+**Verified by:**
+- Mermaid diagram in rule description is extracted as code example
+- Rule description without code examples has no code examples field
+
+---
 
 #### TypeScript JSDoc conventions are extracted alongside Gherkin
 
-_Verified by: TypeScript pattern with heading sections produces multiple rules, TypeScript pattern without headings becomes single rule, TypeScript and Gherkin conventions merge in same bundle, TypeScript pattern with convention but empty description, TypeScript description with tables is extracted correctly, TypeScript description with code examples_
+**Verified by:**
+- TypeScript pattern with heading sections produces multiple rules
+- TypeScript pattern without headings becomes single rule
+- TypeScript and Gherkin conventions merge in same bundle
+- TypeScript pattern with convention but empty description
+- TypeScript description with tables is extracted correctly
+- TypeScript description with code examples
 
 *convention-extractor.feature*
 
@@ -429,50 +659,83 @@ _Verified by: TypeScript pattern with heading sections produces multiple rules, 
 
 *Validates the Decision Doc Codec that parses decision documents (ADR/PDR*
 
+---
+
 #### Rule blocks are partitioned by semantic prefix
 
 Decision documents use Rule: blocks with semantic prefixes to organize
     content into Context, Decision, and Consequences sections (standard ADR
     format).
 
-_Verified by: Partition rules into ADR sections, Non-standard rules go to other category_
+**Verified by:**
+- Partition rules into ADR sections
+- Non-standard rules go to other category
+
+---
 
 #### DocStrings are extracted with language tags
 
 Decision documents contain code examples as Gherkin DocStrings.
 
-_Verified by: Extract single DocString, Extract multiple DocStrings, DocString without language defaults to text_
+**Verified by:**
+- Extract single DocString
+- Extract multiple DocStrings
+- DocString without language defaults to text
+
+---
 
 #### Source mapping tables are parsed from rule descriptions
 
 Decision documents define source mappings in markdown tables.
 
-_Verified by: Parse basic source mapping table, No source mapping returns empty_
+**Verified by:**
+- Parse basic source mapping table
+- No source mapping returns empty
+
+---
 
 #### Self-reference markers are correctly detected
 
 Source files can reference the current decision document using special
     markers like "THIS DECISION", "THIS DECISION (Rule: X)", etc.
 
-_Verified by: Detect THIS DECISION marker, Detect THIS DECISION with Rule, Regular file path is not self-reference, Parse self-reference types, Parse self-reference with rule name_
+**Verified by:**
+- Detect THIS DECISION marker
+- Detect THIS DECISION with Rule
+- Regular file path is not self-reference
+- Parse self-reference types
+- Parse self-reference with rule name
+
+---
 
 #### Extraction methods are normalized to known types
 
 The extraction method column can be written in various formats.
 
-_Verified by: Normalize Decision rule description, Normalize extract-shapes, Normalize unknown method_
+**Verified by:**
+- Normalize Decision rule description
+- Normalize extract-shapes
+- Normalize unknown method
+
+---
 
 #### Complete decision documents are parsed with all content
 
 The parseDecisionDocument function extracts all content from an ADR/PDR.
 
-_Verified by: Parse complete decision document_
+**Verified by:**
+- Parse complete decision document
+
+---
 
 #### Rules can be found by name with partial matching
 
 Self-references may not have an exact rule name match.
 
-_Verified by: Find rule by exact name, Find rule by partial name, Rule not found returns undefined_
+**Verified by:**
+- Find rule by exact name
+- Find rule by partial name
+- Rule not found returns undefined
 
 *decision-doc-codec.feature*
 
@@ -480,47 +743,75 @@ _Verified by: Find rule by exact name, Find rule by partial name, Rule not found
 
 *The Decision Doc Generator orchestrates the full documentation generation*
 
+---
+
 #### Output paths are determined from pattern metadata
 
 The generator computes output paths based on pattern name and optional
     section configuration.
 
-_Verified by: Default output paths for pattern, Custom section for compact output, CamelCase pattern converted to kebab-case_
+**Verified by:**
+- Default output paths for pattern
+- Custom section for compact output
+- CamelCase pattern converted to kebab-case
+
+---
 
 #### Compact output includes only essential content
 
 Summary/compact output is limited to ~50 lines and includes only
     essential tables and type definitions for Claude context files.
 
-_Verified by: Compact output excludes full descriptions, Compact output includes type shapes, Compact output handles empty content_
+**Verified by:**
+- Compact output excludes full descriptions
+- Compact output includes type shapes
+- Compact output handles empty content
+
+---
 
 #### Detailed output includes full content
 
 Detailed output is ~300 lines and includes everything: JSDoc, examples,
     full descriptions, and all extracted content.
 
-_Verified by: Detailed output includes all sections, Detailed output includes consequences, Detailed output includes DocStrings as code blocks_
+**Verified by:**
+- Detailed output includes all sections
+- Detailed output includes consequences
+- Detailed output includes DocStrings as code blocks
+
+---
 
 #### Multi-level generation produces both outputs
 
 The generator can produce both compact and detailed outputs in a single
     pass for maximum utility.
 
-_Verified by: Generate both compact and detailed outputs, Pattern name falls back to pattern.name_
+**Verified by:**
+- Generate both compact and detailed outputs
+- Pattern name falls back to pattern.name
+
+---
 
 #### Generator is registered with the registry
 
 The generator is available in the registry under the name "doc-from-decision"
     and can be invoked through the standard generator interface.
 
-_Verified by: Generator is registered with correct name, Generator filters patterns by source mapping presence, Generator processes patterns with source mappings_
+**Verified by:**
+- Generator is registered with correct name
+- Generator filters patterns by source mapping presence
+- Generator processes patterns with source mappings
+
+---
 
 #### Source mappings are executed during generation
 
 Decision documents with source mapping tables trigger content aggregation
     from the referenced files during the generation process.
 
-_Verified by: Source mappings are executed, Missing source files are reported as validation errors_
+**Verified by:**
+- Source mappings are executed
+- Missing source files are reported as validation errors
 
 *decision-doc-generator.feature*
 
@@ -528,25 +819,44 @@ _Verified by: Source mappings are executed, Missing source files are reported as
 
 *- DocStrings in Gherkin files have consistent indentation for alignment*
 
+---
+
 #### Tabs are normalized to spaces before dedent
 
-_Verified by: Tab-indented code is properly dedented, Mixed tabs and spaces are normalized_
+**Verified by:**
+- Tab-indented code is properly dedented
+- Mixed tabs and spaces are normalized
+
+---
 
 #### Empty lines are handled correctly
 
-_Verified by: Empty lines with trailing spaces are preserved, All empty lines returns original text_
+**Verified by:**
+- Empty lines with trailing spaces are preserved
+- All empty lines returns original text
+
+---
 
 #### Single line input is handled
 
-_Verified by: Single line with indentation is dedented, Single line without indentation is unchanged_
+**Verified by:**
+- Single line with indentation is dedented
+- Single line without indentation is unchanged
+
+---
 
 #### Unicode whitespace is handled
 
-_Verified by: Non-breaking space is treated as content_
+**Verified by:**
+- Non-breaking space is treated as content
+
+---
 
 #### Relative indentation is preserved
 
-_Verified by: Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively_
+**Verified by:**
+- Nested code blocks preserve relative indentation
+- Mixed indentation levels are preserved relatively
 
 *dedent.feature*
 
@@ -554,17 +864,35 @@ _Verified by: Nested code blocks preserve relative indentation, Mixed indentatio
 
 *Pattern descriptions should not create duplicate headers when rendered.*
 
+---
+
 #### Leading headers are stripped from pattern descriptions
 
-_Verified by: Strip single leading markdown header, Strip multiple leading headers, Preserve description without leading header_
+**Verified by:**
+- Strip single leading markdown header
+- Strip multiple leading headers
+- Preserve description without leading header
+
+---
 
 #### Edge cases are handled correctly
 
-_Verified by: Empty description after stripping headers, Description with only whitespace and headers, Header in middle of description is preserved_
+**Verified by:**
+- Empty description after stripping headers
+- Description with only whitespace and headers
+- Header in middle of description is preserved
+
+---
 
 #### stripLeadingHeaders removes only leading headers
 
-_Verified by: Strips h1 header, Strips h2 through h6 headers, Strips leading empty lines before header, Preserves content starting with text, Returns empty string for header-only input, Handles null/undefined input_
+**Verified by:**
+- Strips h1 header
+- Strips h2 through h6 headers
+- Strips leading empty lines before header
+- Preserves content starting with text
+- Returns empty string for header-only input
+- Handles null/undefined input
 
 *description-headers.feature*
 
@@ -572,13 +900,20 @@ _Verified by: Strips h1 header, Strips h2 through h6 headers, Strips leading emp
 
 *Tests the orchestrator's pattern merging, conflict detection, and generator*
 
+---
+
 #### Orchestrator coordinates full documentation generation pipeline
 
-**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+> **Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+>
+> **Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
 
-**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
-
-_Verified by: Non-overlapping patterns merge successfully, Orchestrator detects pattern name conflicts, Orchestrator detects pattern name conflicts with status mismatch, Unknown generator name fails gracefully, Partial success when some generators are invalid_
+**Verified by:**
+- Non-overlapping patterns merge successfully
+- Orchestrator detects pattern name conflicts
+- Orchestrator detects pattern name conflicts with status mismatch
+- Unknown generator name fails gracefully
+- Partial success when some generators are invalid
 
 *orchestrator.feature*
 
@@ -586,25 +921,51 @@ _Verified by: Non-overlapping patterns merge successfully, Orchestrator detects 
 
 *The extractSummary function transforms multi-line pattern descriptions into*
 
+---
+
 #### Single-line descriptions are returned as-is when complete
 
-_Verified by: Complete sentence on single line, Single line without sentence ending gets ellipsis_
+**Verified by:**
+- Complete sentence on single line
+- Single line without sentence ending gets ellipsis
+
+---
 
 #### Multi-line descriptions are combined until sentence ending
 
-_Verified by: Two lines combine into complete sentence, Combines lines up to sentence boundary within limit, Long multi-line text truncates when exceeds limit, Multi-line without sentence ending gets ellipsis_
+**Verified by:**
+- Two lines combine into complete sentence
+- Combines lines up to sentence boundary within limit
+- Long multi-line text truncates when exceeds limit
+- Multi-line without sentence ending gets ellipsis
+
+---
 
 #### Long descriptions are truncated at sentence or word boundaries
 
-_Verified by: Long text truncates at sentence boundary within limit, Long text without sentence boundary truncates at word with ellipsis_
+**Verified by:**
+- Long text truncates at sentence boundary within limit
+- Long text without sentence boundary truncates at word with ellipsis
+
+---
 
 #### Tautological and header lines are skipped
 
-_Verified by: Skips pattern name as first line, Skips section header labels, Skips multiple header patterns_
+**Verified by:**
+- Skips pattern name as first line
+- Skips section header labels
+- Skips multiple header patterns
+
+---
 
 #### Edge cases are handled gracefully
 
-_Verified by: Empty description returns empty string, Markdown headers are stripped, Bold markdown is stripped, Multiple sentence endings - takes first complete sentence, Question mark as sentence ending_
+**Verified by:**
+- Empty description returns empty string
+- Markdown headers are stripped
+- Bold markdown is stripped
+- Multiple sentence endings - takes first complete sentence
+- Question mark as sentence ending
 
 *extract-summary.feature*
 
@@ -612,9 +973,16 @@ _Verified by: Empty description returns empty string, Markdown headers are strip
 
 *Tests the GeneratorRegistry registration, lookup, and listing capabilities.*
 
+---
+
 #### Registry manages generator registration and retrieval
 
-_Verified by: Register generator with unique name, Duplicate registration throws error, Get registered generator, Get unknown generator returns undefined, Available returns sorted list_
+**Verified by:**
+- Register generator with unique name
+- Duplicate registration throws error
+- Get registered generator
+- Get unknown generator returns undefined
+- Available returns sorted list
 
 *registry.feature*
 
@@ -622,17 +990,31 @@ _Verified by: Register generator with unique name, Duplicate registration throws
 
 *Links to implementation files in generated pattern documents should have*
 
+---
+
 #### Repository prefixes are stripped from implementation paths
 
-_Verified by: Strip libar-platform prefix from implementation paths, Strip monorepo prefix from implementation paths, Preserve paths without repository prefix_
+**Verified by:**
+- Strip libar-platform prefix from implementation paths
+- Strip monorepo prefix from implementation paths
+- Preserve paths without repository prefix
+
+---
 
 #### All implementation links in a pattern are normalized
 
-_Verified by: Multiple implementations with mixed prefixes_
+**Verified by:**
+- Multiple implementations with mixed prefixes
+
+---
 
 #### normalizeImplPath strips known prefixes
 
-_Verified by: Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path_
+**Verified by:**
+- Strips libar-platform/ prefix
+- Strips monorepo/ prefix
+- Returns unchanged path without known prefix
+- Only strips prefix at start of path
 
 *implementation-links.feature*
 
@@ -640,39 +1022,54 @@ _Verified by: Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns un
 
 *As a documentation generator*
 
+---
+
 #### Layered diagrams group patterns by arch-layer
 
 Patterns with arch-layer are grouped into Mermaid subgraphs.
 
-_Verified by: Generate subgraphs for each layer_
+**Verified by:**
+- Generate subgraphs for each layer
+
+---
 
 #### Layer order is domain to infrastructure (top to bottom)
 
 The layer subgraphs are rendered in Clean Architecture order:
     domain at top, then application, then infrastructure at bottom.
 
-_Verified by: Layers render in correct order_
+**Verified by:**
+- Layers render in correct order
+
+---
 
 #### Context labels included in layered diagram nodes
 
 Unlike component diagrams which group by context, layered diagrams
     include the context as a label in each node name.
 
-_Verified by: Nodes include context labels_
+**Verified by:**
+- Nodes include context labels
+
+---
 
 #### Patterns without layer go to Other subgraph
 
 Patterns that have arch-role or arch-context but no arch-layer
     are grouped into an "Other" subgraph.
 
-_Verified by: Unlayered patterns in Other subgraph_
+**Verified by:**
+- Unlayered patterns in Other subgraph
+
+---
 
 #### Layered diagram includes summary section
 
 The generated document starts with an overview section
     specific to layered architecture visualization.
 
-_Verified by: Summary section for layered view_
+**Verified by:**
+- Summary section for layered view
 
 *layered-diagram.feature*
 
@@ -680,17 +1077,29 @@ _Verified by: Summary section for layered view_
 
 *Tests for rendering all relationship types in Mermaid dependency graphs*
 
+---
+
 #### Each relationship type has a distinct arrow style
 
-_Verified by: Uses relationships render as solid arrows, Depends-on relationships render as dashed arrows, Implements relationships render as dotted arrows, Extends relationships render as solid open arrows_
+**Verified by:**
+- Uses relationships render as solid arrows
+- Depends-on relationships render as dashed arrows
+- Implements relationships render as dotted arrows
+- Extends relationships render as solid open arrows
+
+---
 
 #### Pattern names are sanitized for Mermaid node IDs
 
-_Verified by: Special characters are replaced_
+**Verified by:**
+- Special characters are replaced
+
+---
 
 #### All relationship types appear in single graph
 
-_Verified by: Complete dependency graph with all relationship types_
+**Verified by:**
+- Complete dependency graph with all relationship types
 
 *mermaid-rendering.feature*
 
@@ -698,41 +1107,64 @@ _Verified by: Complete dependency graph with all relationship types_
 
 *- Need to generate a comprehensive pattern registry from extracted patterns*
 
+---
+
 #### Document structure includes progress tracking and category navigation
 
-**Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and category navigation regardless of dataset size.
+> **Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and category navigation regardless of dataset size.
+>
+> **Rationale:** The PATTERNS.md is the primary entry point for understanding project scope; incomplete structure would leave consumers without context.
 
-**Rationale:** The PATTERNS.md is the primary entry point for understanding project scope; incomplete structure would leave consumers without context.
+**Verified by:**
+- Decode empty dataset
+- Decode dataset with patterns - document structure
+- Progress summary shows correct counts
 
-_Verified by: Decode empty dataset, Decode dataset with patterns - document structure, Progress summary shows correct counts_
+---
 
 #### Pattern table presents all patterns sorted by status then name
 
-**Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category, Status, and Description, sorted by status priority (completed first) then alphabetically by name.
+> **Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category, Status, and Description, sorted by status priority (completed first) then alphabetically by name.
+>
+> **Rationale:** Consistent ordering allows quick scanning of project progress; completed patterns at top confirm done work, while roadmap items at bottom show remaining scope.
 
-**Rationale:** Consistent ordering allows quick scanning of project progress; completed patterns at top confirm done work, while roadmap items at bottom show remaining scope.
+**Verified by:**
+- Pattern table includes all patterns
+- Pattern table is sorted by status then name
 
-_Verified by: Pattern table includes all patterns, Pattern table is sorted by status then name_
+---
 
 #### Category sections group patterns by domain
 
-**Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
+> **Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
 
-_Verified by: Category sections with pattern lists, Filter to specific categories_
+**Verified by:**
+- Category sections with pattern lists
+- Filter to specific categories
+
+---
 
 #### Dependency graph visualizes pattern relationships
 
-**Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
+> **Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
 
-_Verified by: Dependency graph included when relationships exist, No dependency graph when no relationships, Dependency graph disabled by option_
+**Verified by:**
+- Dependency graph included when relationships exist
+- No dependency graph when no relationships
+- Dependency graph disabled by option
+
+---
 
 #### Detail file generation creates per-pattern pages
 
-**Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at patterns/{slug}.md containing an Overview section; when disabled, no additional files must be generated.
+> **Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at patterns/{slug}.md containing an Overview section; when disabled, no additional files must be generated.
+>
+> **Rationale:** Detail files enable deep-linking into specific patterns from the main registry while keeping the index document scannable.
 
-**Rationale:** Detail files enable deep-linking into specific patterns from the main registry while keeping the index document scannable.
-
-_Verified by: Generate individual pattern files when enabled, No detail files when disabled, Individual pattern file contains full details_
+**Verified by:**
+- Generate individual pattern files when enabled
+- No detail files when disabled
+- Individual pattern file contains full details
 
 *patterns-codec.feature*
 
@@ -740,29 +1172,63 @@ _Verified by: Generate individual pattern files when enabled, No detail files wh
 
 *- Need to generate planning checklists, session plans, and findings documents from patterns*
 
+---
+
 #### PlanningChecklistCodec prepares for implementation sessions
 
-**Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
+> **Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
+>
+> **Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
 
-**Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
+**Verified by:**
+- No actionable phases produces empty message
+- Summary shows phases to plan count
+- Pre-planning questions section
+- Definition of Done with deliverables
+- Acceptance criteria from scenarios
+- Risk assessment section
+- Dependency status shows met vs unmet
+- forActivePhases option
+- forNextActionable option
 
-_Verified by: No actionable phases produces empty message, Summary shows phases to plan count, Pre-planning questions section, Definition of Done with deliverables, Acceptance criteria from scenarios, Risk assessment section, Dependency status shows met vs unmet, forActivePhases option, forNextActionable option_
+---
 
 #### SessionPlanCodec generates implementation plans
 
-**Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
+> **Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
+>
+> **Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
 
-**Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
+**Verified by:**
+- No phases to plan produces empty message
+- Summary shows status counts
+- Implementation approach from useCases
+- Deliverables rendering
+- Acceptance criteria with steps
+- Business rules section
+- statusFilter option for active only
+- statusFilter option for planned only
 
-_Verified by: No phases to plan produces empty message, Summary shows status counts, Implementation approach from useCases, Deliverables rendering, Acceptance criteria with steps, Business rules section, statusFilter option for active only, statusFilter option for planned only_
+---
 
 #### SessionFindingsCodec captures retrospective discoveries
 
-**Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
+> **Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
+>
+> **Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
 
-**Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
-
-_Verified by: No findings produces empty message, Summary shows finding type counts, Gaps section, Improvements section, Risks section includes risk field, Learnings section, groupBy category option, groupBy phase option, groupBy type option, showSourcePhase option enabled, showSourcePhase option disabled_
+**Verified by:**
+- No findings produces empty message
+- Summary shows finding type counts
+- Gaps section
+- Improvements section
+- Risks section includes risk field
+- Learnings section
+- groupBy category option
+- groupBy phase option
+- groupBy type option
+- showSourcePhase option enabled
+- showSourcePhase option disabled
 
 *planning-codecs.feature*
 
@@ -770,41 +1236,77 @@ _Verified by: No findings produces empty message, Summary shows finding type cou
 
 *End-to-end integration tests that exercise the full documentation generation*
 
+---
+
 #### POC decision document is parsed correctly
 
-_Verified by: Load actual POC decision document, Source mappings include all extraction types_
+**Verified by:**
+- Load actual POC decision document
+- Source mappings include all extraction types
+
+---
 
 #### Self-references extract content from POC decision
 
-_Verified by: Extract Context rule from THIS DECISION, Extract Decision rule from THIS DECISION, Extract DocStrings from THIS DECISION_
+**Verified by:**
+- Extract Context rule from THIS DECISION
+- Extract Decision rule from THIS DECISION
+- Extract DocStrings from THIS DECISION
+
+---
 
 #### TypeScript shapes are extracted from real files
 
-_Verified by: Extract shapes from types.ts, Extract shapes from decider.ts, Extract createViolation patterns from decider.ts_
+**Verified by:**
+- Extract shapes from types.ts
+- Extract shapes from decider.ts
+- Extract createViolation patterns from decider.ts
+
+---
 
 #### Behavior spec content is extracted correctly
 
-_Verified by: Extract Rule blocks from process-guard.feature, Extract Scenario Outline Examples from process-guard-linter.feature_
+**Verified by:**
+- Extract Rule blocks from process-guard.feature
+- Extract Scenario Outline Examples from process-guard-linter.feature
+
+---
 
 #### JSDoc sections are extracted from CLI files
 
-_Verified by: Extract JSDoc from lint-process.ts_
+**Verified by:**
+- Extract JSDoc from lint-process.ts
+
+---
 
 #### All source mappings execute successfully
 
-_Verified by: Execute all 11 source mappings from POC_
+**Verified by:**
+- Execute all 11 source mappings from POC
+
+---
 
 #### Compact output generates correctly
 
-_Verified by: Generate compact output from POC, Compact output contains essential sections_
+**Verified by:**
+- Generate compact output from POC
+- Compact output contains essential sections
+
+---
 
 #### Detailed output generates correctly
 
-_Verified by: Generate detailed output from POC, Detailed output contains full content_
+**Verified by:**
+- Generate detailed output from POC
+- Detailed output contains full content
+
+---
 
 #### Generated output matches quality expectations
 
-_Verified by: Compact output matches target structure, Validation rules are complete in output_
+**Verified by:**
+- Compact output matches target structure
+- Validation rules are complete in output
 
 *poc-integration.feature*
 
@@ -812,65 +1314,133 @@ _Verified by: Compact output matches target structure, Validation rules are comp
 
 *- Need to generate PR-specific documentation from patterns*
 
+---
+
 #### PrChangesCodec handles empty results gracefully
 
-_Verified by: No changes when no patterns match changedFiles filter, No changes when no patterns match releaseFilter, No changes with combined filters when nothing matches_
+**Verified by:**
+- No changes when no patterns match changedFiles filter
+- No changes when no patterns match releaseFilter
+- No changes with combined filters when nothing matches
+
+---
 
 #### PrChangesCodec generates summary with filter information
 
-_Verified by: Summary section shows pattern counts, Summary shows release tag when releaseFilter is set, Summary shows files filter count when changedFiles is set_
+**Verified by:**
+- Summary section shows pattern counts
+- Summary shows release tag when releaseFilter is set
+- Summary shows files filter count when changedFiles is set
+
+---
 
 #### PrChangesCodec groups changes by phase when sortBy is "phase"
 
-_Verified by: Changes grouped by phase with default sortBy, Pattern details shown within phase groups_
+**Verified by:**
+- Changes grouped by phase with default sortBy
+- Pattern details shown within phase groups
+
+---
 
 #### PrChangesCodec groups changes by priority when sortBy is "priority"
 
-_Verified by: Changes grouped by priority, Priority groups show correct patterns_
+**Verified by:**
+- Changes grouped by priority
+- Priority groups show correct patterns
+
+---
 
 #### PrChangesCodec shows flat list when sortBy is "workflow"
 
-_Verified by: Flat changes list with workflow sort_
+**Verified by:**
+- Flat changes list with workflow sort
+
+---
 
 #### PrChangesCodec renders pattern details with metadata and description
 
-_Verified by: Pattern detail shows metadata table, Pattern detail shows business value when available, Pattern detail shows description_
+**Verified by:**
+- Pattern detail shows metadata table
+- Pattern detail shows business value when available
+- Pattern detail shows description
+
+---
 
 #### PrChangesCodec renders deliverables when includeDeliverables is enabled
 
-_Verified by: Deliverables shown when patterns have deliverables, Deliverables filtered by release when releaseFilter is set, No deliverables section when includeDeliverables is disabled_
+**Verified by:**
+- Deliverables shown when patterns have deliverables
+- Deliverables filtered by release when releaseFilter is set
+- No deliverables section when includeDeliverables is disabled
+
+---
 
 #### PrChangesCodec renders acceptance criteria from scenarios
 
-_Verified by: Acceptance criteria rendered when patterns have scenarios, Acceptance criteria shows scenario steps_
+**Verified by:**
+- Acceptance criteria rendered when patterns have scenarios
+- Acceptance criteria shows scenario steps
+
+---
 
 #### PrChangesCodec renders business rules from Gherkin Rule keyword
 
-_Verified by: Business rules rendered when patterns have rules, Business rules show rule names and verification info_
+**Verified by:**
+- Business rules rendered when patterns have rules
+- Business rules show rule names and verification info
+
+---
 
 #### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
 
-_Verified by: Review checklist generated with standard items, Review checklist includes completed patterns item when applicable, Review checklist includes active work item when applicable, Review checklist includes dependencies item when patterns have dependencies, Review checklist includes deliverables item when patterns have deliverables, No review checklist when includeReviewChecklist is disabled_
+**Verified by:**
+- Review checklist generated with standard items
+- Review checklist includes completed patterns item when applicable
+- Review checklist includes active work item when applicable
+- Review checklist includes dependencies item when patterns have dependencies
+- Review checklist includes deliverables item when patterns have deliverables
+- No review checklist when includeReviewChecklist is disabled
+
+---
 
 #### PrChangesCodec generates dependencies section when includeDependencies is enabled
 
-_Verified by: Dependencies section shows depends on relationships, Dependencies section shows enables relationships, No dependencies section when patterns have no dependencies, No dependencies section when includeDependencies is disabled_
+**Verified by:**
+- Dependencies section shows depends on relationships
+- Dependencies section shows enables relationships
+- No dependencies section when patterns have no dependencies
+- No dependencies section when includeDependencies is disabled
+
+---
 
 #### PrChangesCodec filters patterns by changedFiles
 
-_Verified by: Patterns filtered by changedFiles match, changedFiles filter matches partial paths_
+**Verified by:**
+- Patterns filtered by changedFiles match
+- changedFiles filter matches partial paths
+
+---
 
 #### PrChangesCodec filters patterns by releaseFilter
 
-_Verified by: Patterns filtered by release version_
+**Verified by:**
+- Patterns filtered by release version
+
+---
 
 #### PrChangesCodec uses OR logic for combined filters
 
-_Verified by: Combined filters match patterns meeting either criterion, Patterns matching both criteria are not duplicated_
+**Verified by:**
+- Combined filters match patterns meeting either criterion
+- Patterns matching both criteria are not duplicated
+
+---
 
 #### PrChangesCodec only includes active and completed patterns
 
-_Verified by: Roadmap patterns are excluded, Deferred patterns are excluded_
+**Verified by:**
+- Roadmap patterns are excluded
+- Deferred patterns are excluded
 
 *pr-changes-codec.feature*
 
@@ -878,9 +1448,14 @@ _Verified by: Roadmap patterns are excluded, Deferred patterns are excluded_
 
 *Tests the PrChangesCodec filtering capabilities for generating PR-scoped*
 
+---
+
 #### Orchestrator supports PR changes generation options
 
-_Verified by: PR changes filters to explicit file list, PR changes filters by release version, Combined filters use OR logic_
+**Verified by:**
+- PR changes filters to explicit file list
+- PR changes filters by release version
+- Combined filters use OR logic
 
 *pr-changes-options.feature*
 
@@ -888,21 +1463,34 @@ _Verified by: PR changes filters to explicit file list, PR changes filters by re
 
 *Tests the Implementations section rendering in pattern documents.*
 
+---
+
 #### Implementation files appear in pattern docs via @libar-docs-implements
 
-_Verified by: Implementations section renders with file links, Implementation includes description when available_
+**Verified by:**
+- Implementations section renders with file links
+- Implementation includes description when available
+
+---
 
 #### Multiple implementations are listed alphabetically
 
-_Verified by: Multiple implementations sorted by file path_
+**Verified by:**
+- Multiple implementations sorted by file path
+
+---
 
 #### Patterns without implementations omit the section
 
-_Verified by: No implementations section when none exist_
+**Verified by:**
+- No implementations section when none exist
+
+---
 
 #### Implementation references use relative file links
 
-_Verified by: Links are relative from patterns directory_
+**Verified by:**
+- Links are relative from patterns directory
 
 *prd-implementation-section.feature*
 
@@ -910,99 +1498,207 @@ _Verified by: Links are relative from patterns directory_
 
 *Parameterized codec factory that creates reference document codecs*
 
+---
+
 #### Empty datasets produce fallback content
 
-_Verified by: Codec with no matching content produces fallback message_
+**Verified by:**
+- Codec with no matching content produces fallback message
+
+---
 
 #### Convention content is rendered as sections
 
-_Verified by: Convention rules appear as H2 headings with content, Convention tables are rendered in the document_
+**Verified by:**
+- Convention rules appear as H2 headings with content
+- Convention tables are rendered in the document
+
+---
 
 #### Detail level controls output density
 
-_Verified by: Summary level omits narrative and rationale, Detailed level includes rationale and verified-by_
+**Verified by:**
+- Summary level omits narrative and rationale
+- Detailed level includes rationale and verified-by
+
+---
 
 #### Behavior sections are rendered from category-matching patterns
 
-_Verified by: Behavior-tagged patterns appear in a Behavior Specifications section_
+**Verified by:**
+- Behavior-tagged patterns appear in a Behavior Specifications section
+
+---
 
 #### Shape sources are extracted from matching patterns
 
-_Verified by: Shapes appear when source file matches shapeSources glob, Summary level shows shapes as a compact table, No shapes when source file does not match glob_
+**Verified by:**
+- Shapes appear when source file matches shapeSources glob
+- Summary level shows shapes as a compact table
+- No shapes when source file does not match glob
+
+---
 
 #### Convention and behavior content compose in a single document
 
-_Verified by: Both convention and behavior sections appear when data exists_
+**Verified by:**
+- Both convention and behavior sections appear when data exists
+
+---
 
 #### Composition order follows AD-5: conventions then shapes then behaviors
 
-_Verified by: Convention headings appear before shapes before behaviors_
+**Verified by:**
+- Convention headings appear before shapes before behaviors
+
+---
 
 #### Convention code examples render as mermaid blocks
 
-_Verified by: Convention with mermaid content produces mermaid block in output, Summary level omits convention code examples_
+**Verified by:**
+- Convention with mermaid content produces mermaid block in output
+- Summary level omits convention code examples
+
+---
 
 #### Scoped diagrams are generated from diagramScope config
 
-_Verified by: Config with diagramScope produces mermaid block at detailed level, Neighbor patterns appear in diagram with distinct style, include filter selects patterns by include tag membership, Self-contained scope produces no Related subgraph, Multiple filter dimensions OR together, Explicit pattern names filter selects named patterns, Config without diagramScope produces no diagram section, archLayer filter selects patterns by architectural layer, archLayer and archContext compose via OR, Summary level omits scoped diagram_
+**Verified by:**
+- Config with diagramScope produces mermaid block at detailed level
+- Neighbor patterns appear in diagram with distinct style
+- include filter selects patterns by include tag membership
+- Self-contained scope produces no Related subgraph
+- Multiple filter dimensions OR together
+- Explicit pattern names filter selects named patterns
+- Config without diagramScope produces no diagram section
+- archLayer filter selects patterns by architectural layer
+- archLayer and archContext compose via OR
+- Summary level omits scoped diagram
+
+---
 
 #### Multiple diagram scopes produce multiple mermaid blocks
 
-_Verified by: Config with diagramScopes array produces multiple diagrams, Diagram direction is reflected in mermaid output, Legacy diagramScope still works when diagramScopes is absent_
+**Verified by:**
+- Config with diagramScopes array produces multiple diagrams
+- Diagram direction is reflected in mermaid output
+- Legacy diagramScope still works when diagramScopes is absent
+
+---
 
 #### Standard detail level includes narrative but omits rationale
 
-_Verified by: Standard level includes narrative but omits rationale_
+**Verified by:**
+- Standard level includes narrative but omits rationale
+
+---
 
 #### Deep behavior rendering with structured annotations
 
-_Verified by: Detailed level renders structured behavior rules, Standard level renders behavior rules without rationale, Summary level shows behavior rules as truncated table, Scenario names and verifiedBy merge as deduplicated list_
+**Verified by:**
+- Detailed level renders structured behavior rules
+- Standard level renders behavior rules without rationale
+- Summary level shows behavior rules as truncated table
+- Scenario names and verifiedBy merge as deduplicated list
+
+---
 
 #### Shape JSDoc prose renders at standard and detailed levels
 
-_Verified by: Standard level includes JSDoc in code blocks, Detailed level includes JSDoc in code block and property table, Shapes without JSDoc render code blocks only_
+**Verified by:**
+- Standard level includes JSDoc in code blocks
+- Detailed level includes JSDoc in code block and property table
+- Shapes without JSDoc render code blocks only
+
+---
 
 #### Shape sections render param returns and throws documentation
 
-_Verified by: Detailed level renders param table for function shapes, Detailed level renders returns and throws documentation, Standard level renders param table without throws, Shapes without param docs skip param table_
+**Verified by:**
+- Detailed level renders param table for function shapes
+- Detailed level renders returns and throws documentation
+- Standard level renders param table without throws
+- Shapes without param docs skip param table
+
+---
 
 #### Diagram type controls Mermaid output format
 
-**Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+> **Invariant:** The diagramType field on DiagramScope selects the Mermaid output format. Supported types are graph (flowchart, default), sequenceDiagram, and stateDiagram-v2. Each type produces syntactically valid Mermaid output with type-appropriate node and edge rendering.
+>
+> **Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
 
-**Rationale:** Flowcharts cannot naturally express event flows (sequence), FSM visualization (state), or temporal ordering. Multiple diagram types unlock richer architectural documentation from the same relationship data.
+**Verified by:**
+- Default diagramType produces flowchart
+- Sequence diagram renders participant-message format
+- State diagram renders state transitions
+- Sequence diagram includes neighbor patterns as participants
+- State diagram adds start and end pseudo-states
+- C4 diagram renders system boundary format
+- C4 diagram renders neighbor patterns as external systems
+- Class diagram renders class members and relationships
+- Class diagram renders archRole as stereotype
 
-_Verified by: Default diagramType produces flowchart, Sequence diagram renders participant-message format, State diagram renders state transitions, Sequence diagram includes neighbor patterns as participants, State diagram adds start and end pseudo-states, C4 diagram renders system boundary format, C4 diagram renders neighbor patterns as external systems, Class diagram renders class members and relationships, Class diagram renders archRole as stereotype_
+---
 
 #### Edge labels and custom node shapes enrich diagram readability
 
-**Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+> **Invariant:** Relationship edges display labels describing the relationship type (uses, depends on, implements, extends). Edge labels are enabled by default and can be disabled via showEdgeLabels false. Node shapes in flowchart diagrams vary by archRole value using Mermaid shape syntax.
+>
+> **Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
 
-**Rationale:** Unlabeled edges are ambiguous without consulting a legend. Custom node shapes make archRole visually distinguishable without color reliance, improving accessibility and scanability.
+**Verified by:**
+- Relationship edges display type labels by default
+- Edge labels can be disabled for compact diagrams
+- archRole controls Mermaid node shape
+- Pattern without archRole uses default rectangle shape
+- Edge labels appear by default
+- Edge labels can be disabled
+- archRole controls node shape
+- Unknown archRole falls back to rectangle
 
-_Verified by: Relationship edges display type labels by default, Edge labels can be disabled for compact diagrams, archRole controls Mermaid node shape, Pattern without archRole uses default rectangle shape, Edge labels appear by default, Edge labels can be disabled, archRole controls node shape, Unknown archRole falls back to rectangle_
+---
 
 #### Collapsible blocks wrap behavior rules for progressive disclosure
 
-**Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
+> **Invariant:** When a behavior pattern has 3 or more rules and detail level is not summary, each rule's content is wrapped in a collapsible block with the rule name and scenario count in the summary. Patterns with fewer than 3 rules render rules flat. Summary level never produces collapsible blocks.
+>
+> **Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
 
-**Rationale:** Behavior sections with many rules produce substantial content at detailed level. Collapsible blocks enable progressive disclosure so readers can expand only the rules they need.
+**Verified by:**
+- Behavior pattern with many rules uses collapsible blocks at detailed level
+- Behavior pattern with few rules does not use collapsible blocks
+- Summary level never produces collapsible blocks
+- Many rules use collapsible at detailed level
+- Few rules render flat
+- Summary level suppresses collapsible
 
-_Verified by: Behavior pattern with many rules uses collapsible blocks at detailed level, Behavior pattern with few rules does not use collapsible blocks, Summary level never produces collapsible blocks, Many rules use collapsible at detailed level, Few rules render flat, Summary level suppresses collapsible_
+---
 
 #### Link-out blocks provide source file cross-references
 
-**Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
+> **Invariant:** At standard and detailed levels, each behavior pattern includes a link-out block referencing its source file path. At summary level, link-out blocks are omitted for compact output.
+>
+> **Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
 
-**Rationale:** Cross-reference links enable readers to navigate from generated documentation to the annotated source files, closing the loop between generated docs and the single source of truth.
+**Verified by:**
+- Behavior pattern includes source file link-out at detailed level
+- Standard level includes source file link-out
+- Summary level omits link-out blocks
+- Detailed level includes source link-out
+- Standard level includes source link-out
+- Summary level omits link-out
 
-_Verified by: Behavior pattern includes source file link-out at detailed level, Standard level includes source file link-out, Summary level omits link-out blocks, Detailed level includes source link-out, Standard level includes source link-out, Summary level omits link-out_
+---
 
 #### Include tags route cross-cutting content into reference documents
 
-**Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
+> **Invariant:** Patterns with matching include tags appear alongside category-selected patterns in the behavior section. The merging is additive (OR semantics).
 
-_Verified by: Include-tagged pattern appears in behavior section, Include-tagged pattern is additive with category-selected patterns, Pattern without matching include tag is excluded_
+**Verified by:**
+- Include-tagged pattern appears in behavior section
+- Include-tagged pattern is additive with category-selected patterns
+- Pattern without matching include tag is excluded
 
 *reference-codec.feature*
 
@@ -1010,37 +1706,51 @@ _Verified by: Include-tagged pattern appears in behavior section, Include-tagged
 
 *Registers reference document generators from project config.*
 
+---
+
 #### Registration produces the correct number of generators
 
-**Invariant:** Each reference config produces exactly 2 generators (detailed + summary), plus meta-generators for product-area and non-product-area routing.
+> **Invariant:** Each reference config produces exactly 2 generators (detailed + summary), plus meta-generators for product-area and non-product-area routing.
+>
+> **Rationale:** The count is deterministic from config — any mismatch indicates a registration bug that would silently drop generated documents.
 
-**Rationale:** The count is deterministic from config — any mismatch indicates a registration bug that would silently drop generated documents.
+**Verified by:**
+- Generators are registered from configs plus meta-generators
 
-_Verified by: Generators are registered from configs plus meta-generators_
+---
 
 #### Product area configs produce a separate meta-generator
 
-**Invariant:** Configs with productArea set route to "product-area-docs" meta-generator; configs without route to "reference-docs".
+> **Invariant:** Configs with productArea set route to "product-area-docs" meta-generator; configs without route to "reference-docs".
+>
+> **Rationale:** Product area docs are rendered into per-area subdirectories while standalone references go to the root output.
 
-**Rationale:** Product area docs are rendered into per-area subdirectories while standalone references go to the root output.
+**Verified by:**
+- Product area meta-generator is registered
 
-_Verified by: Product area meta-generator is registered_
+---
 
 #### Generator naming follows kebab-case convention
 
-**Invariant:** Detailed generators end in "-reference" and summary generators end in "-reference-claude".
+> **Invariant:** Detailed generators end in "-reference" and summary generators end in "-reference-claude".
+>
+> **Rationale:** Consistent naming enables programmatic discovery and distinguishes human-readable from AI-optimized outputs.
 
-**Rationale:** Consistent naming enables programmatic discovery and distinguishes human-readable from AI-optimized outputs.
+**Verified by:**
+- Detailed generator has name ending in "-reference"
+- Summary generator has name ending in "-reference-claude"
 
-_Verified by: Detailed generator has name ending in "-reference", Summary generator has name ending in "-reference-claude"_
+---
 
 #### Generator execution produces markdown output
 
-**Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.
+> **Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.
+>
+> **Rationale:** A generator that produces empty output wastes a pipeline slot and creates confusion when expected docs are missing.
 
-**Rationale:** A generator that produces empty output wastes a pipeline slot and creates confusion when expected docs are missing.
-
-_Verified by: Product area generator with matching data produces non-empty output, Product area generator with no patterns still produces intro_
+**Verified by:**
+- Product area generator with matching data produces non-empty output
+- Product area generator with no patterns still produces intro
 
 *reference-generators.feature*
 
@@ -1048,21 +1758,37 @@ _Verified by: Product area generator with matching data produces non-empty outpu
 
 *Summary totals in REMAINING-WORK.md must match the sum of phase table rows.*
 
+---
+
 #### Summary totals equal sum of phase table rows
 
-_Verified by: Summary matches phase table with all patterns having phases, Summary includes completed patterns correctly_
+**Verified by:**
+- Summary matches phase table with all patterns having phases
+- Summary includes completed patterns correctly
+
+---
 
 #### Patterns without phases appear in Backlog row
 
-_Verified by: Summary includes backlog patterns without phase, All patterns in backlog when none have phases_
+**Verified by:**
+- Summary includes backlog patterns without phase
+- All patterns in backlog when none have phases
+
+---
 
 #### Patterns without patternName are counted using id
 
-_Verified by: Patterns with undefined patternName counted correctly, Mixed patterns with and without patternName_
+**Verified by:**
+- Patterns with undefined patternName counted correctly
+- Mixed patterns with and without patternName
+
+---
 
 #### All phases with incomplete patterns are shown
 
-_Verified by: Multiple phases shown in order, Completed phases not shown in remaining work_
+**Verified by:**
+- Multiple phases shown in order
+- Completed phases not shown in remaining work
 
 *remaining-work-totals.feature*
 
@@ -1070,29 +1796,59 @@ _Verified by: Multiple phases shown in order, Completed phases not shown in rema
 
 *- Need to generate changelog, traceability, and overview documents*
 
+---
+
 #### ChangelogCodec follows Keep a Changelog format
 
-**Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
+> **Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
+>
+> **Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
 
-**Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
+**Verified by:**
+- Decode empty dataset produces changelog header only
+- Unreleased section shows active and vNEXT patterns
+- Release sections sorted by semver descending
+- Quarter fallback for patterns without release
+- Earlier section for undated patterns
+- Category mapping to change types
+- Exclude unreleased when option disabled
+- Change type sections follow standard order
 
-_Verified by: Decode empty dataset produces changelog header only, Unreleased section shows active and vNEXT patterns, Release sections sorted by semver descending, Quarter fallback for patterns without release, Earlier section for undated patterns, Category mapping to change types, Exclude unreleased when option disabled, Change type sections follow standard order_
+---
 
 #### TraceabilityCodec maps timeline patterns to behavior tests
 
-**Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
+> **Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
+>
+> **Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
 
-**Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
+**Verified by:**
+- No timeline patterns produces empty message
+- Coverage statistics show totals and percentage
+- Coverage gaps table shows missing coverage
+- Covered phases in collapsible section
+- Exclude gaps when option disabled
+- Exclude stats when option disabled
+- Exclude covered when option disabled
+- Verified behavior files indicated in output
 
-_Verified by: No timeline patterns produces empty message, Coverage statistics show totals and percentage, Coverage gaps table shows missing coverage, Covered phases in collapsible section, Exclude gaps when option disabled, Exclude stats when option disabled, Exclude covered when option disabled, Verified behavior files indicated in output_
+---
 
 #### OverviewCodec provides project architecture summary
 
-**Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
+> **Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
+>
+> **Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
 
-**Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
-
-_Verified by: Decode empty dataset produces minimal overview, Architecture section from overview-tagged patterns, Patterns summary with progress bar, Timeline summary with phase counts, Exclude architecture when option disabled, Exclude patterns summary when option disabled, Exclude timeline summary when option disabled, Multiple overview patterns create multiple architecture subsections_
+**Verified by:**
+- Decode empty dataset produces minimal overview
+- Architecture section from overview-tagged patterns
+- Patterns summary with progress bar
+- Timeline summary with phase counts
+- Exclude architecture when option disabled
+- Exclude patterns summary when option disabled
+- Exclude timeline summary when option disabled
+- Multiple overview patterns create multiple architecture subsections
 
 *reporting-codecs.feature*
 
@@ -1100,13 +1856,40 @@ _Verified by: Decode empty dataset produces minimal overview, Architecture secti
 
 *- Need to generate product requirements documents with flexible groupings*
 
+---
+
 #### RequirementsDocumentCodec generates PRD-style documentation from patterns
 
-_Verified by: No patterns with PRD metadata produces empty message, Summary shows counts and groupings, By product area section groups patterns correctly, By user role section uses collapsible groups, Group by phase option changes primary grouping, Filter by status option limits patterns, All features table shows complete list, Business value rendering when enabled, Generate individual requirement detail files when enabled, Requirement detail file contains acceptance criteria from scenarios, Requirement detail file contains business rules section, Implementation links from relationshipIndex_
+**Verified by:**
+- No patterns with PRD metadata produces empty message
+- Summary shows counts and groupings
+- By product area section groups patterns correctly
+- By user role section uses collapsible groups
+- Group by phase option changes primary grouping
+- Filter by status option limits patterns
+- All features table shows complete list
+- Business value rendering when enabled
+- Generate individual requirement detail files when enabled
+- Requirement detail file contains acceptance criteria from scenarios
+- Requirement detail file contains business rules section
+- Implementation links from relationshipIndex
+
+---
 
 #### AdrDocumentCodec documents architecture decisions
 
-_Verified by: No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, ADR entries use clean text without emojis, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content_
+**Verified by:**
+- No ADR patterns produces empty message
+- Summary shows status counts and categories
+- ADRs grouped by category
+- ADRs grouped by phase option
+- ADRs grouped by date (quarter) option
+- ADR index table with all decisions
+- ADR entries use clean text without emojis
+- Context, Decision, Consequences sections from Rule keywords
+- ADR supersedes rendering
+- Generate individual ADR detail files when enabled
+- ADR detail file contains full content
 
 *requirements-adr-codecs.feature*
 
@@ -1114,58 +1897,90 @@ _Verified by: No ADR patterns produces empty message, Summary shows status count
 
 *Document generation pipeline needs validation, deduplication, and*
 
+---
+
 #### Validation runs before extraction in the pipeline
 
-**Invariant:** Validation must complete and pass before extraction begins.
+> **Invariant:** Validation must complete and pass before extraction begins.
+>
+> **Rationale:** Prevents wasted extraction work and provides clear fail-fast behavior.
 
-**Rationale:** Prevents wasted extraction work and provides clear fail-fast behavior.
-
-_Verified by: Valid decision document generates successfully, Invalid mapping halts pipeline before extraction, Multiple validation errors are reported together, @acceptance-criteria scenarios below.
+**Verified by:**
+- Valid decision document generates successfully
+- Invalid mapping halts pipeline before extraction
+- Multiple validation errors are reported together
+- @acceptance-criteria scenarios below.
 
     The validation layer must run first and halt the pipeline if errors
-    are found, preventing wasted extraction work._
+    are found
+- preventing wasted extraction work.
+
+---
 
 #### Deduplication runs after extraction before assembly
 
-**Invariant:** Deduplication processes all extracted content before document assembly.
+> **Invariant:** Deduplication processes all extracted content before document assembly.
+>
+> **Rationale:** All sources must be extracted to identify cross-source duplicates.
 
-**Rationale:** All sources must be extracted to identify cross-source duplicates.
+**Verified by:**
+- Duplicate content is removed from final output
+- Non-duplicate sections are preserved
+- @acceptance-criteria scenarios below.
 
-_Verified by: Duplicate content is removed from final output, Non-duplicate sections are preserved, @acceptance-criteria scenarios below.
+    Content from all sources is extracted first
+- then deduplicated
+- then assembled into the final document.
 
-    Content from all sources is extracted first, then deduplicated, then assembled into the final document._
+---
 
 #### Warnings from all stages are collected and reported
 
-**Invariant:** Warnings from all pipeline stages are aggregated in the result.
+> **Invariant:** Warnings from all pipeline stages are aggregated in the result.
+>
+> **Rationale:** Users need visibility into non-fatal issues without blocking generation.
 
-**Rationale:** Users need visibility into non-fatal issues without blocking generation.
+**Verified by:**
+- Warnings are collected across pipeline stages
+- Warnings do not prevent successful generation
+- @acceptance-criteria scenarios below.
 
-_Verified by: Warnings are collected across pipeline stages, Warnings do not prevent successful generation, @acceptance-criteria scenarios below.
+    Non-fatal issues from validation
+- extraction
+- and deduplication are
+    collected and included in the result.
 
-    Non-fatal issues from validation, extraction, and deduplication are
-    collected and included in the result._
+---
 
 #### Pipeline provides actionable error messages
 
-**Invariant:** Error messages include context and fix suggestions.
+> **Invariant:** Error messages include context and fix suggestions.
+>
+> **Rationale:** Users should fix issues in one iteration without guessing.
 
-**Rationale:** Users should fix issues in one iteration without guessing.
+**Verified by:**
+- File not found error includes fix suggestion
+- Invalid method error includes valid alternatives
+- Extraction error includes source context
+- @acceptance-criteria scenarios below.
 
-_Verified by: File not found error includes fix suggestion, Invalid method error includes valid alternatives, Extraction error includes source context, @acceptance-criteria scenarios below.
+    Errors include enough context for users to understand and fix the issue.
 
-    Errors include enough context for users to understand and fix the issue._
+---
 
 #### Existing decision documents continue to work
 
-**Invariant:** Valid existing decision documents generate without new errors.
+> **Invariant:** Valid existing decision documents generate without new errors.
+>
+> **Rationale:** Robustness improvements must be backward compatible.
 
-**Rationale:** Robustness improvements must be backward compatible.
-
-_Verified by: PoC decision document still generates, Process Guard decision document still generates, @acceptance-criteria scenarios below.
+**Verified by:**
+- PoC decision document still generates
+- Process Guard decision document still generates
+- @acceptance-criteria scenarios below.
 
     The robustness improvements must not break existing valid decision
-    documents that worked with the PoC._
+    documents that worked with the PoC.
 
 *robustness-integration.feature*
 
@@ -1173,19 +1988,27 @@ _Verified by: PoC decision document still generates, Process Guard decision docu
 
 *This feature tests whether vitest-cucumber supports the Rule keyword*
 
+---
+
 #### Basic arithmetic operations work correctly
 
 The calculator should perform standard math operations
     with correct results.
 
-_Verified by: Addition of two positive numbers, Subtraction of two numbers_
+**Verified by:**
+- Addition of two positive numbers
+- Subtraction of two numbers
+
+---
 
 #### Division has special constraints
 
 Division by zero must be handled gracefully to prevent
     system errors.
 
-_Verified by: Division of two numbers, Division by zero is prevented_
+**Verified by:**
+- Division of two numbers
+- Division by zero is prevented
 
 *rule-keyword-poc.feature*
 
@@ -1193,21 +2016,45 @@ _Verified by: Division of two numbers, Division by zero is prevented_
 
 *- Need to generate session context and remaining work documents from patterns*
 
+---
+
 #### SessionContextCodec provides working context for AI sessions
 
-**Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation for incomplete phases, and active work grouped by phase.
+> **Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation for incomplete phases, and active work grouped by phase.
+>
+> **Rationale:** AI agents need a compact, navigable view of current project state to make informed implementation decisions.
 
-**Rationale:** AI agents need a compact, navigable view of current project state to make informed implementation decisions.
+**Verified by:**
+- Decode empty dataset produces minimal session context
+- Decode dataset with timeline patterns
+- Session status shows current focus
+- Phase navigation for incomplete phases
+- Active work grouped by phase
+- Blocked items section with dependencies
+- No blocked items section when disabled
+- Recent completions collapsible
+- Generate session phase detail files when enabled
+- No detail files when disabled
 
-_Verified by: Decode empty dataset produces minimal session context, Decode dataset with timeline patterns, Session status shows current focus, Phase navigation for incomplete phases, Active work grouped by phase, Blocked items section with dependencies, No blocked items section when disabled, Recent completions collapsible, Generate session phase detail files when enabled, No detail files when disabled_
+---
 
 #### RemainingWorkCodec aggregates incomplete work by phase
 
-**Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification (in-progress/ready/blocked), and next actionable items.
+> **Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification (in-progress/ready/blocked), and next actionable items.
+>
+> **Rationale:** Remaining work visibility prevents scope blindness — knowing what's left, what's blocked, and what's ready drives efficient session planning.
 
-**Rationale:** Remaining work visibility prevents scope blindness — knowing what's left, what's blocked, and what's ready drives efficient session planning.
-
-_Verified by: All work complete produces celebration message, Summary shows remaining counts, Phase navigation with remaining count, By priority shows ready vs blocked, Next actionable items section, Next actionable respects maxNextActionable limit, Sort by phase option, Sort by priority option, Generate remaining work detail files when enabled, No detail files when disabled for remaining_
+**Verified by:**
+- All work complete produces celebration message
+- Summary shows remaining counts
+- Phase navigation with remaining count
+- By priority shows ready vs blocked
+- Next actionable items section
+- Next actionable respects maxNextActionable limit
+- Sort by phase option
+- Sort by priority option
+- Generate remaining work detail files when enabled
+- No detail files when disabled for remaining
 
 *session-codecs.feature*
 
@@ -1215,21 +2062,41 @@ _Verified by: All work complete produces celebration message, Summary shows rema
 
 *Matches file paths against glob patterns for TypeScript shape extraction.*
 
+---
+
 #### Exact paths match without wildcards
 
-_Verified by: Exact path matches identical path, Exact path does not match different path_
+**Verified by:**
+- Exact path matches identical path
+- Exact path does not match different path
+
+---
 
 #### Single-level globs match one directory level
 
-_Verified by: Single glob matches file in target directory, Single glob does not match nested subdirectory, Single glob does not match wrong extension_
+**Verified by:**
+- Single glob matches file in target directory
+- Single glob does not match nested subdirectory
+- Single glob does not match wrong extension
+
+---
 
 #### Recursive globs match any depth
 
-_Verified by: Recursive glob matches file at target depth, Recursive glob matches file at deeper depth, Recursive glob matches file at top level, Recursive glob does not match wrong prefix_
+**Verified by:**
+- Recursive glob matches file at target depth
+- Recursive glob matches file at deeper depth
+- Recursive glob matches file at top level
+- Recursive glob does not match wrong prefix
+
+---
 
 #### Dataset shape extraction deduplicates by name
 
-_Verified by: Shapes are extracted from matching patterns, Duplicate shape names are deduplicated, No shapes returned when glob does not match_
+**Verified by:**
+- Shapes are extracted from matching patterns
+- Duplicate shape names are deduplicated
+- No shapes returned when glob does not match
 
 *shape-matcher.feature*
 
@@ -1237,11 +2104,21 @@ _Verified by: Shapes are extracted from matching patterns, Duplicate shape names
 
 *Tests the filterShapesBySelectors function that provides fine-grained*
 
+---
+
 #### Reference doc configs select shapes via shapeSelectors
 
-**Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
+> **Invariant:** shapeSelectors provides three selection modes: by source path + specific names, by group tag, or by source path alone.
 
-_Verified by: Select specific shapes by source and names, Select all shapes in a group, Select all tagged shapes from a source file, shapeSources without shapeSelectors returns all shapes, Select by source and names, Select by group, Select by source alone, shapeSources backward compatibility preserved_
+**Verified by:**
+- Select specific shapes by source and names
+- Select all shapes in a group
+- Select all tagged shapes from a source file
+- shapeSources without shapeSelectors returns all shapes
+- Select by source and names
+- Select by group
+- Select by source alone
+- shapeSources backward compatibility preserved
 
 *shape-selector.feature*
 
@@ -1249,46 +2126,73 @@ _Verified by: Select specific shapes by source and names, Select all shapes in a
 
 *The Source Mapper aggregates content from multiple source files based on*
 
+---
+
 #### Extraction methods dispatch to correct handlers
 
 The source mapper dispatches to different extraction functions based on
     the extraction method specified in the source mapping table.
 
-_Verified by: Dispatch to decision extraction for THIS DECISION, Dispatch to TypeScript extractor for .ts files, Dispatch to behavior spec extractor for .feature files_
+**Verified by:**
+- Dispatch to decision extraction for THIS DECISION
+- Dispatch to TypeScript extractor for .ts files
+- Dispatch to behavior spec extractor for .feature files
+
+---
 
 #### Self-references extract from current decision document
 
 THIS DECISION markers extract content from the current decision document
     rather than requiring a separate file path.
 
-_Verified by: Extract from THIS DECISION using rule description, Extract DocStrings from THIS DECISION, Extract full document from THIS DECISION_
+**Verified by:**
+- Extract from THIS DECISION using rule description
+- Extract DocStrings from THIS DECISION
+- Extract full document from THIS DECISION
+
+---
 
 #### Multiple sources are aggregated in mapping order
 
 Multiple source mappings result in content extraction from each file.
 
-_Verified by: Aggregate from multiple sources, Ordering is preserved from mapping table_
+**Verified by:**
+- Aggregate from multiple sources
+- Ordering is preserved from mapping table
+
+---
 
 #### Missing files produce warnings without failing
 
 A referenced source file that does not exist produces a warning,
     but generation continues with available sources.
 
-_Verified by: Missing source file produces warning, Partial extraction when some files missing, Validation checks all files before extraction_
+**Verified by:**
+- Missing source file produces warning
+- Partial extraction when some files missing
+- Validation checks all files before extraction
+
+---
 
 #### Empty extraction results produce info warnings
 
 Extraction that succeeds but produces no content (e.g., no shapes found)
     results in an informational warning being logged.
 
-_Verified by: Empty shapes extraction produces info warning, No matching rules produces info warning_
+**Verified by:**
+- Empty shapes extraction produces info warning
+- No matching rules produces info warning
+
+---
 
 #### Extraction methods are normalized for dispatch
 
 The extraction method column can be written in various formats
     and is normalized before dispatch.
 
-_Verified by: Normalize various extraction method formats, Unknown extraction method produces warning_
+**Verified by:**
+- Normalize various extraction method formats
+- Unknown extraction method produces warning
 
 *source-mapper.feature*
 
@@ -1296,45 +2200,78 @@ _Verified by: Normalize various extraction method formats, Unknown extraction me
 
 *Source mappings reference files that may not exist, use invalid*
 
+---
+
 #### Source files must exist and be readable
 
-**Invariant:** All source file paths in mappings must resolve to existing, readable files.
+> **Invariant:** All source file paths in mappings must resolve to existing, readable files.
+>
+> **Rationale:** Prevents extraction failures and provides clear error messages upfront.
 
-**Rationale:** Prevents extraction failures and provides clear error messages upfront.
+**Verified by:**
+- Existing file passes validation
+- Missing file produces error with path
+- Directory instead of file produces error
+- THIS DECISION skips file validation
+- THIS DECISION with rule reference skips file validation
+- @acceptance-criteria scenarios below.
 
-_Verified by: Existing file passes validation, Missing file produces error with path, Directory instead of file produces error, THIS DECISION skips file validation, THIS DECISION with rule reference skips file validation, @acceptance-criteria scenarios below._
+---
 
 #### Extraction methods must be valid and supported
 
-**Invariant:** Extraction methods must match a known method from the supported set.
+> **Invariant:** Extraction methods must match a known method from the supported set.
+>
+> **Rationale:** Invalid methods cannot extract content; suggest valid alternatives.
 
-**Rationale:** Invalid methods cannot extract content; suggest valid alternatives.
+**Verified by:**
+- Valid extraction methods pass validation
+- Unknown method produces error with suggestions
+- Empty method produces error
+- Method aliases are normalized
+- @acceptance-criteria scenarios below.
 
-_Verified by: Valid extraction methods pass validation, Unknown method produces error with suggestions, Empty method produces error, Method aliases are normalized, @acceptance-criteria scenarios below._
+---
 
 #### Extraction methods must be compatible with file types
 
-**Invariant:** Method-file combinations must be compatible (e.g., TypeScript methods for .ts files).
+> **Invariant:** Method-file combinations must be compatible (e.g., TypeScript methods for .ts files).
+>
+> **Rationale:** Incompatible combinations fail at extraction; catch early with clear guidance.
 
-**Rationale:** Incompatible combinations fail at extraction; catch early with clear guidance.
+**Verified by:**
+- TypeScript method on feature file produces error
+- Gherkin method on TypeScript file produces error
+- Compatible method-file combination passes
+- Self-reference method on actual file produces error
+- @acceptance-criteria scenarios below.
 
-_Verified by: TypeScript method on feature file produces error, Gherkin method on TypeScript file produces error, Compatible method-file combination passes, Self-reference method on actual file produces error, @acceptance-criteria scenarios below._
+---
 
 #### Source mapping tables must have required columns
 
-**Invariant:** Tables must contain Section, Source File, and Extraction Method columns.
+> **Invariant:** Tables must contain Section, Source File, and Extraction Method columns.
+>
+> **Rationale:** Missing columns prevent extraction; alternative column names are mapped.
 
-**Rationale:** Missing columns prevent extraction; alternative column names are mapped.
+**Verified by:**
+- Missing Section column produces error
+- Missing Source File column produces error
+- Alternative column names are accepted
+- @acceptance-criteria scenarios below.
 
-_Verified by: Missing Section column produces error, Missing Source File column produces error, Alternative column names are accepted, @acceptance-criteria scenarios below._
+---
 
 #### All validation errors are collected and returned together
 
-**Invariant:** Validation collects all errors before returning, not just the first.
+> **Invariant:** Validation collects all errors before returning, not just the first.
+>
+> **Rationale:** Enables users to fix all issues in a single iteration.
 
-**Rationale:** Enables users to fix all issues in a single iteration.
-
-_Verified by: Multiple errors are aggregated, Warnings are collected alongside errors, @acceptance-criteria scenarios below._
+**Verified by:**
+- Multiple errors are aggregated
+- Warnings are collected alongside errors
+- @acceptance-criteria scenarios below.
 
 *source-mapping-validator.feature*
 
@@ -1342,17 +2279,29 @@ _Verified by: Multiple errors are aggregated, Warnings are collected alongside e
 
 *Tables in business rule descriptions should appear exactly once in output.*
 
+---
+
 #### Tables in rule descriptions render exactly once
 
-_Verified by: Single table renders once in detailed mode, Table is extracted and properly formatted_
+**Verified by:**
+- Single table renders once in detailed mode
+- Table is extracted and properly formatted
+
+---
 
 #### Multiple tables in description each render exactly once
 
-_Verified by: Two tables in description render as two separate tables_
+**Verified by:**
+- Two tables in description render as two separate tables
+
+---
 
 #### stripMarkdownTables removes table syntax from text
 
-_Verified by: Strips single table from text, Strips multiple tables from text, Preserves text without tables_
+**Verified by:**
+- Strips single table from text
+- Strips multiple tables from text
+- Preserves text without tables
 
 *table-extraction.feature*
 
@@ -1360,54 +2309,88 @@ _Verified by: Strips single table from text, Strips multiple tables from text, P
 
 *Validates the Taxonomy Codec that transforms MasterDataset into a*
 
+---
+
 #### Document metadata is correctly set
 
 The taxonomy document has standard metadata fields for title, purpose,
     and detail level that describe the generated content.
 
-_Verified by: Document title is Taxonomy Reference, Document purpose describes tag taxonomy, Detail level reflects generateDetailFiles option_
+**Verified by:**
+- Document title is Taxonomy Reference
+- Document purpose describes tag taxonomy
+- Detail level reflects generateDetailFiles option
+
+---
 
 #### Categories section is generated from TagRegistry
 
 The categories section lists all configured tag categories with their
     domain, priority, and description in a sortable table.
 
-_Verified by: Categories section is included in output, Category table has correct columns, LinkOut to detail file when generateDetailFiles enabled_
+**Verified by:**
+- Categories section is included in output
+- Category table has correct columns
+- LinkOut to detail file when generateDetailFiles enabled
+
+---
 
 #### Metadata tags can be grouped by domain
 
 The groupByDomain option organizes metadata tags into subsections
     by their semantic domain (Core, Relationship, Timeline, etc.).
 
-_Verified by: With groupByDomain enabled tags are grouped into subsections, With groupByDomain disabled single table rendered_
+**Verified by:**
+- With groupByDomain enabled tags are grouped into subsections
+- With groupByDomain disabled single table rendered
+
+---
 
 #### Tags are classified into domains by hardcoded mapping
 
 The domain classification is intentionally hardcoded for documentation
     stability.
 
-_Verified by: Core tags correctly classified, Relationship tags correctly classified, Timeline tags correctly classified, ADR prefix matching works, Unknown tags go to Other Tags group_
+**Verified by:**
+- Core tags correctly classified
+- Relationship tags correctly classified
+- Timeline tags correctly classified
+- ADR prefix matching works
+- Unknown tags go to Other Tags group
+
+---
 
 #### Optional sections can be disabled via codec options
 
 The codec supports disabling format types, presets, and architecture
     diagram sections for compact output generation.
 
-_Verified by: includeFormatTypes disabled excludes Format Types section, includePresets disabled excludes Presets section, includeArchDiagram disabled excludes Architecture section_
+**Verified by:**
+- includeFormatTypes disabled excludes Format Types section
+- includePresets disabled excludes Presets section
+- includeArchDiagram disabled excludes Architecture section
+
+---
 
 #### Detail files are generated for progressive disclosure
 
 The generateDetailFiles option creates additional files for
     categories, metadata tags, and format types with detailed content.
 
-_Verified by: generateDetailFiles creates 3 additional files, Detail files have correct paths, generateDetailFiles disabled creates no additional files_
+**Verified by:**
+- generateDetailFiles creates 3 additional files
+- Detail files have correct paths
+- generateDetailFiles disabled creates no additional files
+
+---
 
 #### Format types are documented with descriptions and examples
 
 The Format Types section documents all supported tag value formats
     with descriptions and examples for each type.
 
-_Verified by: All 6 format types are documented_
+**Verified by:**
+- All 6 format types are documented
 
 *taxonomy-codec.feature*
 
@@ -1415,29 +2398,55 @@ _Verified by: All 6 format types are documented_
 
 *- Need to generate roadmap, milestones, and current work documents from patterns*
 
+---
+
 #### RoadmapDocumentCodec groups patterns by phase with progress tracking
 
-**Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
+> **Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
+>
+> **Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
 
-**Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
+**Verified by:**
+- Decode empty dataset produces minimal roadmap
+- Decode dataset with multiple phases
+- Progress section shows correct status counts
+- Phase navigation table with progress
+- Phase sections show pattern tables
+- Generate phase detail files when enabled
+- No detail files when disabled
+- Quarterly timeline shown when quarters exist
 
-_Verified by: Decode empty dataset produces minimal roadmap, Decode dataset with multiple phases, Progress section shows correct status counts, Phase navigation table with progress, Phase sections show pattern tables, Generate phase detail files when enabled, No detail files when disabled, Quarterly timeline shown when quarters exist_
+---
 
 #### CompletedMilestonesCodec shows only completed patterns grouped by quarter
 
-**Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
+> **Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
+>
+> **Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
 
-**Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
+**Verified by:**
+- No completed patterns produces empty message
+- Summary shows completed counts
+- Quarterly navigation with completed patterns
+- Completed phases shown in collapsible sections
+- Recent completions section with limit
+- Generate quarterly detail files when enabled
 
-_Verified by: No completed patterns produces empty message, Summary shows completed counts, Quarterly navigation with completed patterns, Completed phases shown in collapsible sections, Recent completions section with limit, Generate quarterly detail files when enabled_
+---
 
 #### CurrentWorkCodec shows only active patterns with deliverables
 
-**Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
+> **Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
+>
+> **Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
 
-**Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
-
-_Verified by: No active work produces empty message, Summary shows overall progress, Active phases with progress bars, Deliverables rendered when configured, All active patterns table, Generate current work detail files when enabled_
+**Verified by:**
+- No active work produces empty message
+- Summary shows overall progress
+- Active phases with progress bars
+- Deliverables rendered when configured
+- All active patterns table
+- Generate current work detail files when enabled
 
 *timeline-codecs.feature*
 
@@ -1445,51 +2454,86 @@ _Verified by: No active work produces empty message, Summary shows overall progr
 
 *- Generators need multiple views of the same pattern data*
 
+---
+
 #### Empty dataset produces valid zero-state views
 
-**Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+> **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
 
-_Verified by: Transform empty dataset_
+**Verified by:**
+- Transform empty dataset
+
+---
 
 #### Status and phase grouping creates navigable views
 
-**Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
+> **Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
+>
+> **Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
 
-**Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
+**Verified by:**
+- Group patterns by status
+- Normalize status variants to canonical values
+- Group patterns by phase
+- Sort phases by phase number
+- Compute per-phase status counts
+- Patterns without phase are not in byPhase
 
-_Verified by: Group patterns by status, Normalize status variants to canonical values, Group patterns by phase, Sort phases by phase number, Compute per-phase status counts, Patterns without phase are not in byPhase_
+---
 
 #### Quarter and category grouping organizes by timeline and domain
 
-**Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+> **Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
 
-_Verified by: Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category_
+**Verified by:**
+- Group patterns by quarter
+- Patterns without quarter are not in byQuarter
+- Group patterns by category
+
+---
 
 #### Source grouping separates TypeScript and Gherkin origins
 
-**Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+> **Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
 
-_Verified by: Group patterns by source file type, Patterns with phase are also in roadmap view_
+**Verified by:**
+- Group patterns by source file type
+- Patterns with phase are also in roadmap view
+
+---
 
 #### Relationship index builds bidirectional dependency graph
 
-**Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
+> **Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
+>
+> **Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
 
-**Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
+**Verified by:**
+- Build relationship index from patterns
+- Build relationship index with all relationship types
+- Reverse lookup computes enables from dependsOn
+- Reverse lookup computes usedBy from uses
+- Reverse lookup merges with explicit annotations without duplicates
 
-_Verified by: Build relationship index from patterns, Build relationship index with all relationship types, Reverse lookup computes enables from dependsOn, Reverse lookup computes usedBy from uses, Reverse lookup merges with explicit annotations without duplicates_
+---
 
 #### Completion tracking computes project progress
 
-**Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+> **Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
 
-_Verified by: Calculate completion percentage, Check if fully completed_
+**Verified by:**
+- Calculate completion percentage
+- Check if fully completed
+
+---
 
 #### Workflow integration conditionally includes delivery process data
 
-**Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+> **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
 
-_Verified by: Include workflow in result when provided, Result omits workflow when not provided_
+**Verified by:**
+- Include workflow in result when provided
+- Result omits workflow when not provided
 
 *transform-dataset.feature*
 
@@ -1497,47 +2541,75 @@ _Verified by: Include workflow in result when provided, Result omits workflow wh
 
 *Validates the Validation Rules Codec that transforms MasterDataset into a*
 
+---
+
 #### Document metadata is correctly set
 
 The validation rules document has standard metadata fields for title,
     purpose, and detail level.
 
-_Verified by: Document title is Validation Rules, Document purpose describes Process Guard, Detail level reflects generateDetailFiles option_
+**Verified by:**
+- Document title is Validation Rules
+- Document purpose describes Process Guard
+- Detail level reflects generateDetailFiles option
+
+---
 
 #### All validation rules are documented in a table
 
 The rules table includes all 6 Process Guard validation rules with
     their severity levels and descriptions.
 
-_Verified by: All 6 rules appear in table, Rules have correct severity levels_
+**Verified by:**
+- All 6 rules appear in table
+- Rules have correct severity levels
+
+---
 
 #### FSM state diagram is generated from transitions
 
 The Mermaid diagram shows all valid state transitions for the
     Process Guard FSM.
 
-_Verified by: Mermaid diagram generated when includeFSMDiagram enabled, Diagram includes all 4 states, FSM diagram excluded when includeFSMDiagram disabled_
+**Verified by:**
+- Mermaid diagram generated when includeFSMDiagram enabled
+- Diagram includes all 4 states
+- FSM diagram excluded when includeFSMDiagram disabled
+
+---
 
 #### Protection level matrix shows status protections
 
 The protection matrix documents which statuses have which protection
     levels (none, scope-locked, hard-locked).
 
-_Verified by: Matrix shows all 4 statuses with protection levels, Protection matrix excluded when includeProtectionMatrix disabled_
+**Verified by:**
+- Matrix shows all 4 statuses with protection levels
+- Protection matrix excluded when includeProtectionMatrix disabled
+
+---
 
 #### CLI usage is documented with options and exit codes
 
 The CLI section shows how to invoke the Process Guard linter
     with various options.
 
-_Verified by: CLI example code block included, All 6 CLI options documented, Exit codes documented, CLI section excluded when includeCLIUsage disabled_
+**Verified by:**
+- CLI example code block included
+- All 6 CLI options documented
+- Exit codes documented
+- CLI section excluded when includeCLIUsage disabled
+
+---
 
 #### Escape hatches are documented for special cases
 
 The escape hatches section documents how to override Process Guard
     validation for legitimate use cases.
 
-_Verified by: All 3 escape hatches documented, Escape hatches section excluded when includeEscapeHatches disabled_
+**Verified by:**
+- All 3 escape hatches documented
+- Escape hatches section excluded when includeEscapeHatches disabled
 
 *validation-rules-codec.feature*
 
@@ -1545,47 +2617,76 @@ _Verified by: All 3 escape hatches documented, Escape hatches section excluded w
 
 *The warning collector provides a unified system for capturing, categorizing,*
 
+---
+
 #### Warnings are captured with source context
 
 Each warning includes the source location, category, and message to
     enable debugging and targeted fixes.
 
-_Verified by: Warning includes source file, Warning includes line number when available, Warning includes category_
+**Verified by:**
+- Warning includes source file
+- Warning includes line number when available
+- Warning includes category
+
+---
 
 #### Warnings are categorized for filtering and grouping
 
 Warning categories enable filtering by severity, source, or type
     for different reporting needs.
 
-_Verified by: Warning categories are supported, Warnings can be filtered by category, Warnings can be filtered by source file_
+**Verified by:**
+- Warning categories are supported
+- Warnings can be filtered by category
+- Warnings can be filtered by source file
+
+---
 
 #### Warnings are aggregated across the pipeline
 
 The collector aggregates warnings from all pipeline stages, maintaining
     insertion order and source attribution.
 
-_Verified by: Warnings from multiple stages are collected, Warnings are grouped by source file, Summary counts by category_
+**Verified by:**
+- Warnings from multiple stages are collected
+- Warnings are grouped by source file
+- Summary counts by category
+
+---
 
 #### Warnings integrate with the Result pattern
 
 The warning collector integrates with Result<T, E> to include warnings
     in successful results, enabling callers to inspect non-fatal issues.
 
-_Verified by: Successful result includes warnings, Failed result includes warnings collected before failure, Warnings propagate through pipeline_
+**Verified by:**
+- Successful result includes warnings
+- Failed result includes warnings collected before failure
+- Warnings propagate through pipeline
+
+---
 
 #### Warnings can be formatted for different outputs
 
 The collector provides formatters for console output, JSON, and
     markdown to support different reporting needs.
 
-_Verified by: Console format includes color and location, JSON format is machine-readable, Markdown format for documentation_
+**Verified by:**
+- Console format includes color and location
+- JSON format is machine-readable
+- Markdown format for documentation
+
+---
 
 #### Existing console.warn calls are migrated to collector
 
 All console.warn calls in the source mapper and related modules
     are replaced with warning collector calls.
 
-_Verified by: Source mapper uses warning collector, Shape extractor uses warning collector_
+**Verified by:**
+- Source mapper uses warning collector
+- Shape extractor uses warning collector
 
 *warning-collector.feature*
 

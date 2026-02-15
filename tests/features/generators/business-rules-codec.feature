@@ -185,9 +185,9 @@ Feature: Business Rules Document Codec
   # Rule 10: Verified-by renders as compact italic line
   # ===========================================================================
 
-  Rule: Verified-by renders as compact italic line at standard level
+  Rule: Verified-by renders as checkbox list at standard level
 
-    Scenario: Rules with scenarios show compact verified-by line
+    Scenario: Rules with scenarios show verified-by checklist
       Given a pattern with a rule having scenarios "Create order" and "Cancel order"
       When decoding with BusinessRulesCodec in standard mode
       Then the document contains verified-by with scenario names
@@ -195,7 +195,7 @@ Feature: Business Rules Document Codec
     Scenario: Duplicate scenario names are deduplicated
       Given a pattern with a rule having duplicate scenario names
       When decoding with BusinessRulesCodec in standard mode
-      Then the verified-by line contains each scenario name only once
+      Then the verified-by list contains each scenario name only once
 
   # ===========================================================================
   # Rule 11: Feature names are humanized from camelCase
