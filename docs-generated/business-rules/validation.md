@@ -4,7 +4,7 @@
 
 ---
 
-**41 rules** from 8 features. 10 rules have explicit invariants.
+**41 rules** from 8 features. 37 rules have explicit invariants.
 
 ---
 
@@ -18,6 +18,10 @@
 
 #### Process metadata should not appear in TypeScript code
 
+> **Invariant:** Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
+>
+> **Rationale:** TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.
+
 **Verified by:**
 - Code without process tags passes
 - Feature-only process tags in code are flagged
@@ -25,6 +29,10 @@
 ---
 
 #### Generator hints should not appear in feature files
+
+> **Invariant:** Feature files must not contain generator magic comments beyond a configurable threshold.
+>
+> **Rationale:** Generator hints are implementation details that belong in TypeScript — excessive magic comments in specs indicate leaking implementation concerns into business requirements.
 
 **Verified by:**
 - Feature without magic comments passes
@@ -35,6 +43,10 @@
 
 #### Feature files should not have excessive scenarios
 
+> **Invariant:** A single feature file must not exceed the configured maximum scenario count.
+>
+> **Rationale:** Oversized feature files indicate missing decomposition — they become hard to maintain and slow to execute.
+
 **Verified by:**
 - Feature with few scenarios passes
 - Feature exceeding scenario threshold is flagged
@@ -42,6 +54,10 @@
 ---
 
 #### Feature files should not exceed size thresholds
+
+> **Invariant:** A single feature file must not exceed the configured maximum line count.
+>
+> **Rationale:** Excessively large files indicate a feature that should be split into focused, independently testable specifications.
 
 **Verified by:**
 - Normal-sized feature passes
@@ -51,12 +67,20 @@
 
 #### All anti-patterns can be detected in one pass
 
+> **Invariant:** The anti-pattern detector must evaluate all registered rules in a single scan pass over the source files.
+>
+> **Rationale:** Single-pass detection ensures consistent results and avoids O(n*m) performance degradation with multiple file traversals.
+
 **Verified by:**
 - Combined detection finds process-in-code issues
 
 ---
 
 #### Violations can be formatted for console output
+
+> **Invariant:** Anti-pattern violations must be renderable as grouped, human-readable console output.
+>
+> **Rationale:** Developers need actionable feedback at commit time — ungrouped or unformatted violations are hard to triage and fix.
 
 **Verified by:**
 - Empty violations produce clean report
@@ -134,6 +158,10 @@
 
 #### Status changes are detected as modifications not additions
 
+> **Invariant:** When a deliverable's status value changes between versions, the change detector must classify it as a modification, not an addition or removal.
+>
+> **Rationale:** Correct change classification drives scope-creep detection — misclassifying a status change as an addition would trigger false scope-creep violations on active specs.
+
 **Verified by:**
 - Single deliverable status change is detected as modification
 - Multiple deliverable status changes are all modifications
@@ -142,12 +170,20 @@
 
 #### New deliverables are detected as additions
 
+> **Invariant:** Deliverables present in the new version but absent in the old version must be classified as additions.
+>
+> **Rationale:** Addition detection powers the scope-creep rule — new deliverables added to active specs must be flagged as violations.
+
 **Verified by:**
 - New deliverable is detected as addition
 
 ---
 
 #### Removed deliverables are detected as removals
+
+> **Invariant:** Deliverables present in the old version but absent in the new version must be classified as removals.
+>
+> **Rationale:** Removal detection enables the deliverable-removed warning — silently dropping deliverables could hide incomplete work.
 
 **Verified by:**
 - Removed deliverable is detected as removal
@@ -156,12 +192,23 @@
 
 #### Mixed changes are correctly categorized
 
+> **Invariant:** When a single diff contains additions, removals, and modifications simultaneously, each change must be independently categorized.
+>
+> **Rationale:** Real-world commits often contain mixed changes — incorrect categorization of any single change cascades into wrong validation decisions.
+
 **Verified by:**
 - Mixed additions, removals, and modifications are handled correctly
+- Mixed additions
+- removals
+- and modifications are handled correctly
 
 ---
 
 #### Non-deliverable tables are ignored
+
+> **Invariant:** Changes to non-deliverable tables (e.g., ScenarioOutline Examples tables) must not be detected as deliverable changes.
+>
+> **Rationale:** Feature files contain many table structures — only the Background deliverables table is semantically relevant to process guard validation.
 
 **Verified by:**
 - Changes in Examples tables are not detected as deliverable changes
@@ -176,6 +223,10 @@
 
 #### Deliverable completion uses canonical status taxonomy
 
+> **Invariant:** Deliverable completion status must be determined exclusively using the 6 canonical values from the deliverable status taxonomy.
+>
+> **Rationale:** Freeform status strings bypass schema validation and produce inconsistent completion tracking across the monorepo.
+
 **Verified by:**
 - Complete status is detected as complete
 - Non-complete canonical statuses are correctly identified
@@ -183,6 +234,10 @@
 ---
 
 #### Acceptance criteria must be tagged with @acceptance-criteria
+
+> **Invariant:** Every completed pattern must have at least one scenario tagged with @acceptance-criteria in its feature file.
+>
+> **Rationale:** Without explicit acceptance criteria tags, there is no machine-verifiable proof that the delivered work meets its requirements.
 
 **Verified by:**
 - Feature with @acceptance-criteria scenario passes
@@ -193,6 +248,10 @@
 
 #### Acceptance criteria scenarios can be extracted by name
 
+> **Invariant:** The validator must be able to extract scenario names from @acceptance-criteria-tagged scenarios for reporting.
+>
+> **Rationale:** Extracted names appear in traceability reports and DoD summaries, providing an audit trail from requirement to verification.
+
 **Verified by:**
 - Extract multiple AC scenario names
 - No AC scenarios returns empty list
@@ -200,6 +259,10 @@
 ---
 
 #### DoD requires all deliverables complete and AC present
+
+> **Invariant:** A pattern passes Definition of Done only when ALL deliverables have complete status AND at least one @acceptance-criteria scenario exists.
+>
+> **Rationale:** Partial completion or missing acceptance criteria means the pattern is not verified — marking it complete would bypass quality gates.
 
 **Verified by:**
 - Phase with all deliverables complete and AC passes
@@ -211,6 +274,10 @@
 
 #### DoD can be validated across multiple completed phases
 
+> **Invariant:** DoD validation must evaluate all completed phases independently and report per-phase pass/fail results.
+>
+> **Rationale:** Multi-phase patterns need granular validation — a single aggregate result would hide which specific phase failed its Definition of Done.
+
 **Verified by:**
 - All completed phases passing DoD
 - Mixed pass/fail results
@@ -220,6 +287,10 @@
 ---
 
 #### Summary can be formatted for console output
+
+> **Invariant:** DoD validation results must be renderable as structured console output showing phase-level pass/fail details.
+>
+> **Rationale:** Developers need immediate, actionable feedback during pre-commit validation — raw data structures are not human-readable.
 
 **Verified by:**
 - Empty summary shows no completed phases message
@@ -236,6 +307,10 @@
 
 #### Status values must be valid PDR-005 FSM states
 
+> **Invariant:** Every pattern status value must be one of the states defined in the PDR-005 finite state machine (roadmap, active, completed, deferred).
+>
+> **Rationale:** Invalid status values bypass FSM transition validation and produce undefined behavior in process guard enforcement.
+
 **Verified by:**
 - Valid status values are accepted
 - Invalid status values are rejected
@@ -244,6 +319,10 @@
 ---
 
 #### Status transitions must follow FSM rules
+
+> **Invariant:** Every status change must follow a valid edge in the PDR-005 state machine graph — no skipping states or invalid paths.
+>
+> **Rationale:** The FSM encodes the delivery workflow contract — invalid transitions indicate process violations that could corrupt delivery tracking.
 
 **Verified by:**
 - Valid transitions are accepted
@@ -256,6 +335,10 @@
 
 #### Completed patterns should have proper metadata
 
+> **Invariant:** Patterns in completed status must carry completion date and actual effort metadata to pass validation without warnings.
+>
+> **Rationale:** Completion metadata enables retrospective analysis and effort estimation — missing metadata degrades project planning accuracy over time.
+
 **Verified by:**
 - Completed pattern with full metadata has no warnings
 - Completed pattern without date shows warning
@@ -266,6 +349,10 @@
 
 #### Protection levels match FSM state definitions
 
+> **Invariant:** Each FSM state must map to exactly one protection level (none, scope-locked, or hard-locked) as defined in PDR-005.
+>
+> **Rationale:** Protection levels enforce edit constraints per state — mismatched protection would allow prohibited modifications to active or completed specs.
+
 **Verified by:**
 - Roadmap status has no protection
 - Active status has scope protection
@@ -275,6 +362,10 @@
 ---
 
 #### Combined validation provides complete results
+
+> **Invariant:** The FSM validator must return a combined result including status validity, transition validity, metadata warnings, and protection level in a single call.
+>
+> **Rationale:** Callers need a complete validation picture — requiring multiple separate calls risks partial validation and inconsistent error reporting.
 
 **Verified by:**
 - Valid completed pattern returns combined results
@@ -420,6 +511,10 @@ In strict mode, all relationship targets are validated against known patterns.
 
 #### Status transitions are detected from file-level tags
 
+> **Invariant:** Status transitions must be detected by comparing @libar-docs-status tags at the file level between the old and new versions of a file.
+>
+> **Rationale:** File-level tags are the canonical source of pattern status — detecting transitions from tags ensures consistency with the FSM validator.
+
 **Verified by:**
 - New file with status tag is detected as transition from roadmap
 - Modified file with status change is detected
@@ -428,6 +523,10 @@ In strict mode, all relationship targets are validated against known patterns.
 ---
 
 #### Status tags inside docstrings are ignored
+
+> **Invariant:** Status tags appearing inside Gherkin docstring blocks (between triple-quote delimiters) must not be treated as real status declarations.
+>
+> **Rationale:** Docstrings often contain example code or documentation showing status tags — parsing these as real would cause phantom status transitions.
 
 **Verified by:**
 - Status tag inside docstring is not used for transition
@@ -438,6 +537,10 @@ In strict mode, all relationship targets are validated against known patterns.
 
 #### First valid status tag outside docstrings is used
 
+> **Invariant:** When multiple status tags appear outside docstrings, only the first one determines the file's status.
+>
+> **Rationale:** A single canonical status per file prevents ambiguity — using the first tag matches Gherkin convention where file-level tags appear at the top.
+
 **Verified by:**
 - First file-level tag wins over subsequent tags
 
@@ -445,12 +548,20 @@ In strict mode, all relationship targets are validated against known patterns.
 
 #### Line numbers are tracked from hunk headers
 
+> **Invariant:** Detected status transitions must include the line number where the status tag appears, derived from git diff hunk headers.
+>
+> **Rationale:** Line numbers enable precise error reporting — developers need to know exactly where in the file the transition was detected.
+
 **Verified by:**
 - Transition location includes correct line number
 
 ---
 
 #### Generated documentation directories are excluded
+
+> **Invariant:** Files in generated documentation directories (docs-generated/, docs-living/) must be excluded from status transition detection.
+>
+> **Rationale:** Generated files are projections of source files — detecting transitions in them would produce duplicate violations and false positives.
 
 **Verified by:**
 - Status in docs-generated directory is ignored

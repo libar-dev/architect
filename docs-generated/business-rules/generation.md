@@ -4,7 +4,7 @@
 
 ---
 
-**223 rules** from 45 features. 53 rules have explicit invariants.
+**223 rules** from 45 features. 100 rules have explicit invariants.
 
 ---
 
@@ -663,9 +663,9 @@ If no patterns have architecture annotations,
 
 #### Rule blocks are partitioned by semantic prefix
 
-Decision documents use Rule: blocks with semantic prefixes to organize
-    content into Context, Decision, and Consequences sections (standard ADR
-    format).
+> **Invariant:** Decision document rules must be partitioned into ADR sections based on their semantic prefix (e.g., "Decision:", "Context:", "Consequence:"), with non-standard rules placed in an "other" category.
+>
+> **Rationale:** Semantic partitioning produces structured ADR output that follows the standard ADR format — unpartitioned rules would generate a flat, unnavigable document.
 
 **Verified by:**
 - Partition rules into ADR sections
@@ -675,7 +675,9 @@ Decision documents use Rule: blocks with semantic prefixes to organize
 
 #### DocStrings are extracted with language tags
 
-Decision documents contain code examples as Gherkin DocStrings.
+> **Invariant:** DocStrings within rule descriptions must be extracted preserving their language tag (e.g., typescript, bash), defaulting to "text" when no language is specified.
+>
+> **Rationale:** Language tags enable syntax highlighting in generated markdown code blocks — losing the tag produces unformatted code that is harder to read.
 
 **Verified by:**
 - Extract single DocString
@@ -686,7 +688,9 @@ Decision documents contain code examples as Gherkin DocStrings.
 
 #### Source mapping tables are parsed from rule descriptions
 
-Decision documents define source mappings in markdown tables.
+> **Invariant:** Markdown tables in rule descriptions with source mapping columns must be parsed into structured data, returning empty arrays when no table is present.
+>
+> **Rationale:** Source mapping tables drive the extraction pipeline — they define which files to read and what content to extract for each decision section.
 
 **Verified by:**
 - Parse basic source mapping table
@@ -696,8 +700,9 @@ Decision documents define source mappings in markdown tables.
 
 #### Self-reference markers are correctly detected
 
-Source files can reference the current decision document using special
-    markers like "THIS DECISION", "THIS DECISION (Rule: X)", etc.
+> **Invariant:** The "THIS DECISION" marker must be recognized as a self-reference to the current decision document, with optional rule name qualifiers parsed correctly.
+>
+> **Rationale:** Self-references enable decisions to extract content from their own rules — misdetecting them would trigger file-system lookups for a non-existent "THIS DECISION" file.
 
 **Verified by:**
 - Detect THIS DECISION marker
@@ -710,7 +715,9 @@ Source files can reference the current decision document using special
 
 #### Extraction methods are normalized to known types
 
-The extraction method column can be written in various formats.
+> **Invariant:** Extraction method strings from source mapping tables must be normalized to canonical method names for dispatcher routing.
+>
+> **Rationale:** Users may write extraction methods in various formats (e.g., "Decision rule description", "extract-shapes") — normalization ensures consistent dispatch regardless of formatting.
 
 **Verified by:**
 - Normalize Decision rule description
@@ -721,7 +728,9 @@ The extraction method column can be written in various formats.
 
 #### Complete decision documents are parsed with all content
 
-The parseDecisionDocument function extracts all content from an ADR/PDR.
+> **Invariant:** A complete decision document must be parseable into its constituent parts including rules, DocStrings, source mappings, and self-references in a single parse operation.
+>
+> **Rationale:** Complete parsing validates that all codec features compose correctly — partial parsing could miss interactions between features.
 
 **Verified by:**
 - Parse complete decision document
@@ -730,7 +739,9 @@ The parseDecisionDocument function extracts all content from an ADR/PDR.
 
 #### Rules can be found by name with partial matching
 
-Self-references may not have an exact rule name match.
+> **Invariant:** Rules must be findable by exact name match or partial (substring) name match, returning undefined when no match exists.
+>
+> **Rationale:** Partial matching supports flexible cross-references between decisions — requiring exact matches would make references brittle to minor naming changes.
 
 **Verified by:**
 - Find rule by exact name
@@ -747,8 +758,9 @@ Self-references may not have an exact rule name match.
 
 #### Output paths are determined from pattern metadata
 
-The generator computes output paths based on pattern name and optional
-    section configuration.
+> **Invariant:** Output file paths must be derived from pattern metadata using kebab-case conversion of the pattern name, with configurable section prefixes.
+>
+> **Rationale:** Consistent path derivation ensures generated files are predictable and linkable — ad-hoc paths would break cross-document references.
 
 **Verified by:**
 - Default output paths for pattern
@@ -759,8 +771,9 @@ The generator computes output paths based on pattern name and optional
 
 #### Compact output includes only essential content
 
-Summary/compact output is limited to ~50 lines and includes only
-    essential tables and type definitions for Claude context files.
+> **Invariant:** Compact output mode must include only essential decision content (type shapes, key constraints) while excluding full descriptions and verbose sections.
+>
+> **Rationale:** Compact output is designed for AI context windows where token budget is limited — including full descriptions would negate the space savings.
 
 **Verified by:**
 - Compact output excludes full descriptions
@@ -771,8 +784,9 @@ Summary/compact output is limited to ~50 lines and includes only
 
 #### Detailed output includes full content
 
-Detailed output is ~300 lines and includes everything: JSDoc, examples,
-    full descriptions, and all extracted content.
+> **Invariant:** Detailed output mode must include all decision content including full descriptions, consequences, and DocStrings rendered as code blocks.
+>
+> **Rationale:** Detailed output serves as the complete human reference — omitting any section would force readers to consult source files for the full picture.
 
 **Verified by:**
 - Detailed output includes all sections
@@ -783,8 +797,9 @@ Detailed output is ~300 lines and includes everything: JSDoc, examples,
 
 #### Multi-level generation produces both outputs
 
-The generator can produce both compact and detailed outputs in a single
-    pass for maximum utility.
+> **Invariant:** The generator must produce both compact and detailed output files from a single generation run, using the pattern name or patternName tag as the identifier.
+>
+> **Rationale:** Both output levels serve different audiences (AI vs human) — generating them together ensures consistency and eliminates the risk of one becoming stale.
 
 **Verified by:**
 - Generate both compact and detailed outputs
@@ -794,8 +809,9 @@ The generator can produce both compact and detailed outputs in a single
 
 #### Generator is registered with the registry
 
-The generator is available in the registry under the name "doc-from-decision"
-    and can be invoked through the standard generator interface.
+> **Invariant:** The decision document generator must be registered with the generator registry under a canonical name and must filter input patterns to only those with source mappings.
+>
+> **Rationale:** Registry registration enables discovery via --list-generators — filtering to source-mapped patterns prevents empty output for patterns without decision metadata.
 
 **Verified by:**
 - Generator is registered with correct name
@@ -806,8 +822,9 @@ The generator is available in the registry under the name "doc-from-decision"
 
 #### Source mappings are executed during generation
 
-Decision documents with source mapping tables trigger content aggregation
-    from the referenced files during the generation process.
+> **Invariant:** Source mapping tables must be executed during generation to extract content from referenced files, with missing files reported as validation errors.
+>
+> **Rationale:** Source mappings are the bridge between decision specs and implementation — unexecuted mappings produce empty sections, while silent missing-file errors hide broken references.
 
 **Verified by:**
 - Source mappings are executed
@@ -1240,6 +1257,10 @@ The generated document starts with an overview section
 
 #### POC decision document is parsed correctly
 
+> **Invariant:** The real POC decision document (Process Guard) must be parseable by the codec, extracting all source mappings with their extraction types.
+>
+> **Rationale:** Integration testing against the actual POC document validates that the codec works with real-world content, not just synthetic test data.
+
 **Verified by:**
 - Load actual POC decision document
 - Source mappings include all extraction types
@@ -1247,6 +1268,10 @@ The generated document starts with an overview section
 ---
 
 #### Self-references extract content from POC decision
+
+> **Invariant:** THIS DECISION self-references in the POC document must successfully extract Context rules, Decision rules, and DocStrings from the document itself.
+>
+> **Rationale:** Self-references are the most common extraction type in decision docs — they must work correctly for the POC to demonstrate the end-to-end pipeline.
 
 **Verified by:**
 - Extract Context rule from THIS DECISION
@@ -1257,6 +1282,10 @@ The generated document starts with an overview section
 
 #### TypeScript shapes are extracted from real files
 
+> **Invariant:** The source mapper must successfully extract type shapes and patterns from real TypeScript source files referenced in the POC document.
+>
+> **Rationale:** TypeScript extraction is the primary mechanism for pulling implementation details into decision docs — it must work with actual project files.
+
 **Verified by:**
 - Extract shapes from types.ts
 - Extract shapes from decider.ts
@@ -1266,6 +1295,10 @@ The generated document starts with an overview section
 
 #### Behavior spec content is extracted correctly
 
+> **Invariant:** The source mapper must successfully extract Rule blocks and ScenarioOutline Examples from real Gherkin feature files referenced in the POC document.
+>
+> **Rationale:** Behavior spec extraction bridges decision documents to executable specifications — incorrect extraction would misrepresent the verified behavior.
+
 **Verified by:**
 - Extract Rule blocks from process-guard.feature
 - Extract Scenario Outline Examples from process-guard-linter.feature
@@ -1274,6 +1307,10 @@ The generated document starts with an overview section
 
 #### JSDoc sections are extracted from CLI files
 
+> **Invariant:** The source mapper must successfully extract JSDoc comment sections from real TypeScript CLI files referenced in the POC document.
+>
+> **Rationale:** CLI documentation often lives in JSDoc comments — extracting them into decision docs avoids duplicating CLI usage information manually.
+
 **Verified by:**
 - Extract JSDoc from lint-process.ts
 
@@ -1281,12 +1318,20 @@ The generated document starts with an overview section
 
 #### All source mappings execute successfully
 
+> **Invariant:** All source mappings defined in the POC decision document must execute without errors, producing non-empty extraction results.
+>
+> **Rationale:** End-to-end execution validates that all extraction types work with real files — a single failing mapping would produce incomplete decision documentation.
+
 **Verified by:**
 - Execute all 11 source mappings from POC
 
 ---
 
 #### Compact output generates correctly
+
+> **Invariant:** The compact output for the POC document must generate successfully and contain all essential sections defined by the compact format.
+>
+> **Rationale:** Compact output is the AI-facing artifact — verifying it against the real POC ensures the format serves its purpose of providing concise decision context.
 
 **Verified by:**
 - Generate compact output from POC
@@ -1296,6 +1341,10 @@ The generated document starts with an overview section
 
 #### Detailed output generates correctly
 
+> **Invariant:** The detailed output for the POC document must generate successfully and contain all sections including full content from source mappings.
+>
+> **Rationale:** Detailed output is the human-facing artifact — verifying it against the real POC ensures no content is lost in the generation pipeline.
+
 **Verified by:**
 - Generate detailed output from POC
 - Detailed output contains full content
@@ -1303,6 +1352,10 @@ The generated document starts with an overview section
 ---
 
 #### Generated output matches quality expectations
+
+> **Invariant:** The generated output structure must match the expected target format, with complete validation rules and properly structured sections.
+>
+> **Rationale:** Quality assertions catch regressions in output formatting — structural drift in generated documents would degrade their usefulness as references.
 
 **Verified by:**
 - Compact output matches target structure
@@ -2130,8 +2183,9 @@ Division by zero must be handled gracefully to prevent
 
 #### Extraction methods dispatch to correct handlers
 
-The source mapper dispatches to different extraction functions based on
-    the extraction method specified in the source mapping table.
+> **Invariant:** Each extraction method type (self-reference, TypeScript, Gherkin) must dispatch to the correct specialized handler based on the source file type or marker.
+>
+> **Rationale:** Wrong dispatch would apply TypeScript extraction logic to Gherkin files (or vice versa), producing garbled or empty results.
 
 **Verified by:**
 - Dispatch to decision extraction for THIS DECISION
@@ -2142,8 +2196,9 @@ The source mapper dispatches to different extraction functions based on
 
 #### Self-references extract from current decision document
 
-THIS DECISION markers extract content from the current decision document
-    rather than requiring a separate file path.
+> **Invariant:** THIS DECISION self-references must extract content from the current decision document using rule descriptions, DocStrings, or full document access.
+>
+> **Rationale:** Self-references avoid circular file reads — the document content is already in memory, so extraction is a lookup operation rather than a file I/O operation.
 
 **Verified by:**
 - Extract from THIS DECISION using rule description
@@ -2154,7 +2209,9 @@ THIS DECISION markers extract content from the current decision document
 
 #### Multiple sources are aggregated in mapping order
 
-Multiple source mappings result in content extraction from each file.
+> **Invariant:** When multiple source mappings target the same section, their extracted content must be aggregated in the order defined by the mapping table.
+>
+> **Rationale:** Mapping order is intentional — authors structure their source tables to produce a logical reading flow, and reordering would break the narrative.
 
 **Verified by:**
 - Aggregate from multiple sources
@@ -2164,8 +2221,9 @@ Multiple source mappings result in content extraction from each file.
 
 #### Missing files produce warnings without failing
 
-A referenced source file that does not exist produces a warning,
-    but generation continues with available sources.
+> **Invariant:** When a referenced source file does not exist, the mapper must produce a warning and continue processing remaining mappings rather than failing entirely.
+>
+> **Rationale:** Partial extraction is more useful than total failure — a decision document with most sections populated and one warning is better than no document at all.
 
 **Verified by:**
 - Missing source file produces warning
@@ -2176,8 +2234,9 @@ A referenced source file that does not exist produces a warning,
 
 #### Empty extraction results produce info warnings
 
-Extraction that succeeds but produces no content (e.g., no shapes found)
-    results in an informational warning being logged.
+> **Invariant:** When extraction succeeds but produces empty results (no matching shapes, no matching rules), an informational warning must be generated.
+>
+> **Rationale:** Empty results often indicate stale source mappings pointing to renamed or removed content — warnings surface these issues before they reach generated output.
 
 **Verified by:**
 - Empty shapes extraction produces info warning
@@ -2187,8 +2246,9 @@ Extraction that succeeds but produces no content (e.g., no shapes found)
 
 #### Extraction methods are normalized for dispatch
 
-The extraction method column can be written in various formats
-    and is normalized before dispatch.
+> **Invariant:** Extraction method strings must be normalized to canonical forms before dispatch, with unrecognized methods producing a warning.
+>
+> **Rationale:** Users write extraction methods in natural language — normalization bridges the gap between human-readable table entries and programmatic dispatch keys.
 
 **Verified by:**
 - Normalize various extraction method formats
@@ -2313,8 +2373,9 @@ The extraction method column can be written in various formats
 
 #### Document metadata is correctly set
 
-The taxonomy document has standard metadata fields for title, purpose,
-    and detail level that describe the generated content.
+> **Invariant:** The taxonomy document must have the title "Taxonomy Reference", a descriptive purpose string, and a detail level reflecting the generateDetailFiles option.
+>
+> **Rationale:** Document metadata drives the table of contents and navigation in generated doc sites — incorrect metadata produces broken links and misleading titles.
 
 **Verified by:**
 - Document title is Taxonomy Reference
@@ -2325,8 +2386,9 @@ The taxonomy document has standard metadata fields for title, purpose,
 
 #### Categories section is generated from TagRegistry
 
-The categories section lists all configured tag categories with their
-    domain, priority, and description in a sortable table.
+> **Invariant:** The categories section must render all categories from the configured TagRegistry as a table, with optional linkOut to detail files when progressive disclosure is enabled.
+>
+> **Rationale:** Categories are the primary navigation structure in the taxonomy — missing categories leave developers unable to find the correct annotation tags.
 
 **Verified by:**
 - Categories section is included in output
@@ -2337,8 +2399,9 @@ The categories section lists all configured tag categories with their
 
 #### Metadata tags can be grouped by domain
 
-The groupByDomain option organizes metadata tags into subsections
-    by their semantic domain (Core, Relationship, Timeline, etc.).
+> **Invariant:** When groupByDomain is enabled, metadata tags must be organized into domain-specific subsections; when disabled, a single flat table must be rendered.
+>
+> **Rationale:** Domain grouping improves scannability for large tag sets (21 categories in ddd-es-cqrs) while flat mode is simpler for small presets (3 categories in generic).
 
 **Verified by:**
 - With groupByDomain enabled tags are grouped into subsections
@@ -2348,8 +2411,9 @@ The groupByDomain option organizes metadata tags into subsections
 
 #### Tags are classified into domains by hardcoded mapping
 
-The domain classification is intentionally hardcoded for documentation
-    stability.
+> **Invariant:** Tags must be classified into domains (Core, Relationship, Timeline, etc.) using a hardcoded mapping, with unrecognized tags placed in an "Other Tags" group.
+>
+> **Rationale:** Domain classification is stable across releases — hardcoding prevents miscategorization from user config errors while the "Other" fallback handles future tag additions gracefully.
 
 **Verified by:**
 - Core tags correctly classified
@@ -2362,8 +2426,9 @@ The domain classification is intentionally hardcoded for documentation
 
 #### Optional sections can be disabled via codec options
 
-The codec supports disabling format types, presets, and architecture
-    diagram sections for compact output generation.
+> **Invariant:** Format Types, Presets, and Architecture sections must each be independently disableable via their respective codec option flags.
+>
+> **Rationale:** Not all projects need all sections — disabling irrelevant sections reduces generated document size and prevents confusion from inapplicable content.
 
 **Verified by:**
 - includeFormatTypes disabled excludes Format Types section
@@ -2374,8 +2439,9 @@ The codec supports disabling format types, presets, and architecture
 
 #### Detail files are generated for progressive disclosure
 
-The generateDetailFiles option creates additional files for
-    categories, metadata tags, and format types with detailed content.
+> **Invariant:** When generateDetailFiles is enabled, the codec must produce additional detail files (one per domain group) alongside the main taxonomy document; when disabled, no additional files are created.
+>
+> **Rationale:** Progressive disclosure keeps the main document scannable while providing deep-dive content in linked pages — monolithic documents become unwieldy for large tag sets.
 
 **Verified by:**
 - generateDetailFiles creates 3 additional files
@@ -2386,8 +2452,9 @@ The generateDetailFiles option creates additional files for
 
 #### Format types are documented with descriptions and examples
 
-The Format Types section documents all supported tag value formats
-    with descriptions and examples for each type.
+> **Invariant:** All 6 format types must be documented with descriptions and usage examples in the generated taxonomy.
+>
+> **Rationale:** Format types control how tag values are parsed — undocumented formats force developers to guess the correct syntax, leading to annotation errors.
 
 **Verified by:**
 - All 6 format types are documented
@@ -2545,8 +2612,9 @@ The Format Types section documents all supported tag value formats
 
 #### Document metadata is correctly set
 
-The validation rules document has standard metadata fields for title,
-    purpose, and detail level.
+> **Invariant:** The validation rules document must have the title "Validation Rules", a purpose describing Process Guard, and a detail level reflecting the generateDetailFiles option.
+>
+> **Rationale:** Accurate metadata ensures the validation rules document is correctly indexed in the generated documentation site.
 
 **Verified by:**
 - Document title is Validation Rules
@@ -2557,8 +2625,9 @@ The validation rules document has standard metadata fields for title,
 
 #### All validation rules are documented in a table
 
-The rules table includes all 6 Process Guard validation rules with
-    their severity levels and descriptions.
+> **Invariant:** All 6 Process Guard validation rules must appear in the rules table with their correct severity levels (error or warning).
+>
+> **Rationale:** The rules table is the primary reference for understanding what Process Guard enforces — missing rules would leave developers surprised by undocumented validation failures.
 
 **Verified by:**
 - All 6 rules appear in table
@@ -2568,8 +2637,9 @@ The rules table includes all 6 Process Guard validation rules with
 
 #### FSM state diagram is generated from transitions
 
-The Mermaid diagram shows all valid state transitions for the
-    Process Guard FSM.
+> **Invariant:** When includeFSMDiagram is enabled, a Mermaid state diagram showing all 4 FSM states and their transitions must be generated; when disabled, the diagram section must be omitted.
+>
+> **Rationale:** The state diagram is the most intuitive representation of allowed transitions — it answers "where can I go from here?" faster than a text table.
 
 **Verified by:**
 - Mermaid diagram generated when includeFSMDiagram enabled
@@ -2580,8 +2650,9 @@ The Mermaid diagram shows all valid state transitions for the
 
 #### Protection level matrix shows status protections
 
-The protection matrix documents which statuses have which protection
-    levels (none, scope-locked, hard-locked).
+> **Invariant:** When includeProtectionMatrix is enabled, a matrix showing all 4 statuses with their protection levels must be generated; when disabled, the section must be omitted.
+>
+> **Rationale:** The protection matrix explains why certain edits are blocked — without it, developers encounter cryptic "scope-creep" or "completed-protection" errors without understanding the underlying model.
 
 **Verified by:**
 - Matrix shows all 4 statuses with protection levels
@@ -2591,8 +2662,9 @@ The protection matrix documents which statuses have which protection
 
 #### CLI usage is documented with options and exit codes
 
-The CLI section shows how to invoke the Process Guard linter
-    with various options.
+> **Invariant:** When includeCLIUsage is enabled, the document must include CLI example code, all 6 options, and exit code documentation; when disabled, the section must be omitted.
+>
+> **Rationale:** CLI documentation in the validation rules doc provides a single reference for both the rules and how to run them — separate docs would fragment the developer experience.
 
 **Verified by:**
 - CLI example code block included
@@ -2604,8 +2676,9 @@ The CLI section shows how to invoke the Process Guard linter
 
 #### Escape hatches are documented for special cases
 
-The escape hatches section documents how to override Process Guard
-    validation for legitimate use cases.
+> **Invariant:** When includeEscapeHatches is enabled, all 3 escape hatch mechanisms must be documented; when disabled, the section must be omitted.
+>
+> **Rationale:** Escape hatches prevent the validation system from becoming a blocker — developers need to know how to safely bypass rules for legitimate exceptions.
 
 **Verified by:**
 - All 3 escape hatches documented
@@ -2621,8 +2694,9 @@ The escape hatches section documents how to override Process Guard
 
 #### Warnings are captured with source context
 
-Each warning includes the source location, category, and message to
-    enable debugging and targeted fixes.
+> **Invariant:** Each captured warning must include the source file path, optional line number, and category for precise identification.
+>
+> **Rationale:** Context-free warnings are impossible to act on — developers need to know which file and line produced the warning to fix the underlying issue.
 
 **Verified by:**
 - Warning includes source file
@@ -2633,8 +2707,9 @@ Each warning includes the source location, category, and message to
 
 #### Warnings are categorized for filtering and grouping
 
-Warning categories enable filtering by severity, source, or type
-    for different reporting needs.
+> **Invariant:** Warnings must support multiple categories and be filterable by both category and source file.
+>
+> **Rationale:** Large codebases produce many warnings — filtering by category or file lets developers focus on one concern at a time instead of triaging an overwhelming flat list.
 
 **Verified by:**
 - Warning categories are supported
@@ -2645,8 +2720,9 @@ Warning categories enable filtering by severity, source, or type
 
 #### Warnings are aggregated across the pipeline
 
-The collector aggregates warnings from all pipeline stages, maintaining
-    insertion order and source attribution.
+> **Invariant:** Warnings from multiple pipeline stages must be collected into a single aggregated view, groupable by source file and summarizable by category counts.
+>
+> **Rationale:** Pipeline stages run independently — without aggregation, warnings would be scattered across stage outputs, making it impossible to see the full picture.
 
 **Verified by:**
 - Warnings from multiple stages are collected
@@ -2657,8 +2733,9 @@ The collector aggregates warnings from all pipeline stages, maintaining
 
 #### Warnings integrate with the Result pattern
 
-The warning collector integrates with Result<T, E> to include warnings
-    in successful results, enabling callers to inspect non-fatal issues.
+> **Invariant:** Warnings must propagate through the Result monad, being preserved in both successful and failed results and across pipeline stages.
+>
+> **Rationale:** The Result pattern is the standard error-handling mechanism — warnings that don't propagate through Results would be silently lost when functions compose.
 
 **Verified by:**
 - Successful result includes warnings
@@ -2669,8 +2746,9 @@ The warning collector integrates with Result<T, E> to include warnings
 
 #### Warnings can be formatted for different outputs
 
-The collector provides formatters for console output, JSON, and
-    markdown to support different reporting needs.
+> **Invariant:** Warnings must be formattable as colored console output, machine-readable JSON, and markdown for documentation, each with appropriate structure.
+>
+> **Rationale:** Different consumers need different formats — CI pipelines parse JSON, developers read console output, and generated docs embed markdown.
 
 **Verified by:**
 - Console format includes color and location
@@ -2681,8 +2759,9 @@ The collector provides formatters for console output, JSON, and
 
 #### Existing console.warn calls are migrated to collector
 
-All console.warn calls in the source mapper and related modules
-    are replaced with warning collector calls.
+> **Invariant:** Pipeline components (source mapper, shape extractor) must use the warning collector instead of direct console.warn calls.
+>
+> **Rationale:** Direct console.warn calls bypass aggregation and filtering — migrating to the collector ensures all warnings are captured, categorized, and available for programmatic consumption.
 
 **Verified by:**
 - Source mapper uses warning collector

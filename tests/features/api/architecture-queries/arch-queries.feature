@@ -13,6 +13,10 @@ Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
 
   Rule: Neighborhood and comparison views
 
+    **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
+    **Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
+    **Verified by:** Pattern neighborhood shows direct connections, Cross-context comparison shows shared and unique dependencies, Neighborhood for nonexistent pattern returns undefined
+
     @acceptance-criteria @happy-path
     Scenario: Pattern neighborhood shows direct connections
       Given a pattern "OrderSaga" in context "orders" with role "saga"
@@ -47,6 +51,10 @@ Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
 
   Rule: Taxonomy discovery via tags and sources
 
+    **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
+    **Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
+    **Verified by:** Tag aggregation counts values across patterns, Source inventory categorizes files by type, Tags with no patterns returns empty report
+
     @acceptance-criteria @happy-path
     Scenario: Tag aggregation counts values across patterns
       Given patterns with various statuses and categories
@@ -72,6 +80,10 @@ Feature: Architecture Queries - Neighborhood, Comparison, Tags, Sources
       And no tag entries are listed
 
   Rule: Coverage analysis reports annotation completeness
+
+    **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
+    **Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
+    **Verified by:** Unused taxonomy detection, Cross-context comparison with integration points, Neighborhood includes implements relationships, Neighborhood includes dependsOn and enables relationships
 
     @acceptance-criteria @happy-path
     Scenario: Unused taxonomy detection

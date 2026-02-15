@@ -4,7 +4,7 @@
 
 ---
 
-**32 rules** from 7 features. 15 rules have explicit invariants.
+**32 rules** from 7 features. 32 rules have explicit invariants.
 
 ---
 
@@ -18,6 +18,10 @@
 
 #### Config files are discovered by walking up directories
 
+> **Invariant:** The config loader must search for configuration files starting from the current directory and walking up parent directories until a match is found or the filesystem root is reached.
+>
+> **Rationale:** Projects may run CLI commands from subdirectories — upward traversal ensures the nearest config file is always found regardless of working directory.
+
 **Verified by:**
 - Find config file in current directory
 - Find config file in parent directory
@@ -28,12 +32,20 @@
 
 #### Config discovery stops at repo root
 
+> **Invariant:** Directory traversal must stop at repository root markers (e.g., .git directory) and not search beyond them.
+>
+> **Rationale:** Searching beyond the repo root could find unrelated config files from parent projects, producing confusing cross-project behavior.
+
 **Verified by:**
 - Stop at .git directory marker
 
 ---
 
 #### Config is loaded and validated
+
+> **Invariant:** Loaded config files must have a valid default export matching the expected configuration schema, with appropriate error messages for invalid formats.
+>
+> **Rationale:** Invalid configurations produce cryptic downstream errors — early validation with clear messages prevents debugging wasted on malformed config.
 
 **Verified by:**
 - Load valid config with default fallback
@@ -44,6 +56,10 @@
 ---
 
 #### Config errors are formatted for display
+
+> **Invariant:** Configuration loading errors must be formatted as human-readable messages including the file path and specific error description.
+>
+> **Rationale:** Raw error objects are not actionable — developers need the config file path and a clear description to diagnose and fix configuration issues.
 
 **Verified by:**
 - Format error with path and message
@@ -142,6 +158,10 @@
 
 #### Factory creates configured instances with correct defaults
 
+> **Invariant:** The configuration factory must produce a fully initialized instance for any supported preset, with the libar-generic preset as the default when no arguments are provided.
+>
+> **Rationale:** A sensible default preset eliminates boilerplate for the common case while still supporting specialized presets (ddd-es-cqrs) for advanced monorepo configurations.
+
 **Verified by:**
 - Create with no arguments uses libar-generic preset
 - Create with generic preset
@@ -152,6 +172,10 @@
 
 #### Custom prefix configuration works correctly
 
+> **Invariant:** Custom tag prefix and file opt-in tag overrides must be applied to the configuration instance, replacing the preset defaults.
+>
+> **Rationale:** Consuming projects may use different annotation prefixes — custom prefixes enable the toolkit to work with any tag convention without forking presets.
+
 **Verified by:**
 - Custom tag prefix overrides preset
 - Custom file opt-in tag overrides preset
@@ -161,6 +185,10 @@
 
 #### Preset categories replace base categories entirely
 
+> **Invariant:** When a preset defines its own category set, it must fully replace (not merge with) the base categories.
+>
+> **Rationale:** Category sets are curated per-preset — merging would include irrelevant categories (e.g., DDD categories in a generic project) that pollute taxonomy reports.
+
 **Verified by:**
 - Generic preset excludes DDD categories
 - Libar-generic preset excludes DDD categories
@@ -168,6 +196,10 @@
 ---
 
 #### Regex builders use configured prefix
+
+> **Invariant:** All regex builders (hasFileOptIn, hasDocDirectives, normalizeTag) must use the configured tag prefix, not a hardcoded one.
+>
+> **Rationale:** Regex patterns that ignore the configured prefix would miss annotations in projects using custom prefixes, silently skipping source files.
 
 **Verified by:**
 - hasFileOptIn detects configured opt-in tag
@@ -187,12 +219,20 @@
 
 #### defineConfig is an identity function
 
+> **Invariant:** The defineConfig helper must return its input unchanged, serving only as a type annotation aid for IDE autocomplete.
+>
+> **Rationale:** defineConfig exists for TypeScript type inference in config files — any transformation would surprise users who expect their config object to pass through unmodified.
+
 **Verified by:**
 - defineConfig returns input unchanged
 
 ---
 
 #### Schema validates correct configurations
+
+> **Invariant:** Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors.
+>
+> **Rationale:** The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features.
 
 **Verified by:**
 - Valid minimal config passes validation
@@ -201,6 +241,10 @@
 ---
 
 #### Schema rejects invalid configurations
+
+> **Invariant:** The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields.
+>
+> **Rationale:** Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.
 
 **Verified by:**
 - Empty glob pattern rejected
@@ -212,6 +256,10 @@
 ---
 
 #### Type guards distinguish config formats
+
+> **Invariant:** The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances.
+>
+> **Rationale:** The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors.
 
 **Verified by:**
 - isProjectConfig returns true for new-style config
@@ -337,12 +385,20 @@
 
 #### No override returns base unchanged
 
+> **Invariant:** When no source overrides are provided, the merged result must be identical to the base source configuration.
+>
+> **Rationale:** The merge function must be safe to call unconditionally — returning modified results without overrides would corrupt default source paths.
+
 **Verified by:**
 - No override returns base sources
 
 ---
 
 #### Feature overrides control feature source selection
+
+> **Invariant:** additionalFeatures must append to base feature sources while replaceFeatures must completely replace them, and these two options are mutually exclusive.
+>
+> **Rationale:** Projects need both additive and replacement strategies — additive for extending (monorepo packages), replacement for narrowing (focused generation runs).
 
 **Verified by:**
 - additionalFeatures appended to base features
@@ -353,6 +409,10 @@
 
 #### TypeScript source overrides append additional input
 
+> **Invariant:** additionalInput must append to (not replace) the base TypeScript source paths.
+>
+> **Rationale:** TypeScript sources are always additive — the base sources contain core patterns that must always be included alongside project-specific additions.
+
 **Verified by:**
 - additionalInput appended to typescript sources
 
@@ -360,12 +420,20 @@
 
 #### Combined overrides apply together
 
+> **Invariant:** Feature overrides and TypeScript overrides must compose independently when both are provided simultaneously.
+>
+> **Rationale:** Real configs often specify both feature and TypeScript overrides — they must not interfere with each other or produce order-dependent results.
+
 **Verified by:**
 - additionalFeatures and additionalInput combined
 
 ---
 
 #### Exclude is always inherited from base
+
+> **Invariant:** The exclude patterns must always come from the base configuration, never from overrides.
+>
+> **Rationale:** Exclude patterns are a safety mechanism — allowing overrides to modify excludes could accidentally include sensitive or generated files in the scan.
 
 **Verified by:**
 - Exclude always inherited

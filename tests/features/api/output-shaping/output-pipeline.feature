@@ -9,6 +9,10 @@ Feature: Output Modifier Pipeline
 
   Rule: Output modifiers apply with correct precedence
 
+    **Invariant:** Output modifiers (count, names-only, fields, full) must apply to pattern arrays with correct precedence, passing scalar inputs through unchanged, with summaries as the default mode.
+    **Rationale:** Predictable modifier behavior enables composable CLI queries — unexpected precedence or scalar handling would produce confusing output for piped commands.
+    **Verified by:** Default mode returns summaries for pattern arrays, Count modifier returns integer, Names-only modifier returns string array, Fields modifier picks specific fields, Full modifier bypasses summarization, Scalar input passes through unchanged, Fields with single field returns objects with one key
+
     @acceptance-criteria @happy-path
     Scenario: Default mode returns summaries for pattern arrays
       Given 3 patterns in the pipeline
@@ -54,6 +58,10 @@ Feature: Output Modifier Pipeline
 
   Rule: Modifier conflicts are rejected
 
+    **Invariant:** Mutually exclusive modifier combinations (full+names-only, full+count, full+fields) and invalid field names must be rejected with clear error messages.
+    **Rationale:** Conflicting modifiers produce ambiguous intent — rejecting early with a clear message is better than silently picking one modifier and ignoring the other.
+    **Verified by:** Full combined with names-only is rejected, Full combined with count is rejected, Full combined with fields is rejected, Invalid field name is rejected
+
     @acceptance-criteria @validation
     Scenario: Full combined with names-only is rejected
       When I validate modifiers with full and names-only both true
@@ -75,6 +83,10 @@ Feature: Output Modifier Pipeline
       Then validation fails with "Invalid field names: bogusField"
 
   Rule: List filters compose via AND logic
+
+    **Invariant:** Multiple list filters (status, category) must compose via AND logic, with pagination (limit/offset) applied after filtering and empty results for out-of-range offsets.
+    **Rationale:** AND composition is the intuitive default for filters — "status=active AND category=core" should narrow results, not widen them via OR logic.
+    **Verified by:** Filter by status returns matching patterns, Filter by status and category narrows results, Pagination with limit and offset, Offset beyond array length returns empty results
 
     @acceptance-criteria @happy-path
     Scenario: Filter by status returns matching patterns
@@ -101,6 +113,10 @@ Feature: Output Modifier Pipeline
       Then 0 patterns are returned
 
   Rule: Empty stripping removes noise
+
+    **Invariant:** Null and empty values must be stripped from output objects to reduce noise in API responses.
+    **Rationale:** Empty fields in pattern summaries create visual clutter and waste tokens in AI context windows — stripping them keeps output focused on meaningful data.
+    **Verified by:** Null and empty values are stripped
 
     @acceptance-criteria @happy-path
     Scenario: Null and empty values are stripped

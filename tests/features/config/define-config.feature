@@ -23,6 +23,10 @@ Feature: Define Config - Schema Validation and Type Guards
 
   Rule: defineConfig is an identity function
 
+    **Invariant:** The defineConfig helper must return its input unchanged, serving only as a type annotation aid for IDE autocomplete.
+    **Rationale:** defineConfig exists for TypeScript type inference in config files — any transformation would surprise users who expect their config object to pass through unmodified.
+    **Verified by:** defineConfig returns input unchanged
+
     @happy-path
     Scenario: defineConfig returns input unchanged
       Given a project config with preset "libar-generic"
@@ -30,6 +34,10 @@ Feature: Define Config - Schema Validation and Type Guards
       Then the result should be the exact same object
 
   Rule: Schema validates correct configurations
+
+    **Invariant:** Valid configuration objects (both minimal and fully-specified) must pass schema validation without errors.
+    **Rationale:** The schema must accept all legitimate configuration shapes — rejecting valid configs would block users from using supported features.
+    **Verified by:** Valid minimal config passes validation, Valid full config passes validation
 
     @happy-path
     Scenario: Valid minimal config passes validation
@@ -44,6 +52,10 @@ Feature: Define Config - Schema Validation and Type Guards
       Then validation should succeed
 
   Rule: Schema rejects invalid configurations
+
+    **Invariant:** The configuration schema must reject invalid values including empty globs, directory traversal patterns, mutually exclusive options, invalid preset names, and unknown fields.
+    **Rationale:** Schema validation is the first line of defense against misconfiguration — permissive validation lets invalid configs produce confusing downstream errors.
+    **Verified by:** Empty glob pattern rejected, Parent directory traversal rejected in globs, replaceFeatures and additionalFeatures mutually exclusive, Invalid preset name rejected, Unknown fields rejected in strict mode
 
     @validation
     Scenario: Empty glob pattern rejected
@@ -79,6 +91,10 @@ Feature: Define Config - Schema Validation and Type Guards
       Then validation should fail
 
   Rule: Type guards distinguish config formats
+
+    **Invariant:** The isProjectConfig and isLegacyInstance type guards must correctly distinguish between new-style project configs and legacy configuration instances.
+    **Rationale:** The codebase supports both config formats during migration — incorrect type detection would apply the wrong loading path and produce runtime errors.
+    **Verified by:** isProjectConfig returns true for new-style config, isProjectConfig returns false for legacy instance, isLegacyInstance returns true for legacy objects, isLegacyInstance returns false for new-style config
 
     @happy-path
     Scenario: isProjectConfig returns true for new-style config
