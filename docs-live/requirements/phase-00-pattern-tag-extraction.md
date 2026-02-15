@@ -6,27 +6,29 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 The extractPatternTags function parses Gherkin feature tags
-  into structured metadata objects for pattern processing.
+into structured metadata objects for pattern processing.
 
-  **Problem:**
-  - Gherkin tags are flat strings needing semantic interpretation
-  - Multiple tag formats exist: @tag:value, @libar-process-tag:value
-  - Dependencies and enables can have comma-separated values
-  - Category tags have no colon and must be distinguished from other tags
+**Problem:**
 
-  **Solution:**
-  - extractPatternTags parses tag strings into structured metadata
-  - Normalizes both @tag:value and @libar-process-tag:value formats
-  - Splits comma-separated values for dependencies and enables
-  - Filters non-category tags (acceptance-criteria, happy-path, etc.)
+- Gherkin tags are flat strings needing semantic interpretation
+- Multiple tag formats exist: @tag:value, @libar-process-tag:value
+- Dependencies and enables can have comma-separated values
+- Category tags have no colon and must be distinguished from other tags
+
+**Solution:**
+
+- extractPatternTags parses tag strings into structured metadata
+- Normalizes both @tag:value and @libar-process-tag:value formats
+- Splits comma-separated values for dependencies and enables
+- Filters non-category tags (acceptance-criteria, happy-path, etc.)
 
 ## Acceptance Criteria
 
@@ -208,6 +210,57 @@ The extractPatternTags function parses Gherkin feature tags
 - Then the metadata convention should contain "testing-policy"
 - And the metadata convention should contain "fsm-rules"
 - And the metadata convention should not contain "nonexistent-value"
+
+## Business Rules
+
+**Single value tags produce scalar metadata fields**
+
+**Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+**Verified by:** Extract pattern name tag, Extract phase number tag, Extract status roadmap tag, Extract status deferred tag, Extract status completed tag, Extract status active tag, Extract brief path tag
+
+_Verified by: Extract pattern name tag, Extract phase number tag, Extract status roadmap tag, Extract status deferred tag, Extract status completed tag, Extract status active tag, Extract brief path tag_
+
+**Array value tags accumulate into list metadata fields**
+
+**Invariant:** Tags for depends-on and enables split comma-separated values and accumulate across multiple tag occurrences.
+**Verified by:** Extract single dependency, Extract comma-separated dependencies, Extract comma-separated enables
+
+_Verified by: Extract single dependency, Extract comma-separated dependencies, Extract comma-separated enables_
+
+**Category tags are colon-free tags filtered against known non-categories**
+
+**Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+**Verified by:** Extract category tags (no colon), libar-docs opt-in marker is NOT a category
+
+_Verified by: Extract category tags (no colon), libar-docs opt-in marker is NOT a category_
+
+**Complex tag lists produce fully populated metadata**
+
+**Invariant:** All tag types (scalar, array, category) are correctly extracted from a single mixed tag list.
+**Verified by:** Extract all metadata from complex tag list
+
+_Verified by: Extract all metadata from complex tag list_
+
+**Edge cases produce safe defaults**
+
+**Invariant:** Empty or invalid inputs produce empty metadata or omit invalid fields rather than throwing errors.
+**Verified by:** Empty tag list returns empty metadata, Invalid phase number is ignored
+
+_Verified by: Empty tag list returns empty metadata, Invalid phase number is ignored_
+
+**Convention tags support CSV values with whitespace trimming**
+
+**Invariant:** Convention tags split comma-separated values and trim whitespace from each value.
+**Verified by:** Extract single convention tag, Extract CSV convention tags, Convention tag trims whitespace in CSV values
+
+_Verified by: Extract single convention tag, Extract CSV convention tags, Convention tag trims whitespace in CSV values_
+
+**Registry-driven extraction handles enums, transforms, and value constraints**
+
+**Invariant:** Tags defined in the registry use data-driven extraction with enum validation, CSV accumulation, value transforms, and constraint checking.
+**Verified by:** Registry-driven enum tag without prior if/else branch, Registry-driven enum rejects invalid value, Registry-driven CSV tag accumulates values, Transform applies hyphen-to-space on business value, Transform applies ADR number padding, Transform strips quotes from title tag, Repeatable value tag accumulates multiple occurrences, CSV with values constraint rejects invalid values
+
+_Verified by: Registry-driven enum tag without prior if/else branch, Registry-driven enum rejects invalid value, Registry-driven CSV tag accumulates values, Transform applies hyphen-to-space on business value, Transform applies ADR number padding, Transform strips quotes from title tag, Repeatable value tag accumulates multiple occurrences, CSV with values constraint rejects invalid values_
 
 ---
 

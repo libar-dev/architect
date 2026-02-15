@@ -27,6 +27,10 @@
   - Error handling
   - Logging/notification of cleanup actions
 
+## Dependencies
+
+- Depends on: SessionFileLifecycle
+
 ## Acceptance Criteria
 
 **Cleanup runs after generating session files**

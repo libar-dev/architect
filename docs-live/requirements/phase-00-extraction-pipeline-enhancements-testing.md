@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 Validates extraction pipeline capabilities for ReferenceDocShowcase:
-  function signature surfacing, full property-level JSDoc,
-  param/returns/throws extraction, and auto-shape discovery mode.
+function signature surfacing, full property-level JSDoc,
+param/returns/throws extraction, and auto-shape discovery mode.
 
 ## Acceptance Criteria
 
@@ -26,15 +26,16 @@ Validates extraction pipeline capabilities for ReferenceDocShowcase:
 - Then the function export "greet" has signature "function greet(name: string): string;"
 
 ```markdown
-/** @libar-docs */
+/\*_ @libar-docs _/
 
-/**
- * @libar-docs-core
- * Simple utility
- */
-export function greet(name: string): string {
+/\*\*
+
+- @libar-docs-core
+- Simple utility
+  \*/
+  export function greet(name: string): string {
   return `Hello, ${name}`;
-}
+  }
 ```
 
 **Async function keeps async prefix in signature**
@@ -44,15 +45,16 @@ export function greet(name: string): string {
 - Then the function export "loadData" has signature "async function loadData(url: string): Promise<string>;"
 
 ```markdown
-/** @libar-docs */
+/\*_ @libar-docs _/
 
-/**
- * @libar-docs-core
- * Async loader
- */
-export async function loadData(url: string): Promise<string> {
+/\*\*
+
+- @libar-docs-core
+- Async loader
+  \*/
+  export async function loadData(url: string): Promise<string> {
   return fetch(url).then(r => r.text());
-}
+  }
 ```
 
 **Multi-parameter function has all types in signature**
@@ -62,15 +64,16 @@ export async function loadData(url: string): Promise<string> {
 - Then the function export "merge" has signature "function merge(a: string[], b: string[], unique: boolean): string[];"
 
 ```markdown
-/** @libar-docs */
+/\*_ @libar-docs _/
 
-/**
- * @libar-docs-core
- * Merge utility
- */
-export function merge(a: string[], b: string[], unique: boolean): string[] {
+/\*\*
+
+- @libar-docs-core
+- Merge utility
+  \*/
+  export function merge(a: string[], b: string[], unique: boolean): string[] {
   return unique ? [...new Set([...a, ...b])] : [...a, ...b];
-}
+  }
 ```
 
 **Function with object parameter type preserves braces**
@@ -80,15 +83,16 @@ export function merge(a: string[], b: string[], unique: boolean): string[] {
 - Then the function export "configure" has signature "function configure(opts: { timeout: number; retries: number }): void;"
 
 ```markdown
-/** @libar-docs */
+/\*_ @libar-docs _/
 
-/**
- * @libar-docs-core
- * Config processor
- */
-export function configure(opts: { timeout: number; retries: number }): void {
+/\*\*
+
+- @libar-docs-core
+- Config processor
+  \*/
+  export function configure(opts: { timeout: number; retries: number }): void {
   console.log(opts);
-}
+  }
 ```
 
 **Multi-line property JSDoc is fully preserved**
@@ -98,25 +102,26 @@ export function configure(opts: { timeout: number; retries: number }): void {
 - Then the property "timeout" JSDoc contains all fragments:
 
 ```markdown
-/**
- * Configuration options for the processor.
- * Controls timeout behavior and retry strategy.
- */
-export interface ProcessorConfig {
-  /**
-   * Maximum time to wait for a response.
-   * Measured in milliseconds from request start.
-   * Defaults to 30000 if not specified.
-   */
-  timeout: number;
-}
+/\*\*
+
+- Configuration options for the processor.
+- Controls timeout behavior and retry strategy.
+  \*/
+  export interface ProcessorConfig {
+  /\*\*
+  - Maximum time to wait for a response.
+  - Measured in milliseconds from request start.
+  - Defaults to 30000 if not specified.
+    \*/
+    timeout: number;
+    }
 ```
 
-| fragment |
-| --- |
-| Maximum time to wait for a response. |
+| fragment                                     |
+| -------------------------------------------- |
+| Maximum time to wait for a response.         |
 | Measured in milliseconds from request start. |
-| Defaults to 30000 if not specified. |
+| Defaults to 30000 if not specified.          |
 
 **Single-line property JSDoc still works**
 
@@ -126,8 +131,8 @@ export interface ProcessorConfig {
 
 ```markdown
 export interface SimpleConfig {
-  /** Timeout in milliseconds. */
-  timeout: number;
+/\*_ Timeout in milliseconds. _/
+timeout: number;
 }
 ```
 
@@ -139,21 +144,22 @@ export interface SimpleConfig {
 - And the param docs match:
 
 ```markdown
-/**
- * Process an order with validation.
- * @param orderId - The unique order identifier
- * @param quantity - Number of items to process
- * @returns The processed order result
- */
-export function processOrder(orderId: string, quantity: number): OrderResult {
+/\*\*
+
+- Process an order with validation.
+- @param orderId - The unique order identifier
+- @param quantity - Number of items to process
+- @returns The processed order result
+  \*/
+  export function processOrder(orderId: string, quantity: number): OrderResult {
   throw new Error('not implemented');
-}
+  }
 ```
 
-| name | description |
-| --- | --- |
-| orderId | The unique order identifier |
-| quantity | Number of items to process |
+| name     | description                 |
+| -------- | --------------------------- |
+| orderId  | The unique order identifier |
+| quantity | Number of items to process  |
 
 **Returns tag is extracted from function JSDoc**
 
@@ -162,13 +168,14 @@ export function processOrder(orderId: string, quantity: number): OrderResult {
 - Then the shape has a returns doc with description "The total price including tax"
 
 ```markdown
-/**
- * Calculate the total price.
- * @returns The total price including tax
- */
-export function calculateTotal(): number {
+/\*\*
+
+- Calculate the total price.
+- @returns The total price including tax
+  \*/
+  export function calculateTotal(): number {
   return 0;
-}
+  }
 ```
 
 **Throws tags are extracted from function JSDoc**
@@ -179,21 +186,22 @@ export function calculateTotal(): number {
 - And the throws docs match:
 
 ```markdown
-/**
- * Validate input data.
- * @param data - The input to validate
- * @throws {ValidationError} When input fails schema check
- * @throws {TypeError} When input is not a string
- */
-export function validate(data: string): boolean {
+/\*\*
+
+- Validate input data.
+- @param data - The input to validate
+- @throws {ValidationError} When input fails schema check
+- @throws {TypeError} When input is not a string
+  \*/
+  export function validate(data: string): boolean {
   return true;
-}
+  }
 ```
 
-| type | description |
-| --- | --- |
+| type            | description                   |
+| --------------- | ----------------------------- |
 | ValidationError | When input fails schema check |
-| TypeError | When input is not a string |
+| TypeError       | When input is not a string    |
 
 **JSDoc params with braces type syntax are parsed**
 
@@ -204,33 +212,34 @@ export function validate(data: string): boolean {
 - And the shape has a returns doc with type "boolean"
 
 ```markdown
-/**
- * Legacy-style JSDoc with types.
- * @param {string} name The user name
- * @param {number} age The user age
- * @returns {boolean} Whether the user is valid
- */
-export function isValid(name: string, age: number): boolean {
+/\*\*
+
+- Legacy-style JSDoc with types.
+- @param {string} name The user name
+- @param {number} age The user age
+- @returns {boolean} Whether the user is valid
+  \*/
+  export function isValid(name: string, age: number): boolean {
   return true;
-}
+  }
 ```
 
-| name | type | description |
-| --- | --- | --- |
+| name | type   | description   |
+| ---- | ------ | ------------- |
 | name | string | The user name |
-| age | number | The user age |
+| age  | number | The user age  |
 
 **Wildcard extracts all exported declarations**
 
 - Given TypeScript source for wildcard extraction:
-- When extracting shapes with wildcard "*"
+- When extracting shapes with wildcard "\*"
 - Then 3 shapes are extracted
 - And the extracted shapes include all:
 - And the extracted shapes do not include "internal"
 
 ```markdown
 export interface Config {
-  timeout: number;
+timeout: number;
 }
 
 export type Status = 'active' | 'inactive';
@@ -240,16 +249,16 @@ export function process(): void {}
 const internal = 42;
 ```
 
-| name |
-| --- |
-| Config |
-| Status |
+| name    |
+| ------- |
+| Config  |
+| Status  |
 | process |
 
 **Mixed wildcard and names produces warning**
 
 - Given TypeScript source for wildcard extraction:
-- When extracting shapes with tag "*, Foo"
+- When extracting shapes with tag "\*, Foo"
 - Then extraction produces a warning about wildcard exclusivity
 - And 0 shapes are extracted
 
@@ -257,12 +266,36 @@ const internal = 42;
 export interface Foo { x: number; }
 ```
 
+**Same-name type and const exports produce one shape**
+
+- Given TypeScript source for wildcard extraction:
+- When extracting shapes with wildcard "\*"
+- Then 1 shapes are extracted
+- And the extracted shapes include all:
+- And the extracted shape "Result" has kind "type"
+
+```markdown
+export type Result<T, E = Error> =
+| { readonly ok: true; readonly value: T }
+| { readonly ok: false; readonly error: E };
+
+export const Result = {
+ok<T>(value: T): Result<T, never> {
+return { ok: true, value };
+},
+};
+```
+
+| name   |
+| ------ |
+| Result |
+
 ## Business Rules
 
 **Function signatures surface full parameter types in ExportInfo**
 
 **Invariant:** ExportInfo.signature shows full parameter types and
-    return type instead of the placeholder value.
+return type instead of the placeholder value.
 
     **Verified by:** Simple function signature, Async function keeps async prefix,
     Multi-parameter function, Function with object parameter type
@@ -272,7 +305,7 @@ _Verified by: Simple function signature is extracted with full types, Async func
 **Property-level JSDoc preserves full multi-line content**
 
 **Invariant:** Property-level JSDoc preserves full multi-line content
-    without first-line truncation.
+without first-line truncation.
 
     **Verified by:** Multi-line property JSDoc preserved,
     Single-line property JSDoc unchanged
@@ -282,7 +315,7 @@ _Verified by: Multi-line property JSDoc is fully preserved, Single-line property
 **Param returns and throws tags are extracted from function JSDoc**
 
 **Invariant:** JSDoc param, returns, and throws tags are extracted
-    and stored on ExtractedShape for function-kind shapes.
+and stored on ExtractedShape for function-kind shapes.
 
     **Verified by:** Param tags extracted, Returns tag extracted,
     Throws tags extracted, TypeScript-style params without braces
@@ -292,13 +325,14 @@ _Verified by: Param tags are extracted from function JSDoc, Returns tag is extra
 **Auto-shape discovery extracts all exported types via wildcard**
 
 **Invariant:** When extract-shapes tag value is the wildcard character,
-    all exported declarations are extracted without listing names.
+all exported declarations are extracted without listing names.
 
     **Verified by:** Wildcard extracts all exports,
     Non-exported declarations excluded,
-    Mixed wildcard and names rejected
+    Mixed wildcard and names rejected,
+    Same-name type and const exports produce one shape
 
-_Verified by: Wildcard extracts all exported declarations, Mixed wildcard and names produces warning_
+_Verified by: Wildcard extracts all exported declarations, Mixed wildcard and names produces warning, Same-name type and const exports produce one shape_
 
 ---
 

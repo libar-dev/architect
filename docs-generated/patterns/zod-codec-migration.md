@@ -242,6 +242,72 @@ All JSON parsing and serialization uses type-safe Zod codec pattern,
 - Then the file load result should be an error
 - And the error message should contain "Invalid JSON"
 
+## Business Rules
+
+**Input codec parses and validates JSON in a single step**
+
+**Invariant:** Every JSON string parsed through the input codec is both syntactically valid JSON and schema-conformant before returning a typed value.
+
+    **Verified by:** Input codec parses valid JSON to typed object, Input codec returns error for malformed JSON, Input codec returns validation errors for schema violations, Input codec strips $schema field before validation
+
+_Verified by: Input codec parses valid JSON to typed object, Input codec returns error for malformed JSON, Input codec returns validation errors for schema violations, Input codec strips $schema field before validation_
+
+**Output codec validates before serialization**
+
+**Invariant:** Every object serialized through the output codec is schema-validated before JSON.stringify, preventing invalid data from reaching consumers.
+
+    **Verified by:** Output codec serializes valid object to JSON, Output codec returns error for schema violations, Output codec respects indent option
+
+_Verified by: Output codec serializes valid object to JSON, Output codec returns error for schema violations, Output codec respects indent option_
+
+**LintOutputSchema validates CLI lint output structure**
+
+**Invariant:** Lint output JSON always conforms to the LintOutputSchema, ensuring consistent structure for downstream tooling.
+
+    **Verified by:** LintOutputSchema validates correct lint output, LintOutputSchema rejects invalid severity
+
+_Verified by: LintOutputSchema validates correct lint output, LintOutputSchema rejects invalid severity_
+
+**ValidationSummaryOutputSchema validates cross-source analysis output**
+
+**Invariant:** Validation summary JSON always conforms to the ValidationSummaryOutputSchema, ensuring consistent reporting of cross-source pattern analysis.
+
+    **Verified by:** ValidationSummaryOutputSchema validates correct validation output, ValidationSummaryOutputSchema rejects invalid issue source
+
+_Verified by: ValidationSummaryOutputSchema validates correct validation output, ValidationSummaryOutputSchema rejects invalid issue source_
+
+**RegistryMetadataOutputSchema accepts arbitrary nested structures**
+
+**Invariant:** Registry metadata codec accepts any valid JSON-serializable object without schema constraints on nested structure.
+
+    **Verified by:** RegistryMetadataOutputSchema accepts arbitrary metadata
+
+_Verified by: RegistryMetadataOutputSchema accepts arbitrary metadata_
+
+**formatCodecError produces human-readable error output**
+
+**Invariant:** Formatted codec errors always include the operation context and all validation error details for debugging.
+
+    **Verified by:** formatCodecError includes validation errors in output
+
+_Verified by: formatCodecError includes validation errors in output_
+
+**safeParse returns typed values or undefined without throwing**
+
+**Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any failure.
+
+    **Verified by:** safeParse returns typed value on valid JSON, safeParse returns undefined on malformed JSON, safeParse returns undefined on schema violation
+
+_Verified by: safeParse returns typed value on valid JSON, safeParse returns undefined on malformed JSON, safeParse returns undefined on schema violation_
+
+**createFileLoader handles filesystem operations with typed errors**
+
+**Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values with appropriate messages and source paths.
+
+    **Verified by:** createFileLoader loads and parses valid JSON file, createFileLoader handles ENOENT error, createFileLoader handles EACCES error, createFileLoader handles general read error, createFileLoader handles invalid JSON in file
+
+_Verified by: createFileLoader loads and parses valid JSON file, createFileLoader handles ENOENT error, createFileLoader handles EACCES error, createFileLoader handles general read error, createFileLoader handles invalid JSON in file_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

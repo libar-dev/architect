@@ -29,6 +29,10 @@ Validates that completed phases meet Definition of Done criteria:
   - validateDoD() validates across multiple phases
   - formatDoDSummary() renders console-friendly output
 
+## Dependencies
+
+- Depends on: AntiPatternDetector
+
 ## Acceptance Criteria
 
 **Complete status is detected as complete**

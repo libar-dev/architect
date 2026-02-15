@@ -22,6 +22,8 @@
  * const doc = codec.decode(dataset);
  * ```
  */
+import { type MasterDataset } from '../../validation-schemas/master-dataset.js';
+import { type SectionBlock } from '../schema.js';
 import { type BaseCodecOptions, type DetailLevel, type DocumentCodec } from './types/base.js';
 import type { ShapeSelector } from './shape-matcher.js';
 /** Content source identifiers for hardcoded domain diagrams */
@@ -152,4 +154,12 @@ export interface ReferenceCodecOptions extends BaseCodecOptions {
  * @param options - Codec options including DetailLevel
  */
 export declare function createReferenceCodec(config: ReferenceDocConfig, options?: ReferenceCodecOptions): DocumentCodec;
+/**
+ * Build a scoped relationship diagram from DiagramScope config.
+ *
+ * Dispatches to type-specific builders based on scope.diagramType (DD-6).
+ * Scope patterns are grouped by archContext in subgraphs (flowchart) or
+ * rendered as participants/states (sequence/state diagrams).
+ */
+export declare function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[];
 //# sourceMappingURL=reference.d.ts.map

@@ -842,13 +842,6 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
-    DoDValidator --> DoDValidationTypes
-    DoDValidator --> GherkinTypes
-    DoDValidator --> DualSourceExtractor
-    AntiPatternDetector --> DoDValidationTypes
-    AntiPatternDetector --> GherkinTypes
-    UtilsModule --> StringUtilities
-    UtilsModule --> CollectionUtilities
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -859,8 +852,15 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
+    DoDValidator --> DoDValidationTypes
+    DoDValidator --> GherkinTypes
+    DoDValidator --> DualSourceExtractor
+    AntiPatternDetector --> DoDValidationTypes
+    AntiPatternDetector --> GherkinTypes
     ResultMonadTypes ..-> ResultMonad
     ErrorFactoryTypes ..-> ErrorFactories
+    UtilsModule --> StringUtilities
+    UtilsModule --> CollectionUtilities
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -888,6 +888,16 @@ graph TD
     Document_Extractor --> Pattern_Scanner
     Document_Extractor --> Tag_Registry
     Document_Extractor --> Zod
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    Documentation_Generation_Orchestrator --> Doc_Extractor
+    Documentation_Generation_Orchestrator --> Gherkin_Scanner
+    Documentation_Generation_Orchestrator --> Gherkin_Extractor
+    Documentation_Generation_Orchestrator --> Generator_Registry
+    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -914,16 +924,6 @@ graph TD
     Documentation_Generator_CLI --> Orchestrator
     Documentation_Generator_CLI --> Generator_Registry
     CLIErrorHandler --> DocError
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
-    Documentation_Generation_Orchestrator --> Doc_Extractor
-    Documentation_Generation_Orchestrator --> Gherkin_Scanner
-    Documentation_Generation_Orchestrator --> Gherkin_Extractor
-    Documentation_Generation_Orchestrator --> Generator_Registry
-    Documentation_Generation_Orchestrator --> JSON_Output_Codec
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -986,8 +986,13 @@ graph TD
     ContextAssembler___Session_Oriented_Context_Bundle_Builder --> MasterDataset
     ContextAssembler___Session_Oriented_Context_Bundle_Builder --> PatternSummarizer
     ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
-    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
-    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
@@ -996,13 +1001,10 @@ graph TD
     HandoffGenerator___Session_End_State_Summary --> MasterDataset
     HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
     HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
+    StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
+    StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
+    FSMValidator --> FSMTransitions
+    FSMValidator --> FSMStates
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -1015,7 +1017,12 @@ graph TD
     ProcessGuardModule ..-> ProcessGuardLinter
     DetectChanges --> DeriveProcessState
     DetectChanges ..-> ProcessGuardLinter
+    DeriveProcessState --> GherkinScanner
+    DeriveProcessState --> FSMValidator
     DeriveProcessState ..-> ProcessGuardLinter
+    ProcessGuardDecider --> FSMValidator
+    ProcessGuardDecider --> DeriveProcessState
+    ProcessGuardDecider --> DetectChanges
     ProcessGuardDecider ..-> ProcessGuardLinter
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
@@ -1028,14 +1035,20 @@ graph TD
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    PDR001SessionWorkflowCommands -.-> DataAPIDesignSessionSupport
+    ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     StepLintExtendedRules -.-> StepLintVitestCucumber
+    StepDefinitionCompletion -.-> ADR002GherkinOnlyTesting
+    SessionFileCleanup -.-> SessionFileLifecycle
     ScopedArchitecturalView -.-> ArchitectureDiagramGeneration
     ScopedArchitecturalView -.-> ShapeExtraction
     ReferenceDocShowcase -.-> CodecDrivenReferenceGeneration
     ReferenceDocShowcase -.-> ScopedArchitecturalView
     ReferenceDocShowcase -.-> ShapeExtraction
+    LivingRoadmapCLI -.-> MvpWorkflowImplementation
+    EffortVarianceTracking -.-> MvpWorkflowImplementation
     DocGenerationProofOfConcept -.-> ShapeExtraction
     DeclarationLevelShapeTagging -.-> ShapeExtraction
     DeclarationLevelShapeTagging -.-> ReferenceDocShowcase
@@ -1048,20 +1061,27 @@ graph TD
     CrossCuttingDocumentInclusion -.-> ReferenceDocShowcase
     CodecDrivenReferenceGeneration -.-> DocGenerationProofOfConcept
     CodecDrivenReferenceGeneration -.-> ScopedArchitecturalView
+    CliBehaviorTesting -.-> ADR002GherkinOnlyTesting
     ClaudeModuleGeneration -.-> ArchitectureDiagramGeneration
-    PDR001SessionWorkflowCommands -.-> DataAPIDesignSessionSupport
-    LintRulesTesting ..-> LintRules
-    LintEngineTesting ..-> LintEngine
     StatusTransitionDetectionTesting ..-> DetectChanges
+    ProcessGuardTesting -.-> PhaseStateMachineValidation
+    ProcessGuardTesting -.-> AntiPatternDetector
     ProcessGuardTesting ..-> ProcessGuardLinter
+    FSMValidatorTesting -.-> FSMTransitions
+    FSMValidatorTesting -.-> FSMStates
     FSMValidatorTesting ..-> PhaseStateMachineValidation
+    DoDValidatorTesting -.-> AntiPatternDetector
     DoDValidatorTesting ..-> DoDValidation
     DetectChangesTesting ..-> DetectChanges
+    AntiPatternDetectorTesting -.-> DoDValidationTypes
     AntiPatternDetectorTesting ..-> AntiPatternDetector
     ShapeExtractionTesting ..-> ReferenceDocShowcase
     ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
     DualSourceExtractorTesting ..-> DualSourceExtractor
     DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
+    LintRulesTesting ..-> LintRules
+    LintEngineTesting -.-> LintRules
+    LintEngineTesting ..-> LintEngine
     GeneratorRegistryTesting ..-> GeneratorRegistry
     GeneratorRegistryTesting ..-> GeneratorInfrastructureTesting
     PrdImplementationSectionTesting ..-> PrdImplementationSection
@@ -1072,14 +1092,6 @@ graph TD
     BusinessRulesDocumentCodec ..-> BusinessRulesGenerator
     DefineConfigTesting ..-> DefineConfig
     ConfigLoaderTesting ..-> ConfigLoader
-    TransformDatasetTesting ..-> TransformDataset
-    RichContentHelpersTesting ..-> RichContentHelpers
-    PatternsCodecTesting ..-> PatternsCodec
-    LayerInferenceTesting ..-> LayerInference
-    KebabCaseSlugs -.-> StringUtils
-    ErrorHandlingUnification -.-> ResultMonad
-    ErrorHandlingUnification -.-> ErrorFactories
-    ProcessStateAPITesting ..-> ProcessStateAPICLI
     WarningCollectorTesting ..-> WarningCollector
     ValidationRulesCodecTesting ..-> ValidationRulesCodec
     TaxonomyCodecTesting ..-> TaxonomyCodec
@@ -1093,6 +1105,14 @@ graph TD
     LintPatternsCli ..-> CliBehaviorTesting
     GenerateTagTaxonomyCli ..-> CliBehaviorTesting
     GenerateDocsCli ..-> CliBehaviorTesting
+    ProcessStateAPITesting ..-> ProcessStateAPICLI
+    TransformDatasetTesting ..-> TransformDataset
+    RichContentHelpersTesting ..-> RichContentHelpers
+    PatternsCodecTesting ..-> PatternsCodec
+    LayerInferenceTesting ..-> LayerInference
+    KebabCaseSlugs -.-> StringUtils
+    ErrorHandlingUnification -.-> ResultMonad
+    ErrorHandlingUnification -.-> ErrorFactories
     UsesTagTesting ..-> PatternRelationshipModel
     MermaidRelationshipRendering ..-> PatternRelationshipModel
     LinterValidationTesting ..-> PatternRelationshipModel

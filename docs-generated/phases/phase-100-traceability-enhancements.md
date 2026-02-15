@@ -399,6 +399,10 @@ _Verified by: Dependency references non-existent pattern, All dependencies resol
 
   Implements Convergence Opportunity 3: Earned-Value Tracking (lightweight).
 
+#### Dependencies
+
+- Depends on: MvpWorkflowImplementation
+
 #### Acceptance Criteria
 
 **Generate phase variance report**
@@ -442,6 +446,10 @@ _Verified by: Dependency references non-existent pattern, All dependencies resol
   Transforms roadmap from "document to maintain" to "queries over reality".
 
   Implements Convergence Opportunity 8: Living Roadmap That Compiles.
+
+#### Dependencies
+
+- Depends on: MvpWorkflowImplementation
 
 #### Acceptance Criteria
 
@@ -693,6 +701,10 @@ _Verified by: Valid release version formats_
   - What files are deleted vs preserved
   - Error handling
   - Logging/notification of cleanup actions
+
+#### Dependencies
+
+- Depends on: SessionFileLifecycle
 
 #### Acceptance Criteria
 

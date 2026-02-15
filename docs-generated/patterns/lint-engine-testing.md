@@ -23,6 +23,10 @@ The lint engine orchestrates rule execution, aggregates violations,
   - Violation sorting
   - Pretty and JSON output formats
 
+## Dependencies
+
+- Depends on: LintRules
+
 ## Acceptance Criteria
 
 **Return empty array when all rules pass**
@@ -351,6 +355,50 @@ The lint engine orchestrates rule execution, aggregates violations,
 | severity | warning |
 | message | Detailed message |
 | line | 42 |
+
+## Business Rules
+
+**Single directive linting validates annotations against rules**
+
+**Invariant:** Every directive is checked against all provided rules and violations include source location.
+      **Verified by:** Return empty array when all rules pass, Return violations for failing rules, Run all provided rules, Include correct file and line in violations
+
+_Verified by: Return empty array when all rules pass, Return violations for failing rules, Run all provided rules, Include correct file and line in violations_
+
+**Multi-file batch linting aggregates results across files**
+
+**Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are accurate.
+      **Verified by:** Return empty results for clean files, Collect violations by file, Count violations by severity, Handle multiple directives per file
+
+_Verified by: Return empty results for clean files, Collect violations by file, Count violations by severity, Handle multiple directives per file_
+
+**Failure detection respects strict mode for severity escalation**
+
+**Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.
+      **Verified by:** Return true when there are errors, Return false for warnings only in non-strict mode, Return true for warnings in strict mode, Return false for info only, Return false when no violations
+
+_Verified by: Return true when there are errors, Return false for warnings only in non-strict mode, Return true for warnings in strict mode, Return false for info only, Return false when no violations_
+
+**Violation sorting orders by severity then by line number**
+
+**Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array.
+      **Verified by:** Sort errors first then warnings then info, Sort by line number within same severity, Not mutate original array
+
+_Verified by: Sort errors first then warnings then info, Sort by line number within same severity, Not mutate original array_
+
+**Pretty formatting produces human-readable output with severity counts**
+
+**Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.
+      **Verified by:** Show success message when no violations, Format violations with file line severity and message, Show summary line with counts, Filter out warnings and info in quiet mode
+
+_Verified by: Show success message when no violations, Format violations with file line severity and message, Show summary line with counts, Filter out warnings and info in quiet mode_
+
+**JSON formatting produces machine-readable output with full details**
+
+**Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.
+      **Verified by:** Return valid JSON, Include all summary fields, Include violation details
+
+_Verified by: Return valid JSON, Include all summary fields, Include violation details_
 
 ---
 

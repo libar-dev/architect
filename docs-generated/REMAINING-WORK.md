@@ -45,8 +45,8 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 47 |
-| ✅ Ready to Start | 43 |
-| ⚠️ Blocked | 2 |
+| ✅ Ready to Start | 42 |
+| ⚠️ Blocked | 3 |
 
 ### Top Ready to Start
 
@@ -75,6 +75,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Data API Platform Integration (Phase 25) - 3d
 - 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 43 actionable items.
+Showing 5 of 42 actionable items.
 
 ---

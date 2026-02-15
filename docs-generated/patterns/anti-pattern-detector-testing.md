@@ -28,6 +28,10 @@ Detects violations of the dual-source documentation architecture and
   - detectScenarioBloat() warns about too many scenarios
   - detectMegaFeature() warns about large feature files
 
+## Dependencies
+
+- Depends on: DoDValidationTypes
+
 ## Acceptance Criteria
 
 **Code without process tags passes**

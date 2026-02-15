@@ -137,6 +137,40 @@ The delivery process supports mid-phase handoffs between sessions and
 - Then learnings are captured via discovery tags
 - And discoveries flow to SESSION-FINDINGS.md after regeneration
 
+## Business Rules
+
+**Handoff context generation captures session state**
+
+**Invariant:** Active phases with handoff context enabled must include session handoff sections with template and checklist links.
+
+      **Verified by:** SESSION-CONTEXT.md includes handoff section for active phases, Discovery tags appear in handoff context section, Paused phase shows status indicator
+
+_Verified by: SESSION-CONTEXT.md includes handoff section for active phases, Discovery tags appear in handoff context section, Paused phase shows status indicator_
+
+**Handoff templates and checklists contain required sections**
+
+**Invariant:** Session handoff template and retrospective checklist must exist and contain all required sections for structured knowledge transfer.
+
+      **Verified by:** Handoff template exists and contains required sections, Retrospective checklist exists and contains required sections
+
+_Verified by: Handoff template exists and contains required sections, Retrospective checklist exists and contains required sections_
+
+**PROCESS_SETUP.md documents handoff and coordination protocols**
+
+**Invariant:** PROCESS_SETUP.md must document both session handoff protocol and multi-developer coordination patterns.
+
+      **Verified by:** PROCESS_SETUP.md documents handoff protocol, PROCESS_SETUP.md documents multi-developer coordination
+
+_Verified by: PROCESS_SETUP.md documents handoff protocol, PROCESS_SETUP.md documents multi-developer coordination_
+
+**Edge cases and acceptance criteria ensure robustness**
+
+**Invariant:** Handoff context must degrade gracefully when no discoveries exist and must be disableable. Mid-phase handoffs, multi-developer coordination, and retrospective capture must all preserve context.
+
+      **Verified by:** Fresh phase shows no previous context message, Handoff context can be disabled, Mid-phase handoff preserves context, Multiple developers can coordinate, Session retrospective captures learnings
+
+_Verified by: Fresh phase shows no previous context message, Handoff context can be disabled, Mid-phase handoff preserves context, Multiple developers can coordinate, Session retrospective captures learnings_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

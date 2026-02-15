@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The universal renderer converts RenderableDocument to markdown.
-  It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
+It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 
 ## Acceptance Criteria
 
@@ -45,11 +45,11 @@ The universal renderer converts RenderableDocument to markdown.
 - Then the output contains "**Purpose:** Show everything"
 - And the output contains "**Detail Level:** comprehensive"
 
-| field | value |
-| --- | --- |
-| title | Complete Doc |
-| purpose | Show everything |
-| detailLevel | comprehensive |
+| field       | value           |
+| ----------- | --------------- |
+| title       | Complete Doc    |
+| purpose     | Show everything |
+| detailLevel | comprehensive   |
 
 **Render headings at different levels**
 
@@ -79,9 +79,9 @@ The universal renderer converts RenderableDocument to markdown.
 
 **Render paragraph with special characters**
 
-- Given a document with a paragraph "Has *bold* and _italic_ and `code`"
+- Given a document with a paragraph "Has _bold_ and _italic_ and `code`"
 - When rendering to markdown
-- Then the output contains "Has *bold* and _italic_ and `code`"
+- Then the output contains "Has _bold_ and _italic_ and `code`"
 
 **Render separator**
 
@@ -96,15 +96,15 @@ The universal renderer converts RenderableDocument to markdown.
 - Then the output contains the table:
 
 | Column1 | Column2 |
-| --- | --- |
-| a | b |
-| c | d |
+| ------- | ------- |
+| a       | b       |
+| c       | d       |
 
 ```markdown
 | Column1 | Column2 |
-| --- | --- |
-| a | b |
-| c | d |
+| ------- | ------- |
+| a       | b       |
+| c       | d       |
 ```
 
 **Render table with alignment**
@@ -114,10 +114,10 @@ The universal renderer converts RenderableDocument to markdown.
 - Then the output contains "| --- | :---: | ---: |"
 
 | Column | Alignment |
-| --- | --- |
-| Left | left |
-| Center | center |
-| Right | right |
+| ------ | --------- |
+| Left   | left      |
+| Center | center    |
+| Right  | right     |
 
 **Render empty table (no columns)**
 
@@ -149,14 +149,14 @@ The universal renderer converts RenderableDocument to markdown.
 - When rendering to markdown
 - Then the output contains all of:
 
-| item |
-| --- |
+| item   |
+| ------ |
 | Item 1 |
 | Item 2 |
 | Item 3 |
 
-| text |
-| --- |
+| text     |
+| -------- |
 | - Item 1 |
 | - Item 2 |
 | - Item 3 |
@@ -167,17 +167,17 @@ The universal renderer converts RenderableDocument to markdown.
 - When rendering to markdown
 - Then the output contains all of:
 
-| item |
-| --- |
-| First item |
+| item        |
+| ----------- |
+| First item  |
 | Second item |
-| Third item |
+| Third item  |
 
-| text |
-| --- |
-| 1. First item |
+| text           |
+| -------------- |
+| 1. First item  |
 | 2. Second item |
-| 3. Third item |
+| 3. Third item  |
 
 **Render checkbox list with checked items**
 
@@ -185,14 +185,14 @@ The universal renderer converts RenderableDocument to markdown.
 - When rendering to markdown
 - Then the output contains all of:
 
-| text | checked |
-| --- | --- |
-| Done | true |
-| Not done | false |
+| text     | checked |
+| -------- | ------- |
+| Done     | true    |
+| Not done | false   |
 
-| text |
-| --- |
-| - [x] Done |
+| text           |
+| -------------- |
+| - [x] Done     |
 | - [ ] Not done |
 
 **Render nested list**
@@ -208,8 +208,8 @@ The universal renderer converts RenderableDocument to markdown.
 - Parent 2
 ```
 
-| text |
-| --- |
+| text       |
+| ---------- |
 | - Parent 1 |
 | - Child 1a |
 | - Child 1b |
@@ -225,11 +225,11 @@ The universal renderer converts RenderableDocument to markdown.
 const x = 42;
 ```
 
-| text |
-| --- |
+| text          |
+| ------------- |
 | ```typescript |
 | const x = 42; |
-| ``` |
+| ```           |
 
 **Render code block without language**
 
@@ -241,9 +241,9 @@ const x = 42;
 plain code
 ```
 
-| text |
-| --- |
-| ``` |
+| text       |
+| ---------- |
+| ```        |
 | plain code |
 
 **Render mermaid diagram**
@@ -254,14 +254,14 @@ plain code
 
 ```markdown
 graph TD
-  A --> B
+A --> B
 ```
 
-| text |
-| --- |
+| text       |
+| ---------- |
 | ```mermaid |
-| graph TD |
-| A --> B |
+| graph TD   |
+| A --> B    |
 
 **Render collapsible block**
 
@@ -270,12 +270,12 @@ graph TD
 - When rendering to markdown
 - Then the output contains all of:
 
-| text |
-| --- |
-| <details> |
+| text                               |
+| ---------------------------------- |
+| <details>                          |
 | <summary>Click to expand</summary> |
-| Hidden content here |
-| </details> |
+| Hidden content here                |
+| </details>                         |
 
 **Render collapsible with HTML entities in summary**
 
@@ -322,25 +322,25 @@ graph TD
 - When rendering to markdown
 - Then the output contains all of:
 
-| field | value |
-| --- | --- |
-| title | Complex Document |
-| purpose | Test all blocks |
+| field   | value            |
+| ------- | ---------------- |
+| title   | Complex Document |
+| purpose | Test all blocks  |
 
-| type | content |
-| --- | --- |
-| heading | Section 1 |
+| type      | content   |
+| --------- | --------- |
+| heading   | Section 1 |
 | paragraph | Some text |
-| separator |  |
-| heading | Section 2 |
+| separator |           |
+| heading   | Section 2 |
 
-| text |
-| --- |
+| text               |
+| ------------------ |
 | # Complex Document |
-| ## Section 1 |
-| Some text |
-| --- |
-| ## Section 2 |
+| ## Section 1       |
+| Some text          |
+| ---                |
+| ## Section 2       |
 
 **Claude context renders title and headings as section markers**
 
@@ -351,10 +351,10 @@ graph TD
 - And the claude context output contains "=== SECTION ONE ==="
 - And the claude context output does not contain "#"
 
-| type | content |
-| --- | --- |
-| heading | Section One |
-| paragraph | Body text |
+| type      | content     |
+| --------- | ----------- |
+| heading   | Section One |
+| paragraph | Body text   |
 
 **Claude context renders sub-headings with different markers**
 
@@ -373,12 +373,12 @@ graph TD
 
 ```markdown
 graph TD
-  A --> B
+A --> B
 ```
 
-| text |
-| --- |
-| mermaid |
+| text     |
+| -------- |
+| mermaid  |
 | graph TD |
 
 **Claude context flattens collapsible blocks**
@@ -390,13 +390,13 @@ graph TD
 - Then the claude context output contains all of:
 - And the claude context output does not contain any of:
 
-| text |
-| --- |
-| Hidden content here |
+| text                    |
+| ----------------------- |
+| Hidden content here     |
 | --- Click to expand --- |
 
-| text |
-| --- |
+| text      |
+| --------- |
 | <details> |
 | <summary> |
 
@@ -416,16 +416,16 @@ graph TD
 - Then the claude context output contains all of:
 - And the claude context output does not contain "---"
 
-| type | content |
-| --- | --- |
-| paragraph | Before |
-| separator |  |
-| paragraph | After |
+| type      | content |
+| --------- | ------- |
+| paragraph | Before  |
+| separator |         |
+| paragraph | After   |
 
-| text |
-| --- |
+| text   |
+| ------ |
 | Before |
-| After |
+| After  |
 
 **Claude context produces fewer characters than markdown**
 
@@ -433,6 +433,85 @@ graph TD
 - When rendering to markdown
 - And rendering to claude context
 - Then the claude context output is shorter than the markdown output
+
+## Business Rules
+
+**Document metadata renders as frontmatter before sections**
+
+**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+**Verified by:** Render minimal document with title only, Render document with purpose, Render document with detail level, Render document with purpose and detail level
+
+_Verified by: Render minimal document with title only, Render document with purpose, Render document with detail level, Render document with purpose and detail level_
+
+**Headings render at correct markdown levels with clamping**
+
+**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+**Verified by:** Render headings at different levels, Clamp heading level 0 to 1, Clamp heading level 7 to 6
+
+_Verified by: Render headings at different levels, Clamp heading level 0 to 1, Clamp heading level 7 to 6_
+
+**Paragraphs and separators render as plain text and horizontal rules**
+
+**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+**Verified by:** Render paragraph, Render paragraph with special characters, Render separator
+
+_Verified by: Render paragraph, Render paragraph with special characters, Render separator_
+
+**Tables render with headers, alignment, and cell escaping**
+
+**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+**Verified by:** Render basic table, Render table with alignment, Render empty table (no columns), Render table with pipe character in cell, Render table with newline in cell, Render table with short row (fewer cells than columns)
+
+_Verified by: Render basic table, Render table with alignment, Render empty table (no columns), Render table with pipe character in cell, Render table with newline in cell, Render table with short row (fewer cells than columns)_
+
+**Lists render in unordered, ordered, checkbox, and nested formats**
+
+**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+**Verified by:** Render unordered list, Render ordered list, Render checkbox list with checked items, Render nested list
+
+_Verified by: Render unordered list, Render ordered list, Render checkbox list with checked items, Render nested list_
+
+**Code blocks and mermaid diagrams render with fenced syntax**
+
+**Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+**Verified by:** Render code block with language, Render code block without language, Render mermaid diagram
+
+_Verified by: Render code block with language, Render code block without language, Render mermaid diagram_
+
+**Collapsible blocks render as HTML details elements**
+
+**Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+**Verified by:** Render collapsible block, Render collapsible with HTML entities in summary, Render nested collapsible content
+
+_Verified by: Render collapsible block, Render collapsible with HTML entities in summary, Render nested collapsible content_
+
+**Link-out blocks render as markdown links with URL encoding**
+
+**Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+**Verified by:** Render link-out block, Render link-out with spaces in path
+
+_Verified by: Render link-out block, Render link-out with spaces in path_
+
+**Multi-file documents produce correct output file collections**
+
+**Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+**Verified by:** Render document with additional files, Render document without additional files
+
+_Verified by: Render document with additional files, Render document without additional files_
+
+**Complex documents render all block types in sequence**
+
+**Invariant:** Multiple block types in a single document render in order without interference.
+**Verified by:** Render complex document with multiple block types
+
+_Verified by: Render complex document with multiple block types_
+
+**Claude context renderer produces compact AI-optimized output**
+
+**Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+**Verified by:** Claude context renders title and headings as section markers, Claude context renders sub-headings with different markers, Claude context omits mermaid blocks, Claude context flattens collapsible blocks, Claude context renders link-out as plain text, Claude context omits separator tokens, Claude context produces fewer characters than markdown
+
+_Verified by: Claude context renders title and headings as section markers, Claude context renders sub-headings with different markers, Claude context omits mermaid blocks, Claude context flattens collapsible blocks, Claude context renders link-out as plain text, Claude context omits separator tokens, Claude context produces fewer characters than markdown_
 
 ---
 

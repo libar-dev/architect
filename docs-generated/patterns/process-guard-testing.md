@@ -29,6 +29,11 @@ Pure validation functions for enforcing delivery process rules per PDR-005.
   - checkSessionScope() warns about files outside session scope
   - checkSessionExcluded() errors on explicitly excluded files
 
+## Dependencies
+
+- Depends on: PhaseStateMachineValidation
+- Depends on: AntiPatternDetector
+
 ## Acceptance Criteria
 
 **Completed file with unlock-reason passes validation**

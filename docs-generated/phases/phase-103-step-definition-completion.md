@@ -53,6 +53,10 @@
   | CI Integration | Tests run on every commit |
   | Refactoring Safety | Changes verified against specs |
 
+#### Dependencies
+
+- Depends on: ADR002GherkinOnlyTesting
+
 #### Acceptance Criteria
 
 **pr-changes-generation.steps.ts implements all 12 scenarios**

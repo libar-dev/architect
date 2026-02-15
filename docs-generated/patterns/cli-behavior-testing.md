@@ -32,6 +32,10 @@
   | User Experience | Clear error messages for invalid usage |
   | CI/CD Integration | Predictable exit codes for automation |
 
+## Dependencies
+
+- Depends on: ADR002GherkinOnlyTesting
+
 ## Implementations
 
 Files that implement this pattern:

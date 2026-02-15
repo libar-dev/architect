@@ -1013,6 +1013,50 @@ export function autenticar() {
 | Funcion |
 | emojis |
 
+## Business Rules
+
+**Export types are correctly identified from TypeScript declarations**
+
+**Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
+      **Verified by:** Parse function export with directive, Parse type export with directive, Parse interface export with directive, Parse const export with directive, Parse class export with directive, Parse enum export with directive, Parse const enum export with directive, Parse abstract class export with directive, Parse arrow function export with directive, Parse async function export with directive, Parse generic function export with directive, Parse default export with directive, Parse re-exports with directive, Parse multiple exports in single statement, Parse multiple directives in same file
+
+_Verified by: Parse function export with directive, Parse type export with directive, Parse interface export with directive, Parse const export with directive, Parse class export with directive, Parse enum export with directive, Parse const enum export with directive, Parse abstract class export with directive, Parse arrow function export with directive, Parse async function export with directive, Parse generic function export with directive, Parse default export with directive, Parse re-exports with directive, Parse multiple exports in single statement, Parse multiple directives in same file_
+
+**Metadata is correctly extracted from JSDoc comments**
+
+**Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all correctly parsed and separated.
+      **Verified by:** Extract examples from directive, Extract multi-line description, Track line numbers correctly, Extract function signature information, Ignore @param and @returns in description
+
+_Verified by: Extract examples from directive, Extract multi-line description, Track line numbers correctly, Extract function signature information, Ignore @param and @returns in description_
+
+**Tags are extracted only from the directive section, not from description or examples**
+
+**Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in description prose or example code blocks are ignored.
+      **Verified by:** Extract multiple tags from directive section, Extract tag with description on same line, NOT extract tags mentioned in description, NOT extract tags mentioned in @example sections
+
+_Verified by: Extract multiple tags from directive section, Extract tag with description on same line, NOT extract tags mentioned in description, NOT extract tags mentioned in @example sections_
+
+**When to Use sections are extracted in all supported formats**
+
+**Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and asterisk bullet format. When no When to Use section exists, the field is undefined.
+      **Verified by:** Extract When to Use heading format with bullet points, Extract When to use inline format, Extract asterisk bullets in When to Use section, Not set whenToUse when section is missing
+
+_Verified by: Extract When to Use heading format with bullet points, Extract When to use inline format, Extract asterisk bullets in When to Use section, Not set whenToUse when section is missing_
+
+**Relationship tags extract uses and usedBy dependencies**
+
+**Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
+      **Verified by:** Extract @libar-docs-uses with single value, Extract @libar-docs-uses with comma-separated values, Extract @libar-docs-used-by with single value, Extract @libar-docs-used-by with comma-separated values, Extract both uses and usedBy from same directive, NOT capture uses/usedBy values in description, Not set uses/usedBy when no relationship tags exist
+
+_Verified by: Extract @libar-docs-uses with single value, Extract @libar-docs-uses with comma-separated values, Extract @libar-docs-used-by with single value, Extract @libar-docs-used-by with comma-separated values, Extract both uses and usedBy from same directive, NOT capture uses/usedBy values in description, Not set uses/usedBy when no relationship tags exist_
+
+**Edge cases and malformed input are handled gracefully**
+
+**Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+      **Verified by:** Skip comments without @libar-docs-* tags, Skip invalid directive with incomplete tag, Handle malformed TypeScript gracefully, Handle empty file gracefully, Handle whitespace-only file, Handle file with only comments and no exports, Skip inline comments (non-block), Handle unicode characters in descriptions
+
+_Verified by: Skip comments without @libar-docs-* tags, Skip invalid directive with incomplete tag, Handle malformed TypeScript gracefully, Handle empty file gracefully, Handle whitespace-only file, Handle file with only comments and no exports, Skip inline comments (non-block), Handle unicode characters in descriptions_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

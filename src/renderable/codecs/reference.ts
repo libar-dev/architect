@@ -1672,7 +1672,7 @@ function buildClassDiagram(ctx: DiagramContext): string[] {
  * Scope patterns are grouped by archContext in subgraphs (flowchart) or
  * rendered as participants/states (sequence/state diagrams).
  */
-function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[] {
+export function buildScopedDiagram(dataset: MasterDataset, scope: DiagramScope): SectionBlock[] {
   const title = scope.title ?? 'Component Overview';
 
   // Content source override: render hardcoded domain diagrams

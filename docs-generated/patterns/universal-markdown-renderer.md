@@ -434,6 +434,85 @@ graph TD
 - And rendering to claude context
 - Then the claude context output is shorter than the markdown output
 
+## Business Rules
+
+**Document metadata renders as frontmatter before sections**
+
+**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+      **Verified by:** Render minimal document with title only, Render document with purpose, Render document with detail level, Render document with purpose and detail level
+
+_Verified by: Render minimal document with title only, Render document with purpose, Render document with detail level, Render document with purpose and detail level_
+
+**Headings render at correct markdown levels with clamping**
+
+**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+      **Verified by:** Render headings at different levels, Clamp heading level 0 to 1, Clamp heading level 7 to 6
+
+_Verified by: Render headings at different levels, Clamp heading level 0 to 1, Clamp heading level 7 to 6_
+
+**Paragraphs and separators render as plain text and horizontal rules**
+
+**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+      **Verified by:** Render paragraph, Render paragraph with special characters, Render separator
+
+_Verified by: Render paragraph, Render paragraph with special characters, Render separator_
+
+**Tables render with headers, alignment, and cell escaping**
+
+**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+      **Verified by:** Render basic table, Render table with alignment, Render empty table (no columns), Render table with pipe character in cell, Render table with newline in cell, Render table with short row (fewer cells than columns)
+
+_Verified by: Render basic table, Render table with alignment, Render empty table (no columns), Render table with pipe character in cell, Render table with newline in cell, Render table with short row (fewer cells than columns)_
+
+**Lists render in unordered, ordered, checkbox, and nested formats**
+
+**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+      **Verified by:** Render unordered list, Render ordered list, Render checkbox list with checked items, Render nested list
+
+_Verified by: Render unordered list, Render ordered list, Render checkbox list with checked items, Render nested list_
+
+**Code blocks and mermaid diagrams render with fenced syntax**
+
+**Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+      **Verified by:** Render code block with language, Render code block without language, Render mermaid diagram
+
+_Verified by: Render code block with language, Render code block without language, Render mermaid diagram_
+
+**Collapsible blocks render as HTML details elements**
+
+**Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+      **Verified by:** Render collapsible block, Render collapsible with HTML entities in summary, Render nested collapsible content
+
+_Verified by: Render collapsible block, Render collapsible with HTML entities in summary, Render nested collapsible content_
+
+**Link-out blocks render as markdown links with URL encoding**
+
+**Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+      **Verified by:** Render link-out block, Render link-out with spaces in path
+
+_Verified by: Render link-out block, Render link-out with spaces in path_
+
+**Multi-file documents produce correct output file collections**
+
+**Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+      **Verified by:** Render document with additional files, Render document without additional files
+
+_Verified by: Render document with additional files, Render document without additional files_
+
+**Complex documents render all block types in sequence**
+
+**Invariant:** Multiple block types in a single document render in order without interference.
+      **Verified by:** Render complex document with multiple block types
+
+_Verified by: Render complex document with multiple block types_
+
+**Claude context renderer produces compact AI-optimized output**
+
+**Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+      **Verified by:** Claude context renders title and headings as section markers, Claude context renders sub-headings with different markers, Claude context omits mermaid blocks, Claude context flattens collapsible blocks, Claude context renders link-out as plain text, Claude context omits separator tokens, Claude context produces fewer characters than markdown
+
+_Verified by: Claude context renders title and headings as section markers, Claude context renders sub-headings with different markers, Claude context omits mermaid blocks, Claude context flattens collapsible blocks, Claude context renders link-out as plain text, Claude context omits separator tokens, Claude context produces fewer characters than markdown_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

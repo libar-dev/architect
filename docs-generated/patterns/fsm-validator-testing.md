@@ -26,6 +26,11 @@ Pure validation functions for the 4-state FSM defined in PDR-005.
   - validateTransition() validates transitions against FSM matrix
   - validateCompletionMetadata() warns about missing completion info
 
+## Dependencies
+
+- Depends on: FSMTransitions
+- Depends on: FSMStates
+
 ## Acceptance Criteria
 
 **Valid status values are accepted**

@@ -29,6 +29,16 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- ADR005CodecBasedMarkdownRendering ---
+
+| Rule                                                              | Description                                                                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
+| RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
+| CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
+| ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |
+| The markdown renderer is codec-agnostic                           | **Invariant:** The renderer accepts any RenderableDocument regardless of<br> which codec produced it. Rendering...    |
+
 --- UniversalDocGeneratorRobustness ---
 
 | Rule                                                              | Description                                                                                                                |
@@ -163,30 +173,6 @@ Detail Level: Compact summary
 
 --- ArchitectureDelta ---
 
---- ADR005CodecBasedMarkdownRendering ---
-
-| Rule                                                              | Description                                                                                                           |
-| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
-| RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
-| CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
-| ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |
-| The markdown renderer is codec-agnostic                           | **Invariant:** The renderer accepts any RenderableDocument regardless of<br> which codec produced it. Rendering...    |
-
---- TestContentBlocks ---
-
-| Rule                                                 | Description                                                                                                           |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Business rules appear as a separate section          | Rule descriptions provide context for why this business rule exists.<br> You can include multiple paragraphs here.... |
-| Multiple rules create multiple Business Rule entries | Each Rule keyword creates a separate entry in the Business Rules section.<br> This helps organize complex features... |
-
---- RuleKeywordPoC ---
-
-| Rule                                       | Description                                                                      |
-| ------------------------------------------ | -------------------------------------------------------------------------------- |
-| Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
-| Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
-
 --- TableExtraction ---
 
 | Rule                                                    | Description                                                                                                             |
@@ -243,6 +229,20 @@ Detail Level: Compact summary
 | Source file shown as filename text                             |             |
 | Verified-by renders as checkbox list at standard level         |             |
 | Feature names are humanized from camelCase pattern names       |             |
+
+--- TestContentBlocks ---
+
+| Rule                                                 | Description                                                                                                           |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Business rules appear as a separate section          | Rule descriptions provide context for why this business rule exists.<br> You can include multiple paragraphs here.... |
+| Multiple rules create multiple Business Rule entries | Each Rule keyword creates a separate entry in the Business Rules section.<br> This helps organize complex features... |
+
+--- RuleKeywordPoC ---
+
+| Rule                                       | Description                                                                      |
+| ------------------------------------------ | -------------------------------------------------------------------------------- |
+| Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
+| Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
 
 --- WarningCollectorTesting ---
 
@@ -488,6 +488,14 @@ Detail Level: Compact summary
 | safeParse returns typed values or undefined without throwing         | **Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any...           |
 | createFileLoader handles filesystem operations with typed errors     | **Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values... |
 
+--- MermaidRelationshipRendering ---
+
+| Rule                                              | Description                                                                                                            |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Each relationship type has a distinct arrow style | **Invariant:** Each relationship type (uses, depends-on, implements, extends) must render with a unique, visually...   |
+| Pattern names are sanitized for Mermaid node IDs  | **Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots,... |
+| All relationship types appear in single graph     | **Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements,...       |
+
 --- LayeredDiagramGeneration ---
 
 | Rule                                                    | Description                                                                                                             |
@@ -542,14 +550,6 @@ Detail Level: Compact summary
 | archIndex groups patterns by arch-layer                | **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key....     |
 | archIndex.all contains all patterns with any arch tag  | **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context,... |
 | Patterns without arch tags are excluded from archIndex | **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view....     |
-
---- MermaidRelationshipRendering ---
-
-| Rule                                              | Description                                                                                                            |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Each relationship type has a distinct arrow style | **Invariant:** Each relationship type (uses, depends-on, implements, extends) must render with a unique, visually...   |
-| Pattern names are sanitized for Mermaid node IDs  | **Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots,... |
-| All relationship types appear in single graph     | **Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements,...       |
 
 --- TimelineCodecTesting ---
 

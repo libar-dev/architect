@@ -389,6 +389,7 @@ _Verified by: Dependency references non-existent pattern, All dependencies resol
 | Status | planned |
 | Effort | 2d |
 | Business Value | track planned vs actual effort variance |
+| Dependencies | MvpWorkflowImplementation |
 
 **Problem:**
   No systematic way to track planned vs actual effort.
@@ -430,6 +431,7 @@ _Verified by: Dependency references non-existent pattern, All dependencies resol
 | Status | planned |
 | Effort | 5d |
 | Business Value | query roadmap with natural language |
+| Dependencies | MvpWorkflowImplementation |
 
 **Problem:**
   Roadmap is a static document that requires regeneration.
@@ -677,6 +679,7 @@ _Verified by: Valid release version formats_
 | Status | planned |
 | Effort | 2h |
 | Business Value | ensure session directory only contains active phase files |
+| Dependencies | SessionFileLifecycle |
 
 **Problem:**
   Session files (docs-living/sessions/phase-*.md) are ephemeral working

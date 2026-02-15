@@ -257,6 +257,30 @@ const internal = 42;
 export interface Foo { x: number; }
 ```
 
+**Same-name type and const exports produce one shape**
+
+- Given TypeScript source for wildcard extraction:
+- When extracting shapes with wildcard "*"
+- Then 1 shapes are extracted
+- And the extracted shapes include all:
+- And the extracted shape "Result" has kind "type"
+
+```markdown
+export type Result<T, E = Error> =
+  | { readonly ok: true; readonly value: T }
+  | { readonly ok: false; readonly error: E };
+
+export const Result = {
+  ok<T>(value: T): Result<T, never> {
+    return { ok: true, value };
+  },
+};
+```
+
+| name |
+| --- |
+| Result |
+
 ## Business Rules
 
 **Function signatures surface full parameter types in ExportInfo**
@@ -296,9 +320,10 @@ _Verified by: Param tags are extracted from function JSDoc, Returns tag is extra
 
     **Verified by:** Wildcard extracts all exports,
     Non-exported declarations excluded,
-    Mixed wildcard and names rejected
+    Mixed wildcard and names rejected,
+    Same-name type and const exports produce one shape
 
-_Verified by: Wildcard extracts all exported declarations, Mixed wildcard and names produces warning_
+_Verified by: Wildcard extracts all exported declarations, Mixed wildcard and names produces warning, Same-name type and const exports produce one shape_
 
 ---
 

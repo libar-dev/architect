@@ -1276,7 +1276,7 @@ function buildClassDiagram(ctx) {
  * Scope patterns are grouped by archContext in subgraphs (flowchart) or
  * rendered as participants/states (sequence/state diagrams).
  */
-function buildScopedDiagram(dataset, scope) {
+export function buildScopedDiagram(dataset, scope) {
     const title = scope.title ?? 'Component Overview';
     // Content source override: render hardcoded domain diagrams
     if (scope.source === 'fsm-lifecycle') {

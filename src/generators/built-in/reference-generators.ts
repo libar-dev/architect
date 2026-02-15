@@ -12,16 +12,21 @@
 
 import type { DocumentGenerator, GeneratorContext, GeneratorOutput } from '../types.js';
 import type { ExtractedPattern } from '../../validation-schemas/index.js';
+import type { MasterDataset } from '../../validation-schemas/master-dataset.js';
 import type { DetailLevel } from '../../renderable/codecs/types/base.js';
-import type { RenderableDocument } from '../../renderable/schema.js';
+import type { RenderableDocument, SectionBlock } from '../../renderable/schema.js';
+import { heading, paragraph, separator, table, document } from '../../renderable/schema.js';
 import type { GeneratorRegistry } from '../registry.js';
 import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
 import {
   createReferenceCodec,
   PRODUCT_AREA_META,
+  buildScopedDiagram,
   type ReferenceDocConfig,
+  type DiagramScope,
 } from '../../renderable/codecs/reference.js';
 import { toKebabCase } from '../../utils/string-utils.js';
+import { normalizeStatus } from '../../taxonomy/normalized-status.js';
 
 // ============================================================================
 // Reference Document Configurations
@@ -264,7 +269,7 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
     // Progressive disclosure index
     files.push({
       path: 'PRODUCT-AREAS.md',
-      content: buildProductAreaIndex(this.configs),
+      content: buildProductAreaIndex(this.configs, context.masterDataset),
     });
 
     return Promise.resolve({ files });
@@ -274,81 +279,128 @@ class ProductAreaDocsGenerator implements DocumentGenerator {
 /**
  * Builds a progressive disclosure index for product area documents.
  *
- * Includes per-area intros from PRODUCT_AREA_META and two cross-area
- * Mermaid diagrams showing pipeline data flow and dependency layers.
+ * Data-driven: computes per-area statistics from MasterDataset patterns,
+ * renders cross-area progress table, and generates live Mermaid diagrams
+ * from annotation relationship data via buildScopedDiagram.
  */
-function buildProductAreaIndex(configs: readonly ReferenceDocConfig[]): string {
-  const lines: string[] = [
-    '# Product Areas',
-    '',
-    '**Purpose:** Product area overview index',
-    '',
-    '---',
-    '',
-  ];
+function buildProductAreaIndex(
+  configs: readonly ReferenceDocConfig[],
+  dataset: MasterDataset
+): string {
+  const sections: SectionBlock[] = [];
 
-  // Per-area sections with intro prose
+  // Per-area sections with intro prose and live statistics
   for (const config of configs) {
     const area = config.productArea;
     if (area === undefined) continue;
     const meta = PRODUCT_AREA_META[area];
     if (meta === undefined) continue;
 
-    lines.push(`## [${area}](product-areas/${config.docsFilename})`);
-    lines.push('');
-    lines.push(`> **${meta.question}**`);
-    lines.push('');
-    lines.push(meta.intro);
-    lines.push('');
+    sections.push(heading(2, `[${area}](product-areas/${config.docsFilename})`));
+    sections.push(paragraph(`> **${meta.question}**`));
+    sections.push(paragraph(meta.intro));
+
+    // Live per-area statistics
+    const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
+    if (areaPatterns.length > 0) {
+      const completed = areaPatterns.filter(
+        (p) => normalizeStatus(p.status) === 'completed'
+      ).length;
+      const active = areaPatterns.filter((p) => normalizeStatus(p.status) === 'active').length;
+      const planned = areaPatterns.filter((p) => normalizeStatus(p.status) === 'planned').length;
+
+      sections.push(
+        paragraph(
+          `**${areaPatterns.length} patterns** — ${completed} completed, ${active} active, ${planned} planned`
+        )
+      );
+    }
+
+    // Key patterns from curated list
+    if (meta.keyPatterns.length > 0) {
+      sections.push(paragraph(`**Key patterns:** ${meta.keyPatterns.join(', ')}`));
+    }
   }
 
-  // Cross-area relationship diagrams
-  lines.push('---');
-  lines.push('');
-  lines.push('## Pipeline Data Flow');
-  lines.push('');
-  lines.push(
-    'Shows the 4-stage transformation pipeline and which product areas participate at each stage:'
-  );
-  lines.push('');
-  lines.push('```mermaid');
-  lines.push('graph LR');
-  lines.push('    CFG[Configuration] --> ANN');
-  lines.push('    subgraph ANN[Annotation]');
-  lines.push('        S[Scanner] -->|ScannedFile| E[Extractor]');
-  lines.push('    end');
-  lines.push('    E -->|ExtractedPattern| GEN');
-  lines.push('    subgraph GEN[Generation]');
-  lines.push('        P[Pipeline] -->|MasterDataset| C[Codecs]');
-  lines.push('    end');
-  lines.push('    C --> MD((Markdown))');
-  lines.push('    CT[CoreTypes] -.-> S & E & P');
-  lines.push('    VAL[Validation] -.-> P');
-  lines.push('    API[DataAPI] -.-> C');
-  lines.push('```');
-  lines.push('');
-  lines.push('## Product Area Dependency Layers');
-  lines.push('');
-  lines.push('Shows the layered architecture — arrows mean "depends on" (bottom-up):');
-  lines.push('');
-  lines.push('```mermaid');
-  lines.push('graph BT');
-  lines.push('    CT[CoreTypes] --> CFG[Configuration]');
-  lines.push('    CT --> ANN[Annotation]');
-  lines.push('    CT --> VAL[Validation]');
-  lines.push('    CT --> GEN[Generation]');
-  lines.push('    CFG --> ANN');
-  lines.push('    CFG --> GEN');
-  lines.push('    CFG --> VAL');
-  lines.push('    ANN --> GEN');
-  lines.push('    ANN --> VAL');
-  lines.push('    VAL -.->|FSM rules| GEN');
-  lines.push('    API[DataAPI] -.->|queries| GEN');
-  lines.push('    PRO[Process] -.->|sessions| API');
-  lines.push('```');
-  lines.push('');
+  sections.push(separator());
 
-  return lines.join('\n');
+  // Cross-area progress summary table
+  const tableHeaders = ['Area', 'Patterns', 'Completed', 'Active', 'Planned'];
+  const tableRows: string[][] = [];
+  let totalPatterns = 0;
+  let totalCompleted = 0;
+  let totalActive = 0;
+  let totalPlanned = 0;
+
+  for (const config of configs) {
+    const area = config.productArea;
+    if (area === undefined) continue;
+
+    const areaPatterns = dataset.patterns.filter((p) => p.productArea === area);
+    const completed = areaPatterns.filter((p) => normalizeStatus(p.status) === 'completed').length;
+    const active = areaPatterns.filter((p) => normalizeStatus(p.status) === 'active').length;
+    const planned = areaPatterns.filter((p) => normalizeStatus(p.status) === 'planned').length;
+
+    tableRows.push([
+      `[${area}](product-areas/${config.docsFilename})`,
+      String(areaPatterns.length),
+      String(completed),
+      String(active),
+      String(planned),
+    ]);
+
+    totalPatterns += areaPatterns.length;
+    totalCompleted += completed;
+    totalActive += active;
+    totalPlanned += planned;
+  }
+
+  tableRows.push([
+    '**Total**',
+    `**${totalPatterns}**`,
+    `**${totalCompleted}**`,
+    `**${totalActive}**`,
+    `**${totalPlanned}**`,
+  ]);
+
+  sections.push(heading(2, 'Progress Overview'));
+  sections.push(table(tableHeaders, tableRows));
+  sections.push(separator());
+
+  // Live cross-area diagrams from annotation data
+  // Collect key patterns from all areas for a curated cross-area view
+  const allKeyPatterns: string[] = [];
+  for (const config of configs) {
+    const area = config.productArea;
+    if (area === undefined) continue;
+    const meta = PRODUCT_AREA_META[area];
+    if (meta !== undefined) {
+      allKeyPatterns.push(...meta.keyPatterns);
+    }
+  }
+
+  // Diagram 1: C4Context cross-area system overview
+  const c4Scope: DiagramScope = {
+    title: 'System Architecture',
+    diagramType: 'C4Context',
+    patterns: allKeyPatterns,
+  };
+  sections.push(...buildScopedDiagram(dataset, c4Scope));
+
+  // Diagram 2: Flowchart showing cross-area relationships
+  const flowScope: DiagramScope = {
+    title: 'Cross-Area Pattern Relationships',
+    direction: 'LR',
+    patterns: allKeyPatterns,
+  };
+  sections.push(...buildScopedDiagram(dataset, flowScope));
+
+  const doc = document('Product Areas', sections, {
+    purpose: 'Product area overview index',
+    detailLevel: 'Full reference',
+  });
+
+  return renderToMarkdown(doc);
 }
 
 /**

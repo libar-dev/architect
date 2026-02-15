@@ -297,6 +297,78 @@ The delivery process generates PR-CHANGES.md from active or completed phases,
 | 42 | Mixed PR | Feature B | complete | 1 | src/b.ts | v0.2.0 |
 | 42 | Mixed PR | Feature C | complete | 1 | src/c.ts | v0.2.0 |
 
+## Business Rules
+
+**Release version filtering controls which phases appear in output**
+
+**Invariant:** Only phases with deliverables matching the releaseFilter are included; roadmap phases are always excluded.
+      **Verified by:** Filter phases by specific release version, Show all active and completed phases when no releaseFilter, Active phases with matching deliverables are included, Roadmap phases are excluded even with matching deliverables
+
+_Verified by: Filter phases by specific release version, Show all active and completed phases when no releaseFilter, Active phases with matching deliverables are included, Roadmap phases are excluded even with matching deliverables_
+
+**Patterns are grouped by phase number in the output**
+
+**Invariant:** Each phase number produces a separate heading section in the generated output.
+      **Verified by:** Patterns grouped by phase number
+
+_Verified by: Patterns grouped by phase number_
+
+**Summary statistics provide a high-level overview of the PR**
+
+**Invariant:** Summary section always shows pattern counts and release tag when a releaseFilter is active.
+      **Verified by:** Summary shows pattern counts in table format, Summary shows release tag when filtering
+
+_Verified by: Summary shows pattern counts in table format, Summary shows release tag when filtering_
+
+**Deliverables are displayed inline with their parent patterns**
+
+**Invariant:** When includeDeliverables is enabled, each pattern lists its deliverables with name, status, and release tag.
+      **Verified by:** Deliverables shown inline with patterns, Deliverables show release tags
+
+_Verified by: Deliverables shown inline with patterns, Deliverables show release tags_
+
+**Review checklist includes standard code quality verification items**
+
+**Invariant:** Review checklist always includes code conventions, tests, documentation, and completed pattern verification items.
+      **Verified by:** Review checklist includes standard code quality items, Review checklist includes completed pattern verification
+
+_Verified by: Review checklist includes standard code quality items, Review checklist includes completed pattern verification_
+
+**Dependencies section shows inter-pattern relationships**
+
+**Invariant:** Dependencies section surfaces both what patterns enable and what they depend on.
+      **Verified by:** Dependencies shows what patterns enable, Dependencies shows what patterns depend on
+
+_Verified by: Dependencies shows what patterns enable, Dependencies shows what patterns depend on_
+
+**Business value can be included or excluded from pattern metadata**
+
+**Invariant:** Business value display is controlled by the includeBusinessValue option.
+      **Verified by:** Pattern metadata includes business value when enabled, Business value can be excluded
+
+_Verified by: Pattern metadata includes business value when enabled, Business value can be excluded_
+
+**Output can be sorted by phase number or priority**
+
+**Invariant:** Sorting is deterministic and respects the configured sortBy option.
+      **Verified by:** Phases sorted by phase number, Phases sorted by priority
+
+_Verified by: Phases sorted by phase number, Phases sorted by priority_
+
+**Edge cases produce graceful output**
+
+**Invariant:** The generator handles missing phases, missing deliverables, and missing phase numbers without errors.
+      **Verified by:** No matching phases produces no changes message, Patterns without deliverables still display, Patterns without phase show in phase 0 group
+
+_Verified by: No matching phases produces no changes message, Patterns without deliverables still display, Patterns without phase show in phase 0 group_
+
+**Deliverable-level filtering shows only matching deliverables within a phase**
+
+**Invariant:** When a phase contains deliverables with different release tags, only those matching the releaseFilter are shown.
+      **Verified by:** Mixed releases within single phase shows only matching deliverables
+
+_Verified by: Mixed releases within single phase shows only matching deliverables_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

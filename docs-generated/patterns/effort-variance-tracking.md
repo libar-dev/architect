@@ -30,6 +30,10 @@
 
   Implements Convergence Opportunity 3: Earned-Value Tracking (lightweight).
 
+## Dependencies
+
+- Depends on: MvpWorkflowImplementation
+
 ## Acceptance Criteria
 
 **Generate phase variance report**

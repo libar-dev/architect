@@ -113,6 +113,27 @@ export const Result = {
 };
 ```
 
+**Both same-name declarations tagged produces shapes for each**
+
+- Given a TypeScript source file containing:
+- When discoverTaggedShapes runs on the source
+- Then 2 shapes are returned
+- And the shapes include kind "type" and kind "const"
+
+```typescript
+/** @libar-docs-shape core-types */
+export type Result<T, E = Error> =
+  | { readonly ok: true; readonly value: T }
+  | { readonly ok: false; readonly error: E };
+
+/** @libar-docs-shape core-types */
+export const Result = {
+  ok<T>(value: T): Result<T, never> {
+    return { ok: true, value };
+  },
+};
+```
+
 **All five declaration kinds are discoverable**
 
 - Given a TypeScript source file containing:
@@ -208,6 +229,18 @@ export interface NotAShape {
 export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 ```
 
+**Generic arrow function in non-JSX context parses correctly**
+
+- Given a TypeScript source file containing:
+- When discoverTaggedShapes runs on the source
+- Then 1 shape is returned
+- And the shape has name "identity" and kind "const"
+
+```typescript
+/** @libar-docs-shape */
+export const identity = <T>(value: T): T => value;
+```
+
 ## Business Rules
 
 **Declarations opt in via libar-docs-shape tag**
@@ -220,9 +253,10 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
     Group name is captured from tag value,
     Bare tag works without group,
     Non-exported tagged declaration is extracted,
-    Tagged type is found despite same-name const declaration
+    Tagged type is found despite same-name const declaration,
+    Both same-name declarations tagged produces shapes for each
 
-_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted, Tagged type is found despite same-name const declaration_
+_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted, Tagged type is found despite same-name const declaration, Both same-name declarations tagged produces shapes for each_
 
 **Discovery uses existing estree parser with JSDoc comment scanning**
 
@@ -231,9 +265,10 @@ _Verified by: Tagged declaration is extracted as shape, Untagged exported declar
 
     **Verified by:** All 5 declaration kinds supported,
     JSDoc gap enforcement,
-    Tag with other JSDoc content
+    Tag with other JSDoc content,
+    Generic arrow function in non-JSX context parses correctly
 
-_Verified by: All five declaration kinds are discoverable, JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched, Tag as last line before closing JSDoc delimiter, Hypothetical libar-docs-shape-extended tag is not matched, Tag coexists with other JSDoc content_
+_Verified by: All five declaration kinds are discoverable, JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched, Tag as last line before closing JSDoc delimiter, Hypothetical libar-docs-shape-extended tag is not matched, Tag coexists with other JSDoc content, Generic arrow function in non-JSX context parses correctly_
 
 ---
 

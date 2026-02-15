@@ -4,7 +4,7 @@
 
 ---
 
-**41 rules** from 8 features. 41 rules have explicit invariants.
+**54 rules** from 10 features. 54 rules have explicit invariants.
 
 ---
 
@@ -372,6 +372,83 @@
 
 *fsm-validator.feature*
 
+### Lint Engine
+
+*The lint engine orchestrates rule execution, aggregates violations,*
+
+---
+
+#### Single directive linting validates annotations against rules
+
+> **Invariant:** Every directive is checked against all provided rules and violations include source location.
+
+**Verified by:**
+- Return empty array when all rules pass
+- Return violations for failing rules
+- Run all provided rules
+- Include correct file and line in violations
+
+---
+
+#### Multi-file batch linting aggregates results across files
+
+> **Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are accurate.
+
+**Verified by:**
+- Return empty results for clean files
+- Collect violations by file
+- Count violations by severity
+- Handle multiple directives per file
+
+---
+
+#### Failure detection respects strict mode for severity escalation
+
+> **Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates failure.
+
+**Verified by:**
+- Return true when there are errors
+- Return false for warnings only in non-strict mode
+- Return true for warnings in strict mode
+- Return false for info only
+- Return false when no violations
+
+---
+
+#### Violation sorting orders by severity then by line number
+
+> **Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within each severity. Sorting does not mutate the original array.
+
+**Verified by:**
+- Sort errors first then warnings then info
+- Sort by line number within same severity
+- Not mutate original array
+
+---
+
+#### Pretty formatting produces human-readable output with severity counts
+
+> **Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet mode suppresses non-error violations.
+
+**Verified by:**
+- Show success message when no violations
+- Format violations with file line severity and message
+- Show summary line with counts
+- Filter out warnings and info in quiet mode
+
+---
+
+#### JSON formatting produces machine-readable output with full details
+
+> **Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file, line, severity, rule, and message.
+
+**Verified by:**
+- Return valid JSON
+- Include all summary fields
+- Include violation details
+
+*lint-engine.feature*
+
 ### Linter Validation
 
 *Tests for lint rules that validate relationship integrity, detect conflicts,*
@@ -432,6 +509,116 @@
 - Valid parent reference passes
 
 *linter-validation.feature*
+
+### Lint Rules
+
+*The lint system validates @libar-docs-* documentation annotations for quality.*
+
+---
+
+#### Files must declare an explicit pattern name
+
+> **Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry.
+>
+> **Rationale:** Without a pattern name, the file cannot be tracked, linked, or referenced in generated documentation.
+
+**Verified by:**
+- Detect missing pattern name
+- Detect empty string pattern name
+- Detect whitespace-only pattern name
+- Accept valid pattern name
+- Include file and line in violation
+
+---
+
+#### Files should declare a lifecycle status
+
+> **Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle.
+>
+> **Rationale:** Missing status prevents FSM validation and roadmap tracking.
+
+**Verified by:**
+- Detect missing status
+- Accept completed status
+- Accept active status
+- Accept roadmap status
+- Accept deferred status
+
+---
+
+#### Files should document when to use the pattern
+
+> **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern.
+>
+> **Rationale:** Without usage guidance, patterns become undiscoverable despite being documented.
+
+**Verified by:**
+- Detect missing whenToUse
+- Detect empty whenToUse array
+- Accept whenToUse with content
+
+---
+
+#### Descriptions must not repeat the pattern name
+
+> **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected.
+>
+> **Rationale:** Tautological descriptions waste reader attention and indicate missing documentation effort.
+
+**Verified by:**
+- Detect description that equals pattern name
+- Detect description that is pattern name with punctuation
+- Detect short description starting with pattern name
+- Accept description with substantial content after name
+- Accept meaningfully different description
+- Ignore empty descriptions
+- Ignore missing pattern name
+- Skip headings when finding first line
+- Skip "When to use" sections when finding first line
+
+---
+
+#### Files should declare relationship tags
+
+> **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and architecture diagrams.
+>
+> **Rationale:** Isolated patterns without relationships produce diagrams with no edges and prevent dependency analysis.
+
+**Verified by:**
+- Detect missing relationship tags
+- Detect empty uses array
+- Accept uses with content
+- Accept usedBy with content
+- Accept both uses and usedBy
+
+---
+
+#### Default rules collection is complete and well-ordered
+
+> **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity (errors first).
+>
+> **Rationale:** A complete, ordered collection ensures no rule is silently dropped and severity-based filtering works correctly.
+
+**Verified by:**
+- Default rules contains all 8 rules
+- Default rules have unique IDs
+- Default rules are ordered by severity
+- Default rules include all named rules
+
+---
+
+#### Rules can be filtered by minimum severity
+
+> **Invariant:** Filtering by severity must return only rules at or above the specified level.
+>
+> **Rationale:** CI pipelines need to control which violations block merges vs. which are advisory.
+
+**Verified by:**
+- Filter returns all rules for info severity
+- Filter excludes info rules for warning severity
+- Filter returns only errors for error severity
+
+*lint-rules.feature*
 
 ### Process Guard
 

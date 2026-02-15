@@ -54,6 +54,12 @@ Enhanced documentation generation with human-readable names,
 - Then behaviorFileVerified is undefined
 - And the explicit behavior file path is used
 
+**Behavior file inferred from timeline naming convention**
+
+- Given a timeline feature at "tests/features/timeline/phase-37-remaining-work.feature"
+- When inferring the behavior file path
+- Then the inferred path is "tests/features/behavior/remaining-work.feature"
+
 **Traceability shows covered phases with verified behavior files**
 
 - Given patterns with the following behavior files:
@@ -86,6 +92,13 @@ Enhanced documentation generation with human-readable names,
 - When getting the display name
 - Then the display name is "simple-feature" unchanged
 
+**Explicit title tag overrides CamelCase transformation**
+
+- Given a pattern with title "OAuth 2.0 Integration"
+- And patternName "OAuth2Integration"
+- When getting the display name
+- Then the result is "OAuth 2.0 Integration"
+
 **PRD shows numbered acceptance criteria with bold keywords**
 
 - Given a pattern with acceptance criteria scenarios:
@@ -106,24 +119,17 @@ Enhanced documentation generation with human-readable names,
 - Then scenario names are shown
 - But Given/When/Then steps are NOT rendered
 
+**PRD shows full Feature description without truncation**
+
+- Given a pattern with a 600-character Feature description
+- When generating PRODUCT-REQUIREMENTS.md
+- Then the full description renders without truncation
+
 **Hyphenated business value converted to spaces**
 
 - Given a pattern with businessValue "enable-rich-prd-documentation"
 - When formatting the business value
 - Then the result is "enable rich prd documentation"
-
-**File extensions not treated as sentence endings**
-
-- Given a description "Enhance REMAINING-WORK.md generation for better planning."
-- When extracting the first sentence
-- Then the result is "Enhance REMAINING-WORK.md generation for better planning."
-
-**Explicit title tag overrides CamelCase transformation**
-
-- Given a pattern with title "OAuth 2.0 Integration"
-- And patternName "OAuth2Integration"
-- When getting the display name
-- Then the result is "OAuth 2.0 Integration"
 
 **Business value displayed in Next Actionable table**
 
@@ -142,17 +148,48 @@ Enhanced documentation generation with human-readable names,
 | Eliminate manual regeneration |
 | Documented full cycle enables adoption |
 
-**PRD shows full Feature description without truncation**
+**File extensions not treated as sentence endings**
 
-- Given a pattern with a 600-character Feature description
-- When generating PRODUCT-REQUIREMENTS.md
-- Then the full description renders without truncation
+- Given a description "Enhance REMAINING-WORK.md generation for better planning."
+- When extracting the first sentence
+- Then the result is "Enhance REMAINING-WORK.md generation for better planning."
 
-**Behavior file inferred from timeline naming convention**
+## Business Rules
 
-- Given a timeline feature at "tests/features/timeline/phase-37-remaining-work.feature"
-- When inferring the behavior file path
-- Then the inferred path is "tests/features/behavior/remaining-work.feature"
+**Behavior files are verified during pattern extraction**
+
+**Invariant:** Every timeline pattern must report whether its corresponding behavior file exists.
+    **Verified by:** Behavior file existence verified during extraction, Missing behavior file sets verification to false, Explicit behavior file tag skips verification, Behavior file inferred from timeline naming convention
+
+_Verified by: Behavior file existence verified during extraction, Missing behavior file sets verification to false, Explicit behavior file tag skips verification, Behavior file inferred from timeline naming convention_
+
+**Traceability coverage reports verified and unverified behavior files**
+
+**Invariant:** Coverage reports must distinguish between patterns with verified behavior files and those without.
+    **Verified by:** Traceability shows covered phases with verified behavior files
+
+_Verified by: Traceability shows covered phases with verified behavior files_
+
+**Pattern names are transformed to human-readable display names**
+
+**Invariant:** Display names must convert CamelCase to title case, handle consecutive capitals, and respect explicit title overrides.
+    **Verified by:** CamelCase pattern names transformed to title case, PascalCase with consecutive caps handled correctly, Falls back to name when no patternName, Explicit title tag overrides CamelCase transformation
+
+_Verified by: CamelCase pattern names transformed to title case, PascalCase with consecutive caps handled correctly, Falls back to name when no patternName, Explicit title tag overrides CamelCase transformation_
+
+**PRD acceptance criteria are formatted with numbering and bold keywords**
+
+**Invariant:** PRD output must number acceptance criteria and bold Given/When/Then keywords when steps are enabled.
+    **Verified by:** PRD shows numbered acceptance criteria with bold keywords, PRD respects includeScenarioSteps flag, PRD shows full Feature description without truncation
+
+_Verified by: PRD shows numbered acceptance criteria with bold keywords, PRD respects includeScenarioSteps flag, PRD shows full Feature description without truncation_
+
+**Business values are formatted for human readability**
+
+**Invariant:** Hyphenated business value tags must be converted to space-separated readable text in all output contexts.
+    **Verified by:** Hyphenated business value converted to spaces, Business value displayed in Next Actionable table, File extensions not treated as sentence endings
+
+_Verified by: Hyphenated business value converted to spaces, Business value displayed in Next Actionable table, File extensions not treated as sentence endings_
 
 ---
 

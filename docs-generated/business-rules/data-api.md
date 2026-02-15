@@ -4,7 +4,7 @@
 
 ---
 
-**85 rules** from 18 features. 71 rules have explicit invariants.
+**86 rules** from 18 features. 72 rules have explicit invariants.
 
 ---
 
@@ -851,6 +851,25 @@
 - Arch dangling returns broken references
 - Arch orphans returns isolated patterns
 - Arch blocking returns blocked patterns
+
+---
+
+#### CLI rules subcommand queries business rules and invariants
+
+> **Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
+>
+> **Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
+
+**Verified by:**
+- Rules returns business rules from feature files
+- Rules filters by product area
+- Rules with count modifier returns totals
+- Rules with names-only returns flat array
+- Rules filters by pattern name
+- Rules with only-invariants excludes rules without invariants
+- Rules product area filter excludes non-matching areas
+- Rules for non-existent product area returns hint
+- Rules combines product area and only-invariants filters
 
 *process-api.feature*
 

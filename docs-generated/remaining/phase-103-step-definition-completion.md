@@ -31,6 +31,7 @@ These patterns can be started immediately:
 | Status | planned |
 | Effort | 2d |
 | Business Value | make existing behavior specs executable |
+| Dependencies | ADR002GherkinOnlyTesting |
 
 **Problem:**
   7 feature files in tests/features/behavior/ have complete Gherkin specs

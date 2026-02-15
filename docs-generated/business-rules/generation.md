@@ -4,7 +4,7 @@
 
 ---
 
-**223 rules** from 45 features. 189 rules have explicit invariants.
+**264 rules** from 50 features. 230 rules have explicit invariants.
 
 ---
 
@@ -1067,6 +1067,67 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 *description-headers.feature*
 
+### Description Quality Foundation
+
+*- CamelCase pattern names (e.g., "RemainingWorkEnhancement") are hard to read*
+
+---
+
+#### Behavior files are verified during pattern extraction
+
+> **Invariant:** Every timeline pattern must report whether its corresponding behavior file exists.
+
+**Verified by:**
+- Behavior file existence verified during extraction
+- Missing behavior file sets verification to false
+- Explicit behavior file tag skips verification
+- Behavior file inferred from timeline naming convention
+
+---
+
+#### Traceability coverage reports verified and unverified behavior files
+
+> **Invariant:** Coverage reports must distinguish between patterns with verified behavior files and those without.
+
+**Verified by:**
+- Traceability shows covered phases with verified behavior files
+
+---
+
+#### Pattern names are transformed to human-readable display names
+
+> **Invariant:** Display names must convert CamelCase to title case, handle consecutive capitals, and respect explicit title overrides.
+
+**Verified by:**
+- CamelCase pattern names transformed to title case
+- PascalCase with consecutive caps handled correctly
+- Falls back to name when no patternName
+- Explicit title tag overrides CamelCase transformation
+
+---
+
+#### PRD acceptance criteria are formatted with numbering and bold keywords
+
+> **Invariant:** PRD output must number acceptance criteria and bold Given/When/Then keywords when steps are enabled.
+
+**Verified by:**
+- PRD shows numbered acceptance criteria with bold keywords
+- PRD respects includeScenarioSteps flag
+- PRD shows full Feature description without truncation
+
+---
+
+#### Business values are formatted for human readability
+
+> **Invariant:** Hyphenated business value tags must be converted to space-separated readable text in all output contexts.
+
+**Verified by:**
+- Hyphenated business value converted to spaces
+- Business value displayed in Next Actionable table
+- File extensions not treated as sentence endings
+
+*description-quality-foundation.feature*
+
 ### Documentation Orchestrator
 
 *Tests the orchestrator's pattern merging, conflict detection, and generator*
@@ -1747,6 +1808,113 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 *pr-changes-codec.feature*
 
+### Pr Changes Generation
+
+*- PR descriptions are manually written, often incomplete or inconsistent*
+
+---
+
+#### Release version filtering controls which phases appear in output
+
+> **Invariant:** Only phases with deliverables matching the releaseFilter are included; roadmap phases are always excluded.
+
+**Verified by:**
+- Filter phases by specific release version
+- Show all active and completed phases when no releaseFilter
+- Active phases with matching deliverables are included
+- Roadmap phases are excluded even with matching deliverables
+
+---
+
+#### Patterns are grouped by phase number in the output
+
+> **Invariant:** Each phase number produces a separate heading section in the generated output.
+
+**Verified by:**
+- Patterns grouped by phase number
+
+---
+
+#### Summary statistics provide a high-level overview of the PR
+
+> **Invariant:** Summary section always shows pattern counts and release tag when a releaseFilter is active.
+
+**Verified by:**
+- Summary shows pattern counts in table format
+- Summary shows release tag when filtering
+
+---
+
+#### Deliverables are displayed inline with their parent patterns
+
+> **Invariant:** When includeDeliverables is enabled, each pattern lists its deliverables with name, status, and release tag.
+
+**Verified by:**
+- Deliverables shown inline with patterns
+- Deliverables show release tags
+
+---
+
+#### Review checklist includes standard code quality verification items
+
+> **Invariant:** Review checklist always includes code conventions, tests, documentation, and completed pattern verification items.
+
+**Verified by:**
+- Review checklist includes standard code quality items
+- Review checklist includes completed pattern verification
+
+---
+
+#### Dependencies section shows inter-pattern relationships
+
+> **Invariant:** Dependencies section surfaces both what patterns enable and what they depend on.
+
+**Verified by:**
+- Dependencies shows what patterns enable
+- Dependencies shows what patterns depend on
+
+---
+
+#### Business value can be included or excluded from pattern metadata
+
+> **Invariant:** Business value display is controlled by the includeBusinessValue option.
+
+**Verified by:**
+- Pattern metadata includes business value when enabled
+- Business value can be excluded
+
+---
+
+#### Output can be sorted by phase number or priority
+
+> **Invariant:** Sorting is deterministic and respects the configured sortBy option.
+
+**Verified by:**
+- Phases sorted by phase number
+- Phases sorted by priority
+
+---
+
+#### Edge cases produce graceful output
+
+> **Invariant:** The generator handles missing phases, missing deliverables, and missing phase numbers without errors.
+
+**Verified by:**
+- No matching phases produces no changes message
+- Patterns without deliverables still display
+- Patterns without phase show in phase 0 group
+
+---
+
+#### Deliverable-level filtering shows only matching deliverables within a phase
+
+> **Invariant:** When a phase contains deliverables with different release tags, only those matching the releaseFilter are shown.
+
+**Verified by:**
+- Mixed releases within single phase shows only matching deliverables
+
+*pr-changes-generation.feature*
+
 ### Pr Changes Options
 
 *Tests the PrChangesCodec filtering capabilities for generating PR-scoped*
@@ -2074,6 +2242,85 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 - Product area generator with no patterns still produces intro
 
 *reference-generators.feature*
+
+### Remaining Work Enhancement
+
+*- Flat phase lists make it hard to identify what to work on next*
+
+---
+
+#### Priority-based sorting surfaces critical work first
+
+> **Invariant:** Phases with higher priority always appear before lower-priority phases when sorting by priority.
+
+**Verified by:**
+- Next Actionable sorted by priority
+- Undefined priority sorts last
+- Priority icons displayed in table
+
+---
+
+#### Effort parsing converts duration strings to comparable hours
+
+> **Invariant:** Effort strings must be parsed to a common unit (hours) for accurate sorting across different time scales.
+
+**Verified by:**
+- Phases sorted by effort ascending
+- Effort parsing handles hours
+- Effort parsing handles days
+- Effort parsing handles weeks
+- Effort parsing handles months
+
+---
+
+#### Quarter grouping organizes planned work into time-based buckets
+
+> **Invariant:** Phases with a quarter tag are grouped under their quarter heading; phases without a quarter appear under Unscheduled.
+
+**Verified by:**
+- Planned phases grouped by quarter
+- Quarters sorted chronologically
+
+---
+
+#### Priority grouping organizes phases by urgency level
+
+> **Invariant:** Phases are grouped under their priority heading; phases without priority appear under Unprioritized.
+
+**Verified by:**
+- Planned phases grouped by priority
+
+---
+
+#### Progressive disclosure prevents information overload in large backlogs
+
+> **Invariant:** When the backlog exceeds maxNextActionable, only the top N phases are shown with a link or count for the remainder.
+
+**Verified by:**
+- Large backlog uses progressive disclosure
+- Moderate backlog shows count without link
+
+---
+
+#### Edge cases are handled gracefully
+
+> **Invariant:** Empty or fully-blocked backlogs produce meaningful output instead of errors or blank sections.
+
+**Verified by:**
+- Empty backlog handling
+- All phases blocked
+
+---
+
+#### Default behavior preserves backward compatibility
+
+> **Invariant:** Without explicit sortBy or groupPlannedBy options, phases are sorted by phase number in a flat list.
+
+**Verified by:**
+- Default sorting is by phase number
+- Default grouping is none (flat list)
+
+*remaining-work-enhancement.feature*
 
 ### Remaining Work Summary Accuracy
 
@@ -2911,6 +3158,138 @@ Division by zero must be handled gracefully to prevent
 
 *transform-dataset.feature*
 
+### Universal Markdown Renderer
+
+*The universal renderer converts RenderableDocument to markdown.*
+
+---
+
+#### Document metadata renders as frontmatter before sections
+
+> **Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+
+**Verified by:**
+- Render minimal document with title only
+- Render document with purpose
+- Render document with detail level
+- Render document with purpose and detail level
+
+---
+
+#### Headings render at correct markdown levels with clamping
+
+> **Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+
+**Verified by:**
+- Render headings at different levels
+- Clamp heading level 0 to 1
+- Clamp heading level 7 to 6
+
+---
+
+#### Paragraphs and separators render as plain text and horizontal rules
+
+> **Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+
+**Verified by:**
+- Render paragraph
+- Render paragraph with special characters
+- Render separator
+
+---
+
+#### Tables render with headers, alignment, and cell escaping
+
+> **Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+
+**Verified by:**
+- Render basic table
+- Render table with alignment
+- Render empty table (no columns)
+- Render table with pipe character in cell
+- Render table with newline in cell
+- Render table with short row (fewer cells than columns)
+
+---
+
+#### Lists render in unordered, ordered, checkbox, and nested formats
+
+> **Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+
+**Verified by:**
+- Render unordered list
+- Render ordered list
+- Render checkbox list with checked items
+- Render nested list
+
+---
+
+#### Code blocks and mermaid diagrams render with fenced syntax
+
+> **Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+
+**Verified by:**
+- Render code block with language
+- Render code block without language
+- Render mermaid diagram
+
+---
+
+#### Collapsible blocks render as HTML details elements
+
+> **Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+
+**Verified by:**
+- Render collapsible block
+- Render collapsible with HTML entities in summary
+- Render nested collapsible content
+
+---
+
+#### Link-out blocks render as markdown links with URL encoding
+
+> **Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+
+**Verified by:**
+- Render link-out block
+- Render link-out with spaces in path
+
+---
+
+#### Multi-file documents produce correct output file collections
+
+> **Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+
+**Verified by:**
+- Render document with additional files
+- Render document without additional files
+
+---
+
+#### Complex documents render all block types in sequence
+
+> **Invariant:** Multiple block types in a single document render in order without interference.
+
+**Verified by:**
+- Render complex document with multiple block types
+
+---
+
+#### Claude context renderer produces compact AI-optimized output
+
+> **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+
+**Verified by:**
+- Claude context renders title and headings as section markers
+- Claude context renders sub-headings with different markers
+- Claude context omits mermaid blocks
+- Claude context flattens collapsible blocks
+- Claude context renders link-out as plain text
+- Claude context omits separator tokens
+- Claude context produces fewer characters than markdown
+
+*render.feature*
+
 ### Validation Rules Codec
 
 *Validates the Validation Rules Codec that transforms MasterDataset into a*
@@ -3075,6 +3454,97 @@ Division by zero must be handled gracefully to prevent
 - Shape extractor uses warning collector
 
 *warning-collector.feature*
+
+### Zod Codec Migration
+
+*- Raw JSON.parse returns unknown/any types, losing type safety at runtime*
+
+---
+
+#### Input codec parses and validates JSON in a single step
+
+> **Invariant:** Every JSON string parsed through the input codec is both syntactically valid JSON and schema-conformant before returning a typed value.
+
+**Verified by:**
+- Input codec parses valid JSON to typed object
+- Input codec returns error for malformed JSON
+- Input codec returns validation errors for schema violations
+- Input codec strips $schema field before validation
+
+---
+
+#### Output codec validates before serialization
+
+> **Invariant:** Every object serialized through the output codec is schema-validated before JSON.stringify, preventing invalid data from reaching consumers.
+
+**Verified by:**
+- Output codec serializes valid object to JSON
+- Output codec returns error for schema violations
+- Output codec respects indent option
+
+---
+
+#### LintOutputSchema validates CLI lint output structure
+
+> **Invariant:** Lint output JSON always conforms to the LintOutputSchema, ensuring consistent structure for downstream tooling.
+
+**Verified by:**
+- LintOutputSchema validates correct lint output
+- LintOutputSchema rejects invalid severity
+
+---
+
+#### ValidationSummaryOutputSchema validates cross-source analysis output
+
+> **Invariant:** Validation summary JSON always conforms to the ValidationSummaryOutputSchema, ensuring consistent reporting of cross-source pattern analysis.
+
+**Verified by:**
+- ValidationSummaryOutputSchema validates correct validation output
+- ValidationSummaryOutputSchema rejects invalid issue source
+
+---
+
+#### RegistryMetadataOutputSchema accepts arbitrary nested structures
+
+> **Invariant:** Registry metadata codec accepts any valid JSON-serializable object without schema constraints on nested structure.
+
+**Verified by:**
+- RegistryMetadataOutputSchema accepts arbitrary metadata
+
+---
+
+#### formatCodecError produces human-readable error output
+
+> **Invariant:** Formatted codec errors always include the operation context and all validation error details for debugging.
+
+**Verified by:**
+- formatCodecError includes validation errors in output
+
+---
+
+#### safeParse returns typed values or undefined without throwing
+
+> **Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any failure.
+
+**Verified by:**
+- safeParse returns typed value on valid JSON
+- safeParse returns undefined on malformed JSON
+- safeParse returns undefined on schema violation
+
+---
+
+#### createFileLoader handles filesystem operations with typed errors
+
+> **Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values with appropriate messages and source paths.
+
+**Verified by:**
+- createFileLoader loads and parses valid JSON file
+- createFileLoader handles ENOENT error
+- createFileLoader handles EACCES error
+- createFileLoader handles general read error
+- createFileLoader handles invalid JSON in file
+
+*codec-migration.feature*
 
 ---
 

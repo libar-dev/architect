@@ -25,6 +25,18 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- PDR001SessionWorkflowCommands ---
+
+| Rule                                                 | Description                                                                                                                        |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
+| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
+| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
+| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
+| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
+| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
+| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
+
 --- ProcessStateAPIRelationshipQueries ---
 
 | Rule                                             | Description                                                                                                               |
@@ -113,18 +125,6 @@ Detail Level: Compact summary
 | Arch subcommand provides neighborhood and comparison views     | **Invariant:** Architecture queries resolve pattern names to concrete<br> relationships and file paths, not just...      |
 | Coverage analysis reports annotation completeness with gaps    | **Invariant:** Coverage reports identify unannotated files that should have<br> the libar-docs opt-in marker based on... |
 | Tags and sources commands provide taxonomy and inventory views | **Invariant:** All tag values in use are discoverable without reading<br> configuration files. Source file inventory...  |
-
---- PDR001SessionWorkflowCommands ---
-
-| Rule                                                 | Description                                                                                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| DD-1 - Text output with section markers              | Both scope-validate and handoff return string from the router, using<br> === SECTION === markers. Follows the dual...              |
-| DD-2 - Git integration is opt-in via --git flag      | The handoff command accepts an optional --git flag. The CLI handler<br> calls git diff and passes file list to the...              |
-| DD-3 - Session type inferred from FSM status         | Handoff infers session type from pattern's current FSM status.<br> An explicit --session flag overrides inference....              |
-| DD-4 - Severity levels match Process Guard model     | Scope validation uses three severity levels:<br><br> \| Severity \| Meaning \|<br> \| PASS \| Check passed \|<br> \| BLOCKED \|... |
-| DD-5 - Current date only for handoff                 | Handoff always uses the current date. No --date flag.                                                                              |
-| DD-6 - Both positional and flag forms for scope type | scope-validate accepts scope type as both positional argument<br> and --type flag.                                                 |
-| DD-7 - Co-located formatter functions                | Each module (scope-validator.ts, handoff-generator.ts) exports<br> both the data builder and the text formatter....                |
 
 --- ValidatePatternsCli ---
 
@@ -228,6 +228,21 @@ Detail Level: Compact summary
 | Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
 | PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
 
+--- ScopeValidatorTests ---
+
+| Rule                                                     | Description                                                                                                             |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
+| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
+| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
+
+--- HandoffGeneratorTests ---
+
+| Rule                                            | Description                                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
+| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
+
 --- PatternSummarizeTests ---
 
 | Rule                                         | Description                                                                                                             |
@@ -260,21 +275,6 @@ Detail Level: Compact summary
 | Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
-
---- ScopeValidatorTests ---
-
-| Rule                                                     | Description                                                                                                             |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
-| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
-| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
-
---- HandoffGeneratorTests ---
-
-| Rule                                            | Description                                                                                                    |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
-| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
 
 --- ContextFormatterTests ---
 

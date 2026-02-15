@@ -4,11 +4,108 @@
 
 ---
 
-**67 rules** from 14 features. 53 rules have explicit invariants.
+**88 rules** from 17 features. 74 rules have explicit invariants.
 
 ---
 
 ## Uncategorized
+
+### Ast Parser
+
+*The AST Parser extracts @libar-docs-* directives from TypeScript source files*
+
+---
+
+#### Export types are correctly identified from TypeScript declarations
+
+> **Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
+
+**Verified by:**
+- Parse function export with directive
+- Parse type export with directive
+- Parse interface export with directive
+- Parse const export with directive
+- Parse class export with directive
+- Parse enum export with directive
+- Parse const enum export with directive
+- Parse abstract class export with directive
+- Parse arrow function export with directive
+- Parse async function export with directive
+- Parse generic function export with directive
+- Parse default export with directive
+- Parse re-exports with directive
+- Parse multiple exports in single statement
+- Parse multiple directives in same file
+
+---
+
+#### Metadata is correctly extracted from JSDoc comments
+
+> **Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all correctly parsed and separated.
+
+**Verified by:**
+- Extract examples from directive
+- Extract multi-line description
+- Track line numbers correctly
+- Extract function signature information
+- Ignore @param and @returns in description
+
+---
+
+#### Tags are extracted only from the directive section, not from description or examples
+
+> **Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in description prose or example code blocks are ignored.
+
+**Verified by:**
+- Extract multiple tags from directive section
+- Extract tag with description on same line
+- NOT extract tags mentioned in description
+- NOT extract tags mentioned in @example sections
+
+---
+
+#### When to Use sections are extracted in all supported formats
+
+> **Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and asterisk bullet format. When no When to Use section exists, the field is undefined.
+
+**Verified by:**
+- Extract When to Use heading format with bullet points
+- Extract When to use inline format
+- Extract asterisk bullets in When to Use section
+- Not set whenToUse when section is missing
+
+---
+
+#### Relationship tags extract uses and usedBy dependencies
+
+> **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
+
+**Verified by:**
+- Extract @libar-docs-uses with single value
+- Extract @libar-docs-uses with comma-separated values
+- Extract @libar-docs-used-by with single value
+- Extract @libar-docs-used-by with comma-separated values
+- Extract both uses and usedBy from same directive
+- NOT capture uses/usedBy values in description
+- Not set uses/usedBy when no relationship tags exist
+
+---
+
+#### Edge cases and malformed input are handled gracefully
+
+> **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+
+**Verified by:**
+- Skip comments without @libar-docs-* tags
+- Skip invalid directive with incomplete tag
+- Handle malformed TypeScript gracefully
+- Handle empty file gracefully
+- Handle whitespace-only file
+- Handle file with only comments and no exports
+- Skip inline comments (non-block)
+- Handle unicode characters in descriptions
+
+*ast-parser.feature*
 
 ### Context Inference
 
@@ -621,6 +718,192 @@
 - RelationshipEntry schema accepts implementedBy
 
 *implements-tag.feature*
+
+### Layer Inference
+
+*- Manual layer annotation in every feature file is tedious and error-prone*
+
+---
+
+#### Timeline layer is detected from /timeline/ directory segments
+
+> **Invariant:** Any feature file path containing a /timeline/ directory segment is classified as timeline layer.
+
+**Verified by:**
+- Detect timeline features from /timeline/ path
+- Detect timeline features regardless of parent directories
+- Detect timeline features in delivery-process package
+
+---
+
+#### Domain layer is detected from business context directory segments
+
+> **Invariant:** Feature files in /deciders/, /orders/, or /inventory/ directories are classified as domain layer.
+
+**Verified by:**
+- Detect decider features as domain
+- Detect orders features as domain
+- Detect inventory features as domain
+
+---
+
+#### Integration layer is detected and takes priority over domain directories
+
+> **Invariant:** Paths containing /integration-features/ or /integration/ are classified as integration, even when they also contain domain directory names.
+
+**Verified by:**
+- Detect integration-features directory as integration
+- Detect /integration/ directory as integration
+- Integration takes priority over orders subdirectory
+- Integration takes priority over inventory subdirectory
+
+---
+
+#### E2E layer is detected from /e2e/ directory segments
+
+> **Invariant:** Any feature file path containing an /e2e/ directory segment is classified as e2e layer.
+
+**Verified by:**
+- Detect e2e features from /e2e/ path
+- Detect e2e features in frontend app
+- Detect e2e-journeys as e2e
+
+---
+
+#### Component layer is detected from tool-specific directory segments
+
+> **Invariant:** Feature files in /scanner/ or /lint/ directories are classified as component layer.
+
+**Verified by:**
+- Detect scanner features as component
+- Detect lint features as component
+
+---
+
+#### Unknown layer is the fallback for unclassified paths
+
+> **Invariant:** Any feature file path that does not match a known layer pattern is classified as unknown.
+
+**Verified by:**
+- Return unknown for unclassified paths
+- Return unknown for root-level features
+- Return unknown for generic test paths
+
+---
+
+#### Path normalization handles cross-platform and case differences
+
+> **Invariant:** Layer inference produces correct results regardless of path separators, case, or absolute vs relative paths.
+
+**Verified by:**
+- Handle Windows-style paths with backslashes
+- Be case-insensitive
+- Handle mixed path separators
+- Handle absolute Unix paths
+- Handle Windows absolute paths
+- Timeline in filename only should not match
+- Timeline detected even with deep nesting
+
+---
+
+#### FEATURE_LAYERS constant provides validated layer enumeration
+
+> **Invariant:** FEATURE_LAYERS is a readonly array containing exactly all 6 valid layer values.
+
+**Verified by:**
+- FEATURE_LAYERS contains all valid layer values
+- FEATURE_LAYERS has exactly 6 layers
+- FEATURE_LAYERS is a readonly array
+
+*layer-inference.feature*
+
+### Pattern Tag Extraction
+
+*- Gherkin tags are flat strings needing semantic interpretation*
+
+---
+
+#### Single value tags produce scalar metadata fields
+
+> **Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+
+**Verified by:**
+- Extract pattern name tag
+- Extract phase number tag
+- Extract status roadmap tag
+- Extract status deferred tag
+- Extract status completed tag
+- Extract status active tag
+- Extract brief path tag
+
+---
+
+#### Array value tags accumulate into list metadata fields
+
+> **Invariant:** Tags for depends-on and enables split comma-separated values and accumulate across multiple tag occurrences.
+
+**Verified by:**
+- Extract single dependency
+- Extract comma-separated dependencies
+- Extract comma-separated enables
+
+---
+
+#### Category tags are colon-free tags filtered against known non-categories
+
+> **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+
+**Verified by:**
+- Extract category tags (no colon)
+- libar-docs opt-in marker is NOT a category
+
+---
+
+#### Complex tag lists produce fully populated metadata
+
+> **Invariant:** All tag types (scalar, array, category) are correctly extracted from a single mixed tag list.
+
+**Verified by:**
+- Extract all metadata from complex tag list
+
+---
+
+#### Edge cases produce safe defaults
+
+> **Invariant:** Empty or invalid inputs produce empty metadata or omit invalid fields rather than throwing errors.
+
+**Verified by:**
+- Empty tag list returns empty metadata
+- Invalid phase number is ignored
+
+---
+
+#### Convention tags support CSV values with whitespace trimming
+
+> **Invariant:** Convention tags split comma-separated values and trim whitespace from each value.
+
+**Verified by:**
+- Extract single convention tag
+- Extract CSV convention tags
+- Convention tag trims whitespace in CSV values
+
+---
+
+#### Registry-driven extraction handles enums, transforms, and value constraints
+
+> **Invariant:** Tags defined in the registry use data-driven extraction with enum validation, CSV accumulation, value transforms, and constraint checking.
+
+**Verified by:**
+- Registry-driven enum tag without prior if/else branch
+- Registry-driven enum rejects invalid value
+- Registry-driven CSV tag accumulates values
+- Transform applies hyphen-to-space on business value
+- Transform applies ADR number padding
+- Transform strips quotes from title tag
+- Repeatable value tag accumulates multiple occurrences
+- CSV with values constraint rejects invalid values
+
+*pattern-tag-extraction.feature*
 
 ### Scanner Core
 

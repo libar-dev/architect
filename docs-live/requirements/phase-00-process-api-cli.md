@@ -6,10 +6,10 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | DataAPI |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | completed |
+| Product Area | DataAPI   |
 
 ## Description
 
@@ -30,7 +30,7 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 
 **No subcommand shows help**
 
-- When running "process-api -i 'src/**/*.ts'"
+- When running "process-api -i 'src/\*_/_.ts'"
 - Then exit code is 1
 - And output contains "Usage:"
 
@@ -49,35 +49,35 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Status shows counts and completion percentage**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' status"
+- When running "process-api -i 'src/\*_/_.ts' status"
 - Then exit code is 0
 - And stdout is valid JSON with key "success"
 
 **Query getStatusCounts returns count object**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' query getStatusCounts"
+- When running "process-api -i 'src/\*_/_.ts' query getStatusCounts"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Query isValidTransition with arguments**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' query isValidTransition roadmap active"
+- When running "process-api -i 'src/\*_/_.ts' query isValidTransition roadmap active"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Unknown API method shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' query nonExistentMethod"
+- When running "process-api -i 'src/\*_/_.ts' query nonExistentMethod"
 - Then exit code is 1
 - And output contains "Unknown"
 
 **Pattern lookup returns full detail**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' pattern CompletedPattern"
+- When running "process-api -i 'src/\*_/_.ts' pattern CompletedPattern"
 - Then exit code is 0
 - And stdout is valid JSON
 - And stdout contains "CompletedPattern"
@@ -85,56 +85,56 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Pattern not found shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' pattern NonExistent"
+- When running "process-api -i 'src/\*_/_.ts' pattern NonExistent"
 - Then exit code is 1
 - And output contains "not found"
 
 **Arch roles lists roles with counts**
 
 - Given TypeScript files with architecture annotations
-- When running "process-api -i 'src/**/*.ts' arch roles"
+- When running "process-api -i 'src/\*_/_.ts' arch roles"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Arch context filters to bounded context**
 
 - Given TypeScript files with architecture annotations
-- When running "process-api -i 'src/**/*.ts' arch context testctx"
+- When running "process-api -i 'src/\*_/_.ts' arch context testctx"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Arch layer lists layers with counts**
 
 - Given TypeScript files with architecture annotations
-- When running "process-api -i 'src/**/*.ts' arch layer"
+- When running "process-api -i 'src/\*_/_.ts' arch layer"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Query without method name shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' query"
+- When running "process-api -i 'src/\*_/_.ts' query"
 - Then exit code is 1
 - And output contains "Usage:"
 
 **Pattern without name shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' pattern"
+- When running "process-api -i 'src/\*_/_.ts' pattern"
 - Then exit code is 1
 - And output contains "Usage:"
 
 **Unknown subcommand shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' foobar"
+- When running "process-api -i 'src/\*_/_.ts' foobar"
 - Then exit code is 1
 - And output contains "Unknown subcommand"
 
 **Integer arguments are coerced for phase queries**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' query getPatternsByPhase 1"
+- When running "process-api -i 'src/\*_/_.ts' query getPatternsByPhase 1"
 - Then exit code is 0
 
 **Double-dash separator is handled gracefully**
@@ -145,21 +145,21 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **List all patterns returns JSON array**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' list"
+- When running "process-api -i 'src/\*_/_.ts' list"
 - Then exit code is 0
 - And stdout is valid JSON with key "success"
 
 **List with invalid phase shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' list --phase abc"
+- When running "process-api -i 'src/\*_/_.ts' list --phase abc"
 - Then exit code is 1
 - And output contains "Invalid --phase"
 
 **Search returns matching patterns**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' search Completed"
+- When running "process-api -i 'src/\*_/_.ts' search Completed"
 - Then exit code is 0
 - And stdout is valid JSON
 - And stdout contains "CompletedPattern"
@@ -167,14 +167,14 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Search without query shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' search"
+- When running "process-api -i 'src/\*_/_.ts' search"
 - Then exit code is 1
 - And output contains "Usage:"
 
 **Context returns curated text bundle**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' context CompletedPattern"
+- When running "process-api -i 'src/\*_/_.ts' context CompletedPattern"
 - Then exit code is 0
 - And stdout is non-empty
 - And stdout contains "CompletedPattern"
@@ -182,14 +182,14 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Context without pattern name shows error**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' context"
+- When running "process-api -i 'src/\*_/_.ts' context"
 - Then exit code is 1
 - And output contains "Usage:"
 
 **Overview returns executive summary text**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' overview"
+- When running "process-api -i 'src/\*_/_.ts' overview"
 - Then exit code is 0
 - And stdout is non-empty
 - And stdout contains "PROGRESS"
@@ -197,28 +197,28 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Dep-tree returns dependency tree text**
 
 - Given TypeScript files with architecture annotations and dependencies
-- When running "process-api -i 'src/**/*.ts' dep-tree ScannerService"
+- When running "process-api -i 'src/\*_/_.ts' dep-tree ScannerService"
 - Then exit code is 0
 - And stdout is non-empty
 
 **Tags returns tag usage counts**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' tags"
+- When running "process-api -i 'src/\*_/_.ts' tags"
 - Then exit code is 0
 - And stdout is valid JSON with key "data"
 
 **Sources returns file inventory**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' sources"
+- When running "process-api -i 'src/\*_/_.ts' sources"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Arch neighborhood returns pattern relationships**
 
 - Given TypeScript files with architecture annotations and dependencies
-- When running "process-api -i 'src/**/*.ts' arch neighborhood ScannerService"
+- When running "process-api -i 'src/\*_/_.ts' arch neighborhood ScannerService"
 - Then exit code is 0
 - And stdout is valid JSON
 - And stdout contains "ScannerService"
@@ -226,49 +226,49 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Arch compare returns context comparison**
 
 - Given TypeScript files with two architecture contexts
-- When running "process-api -i 'src/**/*.ts' arch compare scanner codec"
+- When running "process-api -i 'src/\*_/_.ts' arch compare scanner codec"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Arch coverage returns annotation coverage**
 
 - Given TypeScript files with architecture annotations
-- When running "process-api -i 'src/**/*.ts' arch coverage"
+- When running "process-api -i 'src/\*_/_.ts' arch coverage"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Unannotated finds files missing libar-docs marker**
 
 - Given TypeScript files with mixed annotations
-- When running "process-api -i 'src/**/*.ts' unannotated"
+- When running "process-api -i 'src/\*_/_.ts' unannotated"
 - Then exit code is 0
 - And stdout is valid JSON
 
 **Count modifier after list subcommand returns count**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' list --count"
+- When running "process-api -i 'src/\*_/_.ts' list --count"
 - Then exit code is 0
 - And stdout JSON data is a number
 
 **Names-only modifier after list subcommand returns names**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' list --names-only"
+- When running "process-api -i 'src/\*_/_.ts' list --names-only"
 - Then exit code is 0
 - And stdout JSON data is a string array
 
 **Count modifier combined with list filter**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' list --status completed --count"
+- When running "process-api -i 'src/\*_/_.ts' list --status completed --count"
 - Then exit code is 0
 - And stdout JSON data is a number
 
 **Arch dangling returns broken references**
 
 - Given TypeScript files with a dangling reference
-- When running "process-api -i 'src/**/*.ts' arch dangling"
+- When running "process-api -i 'src/\*_/_.ts' arch dangling"
 - Then exit code is 0
 - And stdout JSON data is an array
 - And stdout JSON data contains an entry with field "missing"
@@ -276,7 +276,7 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Arch orphans returns isolated patterns**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' arch orphans"
+- When running "process-api -i 'src/\*_/_.ts' arch orphans"
 - Then exit code is 0
 - And stdout JSON data is an array
 - And stdout JSON data contains an entry with field "pattern"
@@ -284,9 +284,111 @@ Command-line interface for querying delivery process state via ProcessStateAPI.
 **Arch blocking returns blocked patterns**
 
 - Given TypeScript files with pattern annotations
-- When running "process-api -i 'src/**/*.ts' arch blocking"
+- When running "process-api -i 'src/\*_/_.ts' arch blocking"
 - Then exit code is 0
 - And stdout JSON data is an array
+
+**Rules returns business rules from feature files**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules"
+- Then exit code is 0
+- And stdout JSON data has fields:
+
+| field           |
+| --------------- |
+| totalRules      |
+| totalInvariants |
+| productAreas    |
+
+**Rules filters by product area**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --product-area Validation"
+- Then exit code is 0
+- And stdout JSON data has field "productAreas"
+
+**Rules with count modifier returns totals**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --count"
+- Then exit code is 0
+- And stdout JSON data has fields:
+
+| field           |
+| --------------- |
+| totalRules      |
+| totalInvariants |
+
+**Rules with names-only returns flat array**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --names-only"
+- Then exit code is 0
+- And stdout JSON data is an array
+
+**Rules filters by pattern name**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --pattern CoreUtilsTest --count"
+- Then exit code is 0
+- And stdout JSON data has field values:
+
+| field           | value |
+| --------------- | ----- |
+| totalRules      | 2     |
+| totalInvariants | 1     |
+
+**Rules with only-invariants excludes rules without invariants**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --only-invariants --count"
+- Then exit code is 0
+- And stdout JSON data has field values:
+
+| field           | value |
+| --------------- | ----- |
+| totalRules      | 3     |
+| totalInvariants | 3     |
+
+**Rules product area filter excludes non-matching areas**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --product-area Validation --count"
+- Then exit code is 0
+- And stdout JSON data has field values:
+
+| field      | value |
+| ---------- | ----- |
+| totalRules | 2     |
+
+**Rules for non-existent product area returns hint**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --product-area NonExistent --count"
+- Then exit code is 0
+- And stdout JSON data has field "hint"
+
+**Rules combines product area and only-invariants filters**
+
+- Given TypeScript files with pattern annotations
+- And Gherkin feature files with business rules
+- When running "process-api -i 'src/**/\*.ts' -f 'specs/**/\*.feature' rules --product-area CoreTypes --only-invariants --count"
+- Then exit code is 0
+- And stdout JSON data has field values:
+
+| field           | value |
+| --------------- | ----- |
+| totalRules      | 1     |
+| totalInvariants | 1     |
 
 ## Business Rules
 
@@ -365,6 +467,16 @@ _Verified by: Count modifier after list subcommand returns count, Names-only mod
     **Verified by:** Arch dangling returns broken references, Arch orphans returns isolated patterns, Arch blocking returns blocked patterns
 
 _Verified by: Arch dangling returns broken references, Arch orphans returns isolated patterns, Arch blocking returns blocked patterns_
+
+**CLI rules subcommand queries business rules and invariants**
+
+**Invariant:** The rules subcommand returns structured business rules extracted from Gherkin Rule: blocks, grouped by product area and phase, with parsed invariant and rationale annotations.
+
+    **Rationale:** Live business rule queries replace static generated markdown, enabling on-demand filtering by product area, pattern, and invariant presence.
+
+    **Verified by:** Rules returns business rules from feature files, Rules filters by product area, Rules with count modifier returns totals, Rules with names-only returns flat array
+
+_Verified by: Rules returns business rules from feature files, Rules filters by product area, Rules with count modifier returns totals, Rules with names-only returns flat array, Rules filters by pattern name, Rules with only-invariants excludes rules without invariants, Rules product area filter excludes non-matching areas, Rules for non-existent product area returns hint, Rules combines product area and only-invariants filters_
 
 ---
 

@@ -214,6 +214,57 @@ Enhanced REMAINING-WORK.md generation with priority-based sorting,
 | 110 | Q1 Work | Q1-2026 | roadmap |
 | 111 | Q2 Work | Q2-2026 | roadmap |
 
+## Business Rules
+
+**Priority-based sorting surfaces critical work first**
+
+**Invariant:** Phases with higher priority always appear before lower-priority phases when sorting by priority.
+    **Verified by:** Next Actionable sorted by priority, Undefined priority sorts last, Priority icons displayed in table
+
+_Verified by: Next Actionable sorted by priority, Undefined priority sorts last, Priority icons displayed in table_
+
+**Effort parsing converts duration strings to comparable hours**
+
+**Invariant:** Effort strings must be parsed to a common unit (hours) for accurate sorting across different time scales.
+    **Verified by:** Phases sorted by effort ascending, Effort parsing handles hours, Effort parsing handles days, Effort parsing handles weeks, Effort parsing handles months
+
+_Verified by: Phases sorted by effort ascending, Effort parsing handles hours, Effort parsing handles days, Effort parsing handles weeks, Effort parsing handles months_
+
+**Quarter grouping organizes planned work into time-based buckets**
+
+**Invariant:** Phases with a quarter tag are grouped under their quarter heading; phases without a quarter appear under Unscheduled.
+    **Verified by:** Planned phases grouped by quarter, Quarters sorted chronologically
+
+_Verified by: Planned phases grouped by quarter, Quarters sorted chronologically_
+
+**Priority grouping organizes phases by urgency level**
+
+**Invariant:** Phases are grouped under their priority heading; phases without priority appear under Unprioritized.
+    **Verified by:** Planned phases grouped by priority
+
+_Verified by: Planned phases grouped by priority_
+
+**Progressive disclosure prevents information overload in large backlogs**
+
+**Invariant:** When the backlog exceeds maxNextActionable, only the top N phases are shown with a link or count for the remainder.
+    **Verified by:** Large backlog uses progressive disclosure, Moderate backlog shows count without link
+
+_Verified by: Large backlog uses progressive disclosure, Moderate backlog shows count without link_
+
+**Edge cases are handled gracefully**
+
+**Invariant:** Empty or fully-blocked backlogs produce meaningful output instead of errors or blank sections.
+    **Verified by:** Empty backlog handling, All phases blocked
+
+_Verified by: Empty backlog handling, All phases blocked_
+
+**Default behavior preserves backward compatibility**
+
+**Invariant:** Without explicit sortBy or groupPlannedBy options, phases are sorted by phase number in a flat list.
+    **Verified by:** Default sorting is by phase number, Default grouping is none (flat list)
+
+_Verified by: Default sorting is by phase number, Default grouping is none (flat list)_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

@@ -353,6 +353,109 @@ ArchIndexSchema = z.object({
 
 ## Behavior Specifications
 
+### PDR001SessionWorkflowCommands
+
+[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
+
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
+
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
+
+<details>
+<summary>DD-1 - Text output with section markers</summary>
+
+#### DD-1 - Text output with section markers
+
+Both scope-validate and handoff return string from the router, using
+=== SECTION === markers. Follows the dual output path where text
+commands bypass JSON.stringify.
+
+</details>
+
+<details>
+<summary>DD-2 - Git integration is opt-in via --git flag</summary>
+
+#### DD-2 - Git integration is opt-in via --git flag
+
+The handoff command accepts an optional --git flag. The CLI handler
+calls git diff and passes file list to the pure generator function.
+No shell dependency in domain logic.
+
+</details>
+
+<details>
+<summary>DD-3 - Session type inferred from FSM status</summary>
+
+#### DD-3 - Session type inferred from FSM status
+
+Handoff infers session type from pattern's current FSM status.
+An explicit --session flag overrides inference.
+
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
+
+</details>
+
+<details>
+<summary>DD-4 - Severity levels match Process Guard model</summary>
+
+#### DD-4 - Severity levels match Process Guard model
+
+Scope validation uses three severity levels:
+
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
+
+</details>
+
+<details>
+<summary>DD-5 - Current date only for handoff</summary>
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date. No --date flag.
+
+</details>
+
+<details>
+<summary>DD-6 - Both positional and flag forms for scope type</summary>
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+and --type flag.
+
+</details>
+
+<details>
+<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+both the data builder and the text formatter. Simpler than the
+context-assembler/context-formatter split.
+
+**Verified by:**
+
+- scope-validate outputs structured text
+- Active pattern infers implement session
+
+</details>
+
 ### ProcessStateAPIRelationshipQueries
 
 [View ProcessStateAPIRelationshipQueries source](delivery-process/specs/process-state-api-relationship-queries.feature)
@@ -1618,109 +1721,6 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
-### PDR001SessionWorkflowCommands
-
-[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
-
-**Context:**
-DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-readiness check) and `handoff` (session-end state summary) CLI subcommands.
-Seven design decisions affect how these commands behave.
-
-**Decision:**
-Seven design decisions (DD-1 through DD-7) captured as Rules below.
-
-<details>
-<summary>DD-1 - Text output with section markers</summary>
-
-#### DD-1 - Text output with section markers
-
-Both scope-validate and handoff return string from the router, using
-=== SECTION === markers. Follows the dual output path where text
-commands bypass JSON.stringify.
-
-</details>
-
-<details>
-<summary>DD-2 - Git integration is opt-in via --git flag</summary>
-
-#### DD-2 - Git integration is opt-in via --git flag
-
-The handoff command accepts an optional --git flag. The CLI handler
-calls git diff and passes file list to the pure generator function.
-No shell dependency in domain logic.
-
-</details>
-
-<details>
-<summary>DD-3 - Session type inferred from FSM status</summary>
-
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-An explicit --session flag overrides inference.
-
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
-
-</details>
-
-<details>
-<summary>DD-4 - Severity levels match Process Guard model</summary>
-
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
-
-</details>
-
-<details>
-<summary>DD-5 - Current date only for handoff</summary>
-
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date. No --date flag.
-
-</details>
-
-<details>
-<summary>DD-6 - Both positional and flag forms for scope type</summary>
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-and --type flag.
-
-</details>
-
-<details>
-<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-both the data builder and the text formatter. Simpler than the
-context-assembler/context-formatter split.
-
-**Verified by:**
-
-- scope-validate outputs structured text
-- Active pattern infers implement session
-
-</details>
-
 ### ValidatePatternsCli
 
 [View ValidatePatternsCli source](tests/features/cli/validate-patterns.feature)
@@ -2669,6 +2669,112 @@ the MasterDataset with filesystem existence checks.
 
 </details>
 
+### ScopeValidatorTests
+
+[View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
+
+**Problem:**
+Starting an implementation or design session without checking prerequisites
+wastes time when blockers are discovered mid-session.
+
+**Solution:**
+ScopeValidator runs composable checks and aggregates results into a verdict
+(ready, blocked, or warnings) before a session starts.
+
+<details>
+<summary>Implementation scope validation checks all prerequisites (7 scenarios)</summary>
+
+#### Implementation scope validation checks all prerequisites
+
+**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
+
+**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
+
+**Verified by:**
+
+- All implementation checks pass
+- Incomplete dependency blocks implementation
+- FSM transition from completed blocks implementation
+- Missing PDR references produce WARN
+- No deliverables blocks implementation
+- Strict mode promotes WARN to BLOCKED
+- Pattern not found throws error
+
+</details>
+
+<details>
+<summary>Design scope validation checks dependency stubs (2 scenarios)</summary>
+
+#### Design scope validation checks dependency stubs
+
+**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
+
+**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
+
+**Verified by:**
+
+- Design session with no dependencies passes
+- Design session with dependencies lacking stubs produces WARN
+
+</details>
+
+<details>
+<summary>Formatter produces structured text output (3 scenarios)</summary>
+
+#### Formatter produces structured text output
+
+**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
+
+**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
+
+**Verified by:**
+
+- Formatter produces markers per ADR-008
+- Formatter shows warnings verdict text
+- Formatter shows blocker details for blocked verdict
+
+</details>
+
+### HandoffGeneratorTests
+
+[View HandoffGeneratorTests source](tests/features/api/session-support/handoff-generator.feature)
+
+**Problem:**
+Multi-session work loses critical state between sessions when handoff
+documentation is manual or forgotten.
+
+**Solution:**
+HandoffGenerator assembles a structured handoff document from ProcessStateAPI
+and MasterDataset, capturing completed work, remaining items, discovered
+issues, and next-session priorities.
+
+#### Handoff generates compact session state summary
+
+**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
+
+**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
+
+**Verified by:**
+
+- Generate handoff for in-progress pattern
+- Handoff captures discovered items
+- Session type is inferred from status
+- Completed pattern infers review session type
+- Deferred pattern infers design session type
+- Files modified section included when provided
+- Blockers section shows incomplete dependencies
+- Pattern not found throws error
+
+#### Formatter produces structured text output
+
+**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
+
+**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
+
+**Verified by:**
+
+- Handoff formatter produces markers per ADR-008
+
 ### PatternSummarizeTests
 
 [View PatternSummarizeTests source](tests/features/api/output-shaping/summarize.feature)
@@ -2907,112 +3013,6 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 - Single character difference
 
 </details>
-
-### ScopeValidatorTests
-
-[View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
-
-**Problem:**
-Starting an implementation or design session without checking prerequisites
-wastes time when blockers are discovered mid-session.
-
-**Solution:**
-ScopeValidator runs composable checks and aggregates results into a verdict
-(ready, blocked, or warnings) before a session starts.
-
-<details>
-<summary>Implementation scope validation checks all prerequisites (7 scenarios)</summary>
-
-#### Implementation scope validation checks all prerequisites
-
-**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
-
-**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
-
-**Verified by:**
-
-- All implementation checks pass
-- Incomplete dependency blocks implementation
-- FSM transition from completed blocks implementation
-- Missing PDR references produce WARN
-- No deliverables blocks implementation
-- Strict mode promotes WARN to BLOCKED
-- Pattern not found throws error
-
-</details>
-
-<details>
-<summary>Design scope validation checks dependency stubs (2 scenarios)</summary>
-
-#### Design scope validation checks dependency stubs
-
-**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
-
-**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
-
-**Verified by:**
-
-- Design session with no dependencies passes
-- Design session with dependencies lacking stubs produces WARN
-
-</details>
-
-<details>
-<summary>Formatter produces structured text output (3 scenarios)</summary>
-
-#### Formatter produces structured text output
-
-**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
-
-**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
-
-**Verified by:**
-
-- Formatter produces markers per ADR-008
-- Formatter shows warnings verdict text
-- Formatter shows blocker details for blocked verdict
-
-</details>
-
-### HandoffGeneratorTests
-
-[View HandoffGeneratorTests source](tests/features/api/session-support/handoff-generator.feature)
-
-**Problem:**
-Multi-session work loses critical state between sessions when handoff
-documentation is manual or forgotten.
-
-**Solution:**
-HandoffGenerator assembles a structured handoff document from ProcessStateAPI
-and MasterDataset, capturing completed work, remaining items, discovered
-issues, and next-session priorities.
-
-#### Handoff generates compact session state summary
-
-**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
-
-**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
-
-**Verified by:**
-
-- Generate handoff for in-progress pattern
-- Handoff captures discovered items
-- Session type is inferred from status
-- Completed pattern infers review session type
-- Deferred pattern infers design session type
-- Files modified section included when provided
-- Blockers section shows incomplete dependencies
-- Pattern not found throws error
-
-#### Formatter produces structured text output
-
-**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
-
-**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
-
-**Verified by:**
-
-- Handoff formatter produces markers per ADR-008
 
 ### ContextFormatterTests
 
