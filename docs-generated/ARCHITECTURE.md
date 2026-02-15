@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 139 annotated source files across 11 bounded contexts.
+This diagram was auto-generated from 140 annotated source files across 11 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 139 |
+| Total Components | 140 |
 | Bounded Contexts | 11 |
 | Component Roles | 5 |
 
@@ -81,12 +81,12 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
+        TransformDataset["TransformDataset[service]"]
+        PipelineModule["PipelineModule"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         BuiltInGenerators["BuiltInGenerators"]
         DecisionDocGenerator["DecisionDocGenerator[service]"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
-        TransformDataset["TransformDataset[service]"]
-        PipelineModule["PipelineModule"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -179,6 +179,9 @@ graph TB
         ValidationModule["ValidationModule"]
         ResultMonadTypes["ResultMonadTypes"]
         ErrorFactoryTypes["ErrorFactoryTypes"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -187,16 +190,9 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
-        RenderableUtils["RenderableUtils"]
-        SectionBlock["SectionBlock"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
         CLIVersionHelper["CLIVersionHelper"]
         ValidatePatternsCLI["ValidatePatternsCLI"]
         LintProcessCLI["LintProcessCLI"]
@@ -204,6 +200,10 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -225,10 +225,10 @@ graph TB
         ProcessGuardModule["ProcessGuardModule"]
         DetectChanges["DetectChanges"]
         DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
-        PipelineModule["PipelineModule"]
         CodecBaseOptions["CodecBaseOptions"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
         ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
@@ -239,11 +239,12 @@ graph TB
         MvpWorkflowImplementation["MvpWorkflowImplementation"]
         LivingRoadmapCLI["LivingRoadmapCLI"]
         EffortVarianceTracking["EffortVarianceTracking"]
+        ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
         ProcessGuardTesting["ProcessGuardTesting"]
+        StringUtils["StringUtils"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
-        StringUtils["StringUtils"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
@@ -263,6 +264,24 @@ graph TB
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    GherkinExtractor --> GherkinASTParser
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -280,29 +299,11 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    GherkinExtractor --> GherkinASTParser
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
     GeneratorRegistry --> GeneratorTypes
     Documentation_Generation_Orchestrator --> Pattern_Scanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> Pattern_Scanner
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -332,17 +333,18 @@ graph TB
     ProcessGuardDecider --> FSMValidator
     ProcessGuardDecider --> DeriveProcessState
     ProcessGuardDecider --> DetectChanges
+    TransformDataset --> MasterDataset
+    PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    TransformDataset --> MasterDataset
-    PipelineModule --> TransformDataset
     ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
     StepDefinitionCompletion -.-> ADR002GherkinOnlyTesting
     SessionFileCleanup -.-> SessionFileLifecycle
     LivingRoadmapCLI -.-> MvpWorkflowImplementation
     EffortVarianceTracking -.-> MvpWorkflowImplementation
+    ConfigBasedWorkflowDefinition -.-> MvpWorkflowImplementation
     CliBehaviorTesting -.-> ADR002GherkinOnlyTesting
     ProcessGuardTesting -.-> AntiPatternDetector
     KebabCaseSlugs -.-> StringUtils
@@ -442,6 +444,7 @@ All components with architecture annotations:
 | ✅ Codec Base Options | - | - | - | src/renderable/codecs/types/base.ts |
 | ✅ Codec Generator Registration | - | - | - | src/generators/built-in/codec-generators.ts |
 | ✅ Codec Utils | - | - | - | src/validation-schemas/codec-utils.ts |
+| 📋 Config Based Workflow Definition | - | - | - | delivery-process/specs/config-based-workflow-definition.feature |
 | 🚧 Deliverable Status Taxonomy | - | - | - | src/taxonomy/deliverable-status.ts |
 | 🚧 Derive Process State | - | - | - | src/lint/process-guard/derive-state.ts |
 | 🚧 Detect Changes | - | - | - | src/lint/process-guard/detect-changes.ts |

@@ -173,6 +173,20 @@ Detail Level: Compact summary
 
 --- ArchitectureDelta ---
 
+--- TestContentBlocks ---
+
+| Rule                                                 | Description                                                                                                           |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Business rules appear as a separate section          | Rule descriptions provide context for why this business rule exists.<br> You can include multiple paragraphs here.... |
+| Multiple rules create multiple Business Rule entries | Each Rule keyword creates a separate entry in the Business Rules section.<br> This helps organize complex features... |
+
+--- RuleKeywordPoC ---
+
+| Rule                                       | Description                                                                      |
+| ------------------------------------------ | -------------------------------------------------------------------------------- |
+| Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
+| Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
+
 --- TableExtraction ---
 
 | Rule                                                    | Description                                                                                                             |
@@ -229,20 +243,6 @@ Detail Level: Compact summary
 | Source file shown as filename text                             |             |
 | Verified-by renders as checkbox list at standard level         |             |
 | Feature names are humanized from camelCase pattern names       |             |
-
---- TestContentBlocks ---
-
-| Rule                                                 | Description                                                                                                           |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Business rules appear as a separate section          | Rule descriptions provide context for why this business rule exists.<br> You can include multiple paragraphs here.... |
-| Multiple rules create multiple Business Rule entries | Each Rule keyword creates a separate entry in the Business Rules section.<br> This helps organize complex features... |
-
---- RuleKeywordPoC ---
-
-| Rule                                       | Description                                                                      |
-| ------------------------------------------ | -------------------------------------------------------------------------------- |
-| Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
-| Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
 
 --- WarningCollectorTesting ---
 

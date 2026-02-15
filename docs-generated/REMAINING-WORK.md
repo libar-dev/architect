@@ -7,13 +7,13 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 205/297 (69%)
+**Overall Progress:** [██████████████░░░░░░] 205/299 (69%)
 
 | Status | Count |
 | --- | --- |
 | 🚧 Active | 47 |
-| 📋 Planned | 45 |
-| **Total Remaining** | 92 |
+| 📋 Planned | 47 |
+| **Total Remaining** | 94 |
 
 ---
 
@@ -30,13 +30,13 @@
 | 📋 [RichContentHelpersTesting](remaining/phase-44-rich-content-helpers-testing.md) | 2 | 0 | 0% |
 | 🚧 [StepLintVitestCucumber](remaining/phase-50-step-lint-vitest-cucumber.md) | 1 | 1 | 0% |
 | 📋 [StepLintExtendedRules](remaining/phase-51-step-lint-extended-rules.md) | 1 | 0 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 4 | 0 | 50% |
+| 📋 [TypeScriptTaxonomyImplementation](remaining/phase-99-type-script-taxonomy-implementation.md) | 5 | 0 | 44% |
 | 📋 [TraceabilityEnhancements](remaining/phase-100-traceability-enhancements.md) | 11 | 0 | 15% |
 | 📋 [CliBehaviorTesting](remaining/phase-101-cli-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [CodecBehaviorTesting](remaining/phase-102-codec-behavior-testing.md) | 1 | 0 | 0% |
 | 📋 [StepDefinitionCompletion](remaining/phase-103-step-definition-completion.md) | 1 | 0 | 0% |
 | 📋 [GeneratorInfrastructureTesting](remaining/phase-104-generator-infrastructure-testing.md) | 1 | 0 | 0% |
-| 🚧 Backlog (No Phase) | 59 | 42 | 0% |
+| 🚧 Backlog (No Phase) | 60 | 42 | 0% |
 
 ---
 
@@ -45,7 +45,7 @@
 | Priority | Count |
 | --- | --- |
 | 🚧 In Progress | 47 |
-| ✅ Ready to Start | 42 |
+| ✅ Ready to Start | 44 |
 | ⚠️ Blocked | 3 |
 
 ### Top Ready to Start
@@ -57,9 +57,9 @@
 - Data API Relationship Graph (Phase 25)
 - Kebab Case Slugs (Phase 44)
 - Rich Content Helpers Testing (Phase 44)
+- Config Based Workflow Definition (Phase 99)
 - Prd Implementation Section (Phase 99)
 - Status Aware Eslint Suppression (Phase 99)
-- Streaming Git Diff (Phase 99)
 
 See phase detail files for full list.
 
@@ -75,6 +75,6 @@ Items ready to start (no blocking dependencies):
 - 📋 Data API Platform Integration (Phase 25) - 3d
 - 📋 Data API Relationship Graph (Phase 25) - 2d
 
-Showing 5 of 42 actionable items.
+Showing 5 of 44 actionable items.
 
 ---

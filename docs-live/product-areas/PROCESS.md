@@ -165,6 +165,7 @@ graph LR
     MvpWorkflowImplementation["MvpWorkflowImplementation"]
     LivingRoadmapCLI["LivingRoadmapCLI"]
     EffortVarianceTracking["EffortVarianceTracking"]
+    ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
     CliBehaviorTesting["CliBehaviorTesting"]
     SessionFileLifecycle["SessionFileLifecycle"]
     ADR003SourceFirstPatternArchitecture -.->|depends on| ADR001TaxonomyCanonicalValues
@@ -172,6 +173,7 @@ graph LR
     SessionFileCleanup -.->|depends on| SessionFileLifecycle
     LivingRoadmapCLI -.->|depends on| MvpWorkflowImplementation
     EffortVarianceTracking -.->|depends on| MvpWorkflowImplementation
+    ConfigBasedWorkflowDefinition -.->|depends on| MvpWorkflowImplementation
     CliBehaviorTesting -.->|depends on| ADR002GherkinOnlyTesting
 ```
 
@@ -973,5 +975,49 @@ maintaining a clean docs-living/sessions/ directory.
 - COMPLETED-MILESTONES.md serves as authoritative history (no session files needed)
 - Generator output tracks deleted files for transparency and debugging
 - Cleanup is idempotent and handles edge cases (missing dirs, empty state)
+
+<details>
+<summary>Orphaned session files are removed during generation (2 scenarios)</summary>
+
+#### Orphaned session files are removed during generation
+
+**Invariant:** Only session files for active phases are preserved; all other phase files must be deleted during cleanup and replaced with fresh content.
+
+**Verified by:**
+
+- Orphaned session files are deleted during generation
+- Active phase session files are preserved and regenerated
+
+</details>
+
+<details>
+<summary>Cleanup handles edge cases without errors (3 scenarios)</summary>
+
+#### Cleanup handles edge cases without errors
+
+**Invariant:** Cleanup must be idempotent, tolerate missing directories, and produce empty results when no phases are active.
+
+**Rationale:** Generator runs are not guarded by precondition checks for directory existence. Cleanup must never crash regardless of filesystem state.
+
+**Verified by:**
+
+- No active phases results in empty sessions directory
+- Cleanup is idempotent
+- Missing sessions directory is handled gracefully
+
+</details>
+
+<details>
+<summary>Deleted files are tracked in cleanup results (1 scenarios)</summary>
+
+#### Deleted files are tracked in cleanup results
+
+**Invariant:** The cleanup result must include the relative paths of all deleted session files for transparency and debugging.
+
+**Verified by:**
+
+- Deleted files are tracked in generator output
+
+</details>
 
 ---

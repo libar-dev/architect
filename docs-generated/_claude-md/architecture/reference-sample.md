@@ -104,10 +104,10 @@ Detail Level: Compact summary
 
 | Type | Kind |
 | --- | --- |
-| SectionBlock | type |
 | normalizeStatus | function |
 | DELIVERABLE_STATUS_VALUES | const |
 | CategoryDefinition | interface |
+| SectionBlock | type |
 
 
 === BEHAVIOR SPECIFICATIONS ===
@@ -138,6 +138,15 @@ Detail Level: Compact summary
 | Source ownership | **Invariant:** Relationship tags have defined ownership by source type.<br>    Anti-pattern detection enforces these... |
 | Quarter format convention | **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`).<br>    ISO-year-first sorting works... |
 | Deliverable status canonical values | **Invariant:** Deliverable status (distinct from pattern FSM status)<br>    uses exactly 6 values, enforced by Zod... |
+
+--- ConfigBasedWorkflowDefinition ---
+
+| Rule | Description |
+| --- | --- |
+| Default workflow is built from an inline constant | **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without<br>    file system access. It cannot fail. The... |
+| Custom workflow files still work via --workflow flag | **Invariant:** `loadWorkflowFromPath()` remains available for projects<br>    that need custom workflow definitions. The... |
+| FSM validation and Process Guard are not affected | **Invariant:** The FSM transition matrix, protection levels, and Process<br>    Guard rules remain hardcoded in... |
+| Workflow as a configurable preset field is deferred | Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and<br>    `DeliveryProcessProjectConfig` (project... |
 
 --- ProcessGuardTesting ---
 

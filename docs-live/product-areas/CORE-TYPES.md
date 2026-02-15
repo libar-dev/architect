@@ -487,4 +487,63 @@ union pattern for consistent, structured error handling.
 - formatDocError for human-readable output with all context fields
 - Error collection pattern that captures warnings without console output
 
+<details>
+<summary>isDocError type guard classifies errors correctly (3 scenarios)</summary>
+
+#### isDocError type guard classifies errors correctly
+
+**Invariant:** isDocError must return true for valid DocError instances and false for non-DocError values including null and undefined.
+
+**Verified by:**
+
+- isDocError detects valid DocError instances
+- isDocError rejects non-DocError objects
+- isDocError rejects null and undefined
+
+</details>
+
+<details>
+<summary>formatDocError produces structured human-readable output (2 scenarios)</summary>
+
+#### formatDocError produces structured human-readable output
+
+**Invariant:** formatDocError must include all context fields (error type, file path, line number) and render validation errors when present on pattern errors.
+
+**Verified by:**
+
+- formatDocError includes structured context
+- formatDocError includes validation errors for pattern errors
+
+</details>
+
+<details>
+<summary>Gherkin extractor collects errors without console side effects (3 scenarios)</summary>
+
+#### Gherkin extractor collects errors without console side effects
+
+**Invariant:** Extraction errors must include structured context (file path, pattern name, validation errors) and must never use console.warn to report warnings.
+
+**Rationale:** console.warn bypasses error collection, making warnings invisible to callers and untestable. Structured error objects enable programmatic handling across all consumers.
+
+**Verified by:**
+
+- Errors include structured context
+- No console.warn bypasses error collection
+- Skip feature files without @libar-docs opt-in
+
+</details>
+
+<details>
+<summary>CLI error handler formats unknown errors gracefully (1 scenarios)</summary>
+
+#### CLI error handler formats unknown errors gracefully
+
+**Invariant:** Unknown error values (non-DocError, non-Error) must be formatted as "Error: {value}" strings for safe display without crashing.
+
+**Verified by:**
+
+- handleCliError formats unknown errors
+
+</details>
+
 ---

@@ -2451,6 +2451,75 @@ Uses @libar-docs-decision, @libar-docs-replaces annotations.
 
 Implements Convergence Opportunity 5: Architecture Change Control.
 
+### TestContentBlocks
+
+[View TestContentBlocks source](tests/features/poc/test-content-blocks.feature)
+
+This feature demonstrates what content blocks are captured and rendered
+by the PRD generator. Use this as a reference for writing rich specs.
+
+**Overview**
+
+The delivery process supports **rich Markdown** in descriptions:
+
+- Bullet points work
+- _Italics_ and **bold** work
+- `inline code` works
+
+**Custom Section**
+
+You can create any section you want using bold headers.
+This content will appear in the PRD Description section.
+
+#### Business rules appear as a separate section
+
+Rule descriptions provide context for why this business rule exists.
+You can include multiple paragraphs here.
+
+    This is a second paragraph explaining edge cases or exceptions.
+
+**Verified by:**
+
+- Scenario with DocString for rich content
+- Scenario with DataTable for structured data
+
+#### Multiple rules create multiple Business Rule entries
+
+Each Rule keyword creates a separate entry in the Business Rules section.
+This helps organize complex features into logical business domains.
+
+**Verified by:**
+
+- Simple scenario under second rule
+- Scenario with examples table
+
+### RuleKeywordPoC
+
+[View RuleKeywordPoC source](tests/features/poc/rule-keyword-poc.feature)
+
+This feature tests whether vitest-cucumber supports the Rule keyword
+for organizing scenarios under business rules.
+
+#### Basic arithmetic operations work correctly
+
+The calculator should perform standard math operations
+with correct results.
+
+**Verified by:**
+
+- Addition of two positive numbers
+- Subtraction of two numbers
+
+#### Division has special constraints
+
+Division by zero must be handled gracefully to prevent
+system errors.
+
+**Verified by:**
+
+- Division of two numbers
+- Division by zero is prevented
+
 ### TableExtraction
 
 [View TableExtraction source](tests/features/generators/table-extraction.feature)
@@ -2787,75 +2856,6 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - Testing suffix is stripped from feature names
 
 </details>
-
-### TestContentBlocks
-
-[View TestContentBlocks source](tests/features/poc/test-content-blocks.feature)
-
-This feature demonstrates what content blocks are captured and rendered
-by the PRD generator. Use this as a reference for writing rich specs.
-
-**Overview**
-
-The delivery process supports **rich Markdown** in descriptions:
-
-- Bullet points work
-- _Italics_ and **bold** work
-- `inline code` works
-
-**Custom Section**
-
-You can create any section you want using bold headers.
-This content will appear in the PRD Description section.
-
-#### Business rules appear as a separate section
-
-Rule descriptions provide context for why this business rule exists.
-You can include multiple paragraphs here.
-
-    This is a second paragraph explaining edge cases or exceptions.
-
-**Verified by:**
-
-- Scenario with DocString for rich content
-- Scenario with DataTable for structured data
-
-#### Multiple rules create multiple Business Rule entries
-
-Each Rule keyword creates a separate entry in the Business Rules section.
-This helps organize complex features into logical business domains.
-
-**Verified by:**
-
-- Simple scenario under second rule
-- Scenario with examples table
-
-### RuleKeywordPoC
-
-[View RuleKeywordPoC source](tests/features/poc/rule-keyword-poc.feature)
-
-This feature tests whether vitest-cucumber supports the Rule keyword
-for organizing scenarios under business rules.
-
-#### Basic arithmetic operations work correctly
-
-The calculator should perform standard math operations
-with correct results.
-
-**Verified by:**
-
-- Addition of two positive numbers
-- Subtraction of two numbers
-
-#### Division has special constraints
-
-Division by zero must be handled gracefully to prevent
-system errors.
-
-**Verified by:**
-
-- Division of two numbers
-- Division by zero is prevented
 
 ### WarningCollectorTesting
 

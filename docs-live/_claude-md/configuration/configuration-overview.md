@@ -39,6 +39,17 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- DEFAULT_WORKFLOW_CONFIG — Inline Default Workflow Constant ---
+
+--- ConfigBasedWorkflowDefinition ---
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Default workflow is built from an inline constant    | **Invariant:** `loadDefaultWorkflow()` returns a `LoadedWorkflow` without<br> file system access. It cannot fail. The... |
+| Custom workflow files still work via --workflow flag | **Invariant:** `loadWorkflowFromPath()` remains available for projects<br> that need custom workflow definitions. The... |
+| FSM validation and Process Guard are not affected    | **Invariant:** The FSM transition matrix, protection levels, and Process<br> Guard rules remain hardcoded in...          |
+| Workflow as a configurable preset field is deferred  | Adding `workflow` as a field on `DeliveryProcessConfig` (presets) and<br> `DeliveryProcessProjectConfig` (project...     |
+
 --- SourceMerging ---
 
 | Rule                                                | Description                                                                                                            |

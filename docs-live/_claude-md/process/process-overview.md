@@ -180,3 +180,9 @@ Detail Level: Compact summary
 | Edge cases and acceptance criteria ensure robustness          | **Invariant:** Handoff context must degrade gracefully when no discoveries exist and must be disableable. Mid-phase...  |
 
 --- SessionFileLifecycle ---
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Orphaned session files are removed during generation | **Invariant:** Only session files for active phases are preserved; all other phase files must be deleted during...       |
+| Cleanup handles edge cases without errors            | **Invariant:** Cleanup must be idempotent, tolerate missing directories, and produce empty results when no phases are... |
+| Deleted files are tracked in cleanup results         | **Invariant:** The cleanup result must include the relative paths of all deleted session files for transparency and...   |

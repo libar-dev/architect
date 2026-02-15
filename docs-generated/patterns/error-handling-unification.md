@@ -110,6 +110,42 @@ All CLI commands and extractors should use the DocError discriminated
 - When handleCliError formats the error
 - Then the output should contain "Error: string error"
 
+## Business Rules
+
+**isDocError type guard classifies errors correctly**
+
+**Invariant:** isDocError must return true for valid DocError instances and false for non-DocError values including null and undefined.
+
+      **Verified by:** isDocError detects valid DocError instances, isDocError rejects non-DocError objects, isDocError rejects null and undefined
+
+_Verified by: isDocError detects valid DocError instances, isDocError rejects non-DocError objects, isDocError rejects null and undefined_
+
+**formatDocError produces structured human-readable output**
+
+**Invariant:** formatDocError must include all context fields (error type, file path, line number) and render validation errors when present on pattern errors.
+
+      **Verified by:** formatDocError includes structured context, formatDocError includes validation errors for pattern errors
+
+_Verified by: formatDocError includes structured context, formatDocError includes validation errors for pattern errors_
+
+**Gherkin extractor collects errors without console side effects**
+
+**Invariant:** Extraction errors must include structured context (file path, pattern name, validation errors) and must never use console.warn to report warnings.
+
+      **Rationale:** console.warn bypasses error collection, making warnings invisible to callers and untestable. Structured error objects enable programmatic handling across all consumers.
+
+      **Verified by:** Errors include structured context, No console.warn bypasses error collection, Skip feature files without @libar-docs opt-in
+
+_Verified by: Errors include structured context, No console.warn bypasses error collection, Skip feature files without @libar-docs opt-in_
+
+**CLI error handler formats unknown errors gracefully**
+
+**Invariant:** Unknown error values (non-DocError, non-Error) must be formatted as "Error: {value}" strings for safe display without crashing.
+
+      **Verified by:** handleCliError formats unknown errors
+
+_Verified by: handleCliError formats unknown errors_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

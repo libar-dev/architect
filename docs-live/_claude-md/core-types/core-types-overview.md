@@ -65,3 +65,10 @@ Detail Level: Compact summary
 | Phase slugs use kebab-case for names  | **Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format...           |
 
 --- ErrorHandlingUnification ---
+
+| Rule                                                           | Description                                                                                                             |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| isDocError type guard classifies errors correctly              | **Invariant:** isDocError must return true for valid DocError instances and false for non-DocError values including...  |
+| formatDocError produces structured human-readable output       | **Invariant:** formatDocError must include all context fields (error type, file path, line number) and render...        |
+| Gherkin extractor collects errors without console side effects | **Invariant:** Extraction errors must include structured context (file path, pattern name, validation errors) and...    |
+| CLI error handler formats unknown errors gracefully            | **Invariant:** Unknown error values (non-DocError, non-Error) must be formatted as "Error: {value}" strings for safe... |

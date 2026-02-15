@@ -62,8 +62,6 @@
 
 ## Recent Completions
 
-- ✅ Handoff Generator Tests
-- ✅ Scope Validator Tests
 - ✅ Arch Index Dataset
 - ✅ Arch Tag Extraction
 - ✅ Component Diagram Generation
@@ -72,6 +70,8 @@
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
+- ✅ Planning Codec Testing
+- ✅ Pr Changes Codec Testing
 
 Showing 10 of 205 completed patterns. See quarterly files for full history.
 

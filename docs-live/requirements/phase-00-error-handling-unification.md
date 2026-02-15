@@ -6,27 +6,29 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | completed |
 | Product Area | CoreTypes |
 
 ## Description
 
 All CLI commands and extractors should use the DocError discriminated
-  union pattern for consistent, structured error handling.
+union pattern for consistent, structured error handling.
 
-  **Problem:**
-  - Raw errors lack context (no file path, line number, or pattern name)
-  - Inconsistent error formats across CLI, scanner, and extractor
-  - console.warn bypasses error collection, losing validation warnings
-  - Unknown errors produce unhelpful messages
+**Problem:**
 
-  **Solution:**
-  - DocError discriminated union with structured context (type, file, line, reason)
-  - isDocError type guard for safe error classification
-  - formatDocError for human-readable output with all context fields
-  - Error collection pattern that captures warnings without console output
+- Raw errors lack context (no file path, line number, or pattern name)
+- Inconsistent error formats across CLI, scanner, and extractor
+- console.warn bypasses error collection, losing validation warnings
+- Unknown errors produce unhelpful messages
+
+**Solution:**
+
+- DocError discriminated union with structured context (type, file, line, reason)
+- isDocError type guard for safe error classification
+- formatDocError for human-readable output with all context fields
+- Error collection pattern that captures warnings without console output
 
 ## Acceptance Criteria
 
@@ -56,11 +58,11 @@ All CLI commands and extractors should use the DocError discriminated
 - And the formatted output should contain the file path "File: /path/to/src.ts"
 - And the formatted output should contain the line number "Line: 42"
 
-| field | value |
-| --- | --- |
-| file | /path/to/src.ts |
-| line | 42 |
-| reason | Syntax error |
+| field  | value           |
+| ------ | --------------- |
+| file   | /path/to/src.ts |
+| line   | 42              |
+| reason | Syntax error    |
 
 **formatDocError includes validation errors for pattern errors**
 
@@ -70,11 +72,11 @@ All CLI commands and extractors should use the DocError discriminated
 - And the formatted output should contain "Validation errors:"
 - And the formatted output should contain the first validation error "id: Required"
 
-| field | value |
-| --- | --- |
-| file | test.feature |
-| patternName | TestPattern |
-| reason | Schema failed |
+| field            | value                                |
+| ---------------- | ------------------------------------ |
+| file             | test.feature                         |
+| patternName      | TestPattern                          |
+| reason           | Schema failed                        |
 | validationErrors | id: Required, category: Invalid enum |
 
 **Errors include structured context**
@@ -104,6 +106,42 @@ All CLI commands and extractors should use the DocError discriminated
 - Given an unknown error value "string error"
 - When handleCliError formats the error
 - Then the output should contain "Error: string error"
+
+## Business Rules
+
+**isDocError type guard classifies errors correctly**
+
+**Invariant:** isDocError must return true for valid DocError instances and false for non-DocError values including null and undefined.
+
+      **Verified by:** isDocError detects valid DocError instances, isDocError rejects non-DocError objects, isDocError rejects null and undefined
+
+_Verified by: isDocError detects valid DocError instances, isDocError rejects non-DocError objects, isDocError rejects null and undefined_
+
+**formatDocError produces structured human-readable output**
+
+**Invariant:** formatDocError must include all context fields (error type, file path, line number) and render validation errors when present on pattern errors.
+
+      **Verified by:** formatDocError includes structured context, formatDocError includes validation errors for pattern errors
+
+_Verified by: formatDocError includes structured context, formatDocError includes validation errors for pattern errors_
+
+**Gherkin extractor collects errors without console side effects**
+
+**Invariant:** Extraction errors must include structured context (file path, pattern name, validation errors) and must never use console.warn to report warnings.
+
+      **Rationale:** console.warn bypasses error collection, making warnings invisible to callers and untestable. Structured error objects enable programmatic handling across all consumers.
+
+      **Verified by:** Errors include structured context, No console.warn bypasses error collection, Skip feature files without @libar-docs opt-in
+
+_Verified by: Errors include structured context, No console.warn bypasses error collection, Skip feature files without @libar-docs opt-in_
+
+**CLI error handler formats unknown errors gracefully**
+
+**Invariant:** Unknown error values (non-DocError, non-Error) must be formatted as "Error: {value}" strings for safe display without crashing.
+
+      **Verified by:** handleCliError formats unknown errors
+
+_Verified by: handleCliError formats unknown errors_
 
 ---
 

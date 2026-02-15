@@ -9,7 +9,7 @@
  * Registers all reference document generators. Each config produces
  * TWO generators: detailed (docs/) and summary (_claude-md/).
  */
-import { heading, paragraph, separator, table, document, } from '../../renderable/schema.js';
+import { heading, paragraph, separator, table, document } from '../../renderable/schema.js';
 import { renderToMarkdown, renderToClaudeContext } from '../../renderable/render.js';
 import { createReferenceCodec, PRODUCT_AREA_META, buildScopedDiagram, } from '../../renderable/codecs/reference.js';
 import { toKebabCase } from '../../utils/string-utils.js';
