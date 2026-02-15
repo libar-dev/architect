@@ -672,7 +672,7 @@ function humanizeFeatureName(name) {
  * Uses case-insensitive comparison to catch near-duplicates like
  * "Standard level includes source link-out" vs "Standard level includes source link-out".
  */
-function deduplicateScenarioNames(scenarioNames, verifiedBy) {
+export function deduplicateScenarioNames(scenarioNames, verifiedBy) {
     const seen = new Map(); // lowercase → original
     for (const name of scenarioNames) {
         const key = name.toLowerCase().trim();

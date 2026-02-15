@@ -149,24 +149,6 @@ Detail Level: Compact summary
 | Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
 | Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |
 
---- ContextFormatterTests ---
-
-| Rule                                                 | Description                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
-| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
-| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
-| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
-
---- ContextAssemblerTests ---
-
-| Rule                                                      | Description                                                                                                              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
-| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
-| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
-| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
-
 --- PatternSummarizeTests ---
 
 | Rule                                         | Description                                                                                                             |
@@ -199,3 +181,21 @@ Detail Level: Compact summary
 | Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
+
+--- ContextFormatterTests ---
+
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
+| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
+| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
+| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
+
+--- ContextAssemblerTests ---
+
+| Rule                                                      | Description                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
+| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
+| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
+| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |

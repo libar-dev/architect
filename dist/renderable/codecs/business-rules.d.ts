@@ -322,10 +322,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -603,10 +603,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -845,10 +845,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1087,10 +1087,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1333,10 +1333,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -1582,10 +1582,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1824,10 +1824,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2067,10 +2067,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2309,10 +2309,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2551,10 +2551,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -2793,10 +2793,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3061,10 +3061,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3303,10 +3303,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3545,10 +3545,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3787,10 +3787,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4029,10 +4029,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4070,4 +4070,11 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
     sections: z.ZodArray<z.ZodAny>;
     additionalFiles: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodAny>>;
 }, z.core.$strip>>;
+/**
+ * Deduplicate scenario names from Rule block and **Verified by:** annotation.
+ *
+ * Uses case-insensitive comparison to catch near-duplicates like
+ * "Standard level includes source link-out" vs "Standard level includes source link-out".
+ */
+export declare function deduplicateScenarioNames(scenarioNames: readonly string[], verifiedBy: readonly string[] | undefined): string[];
 //# sourceMappingURL=business-rules.d.ts.map

@@ -236,7 +236,7 @@ function generateWithoutReleaseFilter(): void {
 
 const feature = await loadFeature('tests/features/behavior/pr-changes-generation.feature');
 
-describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
+describeFeature(feature, ({ AfterEachScenario, Rule }) => {
   AfterEachScenario(() => {
     state = null;
   });
@@ -245,75 +245,101 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
   // Release Version Filtering
   // ===========================================================================
 
-  Scenario('Filter phases by specific release version', ({ Given, When, Then, And }) => {
-    Given(
-      'completed phases tagged with different releases:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
-        setupCompletedPhasesWithReleases(dataTable);
+  Rule('Release version filtering controls which phases appear in output', ({ RuleScenario }) => {
+    RuleScenario('Filter phases by specific release version', ({ Given, When, Then, And }) => {
+      Given(
+        'completed phases tagged with different releases:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          setupCompletedPhasesWithReleases(dataTable);
+        }
+      );
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        generateWithReleaseFilter('v0.2.0');
+      });
+
+      Then('the output should contain "Critical Fixes"', () => assertContains('Critical Fixes'));
+      And('the output should contain "Error Handling"', () => assertContains('Error Handling'));
+      And('the output should not contain "Foundation"', () => assertNotContains('Foundation'));
+      And('the output should not contain "Core Types"', () => assertNotContains('Core Types'));
+    });
+
+    RuleScenario(
+      'Show all active and completed phases when no releaseFilter',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'completed phases with mixed release status:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            setupCompletedPhasesWithUnreleasedMix(dataTable);
+          }
+        );
+
+        When('generating PR changes without releaseFilter', () => {
+          generateWithoutReleaseFilter();
+        });
+
+        Then('the output should contain "Session Handoffs"', () =>
+          assertContains('Session Handoffs')
+        );
+        And('the output should contain "Changelog Gen"', () => assertContains('Changelog Gen'));
+        And('the output should contain "Foundation"', () => assertContains('Foundation'));
       }
     );
 
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      generateWithReleaseFilter('v0.2.0');
-    });
+    RuleScenario(
+      'Active phases with matching deliverables are included',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'phases with different statuses and deliverables:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            setupMixedStatusPhases(dataTable);
+          }
+        );
 
-    Then('the output should contain "Critical Fixes"', () => assertContains('Critical Fixes'));
-    And('the output should contain "Error Handling"', () => assertContains('Error Handling'));
-    And('the output should not contain "Foundation"', () => assertNotContains('Foundation'));
-    And('the output should not contain "Core Types"', () => assertNotContains('Core Types'));
+        When('generating PR changes with releaseFilter "v0.3.0"', () => {
+          generateWithReleaseFilter('v0.3.0');
+        });
+
+        Then('the output should contain "Documentation"', () => assertContains('Documentation'));
+        And('the output should not contain "Previous Work"', () =>
+          assertNotContains('Previous Work')
+        );
+        And('the output should not contain "Future Work"', () => assertNotContains('Future Work'));
+      }
+    );
+
+    RuleScenario(
+      'Roadmap phases are excluded even with matching deliverables',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'phases with different statuses and deliverables:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            setupMixedStatusPhases(dataTable);
+          }
+        );
+
+        When('generating PR changes with releaseFilter "v1.0.0"', () => {
+          generateWithReleaseFilter('v1.0.0');
+        });
+
+        Then('the output should contain "Active Feature"', () => assertContains('Active Feature'));
+        And('the output should not contain "Planned Feature"', () =>
+          assertNotContains('Planned Feature')
+        );
+      }
+    );
   });
 
-  Scenario(
-    'Show all active and completed phases when no releaseFilter',
-    ({ Given, When, Then, And }) => {
+  // ===========================================================================
+  // Phase Grouping
+  // ===========================================================================
+
+  Rule('Patterns are grouped by phase number in the output', ({ RuleScenario }) => {
+    RuleScenario('Patterns grouped by phase number', ({ Given, When, Then, And }) => {
       Given(
-        'completed phases with mixed release status:',
+        'completed phases with different workflows:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
-          setupCompletedPhasesWithUnreleasedMix(dataTable);
-        }
-      );
-
-      When('generating PR changes without releaseFilter', () => {
-        generateWithoutReleaseFilter();
-      });
-
-      Then('the output should contain "Session Handoffs"', () =>
-        assertContains('Session Handoffs')
-      );
-      And('the output should contain "Changelog Gen"', () => assertContains('Changelog Gen'));
-      And('the output should contain "Foundation"', () => assertContains('Foundation'));
-    }
-  );
-
-  Scenario(
-    'Active phases with matching deliverables are included',
-    ({ Given, When, Then, And }) => {
-      Given(
-        'phases with different statuses and deliverables:',
-        (_ctx: unknown, dataTable: DataTableRow[]) => {
-          setupMixedStatusPhases(dataTable);
-        }
-      );
-
-      When('generating PR changes with releaseFilter "v0.3.0"', () => {
-        generateWithReleaseFilter('v0.3.0');
-      });
-
-      Then('the output should contain "Documentation"', () => assertContains('Documentation'));
-      And('the output should not contain "Previous Work"', () =>
-        assertNotContains('Previous Work')
-      );
-      And('the output should not contain "Future Work"', () => assertNotContains('Future Work'));
-    }
-  );
-
-  Scenario(
-    'Roadmap phases are excluded even with matching deliverables',
-    ({ Given, When, Then, And }) => {
-      Given(
-        'phases with different statuses and deliverables:',
-        (_ctx: unknown, dataTable: DataTableRow[]) => {
-          setupMixedStatusPhases(dataTable);
+          setupCompletedPhasesWithReleases(dataTable);
         }
       );
 
@@ -321,363 +347,404 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         generateWithReleaseFilter('v1.0.0');
       });
 
-      Then('the output should contain "Active Feature"', () => assertContains('Active Feature'));
-      And('the output should not contain "Planned Feature"', () =>
-        assertNotContains('Planned Feature')
+      Then('the output should contain "## Changes by Phase"', () =>
+        assertContains('## Changes by Phase')
       );
-    }
-  );
-
-  // ===========================================================================
-  // Phase Grouping
-  // ===========================================================================
-
-  Scenario('Patterns grouped by phase number', ({ Given, When, Then, And }) => {
-    Given(
-      'completed phases with different workflows:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
-        setupCompletedPhasesWithReleases(dataTable);
-      }
-    );
-
-    When('generating PR changes with releaseFilter "v1.0.0"', () => {
-      generateWithReleaseFilter('v1.0.0');
+      And('the output should contain "### Phase 1"', () => assertContains('### Phase 1'));
+      And('the output should contain "### Phase 2"', () => assertContains('### Phase 2'));
+      And('the output should contain "### Phase 3"', () => assertContains('### Phase 3'));
+      And('the output should contain "### Phase 4"', () => assertContains('### Phase 4'));
     });
-
-    Then('the output should contain "## Changes by Phase"', () =>
-      assertContains('## Changes by Phase')
-    );
-    And('the output should contain "### Phase 1"', () => assertContains('### Phase 1'));
-    And('the output should contain "### Phase 2"', () => assertContains('### Phase 2'));
-    And('the output should contain "### Phase 3"', () => assertContains('### Phase 3'));
-    And('the output should contain "### Phase 4"', () => assertContains('### Phase 4'));
   });
 
   // ===========================================================================
   // Summary Statistics
   // ===========================================================================
 
-  Scenario('Summary shows pattern counts in table format', ({ Given, When, Then, And }) => {
-    Given('completed phases with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      for (const row of dataTable) {
-        const name = row.Name ?? '';
-        const deliverableCount = parseInt(row.Deliverables ?? '1', 10);
-        const deliverables = Array.from({ length: deliverableCount }, (_, i) => ({
-          name: `${name} Deliverable ${i + 1}`,
-          status: 'complete',
-          tests: 1,
-          location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/item${i + 1}/`,
-          release: row.Release ?? undefined,
-        })) satisfies TestDeliverable[];
-        state.patterns.push(
-          createTestPattern({
-            name: row.Name ?? 'Unnamed',
-            phase: parseInt(row.Phase ?? '0', 10),
-            status: 'completed',
-            workflow: row.Workflow ?? 'implementation',
-            deliverables,
-          })
-        );
-      }
+  Rule('Summary statistics provide a high-level overview of the PR', ({ RuleScenario }) => {
+    RuleScenario('Summary shows pattern counts in table format', ({ Given, When, Then, And }) => {
+      Given('completed phases with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        for (const row of dataTable) {
+          const name = row.Name ?? '';
+          const deliverableCount = parseInt(row.Deliverables ?? '1', 10);
+          const deliverables = Array.from({ length: deliverableCount }, (_, i) => ({
+            name: `${name} Deliverable ${i + 1}`,
+            status: 'complete',
+            tests: 1,
+            location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/item${i + 1}/`,
+            release: row.Release ?? undefined,
+          })) satisfies TestDeliverable[];
+          state.patterns.push(
+            createTestPattern({
+              name: row.Name ?? 'Unnamed',
+              phase: parseInt(row.Phase ?? '0', 10),
+              status: 'completed',
+              workflow: row.Workflow ?? 'implementation',
+              deliverables,
+            })
+          );
+        }
+      });
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        generateWithReleaseFilter('v0.2.0');
+      });
+
+      Then('the output should contain "## Summary"', () => assertContains('## Summary'));
+      And('the output should contain "Patterns in PR"', () => assertContains('Patterns in PR'));
+      And('the output should contain "Completed"', () => assertContains('Completed'));
     });
 
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      generateWithReleaseFilter('v0.2.0');
+    RuleScenario('Summary shows release tag when filtering', ({ Given, When, Then, And }) => {
+      Given('completed phases with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        for (const row of dataTable) {
+          const name = row.Name ?? '';
+          const deliverableCount = parseInt(row.Deliverables ?? '1', 10);
+          const deliverables = Array.from({ length: deliverableCount }, (_, i) => ({
+            name: `${name} Deliverable ${i + 1}`,
+            status: 'complete',
+            tests: 1,
+            location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/item${i + 1}/`,
+            release: row.Release ?? undefined,
+          })) satisfies TestDeliverable[];
+          state.patterns.push(
+            createTestPattern({
+              name: row.Name ?? 'Unnamed',
+              phase: parseInt(row.Phase ?? '0', 10),
+              status: 'completed',
+              workflow: row.Workflow ?? 'implementation',
+              deliverables,
+            })
+          );
+        }
+      });
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        generateWithReleaseFilter('v0.2.0');
+      });
+
+      Then('the output should contain "## Summary"', () => assertContains('## Summary'));
+      And('the output should contain "Release Tag"', () => assertContains('Release Tag'));
+      And('the output should contain "v0.2.0"', () => assertContains('v0.2.0'));
     });
-
-    Then('the output should contain "## Summary"', () => assertContains('## Summary'));
-    And('the output should contain "Patterns in PR"', () => assertContains('Patterns in PR'));
-    And('the output should contain "Completed"', () => assertContains('Completed'));
-  });
-
-  Scenario('Summary shows release tag when filtering', ({ Given, When, Then, And }) => {
-    Given('completed phases with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      for (const row of dataTable) {
-        const name = row.Name ?? '';
-        const deliverableCount = parseInt(row.Deliverables ?? '1', 10);
-        const deliverables = Array.from({ length: deliverableCount }, (_, i) => ({
-          name: `${name} Deliverable ${i + 1}`,
-          status: 'complete',
-          tests: 1,
-          location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/item${i + 1}/`,
-          release: row.Release ?? undefined,
-        })) satisfies TestDeliverable[];
-        state.patterns.push(
-          createTestPattern({
-            name: row.Name ?? 'Unnamed',
-            phase: parseInt(row.Phase ?? '0', 10),
-            status: 'completed',
-            workflow: row.Workflow ?? 'implementation',
-            deliverables,
-          })
-        );
-      }
-    });
-
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      generateWithReleaseFilter('v0.2.0');
-    });
-
-    Then('the output should contain "## Summary"', () => assertContains('## Summary'));
-    And('the output should contain "Release Tag"', () => assertContains('Release Tag'));
-    And('the output should contain "v0.2.0"', () => assertContains('v0.2.0'));
   });
 
   // ===========================================================================
   // Deliverables Display
   // ===========================================================================
 
-  Scenario('Deliverables shown inline with patterns', ({ Given, When, Then, And }) => {
-    Given('completed phase 23 with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const deliverables = dataTable.map((row) => ({
-        name: row.Name ?? 'Unnamed',
-        status: row.Status ?? 'complete',
-        tests: parseInt(row.Tests ?? '0', 10),
-        location: row.Location ?? 'src/',
-        release: 'v0.2.0',
-      })) satisfies TestDeliverable[];
-      state.patterns.push(
-        createTestPattern({
-          name: 'Phase 23 Pattern',
-          phase: 23,
-          status: 'completed',
-          workflow: 'implementation',
-          deliverables,
-        })
+  Rule('Deliverables are displayed inline with their parent patterns', ({ RuleScenario }) => {
+    RuleScenario('Deliverables shown inline with patterns', ({ Given, When, Then, And }) => {
+      Given('completed phase 23 with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const deliverables = dataTable.map((row) => ({
+          name: row.Name ?? 'Unnamed',
+          status: row.Status ?? 'complete',
+          tests: parseInt(row.Tests ?? '0', 10),
+          location: row.Location ?? 'src/',
+          release: 'v0.2.0',
+        })) satisfies TestDeliverable[];
+        state.patterns.push(
+          createTestPattern({
+            name: 'Phase 23 Pattern',
+            phase: 23,
+            status: 'completed',
+            workflow: 'implementation',
+            deliverables,
+          })
+        );
+      });
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: true };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('the output should contain "Deliverables:"', () => assertContains('Deliverables:'));
+      And('the output should contain "Fix parseArgs bug"', () =>
+        assertContains('Fix parseArgs bug')
+      );
+      And('the output should contain "Add --version flag"', () =>
+        assertContains('Add --version flag')
+      );
+      And('the output should contain "Update README language"', () =>
+        assertContains('Update README language')
       );
     });
 
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: true };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+    RuleScenario('Deliverables show release tags', ({ Given, When, Then }) => {
+      Given('completed phase 23 with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        state = initState();
+        const deliverables = dataTable.map((row) => ({
+          name: row.Name ?? 'Unnamed',
+          status: row.Status ?? 'complete',
+          tests: parseInt(row.Tests ?? '0', 10),
+          location: row.Location ?? 'src/',
+          release: 'v0.2.0',
+        })) satisfies TestDeliverable[];
+        state.patterns.push(
+          createTestPattern({
+            name: 'Phase 23 Pattern',
+            phase: 23,
+            status: 'completed',
+            workflow: 'implementation',
+            deliverables,
+          })
+        );
+      });
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: true };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('the output should contain "(v0.2.0)"', () => assertContains('(v0.2.0)'));
     });
-
-    Then('the output should contain "Deliverables:"', () => assertContains('Deliverables:'));
-    And('the output should contain "Fix parseArgs bug"', () => assertContains('Fix parseArgs bug'));
-    And('the output should contain "Add --version flag"', () =>
-      assertContains('Add --version flag')
-    );
-    And('the output should contain "Update README language"', () =>
-      assertContains('Update README language')
-    );
-  });
-
-  Scenario('Deliverables show release tags', ({ Given, When, Then }) => {
-    Given('completed phase 23 with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      const deliverables = dataTable.map((row) => ({
-        name: row.Name ?? 'Unnamed',
-        status: row.Status ?? 'complete',
-        tests: parseInt(row.Tests ?? '0', 10),
-        location: row.Location ?? 'src/',
-        release: 'v0.2.0',
-      })) satisfies TestDeliverable[];
-      state.patterns.push(
-        createTestPattern({
-          name: 'Phase 23 Pattern',
-          phase: 23,
-          status: 'completed',
-          workflow: 'implementation',
-          deliverables,
-        })
-      );
-    });
-
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: true };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-    });
-
-    Then('the output should contain "(v0.2.0)"', () => assertContains('(v0.2.0)'));
   });
 
   // ===========================================================================
   // Review Checklist
   // ===========================================================================
 
-  Scenario(
-    'Review checklist includes standard code quality items',
-    ({ Given, When, Then, And }) => {
-      Given('completed phase 23 with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-        state = initState();
-        const deliverables = dataTable.map((row) => ({
-          name: row.Name ?? 'Unnamed',
-          status: row.Status ?? 'complete',
-          tests: parseInt(row.Tests ?? '0', 10),
-          location: row.Location ?? 'src/',
-          release: 'v0.2.0',
-        })) satisfies TestDeliverable[];
-        state.patterns.push(
-          createTestPattern({
-            name: 'Phase 23 Pattern',
-            phase: 23,
-            status: 'completed',
-            workflow: 'implementation',
-            deliverables,
-          })
+  Rule('Review checklist includes standard code quality verification items', ({ RuleScenario }) => {
+    RuleScenario(
+      'Review checklist includes standard code quality items',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'completed phase 23 with deliverables:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            state = initState();
+            const deliverables = dataTable.map((row) => ({
+              name: row.Name ?? 'Unnamed',
+              status: row.Status ?? 'complete',
+              tests: parseInt(row.Tests ?? '0', 10),
+              location: row.Location ?? 'src/',
+              release: 'v0.2.0',
+            })) satisfies TestDeliverable[];
+            state.patterns.push(
+              createTestPattern({
+                name: 'Phase 23 Pattern',
+                phase: 23,
+                status: 'completed',
+                workflow: 'implementation',
+                deliverables,
+              })
+            );
+          }
         );
-      });
 
-      When('generating PR changes with releaseFilter "v0.2.0"', () => {
-        state!.dataset = buildDataset();
-        state!.options = { releaseFilter: 'v0.2.0', includeReviewChecklist: true };
-        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-      });
+        When('generating PR changes with releaseFilter "v0.2.0"', () => {
+          state!.dataset = buildDataset();
+          state!.options = { releaseFilter: 'v0.2.0', includeReviewChecklist: true };
+          state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+        });
 
-      Then('the output should contain "## Review Checklist"', () =>
-        assertContains('## Review Checklist')
-      );
-      And('the output should contain "- [ ] Code follows project conventions"', () =>
-        assertContains('- [ ] Code follows project conventions')
-      );
-      And('the output should contain "- [ ] Tests added/updated for changes"', () =>
-        assertContains('- [ ] Tests added/updated for changes')
-      );
-      And('the output should contain "- [ ] Documentation updated if needed"', () =>
-        assertContains('- [ ] Documentation updated if needed')
-      );
-    }
-  );
-
-  Scenario(
-    'Review checklist includes completed pattern verification',
-    ({ Given, When, Then, And }) => {
-      Given('completed phase 23 with deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-        state = initState();
-        const deliverables = dataTable.map((row) => ({
-          name: row.Name ?? 'Unnamed',
-          status: row.Status ?? 'complete',
-          tests: parseInt(row.Tests ?? '0', 10),
-          location: row.Location ?? 'src/',
-          release: 'v0.2.0',
-        })) satisfies TestDeliverable[];
-        state.patterns.push(
-          createTestPattern({
-            name: 'Phase 23 Pattern',
-            phase: 23,
-            status: 'completed',
-            workflow: 'implementation',
-            deliverables,
-          })
+        Then('the output should contain "## Review Checklist"', () =>
+          assertContains('## Review Checklist')
         );
-      });
+        And('the output should contain "- [ ] Code follows project conventions"', () =>
+          assertContains('- [ ] Code follows project conventions')
+        );
+        And('the output should contain "- [ ] Tests added/updated for changes"', () =>
+          assertContains('- [ ] Tests added/updated for changes')
+        );
+        And('the output should contain "- [ ] Documentation updated if needed"', () =>
+          assertContains('- [ ] Documentation updated if needed')
+        );
+      }
+    );
 
-      When('generating PR changes with releaseFilter "v0.2.0"', () => {
-        state!.dataset = buildDataset();
-        state!.options = { releaseFilter: 'v0.2.0', includeReviewChecklist: true };
-        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-      });
+    RuleScenario(
+      'Review checklist includes completed pattern verification',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'completed phase 23 with deliverables:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            state = initState();
+            const deliverables = dataTable.map((row) => ({
+              name: row.Name ?? 'Unnamed',
+              status: row.Status ?? 'complete',
+              tests: parseInt(row.Tests ?? '0', 10),
+              location: row.Location ?? 'src/',
+              release: 'v0.2.0',
+            })) satisfies TestDeliverable[];
+            state.patterns.push(
+              createTestPattern({
+                name: 'Phase 23 Pattern',
+                phase: 23,
+                status: 'completed',
+                workflow: 'implementation',
+                deliverables,
+              })
+            );
+          }
+        );
 
-      Then('the output should contain "## Review Checklist"', () =>
-        assertContains('## Review Checklist')
-      );
-      And('the output should contain "- [ ] Completed patterns verified working"', () =>
-        assertContains('- [ ] Completed patterns verified working')
-      );
-    }
-  );
+        When('generating PR changes with releaseFilter "v0.2.0"', () => {
+          state!.dataset = buildDataset();
+          state!.options = { releaseFilter: 'v0.2.0', includeReviewChecklist: true };
+          state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+        });
+
+        Then('the output should contain "## Review Checklist"', () =>
+          assertContains('## Review Checklist')
+        );
+        And('the output should contain "- [ ] Completed patterns verified working"', () =>
+          assertContains('- [ ] Completed patterns verified working')
+        );
+      }
+    );
+  });
 
   // ===========================================================================
   // Dependencies Section
   // ===========================================================================
 
-  Scenario('Dependencies shows what patterns enable', ({ Given, When, Then, And }) => {
-    Given(
-      'completed phases with dependency relationships:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
-        state = initState();
-        for (const row of dataTable) {
-          const name = row.Name ?? '';
-          const enables = row.Enables ? row.Enables.split(',').map((e) => e.trim()) : [];
-          const deliverables = [
-            {
-              name: `${name} Deliverable`,
-              status: 'complete',
-              tests: 1,
-              location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
-              release: row.Release ?? undefined,
-            },
-          ] satisfies TestDeliverable[];
-          state.patterns.push(
-            createTestPattern({
-              name: row.Name ?? 'Unnamed',
-              phase: parseInt(row.Phase ?? '0', 10),
-              status: 'completed',
-              workflow: row.Workflow ?? 'implementation',
-              deliverables,
-              enables,
-            })
-          );
+  Rule('Dependencies section shows inter-pattern relationships', ({ RuleScenario }) => {
+    RuleScenario('Dependencies shows what patterns enable', ({ Given, When, Then, And }) => {
+      Given(
+        'completed phases with dependency relationships:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          for (const row of dataTable) {
+            const name = row.Name ?? '';
+            const enables = row.Enables ? row.Enables.split(',').map((e) => e.trim()) : [];
+            const deliverables = [
+              {
+                name: `${name} Deliverable`,
+                status: 'complete',
+                tests: 1,
+                location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
+                release: row.Release ?? undefined,
+              },
+            ] satisfies TestDeliverable[];
+            state.patterns.push(
+              createTestPattern({
+                name: row.Name ?? 'Unnamed',
+                phase: parseInt(row.Phase ?? '0', 10),
+                status: 'completed',
+                workflow: row.Workflow ?? 'implementation',
+                deliverables,
+                enables,
+              })
+            );
+          }
         }
-      }
-    );
+      );
 
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { releaseFilter: 'v0.2.0', includeDependencies: true };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { releaseFilter: 'v0.2.0', includeDependencies: true };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('the output should contain "## Dependencies"', () => assertContains('## Dependencies'));
+      And('the output should contain "### Enables"', () => assertContains('### Enables'));
+      And('the output should contain "CatalogueSchemas"', () => assertContains('CatalogueSchemas'));
+      And('the output should contain "MermaidExpansion"', () => assertContains('MermaidExpansion'));
     });
 
-    Then('the output should contain "## Dependencies"', () => assertContains('## Dependencies'));
-    And('the output should contain "### Enables"', () => assertContains('### Enables'));
-    And('the output should contain "CatalogueSchemas"', () => assertContains('CatalogueSchemas'));
-    And('the output should contain "MermaidExpansion"', () => assertContains('MermaidExpansion'));
-  });
-
-  Scenario('Dependencies shows what patterns depend on', ({ Given, When, Then, And }) => {
-    Given(
-      'completed phases where all dependencies are met:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
-        state = initState();
-        for (const row of dataTable) {
-          const name = row.Name ?? '';
-          const dependsOn = row.DependsOn ? row.DependsOn.split(',').map((d) => d.trim()) : [];
-          const deliverables = [
-            {
-              name: `${name} Deliverable`,
-              status: 'complete',
-              tests: 1,
-              location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
-              release: row.Release ?? undefined,
-            },
-          ] satisfies TestDeliverable[];
-          state.patterns.push(
-            createTestPattern({
-              name: row.Name ?? 'Unnamed',
-              phase: parseInt(row.Phase ?? '0', 10),
-              status: 'completed',
-              workflow: row.Workflow ?? 'implementation',
-              deliverables,
-              dependsOn,
-            })
-          );
+    RuleScenario('Dependencies shows what patterns depend on', ({ Given, When, Then, And }) => {
+      Given(
+        'completed phases where all dependencies are met:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          for (const row of dataTable) {
+            const name = row.Name ?? '';
+            const dependsOn = row.DependsOn ? row.DependsOn.split(',').map((d) => d.trim()) : [];
+            const deliverables = [
+              {
+                name: `${name} Deliverable`,
+                status: 'complete',
+                tests: 1,
+                location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
+                release: row.Release ?? undefined,
+              },
+            ] satisfies TestDeliverable[];
+            state.patterns.push(
+              createTestPattern({
+                name: row.Name ?? 'Unnamed',
+                phase: parseInt(row.Phase ?? '0', 10),
+                status: 'completed',
+                workflow: row.Workflow ?? 'implementation',
+                deliverables,
+                dependsOn,
+              })
+            );
+          }
         }
-      }
-    );
+      );
 
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { releaseFilter: 'v0.2.0', includeDependencies: true };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { releaseFilter: 'v0.2.0', includeDependencies: true };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('the output should contain "## Dependencies"', () => assertContains('## Dependencies'));
+      And('the output should contain "### Depends On"', () => assertContains('### Depends On'));
+      And('the output should contain "Error Handling"', () => assertContains('Error Handling'));
     });
-
-    Then('the output should contain "## Dependencies"', () => assertContains('## Dependencies'));
-    And('the output should contain "### Depends On"', () => assertContains('### Depends On'));
-    And('the output should contain "Error Handling"', () => assertContains('Error Handling'));
   });
 
   // ===========================================================================
   // Business Value
   // ===========================================================================
 
-  Scenario(
-    'Pattern metadata includes business value when enabled',
-    ({ Given, When, Then, And }) => {
+  Rule('Business value can be included or excluded from pattern metadata', ({ RuleScenario }) => {
+    RuleScenario(
+      'Pattern metadata includes business value when enabled',
+      ({ Given, When, Then, And }) => {
+        Given(
+          'a completed phase with business value:',
+          (_ctx: unknown, dataTable: DataTableRow[]) => {
+            state = initState();
+            for (const row of dataTable) {
+              const name = row.Name ?? '';
+              const deliverables = [
+                {
+                  name: `${name} Deliverable`,
+                  status: 'complete',
+                  tests: 1,
+                  location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
+                  release: row.Release ?? undefined,
+                },
+              ] satisfies TestDeliverable[];
+              const pattern = createTestPattern({
+                name: row.Name ?? 'Unnamed',
+                phase: parseInt(row.Phase ?? '0', 10),
+                status: 'completed',
+                workflow: row.Workflow ?? 'implementation',
+                deliverables,
+              });
+              (pattern as { businessValue?: string }).businessValue = row.BusinessValue ?? '';
+              state.patterns.push(pattern);
+            }
+          }
+        );
+
+        When(
+          'generating PR changes with releaseFilter "v0.2.0" and includeBusinessValue enabled',
+          () => {
+            state!.dataset = buildDataset();
+            state!.options = { releaseFilter: 'v0.2.0', includeBusinessValue: true };
+            state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+          }
+        );
+
+        Then('the output should contain "Changelog Gen"', () => assertContains('Changelog Gen'));
+        And('the output should contain "Business Value"', () => assertContains('Business Value'));
+        And('the output should contain "Automated release notes"', () =>
+          assertContains('Automated release notes')
+        );
+      }
+    );
+
+    RuleScenario('Business value can be excluded', ({ Given, When, Then }) => {
       Given(
         'a completed phase with business value:',
         (_ctx: unknown, dataTable: DataTableRow[]) => {
@@ -706,90 +773,167 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
         }
       );
 
-      When(
-        'generating PR changes with releaseFilter "v0.2.0" and includeBusinessValue enabled',
-        () => {
-          state!.dataset = buildDataset();
-          state!.options = { releaseFilter: 'v0.2.0', includeBusinessValue: true };
-          state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-        }
+      When('generating PR changes with includeBusinessValue disabled', () => {
+        state!.dataset = buildDataset();
+        state!.options = { includeBusinessValue: false };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('the output should not contain "Business Value"', () =>
+        assertNotContains('Business Value')
       );
-
-      Then('the output should contain "Changelog Gen"', () => assertContains('Changelog Gen'));
-      And('the output should contain "Business Value"', () => assertContains('Business Value'));
-      And('the output should contain "Automated release notes"', () =>
-        assertContains('Automated release notes')
-      );
-    }
-  );
-
-  Scenario('Business value can be excluded', ({ Given, When, Then }) => {
-    Given('a completed phase with business value:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      for (const row of dataTable) {
-        const name = row.Name ?? '';
-        const deliverables = [
-          {
-            name: `${name} Deliverable`,
-            status: 'complete',
-            tests: 1,
-            location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
-            release: row.Release ?? undefined,
-          },
-        ] satisfies TestDeliverable[];
-        const pattern = createTestPattern({
-          name: row.Name ?? 'Unnamed',
-          phase: parseInt(row.Phase ?? '0', 10),
-          status: 'completed',
-          workflow: row.Workflow ?? 'implementation',
-          deliverables,
-        });
-        (pattern as { businessValue?: string }).businessValue = row.BusinessValue ?? '';
-        state.patterns.push(pattern);
-      }
     });
-
-    When('generating PR changes with includeBusinessValue disabled', () => {
-      state!.dataset = buildDataset();
-      state!.options = { includeBusinessValue: false };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-    });
-
-    Then('the output should not contain "Business Value"', () =>
-      assertNotContains('Business Value')
-    );
   });
 
   // ===========================================================================
   // Sorting Options
   // ===========================================================================
 
-  Scenario('Phases sorted by phase number', ({ Given, When, Then, And }) => {
-    Given('completed phases in random order:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      setupCompletedPhasesWithReleases(dataTable);
+  Rule('Output can be sorted by phase number or priority', ({ RuleScenario }) => {
+    RuleScenario('Phases sorted by phase number', ({ Given, When, Then, And }) => {
+      Given('completed phases in random order:', (_ctx: unknown, dataTable: DataTableRow[]) => {
+        setupCompletedPhasesWithReleases(dataTable);
+      });
+
+      When('generating PR changes with sortBy "phase"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { sortBy: 'phase' };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('Phase 23 should appear before Phase 31 in the output', () =>
+        assertAppearsBefore('Phase 23', 'Phase 31')
+      );
+      And('Phase 31 should appear before Phase 40 in the output', () =>
+        assertAppearsBefore('Phase 31', 'Phase 40')
+      );
     });
 
-    When('generating PR changes with sortBy "phase"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { sortBy: 'phase' };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-    });
+    RuleScenario('Phases sorted by priority', ({ Given, When, Then }) => {
+      Given(
+        'completed phases with different priorities:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          for (const row of dataTable) {
+            const name = row.Name ?? '';
+            const deliverables = [
+              {
+                name: `${name} Deliverable`,
+                status: 'complete',
+                tests: 1,
+                location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
+                release: row.Release ?? undefined,
+              },
+            ] satisfies TestDeliverable[];
+            state.patterns.push(
+              createTestPattern({
+                name: row.Name ?? 'Unnamed',
+                phase: parseInt(row.Phase ?? '0', 10),
+                status: 'completed',
+                workflow: row.Workflow ?? 'implementation',
+                deliverables,
+                priority: parsePriority(row.Priority ?? 'medium'),
+              })
+            );
+          }
+        }
+      );
 
-    Then('Phase 23 should appear before Phase 31 in the output', () =>
-      assertAppearsBefore('Phase 23', 'Phase 31')
-    );
-    And('Phase 31 should appear before Phase 40 in the output', () =>
-      assertAppearsBefore('Phase 31', 'Phase 40')
-    );
+      When('generating PR changes with sortBy "priority"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { sortBy: 'priority' };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('"High Priority" should appear before "Low Priority" in the output', () =>
+        assertAppearsBefore('High Priority', 'Low Priority')
+      );
+    });
   });
 
-  Scenario('Phases sorted by priority', ({ Given, When, Then }) => {
-    Given(
-      'completed phases with different priorities:',
-      (_ctx: unknown, dataTable: DataTableRow[]) => {
+  // ===========================================================================
+  // Edge Cases
+  // ===========================================================================
+
+  Rule('Edge cases produce graceful output', ({ RuleScenario }) => {
+    RuleScenario('No matching phases produces no changes message', ({ Given, When, Then }) => {
+      Given('no completed phases for release "v0.2.0"', () => {
+        state = initState();
+        state.patterns.push(
+          createTestPattern({
+            name: 'Other Release Pattern',
+            phase: 10,
+            status: 'completed',
+            workflow: 'implementation',
+            deliverables: [
+              {
+                name: 'Other Deliverable',
+                status: 'complete',
+                tests: 1,
+                location: 'src/other/',
+                release: 'v0.1.0',
+              },
+            ],
+          })
+        );
+      });
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        generateWithReleaseFilter('v0.2.0');
+      });
+
+      Then('the output should contain "No patterns found"', () =>
+        assertContains('No patterns found')
+      );
+    });
+
+    RuleScenario('Patterns without deliverables still display', ({ Given, When, Then, And }) => {
+      Given(
+        'completed phases without deliverables:',
+        (_ctx: unknown, dataTable: DataTableRow[]) => {
+          state = initState();
+          for (const row of dataTable) {
+            // Create pattern with deliverable that has the release tag so it gets included
+            state.patterns.push(
+              createTestPattern({
+                name: row.Name ?? 'Unnamed',
+                phase: parseInt(row.Phase ?? '0', 10),
+                status: 'completed',
+                workflow: row.Workflow ?? 'implementation',
+                // Add a deliverable with release tag for filtering, but we won't show it
+                deliverables: [
+                  {
+                    name: 'Hidden',
+                    status: 'complete',
+                    tests: 0,
+                    location: 'src/',
+                    release: row.Release ?? 'v0.2.0',
+                  },
+                ],
+              })
+            );
+          }
+        }
+      );
+
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        state!.dataset = buildDataset();
+        state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: false };
+        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+      });
+
+      Then('the output should contain "Critical Fixes"', () => assertContains('Critical Fixes'));
+      And('the output should not contain "Deliverables:"', () =>
+        assertNotContains('Deliverables:')
+      );
+    });
+
+    RuleScenario('Patterns without phase show in phase 0 group', ({ Given, When, Then, And }) => {
+      Given('patterns from different sources:', (_ctx: unknown, dataTable: DataTableRow[]) => {
         state = initState();
         for (const row of dataTable) {
           const name = row.Name ?? '';
+          const phase = row.Phase?.trim() ? parseInt(row.Phase, 10) : undefined;
           const deliverables = [
             {
               name: `${name} Deliverable`,
@@ -802,192 +946,89 @@ describeFeature(feature, ({ AfterEachScenario, Scenario }) => {
           state.patterns.push(
             createTestPattern({
               name: row.Name ?? 'Unnamed',
-              phase: parseInt(row.Phase ?? '0', 10),
-              status: 'completed',
-              workflow: row.Workflow ?? 'implementation',
+              phase,
+              status: parseStatus(row.Status ?? 'completed'),
+              workflow: 'implementation',
               deliverables,
-              priority: parsePriority(row.Priority ?? 'medium'),
             })
           );
         }
-      }
-    );
+      });
 
-    When('generating PR changes with sortBy "priority"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { sortBy: 'priority' };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-    });
+      When('generating PR changes with releaseFilter "v0.2.0"', () => {
+        generateWithReleaseFilter('v0.2.0');
+      });
 
-    Then('"High Priority" should appear before "Low Priority" in the output', () =>
-      assertAppearsBefore('High Priority', 'Low Priority')
-    );
-  });
-
-  // ===========================================================================
-  // Edge Cases
-  // ===========================================================================
-
-  Scenario('No matching phases produces no changes message', ({ Given, When, Then }) => {
-    Given('no completed phases for release "v0.2.0"', () => {
-      state = initState();
-      state.patterns.push(
-        createTestPattern({
-          name: 'Other Release Pattern',
-          phase: 10,
-          status: 'completed',
-          workflow: 'implementation',
-          deliverables: [
-            {
-              name: 'Other Deliverable',
-              status: 'complete',
-              tests: 1,
-              location: 'src/other/',
-              release: 'v0.1.0',
-            },
-          ],
-        })
+      Then('the output should contain "Gherkin Phase 23"', () =>
+        assertContains('Gherkin Phase 23')
       );
+      And('the output should contain "TypeScript Pattern"', () =>
+        assertContains('TypeScript Pattern')
+      );
+      And('the output should contain "### Phase 0"', () => assertContains('### Phase 0'));
     });
-
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      generateWithReleaseFilter('v0.2.0');
-    });
-
-    Then('the output should contain "No patterns found"', () =>
-      assertContains('No patterns found')
-    );
-  });
-
-  Scenario('Patterns without deliverables still display', ({ Given, When, Then, And }) => {
-    Given('completed phases without deliverables:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      for (const row of dataTable) {
-        // Create pattern with deliverable that has the release tag so it gets included
-        state.patterns.push(
-          createTestPattern({
-            name: row.Name ?? 'Unnamed',
-            phase: parseInt(row.Phase ?? '0', 10),
-            status: 'completed',
-            workflow: row.Workflow ?? 'implementation',
-            // Add a deliverable with release tag for filtering, but we won't show it
-            deliverables: [
-              {
-                name: 'Hidden',
-                status: 'complete',
-                tests: 0,
-                location: 'src/',
-                release: row.Release ?? 'v0.2.0',
-              },
-            ],
-          })
-        );
-      }
-    });
-
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      state!.dataset = buildDataset();
-      state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: false };
-      state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-    });
-
-    Then('the output should contain "Critical Fixes"', () => assertContains('Critical Fixes'));
-    And('the output should not contain "Deliverables:"', () => assertNotContains('Deliverables:'));
-  });
-
-  Scenario('Patterns without phase show in phase 0 group', ({ Given, When, Then, And }) => {
-    Given('patterns from different sources:', (_ctx: unknown, dataTable: DataTableRow[]) => {
-      state = initState();
-      for (const row of dataTable) {
-        const name = row.Name ?? '';
-        const phase = row.Phase?.trim() ? parseInt(row.Phase, 10) : undefined;
-        const deliverables = [
-          {
-            name: `${name} Deliverable`,
-            status: 'complete',
-            tests: 1,
-            location: `src/${name.toLowerCase().replace(/\s+/g, '-')}/`,
-            release: row.Release ?? undefined,
-          },
-        ] satisfies TestDeliverable[];
-        state.patterns.push(
-          createTestPattern({
-            name: row.Name ?? 'Unnamed',
-            phase,
-            status: parseStatus(row.Status ?? 'completed'),
-            workflow: 'implementation',
-            deliverables,
-          })
-        );
-      }
-    });
-
-    When('generating PR changes with releaseFilter "v0.2.0"', () => {
-      generateWithReleaseFilter('v0.2.0');
-    });
-
-    Then('the output should contain "Gherkin Phase 23"', () => assertContains('Gherkin Phase 23'));
-    And('the output should contain "TypeScript Pattern"', () =>
-      assertContains('TypeScript Pattern')
-    );
-    And('the output should contain "### Phase 0"', () => assertContains('### Phase 0'));
   });
 
   // ===========================================================================
   // Deliverable-Level Filtering
   // ===========================================================================
 
-  Scenario(
-    'Mixed releases within single phase shows only matching deliverables',
-    ({ Given, When, Then, And }) => {
-      Given(
-        'a phase with mixed-release deliverables:',
-        (_ctx: unknown, dataTable: DataTableRow[]) => {
-          state = initState();
-          // Group rows by phase, then build deliverables arrays
-          const phaseGroups = dataTable.reduce(
-            (acc, row) => {
-              const phase = parseInt(row.Phase ?? '0', 10);
-              if (!acc[phase]) {
-                acc[phase] = { name: row.Name ?? 'Unnamed', rows: [] };
+  Rule(
+    'Deliverable-level filtering shows only matching deliverables within a phase',
+    ({ RuleScenario }) => {
+      RuleScenario(
+        'Mixed releases within single phase shows only matching deliverables',
+        ({ Given, When, Then, And }) => {
+          Given(
+            'a phase with mixed-release deliverables:',
+            (_ctx: unknown, dataTable: DataTableRow[]) => {
+              state = initState();
+              // Group rows by phase, then build deliverables arrays
+              const phaseGroups = dataTable.reduce(
+                (acc, row) => {
+                  const phase = parseInt(row.Phase ?? '0', 10);
+                  if (!acc[phase]) {
+                    acc[phase] = { name: row.Name ?? 'Unnamed', rows: [] };
+                  }
+                  acc[phase].rows.push(row);
+                  return acc;
+                },
+                {} as Record<number, { name: string; rows: DataTableRow[] }>
+              );
+
+              for (const [phaseStr, data] of Object.entries(phaseGroups)) {
+                const phase = parseInt(phaseStr, 10);
+                const deliverables = data.rows.map((row) => ({
+                  name: row.Deliverable ?? 'Unnamed Deliverable',
+                  status: row.Status ?? 'complete',
+                  tests: parseInt(row.Tests ?? '1', 10),
+                  location: row.Location ?? 'src/',
+                  release: row.Release ?? undefined,
+                })) satisfies TestDeliverable[];
+                state.patterns.push(
+                  createTestPattern({
+                    name: data.name,
+                    phase,
+                    status: 'completed',
+                    workflow: 'implementation',
+                    deliverables,
+                  })
+                );
               }
-              acc[phase].rows.push(row);
-              return acc;
-            },
-            {} as Record<number, { name: string; rows: DataTableRow[] }>
+            }
           );
 
-          for (const [phaseStr, data] of Object.entries(phaseGroups)) {
-            const phase = parseInt(phaseStr, 10);
-            const deliverables = data.rows.map((row) => ({
-              name: row.Deliverable ?? 'Unnamed Deliverable',
-              status: row.Status ?? 'complete',
-              tests: parseInt(row.Tests ?? '1', 10),
-              location: row.Location ?? 'src/',
-              release: row.Release ?? undefined,
-            })) satisfies TestDeliverable[];
-            state.patterns.push(
-              createTestPattern({
-                name: data.name,
-                phase,
-                status: 'completed',
-                workflow: 'implementation',
-                deliverables,
-              })
-            );
-          }
+          When('generating PR changes with releaseFilter "v0.2.0"', () => {
+            state!.dataset = buildDataset();
+            state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: true };
+            state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
+          });
+
+          Then('the output should contain "Feature B"', () => assertContains('Feature B'));
+          And('the output should contain "Feature C"', () => assertContains('Feature C'));
+          And('the output should not contain "Feature A"', () => assertNotContains('Feature A'));
         }
       );
-
-      When('generating PR changes with releaseFilter "v0.2.0"', () => {
-        state!.dataset = buildDataset();
-        state!.options = { releaseFilter: 'v0.2.0', includeDeliverables: true };
-        state!.output = generatePrChangesMarkdown(state!.dataset, state!.options);
-      });
-
-      Then('the output should contain "Feature B"', () => assertContains('Feature B'));
-      And('the output should contain "Feature C"', () => assertContains('Feature C'));
-      And('the output should not contain "Feature A"', () => assertNotContains('Feature A'));
     }
   );
 });

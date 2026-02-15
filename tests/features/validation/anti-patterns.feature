@@ -4,6 +4,7 @@
 @libar-docs-implements:AntiPatternDetector
 @libar-docs-status:completed
 @libar-docs-product-area:Validation
+@libar-docs-depends-on:DoDValidationTypes
 Feature: Anti-Pattern Detection
   Detects violations of the dual-source documentation architecture and
   process hygiene issues that lead to documentation drift.

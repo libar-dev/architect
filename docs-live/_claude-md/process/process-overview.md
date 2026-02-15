@@ -15,4 +15,11 @@ Detail Level: Compact summary
 
 --- SessionHandoffs ---
 
+| Rule                                                          | Description                                                                                                             |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Handoff context generation captures session state             | **Invariant:** Active phases with handoff context enabled must include session handoff sections with template and...    |
+| Handoff templates and checklists contain required sections    | **Invariant:** Session handoff template and retrospective checklist must exist and contain all required sections for... |
+| PROCESS_SETUP.md documents handoff and coordination protocols | **Invariant:** PROCESS_SETUP.md must document both session handoff protocol and multi-developer coordination...         |
+| Edge cases and acceptance criteria ensure robustness          | **Invariant:** Handoff context must degrade gracefully when no discoveries exist and must be disableable. Mid-phase...  |
+
 --- SessionFileLifecycle ---

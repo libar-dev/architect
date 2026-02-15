@@ -1417,160 +1417,6 @@ issues, and next-session priorities.
 
 </details>
 
-### ContextFormatterTests
-
-[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
-
-Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
-and formatOverview() plain text rendering functions.
-
-<details>
-<summary>formatContextBundle renders section markers (2 scenarios)</summary>
-
-#### formatContextBundle renders section markers
-
-**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
-
-**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
-
-**Verified by:**
-
-- Design bundle renders all populated sections
-- Implement bundle renders deliverables and FSM
-
-</details>
-
-<details>
-<summary>formatDepTree renders indented tree (1 scenarios)</summary>
-
-#### formatDepTree renders indented tree
-
-**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
-
-**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
-
-**Verified by:**
-
-- Tree renders with arrows and focal marker
-
-</details>
-
-<details>
-<summary>formatOverview renders progress summary (1 scenarios)</summary>
-
-#### formatOverview renders progress summary
-
-**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
-
-**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
-
-**Verified by:**
-
-- Overview renders progress line
-
-</details>
-
-<details>
-<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
-
-#### formatFileReadingList renders categorized file paths
-
-**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
-
-**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
-
-**Verified by:**
-
-- File list renders primary and dependency sections
-- Empty file reading list renders minimal output
-
-</details>
-
-### ContextAssemblerTests
-
-[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
-
-Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-buildOverview() pure functions that operate on MasterDataset.
-
-<details>
-<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
-
-#### assembleContext produces session-tailored context bundles
-
-**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
-
-**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
-
-**Verified by:**
-
-- Design session includes stubs, consumers, and architecture
-- Planning session includes only metadata and dependencies
-- Implement session includes deliverables and FSM
-- Multi-pattern context merges metadata from both patterns
-- Pattern not found returns error with suggestion
-- Description preserves Problem and Solution structure
-- Solution text with inline bold is not truncated
-- Design session includes stubs
-- consumers
-- and architecture
-
-</details>
-
-<details>
-<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
-
-#### buildDepTree walks dependency chains with cycle detection
-
-**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
-
-**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
-
-**Verified by:**
-
-- Dependency tree shows chain with status markers
-- Depth limit truncates branches
-- Circular dependencies are handled safely
-- Standalone pattern returns single-node tree
-
-</details>
-
-<details>
-<summary>buildOverview provides executive project summary (2 scenarios)</summary>
-
-#### buildOverview provides executive project summary
-
-**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
-
-**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
-
-**Verified by:**
-
-- Overview shows progress, active phases, and blocking
-- Empty dataset returns zero-state overview
-- Overview shows progress
-- active phases
-- and blocking
-
-</details>
-
-<details>
-<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
-
-#### buildFileReadingList returns paths by relevance
-
-**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
-
-**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
-
-**Verified by:**
-
-- File list includes primary and related files
-- File list includes implementation files for completed dependencies
-- File list without related returns only primary
-
-</details>
-
 ### PatternSummarizeTests
 
 [View PatternSummarizeTests source](tests/features/api/output-shaping/summarize.feature)
@@ -1807,6 +1653,160 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 - Identical strings have distance 0
 - Single character difference
+
+</details>
+
+### ContextFormatterTests
+
+[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
+
+Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
+and formatOverview() plain text rendering functions.
+
+<details>
+<summary>formatContextBundle renders section markers (2 scenarios)</summary>
+
+#### formatContextBundle renders section markers
+
+**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
+
+**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
+
+**Verified by:**
+
+- Design bundle renders all populated sections
+- Implement bundle renders deliverables and FSM
+
+</details>
+
+<details>
+<summary>formatDepTree renders indented tree (1 scenarios)</summary>
+
+#### formatDepTree renders indented tree
+
+**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
+
+**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
+
+**Verified by:**
+
+- Tree renders with arrows and focal marker
+
+</details>
+
+<details>
+<summary>formatOverview renders progress summary (1 scenarios)</summary>
+
+#### formatOverview renders progress summary
+
+**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+
+**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+
+**Verified by:**
+
+- Overview renders progress line
+
+</details>
+
+<details>
+<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
+
+#### formatFileReadingList renders categorized file paths
+
+**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
+
+**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
+
+**Verified by:**
+
+- File list renders primary and dependency sections
+- Empty file reading list renders minimal output
+
+</details>
+
+### ContextAssemblerTests
+
+[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
+
+Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
+buildOverview() pure functions that operate on MasterDataset.
+
+<details>
+<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
+
+#### assembleContext produces session-tailored context bundles
+
+**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+
+**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+
+**Verified by:**
+
+- Design session includes stubs, consumers, and architecture
+- Planning session includes only metadata and dependencies
+- Implement session includes deliverables and FSM
+- Multi-pattern context merges metadata from both patterns
+- Pattern not found returns error with suggestion
+- Description preserves Problem and Solution structure
+- Solution text with inline bold is not truncated
+- Design session includes stubs
+- consumers
+- and architecture
+
+</details>
+
+<details>
+<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
+
+#### buildDepTree walks dependency chains with cycle detection
+
+**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+
+**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
+
+**Verified by:**
+
+- Dependency tree shows chain with status markers
+- Depth limit truncates branches
+- Circular dependencies are handled safely
+- Standalone pattern returns single-node tree
+
+</details>
+
+<details>
+<summary>buildOverview provides executive project summary (2 scenarios)</summary>
+
+#### buildOverview provides executive project summary
+
+**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+
+**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+
+**Verified by:**
+
+- Overview shows progress, active phases, and blocking
+- Empty dataset returns zero-state overview
+- Overview shows progress
+- active phases
+- and blocking
+
+</details>
+
+<details>
+<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
+
+#### buildFileReadingList returns paths by relevance
+
+**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+
+**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
+
+**Verified by:**
+
+- File list includes primary and related files
+- File list includes implementation files for completed dependencies
+- File list without related returns only primary
 
 </details>
 

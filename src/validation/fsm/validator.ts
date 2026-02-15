@@ -4,6 +4,7 @@
  * @libar-docs-pattern FSMValidator
  * @libar-docs-status active
  * @libar-docs-implements PhaseStateMachineValidation
+ * @libar-docs-uses FSMTransitions, FSMStates
  * @libar-docs-depends-on:PDR005MvpWorkflow
  * @libar-docs-arch-role decider
  * @libar-docs-arch-context validation

@@ -4,6 +4,7 @@
 @libar-docs-pattern:FSMValidatorTesting
 @libar-docs-status:completed
 @libar-docs-product-area:Validation
+@libar-docs-depends-on:FSMTransitions,FSMStates
 Feature: Phase State Machine Validation
   Pure validation functions for the 4-state FSM defined in PDR-005.
   All validation follows the Decider pattern: no I/O, no side effects.

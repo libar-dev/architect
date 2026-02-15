@@ -1028,6 +1028,130 @@ This enables automatic filtering and documentation grouping without explicit ann
 - "unknown" fallback layer ensures all features are captured
 - FEATURE_LAYERS constant provides validated layer enumeration
 
+<details>
+<summary>Timeline layer is detected from /timeline/ directory segments (3 scenarios)</summary>
+
+#### Timeline layer is detected from /timeline/ directory segments
+
+**Invariant:** Any feature file path containing a /timeline/ directory segment is classified as timeline layer.
+
+**Verified by:**
+
+- Detect timeline features from /timeline/ path
+- Detect timeline features regardless of parent directories
+- Detect timeline features in delivery-process package
+
+</details>
+
+<details>
+<summary>Domain layer is detected from business context directory segments (3 scenarios)</summary>
+
+#### Domain layer is detected from business context directory segments
+
+**Invariant:** Feature files in /deciders/, /orders/, or /inventory/ directories are classified as domain layer.
+
+**Verified by:**
+
+- Detect decider features as domain
+- Detect orders features as domain
+- Detect inventory features as domain
+
+</details>
+
+<details>
+<summary>Integration layer is detected and takes priority over domain directories (4 scenarios)</summary>
+
+#### Integration layer is detected and takes priority over domain directories
+
+**Invariant:** Paths containing /integration-features/ or /integration/ are classified as integration, even when they also contain domain directory names.
+
+**Verified by:**
+
+- Detect integration-features directory as integration
+- Detect /integration/ directory as integration
+- Integration takes priority over orders subdirectory
+- Integration takes priority over inventory subdirectory
+
+</details>
+
+<details>
+<summary>E2E layer is detected from /e2e/ directory segments (3 scenarios)</summary>
+
+#### E2E layer is detected from /e2e/ directory segments
+
+**Invariant:** Any feature file path containing an /e2e/ directory segment is classified as e2e layer.
+
+**Verified by:**
+
+- Detect e2e features from /e2e/ path
+- Detect e2e features in frontend app
+- Detect e2e-journeys as e2e
+
+</details>
+
+<details>
+<summary>Component layer is detected from tool-specific directory segments (2 scenarios)</summary>
+
+#### Component layer is detected from tool-specific directory segments
+
+**Invariant:** Feature files in /scanner/ or /lint/ directories are classified as component layer.
+
+**Verified by:**
+
+- Detect scanner features as component
+- Detect lint features as component
+
+</details>
+
+<details>
+<summary>Unknown layer is the fallback for unclassified paths (3 scenarios)</summary>
+
+#### Unknown layer is the fallback for unclassified paths
+
+**Invariant:** Any feature file path that does not match a known layer pattern is classified as unknown.
+
+**Verified by:**
+
+- Return unknown for unclassified paths
+- Return unknown for root-level features
+- Return unknown for generic test paths
+
+</details>
+
+<details>
+<summary>Path normalization handles cross-platform and case differences (7 scenarios)</summary>
+
+#### Path normalization handles cross-platform and case differences
+
+**Invariant:** Layer inference produces correct results regardless of path separators, case, or absolute vs relative paths.
+
+**Verified by:**
+
+- Handle Windows-style paths with backslashes
+- Be case-insensitive
+- Handle mixed path separators
+- Handle absolute Unix paths
+- Handle Windows absolute paths
+- Timeline in filename only should not match
+- Timeline detected even with deep nesting
+
+</details>
+
+<details>
+<summary>FEATURE_LAYERS constant provides validated layer enumeration (3 scenarios)</summary>
+
+#### FEATURE_LAYERS constant provides validated layer enumeration
+
+**Invariant:** FEATURE_LAYERS is a readonly array containing exactly all 6 valid layer values.
+
+**Verified by:**
+
+- FEATURE_LAYERS contains all valid layer values
+- FEATURE_LAYERS has exactly 6 layers
+- FEATURE_LAYERS is a readonly array
+
+</details>
+
 ### DirectiveDetection
 
 [View DirectiveDetection source](tests/features/behavior/directive-detection.feature)

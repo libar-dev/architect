@@ -112,6 +112,17 @@ Detail Level: Compact summary
 
 --- LayerInferenceTesting ---
 
+| Rule                                                                     | Description                                                                                                                |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Timeline layer is detected from /timeline/ directory segments            | **Invariant:** Any feature file path containing a /timeline/ directory segment is classified as timeline layer....         |
+| Domain layer is detected from business context directory segments        | **Invariant:** Feature files in /deciders/, /orders/, or /inventory/ directories are classified as domain layer....        |
+| Integration layer is detected and takes priority over domain directories | **Invariant:** Paths containing /integration-features/ or /integration/ are classified as integration, even when they...   |
+| E2E layer is detected from /e2e/ directory segments                      | **Invariant:** Any feature file path containing an /e2e/ directory segment is classified as e2e layer.<br> \*\*Verified... |
+| Component layer is detected from tool-specific directory segments        | **Invariant:** Feature files in /scanner/ or /lint/ directories are classified as component layer.<br> \*\*Verified...     |
+| Unknown layer is the fallback for unclassified paths                     | **Invariant:** Any feature file path that does not match a known layer pattern is classified as unknown....                |
+| Path normalization handles cross-platform and case differences           | **Invariant:** Layer inference produces correct results regardless of path separators, case, or absolute vs relative...    |
+| FEATURE_LAYERS constant provides validated layer enumeration             | **Invariant:** FEATURE_LAYERS is a readonly array containing exactly all 6 valid layer values.<br> **Verified by:**...     |
+
 --- DirectiveDetection ---
 
 | Rule                                                       | Description                                                                                                              |

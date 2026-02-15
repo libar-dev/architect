@@ -4,6 +4,7 @@
 @libar-docs-pattern:DoDValidatorTesting
 @libar-docs-status:completed
 @libar-docs-product-area:Validation
+@libar-docs-depends-on:AntiPatternDetector
 Feature: Definition of Done (DoD) Validation
   Validates that completed phases meet Definition of Done criteria:
   1. All deliverables must have "complete" status

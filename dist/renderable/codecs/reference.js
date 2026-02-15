@@ -160,14 +160,32 @@ export const PRODUCT_AREA_META = {
     Validation: {
         question: 'How is the workflow enforced?',
         covers: 'FSM, DoD, anti-patterns, process guard, lint',
-        intro: 'Validation enforces delivery workflow rules at commit time using a Decider pattern. ' +
-            'Process Guard derives state from annotations (no separate state store), validates ' +
-            'proposed changes against FSM rules, and blocks invalid transitions. Protection levels ' +
-            'escalate with status: roadmap allows free editing, active locks scope, completed requires explicit unlock.',
+        intro: 'Validation is the enforcement boundary — it ensures that every change to annotated source files ' +
+            'respects the delivery lifecycle rules defined by the FSM, protection levels, and scope constraints. ' +
+            'The system operates in three layers: the FSM validator checks status transitions against a 4-state ' +
+            'directed graph, the Process Guard orchestrates commit-time validation using a Decider pattern ' +
+            '(state derived from annotations, not stored separately), and the lint engine provides pluggable ' +
+            'rule execution with pretty and JSON output. Anti-pattern detection enforces dual-source ownership ' +
+            'boundaries — `@libar-docs-uses` belongs on TypeScript, `@libar-docs-depends-on` belongs on Gherkin — ' +
+            'preventing cross-domain tag confusion that causes documentation drift. Definition of Done validation ' +
+            'ensures completed patterns have all deliverables marked done and at least one acceptance-criteria scenario.',
+        diagramScopes: [
+            {
+                archContext: ['validation', 'lint'],
+                diagramType: 'C4Context',
+                title: 'Validation & Lint Boundary',
+            },
+            {
+                archContext: ['validation', 'lint'],
+                direction: 'LR',
+                title: 'Enforcement Pipeline',
+            },
+        ],
         keyInvariants: [
             'Protection levels: `roadmap`/`deferred` = none (fully editable), `active` = scope-locked (no new deliverables), `completed` = hard-locked (requires `@libar-docs-unlock-reason`)',
             'Valid FSM transitions: Only roadmap→active, roadmap→deferred, active→completed, active→roadmap, deferred→roadmap. Completed is terminal',
             'Decider pattern: All validation is (state, changes, options) → result. State is derived from annotations, not maintained separately',
+            'Dual-source ownership: Anti-pattern detection enforces tag boundaries — `uses` on TypeScript (runtime deps), `depends-on`/`quarter`/`team` on Gherkin (planning metadata). Violations are flagged before they cause documentation drift',
         ],
         keyPatterns: [
             'ProcessGuardLinter',

@@ -178,7 +178,7 @@ function parseDirectiveFromTable(table: DataTableRow[]): Partial<DocDirective> {
 
 const feature = await loadFeature('tests/features/lint/lint-engine.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   AfterEachScenario(() => {
     state = null;
   });
@@ -193,119 +193,121 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // lintDirective
   // ===========================================================================
 
-  Scenario('Return empty array when all rules pass', ({ Given, When, Then }) => {
-    Given('a directive with all required fields:', (_ctx: unknown, table: DataTableRow[]) => {
-      const overrides = parseDirectiveFromTable(table);
-      // Handle whenToUse as array
-      if (overrides.whenToUse && !Array.isArray(overrides.whenToUse)) {
-        overrides.whenToUse = [overrides.whenToUse];
-      }
-      state!.directive = createTestDirective(overrides);
+  Rule('Single directive linting validates annotations against rules', ({ RuleScenario }) => {
+    RuleScenario('Return empty array when all rules pass', ({ Given, When, Then }) => {
+      Given('a directive with all required fields:', (_ctx: unknown, table: DataTableRow[]) => {
+        const overrides = parseDirectiveFromTable(table);
+        // Handle whenToUse as array
+        if (overrides.whenToUse && !Array.isArray(overrides.whenToUse)) {
+          overrides.whenToUse = [overrides.whenToUse];
+        }
+        state!.directive = createTestDirective(overrides);
+      });
+
+      When('I lint the directive with default rules', () => {
+        state!.violations = lintDirective(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber,
+          defaultRules
+        );
+      });
+
+      Then('the violation count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.violations).toHaveLength(count);
+      });
     });
 
-    When('I lint the directive with default rules', () => {
-      state!.violations = lintDirective(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber,
-        defaultRules
+    RuleScenario('Return violations for failing rules', ({ Given, When, Then, And }) => {
+      Given('a directive with no fields set', () => {
+        state!.directive = createTestDirective();
+      });
+
+      When('I lint the directive with default rules', () => {
+        state!.violations = lintDirective(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber,
+          defaultRules
+        );
+      });
+
+      Then('the violation count should be greater than {int}', (_ctx: unknown, count: number) => {
+        expect(state!.violations.length).toBeGreaterThan(count);
+      });
+
+      And('the violations should include rule {string}', (_ctx: unknown, ruleId: string) => {
+        expect(state!.violations.some((v) => v.rule === ruleId)).toBe(true);
+      });
+    });
+
+    RuleScenario('Run all provided rules', ({ Given, When, Then, And }) => {
+      Given('a directive with no fields set', () => {
+        state!.directive = createTestDirective();
+      });
+
+      And('custom rules:', (_ctx: unknown, table: DataTableRow[]) => {
+        state!.customRules = table.map((row) =>
+          createAlwaysFailRule(row.id, row.severity as LintSeverity)
+        );
+      });
+
+      When('I lint the directive with custom rules', () => {
+        state!.violations = lintDirective(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber,
+          state!.customRules
+        );
+      });
+
+      Then('the violation count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.violations).toHaveLength(count);
+      });
+
+      And('the violations should have rules:', (_ctx: unknown, table: DataTableRow[]) => {
+        const expectedRules = table.map((row) => row.ruleId);
+        const actualRules = state!.violations.map((v) => v.rule);
+        expect(actualRules).toEqual(expectedRules);
+      });
+    });
+
+    RuleScenario('Include correct file and line in violations', ({ Given, When, Then, And }) => {
+      Given('a directive with no fields set', () => {
+        state!.directive = createTestDirective();
+      });
+
+      And(
+        'a custom rule {string} with severity {string}',
+        (_ctx: unknown, ruleId: string, severity: string) => {
+          state!.customRules = [createAlwaysFailRule(ruleId, severity as LintSeverity)];
+        }
       );
-    });
 
-    Then('the violation count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.violations).toHaveLength(count);
-    });
-  });
-
-  Scenario('Return violations for failing rules', ({ Given, When, Then, And }) => {
-    Given('a directive with no fields set', () => {
-      state!.directive = createTestDirective();
-    });
-
-    When('I lint the directive with default rules', () => {
-      state!.violations = lintDirective(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber,
-        defaultRules
+      And(
+        'the directive location is {string} at line {int}',
+        (_ctx: unknown, filePath: string, line: number) => {
+          state!.filePath = filePath;
+          state!.lineNumber = line;
+        }
       );
-    });
 
-    Then('the violation count should be greater than {int}', (_ctx: unknown, count: number) => {
-      expect(state!.violations.length).toBeGreaterThan(count);
-    });
+      When('I lint the directive with custom rules', () => {
+        state!.violations = lintDirective(
+          state!.directive,
+          state!.filePath,
+          state!.lineNumber,
+          state!.customRules
+        );
+      });
 
-    And('the violations should include rule {string}', (_ctx: unknown, ruleId: string) => {
-      expect(state!.violations.some((v) => v.rule === ruleId)).toBe(true);
-    });
-  });
+      Then('the first violation should have file {string}', (_ctx: unknown, file: string) => {
+        expect(state!.violations[0].file).toBe(file);
+      });
 
-  Scenario('Run all provided rules', ({ Given, When, Then, And }) => {
-    Given('a directive with no fields set', () => {
-      state!.directive = createTestDirective();
-    });
-
-    And('custom rules:', (_ctx: unknown, table: DataTableRow[]) => {
-      state!.customRules = table.map((row) =>
-        createAlwaysFailRule(row.id, row.severity as LintSeverity)
-      );
-    });
-
-    When('I lint the directive with custom rules', () => {
-      state!.violations = lintDirective(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber,
-        state!.customRules
-      );
-    });
-
-    Then('the violation count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.violations).toHaveLength(count);
-    });
-
-    And('the violations should have rules:', (_ctx: unknown, table: DataTableRow[]) => {
-      const expectedRules = table.map((row) => row.ruleId);
-      const actualRules = state!.violations.map((v) => v.rule);
-      expect(actualRules).toEqual(expectedRules);
-    });
-  });
-
-  Scenario('Include correct file and line in violations', ({ Given, When, Then, And }) => {
-    Given('a directive with no fields set', () => {
-      state!.directive = createTestDirective();
-    });
-
-    And(
-      'a custom rule {string} with severity {string}',
-      (_ctx: unknown, ruleId: string, severity: string) => {
-        state!.customRules = [createAlwaysFailRule(ruleId, severity as LintSeverity)];
-      }
-    );
-
-    And(
-      'the directive location is {string} at line {int}',
-      (_ctx: unknown, filePath: string, line: number) => {
-        state!.filePath = filePath;
-        state!.lineNumber = line;
-      }
-    );
-
-    When('I lint the directive with custom rules', () => {
-      state!.violations = lintDirective(
-        state!.directive,
-        state!.filePath,
-        state!.lineNumber,
-        state!.customRules
-      );
-    });
-
-    Then('the first violation should have file {string}', (_ctx: unknown, file: string) => {
-      expect(state!.violations[0].file).toBe(file);
-    });
-
-    And('the first violation should have line {int}', (_ctx: unknown, line: number) => {
-      expect(state!.violations[0].line).toBe(line);
+      And('the first violation should have line {int}', (_ctx: unknown, line: number) => {
+        expect(state!.violations[0].line).toBe(line);
+      });
     });
   });
 
@@ -313,236 +315,240 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // lintFiles
   // ===========================================================================
 
-  Scenario('Return empty results for clean files', ({ Given, When, Then, And }) => {
-    Given('clean directives in files:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        const cleanDirective = createCleanDirective();
-        state!.files.set(row.file, [{ directive: cleanDirective, line: 1 }]);
-      }
+  Rule('Multi-file batch linting aggregates results across files', ({ RuleScenario }) => {
+    RuleScenario('Return empty results for clean files', ({ Given, When, Then, And }) => {
+      Given('clean directives in files:', (_ctx: unknown, table: DataTableRow[]) => {
+        for (const row of table) {
+          const cleanDirective = createCleanDirective();
+          state!.files.set(row.file, [{ directive: cleanDirective, line: 1 }]);
+        }
+      });
+
+      When('I lint all files with default rules', () => {
+        state!.summary = lintFiles(state!.files, defaultRules);
+      });
+
+      Then('the result count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.results).toHaveLength(count);
+      });
+
+      And('the error count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.errorCount).toBe(count);
+      });
+
+      And('the warning count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.warningCount).toBe(count);
+      });
+
+      And('the info count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.infoCount).toBe(count);
+      });
+
+      And('the files scanned should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.filesScanned).toBe(count);
+      });
+
+      And('the directives checked should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.directivesChecked).toBe(count);
+      });
     });
 
-    When('I lint all files with default rules', () => {
-      state!.summary = lintFiles(state!.files, defaultRules);
+    RuleScenario('Collect violations by file', ({ Given, When, Then, And }) => {
+      Given('dirty directives in files:', (_ctx: unknown, table: DataTableRow[]) => {
+        for (const row of table) {
+          const dirtyDirective = createTestDirective(); // Missing everything
+          state!.files.set(row.file, [{ directive: dirtyDirective, line: parseInt(row.line) }]);
+        }
+      });
+
+      When('I lint all files with default rules', () => {
+        state!.summary = lintFiles(state!.files, defaultRules);
+      });
+
+      Then('the result count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.results).toHaveLength(count);
+      });
+
+      And('results should include files:', (_ctx: unknown, table: DataTableRow[]) => {
+        for (const row of table) {
+          expect(state!.summary.results.some((r) => r.file === row.file)).toBe(true);
+        }
+      });
     });
 
-    Then('the result count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.results).toHaveLength(count);
+    RuleScenario('Count violations by severity', ({ Given, When, Then, And }) => {
+      Given('a directive with no fields set', () => {
+        state!.directive = createTestDirective();
+      });
+
+      And('custom rules:', (_ctx: unknown, table: DataTableRow[]) => {
+        state!.customRules = table.map((row) =>
+          createAlwaysFailRule(row.id, row.severity as LintSeverity)
+        );
+      });
+
+      And('the directive is in file {string}', (_ctx: unknown, file: string) => {
+        state!.files.set(file, [{ directive: state!.directive, line: 1 }]);
+      });
+
+      When('I lint all files with custom rules', () => {
+        state!.summary = lintFiles(state!.files, state!.customRules);
+      });
+
+      Then('the error count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.errorCount).toBe(count);
+      });
+
+      And('the warning count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.warningCount).toBe(count);
+      });
+
+      And('the info count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.infoCount).toBe(count);
+      });
     });
 
-    And('the error count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.errorCount).toBe(count);
-    });
+    RuleScenario('Handle multiple directives per file', ({ Given, When, Then, And }) => {
+      Given(
+        'multiple directives in {string}:',
+        (_ctx: unknown, file: string, table: DataTableRow[]) => {
+          const directives: DirectiveWithLocation[] = table.map((row) => ({
+            directive: createTestDirective({
+              patternName: row.patternName,
+              status: row.status ? (row.status as DocDirective['status']) : undefined,
+            }),
+            line: parseInt(row.line),
+          }));
+          state!.files.set(file, directives);
+        }
+      );
 
-    And('the warning count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.warningCount).toBe(count);
-    });
+      When('I lint all files with default rules', () => {
+        state!.summary = lintFiles(state!.files, defaultRules);
+      });
 
-    And('the info count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.infoCount).toBe(count);
-    });
+      Then('the directives checked should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.directivesChecked).toBe(count);
+      });
 
-    And('the files scanned should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.filesScanned).toBe(count);
-    });
+      And('the result count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.summary.results).toHaveLength(count);
+      });
 
-    And('the directives checked should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.directivesChecked).toBe(count);
-    });
-  });
-
-  Scenario('Collect violations by file', ({ Given, When, Then, And }) => {
-    Given('dirty directives in files:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        const dirtyDirective = createTestDirective(); // Missing everything
-        state!.files.set(row.file, [{ directive: dirtyDirective, line: parseInt(row.line) }]);
-      }
-    });
-
-    When('I lint all files with default rules', () => {
-      state!.summary = lintFiles(state!.files, defaultRules);
-    });
-
-    Then('the result count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.results).toHaveLength(count);
-    });
-
-    And('results should include files:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        expect(state!.summary.results.some((r) => r.file === row.file)).toBe(true);
-      }
-    });
-  });
-
-  Scenario('Count violations by severity', ({ Given, When, Then, And }) => {
-    Given('a directive with no fields set', () => {
-      state!.directive = createTestDirective();
-    });
-
-    And('custom rules:', (_ctx: unknown, table: DataTableRow[]) => {
-      state!.customRules = table.map((row) =>
-        createAlwaysFailRule(row.id, row.severity as LintSeverity)
+      And(
+        'the first result should have more than {int} violation',
+        (_ctx: unknown, count: number) => {
+          expect(state!.summary.results[0].violations.length).toBeGreaterThan(count);
+        }
       );
     });
-
-    And('the directive is in file {string}', (_ctx: unknown, file: string) => {
-      state!.files.set(file, [{ directive: state!.directive, line: 1 }]);
-    });
-
-    When('I lint all files with custom rules', () => {
-      state!.summary = lintFiles(state!.files, state!.customRules);
-    });
-
-    Then('the error count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.errorCount).toBe(count);
-    });
-
-    And('the warning count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.warningCount).toBe(count);
-    });
-
-    And('the info count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.infoCount).toBe(count);
-    });
-  });
-
-  Scenario('Handle multiple directives per file', ({ Given, When, Then, And }) => {
-    Given(
-      'multiple directives in {string}:',
-      (_ctx: unknown, file: string, table: DataTableRow[]) => {
-        const directives: DirectiveWithLocation[] = table.map((row) => ({
-          directive: createTestDirective({
-            patternName: row.patternName,
-            status: row.status ? (row.status as DocDirective['status']) : undefined,
-          }),
-          line: parseInt(row.line),
-        }));
-        state!.files.set(file, directives);
-      }
-    );
-
-    When('I lint all files with default rules', () => {
-      state!.summary = lintFiles(state!.files, defaultRules);
-    });
-
-    Then('the directives checked should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.directivesChecked).toBe(count);
-    });
-
-    And('the result count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.summary.results).toHaveLength(count);
-    });
-
-    And(
-      'the first result should have more than {int} violation',
-      (_ctx: unknown, count: number) => {
-        expect(state!.summary.results[0].violations.length).toBeGreaterThan(count);
-      }
-    );
   });
 
   // ===========================================================================
   // hasFailures
   // ===========================================================================
 
-  Scenario('Return true when there are errors', ({ Given, Then, And }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
+  Rule('Failure detection respects strict mode for severity escalation', ({ RuleScenario }) => {
+    RuleScenario('Return true when there are errors', ({ Given, Then, And }) => {
+      Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const row = table[0];
+        state!.summary = {
+          results: [],
+          errorCount: parseInt(row.errorCount),
+          warningCount: parseInt(row.warningCount),
+          infoCount: parseInt(row.infoCount),
+          filesScanned: 1,
+          directivesChecked: 1,
+        };
+      });
+
+      Then('hasFailures should return true in normal mode', () => {
+        expect(hasFailures(state!.summary, false)).toBe(true);
+      });
+
+      And('hasFailures should return true in strict mode', () => {
+        expect(hasFailures(state!.summary, true)).toBe(true);
+      });
     });
 
-    Then('hasFailures should return true in normal mode', () => {
-      expect(hasFailures(state!.summary, false)).toBe(true);
+    RuleScenario('Return false for warnings only in non-strict mode', ({ Given, Then }) => {
+      Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const row = table[0];
+        state!.summary = {
+          results: [],
+          errorCount: parseInt(row.errorCount),
+          warningCount: parseInt(row.warningCount),
+          infoCount: parseInt(row.infoCount),
+          filesScanned: 1,
+          directivesChecked: 1,
+        };
+      });
+
+      Then('hasFailures should return false in normal mode', () => {
+        expect(hasFailures(state!.summary, false)).toBe(false);
+      });
     });
 
-    And('hasFailures should return true in strict mode', () => {
-      expect(hasFailures(state!.summary, true)).toBe(true);
-    });
-  });
+    RuleScenario('Return true for warnings in strict mode', ({ Given, Then }) => {
+      Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const row = table[0];
+        state!.summary = {
+          results: [],
+          errorCount: parseInt(row.errorCount),
+          warningCount: parseInt(row.warningCount),
+          infoCount: parseInt(row.infoCount),
+          filesScanned: 1,
+          directivesChecked: 1,
+        };
+      });
 
-  Scenario('Return false for warnings only in non-strict mode', ({ Given, Then }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
-    });
-
-    Then('hasFailures should return false in normal mode', () => {
-      expect(hasFailures(state!.summary, false)).toBe(false);
-    });
-  });
-
-  Scenario('Return true for warnings in strict mode', ({ Given, Then }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
+      Then('hasFailures should return true in strict mode', () => {
+        expect(hasFailures(state!.summary, true)).toBe(true);
+      });
     });
 
-    Then('hasFailures should return true in strict mode', () => {
-      expect(hasFailures(state!.summary, true)).toBe(true);
-    });
-  });
+    RuleScenario('Return false for info only', ({ Given, Then, And }) => {
+      Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const row = table[0];
+        state!.summary = {
+          results: [],
+          errorCount: parseInt(row.errorCount),
+          warningCount: parseInt(row.warningCount),
+          infoCount: parseInt(row.infoCount),
+          filesScanned: 1,
+          directivesChecked: 1,
+        };
+      });
 
-  Scenario('Return false for info only', ({ Given, Then, And }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
-    });
+      Then('hasFailures should return false in normal mode', () => {
+        expect(hasFailures(state!.summary, false)).toBe(false);
+      });
 
-    Then('hasFailures should return false in normal mode', () => {
-      expect(hasFailures(state!.summary, false)).toBe(false);
-    });
-
-    And('hasFailures should return false in strict mode', () => {
-      expect(hasFailures(state!.summary, true)).toBe(false);
-    });
-  });
-
-  Scenario('Return false when no violations', ({ Given, Then, And }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: parseInt(row.filesScanned),
-        directivesChecked: parseInt(row.directivesChecked),
-      };
+      And('hasFailures should return false in strict mode', () => {
+        expect(hasFailures(state!.summary, true)).toBe(false);
+      });
     });
 
-    Then('hasFailures should return false in normal mode', () => {
-      expect(hasFailures(state!.summary, false)).toBe(false);
-    });
+    RuleScenario('Return false when no violations', ({ Given, Then, And }) => {
+      Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const row = table[0];
+        state!.summary = {
+          results: [],
+          errorCount: parseInt(row.errorCount),
+          warningCount: parseInt(row.warningCount),
+          infoCount: parseInt(row.infoCount),
+          filesScanned: parseInt(row.filesScanned),
+          directivesChecked: parseInt(row.directivesChecked),
+        };
+      });
 
-    And('hasFailures should return false in strict mode', () => {
-      expect(hasFailures(state!.summary, true)).toBe(false);
+      Then('hasFailures should return false in normal mode', () => {
+        expect(hasFailures(state!.summary, false)).toBe(false);
+      });
+
+      And('hasFailures should return false in strict mode', () => {
+        expect(hasFailures(state!.summary, true)).toBe(false);
+      });
     });
   });
 
@@ -550,352 +556,364 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   // sortViolationsBySeverity
   // ===========================================================================
 
-  Scenario('Sort errors first then warnings then info', ({ Given, When, Then }) => {
-    Given('violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      state!.originalViolations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: '',
-        file: '/f.ts',
-        line: parseInt(row.line),
-      }));
+  Rule('Violation sorting orders by severity then by line number', ({ RuleScenario }) => {
+    RuleScenario('Sort errors first then warnings then info', ({ Given, When, Then }) => {
+      Given('violations:', (_ctx: unknown, table: DataTableRow[]) => {
+        state!.originalViolations = table.map((row) => ({
+          rule: row.rule,
+          severity: row.severity as LintSeverity,
+          message: '',
+          file: '/f.ts',
+          line: parseInt(row.line),
+        }));
+      });
+
+      When('I sort violations by severity', () => {
+        state!.sortedViolations = sortViolationsBySeverity(state!.originalViolations);
+      });
+
+      Then('the severity order should be:', (_ctx: unknown, table: DataTableRow[]) => {
+        const expectedSeverities = table.map((row) => row.severity);
+        const actualSeverities = state!.sortedViolations.map((v) => v.severity);
+        expect(actualSeverities).toEqual(expectedSeverities);
+      });
     });
 
-    When('I sort violations by severity', () => {
-      state!.sortedViolations = sortViolationsBySeverity(state!.originalViolations);
+    RuleScenario('Sort by line number within same severity', ({ Given, When, Then }) => {
+      Given('violations:', (_ctx: unknown, table: DataTableRow[]) => {
+        state!.originalViolations = table.map((row) => ({
+          rule: row.rule,
+          severity: row.severity as LintSeverity,
+          message: '',
+          file: '/f.ts',
+          line: parseInt(row.line),
+        }));
+      });
+
+      When('I sort violations by severity', () => {
+        state!.sortedViolations = sortViolationsBySeverity(state!.originalViolations);
+      });
+
+      Then('the line order should be:', (_ctx: unknown, table: DataTableRow[]) => {
+        const expectedLines = table.map((row) => parseInt(row.line));
+        const actualLines = state!.sortedViolations.map((v) => v.line);
+        expect(actualLines).toEqual(expectedLines);
+      });
     });
 
-    Then('the severity order should be:', (_ctx: unknown, table: DataTableRow[]) => {
-      const expectedSeverities = table.map((row) => row.severity);
-      const actualSeverities = state!.sortedViolations.map((v) => v.severity);
-      expect(actualSeverities).toEqual(expectedSeverities);
+    RuleScenario('Not mutate original array', ({ Given, When, Then, And }) => {
+      Given('violations:', (_ctx: unknown, table: DataTableRow[]) => {
+        state!.originalViolations = table.map((row) => ({
+          rule: row.rule,
+          severity: row.severity as LintSeverity,
+          message: '',
+          file: '/f.ts',
+          line: parseInt(row.line),
+        }));
+      });
+
+      When('I sort violations by severity', () => {
+        state!.sortedViolations = sortViolationsBySeverity(state!.originalViolations);
+      });
+
+      Then(
+        'the original first violation should have severity {string}',
+        (_ctx: unknown, severity: string) => {
+          expect(state!.originalViolations[0].severity).toBe(severity);
+        }
+      );
+
+      And(
+        'the sorted first violation should have severity {string}',
+        (_ctx: unknown, severity: string) => {
+          expect(state!.sortedViolations[0].severity).toBe(severity);
+        }
+      );
     });
-  });
-
-  Scenario('Sort by line number within same severity', ({ Given, When, Then }) => {
-    Given('violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      state!.originalViolations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: '',
-        file: '/f.ts',
-        line: parseInt(row.line),
-      }));
-    });
-
-    When('I sort violations by severity', () => {
-      state!.sortedViolations = sortViolationsBySeverity(state!.originalViolations);
-    });
-
-    Then('the line order should be:', (_ctx: unknown, table: DataTableRow[]) => {
-      const expectedLines = table.map((row) => parseInt(row.line));
-      const actualLines = state!.sortedViolations.map((v) => v.line);
-      expect(actualLines).toEqual(expectedLines);
-    });
-  });
-
-  Scenario('Not mutate original array', ({ Given, When, Then, And }) => {
-    Given('violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      state!.originalViolations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: '',
-        file: '/f.ts',
-        line: parseInt(row.line),
-      }));
-    });
-
-    When('I sort violations by severity', () => {
-      state!.sortedViolations = sortViolationsBySeverity(state!.originalViolations);
-    });
-
-    Then(
-      'the original first violation should have severity {string}',
-      (_ctx: unknown, severity: string) => {
-        expect(state!.originalViolations[0].severity).toBe(severity);
-      }
-    );
-
-    And(
-      'the sorted first violation should have severity {string}',
-      (_ctx: unknown, severity: string) => {
-        expect(state!.sortedViolations[0].severity).toBe(severity);
-      }
-    );
   });
 
   // ===========================================================================
   // formatPretty
   // ===========================================================================
 
-  Scenario('Show success message when no violations', ({ Given, When, Then }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: parseInt(row.filesScanned),
-        directivesChecked: parseInt(row.directivesChecked),
-      };
-    });
+  Rule(
+    'Pretty formatting produces human-readable output with severity counts',
+    ({ RuleScenario }) => {
+      RuleScenario('Show success message when no violations', ({ Given, When, Then }) => {
+        Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+          const row = table[0];
+          state!.summary = {
+            results: [],
+            errorCount: parseInt(row.errorCount),
+            warningCount: parseInt(row.warningCount),
+            infoCount: parseInt(row.infoCount),
+            filesScanned: parseInt(row.filesScanned),
+            directivesChecked: parseInt(row.directivesChecked),
+          };
+        });
 
-    When('I format the summary as pretty', () => {
-      state!.prettyOutput = formatPretty(state!.summary);
-    });
+        When('I format the summary as pretty', () => {
+          state!.prettyOutput = formatPretty(state!.summary);
+        });
 
-    Then('the output should contain:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        expect(state!.prettyOutput).toContain(row.text);
-      }
-    });
-  });
+        Then('the output should contain:', (_ctx: unknown, table: DataTableRow[]) => {
+          for (const row of table) {
+            expect(state!.prettyOutput).toContain(row.text);
+          }
+        });
+      });
 
-  Scenario('Format violations with file line severity and message', ({ Given, When, Then }) => {
-    Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      const violations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: row.message,
-        file: row.file,
-        line: parseInt(row.line),
-      }));
+      RuleScenario(
+        'Format violations with file line severity and message',
+        ({ Given, When, Then }) => {
+          Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
+            const violations = table.map((row) => ({
+              rule: row.rule,
+              severity: row.severity as LintSeverity,
+              message: row.message,
+              file: row.file,
+              line: parseInt(row.line),
+            }));
 
-      const results = [
-        {
-          file: table[0].file,
-          violations,
-        },
-      ];
+            const results = [
+              {
+                file: table[0].file,
+                violations,
+              },
+            ];
 
-      state!.summary = {
-        results,
-        errorCount: violations.filter((v) => v.severity === 'error').length,
-        warningCount: violations.filter((v) => v.severity === 'warning').length,
-        infoCount: violations.filter((v) => v.severity === 'info').length,
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
-    });
+            state!.summary = {
+              results,
+              errorCount: violations.filter((v) => v.severity === 'error').length,
+              warningCount: violations.filter((v) => v.severity === 'warning').length,
+              infoCount: violations.filter((v) => v.severity === 'info').length,
+              filesScanned: 1,
+              directivesChecked: 1,
+            };
+          });
 
-    When('I format the summary as pretty', () => {
-      state!.prettyOutput = formatPretty(state!.summary);
-    });
+          When('I format the summary as pretty', () => {
+            state!.prettyOutput = formatPretty(state!.summary);
+          });
 
-    Then('the output should contain:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        expect(state!.prettyOutput).toContain(row.text);
-      }
-    });
-  });
+          Then('the output should contain:', (_ctx: unknown, table: DataTableRow[]) => {
+            for (const row of table) {
+              expect(state!.prettyOutput).toContain(row.text);
+            }
+          });
+        }
+      );
 
-  Scenario('Show summary line with counts', ({ Given, When, Then }) => {
-    Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      const violations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: row.message,
-        file: row.file,
-        line: parseInt(row.line),
-      }));
+      RuleScenario('Show summary line with counts', ({ Given, When, Then }) => {
+        Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
+          const violations = table.map((row) => ({
+            rule: row.rule,
+            severity: row.severity as LintSeverity,
+            message: row.message,
+            file: row.file,
+            line: parseInt(row.line),
+          }));
 
-      const results = [
-        {
-          file: '/f.ts',
-          violations,
-        },
-      ];
+          const results = [
+            {
+              file: '/f.ts',
+              violations,
+            },
+          ];
 
-      state!.summary = {
-        results,
-        errorCount: violations.filter((v) => v.severity === 'error').length,
-        warningCount: violations.filter((v) => v.severity === 'warning').length,
-        infoCount: violations.filter((v) => v.severity === 'info').length,
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
-    });
+          state!.summary = {
+            results,
+            errorCount: violations.filter((v) => v.severity === 'error').length,
+            warningCount: violations.filter((v) => v.severity === 'warning').length,
+            infoCount: violations.filter((v) => v.severity === 'info').length,
+            filesScanned: 1,
+            directivesChecked: 1,
+          };
+        });
 
-    When('I format the summary as pretty', () => {
-      state!.prettyOutput = formatPretty(state!.summary);
-    });
+        When('I format the summary as pretty', () => {
+          state!.prettyOutput = formatPretty(state!.summary);
+        });
 
-    Then('the output should contain:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        expect(state!.prettyOutput).toContain(row.text);
-      }
-    });
-  });
+        Then('the output should contain:', (_ctx: unknown, table: DataTableRow[]) => {
+          for (const row of table) {
+            expect(state!.prettyOutput).toContain(row.text);
+          }
+        });
+      });
 
-  Scenario('Filter out warnings and info in quiet mode', ({ Given, When, Then, And }) => {
-    Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      const violations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: row.message,
-        file: row.file,
-        line: parseInt(row.line),
-      }));
+      RuleScenario('Filter out warnings and info in quiet mode', ({ Given, When, Then, And }) => {
+        Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
+          const violations = table.map((row) => ({
+            rule: row.rule,
+            severity: row.severity as LintSeverity,
+            message: row.message,
+            file: row.file,
+            line: parseInt(row.line),
+          }));
 
-      const results = [
-        {
-          file: '/f.ts',
-          violations,
-        },
-      ];
+          const results = [
+            {
+              file: '/f.ts',
+              violations,
+            },
+          ];
 
-      state!.summary = {
-        results,
-        errorCount: violations.filter((v) => v.severity === 'error').length,
-        warningCount: violations.filter((v) => v.severity === 'warning').length,
-        infoCount: violations.filter((v) => v.severity === 'info').length,
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
-    });
+          state!.summary = {
+            results,
+            errorCount: violations.filter((v) => v.severity === 'error').length,
+            warningCount: violations.filter((v) => v.severity === 'warning').length,
+            infoCount: violations.filter((v) => v.severity === 'info').length,
+            filesScanned: 1,
+            directivesChecked: 1,
+          };
+        });
 
-    When('I format the summary as pretty with quiet mode', () => {
-      state!.prettyOutput = formatPretty(state!.summary, { quiet: true });
-    });
+        When('I format the summary as pretty with quiet mode', () => {
+          state!.prettyOutput = formatPretty(state!.summary, { quiet: true });
+        });
 
-    Then('the output should contain {string}', (_ctx: unknown, text: string) => {
-      expect(state!.prettyOutput).toContain(text);
-    });
+        Then('the output should contain {string}', (_ctx: unknown, text: string) => {
+          expect(state!.prettyOutput).toContain(text);
+        });
 
-    And('the output should not contain:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        expect(state!.prettyOutput).not.toContain(row.text);
-      }
-    });
-  });
+        And('the output should not contain:', (_ctx: unknown, table: DataTableRow[]) => {
+          for (const row of table) {
+            expect(state!.prettyOutput).not.toContain(row.text);
+          }
+        });
+      });
+    }
+  );
 
   // ===========================================================================
   // formatJson
   // ===========================================================================
 
-  Scenario('Return valid JSON', ({ Given, When, Then, And }) => {
-    Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      const violations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: row.message,
-        file: row.file,
-        line: parseInt(row.line),
-      }));
+  Rule('JSON formatting produces machine-readable output with full details', ({ RuleScenario }) => {
+    RuleScenario('Return valid JSON', ({ Given, When, Then, And }) => {
+      Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
+        const violations = table.map((row) => ({
+          rule: row.rule,
+          severity: row.severity as LintSeverity,
+          message: row.message,
+          file: row.file,
+          line: parseInt(row.line),
+        }));
 
-      const results = [
-        {
-          file: table[0].file,
-          violations,
-        },
-      ];
+        const results = [
+          {
+            file: table[0].file,
+            violations,
+          },
+        ];
 
-      state!.summary = {
-        results,
-        errorCount: violations.filter((v) => v.severity === 'error').length,
-        warningCount: violations.filter((v) => v.severity === 'warning').length,
-        infoCount: violations.filter((v) => v.severity === 'info').length,
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
+        state!.summary = {
+          results,
+          errorCount: violations.filter((v) => v.severity === 'error').length,
+          warningCount: violations.filter((v) => v.severity === 'warning').length,
+          infoCount: violations.filter((v) => v.severity === 'info').length,
+          filesScanned: 1,
+          directivesChecked: 1,
+        };
+      });
+
+      When('I format the summary as JSON', () => {
+        const result = formatJson(state!.summary);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          state!.jsonOutput = result.value;
+          state!.parsedJson = JSON.parse(result.value) as LintJsonOutput;
+        }
+      });
+
+      Then('the JSON should be valid', () => {
+        expect(state!.parsedJson).toBeDefined();
+      });
+
+      And('the JSON results count should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.parsedJson!.results).toHaveLength(count);
+      });
+
+      And('the JSON summary errors should be {int}', (_ctx: unknown, count: number) => {
+        expect(state!.parsedJson!.summary.errors).toBe(count);
+      });
     });
 
-    When('I format the summary as JSON', () => {
-      const result = formatJson(state!.summary);
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        state!.jsonOutput = result.value;
-        state!.parsedJson = JSON.parse(result.value) as LintJsonOutput;
-      }
+    RuleScenario('Include all summary fields', ({ Given, When, Then }) => {
+      Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
+        const row = table[0];
+        state!.summary = {
+          results: [],
+          errorCount: parseInt(row.errorCount),
+          warningCount: parseInt(row.warningCount),
+          infoCount: parseInt(row.infoCount),
+          filesScanned: parseInt(row.filesScanned),
+          directivesChecked: parseInt(row.directivesChecked),
+        };
+      });
+
+      When('I format the summary as JSON', () => {
+        const result = formatJson(state!.summary);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          state!.jsonOutput = result.value;
+          state!.parsedJson = JSON.parse(result.value) as LintJsonOutput;
+        }
+      });
+
+      Then('the JSON summary should match:', (_ctx: unknown, table: DataTableRow[]) => {
+        for (const row of table) {
+          const field = row.field as keyof LintJsonOutput['summary'];
+          expect(state!.parsedJson!.summary[field]).toBe(parseInt(row.value));
+        }
+      });
     });
 
-    Then('the JSON should be valid', () => {
-      expect(state!.parsedJson).toBeDefined();
-    });
+    RuleScenario('Include violation details', ({ Given, When, Then }) => {
+      Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
+        const violations = table.map((row) => ({
+          rule: row.rule,
+          severity: row.severity as LintSeverity,
+          message: row.message,
+          file: row.file,
+          line: parseInt(row.line),
+        }));
 
-    And('the JSON results count should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.parsedJson!.results).toHaveLength(count);
-    });
+        const results = [
+          {
+            file: table[0].file,
+            violations,
+          },
+        ];
 
-    And('the JSON summary errors should be {int}', (_ctx: unknown, count: number) => {
-      expect(state!.parsedJson!.summary.errors).toBe(count);
-    });
-  });
+        state!.summary = {
+          results,
+          errorCount: violations.filter((v) => v.severity === 'error').length,
+          warningCount: violations.filter((v) => v.severity === 'warning').length,
+          infoCount: violations.filter((v) => v.severity === 'info').length,
+          filesScanned: 1,
+          directivesChecked: 1,
+        };
+      });
 
-  Scenario('Include all summary fields', ({ Given, When, Then }) => {
-    Given('a lint summary with:', (_ctx: unknown, table: DataTableRow[]) => {
-      const row = table[0];
-      state!.summary = {
-        results: [],
-        errorCount: parseInt(row.errorCount),
-        warningCount: parseInt(row.warningCount),
-        infoCount: parseInt(row.infoCount),
-        filesScanned: parseInt(row.filesScanned),
-        directivesChecked: parseInt(row.directivesChecked),
-      };
-    });
+      When('I format the summary as JSON', () => {
+        const result = formatJson(state!.summary);
+        expect(result.ok).toBe(true);
+        if (result.ok) {
+          state!.jsonOutput = result.value;
+          state!.parsedJson = JSON.parse(result.value) as LintJsonOutput;
+        }
+      });
 
-    When('I format the summary as JSON', () => {
-      const result = formatJson(state!.summary);
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        state!.jsonOutput = result.value;
-        state!.parsedJson = JSON.parse(result.value) as LintJsonOutput;
-      }
-    });
-
-    Then('the JSON summary should match:', (_ctx: unknown, table: DataTableRow[]) => {
-      for (const row of table) {
-        const field = row.field as keyof LintJsonOutput['summary'];
-        expect(state!.parsedJson!.summary[field]).toBe(parseInt(row.value));
-      }
-    });
-  });
-
-  Scenario('Include violation details', ({ Given, When, Then }) => {
-    Given('a lint summary with violations:', (_ctx: unknown, table: DataTableRow[]) => {
-      const violations = table.map((row) => ({
-        rule: row.rule,
-        severity: row.severity as LintSeverity,
-        message: row.message,
-        file: row.file,
-        line: parseInt(row.line),
-      }));
-
-      const results = [
-        {
-          file: table[0].file,
-          violations,
-        },
-      ];
-
-      state!.summary = {
-        results,
-        errorCount: violations.filter((v) => v.severity === 'error').length,
-        warningCount: violations.filter((v) => v.severity === 'warning').length,
-        infoCount: violations.filter((v) => v.severity === 'info').length,
-        filesScanned: 1,
-        directivesChecked: 1,
-      };
-    });
-
-    When('I format the summary as JSON', () => {
-      const result = formatJson(state!.summary);
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        state!.jsonOutput = result.value;
-        state!.parsedJson = JSON.parse(result.value) as LintJsonOutput;
-      }
-    });
-
-    Then('the first JSON violation should have:', (_ctx: unknown, table: DataTableRow[]) => {
-      const violation = state!.parsedJson!.results[0].violations[0];
-      for (const row of table) {
-        const field = row.field as keyof typeof violation;
-        const expectedValue = field === 'line' ? parseInt(row.value) : row.value;
-        expect(violation[field]).toBe(expectedValue);
-      }
+      Then('the first JSON violation should have:', (_ctx: unknown, table: DataTableRow[]) => {
+        const violation = state!.parsedJson!.results[0].violations[0];
+        for (const row of table) {
+          const field = row.field as keyof typeof violation;
+          const expectedValue = field === 'line' ? parseInt(row.value) : row.value;
+          expect(violation[field]).toBe(expectedValue);
+        }
+      });
     });
   });
 });

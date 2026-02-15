@@ -960,7 +960,7 @@ function humanizeFeatureName(name: string): string {
  * Uses case-insensitive comparison to catch near-duplicates like
  * "Standard level includes source link-out" vs "Standard level includes source link-out".
  */
-function deduplicateScenarioNames(
+export function deduplicateScenarioNames(
   scenarioNames: readonly string[],
   verifiedBy: readonly string[] | undefined
 ): string[] {
