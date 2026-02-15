@@ -331,6 +331,116 @@ ArchIndexSchema = z.object({
 
 ## Behavior Specifications
 
+### ProcessStateAPITesting
+
+[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+
+Programmatic interface for querying delivery process state.
+Designed for Claude Code integration and tool automation.
+
+**Problem:**
+
+- Markdown generation is not ideal for programmatic access
+- Claude Code needs structured data to answer process questions
+- Multiple queries require redundant parsing of MasterDataset
+
+**Solution:**
+
+- ProcessStateAPI wraps MasterDataset with typed query methods
+- Returns structured data suitable for programmatic consumption
+- Integrates FSM validation for transition checks
+
+<details>
+<summary>Status queries return correct patterns (6 scenarios)</summary>
+
+#### Status queries return correct patterns
+
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+
+**Verified by:**
+
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
+
+</details>
+
+<details>
+<summary>Phase queries return correct phase data (4 scenarios)</summary>
+
+#### Phase queries return correct phase data
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+
+**Verified by:**
+
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
+
+</details>
+
+<details>
+<summary>FSM queries expose transition validation (4 scenarios)</summary>
+
+#### FSM queries expose transition validation
+
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+</details>
+
+<details>
+<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+
+#### Pattern queries find and retrieve pattern data
+
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+</details>
+
+<details>
+<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+
+#### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
+
+</details>
+
 ### ValidatePatternsCli
 
 [View ValidatePatternsCli source](tests/features/cli/validate-patterns.feature)
@@ -1037,113 +1147,372 @@ Command-line interface for generating documentation from annotated TypeScript.
 
 </details>
 
-### ProcessStateAPITesting
+### ContextFormatterTests
 
-[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
 
-Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
+Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
+and formatOverview() plain text rendering functions.
+
+<details>
+<summary>formatContextBundle renders section markers (2 scenarios)</summary>
+
+#### formatContextBundle renders section markers
+
+**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
+
+**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
+
+**Verified by:**
+
+- Design bundle renders all populated sections
+- Implement bundle renders deliverables and FSM
+
+</details>
+
+<details>
+<summary>formatDepTree renders indented tree (1 scenarios)</summary>
+
+#### formatDepTree renders indented tree
+
+**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
+
+**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
+
+**Verified by:**
+
+- Tree renders with arrows and focal marker
+
+</details>
+
+<details>
+<summary>formatOverview renders progress summary (1 scenarios)</summary>
+
+#### formatOverview renders progress summary
+
+**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+
+**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+
+**Verified by:**
+
+- Overview renders progress line
+
+</details>
+
+<details>
+<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
+
+#### formatFileReadingList renders categorized file paths
+
+**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
+
+**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
+
+**Verified by:**
+
+- File list renders primary and dependency sections
+- Empty file reading list renders minimal output
+
+</details>
+
+### ContextAssemblerTests
+
+[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
+
+Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
+buildOverview() pure functions that operate on MasterDataset.
+
+<details>
+<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
+
+#### assembleContext produces session-tailored context bundles
+
+**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+
+**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+
+**Verified by:**
+
+- Design session includes stubs, consumers, and architecture
+- Planning session includes only metadata and dependencies
+- Implement session includes deliverables and FSM
+- Multi-pattern context merges metadata from both patterns
+- Pattern not found returns error with suggestion
+- Description preserves Problem and Solution structure
+- Solution text with inline bold is not truncated
+- Design session includes stubs
+- consumers
+- and architecture
+
+</details>
+
+<details>
+<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
+
+#### buildDepTree walks dependency chains with cycle detection
+
+**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+
+**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
+
+**Verified by:**
+
+- Dependency tree shows chain with status markers
+- Depth limit truncates branches
+- Circular dependencies are handled safely
+- Standalone pattern returns single-node tree
+
+</details>
+
+<details>
+<summary>buildOverview provides executive project summary (2 scenarios)</summary>
+
+#### buildOverview provides executive project summary
+
+**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+
+**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+
+**Verified by:**
+
+- Overview shows progress, active phases, and blocking
+- Empty dataset returns zero-state overview
+- Overview shows progress
+- active phases
+- and blocking
+
+</details>
+
+<details>
+<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
+
+#### buildFileReadingList returns paths by relevance
+
+**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+
+**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
+
+**Verified by:**
+
+- File list includes primary and related files
+- File list includes implementation files for completed dependencies
+- File list without related returns only primary
+
+</details>
+
+### ScopeValidatorTests
+
+[View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
 
 **Problem:**
-
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
+Starting an implementation or design session without checking prerequisites
+wastes time when blockers are discovered mid-session.
 
 **Solution:**
-
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
+ScopeValidator runs composable checks and aggregates results into a verdict
+(ready, blocked, or warnings) before a session starts.
 
 <details>
-<summary>Status queries return correct patterns (6 scenarios)</summary>
+<summary>Implementation scope validation checks all prerequisites (7 scenarios)</summary>
 
-#### Status queries return correct patterns
+#### Implementation scope validation checks all prerequisites
 
-**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
 
-**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
 
 **Verified by:**
 
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
+- All implementation checks pass
+- Incomplete dependency blocks implementation
+- FSM transition from completed blocks implementation
+- Missing PDR references produce WARN
+- No deliverables blocks implementation
+- Strict mode promotes WARN to BLOCKED
+- Pattern not found throws error
 
 </details>
 
 <details>
-<summary>Phase queries return correct phase data (4 scenarios)</summary>
+<summary>Design scope validation checks dependency stubs (2 scenarios)</summary>
 
-#### Phase queries return correct phase data
+#### Design scope validation checks dependency stubs
 
-**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
 
-**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
 
 **Verified by:**
 
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
+- Design session with no dependencies passes
+- Design session with dependencies lacking stubs produces WARN
 
 </details>
 
 <details>
-<summary>FSM queries expose transition validation (4 scenarios)</summary>
+<summary>Formatter produces structured text output (3 scenarios)</summary>
 
-#### FSM queries expose transition validation
+#### Formatter produces structured text output
 
-**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
 
-**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
 
 **Verified by:**
 
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
+- Formatter produces markers per ADR-008
+- Formatter shows warnings verdict text
+- Formatter shows blocker details for blocked verdict
+
+</details>
+
+### HandoffGeneratorTests
+
+[View HandoffGeneratorTests source](tests/features/api/session-support/handoff-generator.feature)
+
+**Problem:**
+Multi-session work loses critical state between sessions when handoff
+documentation is manual or forgotten.
+
+**Solution:**
+HandoffGenerator assembles a structured handoff document from ProcessStateAPI
+and MasterDataset, capturing completed work, remaining items, discovered
+issues, and next-session priorities.
+
+#### Handoff generates compact session state summary
+
+**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
+
+**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
+
+**Verified by:**
+
+- Generate handoff for in-progress pattern
+- Handoff captures discovered items
+- Session type is inferred from status
+- Completed pattern infers review session type
+- Deferred pattern infers design session type
+- Files modified section included when provided
+- Blockers section shows incomplete dependencies
+- Pattern not found throws error
+
+#### Formatter produces structured text output
+
+**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
+
+**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
+
+**Verified by:**
+
+- Handoff formatter produces markers per ADR-008
+
+### StubTaxonomyTagTests
+
+[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
+
+**Problem:**
+Stub metadata (target path, design session) was stored as plain text
+in JSDoc descriptions, invisible to structured queries.
+
+**Solution:**
+Register libar-docs-target and libar-docs-since as taxonomy tags
+so they flow through the extraction pipeline as structured fields.
+
+#### Taxonomy tags are registered in the registry
+
+**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
+
+**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
+
+**Verified by:**
+
+- Target and since tags exist in registry
+
+#### Tags are part of the stub metadata group
+
+**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
+
+**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
+
+**Verified by:**
+
+- Built registry groups target and since as stub tags
+
+### StubResolverTests
+
+[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
+
+**Problem:**
+Design session stubs need structured discovery and resolution
+to determine which stubs have been implemented and which remain.
+
+**Solution:**
+StubResolver functions identify, resolve, and group stubs from
+the MasterDataset with filesystem existence checks.
+
+<details>
+<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
+
+#### Stubs are identified by path or target metadata
+
+**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+
+**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+
+**Verified by:**
+
+- Patterns in stubs directory are identified as stubs
+- Patterns with targetPath are identified as stubs
 
 </details>
 
 <details>
-<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
 
-#### Pattern queries find and retrieve pattern data
+#### Stubs are resolved against the filesystem
 
-**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
 
-**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
 
 **Verified by:**
 
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
+- Resolved stubs show target existence status
+- Stubs are grouped by implementing pattern
 
 </details>
 
 <details>
-<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
 
-#### Timeline queries group patterns by time
+#### Decision items are extracted from descriptions
 
-**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
 
-**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
 
 **Verified by:**
 
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
+- AD-N items are extracted from description text
+- Empty description returns no decision items
+- Malformed AD items are skipped
+
+</details>
+
+<details>
+<summary>PDR references are found across patterns (2 scenarios)</summary>
+
+#### PDR references are found across patterns
+
+**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
+
+**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
+
+**Verified by:**
+
+- Patterns referencing a PDR are found
+- No references returns empty result
 
 </details>
 
@@ -1385,375 +1754,6 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 - Single character difference
 
 </details>
-
-### ContextFormatterTests
-
-[View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
-
-Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
-and formatOverview() plain text rendering functions.
-
-<details>
-<summary>formatContextBundle renders section markers (2 scenarios)</summary>
-
-#### formatContextBundle renders section markers
-
-**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
-
-**Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
-
-**Verified by:**
-
-- Design bundle renders all populated sections
-- Implement bundle renders deliverables and FSM
-
-</details>
-
-<details>
-<summary>formatDepTree renders indented tree (1 scenarios)</summary>
-
-#### formatDepTree renders indented tree
-
-**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
-
-**Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
-
-**Verified by:**
-
-- Tree renders with arrows and focal marker
-
-</details>
-
-<details>
-<summary>formatOverview renders progress summary (1 scenarios)</summary>
-
-#### formatOverview renders progress summary
-
-**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
-
-**Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
-
-**Verified by:**
-
-- Overview renders progress line
-
-</details>
-
-<details>
-<summary>formatFileReadingList renders categorized file paths (2 scenarios)</summary>
-
-#### formatFileReadingList renders categorized file paths
-
-**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
-
-**Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
-
-**Verified by:**
-
-- File list renders primary and dependency sections
-- Empty file reading list renders minimal output
-
-</details>
-
-### ContextAssemblerTests
-
-[View ContextAssemblerTests source](tests/features/api/context-assembly/context-assembler.feature)
-
-Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-buildOverview() pure functions that operate on MasterDataset.
-
-<details>
-<summary>assembleContext produces session-tailored context bundles (7 scenarios)</summary>
-
-#### assembleContext produces session-tailored context bundles
-
-**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
-
-**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
-
-**Verified by:**
-
-- Design session includes stubs, consumers, and architecture
-- Planning session includes only metadata and dependencies
-- Implement session includes deliverables and FSM
-- Multi-pattern context merges metadata from both patterns
-- Pattern not found returns error with suggestion
-- Description preserves Problem and Solution structure
-- Solution text with inline bold is not truncated
-- Design session includes stubs
-- consumers
-- and architecture
-
-</details>
-
-<details>
-<summary>buildDepTree walks dependency chains with cycle detection (4 scenarios)</summary>
-
-#### buildDepTree walks dependency chains with cycle detection
-
-**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
-
-**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
-
-**Verified by:**
-
-- Dependency tree shows chain with status markers
-- Depth limit truncates branches
-- Circular dependencies are handled safely
-- Standalone pattern returns single-node tree
-
-</details>
-
-<details>
-<summary>buildOverview provides executive project summary (2 scenarios)</summary>
-
-#### buildOverview provides executive project summary
-
-**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
-
-**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
-
-**Verified by:**
-
-- Overview shows progress, active phases, and blocking
-- Empty dataset returns zero-state overview
-- Overview shows progress
-- active phases
-- and blocking
-
-</details>
-
-<details>
-<summary>buildFileReadingList returns paths by relevance (3 scenarios)</summary>
-
-#### buildFileReadingList returns paths by relevance
-
-**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
-
-**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
-
-**Verified by:**
-
-- File list includes primary and related files
-- File list includes implementation files for completed dependencies
-- File list without related returns only primary
-
-</details>
-
-### StubTaxonomyTagTests
-
-[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
-
-**Problem:**
-Stub metadata (target path, design session) was stored as plain text
-in JSDoc descriptions, invisible to structured queries.
-
-**Solution:**
-Register libar-docs-target and libar-docs-since as taxonomy tags
-so they flow through the extraction pipeline as structured fields.
-
-#### Taxonomy tags are registered in the registry
-
-**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
-
-**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
-
-**Verified by:**
-
-- Target and since tags exist in registry
-
-#### Tags are part of the stub metadata group
-
-**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
-
-**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
-
-**Verified by:**
-
-- Built registry groups target and since as stub tags
-
-### StubResolverTests
-
-[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
-
-**Problem:**
-Design session stubs need structured discovery and resolution
-to determine which stubs have been implemented and which remain.
-
-**Solution:**
-StubResolver functions identify, resolve, and group stubs from
-the MasterDataset with filesystem existence checks.
-
-<details>
-<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
-
-#### Stubs are identified by path or target metadata
-
-**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
-
-**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
-
-**Verified by:**
-
-- Patterns in stubs directory are identified as stubs
-- Patterns with targetPath are identified as stubs
-
-</details>
-
-<details>
-<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
-
-#### Stubs are resolved against the filesystem
-
-**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
-
-**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
-
-**Verified by:**
-
-- Resolved stubs show target existence status
-- Stubs are grouped by implementing pattern
-
-</details>
-
-<details>
-<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
-
-#### Decision items are extracted from descriptions
-
-**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
-
-**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
-
-**Verified by:**
-
-- AD-N items are extracted from description text
-- Empty description returns no decision items
-- Malformed AD items are skipped
-
-</details>
-
-<details>
-<summary>PDR references are found across patterns (2 scenarios)</summary>
-
-#### PDR references are found across patterns
-
-**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
-
-**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
-
-**Verified by:**
-
-- Patterns referencing a PDR are found
-- No references returns empty result
-
-</details>
-
-### ScopeValidatorTests
-
-[View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
-
-**Problem:**
-Starting an implementation or design session without checking prerequisites
-wastes time when blockers are discovered mid-session.
-
-**Solution:**
-ScopeValidator runs composable checks and aggregates results into a verdict
-(ready, blocked, or warnings) before a session starts.
-
-<details>
-<summary>Implementation scope validation checks all prerequisites (7 scenarios)</summary>
-
-#### Implementation scope validation checks all prerequisites
-
-**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
-
-**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
-
-**Verified by:**
-
-- All implementation checks pass
-- Incomplete dependency blocks implementation
-- FSM transition from completed blocks implementation
-- Missing PDR references produce WARN
-- No deliverables blocks implementation
-- Strict mode promotes WARN to BLOCKED
-- Pattern not found throws error
-
-</details>
-
-<details>
-<summary>Design scope validation checks dependency stubs (2 scenarios)</summary>
-
-#### Design scope validation checks dependency stubs
-
-**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
-
-**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
-
-**Verified by:**
-
-- Design session with no dependencies passes
-- Design session with dependencies lacking stubs produces WARN
-
-</details>
-
-<details>
-<summary>Formatter produces structured text output (3 scenarios)</summary>
-
-#### Formatter produces structured text output
-
-**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
-
-**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
-
-**Verified by:**
-
-- Formatter produces markers per ADR-008
-- Formatter shows warnings verdict text
-- Formatter shows blocker details for blocked verdict
-
-</details>
-
-### HandoffGeneratorTests
-
-[View HandoffGeneratorTests source](tests/features/api/session-support/handoff-generator.feature)
-
-**Problem:**
-Multi-session work loses critical state between sessions when handoff
-documentation is manual or forgotten.
-
-**Solution:**
-HandoffGenerator assembles a structured handoff document from ProcessStateAPI
-and MasterDataset, capturing completed work, remaining items, discovered
-issues, and next-session priorities.
-
-#### Handoff generates compact session state summary
-
-**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
-
-**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
-
-**Verified by:**
-
-- Generate handoff for in-progress pattern
-- Handoff captures discovered items
-- Session type is inferred from status
-- Completed pattern infers review session type
-- Deferred pattern infers design session type
-- Files modified section included when provided
-- Blockers section shows incomplete dependencies
-- Pattern not found throws error
-
-#### Formatter produces structured text output
-
-**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
-
-**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
-
-**Verified by:**
-
-- Handoff formatter produces markers per ADR-008
 
 ### ArchQueriesTest
 

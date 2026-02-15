@@ -38,6 +38,10 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- LintRulesTesting ---
+
+--- LintEngineTesting ---
+
 --- StatusTransitionDetectionTesting ---
 
 | Rule                                                 | Description                                                                                                              |
@@ -109,10 +113,6 @@ Detail Level: Compact summary
 | Feature files should not exceed size thresholds       | **Invariant:** A single feature file must not exceed the configured maximum line count.<br> **Rationale:**...        |
 | All anti-patterns can be detected in one pass         | **Invariant:** The anti-pattern detector must evaluate all registered rules in a single scan pass over the source... |
 | Violations can be formatted for console output        | **Invariant:** Anti-pattern violations must be renderable as grouped, human-readable console output....              |
-
---- LintRulesTesting ---
-
---- LintEngineTesting ---
 
 --- LinterValidationTesting ---
 

@@ -100,6 +100,83 @@ Detail Level: Compact summary
 | Verified-by renders as checkbox list at standard level         |             |
 | Feature names are humanized from camelCase pattern names       |             |
 
+--- TransformDatasetTesting ---
+
+| Rule                                                              | Description                                                                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Empty dataset produces valid zero-state views                     | **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.<br><br> \*\*Verified... |
+| Status and phase grouping creates navigable views                 | **Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts...      |
+| Quarter and category grouping organizes by timeline and domain    | **Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata...         |
+| Source grouping separates TypeScript and Gherkin origins          | **Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap...   |
+| Relationship index builds bidirectional dependency graph          | **Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and...           |
+| Completion tracking computes project progress                     | **Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in...  |
+| Workflow integration conditionally includes delivery process data | **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from...    |
+
+--- RichContentHelpersTesting ---
+
+| Rule                                         | Description |
+| -------------------------------------------- | ----------- |
+| DocString parsing handles edge cases         |             |
+| DataTable rendering produces valid markdown  |             |
+| Scenario content rendering respects options  |             |
+| Business rule rendering handles descriptions |             |
+| DocString content is dedented when parsed    |             |
+
+--- UniversalMarkdownRenderer ---
+
+--- RemainingWorkSummaryAccuracy ---
+
+| Rule                                              | Description |
+| ------------------------------------------------- | ----------- |
+| Summary totals equal sum of phase table rows      |             |
+| Patterns without phases appear in Backlog row     |             |
+| Patterns without patternName are counted using id |             |
+| All phases with incomplete patterns are shown     |             |
+
+--- RemainingWorkEnhancement ---
+
+--- PrChangesGeneration ---
+
+--- PatternsCodecTesting ---
+
+| Rule                                                                  | Description                                                                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Document structure includes progress tracking and category navigation | **Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and...         |
+| Pattern table presents all patterns sorted by status then name        | **Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category,...        |
+| Category sections group patterns by domain                            | **Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories... |
+| Dependency graph visualizes pattern relationships                     | **Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the...                   |
+| Detail file generation creates per-pattern pages                      | **Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at...          |
+
+--- ImplementationLinkPathNormalization ---
+
+| Rule                                                       | Description |
+| ---------------------------------------------------------- | ----------- |
+| Repository prefixes are stripped from implementation paths |             |
+| All implementation links in a pattern are normalized       |             |
+| normalizeImplPath strips known prefixes                    |             |
+
+--- ExtractSummary ---
+
+| Rule                                                           | Description |
+| -------------------------------------------------------------- | ----------- |
+| Single-line descriptions are returned as-is when complete      |             |
+| Multi-line descriptions are combined until sentence ending     |             |
+| Long descriptions are truncated at sentence or word boundaries |             |
+| Tautological and header lines are skipped                      |             |
+| Edge cases are handled gracefully                              |             |
+
+--- DescriptionQualityFoundation ---
+
+--- DescriptionHeaderNormalization ---
+
+| Rule                                                   | Description |
+| ------------------------------------------------------ | ----------- |
+| Leading headers are stripped from pattern descriptions |             |
+| Edge cases are handled correctly                       |             |
+| stripLeadingHeaders removes only leading headers       |             |
+
+--- ZodCodecMigration ---
+
 --- WarningCollectorTesting ---
 
 | Rule                                                  | Description                                                                                                             |
@@ -211,82 +288,68 @@ Detail Level: Compact summary
 | Section order is preserved after deduplication      | **Invariant:** Section order matches the source mapping table order after deduplication.<br> **Rationale:**...          |
 | Deduplicator integrates with source mapper pipeline | **Invariant:** Deduplication runs after extraction and before document assembly.<br> **Rationale:** All content must... |
 
---- TransformDatasetTesting ---
+--- LayeredDiagramGeneration ---
 
-| Rule                                                              | Description                                                                                                              |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Empty dataset produces valid zero-state views                     | **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.<br><br> \*\*Verified... |
-| Status and phase grouping creates navigable views                 | **Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts...      |
-| Quarter and category grouping organizes by timeline and domain    | **Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata...         |
-| Source grouping separates TypeScript and Gherkin origins          | **Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap...   |
-| Relationship index builds bidirectional dependency graph          | **Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and...           |
-| Completion tracking computes project progress                     | **Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in...  |
-| Workflow integration conditionally includes delivery process data | **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from...    |
+| Rule                                                    | Description                                                                                                              |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Layered diagrams group patterns by arch-layer           | Patterns with arch-layer are grouped into Mermaid subgraphs.<br> Each layer becomes a visual container.                  |
+| Layer order is domain to infrastructure (top to bottom) | The layer subgraphs are rendered in Clean Architecture order:<br> domain at top, then application, then...               |
+| Context labels included in layered diagram nodes        | Unlike component diagrams which group by context, layered diagrams<br> include the context as a label in each node name. |
+| Patterns without layer go to Other subgraph             | Patterns that have arch-role or arch-context but no arch-layer<br> are grouped into an "Other" subgraph.                 |
+| Layered diagram includes summary section                | The generated document starts with an overview section<br> specific to layered architecture visualization.               |
 
---- RichContentHelpersTesting ---
+--- ArchGeneratorRegistration ---
 
-| Rule                                         | Description |
-| -------------------------------------------- | ----------- |
-| DocString parsing handles edge cases         |             |
-| DataTable rendering produces valid markdown  |             |
-| Scenario content rendering respects options  |             |
-| Business rule rendering handles descriptions |             |
-| DocString content is dedented when parsed    |             |
+| Rule                                                         | Description                                                                                                    |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| Architecture generator is registered in the registry         | The architecture generator must be registered like other built-in<br> generators so it can be invoked via CLI. |
+| Architecture generator produces component diagram by default | Running the architecture generator without options produces<br> a component diagram (bounded context view).    |
+| Architecture generator supports diagram type options         | The generator accepts options to specify diagram type<br> (component or layered).                              |
+| Architecture generator supports context filtering            | The generator can filter to specific bounded contexts<br> for focused diagram output.                          |
 
---- UniversalMarkdownRenderer ---
+--- ComponentDiagramGeneration ---
 
---- RemainingWorkSummaryAccuracy ---
+| Rule                                                    | Description                                                                                                         |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Component diagrams group patterns by bounded context    | Patterns with arch-context are grouped into Mermaid subgraphs.<br> Each bounded context becomes a visual container. |
+| Context-less patterns go to Shared Infrastructure       | Patterns without arch-context are grouped into a<br> "Shared Infrastructure" subgraph.                              |
+| Relationship types render with distinct arrow styles    | Arrow styles follow UML conventions:<br> - uses: solid arrow (-->)<br> - depends-on: dashed arrow (-.->)<br> -...   |
+| Arrows only connect annotated components                | Relationships pointing to non-annotated patterns<br> are not rendered (target would not exist in diagram).          |
+| Component diagram includes summary section              | The generated document starts with an overview section<br> showing component counts and bounded context statistics. |
+| Component diagram includes legend when enabled          | The legend explains arrow style meanings for readers.                                                               |
+| Component diagram includes inventory table when enabled | The inventory lists all components with their metadata.                                                             |
+| Empty architecture data shows guidance message          | If no patterns have architecture annotations,<br> the document explains how to add them.                            |
+
+--- ArchTagExtraction ---
+
+| Rule                                                         | Description                                                                                                             |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| arch-role tag is defined in the registry                     | Architecture roles classify components for diagram rendering.<br> Valid roles: command-handler, projection, saga,...    |
+| arch-context tag is defined in the registry                  | Context tags group components into bounded context subgraphs.<br> Format is "value" (free-form string like "orders",... |
+| arch-layer tag is defined in the registry                    | Layer tags enable layered architecture diagrams.<br> Valid layers: domain, application, infrastructure.                 |
+| AST parser extracts arch-role from TypeScript annotations    | The AST parser must extract arch-role alongside other pattern metadata.                                                 |
+| AST parser extracts arch-context from TypeScript annotations | Context values are free-form strings naming the bounded context.                                                        |
+| AST parser extracts arch-layer from TypeScript annotations   | Layer tags classify components by architectural layer.                                                                  |
+| AST parser handles multiple arch tags together               | Components often have role + context + layer together.                                                                  |
+| Missing arch tags yield undefined values                     | Components without arch tags should have undefined (not null or empty).                                                 |
+
+--- ArchIndexDataset ---
+
+| Rule                                                   | Description                                                                                                              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| archIndex groups patterns by arch-role                 | The archIndex.byRole map groups patterns by their architectural role<br> (command-handler, projection, saga, etc.)...    |
+| archIndex groups patterns by arch-context              | The archIndex.byContext map groups patterns by bounded context<br> for subgraph rendering in component diagrams.         |
+| archIndex groups patterns by arch-layer                | The archIndex.byLayer map groups patterns by architectural layer<br> (domain, application, infrastructure) for...        |
+| archIndex.all contains all patterns with any arch tag  | The archIndex.all array contains all patterns that have at least<br> one arch tag (role, context, or layer). Patterns... |
+| Patterns without arch tags are excluded from archIndex | Patterns that have no arch-role, arch-context, or arch-layer are<br> not included in the archIndex at all.               |
+
+--- MermaidRelationshipRendering ---
 
 | Rule                                              | Description |
 | ------------------------------------------------- | ----------- |
-| Summary totals equal sum of phase table rows      |             |
-| Patterns without phases appear in Backlog row     |             |
-| Patterns without patternName are counted using id |             |
-| All phases with incomplete patterns are shown     |             |
-
---- RemainingWorkEnhancement ---
-
---- PrChangesGeneration ---
-
---- PatternsCodecTesting ---
-
-| Rule                                                                  | Description                                                                                                              |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Document structure includes progress tracking and category navigation | **Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and...         |
-| Pattern table presents all patterns sorted by status then name        | **Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category,...        |
-| Category sections group patterns by domain                            | **Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories... |
-| Dependency graph visualizes pattern relationships                     | **Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the...                   |
-| Detail file generation creates per-pattern pages                      | **Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at...          |
-
---- ImplementationLinkPathNormalization ---
-
-| Rule                                                       | Description |
-| ---------------------------------------------------------- | ----------- |
-| Repository prefixes are stripped from implementation paths |             |
-| All implementation links in a pattern are normalized       |             |
-| normalizeImplPath strips known prefixes                    |             |
-
---- ExtractSummary ---
-
-| Rule                                                           | Description |
-| -------------------------------------------------------------- | ----------- |
-| Single-line descriptions are returned as-is when complete      |             |
-| Multi-line descriptions are combined until sentence ending     |             |
-| Long descriptions are truncated at sentence or word boundaries |             |
-| Tautological and header lines are skipped                      |             |
-| Edge cases are handled gracefully                              |             |
-
---- DescriptionQualityFoundation ---
-
---- DescriptionHeaderNormalization ---
-
-| Rule                                                   | Description |
-| ------------------------------------------------------ | ----------- |
-| Leading headers are stripped from pattern descriptions |             |
-| Edge cases are handled correctly                       |             |
-| stripLeadingHeaders removes only leading headers       |             |
-
---- ZodCodecMigration ---
+| Each relationship type has a distinct arrow style |             |
+| Pattern names are sanitized for Mermaid node IDs  |             |
+| All relationship types appear in single graph     |             |
 
 --- TimelineCodecTesting ---
 
@@ -423,66 +486,3 @@ Detail Level: Compact summary
 | additionalFiles merge with last-wins semantics            | **Invariant:** additionalFiles from all children are merged into<br> a single record. When keys collide, the later...  |
 | composeDocuments works at document level without codecs   | **Invariant:** composeDocuments accepts RenderableDocument array and<br> produces a composed RenderableDocument...     |
 | Empty codec outputs are handled gracefully                | **Invariant:** Codecs producing empty sections arrays contribute<br> nothing to the output. No separator is emitted... |
-
---- MermaidRelationshipRendering ---
-
-| Rule                                              | Description |
-| ------------------------------------------------- | ----------- |
-| Each relationship type has a distinct arrow style |             |
-| Pattern names are sanitized for Mermaid node IDs  |             |
-| All relationship types appear in single graph     |             |
-
---- LayeredDiagramGeneration ---
-
-| Rule                                                    | Description                                                                                                              |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Layered diagrams group patterns by arch-layer           | Patterns with arch-layer are grouped into Mermaid subgraphs.<br> Each layer becomes a visual container.                  |
-| Layer order is domain to infrastructure (top to bottom) | The layer subgraphs are rendered in Clean Architecture order:<br> domain at top, then application, then...               |
-| Context labels included in layered diagram nodes        | Unlike component diagrams which group by context, layered diagrams<br> include the context as a label in each node name. |
-| Patterns without layer go to Other subgraph             | Patterns that have arch-role or arch-context but no arch-layer<br> are grouped into an "Other" subgraph.                 |
-| Layered diagram includes summary section                | The generated document starts with an overview section<br> specific to layered architecture visualization.               |
-
---- ArchGeneratorRegistration ---
-
-| Rule                                                         | Description                                                                                                    |
-| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| Architecture generator is registered in the registry         | The architecture generator must be registered like other built-in<br> generators so it can be invoked via CLI. |
-| Architecture generator produces component diagram by default | Running the architecture generator without options produces<br> a component diagram (bounded context view).    |
-| Architecture generator supports diagram type options         | The generator accepts options to specify diagram type<br> (component or layered).                              |
-| Architecture generator supports context filtering            | The generator can filter to specific bounded contexts<br> for focused diagram output.                          |
-
---- ComponentDiagramGeneration ---
-
-| Rule                                                    | Description                                                                                                         |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Component diagrams group patterns by bounded context    | Patterns with arch-context are grouped into Mermaid subgraphs.<br> Each bounded context becomes a visual container. |
-| Context-less patterns go to Shared Infrastructure       | Patterns without arch-context are grouped into a<br> "Shared Infrastructure" subgraph.                              |
-| Relationship types render with distinct arrow styles    | Arrow styles follow UML conventions:<br> - uses: solid arrow (-->)<br> - depends-on: dashed arrow (-.->)<br> -...   |
-| Arrows only connect annotated components                | Relationships pointing to non-annotated patterns<br> are not rendered (target would not exist in diagram).          |
-| Component diagram includes summary section              | The generated document starts with an overview section<br> showing component counts and bounded context statistics. |
-| Component diagram includes legend when enabled          | The legend explains arrow style meanings for readers.                                                               |
-| Component diagram includes inventory table when enabled | The inventory lists all components with their metadata.                                                             |
-| Empty architecture data shows guidance message          | If no patterns have architecture annotations,<br> the document explains how to add them.                            |
-
---- ArchTagExtraction ---
-
-| Rule                                                         | Description                                                                                                             |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
-| arch-role tag is defined in the registry                     | Architecture roles classify components for diagram rendering.<br> Valid roles: command-handler, projection, saga,...    |
-| arch-context tag is defined in the registry                  | Context tags group components into bounded context subgraphs.<br> Format is "value" (free-form string like "orders",... |
-| arch-layer tag is defined in the registry                    | Layer tags enable layered architecture diagrams.<br> Valid layers: domain, application, infrastructure.                 |
-| AST parser extracts arch-role from TypeScript annotations    | The AST parser must extract arch-role alongside other pattern metadata.                                                 |
-| AST parser extracts arch-context from TypeScript annotations | Context values are free-form strings naming the bounded context.                                                        |
-| AST parser extracts arch-layer from TypeScript annotations   | Layer tags classify components by architectural layer.                                                                  |
-| AST parser handles multiple arch tags together               | Components often have role + context + layer together.                                                                  |
-| Missing arch tags yield undefined values                     | Components without arch tags should have undefined (not null or empty).                                                 |
-
---- ArchIndexDataset ---
-
-| Rule                                                   | Description                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| archIndex groups patterns by arch-role                 | The archIndex.byRole map groups patterns by their architectural role<br> (command-handler, projection, saga, etc.)...    |
-| archIndex groups patterns by arch-context              | The archIndex.byContext map groups patterns by bounded context<br> for subgraph rendering in component diagrams.         |
-| archIndex groups patterns by arch-layer                | The archIndex.byLayer map groups patterns by architectural layer<br> (domain, application, infrastructure) for...        |
-| archIndex.all contains all patterns with any arch tag  | The archIndex.all array contains all patterns that have at least<br> one arch tag (role, context, or layer). Patterns... |
-| Patterns without arch tags are excluded from archIndex | Patterns that have no arch-role, arch-context, or arch-layer are<br> not included in the archIndex at all.               |

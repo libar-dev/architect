@@ -25,6 +25,16 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- ProcessStateAPITesting ---
+
+| Rule                                           | Description                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
+| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
+| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
+| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
+| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+
 --- ValidatePatternsCli ---
 
 | Rule                                                         | Description                                                                                                              |
@@ -100,15 +110,54 @@ Detail Level: Compact summary
 | CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
 | CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
 
---- ProcessStateAPITesting ---
+--- ContextFormatterTests ---
 
-| Rule                                           | Description                                                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
-| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
-| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
-| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
-| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
+| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
+| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
+| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
+
+--- ContextAssemblerTests ---
+
+| Rule                                                      | Description                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
+| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
+| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
+| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
+
+--- ScopeValidatorTests ---
+
+| Rule                                                     | Description                                                                                                             |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
+| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
+| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
+
+--- HandoffGeneratorTests ---
+
+| Rule                                            | Description                                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
+| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
+
+--- StubTaxonomyTagTests ---
+
+| Rule                                         | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
+| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
+
+--- StubResolverTests ---
+
+| Rule                                            | Description                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
+| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
+| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
+| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
 
 --- PatternSummarizeTests ---
 
@@ -142,55 +191,6 @@ Detail Level: Compact summary
 | Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
-
---- ContextFormatterTests ---
-
-| Rule                                                 | Description                                                                                                              |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
-| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
-| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
-| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
-
---- ContextAssemblerTests ---
-
-| Rule                                                      | Description                                                                                                              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
-| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
-| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
-| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
-
---- StubTaxonomyTagTests ---
-
-| Rule                                         | Description                                                                                                             |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
-| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
-
---- StubResolverTests ---
-
-| Rule                                            | Description                                                                                                              |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
-| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
-| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
-| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
-
---- ScopeValidatorTests ---
-
-| Rule                                                     | Description                                                                                                             |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
-| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
-| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
-
---- HandoffGeneratorTests ---
-
-| Rule                                            | Description                                                                                                    |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
-| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
 
 --- ArchQueriesTest ---
 

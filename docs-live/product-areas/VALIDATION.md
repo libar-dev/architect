@@ -34,8 +34,8 @@ graph TB
         FSMStates[/"FSMStates"/]
     end
     subgraph related["Related"]
-        CodecUtils["CodecUtils"]:::neighbor
         DoDValidationTypes["DoDValidationTypes"]:::neighbor
+        CodecUtils["CodecUtils"]:::neighbor
         DualSourceExtractor["DualSourceExtractor"]:::neighbor
     end
     DoDValidator -->|uses| DoDValidationTypes
@@ -830,6 +830,36 @@ const missingStatus: LintRule;
 
 ## Behavior Specifications
 
+### LintRulesTesting
+
+[View LintRulesTesting source](tests/features/lint/lint-rules.feature)
+
+The lint system validates @libar-docs-\* documentation annotations for quality.
+
+Rules check parsed directives for completeness and quality, enabling
+CI enforcement of documentation standards.
+
+Each rule has a severity level:
+
+- error: Must fix before merge
+- warning: Should fix for quality
+- info: Suggestions for improvement
+
+### LintEngineTesting
+
+[View LintEngineTesting source](tests/features/lint/lint-engine.feature)
+
+The lint engine orchestrates rule execution, aggregates violations,
+and formats output for human and machine consumption.
+
+The engine provides:
+
+- Single directive linting
+- Multi-file batch linting
+- Failure detection (with strict mode)
+- Violation sorting
+- Pretty and JSON output formats
+
 ### StatusTransitionDetectionTesting
 
 [View StatusTransitionDetectionTesting source](tests/features/validation/status-transition-detection.feature)
@@ -1566,36 +1596,6 @@ process hygiene issues that lead to documentation drift.
 - Violations are grouped by severity
 
 </details>
-
-### LintRulesTesting
-
-[View LintRulesTesting source](tests/features/lint/lint-rules.feature)
-
-The lint system validates @libar-docs-\* documentation annotations for quality.
-
-Rules check parsed directives for completeness and quality, enabling
-CI enforcement of documentation standards.
-
-Each rule has a severity level:
-
-- error: Must fix before merge
-- warning: Should fix for quality
-- info: Suggestions for improvement
-
-### LintEngineTesting
-
-[View LintEngineTesting source](tests/features/lint/lint-engine.feature)
-
-The lint engine orchestrates rule execution, aggregates violations,
-and formats output for human and machine consumption.
-
-The engine provides:
-
-- Single directive linting
-- Multi-file batch linting
-- Failure detection (with strict mode)
-- Violation sorting
-- Pretty and JSON output formats
 
 ### LinterValidationTesting
 

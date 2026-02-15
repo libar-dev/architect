@@ -27,8 +27,8 @@ graph TB
         ContentDeduplicator[/"ContentDeduplicator"/]
         CodecBasedGenerator("CodecBasedGenerator")
         FileCache[/"FileCache"/]
-        TransformDataset("TransformDataset")
         DecisionDocGenerator("DecisionDocGenerator")
+        TransformDataset("TransformDataset")
     end
     subgraph renderer["Renderer"]
         RenderableDocument[/"RenderableDocument"/]
@@ -51,10 +51,10 @@ graph TB
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    TransformDataset -->|uses| MasterDataset
+    ArchitectureCodec -->|uses| MasterDataset
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
-    ArchitectureCodec -->|uses| MasterDataset
+    TransformDataset -->|uses| MasterDataset
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -607,6 +607,647 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - Testing suffix is stripped from feature names
 
 </details>
+
+### TransformDatasetTesting
+
+[View TransformDatasetTesting source](tests/features/behavior/transform-dataset.feature)
+
+The transformToMasterDataset function transforms raw extracted patterns
+into a MasterDataset with all pre-computed views in a single pass.
+This is the core of the unified transformation pipeline.
+
+**Problem:**
+
+- Generators need multiple views of the same pattern data
+- Computing views lazily leads to O(n\*v) complexity
+- Views must be consistent with each other
+
+**Solution:**
+
+- Single-pass transformation computes all views in O(n)
+- All views are immutable and pre-computed
+- MasterDataset is the source of truth for all generators
+
+<details>
+<summary>Empty dataset produces valid zero-state views (1 scenarios)</summary>
+
+#### Empty dataset produces valid zero-state views
+
+**Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+
+**Verified by:**
+
+- Transform empty dataset
+
+</details>
+
+<details>
+<summary>Status and phase grouping creates navigable views (6 scenarios)</summary>
+
+#### Status and phase grouping creates navigable views
+
+**Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
+
+**Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
+
+**Verified by:**
+
+- Group patterns by status
+- Normalize status variants to canonical values
+- Group patterns by phase
+- Sort phases by phase number
+- Compute per-phase status counts
+- Patterns without phase are not in byPhase
+
+</details>
+
+<details>
+<summary>Quarter and category grouping organizes by timeline and domain (3 scenarios)</summary>
+
+#### Quarter and category grouping organizes by timeline and domain
+
+**Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+
+**Verified by:**
+
+- Group patterns by quarter
+- Patterns without quarter are not in byQuarter
+- Group patterns by category
+
+</details>
+
+<details>
+<summary>Source grouping separates TypeScript and Gherkin origins (2 scenarios)</summary>
+
+#### Source grouping separates TypeScript and Gherkin origins
+
+**Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+
+**Verified by:**
+
+- Group patterns by source file type
+- Patterns with phase are also in roadmap view
+
+</details>
+
+<details>
+<summary>Relationship index builds bidirectional dependency graph (5 scenarios)</summary>
+
+#### Relationship index builds bidirectional dependency graph
+
+**Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
+
+**Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
+
+**Verified by:**
+
+- Build relationship index from patterns
+- Build relationship index with all relationship types
+- Reverse lookup computes enables from dependsOn
+- Reverse lookup computes usedBy from uses
+- Reverse lookup merges with explicit annotations without duplicates
+
+</details>
+
+<details>
+<summary>Completion tracking computes project progress (2 scenarios)</summary>
+
+#### Completion tracking computes project progress
+
+**Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+
+**Verified by:**
+
+- Calculate completion percentage
+- Check if fully completed
+
+</details>
+
+<details>
+<summary>Workflow integration conditionally includes delivery process data (2 scenarios)</summary>
+
+#### Workflow integration conditionally includes delivery process data
+
+**Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+
+**Verified by:**
+
+- Include workflow in result when provided
+- Result omits workflow when not provided
+
+</details>
+
+### RichContentHelpersTesting
+
+[View RichContentHelpersTesting source](tests/features/behavior/rich-content-helpers.feature)
+
+As a document codec author
+I need helpers to render Gherkin rich content
+So that DataTables, DocStrings, and scenarios render consistently across codecs
+
+The helpers handle edge cases like:
+
+- Unclosed DocStrings (fallback to plain paragraph)
+- Windows CRLF line endings (normalized to LF)
+- Empty inputs (graceful handling)
+- Missing table cells (empty string fallback)
+
+<details>
+<summary>DocString parsing handles edge cases (6 scenarios)</summary>
+
+#### DocString parsing handles edge cases
+
+**Verified by:**
+
+- Empty description returns empty array
+- Description with no DocStrings returns single paragraph
+- Single DocString parses correctly
+- DocString without language hint uses text
+- Unclosed DocString returns plain paragraph fallback
+- Windows CRLF line endings are normalized
+
+</details>
+
+<details>
+<summary>DataTable rendering produces valid markdown (3 scenarios)</summary>
+
+#### DataTable rendering produces valid markdown
+
+**Verified by:**
+
+- Single row DataTable renders correctly
+- Multi-row DataTable renders correctly
+- Missing cell values become empty strings
+
+</details>
+
+<details>
+<summary>Scenario content rendering respects options (3 scenarios)</summary>
+
+#### Scenario content rendering respects options
+
+**Verified by:**
+
+- Render scenario with steps
+- Skip steps when includeSteps is false
+- Render scenario with DataTable in step
+
+</details>
+
+<details>
+<summary>Business rule rendering handles descriptions (3 scenarios)</summary>
+
+#### Business rule rendering handles descriptions
+
+**Verified by:**
+
+- Rule with simple description
+- Rule with no description
+- Rule with embedded DocString in description
+
+</details>
+
+<details>
+<summary>DocString content is dedented when parsed (4 scenarios)</summary>
+
+#### DocString content is dedented when parsed
+
+**Verified by:**
+
+- Code block preserves internal relative indentation
+- Empty lines in code block are preserved
+- Trailing whitespace is trimmed from each line
+- Code with mixed indentation is preserved
+
+</details>
+
+### UniversalMarkdownRenderer
+
+[View UniversalMarkdownRenderer source](tests/features/behavior/render.feature)
+
+The universal renderer converts RenderableDocument to markdown.
+It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
+
+### RemainingWorkSummaryAccuracy
+
+[View RemainingWorkSummaryAccuracy source](tests/features/behavior/remaining-work-totals.feature)
+
+Summary totals in REMAINING-WORK.md must match the sum of phase table rows.
+The backlog calculation must correctly identify patterns without phases
+using pattern.id (which is always defined) rather than patternName.
+
+<details>
+<summary>Summary totals equal sum of phase table rows (2 scenarios)</summary>
+
+#### Summary totals equal sum of phase table rows
+
+**Verified by:**
+
+- Summary matches phase table with all patterns having phases
+- Summary includes completed patterns correctly
+
+</details>
+
+<details>
+<summary>Patterns without phases appear in Backlog row (2 scenarios)</summary>
+
+#### Patterns without phases appear in Backlog row
+
+**Verified by:**
+
+- Summary includes backlog patterns without phase
+- All patterns in backlog when none have phases
+
+</details>
+
+<details>
+<summary>Patterns without patternName are counted using id (2 scenarios)</summary>
+
+#### Patterns without patternName are counted using id
+
+**Verified by:**
+
+- Patterns with undefined patternName counted correctly
+- Mixed patterns with and without patternName
+
+</details>
+
+<details>
+<summary>All phases with incomplete patterns are shown (2 scenarios)</summary>
+
+#### All phases with incomplete patterns are shown
+
+**Verified by:**
+
+- Multiple phases shown in order
+- Completed phases not shown in remaining work
+
+</details>
+
+### RemainingWorkEnhancement
+
+[View RemainingWorkEnhancement source](tests/features/behavior/remaining-work-enhancement.feature)
+
+Enhanced REMAINING-WORK.md generation with priority-based sorting,
+quarter grouping, and progressive disclosure for better session planning.
+
+**Problem:**
+
+- Flat phase lists make it hard to identify what to work on next
+- No visibility into relative urgency or importance of phases
+- Large backlogs overwhelm planners with too much information at once
+- Quarter-based planning requires manual grouping of phases
+- Effort estimates are not factored into prioritization decisions
+
+**Solution:**
+
+- Priority-based sorting surfaces critical/high-priority work first
+- Quarter grouping organizes planned work into time-based buckets
+- Progressive disclosure shows summary with link to full backlog details
+- Effort parsing enables sorting by estimated work duration
+- Visual priority icons provide at-a-glance urgency indicators
+
+### PrChangesGeneration
+
+[View PrChangesGeneration source](tests/features/behavior/pr-changes-generation.feature)
+
+The delivery process generates PR-CHANGES.md from active or completed phases,
+formatted for PR descriptions, code reviews, and release notes.
+
+**Problem:**
+
+- PR descriptions are manually written, often incomplete or inconsistent
+- Reviewers lack structured view of what changed and why
+- Deliverable completion status scattered across feature files
+- Dependency relationships between phases hidden from reviewers
+
+**Solution:**
+
+- Auto-generate PR-CHANGES.md with summary statistics and phase-grouped changes
+- Include both active and completed phases (roadmap phases excluded)
+- Filter by release version (releaseFilter) to show matching deliverables
+- Surface deliverables inline with each pattern
+- Include review checklist with standard code quality items
+- Include dependency section showing what patterns enable or require
+
+### PatternsCodecTesting
+
+[View PatternsCodecTesting source](tests/features/behavior/patterns-codec.feature)
+
+The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument
+for generating PATTERNS.md and category detail files.
+
+**Problem:**
+
+- Need to generate a comprehensive pattern registry from extracted patterns
+- Output should include progress tracking, navigation, and categorization
+
+**Solution:**
+
+- Codec transforms MasterDataset → RenderableDocument in a single decode call
+- Generates main document with optional category detail files
+
+<details>
+<summary>Document structure includes progress tracking and category navigation (3 scenarios)</summary>
+
+#### Document structure includes progress tracking and category navigation
+
+**Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and category navigation regardless of dataset size.
+
+**Rationale:** The PATTERNS.md is the primary entry point for understanding project scope; incomplete structure would leave consumers without context.
+
+**Verified by:**
+
+- Decode empty dataset
+- Decode dataset with patterns - document structure
+- Progress summary shows correct counts
+
+</details>
+
+<details>
+<summary>Pattern table presents all patterns sorted by status then name (2 scenarios)</summary>
+
+#### Pattern table presents all patterns sorted by status then name
+
+**Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category, Status, and Description, sorted by status priority (completed first) then alphabetically by name.
+
+**Rationale:** Consistent ordering allows quick scanning of project progress; completed patterns at top confirm done work, while roadmap items at bottom show remaining scope.
+
+**Verified by:**
+
+- Pattern table includes all patterns
+- Pattern table is sorted by status then name
+
+</details>
+
+<details>
+<summary>Category sections group patterns by domain (2 scenarios)</summary>
+
+#### Category sections group patterns by domain
+
+**Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
+
+**Verified by:**
+
+- Category sections with pattern lists
+- Filter to specific categories
+
+</details>
+
+<details>
+<summary>Dependency graph visualizes pattern relationships (3 scenarios)</summary>
+
+#### Dependency graph visualizes pattern relationships
+
+**Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
+
+**Verified by:**
+
+- Dependency graph included when relationships exist
+- No dependency graph when no relationships
+- Dependency graph disabled by option
+
+</details>
+
+<details>
+<summary>Detail file generation creates per-pattern pages (3 scenarios)</summary>
+
+#### Detail file generation creates per-pattern pages
+
+**Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at patterns/{slug}.md containing an Overview section; when disabled, no additional files must be generated.
+
+**Rationale:** Detail files enable deep-linking into specific patterns from the main registry while keeping the index document scannable.
+
+**Verified by:**
+
+- Generate individual pattern files when enabled
+- No detail files when disabled
+- Individual pattern file contains full details
+
+</details>
+
+### ImplementationLinkPathNormalization
+
+[View ImplementationLinkPathNormalization source](tests/features/behavior/implementation-links.feature)
+
+Links to implementation files in generated pattern documents should have
+correct relative paths. Repository prefixes like "libar-platform/" must
+be stripped to produce valid links from the output directory.
+
+<details>
+<summary>Repository prefixes are stripped from implementation paths (3 scenarios)</summary>
+
+#### Repository prefixes are stripped from implementation paths
+
+**Verified by:**
+
+- Strip libar-platform prefix from implementation paths
+- Strip monorepo prefix from implementation paths
+- Preserve paths without repository prefix
+
+</details>
+
+<details>
+<summary>All implementation links in a pattern are normalized (1 scenarios)</summary>
+
+#### All implementation links in a pattern are normalized
+
+**Verified by:**
+
+- Multiple implementations with mixed prefixes
+
+</details>
+
+<details>
+<summary>normalizeImplPath strips known prefixes (4 scenarios)</summary>
+
+#### normalizeImplPath strips known prefixes
+
+**Verified by:**
+
+- Strips libar-platform/ prefix
+- Strips monorepo/ prefix
+- Returns unchanged path without known prefix
+- Only strips prefix at start of path
+
+</details>
+
+### ExtractSummary
+
+[View ExtractSummary source](tests/features/behavior/extract-summary.feature)
+
+The extractSummary function transforms multi-line pattern descriptions into
+concise, single-line summaries suitable for table display in generated docs.
+
+**Key behaviors:**
+
+- Combines multiple lines until finding a complete sentence
+- Truncates at sentence boundaries when possible
+- Adds "..." for incomplete text (no sentence ending)
+- Skips tautological first lines (just the pattern name)
+- Skips section header labels like "Problem:", "Solution:"
+
+<details>
+<summary>Single-line descriptions are returned as-is when complete (2 scenarios)</summary>
+
+#### Single-line descriptions are returned as-is when complete
+
+**Verified by:**
+
+- Complete sentence on single line
+- Single line without sentence ending gets ellipsis
+
+</details>
+
+<details>
+<summary>Multi-line descriptions are combined until sentence ending (4 scenarios)</summary>
+
+#### Multi-line descriptions are combined until sentence ending
+
+**Verified by:**
+
+- Two lines combine into complete sentence
+- Combines lines up to sentence boundary within limit
+- Long multi-line text truncates when exceeds limit
+- Multi-line without sentence ending gets ellipsis
+
+</details>
+
+<details>
+<summary>Long descriptions are truncated at sentence or word boundaries (2 scenarios)</summary>
+
+#### Long descriptions are truncated at sentence or word boundaries
+
+**Verified by:**
+
+- Long text truncates at sentence boundary within limit
+- Long text without sentence boundary truncates at word with ellipsis
+
+</details>
+
+<details>
+<summary>Tautological and header lines are skipped (3 scenarios)</summary>
+
+#### Tautological and header lines are skipped
+
+**Verified by:**
+
+- Skips pattern name as first line
+- Skips section header labels
+- Skips multiple header patterns
+
+</details>
+
+<details>
+<summary>Edge cases are handled gracefully (5 scenarios)</summary>
+
+#### Edge cases are handled gracefully
+
+**Verified by:**
+
+- Empty description returns empty string
+- Markdown headers are stripped
+- Bold markdown is stripped
+- Multiple sentence endings - takes first complete sentence
+- Question mark as sentence ending
+
+</details>
+
+### DescriptionQualityFoundation
+
+[View DescriptionQualityFoundation source](tests/features/behavior/description-quality-foundation.feature)
+
+Enhanced documentation generation with human-readable names,
+behavior file verification, and numbered acceptance criteria for PRD quality.
+
+**Problem:**
+
+- CamelCase pattern names (e.g., "RemainingWorkEnhancement") are hard to read
+- File extensions like ".md" incorrectly trigger sentence-ending detection
+- Business value tags with hyphens display as "enable-rich-prd" instead of readable text
+- No way to verify behavior file traceability during extraction
+- PRD acceptance criteria lack visual structure and numbering
+
+**Solution:**
+
+- Transform CamelCase to title case ("Remaining Work Enhancement")
+- Skip file extension patterns when detecting sentence boundaries
+- Convert hyphenated business values to readable phrases
+- Verify behavior file existence during pattern extraction
+- Number acceptance criteria and bold Given/When/Then keywords in PRD output
+
+### DescriptionHeaderNormalization
+
+[View DescriptionHeaderNormalization source](tests/features/behavior/description-headers.feature)
+
+Pattern descriptions should not create duplicate headers when rendered.
+If directive descriptions start with markdown headers, those headers
+should be stripped before rendering under the "Description" section.
+
+<details>
+<summary>Leading headers are stripped from pattern descriptions (3 scenarios)</summary>
+
+#### Leading headers are stripped from pattern descriptions
+
+**Verified by:**
+
+- Strip single leading markdown header
+- Strip multiple leading headers
+- Preserve description without leading header
+
+</details>
+
+<details>
+<summary>Edge cases are handled correctly (3 scenarios)</summary>
+
+#### Edge cases are handled correctly
+
+**Verified by:**
+
+- Empty description after stripping headers
+- Description with only whitespace and headers
+- Header in middle of description is preserved
+
+</details>
+
+<details>
+<summary>stripLeadingHeaders removes only leading headers (6 scenarios)</summary>
+
+#### stripLeadingHeaders removes only leading headers
+
+**Verified by:**
+
+- Strips h1 header
+- Strips h2 through h6 headers
+- Strips leading empty lines before header
+- Preserves content starting with text
+- Returns empty string for header-only input
+- Handles null/undefined input
+
+</details>
+
+### ZodCodecMigration
+
+[View ZodCodecMigration source](tests/features/behavior/codec-migration.feature)
+
+All JSON parsing and serialization uses type-safe Zod codec pattern,
+replacing raw JSON.parse/stringify with single-step validated operations.
+
+**Problem:**
+
+- Raw JSON.parse returns unknown/any types, losing type safety at runtime
+- JSON.stringify doesn't validate output matches expected schema
+- Error handling for malformed JSON scattered across codebase
+- No structured validation errors with field-level details
+- $schema fields from JSON Schema files cause Zod strict mode failures
+
+**Solution:**
+
+- Input codec (createJsonInputCodec) combines parsing + validation in one step
+- Output codec (createJsonOutputCodec) validates before serialization
+- Structured CodecError type with operation, source, and validation details
+- $schema stripping before validation for JSON Schema compatibility
+- formatCodecError utility for consistent human-readable error output
 
 ### WarningCollectorTesting
 
@@ -1765,646 +2406,508 @@ on source priority, and preserve original section order after deduplication.
 
 </details>
 
-### TransformDatasetTesting
+### LayeredDiagramGeneration
 
-[View TransformDatasetTesting source](tests/features/behavior/transform-dataset.feature)
+[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
 
-The transformToMasterDataset function transforms raw extracted patterns
-into a MasterDataset with all pre-computed views in a single pass.
-This is the core of the unified transformation pipeline.
-
-**Problem:**
-
-- Generators need multiple views of the same pattern data
-- Computing views lazily leads to O(n\*v) complexity
-- Views must be consistent with each other
-
-**Solution:**
-
-- Single-pass transformation computes all views in O(n)
-- All views are immutable and pre-computed
-- MasterDataset is the source of truth for all generators
+As a documentation generator
+I want to generate layered architecture diagrams from metadata
+So that system architecture is visualized by layer hierarchy
 
 <details>
-<summary>Empty dataset produces valid zero-state views (1 scenarios)</summary>
+<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
 
-#### Empty dataset produces valid zero-state views
+#### Layered diagrams group patterns by arch-layer
 
-**Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+Patterns with arch-layer are grouped into Mermaid subgraphs.
+Each layer becomes a visual container.
 
 **Verified by:**
 
-- Transform empty dataset
+- Generate subgraphs for each layer
 
 </details>
 
 <details>
-<summary>Status and phase grouping creates navigable views (6 scenarios)</summary>
+<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
 
-#### Status and phase grouping creates navigable views
+#### Layer order is domain to infrastructure (top to bottom)
 
-**Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
-
-**Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
+The layer subgraphs are rendered in Clean Architecture order:
+domain at top, then application, then infrastructure at bottom.
+This reflects the dependency rule: outer layers depend on inner layers.
 
 **Verified by:**
 
-- Group patterns by status
-- Normalize status variants to canonical values
-- Group patterns by phase
-- Sort phases by phase number
-- Compute per-phase status counts
-- Patterns without phase are not in byPhase
+- Layers render in correct order
 
 </details>
 
 <details>
-<summary>Quarter and category grouping organizes by timeline and domain (3 scenarios)</summary>
+<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
 
-#### Quarter and category grouping organizes by timeline and domain
+#### Context labels included in layered diagram nodes
 
-**Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+Unlike component diagrams which group by context, layered diagrams
+include the context as a label in each node name.
 
 **Verified by:**
 
-- Group patterns by quarter
-- Patterns without quarter are not in byQuarter
-- Group patterns by category
+- Nodes include context labels
 
 </details>
 
 <details>
-<summary>Source grouping separates TypeScript and Gherkin origins (2 scenarios)</summary>
+<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
 
-#### Source grouping separates TypeScript and Gherkin origins
+#### Patterns without layer go to Other subgraph
 
-**Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+Patterns that have arch-role or arch-context but no arch-layer
+are grouped into an "Other" subgraph.
 
 **Verified by:**
 
-- Group patterns by source file type
-- Patterns with phase are also in roadmap view
+- Unlayered patterns in Other subgraph
 
 </details>
 
 <details>
-<summary>Relationship index builds bidirectional dependency graph (5 scenarios)</summary>
+<summary>Layered diagram includes summary section (1 scenarios)</summary>
 
-#### Relationship index builds bidirectional dependency graph
+#### Layered diagram includes summary section
 
-**Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
-
-**Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
+The generated document starts with an overview section
+specific to layered architecture visualization.
 
 **Verified by:**
 
-- Build relationship index from patterns
-- Build relationship index with all relationship types
-- Reverse lookup computes enables from dependsOn
-- Reverse lookup computes usedBy from uses
-- Reverse lookup merges with explicit annotations without duplicates
+- Summary section for layered view
+
+</details>
+
+### ArchGeneratorRegistration
+
+[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
+
+As a CLI user
+I want an architecture generator registered in the generator registry
+So that I can run pnpm docs:architecture to generate diagrams
+
+<details>
+<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
+
+#### Architecture generator is registered in the registry
+
+The architecture generator must be registered like other built-in
+generators so it can be invoked via CLI.
+
+**Verified by:**
+
+- Generator is available in registry
 
 </details>
 
 <details>
-<summary>Completion tracking computes project progress (2 scenarios)</summary>
+<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
 
-#### Completion tracking computes project progress
+#### Architecture generator produces component diagram by default
 
-**Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+Running the architecture generator without options produces
+a component diagram (bounded context view).
 
 **Verified by:**
 
-- Calculate completion percentage
-- Check if fully completed
+- Default generation produces component diagram
 
 </details>
 
 <details>
-<summary>Workflow integration conditionally includes delivery process data (2 scenarios)</summary>
+<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
 
-#### Workflow integration conditionally includes delivery process data
+#### Architecture generator supports diagram type options
 
-**Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
-
-**Verified by:**
-
-- Include workflow in result when provided
-- Result omits workflow when not provided
-
-</details>
-
-### RichContentHelpersTesting
-
-[View RichContentHelpersTesting source](tests/features/behavior/rich-content-helpers.feature)
-
-As a document codec author
-I need helpers to render Gherkin rich content
-So that DataTables, DocStrings, and scenarios render consistently across codecs
-
-The helpers handle edge cases like:
-
-- Unclosed DocStrings (fallback to plain paragraph)
-- Windows CRLF line endings (normalized to LF)
-- Empty inputs (graceful handling)
-- Missing table cells (empty string fallback)
-
-<details>
-<summary>DocString parsing handles edge cases (6 scenarios)</summary>
-
-#### DocString parsing handles edge cases
+The generator accepts options to specify diagram type
+(component or layered).
 
 **Verified by:**
 
-- Empty description returns empty array
-- Description with no DocStrings returns single paragraph
-- Single DocString parses correctly
-- DocString without language hint uses text
-- Unclosed DocString returns plain paragraph fallback
-- Windows CRLF line endings are normalized
+- Generate layered diagram with options
 
 </details>
 
 <details>
-<summary>DataTable rendering produces valid markdown (3 scenarios)</summary>
+<summary>Architecture generator supports context filtering (1 scenarios)</summary>
 
-#### DataTable rendering produces valid markdown
+#### Architecture generator supports context filtering
+
+The generator can filter to specific bounded contexts
+for focused diagram output.
 
 **Verified by:**
 
-- Single row DataTable renders correctly
-- Multi-row DataTable renders correctly
-- Missing cell values become empty strings
+- Filter to specific contexts
+
+</details>
+
+### ComponentDiagramGeneration
+
+[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
+
+As a documentation generator
+I want to generate component diagrams from architecture metadata
+So that system architecture is automatically visualized with bounded context subgraphs
+
+<details>
+<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
+
+#### Component diagrams group patterns by bounded context
+
+Patterns with arch-context are grouped into Mermaid subgraphs.
+Each bounded context becomes a visual container.
+
+**Verified by:**
+
+- Generate subgraphs for bounded contexts
 
 </details>
 
 <details>
-<summary>Scenario content rendering respects options (3 scenarios)</summary>
+<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
 
-#### Scenario content rendering respects options
+#### Context-less patterns go to Shared Infrastructure
+
+Patterns without arch-context are grouped into a
+"Shared Infrastructure" subgraph.
 
 **Verified by:**
 
-- Render scenario with steps
-- Skip steps when includeSteps is false
-- Render scenario with DataTable in step
+- Shared infrastructure subgraph for context-less patterns
 
 </details>
 
 <details>
-<summary>Business rule rendering handles descriptions (3 scenarios)</summary>
+<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
 
-#### Business rule rendering handles descriptions
+#### Relationship types render with distinct arrow styles
+
+Arrow styles follow UML conventions: - uses: solid arrow (-->) - depends-on: dashed arrow (-.->) - implements: dotted arrow (..->) - extends: open arrow (-->>)
 
 **Verified by:**
 
-- Rule with simple description
-- Rule with no description
-- Rule with embedded DocString in description
+- Arrow styles for relationship types
 
 </details>
 
 <details>
-<summary>DocString content is dedented when parsed (4 scenarios)</summary>
+<summary>Arrows only connect annotated components (1 scenarios)</summary>
 
-#### DocString content is dedented when parsed
+#### Arrows only connect annotated components
 
-**Verified by:**
-
-- Code block preserves internal relative indentation
-- Empty lines in code block are preserved
-- Trailing whitespace is trimmed from each line
-- Code with mixed indentation is preserved
-
-</details>
-
-### UniversalMarkdownRenderer
-
-[View UniversalMarkdownRenderer source](tests/features/behavior/render.feature)
-
-The universal renderer converts RenderableDocument to markdown.
-It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
-
-### RemainingWorkSummaryAccuracy
-
-[View RemainingWorkSummaryAccuracy source](tests/features/behavior/remaining-work-totals.feature)
-
-Summary totals in REMAINING-WORK.md must match the sum of phase table rows.
-The backlog calculation must correctly identify patterns without phases
-using pattern.id (which is always defined) rather than patternName.
-
-<details>
-<summary>Summary totals equal sum of phase table rows (2 scenarios)</summary>
-
-#### Summary totals equal sum of phase table rows
+Relationships pointing to non-annotated patterns
+are not rendered (target would not exist in diagram).
 
 **Verified by:**
 
-- Summary matches phase table with all patterns having phases
-- Summary includes completed patterns correctly
+- Skip arrows to non-annotated targets
 
 </details>
 
 <details>
-<summary>Patterns without phases appear in Backlog row (2 scenarios)</summary>
+<summary>Component diagram includes summary section (1 scenarios)</summary>
 
-#### Patterns without phases appear in Backlog row
+#### Component diagram includes summary section
+
+The generated document starts with an overview section
+showing component counts and bounded context statistics.
 
 **Verified by:**
 
-- Summary includes backlog patterns without phase
-- All patterns in backlog when none have phases
+- Summary section with counts
 
 </details>
 
 <details>
-<summary>Patterns without patternName are counted using id (2 scenarios)</summary>
+<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
 
-#### Patterns without patternName are counted using id
+#### Component diagram includes legend when enabled
+
+The legend explains arrow style meanings for readers.
 
 **Verified by:**
 
-- Patterns with undefined patternName counted correctly
-- Mixed patterns with and without patternName
+- Legend section with arrow explanations
 
 </details>
 
 <details>
-<summary>All phases with incomplete patterns are shown (2 scenarios)</summary>
+<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
 
-#### All phases with incomplete patterns are shown
+#### Component diagram includes inventory table when enabled
 
-**Verified by:**
-
-- Multiple phases shown in order
-- Completed phases not shown in remaining work
-
-</details>
-
-### RemainingWorkEnhancement
-
-[View RemainingWorkEnhancement source](tests/features/behavior/remaining-work-enhancement.feature)
-
-Enhanced REMAINING-WORK.md generation with priority-based sorting,
-quarter grouping, and progressive disclosure for better session planning.
-
-**Problem:**
-
-- Flat phase lists make it hard to identify what to work on next
-- No visibility into relative urgency or importance of phases
-- Large backlogs overwhelm planners with too much information at once
-- Quarter-based planning requires manual grouping of phases
-- Effort estimates are not factored into prioritization decisions
-
-**Solution:**
-
-- Priority-based sorting surfaces critical/high-priority work first
-- Quarter grouping organizes planned work into time-based buckets
-- Progressive disclosure shows summary with link to full backlog details
-- Effort parsing enables sorting by estimated work duration
-- Visual priority icons provide at-a-glance urgency indicators
-
-### PrChangesGeneration
-
-[View PrChangesGeneration source](tests/features/behavior/pr-changes-generation.feature)
-
-The delivery process generates PR-CHANGES.md from active or completed phases,
-formatted for PR descriptions, code reviews, and release notes.
-
-**Problem:**
-
-- PR descriptions are manually written, often incomplete or inconsistent
-- Reviewers lack structured view of what changed and why
-- Deliverable completion status scattered across feature files
-- Dependency relationships between phases hidden from reviewers
-
-**Solution:**
-
-- Auto-generate PR-CHANGES.md with summary statistics and phase-grouped changes
-- Include both active and completed phases (roadmap phases excluded)
-- Filter by release version (releaseFilter) to show matching deliverables
-- Surface deliverables inline with each pattern
-- Include review checklist with standard code quality items
-- Include dependency section showing what patterns enable or require
-
-### PatternsCodecTesting
-
-[View PatternsCodecTesting source](tests/features/behavior/patterns-codec.feature)
-
-The PatternsDocumentCodec transforms MasterDataset into a RenderableDocument
-for generating PATTERNS.md and category detail files.
-
-**Problem:**
-
-- Need to generate a comprehensive pattern registry from extracted patterns
-- Output should include progress tracking, navigation, and categorization
-
-**Solution:**
-
-- Codec transforms MasterDataset → RenderableDocument in a single decode call
-- Generates main document with optional category detail files
-
-<details>
-<summary>Document structure includes progress tracking and category navigation (3 scenarios)</summary>
-
-#### Document structure includes progress tracking and category navigation
-
-**Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and category navigation regardless of dataset size.
-
-**Rationale:** The PATTERNS.md is the primary entry point for understanding project scope; incomplete structure would leave consumers without context.
+The inventory lists all components with their metadata.
 
 **Verified by:**
 
-- Decode empty dataset
-- Decode dataset with patterns - document structure
-- Progress summary shows correct counts
+- Inventory table with component details
 
 </details>
 
 <details>
-<summary>Pattern table presents all patterns sorted by status then name (2 scenarios)</summary>
+<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
 
-#### Pattern table presents all patterns sorted by status then name
+#### Empty architecture data shows guidance message
 
-**Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category, Status, and Description, sorted by status priority (completed first) then alphabetically by name.
-
-**Rationale:** Consistent ordering allows quick scanning of project progress; completed patterns at top confirm done work, while roadmap items at bottom show remaining scope.
+If no patterns have architecture annotations,
+the document explains how to add them.
 
 **Verified by:**
 
-- Pattern table includes all patterns
-- Pattern table is sorted by status then name
+- No architecture data message
+
+</details>
+
+### ArchTagExtraction
+
+[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
+
+As a documentation generator
+I want architecture tags extracted from source code
+So that I can generate accurate architecture diagrams
+
+<details>
+<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-role tag is defined in the registry
+
+Architecture roles classify components for diagram rendering.
+Valid roles: command-handler, projection, saga, process-manager,
+infrastructure, repository, decider, read-model, bounded-context.
+
+**Verified by:**
+
+- arch-role tag exists with enum format
+- arch-role has required enum values
 
 </details>
 
 <details>
-<summary>Category sections group patterns by domain (2 scenarios)</summary>
+<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
 
-#### Category sections group patterns by domain
+#### arch-context tag is defined in the registry
 
-**Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
+Context tags group components into bounded context subgraphs.
+Format is "value" (free-form string like "orders", "inventory").
 
 **Verified by:**
 
-- Category sections with pattern lists
-- Filter to specific categories
+- arch-context tag exists with value format
 
 </details>
 
 <details>
-<summary>Dependency graph visualizes pattern relationships (3 scenarios)</summary>
+<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
 
-#### Dependency graph visualizes pattern relationships
+#### arch-layer tag is defined in the registry
 
-**Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
+Layer tags enable layered architecture diagrams.
+Valid layers: domain, application, infrastructure.
 
 **Verified by:**
 
-- Dependency graph included when relationships exist
-- No dependency graph when no relationships
-- Dependency graph disabled by option
+- arch-layer tag exists with enum format
+- arch-layer has exactly three values
 
 </details>
 
 <details>
-<summary>Detail file generation creates per-pattern pages (3 scenarios)</summary>
+<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
 
-#### Detail file generation creates per-pattern pages
+#### AST parser extracts arch-role from TypeScript annotations
 
-**Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at patterns/{slug}.md containing an Overview section; when disabled, no additional files must be generated.
-
-**Rationale:** Detail files enable deep-linking into specific patterns from the main registry while keeping the index document scannable.
+The AST parser must extract arch-role alongside other pattern metadata.
 
 **Verified by:**
 
-- Generate individual pattern files when enabled
-- No detail files when disabled
-- Individual pattern file contains full details
-
-</details>
-
-### ImplementationLinkPathNormalization
-
-[View ImplementationLinkPathNormalization source](tests/features/behavior/implementation-links.feature)
-
-Links to implementation files in generated pattern documents should have
-correct relative paths. Repository prefixes like "libar-platform/" must
-be stripped to produce valid links from the output directory.
-
-<details>
-<summary>Repository prefixes are stripped from implementation paths (3 scenarios)</summary>
-
-#### Repository prefixes are stripped from implementation paths
-
-**Verified by:**
-
-- Strip libar-platform prefix from implementation paths
-- Strip monorepo prefix from implementation paths
-- Preserve paths without repository prefix
+- Extract arch-role projection
+- Extract arch-role command-handler
 
 </details>
 
 <details>
-<summary>All implementation links in a pattern are normalized (1 scenarios)</summary>
+<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
 
-#### All implementation links in a pattern are normalized
+#### AST parser extracts arch-context from TypeScript annotations
+
+Context values are free-form strings naming the bounded context.
 
 **Verified by:**
 
-- Multiple implementations with mixed prefixes
+- Extract arch-context orders
+- Extract arch-context inventory
 
 </details>
 
 <details>
-<summary>normalizeImplPath strips known prefixes (4 scenarios)</summary>
+<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
 
-#### normalizeImplPath strips known prefixes
+#### AST parser extracts arch-layer from TypeScript annotations
 
-**Verified by:**
-
-- Strips libar-platform/ prefix
-- Strips monorepo/ prefix
-- Returns unchanged path without known prefix
-- Only strips prefix at start of path
-
-</details>
-
-### ExtractSummary
-
-[View ExtractSummary source](tests/features/behavior/extract-summary.feature)
-
-The extractSummary function transforms multi-line pattern descriptions into
-concise, single-line summaries suitable for table display in generated docs.
-
-**Key behaviors:**
-
-- Combines multiple lines until finding a complete sentence
-- Truncates at sentence boundaries when possible
-- Adds "..." for incomplete text (no sentence ending)
-- Skips tautological first lines (just the pattern name)
-- Skips section header labels like "Problem:", "Solution:"
-
-<details>
-<summary>Single-line descriptions are returned as-is when complete (2 scenarios)</summary>
-
-#### Single-line descriptions are returned as-is when complete
+Layer tags classify components by architectural layer.
 
 **Verified by:**
 
-- Complete sentence on single line
-- Single line without sentence ending gets ellipsis
+- Extract arch-layer application
+- Extract arch-layer infrastructure
 
 </details>
 
 <details>
-<summary>Multi-line descriptions are combined until sentence ending (4 scenarios)</summary>
+<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
 
-#### Multi-line descriptions are combined until sentence ending
+#### AST parser handles multiple arch tags together
+
+Components often have role + context + layer together.
 
 **Verified by:**
 
-- Two lines combine into complete sentence
-- Combines lines up to sentence boundary within limit
-- Long multi-line text truncates when exceeds limit
-- Multi-line without sentence ending gets ellipsis
+- Extract all three arch tags
 
 </details>
 
 <details>
-<summary>Long descriptions are truncated at sentence or word boundaries (2 scenarios)</summary>
+<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
 
-#### Long descriptions are truncated at sentence or word boundaries
+#### Missing arch tags yield undefined values
+
+Components without arch tags should have undefined (not null or empty).
 
 **Verified by:**
 
-- Long text truncates at sentence boundary within limit
-- Long text without sentence boundary truncates at word with ellipsis
+- Missing arch tags are undefined
+
+</details>
+
+### ArchIndexDataset
+
+[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
+
+As a documentation generator
+I want an archIndex built during dataset transformation
+So that I can efficiently look up patterns by role, context, and layer
+
+<details>
+<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-role
+
+The archIndex.byRole map groups patterns by their architectural role
+(command-handler, projection, saga, etc.) for efficient lookup.
+
+**Verified by:**
+
+- Group patterns by role
 
 </details>
 
 <details>
-<summary>Tautological and header lines are skipped (3 scenarios)</summary>
+<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
 
-#### Tautological and header lines are skipped
+#### archIndex groups patterns by arch-context
+
+The archIndex.byContext map groups patterns by bounded context
+for subgraph rendering in component diagrams.
 
 **Verified by:**
 
-- Skips pattern name as first line
-- Skips section header labels
-- Skips multiple header patterns
+- Group patterns by context
 
 </details>
 
 <details>
-<summary>Edge cases are handled gracefully (5 scenarios)</summary>
+<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
 
-#### Edge cases are handled gracefully
+#### archIndex groups patterns by arch-layer
 
-**Verified by:**
-
-- Empty description returns empty string
-- Markdown headers are stripped
-- Bold markdown is stripped
-- Multiple sentence endings - takes first complete sentence
-- Question mark as sentence ending
-
-</details>
-
-### DescriptionQualityFoundation
-
-[View DescriptionQualityFoundation source](tests/features/behavior/description-quality-foundation.feature)
-
-Enhanced documentation generation with human-readable names,
-behavior file verification, and numbered acceptance criteria for PRD quality.
-
-**Problem:**
-
-- CamelCase pattern names (e.g., "RemainingWorkEnhancement") are hard to read
-- File extensions like ".md" incorrectly trigger sentence-ending detection
-- Business value tags with hyphens display as "enable-rich-prd" instead of readable text
-- No way to verify behavior file traceability during extraction
-- PRD acceptance criteria lack visual structure and numbering
-
-**Solution:**
-
-- Transform CamelCase to title case ("Remaining Work Enhancement")
-- Skip file extension patterns when detecting sentence boundaries
-- Convert hyphenated business values to readable phrases
-- Verify behavior file existence during pattern extraction
-- Number acceptance criteria and bold Given/When/Then keywords in PRD output
-
-### DescriptionHeaderNormalization
-
-[View DescriptionHeaderNormalization source](tests/features/behavior/description-headers.feature)
-
-Pattern descriptions should not create duplicate headers when rendered.
-If directive descriptions start with markdown headers, those headers
-should be stripped before rendering under the "Description" section.
-
-<details>
-<summary>Leading headers are stripped from pattern descriptions (3 scenarios)</summary>
-
-#### Leading headers are stripped from pattern descriptions
+The archIndex.byLayer map groups patterns by architectural layer
+(domain, application, infrastructure) for layered diagram rendering.
 
 **Verified by:**
 
-- Strip single leading markdown header
-- Strip multiple leading headers
-- Preserve description without leading header
+- Group patterns by layer
 
 </details>
 
 <details>
-<summary>Edge cases are handled correctly (3 scenarios)</summary>
+<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
 
-#### Edge cases are handled correctly
+#### archIndex.all contains all patterns with any arch tag
+
+The archIndex.all array contains all patterns that have at least
+one arch tag (role, context, or layer). Patterns without any arch
+tags are excluded.
 
 **Verified by:**
 
-- Empty description after stripping headers
-- Description with only whitespace and headers
-- Header in middle of description is preserved
+- archIndex.all includes all annotated patterns
 
 </details>
 
 <details>
-<summary>stripLeadingHeaders removes only leading headers (6 scenarios)</summary>
+<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
 
-#### stripLeadingHeaders removes only leading headers
+#### Patterns without arch tags are excluded from archIndex
+
+Patterns that have no arch-role, arch-context, or arch-layer are
+not included in the archIndex at all.
 
 **Verified by:**
 
-- Strips h1 header
-- Strips h2 through h6 headers
-- Strips leading empty lines before header
-- Preserves content starting with text
-- Returns empty string for header-only input
-- Handles null/undefined input
+- Non-annotated patterns excluded
 
 </details>
 
-### ZodCodecMigration
+### MermaidRelationshipRendering
 
-[View ZodCodecMigration source](tests/features/behavior/codec-migration.feature)
+[View MermaidRelationshipRendering source](tests/features/behavior/pattern-relationships/mermaid-rendering.feature)
 
-All JSON parsing and serialization uses type-safe Zod codec pattern,
-replacing raw JSON.parse/stringify with single-step validated operations.
+Tests for rendering all relationship types in Mermaid dependency graphs
+with distinct visual styles per relationship semantics.
 
-**Problem:**
+<details>
+<summary>Each relationship type has a distinct arrow style (4 scenarios)</summary>
 
-- Raw JSON.parse returns unknown/any types, losing type safety at runtime
-- JSON.stringify doesn't validate output matches expected schema
-- Error handling for malformed JSON scattered across codebase
-- No structured validation errors with field-level details
-- $schema fields from JSON Schema files cause Zod strict mode failures
+#### Each relationship type has a distinct arrow style
 
-**Solution:**
+**Verified by:**
 
-- Input codec (createJsonInputCodec) combines parsing + validation in one step
-- Output codec (createJsonOutputCodec) validates before serialization
-- Structured CodecError type with operation, source, and validation details
-- $schema stripping before validation for JSON Schema compatibility
-- formatCodecError utility for consistent human-readable error output
+- Uses relationships render as solid arrows
+- Depends-on relationships render as dashed arrows
+- Implements relationships render as dotted arrows
+- Extends relationships render as solid open arrows
+
+</details>
+
+<details>
+<summary>Pattern names are sanitized for Mermaid node IDs (1 scenarios)</summary>
+
+#### Pattern names are sanitized for Mermaid node IDs
+
+**Verified by:**
+
+- Special characters are replaced
+
+</details>
+
+<details>
+<summary>All relationship types appear in single graph (1 scenarios)</summary>
+
+#### All relationship types appear in single graph
+
+**Verified by:**
+
+- Complete dependency graph with all relationship types
+
+</details>
 
 ### TimelineCodecTesting
 
@@ -3638,509 +4141,6 @@ documents composed from any combination of existing codecs.
 **Verified by:**
 
 - Empty codec skipped without separator
-
-</details>
-
-### MermaidRelationshipRendering
-
-[View MermaidRelationshipRendering source](tests/features/behavior/pattern-relationships/mermaid-rendering.feature)
-
-Tests for rendering all relationship types in Mermaid dependency graphs
-with distinct visual styles per relationship semantics.
-
-<details>
-<summary>Each relationship type has a distinct arrow style (4 scenarios)</summary>
-
-#### Each relationship type has a distinct arrow style
-
-**Verified by:**
-
-- Uses relationships render as solid arrows
-- Depends-on relationships render as dashed arrows
-- Implements relationships render as dotted arrows
-- Extends relationships render as solid open arrows
-
-</details>
-
-<details>
-<summary>Pattern names are sanitized for Mermaid node IDs (1 scenarios)</summary>
-
-#### Pattern names are sanitized for Mermaid node IDs
-
-**Verified by:**
-
-- Special characters are replaced
-
-</details>
-
-<details>
-<summary>All relationship types appear in single graph (1 scenarios)</summary>
-
-#### All relationship types appear in single graph
-
-**Verified by:**
-
-- Complete dependency graph with all relationship types
-
-</details>
-
-### LayeredDiagramGeneration
-
-[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
-
-As a documentation generator
-I want to generate layered architecture diagrams from metadata
-So that system architecture is visualized by layer hierarchy
-
-<details>
-<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
-
-#### Layered diagrams group patterns by arch-layer
-
-Patterns with arch-layer are grouped into Mermaid subgraphs.
-Each layer becomes a visual container.
-
-**Verified by:**
-
-- Generate subgraphs for each layer
-
-</details>
-
-<details>
-<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
-
-#### Layer order is domain to infrastructure (top to bottom)
-
-The layer subgraphs are rendered in Clean Architecture order:
-domain at top, then application, then infrastructure at bottom.
-This reflects the dependency rule: outer layers depend on inner layers.
-
-**Verified by:**
-
-- Layers render in correct order
-
-</details>
-
-<details>
-<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
-
-#### Context labels included in layered diagram nodes
-
-Unlike component diagrams which group by context, layered diagrams
-include the context as a label in each node name.
-
-**Verified by:**
-
-- Nodes include context labels
-
-</details>
-
-<details>
-<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
-
-#### Patterns without layer go to Other subgraph
-
-Patterns that have arch-role or arch-context but no arch-layer
-are grouped into an "Other" subgraph.
-
-**Verified by:**
-
-- Unlayered patterns in Other subgraph
-
-</details>
-
-<details>
-<summary>Layered diagram includes summary section (1 scenarios)</summary>
-
-#### Layered diagram includes summary section
-
-The generated document starts with an overview section
-specific to layered architecture visualization.
-
-**Verified by:**
-
-- Summary section for layered view
-
-</details>
-
-### ArchGeneratorRegistration
-
-[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
-
-As a CLI user
-I want an architecture generator registered in the generator registry
-So that I can run pnpm docs:architecture to generate diagrams
-
-<details>
-<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
-
-#### Architecture generator is registered in the registry
-
-The architecture generator must be registered like other built-in
-generators so it can be invoked via CLI.
-
-**Verified by:**
-
-- Generator is available in registry
-
-</details>
-
-<details>
-<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
-
-#### Architecture generator produces component diagram by default
-
-Running the architecture generator without options produces
-a component diagram (bounded context view).
-
-**Verified by:**
-
-- Default generation produces component diagram
-
-</details>
-
-<details>
-<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
-
-#### Architecture generator supports diagram type options
-
-The generator accepts options to specify diagram type
-(component or layered).
-
-**Verified by:**
-
-- Generate layered diagram with options
-
-</details>
-
-<details>
-<summary>Architecture generator supports context filtering (1 scenarios)</summary>
-
-#### Architecture generator supports context filtering
-
-The generator can filter to specific bounded contexts
-for focused diagram output.
-
-**Verified by:**
-
-- Filter to specific contexts
-
-</details>
-
-### ComponentDiagramGeneration
-
-[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
-
-As a documentation generator
-I want to generate component diagrams from architecture metadata
-So that system architecture is automatically visualized with bounded context subgraphs
-
-<details>
-<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
-
-#### Component diagrams group patterns by bounded context
-
-Patterns with arch-context are grouped into Mermaid subgraphs.
-Each bounded context becomes a visual container.
-
-**Verified by:**
-
-- Generate subgraphs for bounded contexts
-
-</details>
-
-<details>
-<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
-
-#### Context-less patterns go to Shared Infrastructure
-
-Patterns without arch-context are grouped into a
-"Shared Infrastructure" subgraph.
-
-**Verified by:**
-
-- Shared infrastructure subgraph for context-less patterns
-
-</details>
-
-<details>
-<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
-
-#### Relationship types render with distinct arrow styles
-
-Arrow styles follow UML conventions: - uses: solid arrow (-->) - depends-on: dashed arrow (-.->) - implements: dotted arrow (..->) - extends: open arrow (-->>)
-
-**Verified by:**
-
-- Arrow styles for relationship types
-
-</details>
-
-<details>
-<summary>Arrows only connect annotated components (1 scenarios)</summary>
-
-#### Arrows only connect annotated components
-
-Relationships pointing to non-annotated patterns
-are not rendered (target would not exist in diagram).
-
-**Verified by:**
-
-- Skip arrows to non-annotated targets
-
-</details>
-
-<details>
-<summary>Component diagram includes summary section (1 scenarios)</summary>
-
-#### Component diagram includes summary section
-
-The generated document starts with an overview section
-showing component counts and bounded context statistics.
-
-**Verified by:**
-
-- Summary section with counts
-
-</details>
-
-<details>
-<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
-
-#### Component diagram includes legend when enabled
-
-The legend explains arrow style meanings for readers.
-
-**Verified by:**
-
-- Legend section with arrow explanations
-
-</details>
-
-<details>
-<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
-
-#### Component diagram includes inventory table when enabled
-
-The inventory lists all components with their metadata.
-
-**Verified by:**
-
-- Inventory table with component details
-
-</details>
-
-<details>
-<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
-
-#### Empty architecture data shows guidance message
-
-If no patterns have architecture annotations,
-the document explains how to add them.
-
-**Verified by:**
-
-- No architecture data message
-
-</details>
-
-### ArchTagExtraction
-
-[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
-
-As a documentation generator
-I want architecture tags extracted from source code
-So that I can generate accurate architecture diagrams
-
-<details>
-<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-role tag is defined in the registry
-
-Architecture roles classify components for diagram rendering.
-Valid roles: command-handler, projection, saga, process-manager,
-infrastructure, repository, decider, read-model, bounded-context.
-
-**Verified by:**
-
-- arch-role tag exists with enum format
-- arch-role has required enum values
-
-</details>
-
-<details>
-<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
-
-#### arch-context tag is defined in the registry
-
-Context tags group components into bounded context subgraphs.
-Format is "value" (free-form string like "orders", "inventory").
-
-**Verified by:**
-
-- arch-context tag exists with value format
-
-</details>
-
-<details>
-<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-layer tag is defined in the registry
-
-Layer tags enable layered architecture diagrams.
-Valid layers: domain, application, infrastructure.
-
-**Verified by:**
-
-- arch-layer tag exists with enum format
-- arch-layer has exactly three values
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-role from TypeScript annotations
-
-The AST parser must extract arch-role alongside other pattern metadata.
-
-**Verified by:**
-
-- Extract arch-role projection
-- Extract arch-role command-handler
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-context from TypeScript annotations
-
-Context values are free-form strings naming the bounded context.
-
-**Verified by:**
-
-- Extract arch-context orders
-- Extract arch-context inventory
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-layer from TypeScript annotations
-
-Layer tags classify components by architectural layer.
-
-**Verified by:**
-
-- Extract arch-layer application
-- Extract arch-layer infrastructure
-
-</details>
-
-<details>
-<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
-
-#### AST parser handles multiple arch tags together
-
-Components often have role + context + layer together.
-
-**Verified by:**
-
-- Extract all three arch tags
-
-</details>
-
-<details>
-<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
-
-#### Missing arch tags yield undefined values
-
-Components without arch tags should have undefined (not null or empty).
-
-**Verified by:**
-
-- Missing arch tags are undefined
-
-</details>
-
-### ArchIndexDataset
-
-[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
-
-As a documentation generator
-I want an archIndex built during dataset transformation
-So that I can efficiently look up patterns by role, context, and layer
-
-<details>
-<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-role
-
-The archIndex.byRole map groups patterns by their architectural role
-(command-handler, projection, saga, etc.) for efficient lookup.
-
-**Verified by:**
-
-- Group patterns by role
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-context
-
-The archIndex.byContext map groups patterns by bounded context
-for subgraph rendering in component diagrams.
-
-**Verified by:**
-
-- Group patterns by context
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-layer
-
-The archIndex.byLayer map groups patterns by architectural layer
-(domain, application, infrastructure) for layered diagram rendering.
-
-**Verified by:**
-
-- Group patterns by layer
-
-</details>
-
-<details>
-<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
-
-#### archIndex.all contains all patterns with any arch tag
-
-The archIndex.all array contains all patterns that have at least
-one arch tag (role, context, or layer). Patterns without any arch
-tags are excluded.
-
-**Verified by:**
-
-- archIndex.all includes all annotated patterns
-
-</details>
-
-<details>
-<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
-
-#### Patterns without arch tags are excluded from archIndex
-
-Patterns that have no arch-role, arch-context, or arch-layer are
-not included in the archIndex at all.
-
-**Verified by:**
-
-- Non-annotated patterns excluded
 
 </details>
 
