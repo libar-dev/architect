@@ -6,21 +6,22 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Validation |
 
 ## Description
 
 Configuration schemas validate scanner and generator inputs with security
-  constraints to prevent path traversal attacks and ensure safe file operations.
+constraints to prevent path traversal attacks and ensure safe file operations.
 
-  **Security focus:**
-  - Parent directory traversal (..) is blocked in glob patterns
-  - Output directories must be within project bounds
-  - Registry files must be .json format
-  - Symlink bypass attempts are prevented
+**Security focus:**
+
+- Parent directory traversal (..) is blocked in glob patterns
+- Output directories must be within project bounds
+- Registry files must be .json format
+- Symlink bypass attempts are prevented
 
 ## Acceptance Criteria
 
@@ -28,11 +29,11 @@ Configuration schemas validate scanner and generator inputs with security
 
 - When I validate a scanner config with:
 - Then the scanner config should be valid
-- And the validated patterns should include "src/**/*.ts"
+- And the validated patterns should include "src/\*_/_.ts"
 
-| patterns | baseDir |
-| --- | --- |
-| src/**/*.ts | /project |
+| patterns     | baseDir  |
+| ------------ | -------- |
+| src/\*_/_.ts | /project |
 
 **ScannerConfigSchema accepts multiple patterns**
 
@@ -40,11 +41,11 @@ Configuration schemas validate scanner and generator inputs with security
 - Then the scanner config should be valid
 - And the validated patterns should have 3 items
 
-| pattern |
-| --- |
-| src/**/*.ts |
-| lib/**/*.ts |
-| tests/**/*.ts |
+| pattern        |
+| -------------- |
+| src/\*_/_.ts   |
+| lib/\*_/_.ts   |
+| tests/\*_/_.ts |
 
 **ScannerConfigSchema rejects empty patterns array**
 
@@ -54,7 +55,7 @@ Configuration schemas validate scanner and generator inputs with security
 
 **ScannerConfigSchema rejects parent traversal in patterns**
 
-- When I validate a scanner config with pattern "../secret/*.ts"
+- When I validate a scanner config with pattern "../secret/\*.ts"
 - Then the scanner config should be invalid
 - And the validation error should mention "parent directory traversal"
 
@@ -76,10 +77,10 @@ Configuration schemas validate scanner and generator inputs with security
 - Then the scanner config should be valid
 - And the validated exclude should have 2 items
 
-| pattern |
-| --- |
-| **/node_modules |
-| **/.git |
+| pattern           |
+| ----------------- |
+| \*\*/node_modules |
+| \*\*/.git         |
 
 **GeneratorConfigSchema validates correct configuration**
 
@@ -87,9 +88,9 @@ Configuration schemas validate scanner and generator inputs with security
 - When I validate a generator config with:
 - Then the generator config should be valid
 
-| outputDir | registryPath |
-| --- | --- |
-| docs | registry.json |
+| outputDir | registryPath  |
+| --------- | ------------- |
+| docs      | registry.json |
 
 **GeneratorConfigSchema requires .json registry file**
 
@@ -166,6 +167,44 @@ Configuration schemas validate scanner and generator inputs with security
 - Given a generator config with registryPath "data.xml"
 - When I check if it is a generator config
 - Then isGeneratorConfig should return false
+
+## Business Rules
+
+**ScannerConfigSchema validates scanner configuration**
+
+**Invariant:** Scanner configuration must contain at least one valid glob pattern with no parent directory traversal, and baseDir must resolve to an absolute path.
+
+    **Rationale:** Malformed or malicious glob patterns could scan outside project boundaries, exposing sensitive files.
+
+    **Verified by:** ScannerConfigSchema validates correct configuration, ScannerConfigSchema accepts multiple patterns, ScannerConfigSchema rejects empty patterns array, ScannerConfigSchema rejects parent traversal in patterns, ScannerConfigSchema rejects hidden parent traversal, ScannerConfigSchema normalizes baseDir to absolute path, ScannerConfigSchema accepts optional exclude patterns
+
+_Verified by: ScannerConfigSchema validates correct configuration, ScannerConfigSchema accepts multiple patterns, ScannerConfigSchema rejects empty patterns array, ScannerConfigSchema rejects parent traversal in patterns, ScannerConfigSchema rejects hidden parent traversal, ScannerConfigSchema normalizes baseDir to absolute path, ScannerConfigSchema accepts optional exclude patterns_
+
+**GeneratorConfigSchema validates generator configuration**
+
+**Invariant:** Generator configuration must use a .json registry file and an output directory that does not escape the project root via parent traversal.
+
+    **Rationale:** Non-JSON registry files could introduce parsing vulnerabilities, and unrestricted output paths could overwrite files outside the project.
+
+    **Verified by:** GeneratorConfigSchema validates correct configuration, GeneratorConfigSchema requires .json registry file, GeneratorConfigSchema rejects outputDir with parent traversal, GeneratorConfigSchema accepts relative output directory, GeneratorConfigSchema defaults overwrite to false, GeneratorConfigSchema defaults readmeOnly to false
+
+_Verified by: GeneratorConfigSchema validates correct configuration, GeneratorConfigSchema requires .json registry file, GeneratorConfigSchema rejects outputDir with parent traversal, GeneratorConfigSchema accepts relative output directory, GeneratorConfigSchema defaults overwrite to false, GeneratorConfigSchema defaults readmeOnly to false_
+
+**isScannerConfig type guard narrows unknown values**
+
+**Invariant:** isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir.
+
+    **Verified by:** isScannerConfig returns true for valid config, isScannerConfig returns false for invalid config, isScannerConfig returns false for null, isScannerConfig returns false for non-object
+
+_Verified by: isScannerConfig returns true for valid config, isScannerConfig returns false for invalid config, isScannerConfig returns false for null, isScannerConfig returns false for non-object_
+
+**isGeneratorConfig type guard narrows unknown values**
+
+**Invariant:** isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath.
+
+    **Verified by:** isGeneratorConfig returns true for valid config, isGeneratorConfig returns false for invalid config, isGeneratorConfig returns false for non-json registry
+
+_Verified by: isGeneratorConfig returns true for valid config, isGeneratorConfig returns false for invalid config, isGeneratorConfig returns false for non-json registry_
 
 ---
 

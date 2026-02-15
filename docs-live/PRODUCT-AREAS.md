@@ -14,7 +14,7 @@ The annotation system is the ingestion boundary — it transforms annotated Type
 
 > **How do I configure the tool?**
 
-Configuration controls what gets scanned, which tags are recognized, and how output is organized. Three presets define escalating taxonomy complexity — from 3 categories for simple projects to 21 for full DDD/ES/CQRS architectures. The `defineConfig()` function provides type-safe configuration following the Vite convention.
+Configuration is the entry boundary — it transforms a user-authored `delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
 
 ## [Generation](product-areas/GENERATION.md)
 
@@ -45,3 +45,45 @@ Foundation types used across all other areas. The Result monad replaces try/catc
 > **How does the session workflow work?**
 
 Process defines the session workflow and canonical taxonomy. Git is the event store; documentation artifacts are projections; feature files are the single source of truth. TypeScript source owns pattern identity (ADR-003), while Tier 1 specs are ephemeral planning documents that lose value after completion.
+
+---
+
+## Pipeline Data Flow
+
+Shows the 4-stage transformation pipeline and which product areas participate at each stage:
+
+```mermaid
+graph LR
+    CFG[Configuration] --> ANN
+    subgraph ANN[Annotation]
+        S[Scanner] -->|ScannedFile| E[Extractor]
+    end
+    E -->|ExtractedPattern| GEN
+    subgraph GEN[Generation]
+        P[Pipeline] -->|MasterDataset| C[Codecs]
+    end
+    C --> MD((Markdown))
+    CT[CoreTypes] -.-> S & E & P
+    VAL[Validation] -.-> P
+    API[DataAPI] -.-> C
+```
+
+## Product Area Dependency Layers
+
+Shows the layered architecture — arrows mean "depends on" (bottom-up):
+
+```mermaid
+graph BT
+    CT[CoreTypes] --> CFG[Configuration]
+    CT --> ANN[Annotation]
+    CT --> VAL[Validation]
+    CT --> GEN[Generation]
+    CFG --> ANN
+    CFG --> GEN
+    CFG --> VAL
+    ANN --> GEN
+    ANN --> VAL
+    VAL -.->|FSM rules| GEN
+    API[DataAPI] -.->|queries| GEN
+    PRO[Process] -.->|sessions| API
+```

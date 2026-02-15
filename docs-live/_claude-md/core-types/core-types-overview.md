@@ -14,9 +14,22 @@ Detail Level: Compact summary
 
 --- StringUtils ---
 
+| Rule                                           | Description                                                                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| slugify generates URL-safe slugs               | **Invariant:** slugify must produce lowercase, alphanumeric, hyphen-only strings with no leading/trailing hyphens.... |
+| camelCaseToTitleCase generates readable titles | **Invariant:** camelCaseToTitleCase must insert spaces at camelCase boundaries and preserve known acronyms (HTTP,...  |
+
 --- ResultMonad ---
 
 --- ErrorFactories ---
+
+| Rule                                                                          | Description                                                                                                             |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| createFileSystemError produces discriminated FILE_SYSTEM_ERROR types          | **Invariant:** Every FileSystemError must have type "FILE_SYSTEM_ERROR", the source file path, a reason enum value,...  |
+| createDirectiveValidationError formats file location with line number         | **Invariant:** Every DirectiveValidationError must include the source file path, line number, and reason, with the...   |
+| createPatternValidationError captures pattern identity and validation details | **Invariant:** Every PatternValidationError must include the pattern name, source file path, and reason, with an...     |
+| createProcessMetadataValidationError validates Gherkin process metadata       | **Invariant:** Every ProcessMetadataValidationError must include the feature file path and a reason describing which... |
+| createDeliverableValidationError tracks deliverable-specific failures         | **Invariant:** Every DeliverableValidationError must include the feature file path and reason, with optional...         |
 
 --- KebabCaseSlugs ---
 

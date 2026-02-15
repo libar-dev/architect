@@ -261,6 +261,68 @@ The transformToMasterDataset function transforms raw extracted patterns
 - When transforming to MasterDataset
 - Then the result does not include workflow
 
+## Business Rules
+
+**Empty dataset produces valid zero-state views**
+
+**Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+
+    **Verified by:** Transform empty dataset
+
+_Verified by: Transform empty dataset_
+
+**Status and phase grouping creates navigable views**
+
+**Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
+
+    **Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
+
+    **Verified by:** Group patterns by status, Normalize status variants to canonical values, Group patterns by phase, Sort phases by phase number, Compute per-phase status counts, Patterns without phase are not in byPhase
+
+_Verified by: Group patterns by status, Normalize status variants to canonical values, Group patterns by phase, Sort phases by phase number, Compute per-phase status counts, Patterns without phase are not in byPhase_
+
+**Quarter and category grouping organizes by timeline and domain**
+
+**Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+
+    **Verified by:** Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category
+
+_Verified by: Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category_
+
+**Source grouping separates TypeScript and Gherkin origins**
+
+**Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+
+    **Verified by:** Group patterns by source file type, Patterns with phase are also in roadmap view
+
+_Verified by: Group patterns by source file type, Patterns with phase are also in roadmap view_
+
+**Relationship index builds bidirectional dependency graph**
+
+**Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
+
+    **Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
+
+    **Verified by:** Build relationship index from patterns, Build relationship index with all relationship types, Reverse lookup computes enables from dependsOn, Reverse lookup computes usedBy from uses, Reverse lookup merges with explicit annotations without duplicates
+
+_Verified by: Build relationship index from patterns, Build relationship index with all relationship types, Reverse lookup computes enables from dependsOn, Reverse lookup computes usedBy from uses, Reverse lookup merges with explicit annotations without duplicates_
+
+**Completion tracking computes project progress**
+
+**Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+
+    **Verified by:** Calculate completion percentage, Check if fully completed
+
+_Verified by: Calculate completion percentage, Check if fully completed_
+
+**Workflow integration conditionally includes delivery process data**
+
+**Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+
+    **Verified by:** Include workflow in result when provided, Result omits workflow when not provided
+
+_Verified by: Include workflow in result when provided, Result omits workflow when not provided_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

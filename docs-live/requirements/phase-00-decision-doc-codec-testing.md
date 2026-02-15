@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 Validates the Decision Doc Codec that parses decision documents (ADR/PDR
-  in .feature format) and extracts content for documentation generation.
+in .feature format) and extracts content for documentation generation.
 
 ## Acceptance Criteria
 
@@ -27,11 +27,11 @@ Validates the Decision Doc Codec that parses decision documents (ADR/PDR
 - And consequences should have 1 rule
 - And other should have 0 rules
 
-| Name | Description |
-| --- | --- |
-| Context - Why we need this | Background explanation |
-| Decision - How it works | Implementation approach |
-| Consequences - Trade-offs | Benefits and costs |
+| Name                       | Description             |
+| -------------------------- | ----------------------- |
+| Context - Why we need this | Background explanation  |
+| Decision - How it works    | Implementation approach |
+| Consequences - Trade-offs  | Benefits and costs      |
 
 **Non-standard rules go to other category**
 
@@ -40,10 +40,10 @@ Validates the Decision Doc Codec that parses decision documents (ADR/PDR
 - Then other should have 2 rules
 - And context should have 0 rules
 
-| Name | Description |
-| --- | --- |
-| Proof of Concept - Demo | Example implementation |
-| Expected Output - Format | Output specification |
+| Name                     | Description            |
+| ------------------------ | ---------------------- |
+| Proof of Concept - Demo  | Example implementation |
+| Expected Output - Format | Output specification   |
 
 **Extract single DocString**
 
@@ -139,9 +139,9 @@ Validates the Decision Doc Codec that parses decision documents (ADR/PDR
 - When finding rule "Context - Problem"
 - Then the found rule should have name "Context - Problem"
 
-| Name | Description |
-| --- | --- |
-| Context - Problem | The problem description |
+| Name                | Description              |
+| ------------------- | ------------------------ |
+| Context - Problem   | The problem description  |
 | Decision - Solution | The solution description |
 
 **Find rule by partial name**
@@ -150,10 +150,10 @@ Validates the Decision Doc Codec that parses decision documents (ADR/PDR
 - When finding rule "Context"
 - Then the found rule should have name "Context - Why we need this feature"
 
-| Name | Description |
-| --- | --- |
-| Context - Why we need this feature | Background |
-| Decision - The implementation approach | Solution |
+| Name                                   | Description |
+| -------------------------------------- | ----------- |
+| Context - Why we need this feature     | Background  |
+| Decision - The implementation approach | Solution    |
 
 **Rule not found returns undefined**
 
@@ -161,54 +161,65 @@ Validates the Decision Doc Codec that parses decision documents (ADR/PDR
 - When finding rule "NonExistent"
 - Then no rule should be found
 
-| Name | Description |
-| --- | --- |
+| Name              | Description |
+| ----------------- | ----------- |
 | Context - Problem | Description |
 
 ## Business Rules
 
 **Rule blocks are partitioned by semantic prefix**
 
-Decision documents use Rule: blocks with semantic prefixes to organize
-    content into Context, Decision, and Consequences sections (standard ADR
-    format). Additional rules (like "Proof of Concept") are classified as other.
+**Invariant:** Decision document rules must be partitioned into ADR sections based on their semantic prefix (e.g., "Decision:", "Context:", "Consequence:"), with non-standard rules placed in an "other" category.
+**Rationale:** Semantic partitioning produces structured ADR output that follows the standard ADR format — unpartitioned rules would generate a flat, unnavigable document.
+**Verified by:** Partition rules into ADR sections, Non-standard rules go to other category
 
 _Verified by: Partition rules into ADR sections, Non-standard rules go to other category_
 
 **DocStrings are extracted with language tags**
 
-Decision documents contain code examples as Gherkin DocStrings.
+**Invariant:** DocStrings within rule descriptions must be extracted preserving their language tag (e.g., typescript, bash), defaulting to "text" when no language is specified.
+**Rationale:** Language tags enable syntax highlighting in generated markdown code blocks — losing the tag produces unformatted code that is harder to read.
+**Verified by:** Extract single DocString, Extract multiple DocStrings, DocString without language defaults to text
 
 _Verified by: Extract single DocString, Extract multiple DocStrings, DocString without language defaults to text_
 
 **Source mapping tables are parsed from rule descriptions**
 
-Decision documents define source mappings in markdown tables.
+**Invariant:** Markdown tables in rule descriptions with source mapping columns must be parsed into structured data, returning empty arrays when no table is present.
+**Rationale:** Source mapping tables drive the extraction pipeline — they define which files to read and what content to extract for each decision section.
+**Verified by:** Parse basic source mapping table, No source mapping returns empty
 
 _Verified by: Parse basic source mapping table, No source mapping returns empty_
 
 **Self-reference markers are correctly detected**
 
-Source files can reference the current decision document using special
-    markers like "THIS DECISION", "THIS DECISION (Rule: X)", etc.
+**Invariant:** The "THIS DECISION" marker must be recognized as a self-reference to the current decision document, with optional rule name qualifiers parsed correctly.
+**Rationale:** Self-references enable decisions to extract content from their own rules — misdetecting them would trigger file-system lookups for a non-existent "THIS DECISION" file.
+**Verified by:** Detect THIS DECISION marker, Detect THIS DECISION with Rule, Regular file path is not self-reference, Parse self-reference types, Parse self-reference with rule name
 
 _Verified by: Detect THIS DECISION marker, Detect THIS DECISION with Rule, Regular file path is not self-reference, Parse self-reference types, Parse self-reference with rule name_
 
 **Extraction methods are normalized to known types**
 
-The extraction method column can be written in various formats.
+**Invariant:** Extraction method strings from source mapping tables must be normalized to canonical method names for dispatcher routing.
+**Rationale:** Users may write extraction methods in various formats (e.g., "Decision rule description", "extract-shapes") — normalization ensures consistent dispatch regardless of formatting.
+**Verified by:** Normalize Decision rule description, Normalize extract-shapes, Normalize unknown method
 
 _Verified by: Normalize Decision rule description, Normalize extract-shapes, Normalize unknown method_
 
 **Complete decision documents are parsed with all content**
 
-The parseDecisionDocument function extracts all content from an ADR/PDR.
+**Invariant:** A complete decision document must be parseable into its constituent parts including rules, DocStrings, source mappings, and self-references in a single parse operation.
+**Rationale:** Complete parsing validates that all codec features compose correctly — partial parsing could miss interactions between features.
+**Verified by:** Parse complete decision document
 
 _Verified by: Parse complete decision document_
 
 **Rules can be found by name with partial matching**
 
-Self-references may not have an exact rule name match.
+**Invariant:** Rules must be findable by exact name match or partial (substring) name match, returning undefined when no match exists.
+**Rationale:** Partial matching supports flexible cross-references between decisions — requiring exact matches would make references brittle to minor naming changes.
+**Verified by:** Find rule by exact name, Find rule by partial name, Rule not found returns undefined
 
 _Verified by: Find rule by exact name, Find rule by partial name, Rule not found returns undefined_
 

@@ -129,43 +129,49 @@ The Decision Doc Generator orchestrates the full documentation generation
 
 **Output paths are determined from pattern metadata**
 
-The generator computes output paths based on pattern name and optional
-    section configuration. Compact output goes to _claude-md/, detailed to docs/.
+**Invariant:** Output file paths must be derived from pattern metadata using kebab-case conversion of the pattern name, with configurable section prefixes.
+    **Rationale:** Consistent path derivation ensures generated files are predictable and linkable — ad-hoc paths would break cross-document references.
+    **Verified by:** Default output paths for pattern, Custom section for compact output, CamelCase pattern converted to kebab-case
 
 _Verified by: Default output paths for pattern, Custom section for compact output, CamelCase pattern converted to kebab-case_
 
 **Compact output includes only essential content**
 
-Summary/compact output is limited to ~50 lines and includes only
-    essential tables and type definitions for Claude context files.
+**Invariant:** Compact output mode must include only essential decision content (type shapes, key constraints) while excluding full descriptions and verbose sections.
+    **Rationale:** Compact output is designed for AI context windows where token budget is limited — including full descriptions would negate the space savings.
+    **Verified by:** Compact output excludes full descriptions, Compact output includes type shapes, Compact output handles empty content
 
 _Verified by: Compact output excludes full descriptions, Compact output includes type shapes, Compact output handles empty content_
 
 **Detailed output includes full content**
 
-Detailed output is ~300 lines and includes everything: JSDoc, examples,
-    full descriptions, and all extracted content.
+**Invariant:** Detailed output mode must include all decision content including full descriptions, consequences, and DocStrings rendered as code blocks.
+    **Rationale:** Detailed output serves as the complete human reference — omitting any section would force readers to consult source files for the full picture.
+    **Verified by:** Detailed output includes all sections, Detailed output includes consequences, Detailed output includes DocStrings as code blocks
 
 _Verified by: Detailed output includes all sections, Detailed output includes consequences, Detailed output includes DocStrings as code blocks_
 
 **Multi-level generation produces both outputs**
 
-The generator can produce both compact and detailed outputs in a single
-    pass for maximum utility.
+**Invariant:** The generator must produce both compact and detailed output files from a single generation run, using the pattern name or patternName tag as the identifier.
+    **Rationale:** Both output levels serve different audiences (AI vs human) — generating them together ensures consistency and eliminates the risk of one becoming stale.
+    **Verified by:** Generate both compact and detailed outputs, Pattern name falls back to pattern.name
 
 _Verified by: Generate both compact and detailed outputs, Pattern name falls back to pattern.name_
 
 **Generator is registered with the registry**
 
-The generator is available in the registry under the name "doc-from-decision"
-    and can be invoked through the standard generator interface.
+**Invariant:** The decision document generator must be registered with the generator registry under a canonical name and must filter input patterns to only those with source mappings.
+    **Rationale:** Registry registration enables discovery via --list-generators — filtering to source-mapped patterns prevents empty output for patterns without decision metadata.
+    **Verified by:** Generator is registered with correct name, Generator filters patterns by source mapping presence, Generator processes patterns with source mappings
 
 _Verified by: Generator is registered with correct name, Generator filters patterns by source mapping presence, Generator processes patterns with source mappings_
 
 **Source mappings are executed during generation**
 
-Decision documents with source mapping tables trigger content aggregation
-    from the referenced files during the generation process.
+**Invariant:** Source mapping tables must be executed during generation to extract content from referenced files, with missing files reported as validation errors.
+    **Rationale:** Source mappings are the bridge between decision specs and implementation — unexecuted mappings produce empty sections, while silent missing-file errors hide broken references.
+    **Verified by:** Source mappings are executed, Missing source files are reported as validation errors
 
 _Verified by: Source mappings are executed, Missing source files are reported as validation errors_
 

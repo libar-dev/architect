@@ -132,17 +132,33 @@ The createDeliveryProcess factory provides a type-safe way to configure
 
 **Factory creates configured instances with correct defaults**
 
+**Invariant:** The configuration factory must produce a fully initialized instance for any supported preset, with the libar-generic preset as the default when no arguments are provided.
+    **Rationale:** A sensible default preset eliminates boilerplate for the common case while still supporting specialized presets (ddd-es-cqrs) for advanced monorepo configurations.
+    **Verified by:** Create with no arguments uses libar-generic preset, Create with generic preset, Create with libar-generic preset, Create with ddd-es-cqrs preset explicitly
+
 _Verified by: Create with no arguments uses libar-generic preset, Create with generic preset, Create with libar-generic preset, Create with ddd-es-cqrs preset explicitly_
 
 **Custom prefix configuration works correctly**
+
+**Invariant:** Custom tag prefix and file opt-in tag overrides must be applied to the configuration instance, replacing the preset defaults.
+    **Rationale:** Consuming projects may use different annotation prefixes — custom prefixes enable the toolkit to work with any tag convention without forking presets.
+    **Verified by:** Custom tag prefix overrides preset, Custom file opt-in tag overrides preset, Both prefix and opt-in tag can be customized together
 
 _Verified by: Custom tag prefix overrides preset, Custom file opt-in tag overrides preset, Both prefix and opt-in tag can be customized together_
 
 **Preset categories replace base categories entirely**
 
+**Invariant:** When a preset defines its own category set, it must fully replace (not merge with) the base categories.
+    **Rationale:** Category sets are curated per-preset — merging would include irrelevant categories (e.g., DDD categories in a generic project) that pollute taxonomy reports.
+    **Verified by:** Generic preset excludes DDD categories, Libar-generic preset excludes DDD categories
+
 _Verified by: Generic preset excludes DDD categories, Libar-generic preset excludes DDD categories_
 
 **Regex builders use configured prefix**
+
+**Invariant:** All regex builders (hasFileOptIn, hasDocDirectives, normalizeTag) must use the configured tag prefix, not a hardcoded one.
+    **Rationale:** Regex patterns that ignore the configured prefix would miss annotations in projects using custom prefixes, silently skipping source files.
+    **Verified by:** hasFileOptIn detects configured opt-in tag, hasFileOptIn rejects wrong opt-in tag, hasDocDirectives detects configured prefix, hasDocDirectives rejects wrong prefix, normalizeTag removes configured prefix, normalizeTag handles tag without prefix
 
 _Verified by: hasFileOptIn detects configured opt-in tag, hasFileOptIn rejects wrong opt-in tag, hasDocDirectives detects configured prefix, hasDocDirectives rejects wrong prefix, normalizeTag removes configured prefix, normalizeTag handles tag without prefix_
 

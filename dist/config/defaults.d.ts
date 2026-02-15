@@ -3,6 +3,8 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigurationDefaults
  * @libar-docs-status completed
+ * @libar-docs-arch-layer domain
+ * @libar-docs-arch-context config
  * @libar-docs-used-by DeliveryProcessFactory, PatternScanner, LintRules, DetectChanges, AntiPatternDetector
  *
  * ## Configuration Defaults

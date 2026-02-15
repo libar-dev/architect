@@ -29,7 +29,7 @@
 
 **Problem:**
   Documentation comments duplicate type definitions that exist in the same file.
-  When interfaces change, the JSDoc examples drift. Maintaining two copies of the
+  As interfaces change, the JSDoc examples drift. Maintaining two copies of the
   same type information violates DRY and creates documentation rot.
 
   **Relationship to Documentation Generation:**

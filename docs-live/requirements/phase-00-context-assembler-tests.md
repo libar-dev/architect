@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | active |
+| Property     | Value   |
+| ------------ | ------- |
+| Status       | active  |
 | Product Area | DataAPI |
 
 ## Description
 
 Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
-  buildOverview() pure functions that operate on MasterDataset.
+buildOverview() pure functions that operate on MasterDataset.
 
 ## Acceptance Criteria
 
@@ -153,17 +153,33 @@ Tests for assembleContext(), buildDepTree(), buildFileReadingList(), and
 
 **assembleContext produces session-tailored context bundles**
 
+**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+**Verified by:** Design session includes stubs, consumers, and architecture, Planning session includes only metadata and dependencies, Implement session includes deliverables and FSM, Multi-pattern context merges metadata from both patterns, Pattern not found returns error with suggestion, Description preserves Problem and Solution structure, Solution text with inline bold is not truncated
+
 _Verified by: Design session includes stubs, consumers, and architecture, Planning session includes only metadata and dependencies, Implement session includes deliverables and FSM, Multi-pattern context merges metadata from both patterns, Pattern not found returns error with suggestion, Description preserves Problem and Solution structure, Solution text with inline bold is not truncated_
 
 **buildDepTree walks dependency chains with cycle detection**
+
+**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
+**Verified by:** Dependency tree shows chain with status markers, Depth limit truncates branches, Circular dependencies are handled safely, Standalone pattern returns single-node tree
 
 _Verified by: Dependency tree shows chain with status markers, Depth limit truncates branches, Circular dependencies are handled safely, Standalone pattern returns single-node tree_
 
 **buildOverview provides executive project summary**
 
+**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+**Verified by:** Overview shows progress, active phases, and blocking, Empty dataset returns zero-state overview
+
 _Verified by: Overview shows progress, active phases, and blocking, Empty dataset returns zero-state overview_
 
 **buildFileReadingList returns paths by relevance**
+
+**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
+**Verified by:** File list includes primary and related files, File list includes implementation files for completed dependencies, File list without related returns only primary
 
 _Verified by: File list includes primary and related files, File list includes implementation files for completed dependencies, File list without related returns only primary_
 

@@ -3,6 +3,8 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigurationTypes
  * @libar-docs-status completed
+ * @libar-docs-arch-layer domain
+ * @libar-docs-arch-context config
  * @libar-docs-extract-shapes DeliveryProcessConfig, DeliveryProcessInstance, RegexBuilders
  *
  * ## Configuration Types

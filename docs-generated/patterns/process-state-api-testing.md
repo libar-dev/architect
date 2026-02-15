@@ -169,21 +169,41 @@ Programmatic interface for querying delivery process state.
 
 **Status queries return correct patterns**
 
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+    **Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+    **Verified by:** Get patterns by normalized status, Get patterns by FSM status, Get current work returns active patterns, Get roadmap items returns roadmap and deferred, Get status counts, Get completion percentage
+
 _Verified by: Get patterns by normalized status, Get patterns by FSM status, Get current work returns active patterns, Get roadmap items returns roadmap and deferred, Get status counts, Get completion percentage_
 
 **Phase queries return correct phase data**
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+    **Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+    **Verified by:** Get patterns by phase, Get phase progress, Get nonexistent phase returns undefined, Get active phases
 
 _Verified by: Get patterns by phase, Get phase progress, Get nonexistent phase returns undefined, Get active phases_
 
 **FSM queries expose transition validation**
 
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+    **Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+    **Verified by:** Check valid transition, Check invalid transition, Get valid transitions from status, Get protection info
+
 _Verified by: Check valid transition, Check invalid transition, Get valid transitions from status, Get protection info_
 
 **Pattern queries find and retrieve pattern data**
 
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+    **Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+    **Verified by:** Find pattern by name (case insensitive), Find nonexistent pattern returns undefined, Get patterns by category, Get all categories with counts
+
 _Verified by: Find pattern by name (case insensitive), Find nonexistent pattern returns undefined, Get patterns by category, Get all categories with counts_
 
 **Timeline queries group patterns by time**
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+    **Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+    **Verified by:** Get patterns by quarter, Get all quarters, Get recently completed sorted by date
 
 _Verified by: Get patterns by quarter, Get all quarters, Get recently completed sorted by date_
 

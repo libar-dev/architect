@@ -6,26 +6,28 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value         |
+| ------------ | ------------- |
+| Status       | completed     |
 | Product Area | Configuration |
 
 ## Description
 
 The config loader discovers and loads `delivery-process.config.ts` files
-  for hierarchical configuration, enabling package-level and repo-level
-  taxonomy customization.
+for hierarchical configuration, enabling package-level and repo-level
+taxonomy customization.
 
-  **Problem:**
-  - Different directories need different taxonomies
-  - Package-level config should override repo-level
-  - CLI tools need automatic config discovery
+**Problem:**
 
-  **Solution:**
-  - Walk up directories looking for `delivery-process.config.ts`
-  - Stop at repo root (.git marker)
-  - Fall back to libar-generic preset (3 categories) if no config found
+- Different directories need different taxonomies
+- Package-level config should override repo-level
+- CLI tools need automatic config discovery
+
+**Solution:**
+
+- Walk up directories looking for `delivery-process.config.ts`
+- Stop at repo root (.git marker)
+- Fall back to libar-generic preset (3 categories) if no config found
 
 ## Acceptance Criteria
 
@@ -36,8 +38,8 @@ The config loader discovers and loads `delivery-process.config.ts` files
 - Then config file should be found
 - And config path should end with "delivery-process.config.js"
 
-| path | type |
-| --- | --- |
+| path                       | type   |
+| -------------------------- | ------ |
 | delivery-process.config.js | config |
 
 **Find config file in parent directory**
@@ -47,10 +49,10 @@ The config loader discovers and loads `delivery-process.config.ts` files
 - Then config file should be found
 - And config path should end with "delivery-process.config.js"
 
-| path | type |
-| --- | --- |
+| path                       | type   |
+| -------------------------- | ------ |
 | delivery-process.config.js | config |
-| nested/src/file.ts | source |
+| nested/src/file.ts         | source |
 
 **Prefer TypeScript config over JavaScript**
 
@@ -59,8 +61,8 @@ The config loader discovers and loads `delivery-process.config.ts` files
 - Then config file should be found
 - And config path should end with "delivery-process.config.ts"
 
-| path | type |
-| --- | --- |
+| path                       | type   |
+| -------------------------- | ------ |
 | delivery-process.config.ts | config |
 | delivery-process.config.js | config |
 
@@ -70,8 +72,8 @@ The config loader discovers and loads `delivery-process.config.ts` files
 - When finding config file from "src"
 - Then config file should NOT be found
 
-| path | type |
-| --- | --- |
+| path        | type   |
+| ----------- | ------ |
 | src/file.ts | source |
 
 **Stop at .git directory marker**
@@ -81,9 +83,9 @@ The config loader discovers and loads `delivery-process.config.ts` files
 - Then config file should be found
 - And config path should NOT contain "project/nested"
 
-| path | type |
-| --- | --- |
-| .git/config | git |
+| path                       | type   |
+| -------------------------- | ------ |
+| .git/config                | git    |
 | delivery-process.config.js | config |
 | project/nested/src/file.ts | source |
 
@@ -130,17 +132,33 @@ The config loader discovers and loads `delivery-process.config.ts` files
 
 **Config files are discovered by walking up directories**
 
+**Invariant:** The config loader must search for configuration files starting from the current directory and walking up parent directories until a match is found or the filesystem root is reached.
+**Rationale:** Projects may run CLI commands from subdirectories — upward traversal ensures the nearest config file is always found regardless of working directory.
+**Verified by:** Find config file in current directory, Find config file in parent directory, Prefer TypeScript config over JavaScript, Return null when no config file exists
+
 _Verified by: Find config file in current directory, Find config file in parent directory, Prefer TypeScript config over JavaScript, Return null when no config file exists_
 
 **Config discovery stops at repo root**
+
+**Invariant:** Directory traversal must stop at repository root markers (e.g., .git directory) and not search beyond them.
+**Rationale:** Searching beyond the repo root could find unrelated config files from parent projects, producing confusing cross-project behavior.
+**Verified by:** Stop at .git directory marker
 
 _Verified by: Stop at .git directory marker_
 
 **Config is loaded and validated**
 
+**Invariant:** Loaded config files must have a valid default export matching the expected configuration schema, with appropriate error messages for invalid formats.
+**Rationale:** Invalid configurations produce cryptic downstream errors — early validation with clear messages prevents debugging wasted on malformed config.
+**Verified by:** Load valid config with default fallback, Load valid config file, Error on config without default export, Error on config with wrong type
+
 _Verified by: Load valid config with default fallback, Load valid config file, Error on config without default export, Error on config with wrong type_
 
 **Config errors are formatted for display**
+
+**Invariant:** Configuration loading errors must be formatted as human-readable messages including the file path and specific error description.
+**Rationale:** Raw error objects are not actionable — developers need the config file path and a clear description to diagnose and fix configuration issues.
+**Verified by:** Format error with path and message
 
 _Verified by: Format error with path and message_
 

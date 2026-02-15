@@ -6,20 +6,20 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | DataAPI |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | completed |
+| Product Area | DataAPI   |
 
 ## Description
 
 **Problem:**
-  Starting an implementation or design session without checking prerequisites
-  wastes time when blockers are discovered mid-session.
+Starting an implementation or design session without checking prerequisites
+wastes time when blockers are discovered mid-session.
 
-  **Solution:**
-  ScopeValidator runs composable checks and aggregates results into a verdict
-  (ready, blocked, or warnings) before a session starts.
+**Solution:**
+ScopeValidator runs composable checks and aggregates results into a verdict
+(ready, blocked, or warnings) before a session starts.
 
 ## Acceptance Criteria
 
@@ -108,13 +108,25 @@
 
 **Implementation scope validation checks all prerequisites**
 
+**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
+**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
+**Verified by:** All implementation checks pass, Incomplete dependency blocks implementation, FSM transition from completed blocks implementation, Missing PDR references produce WARN, No deliverables blocks implementation, Strict mode promotes WARN to BLOCKED, Pattern not found throws error
+
 _Verified by: All implementation checks pass, Incomplete dependency blocks implementation, FSM transition from completed blocks implementation, Missing PDR references produce WARN, No deliverables blocks implementation, Strict mode promotes WARN to BLOCKED, Pattern not found throws error_
 
 **Design scope validation checks dependency stubs**
 
+**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
+**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
+**Verified by:** Design session with no dependencies passes, Design session with dependencies lacking stubs produces WARN
+
 _Verified by: Design session with no dependencies passes, Design session with dependencies lacking stubs produces WARN_
 
 **Formatter produces structured text output**
+
+**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
+**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
+**Verified by:** Formatter produces markers per ADR-008, Formatter shows warnings verdict text, Formatter shows blocker details for blocked verdict
 
 _Verified by: Formatter produces markers per ADR-008, Formatter shows warnings verdict text, Formatter shows blocker details for blocked verdict_
 

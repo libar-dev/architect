@@ -3,6 +3,8 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ProjectConfigTypes
  * @libar-docs-status active
+ * @libar-docs-arch-layer domain
+ * @libar-docs-arch-context config
  * @libar-docs-uses ConfigurationTypes, ConfigurationPresets
  * @libar-docs-used-by DefineConfig, ConfigLoader
  * @libar-docs-extract-shapes DeliveryProcessProjectConfig, SourcesConfig, OutputConfig, GeneratorSourceOverride, ResolvedConfig, ResolvedProjectConfig, ResolvedSourcesConfig

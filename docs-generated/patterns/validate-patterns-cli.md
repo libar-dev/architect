@@ -116,25 +116,49 @@ Command-line interface for cross-validating TypeScript patterns vs Gherkin featu
 
 **CLI displays help and version information**
 
+**Invariant:** The --help/-h and --version/-v flags must produce usage/version output and exit successfully without requiring other arguments.
+    **Rationale:** Help and version are universal CLI conventions — both short and long flag forms must work for discoverability and scripting compatibility.
+    **Verified by:** Display help with --help flag, Display help with -h flag, Display version with --version flag, Display version with -v flag
+
 _Verified by: Display help with --help flag, Display help with -h flag, Display version with --version flag, Display version with -v flag_
 
 **CLI requires input and feature patterns**
+
+**Invariant:** The validate-patterns CLI must fail with clear errors when either --input or --features flags are missing.
+    **Rationale:** Cross-source validation requires both TypeScript and Gherkin inputs — running with only one source would produce incomplete validation that misses cross-source mismatches.
+    **Verified by:** Fail without --input flag, Fail without --features flag
 
 _Verified by: Fail without --input flag, Fail without --features flag_
 
 **CLI validates patterns across TypeScript and Gherkin sources**
 
+**Invariant:** The validator must detect mismatches between TypeScript and Gherkin sources including phase and status discrepancies.
+    **Rationale:** Dual-source architecture requires consistency — a pattern with status "active" in TypeScript but "roadmap" in Gherkin creates conflicting truth and broken reports.
+    **Verified by:** Validation passes for matching patterns, Detect phase mismatch between sources, Detect status mismatch between sources
+
 _Verified by: Validation passes for matching patterns, Detect phase mismatch between sources, Detect status mismatch between sources_
 
 **CLI supports multiple output formats**
+
+**Invariant:** The CLI must support JSON and pretty (human-readable) output formats, with pretty as the default.
+    **Rationale:** Pretty format serves interactive use while JSON format enables CI/CD pipeline integration and programmatic consumption of validation results.
+    **Verified by:** JSON output format, Pretty output format is default
 
 _Verified by: JSON output format, Pretty output format is default_
 
 **Strict mode treats warnings as errors**
 
+**Invariant:** When --strict is enabled, warnings must be promoted to errors causing a non-zero exit code (exit 2); without --strict, warnings must not cause failure.
+    **Rationale:** CI pipelines need strict enforcement while local development benefits from lenient mode — the flag lets teams choose their enforcement level.
+    **Verified by:** Strict mode exits with code 2 on warnings, Non-strict mode passes with warnings
+
 _Verified by: Strict mode exits with code 2 on warnings, Non-strict mode passes with warnings_
 
 **CLI warns about unknown flags**
+
+**Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue.
+    **Rationale:** Pattern validation is non-destructive — warning without failing is more user-friendly than hard errors for minor flag typos, while still surfacing the issue.
+    **Verified by:** Warn on unknown flag but continue
 
 _Verified by: Warn on unknown flag but continue_
 

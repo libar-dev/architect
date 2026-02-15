@@ -145,43 +145,49 @@ The warning collector provides a unified system for capturing, categorizing,
 
 **Warnings are captured with source context**
 
-Each warning includes the source location, category, and message to
-    enable debugging and targeted fixes.
+**Invariant:** Each captured warning must include the source file path, optional line number, and category for precise identification.
+    **Rationale:** Context-free warnings are impossible to act on — developers need to know which file and line produced the warning to fix the underlying issue.
+    **Verified by:** Warning includes source file, Warning includes line number when available, Warning includes category
 
 _Verified by: Warning includes source file, Warning includes line number when available, Warning includes category_
 
 **Warnings are categorized for filtering and grouping**
 
-Warning categories enable filtering by severity, source, or type
-    for different reporting needs.
+**Invariant:** Warnings must support multiple categories and be filterable by both category and source file.
+    **Rationale:** Large codebases produce many warnings — filtering by category or file lets developers focus on one concern at a time instead of triaging an overwhelming flat list.
+    **Verified by:** Warning categories are supported, Warnings can be filtered by category, Warnings can be filtered by source file
 
 _Verified by: Warning categories are supported, Warnings can be filtered by category, Warnings can be filtered by source file_
 
 **Warnings are aggregated across the pipeline**
 
-The collector aggregates warnings from all pipeline stages, maintaining
-    insertion order and source attribution.
+**Invariant:** Warnings from multiple pipeline stages must be collected into a single aggregated view, groupable by source file and summarizable by category counts.
+    **Rationale:** Pipeline stages run independently — without aggregation, warnings would be scattered across stage outputs, making it impossible to see the full picture.
+    **Verified by:** Warnings from multiple stages are collected, Warnings are grouped by source file, Summary counts by category
 
 _Verified by: Warnings from multiple stages are collected, Warnings are grouped by source file, Summary counts by category_
 
 **Warnings integrate with the Result pattern**
 
-The warning collector integrates with Result<T, E> to include warnings
-    in successful results, enabling callers to inspect non-fatal issues.
+**Invariant:** Warnings must propagate through the Result monad, being preserved in both successful and failed results and across pipeline stages.
+    **Rationale:** The Result pattern is the standard error-handling mechanism — warnings that don't propagate through Results would be silently lost when functions compose.
+    **Verified by:** Successful result includes warnings, Failed result includes warnings collected before failure, Warnings propagate through pipeline
 
 _Verified by: Successful result includes warnings, Failed result includes warnings collected before failure, Warnings propagate through pipeline_
 
 **Warnings can be formatted for different outputs**
 
-The collector provides formatters for console output, JSON, and
-    markdown to support different reporting needs.
+**Invariant:** Warnings must be formattable as colored console output, machine-readable JSON, and markdown for documentation, each with appropriate structure.
+    **Rationale:** Different consumers need different formats — CI pipelines parse JSON, developers read console output, and generated docs embed markdown.
+    **Verified by:** Console format includes color and location, JSON format is machine-readable, Markdown format for documentation
 
 _Verified by: Console format includes color and location, JSON format is machine-readable, Markdown format for documentation_
 
 **Existing console.warn calls are migrated to collector**
 
-All console.warn calls in the source mapper and related modules
-    are replaced with warning collector calls.
+**Invariant:** Pipeline components (source mapper, shape extractor) must use the warning collector instead of direct console.warn calls.
+    **Rationale:** Direct console.warn calls bypass aggregation and filtering — migrating to the collector ensures all warnings are captured, categorized, and available for programmatic consumption.
+    **Verified by:** Source mapper uses warning collector, Shape extractor uses warning collector
 
 _Verified by: Source mapper uses warning collector, Shape extractor uses warning collector_
 

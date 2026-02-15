@@ -281,10 +281,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -299,12 +299,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
+            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
-            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -561,10 +561,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -579,12 +579,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -802,10 +802,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -820,12 +820,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -1043,10 +1043,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1061,12 +1061,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -1288,10 +1288,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1306,12 +1306,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -1536,10 +1536,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1554,12 +1554,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
+            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
-            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -1777,10 +1777,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1795,12 +1795,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
+            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
-            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -2019,10 +2019,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2037,12 +2037,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2260,10 +2260,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2278,12 +2278,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2501,10 +2501,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2519,12 +2519,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2742,10 +2742,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2760,12 +2760,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3009,10 +3009,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3027,12 +3027,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3250,10 +3250,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3268,12 +3268,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3491,10 +3491,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3509,12 +3509,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3732,10 +3732,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3750,12 +3750,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3973,10 +3973,10 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3991,12 +3991,12 @@ export declare const BusinessRulesCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
+                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
-                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";

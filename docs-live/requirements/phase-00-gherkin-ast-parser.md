@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 The Gherkin AST parser extracts feature metadata, scenarios, and steps
-  from .feature files for timeline generation and process documentation.
+from .feature files for timeline generation and process documentation.
 
 ## Acceptance Criteria
 
@@ -34,40 +34,40 @@ The Gherkin AST parser extracts feature metadata, scenarios, and steps
 ```markdown
 @libar-docs-pattern:ProjectionCategories @libar-docs-phase:15 @libar-docs-status:roadmap
 Feature: Projection Categories
-  A taxonomy that categorizes projections by purpose.
+A taxonomy that categorizes projections by purpose.
 
-  @acceptance-criteria @happy-path
-  Scenario: Define a View projection
-    Given a projection definition
-    When category is set to "view"
-    Then projection is client-exposed
+@acceptance-criteria @happy-path
+Scenario: Define a View projection
+Given a projection definition
+When category is set to "view"
+Then projection is client-exposed
 ```
 
-| field | value |
-| --- | --- |
-| name | Projection Categories |
+| field       | value                                               |
+| ----------- | --------------------------------------------------- |
+| name        | Projection Categories                               |
 | description | A taxonomy that categorizes projections by purpose. |
-| language | en |
+| language    | en                                                  |
 
-| tag |
-| --- |
+| tag                          |
+| ---------------------------- |
 | pattern:ProjectionCategories |
-| phase:15 |
-| status:roadmap |
+| phase:15                     |
+| status:roadmap               |
 
-| field | value |
-| --- | --- |
-| name | Define a View projection |
+| field | value                    |
+| ----- | ------------------------ |
+| name  | Define a View projection |
 
-| tag |
-| --- |
+| tag                 |
+| ------------------- |
 | acceptance-criteria |
-| happy-path |
+| happy-path          |
 
-| field | value |
-| --- | --- |
-| keyword | Given |
-| text | a projection definition |
+| field   | value                   |
+| ------- | ----------------------- |
+| keyword | Given                   |
+| text    | a projection definition |
 
 **Parse multiple scenarios**
 
@@ -80,22 +80,22 @@ Feature: Projection Categories
 ```markdown
 @libar-docs-pattern:MyPattern
 Feature: My Pattern
-  Description
+Description
 
-  Scenario: First scenario
-    Given setup
-    When action
-    Then result
+Scenario: First scenario
+Given setup
+When action
+Then result
 
-  Scenario: Second scenario
-    Given other setup
-    When other action
-    Then other result
+Scenario: Second scenario
+Given other setup
+When other action
+Then other result
 ```
 
-| name |
-| --- |
-| First scenario |
+| name            |
+| --------------- |
+| First scenario  |
 | Second scenario |
 
 **Handle feature without tags**
@@ -107,10 +107,10 @@ Feature: My Pattern
 
 ```markdown
 Feature: Simple Feature
-  A feature without tags
+A feature without tags
 
-  Scenario: Simple scenario
-    Given setup
+Scenario: Simple scenario
+Given setup
 ```
 
 **Return error for malformed Gherkin**
@@ -134,8 +134,27 @@ This is not valid Gherkin
 
 ```markdown
 @libar-docs-pattern:Invalid
+
 # Just a comment
 ```
+
+## Business Rules
+
+**Successful feature file parsing extracts complete metadata**
+
+**Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all nested scenarios with their steps.
+**Rationale:** Downstream generators (timeline, business rules) depend on complete AST extraction; missing fields cause silent gaps in generated documentation.
+**Verified by:** Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags
+
+_Verified by: Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags_
+
+**Invalid Gherkin produces structured errors**
+
+**Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a descriptive error message.
+**Rationale:** The scanner processes many feature files in batch; structured errors allow graceful degradation and per-file error reporting rather than aborting the entire scan.
+**Verified by:** Return error for malformed Gherkin, Return error for file without feature
+
+_Verified by: Return error for malformed Gherkin, Return error for file without feature_
 
 ---
 

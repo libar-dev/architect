@@ -6,26 +6,28 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value         |
+| ------------ | ------------- |
+| Status       | completed     |
 | Product Area | Configuration |
 
 ## Description
 
 mergeSourcesForGenerator computes effective sources for a specific
-  generator by applying per-generator overrides to base resolved sources.
+generator by applying per-generator overrides to base resolved sources.
 
-  **Problem:**
-  - Different generators may need different feature or input sources
-  - Override semantics must be predictable and well-defined
-  - Base exclude patterns must always be inherited
+**Problem:**
 
-  **Solution:**
-  - replaceFeatures (non-empty) replaces base features entirely
-  - additionalFeatures appends to base features
-  - additionalInput appends to base typescript sources
-  - exclude is always inherited from base (no override mechanism)
+- Different generators may need different feature or input sources
+- Override semantics must be predictable and well-defined
+- Base exclude patterns must always be inherited
+
+**Solution:**
+
+- replaceFeatures (non-empty) replaces base features entirely
+- additionalFeatures appends to base features
+- additionalInput appends to base typescript sources
+- exclude is always inherited from base (no override mechanism)
 
 ## Acceptance Criteria
 
@@ -83,21 +85,41 @@ mergeSourcesForGenerator computes effective sources for a specific
 
 **No override returns base unchanged**
 
+**Invariant:** When no source overrides are provided, the merged result must be identical to the base source configuration.
+**Rationale:** The merge function must be safe to call unconditionally — returning modified results without overrides would corrupt default source paths.
+**Verified by:** No override returns base sources
+
 _Verified by: No override returns base sources_
 
 **Feature overrides control feature source selection**
+
+**Invariant:** additionalFeatures must append to base feature sources while replaceFeatures must completely replace them, and these two options are mutually exclusive.
+**Rationale:** Projects need both additive and replacement strategies — additive for extending (monorepo packages), replacement for narrowing (focused generation runs).
+**Verified by:** additionalFeatures appended to base features, replaceFeatures replaces base features entirely, Empty replaceFeatures does NOT replace
 
 _Verified by: additionalFeatures appended to base features, replaceFeatures replaces base features entirely, Empty replaceFeatures does NOT replace_
 
 **TypeScript source overrides append additional input**
 
+**Invariant:** additionalInput must append to (not replace) the base TypeScript source paths.
+**Rationale:** TypeScript sources are always additive — the base sources contain core patterns that must always be included alongside project-specific additions.
+**Verified by:** additionalInput appended to typescript sources
+
 _Verified by: additionalInput appended to typescript sources_
 
 **Combined overrides apply together**
 
+**Invariant:** Feature overrides and TypeScript overrides must compose independently when both are provided simultaneously.
+**Rationale:** Real configs often specify both feature and TypeScript overrides — they must not interfere with each other or produce order-dependent results.
+**Verified by:** additionalFeatures and additionalInput combined
+
 _Verified by: additionalFeatures and additionalInput combined_
 
 **Exclude is always inherited from base**
+
+**Invariant:** The exclude patterns must always come from the base configuration, never from overrides.
+**Rationale:** Exclude patterns are a safety mechanism — allowing overrides to modify excludes could accidentally include sensitive or generated files in the scan.
+**Verified by:** Exclude always inherited
 
 _Verified by: Exclude always inherited_
 

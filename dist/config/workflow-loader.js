@@ -3,6 +3,9 @@
  * @libar-docs-config
  * @libar-docs-pattern WorkflowLoader
  * @libar-docs-status completed
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-uses WorkflowConfigSchema, CodecUtils
  * @libar-docs-used-by GeneratorOrchestrator, SectionHelpers
  *

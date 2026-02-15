@@ -6,22 +6,23 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | completed |
 | Product Area | CoreTypes |
 
 ## Description
 
 Error factories create structured, discriminated error types with consistent
-  message formatting. Each error type has a unique discriminator for exhaustive
-  pattern matching in switch statements.
+message formatting. Each error type has a unique discriminator for exhaustive
+pattern matching in switch statements.
 
-  **Why typed errors matter:**
-  - Compile-time exhaustiveness checking in error handlers
-  - Consistent message formatting across the codebase
-  - Structured data for logging and reporting
-  - Type narrowing via discriminator field
+**Why typed errors matter:**
+
+- Compile-time exhaustiveness checking in error handlers
+- Consistent message formatting across the codebase
+- Structured data for logging and reporting
+- Type narrowing via discriminator field
 
 ## Acceptance Criteria
 
@@ -70,9 +71,9 @@ Error factories create structured, discriminated error types with consistent
 - And the error patternName should be "UserAuth"
 - And the error message should contain all of:
 
-| text |
-| --- |
-| UserAuth |
+| text        |
+| ----------- |
+| UserAuth    |
 | src/auth.ts |
 
 **createPatternValidationError includes validation errors array**
@@ -81,14 +82,14 @@ Error factories create structured, discriminated error types with consistent
 - Then the error validationErrors should have 2 items
 - And validationErrors should contain all:
 
-| error |
-| --- |
-| tags: Required |
+| error                    |
+| ------------------------ |
+| tags: Required           |
 | description: Must be set |
 
-| error |
-| --- |
-| tags: Required |
+| error                    |
+| ------------------------ |
+| tags: Required           |
 | description: Must be set |
 
 **createPatternValidationError omits validationErrors when not provided**
@@ -110,10 +111,10 @@ Error factories create structured, discriminated error types with consistent
 - Then the error validationErrors should have 2 items
 - And validationErrors should contain "status: Invalid enum value"
 
-| error |
-| --- |
+| error                      |
+| -------------------------- |
 | status: Invalid enum value |
-| phase: Expected number |
+| phase: Expected number     |
 
 **createDeliverableValidationError formats file and reason**
 
@@ -138,10 +139,48 @@ Error factories create structured, discriminated error types with consistent
 - When I create a DeliverableValidationError with validation errors:
 - Then the error validationErrors should have 2 items
 
-| error |
-| --- |
-| name: Required |
+| error                  |
+| ---------------------- |
+| name: Required         |
 | tests: Expected number |
+
+## Business Rules
+
+**createFileSystemError produces discriminated FILE_SYSTEM_ERROR types**
+
+**Invariant:** Every FileSystemError must have type "FILE_SYSTEM_ERROR", the source file path, a reason enum value, and a human-readable message derived from the reason.
+**Rationale:** File system errors are the most common failure mode in the scanner; discriminated types enable exhaustive switch/case handling in error recovery paths.
+**Verified by:** createFileSystemError generates correct message for each reason, createFileSystemError includes optional originalError, createFileSystemError omits originalError when not provided
+
+_Verified by: createFileSystemError generates correct message for each reason, createFileSystemError includes optional originalError, createFileSystemError omits originalError when not provided_
+
+**createDirectiveValidationError formats file location with line number**
+
+**Invariant:** Every DirectiveValidationError must include the source file path, line number, and reason, with the message formatted as "file:line" for IDE-clickable error output.
+**Verified by:** createDirectiveValidationError includes line number in message, createDirectiveValidationError includes optional directive snippet, createDirectiveValidationError omits directive when not provided
+
+_Verified by: createDirectiveValidationError includes line number in message, createDirectiveValidationError includes optional directive snippet, createDirectiveValidationError omits directive when not provided_
+
+**createPatternValidationError captures pattern identity and validation details**
+
+**Invariant:** Every PatternValidationError must include the pattern name, source file path, and reason, with an optional array of specific validation errors for detailed diagnostics.
+**Verified by:** createPatternValidationError formats pattern name and file, createPatternValidationError includes validation errors array, createPatternValidationError omits validationErrors when not provided
+
+_Verified by: createPatternValidationError formats pattern name and file, createPatternValidationError includes validation errors array, createPatternValidationError omits validationErrors when not provided_
+
+**createProcessMetadataValidationError validates Gherkin process metadata**
+
+**Invariant:** Every ProcessMetadataValidationError must include the feature file path and a reason describing which metadata field failed validation.
+**Verified by:** createProcessMetadataValidationError formats file and reason, createProcessMetadataValidationError includes readonly validation errors
+
+_Verified by: createProcessMetadataValidationError formats file and reason, createProcessMetadataValidationError includes readonly validation errors_
+
+**createDeliverableValidationError tracks deliverable-specific failures**
+
+**Invariant:** Every DeliverableValidationError must include the feature file path and reason, with optional deliverableName for pinpointing which deliverable failed validation.
+**Verified by:** createDeliverableValidationError formats file and reason, createDeliverableValidationError includes optional deliverableName, createDeliverableValidationError omits deliverableName when not provided, createDeliverableValidationError includes validation errors
+
+_Verified by: createDeliverableValidationError formats file and reason, createDeliverableValidationError includes optional deliverableName, createDeliverableValidationError omits deliverableName when not provided, createDeliverableValidationError includes validation errors_
 
 ---
 

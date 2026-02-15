@@ -6,77 +6,82 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | Annotation |
+| Property       | Value                                        |
+| -------------- | -------------------------------------------- |
+| Status         | completed                                    |
+| Product Area   | Annotation                                   |
 | Business Value | eliminates type duplication in documentation |
-| Phase | 26 |
+| Phase          | 26                                           |
 
 ## Description
 
 **Problem:**
-  Documentation comments duplicate type definitions that exist in the same file.
-  When interfaces change, the JSDoc examples drift. Maintaining two copies of the
-  same type information violates DRY and creates documentation rot.
+Documentation comments duplicate type definitions that exist in the same file.
+As interfaces change, the JSDoc examples drift. Maintaining two copies of the
+same type information violates DRY and creates documentation rot.
 
-  **Relationship to Documentation Generation:**
-  This capability is a critical enabler for ADR-021 (DocGenerationProofOfConcept).
-  Shape extraction allows code to own API type documentation while decisions own
-  intro/context and behavior specs own rules/examples. See the source mapping
-  pattern in doc-generation-proof-of-concept.feature.
+**Relationship to Documentation Generation:**
+This capability is a critical enabler for ADR-021 (DocGenerationProofOfConcept).
+Shape extraction allows code to own API type documentation while decisions own
+intro/context and behavior specs own rules/examples. See the source mapping
+pattern in doc-generation-proof-of-concept.feature.
 
-  Current pattern (duplication):
-  """typescript
-  /**
-   * @libar-docs
-   *
-   * ## API
-   *
-   * ```typescript
-   * // DUPLICATED from actual interface below
-   * interface DeciderInput {
-   *   state: ProcessState;
-   *   changes: ChangeDetection;
-   * }
-   * ```
-   */
+Current pattern (duplication):
+"""typescript
+/\*\*
 
-  // The actual source of truth
-  export interface DeciderInput {
-    state: ProcessState;
-    changes: ChangeDetection;
-  }
-  """
+- @libar-docs
+-
+- ## API
+-
+- ```typescript
 
-  **Solution:**
-  New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
-  The extractor pulls actual TypeScript definitions from AST and inserts them into
-  generated documentation as fenced code blocks.
+  ```
+- // DUPLICATED from actual interface below
+- interface DeciderInput {
+- state: ProcessState;
+- changes: ChangeDetection;
+- }
+- ```
+  */
+  ```
 
-  Target pattern (single source):
-  """typescript
-  /**
-   * @libar-docs
-   * @libar-docs-extract-shapes DeciderInput, ValidationResult
-   *
-   * ## API
-   *
-   * (shapes inserted at generation time)
-   */
+// The actual source of truth
+export interface DeciderInput {
+state: ProcessState;
+changes: ChangeDetection;
+}
+"""
 
-  export interface DeciderInput {
-    state: ProcessState;
-    changes: ChangeDetection;
-  }
-  """
+**Solution:**
+New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
+The extractor pulls actual TypeScript definitions from AST and inserts them into
+generated documentation as fenced code blocks.
 
-  **Why It Matters:**
-  | Benefit | How |
-  | Single source of truth | Types defined once, extracted for docs |
-  | Always-current docs | Generated from actual code definitions |
-  | Reduced maintenance | Change type once, docs update automatically |
-  | API documentation | Public interfaces documented without duplication |
+Target pattern (single source):
+"""typescript
+/\*\*
+
+- @libar-docs
+- @libar-docs-extract-shapes DeciderInput, ValidationResult
+-
+- ## API
+-
+- (shapes inserted at generation time)
+  \*/
+
+export interface DeciderInput {
+state: ProcessState;
+changes: ChangeDetection;
+}
+"""
+
+**Why It Matters:**
+| Benefit | How |
+| Single source of truth | Types defined once, extracted for docs |
+| Always-current docs | Generated from actual code definitions |
+| Reduced maintenance | Change type once, docs update automatically |
+| API documentation | Public interfaces documented without duplication |
 
 ## Acceptance Criteria
 
@@ -343,9 +348,15 @@ export const createValidator: (rules: Rule[]) => Validator = (rules) => {
  * @libar-docs-extract-shapes Output, Input, Options
  */
 
-export interface Input { /* first in source */ }
-export interface Options { /* second in source */ }
-export interface Output { /* third in source */ }
+export interface Input {
+  /* first in source */
+}
+export interface Options {
+  /* second in source */
+}
+export interface Output {
+  /* third in source */
+}
 ```
 
 **Mixed shape types in specified order**
@@ -361,8 +372,12 @@ export interface Output { /* third in source */ }
  */
 
 export type Status = 'ok' | 'error';
-export interface Config { timeout: number; }
-export function validate(input: unknown): boolean { return true; }
+export interface Config {
+  timeout: number;
+}
+export function validate(input: unknown): boolean {
+  return true;
+}
 ```
 
 **Shapes render in claude module**
@@ -521,73 +536,73 @@ interface Output { ... }
 **extract-shapes tag is defined in registry**
 
 **Invariant:** The `extract-shapes` tag must exist with CSV format to list
-    multiple type names for extraction.
+multiple type names for extraction.
 
 _Verified by: Tag registry contains extract-shapes_
 
 **Interfaces are extracted from TypeScript AST**
 
 **Invariant:** When `@libar-docs-extract-shapes` lists an interface name,
-    the extractor must find and extract the complete interface definition
-    including JSDoc comments, generics, and extends clauses.
+the extractor must find and extract the complete interface definition
+including JSDoc comments, generics, and extends clauses.
 
 _Verified by: Extract simple interface, Extract interface with JSDoc, Extract interface with generics, Extract interface with extends, Non-existent shape produces warning_
 
 **Type aliases are extracted from TypeScript AST**
 
 **Invariant:** Type aliases (including union types, intersection types,
-    and mapped types) are extracted when listed in extract-shapes.
+and mapped types) are extracted when listed in extract-shapes.
 
 _Verified by: Extract union type alias, Extract mapped type, Extract conditional type_
 
 **Enums are extracted from TypeScript AST**
 
 **Invariant:** Both string and numeric enums are extracted with their
-    complete member definitions.
+complete member definitions.
 
 _Verified by: Extract string enum, Extract const enum_
 
 **Function signatures are extracted (body omitted)**
 
 **Invariant:** When a function name is listed in extract-shapes, only the
-    signature (parameters, return type, generics) is extracted. The function
-    body is replaced with ellipsis for documentation purposes.
+signature (parameters, return type, generics) is extracted. The function
+body is replaced with ellipsis for documentation purposes.
 
 _Verified by: Extract function signature, Extract async function signature, Extract arrow function with type annotation_
 
 **Multiple shapes are extracted in specified order**
 
 **Invariant:** When multiple shapes are listed, they appear in the
-    documentation in the order specified in the tag, not source order.
+documentation in the order specified in the tag, not source order.
 
 _Verified by: Shapes appear in tag order, Mixed shape types in specified order_
 
 **Extracted shapes render as fenced code blocks**
 
 **Invariant:** Codecs render extracted shapes as TypeScript fenced code
-    blocks, grouped under an "API Types" or similar section.
+blocks, grouped under an "API Types" or similar section.
 
 _Verified by: Shapes render in claude module, Shapes render in detailed docs_
 
 **Shapes can reference types from imports**
 
 **Invariant:** Extracted shapes may reference types from imports. The
-    extractor does NOT resolve imports - it extracts the shape as-is.
-    Consumers understand that referenced types are defined elsewhere.
+extractor does NOT resolve imports - it extracts the shape as-is.
+Consumers understand that referenced types are defined elsewhere.
 
 _Verified by: Shape with imported type reference, Shape extraction does not follow imports, Re-exported type produces same warning as import_
 
 **Overloaded function signatures are all extracted**
 
 **Invariant:** When a function has multiple overload signatures, all
-    signatures are extracted together as they represent the complete API.
+signatures are extracted together as they represent the complete API.
 
 _Verified by: Extract overloaded function signatures, Extract method overloads in interface_
 
 **Shape rendering supports grouping options**
 
 **Invariant:** Codecs can render shapes grouped in a single code block
-    or as separate code blocks, depending on detail level.
+or as separate code blocks, depending on detail level.
 
 _Verified by: Grouped rendering for compact output, Separate rendering for detailed output_
 

@@ -68,17 +68,33 @@ loadProjectConfig loads and resolves configuration from file,
 
 **Missing config returns defaults**
 
+**Invariant:** When no config file exists, loadProjectConfig must return a default resolved config with isDefault=true.
+    **Rationale:** Graceful fallback enables zero-config usage — new projects work without requiring config file creation.
+    **Verified by:** No config file returns default resolved config
+
 _Verified by: No config file returns default resolved config_
 
 **New-style config is loaded and resolved**
+
+**Invariant:** A file exporting defineConfig must be loaded, validated, and resolved with correct preset categories.
+    **Rationale:** defineConfig is the primary config format — correct loading is the critical path for all documentation generation.
+    **Verified by:** defineConfig export loads and resolves correctly
 
 _Verified by: defineConfig export loads and resolves correctly_
 
 **Legacy config is loaded with backward compatibility**
 
+**Invariant:** A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.
+    **Rationale:** Backward compatibility prevents breaking existing consumers during migration to the new config format.
+    **Verified by:** Legacy createDeliveryProcess export loads correctly
+
 _Verified by: Legacy createDeliveryProcess export loads correctly_
 
 **Invalid configs produce clear errors**
+
+**Invariant:** Config files without a default export or with invalid data must produce descriptive error messages.
+    **Rationale:** Actionable error messages reduce debugging time — users need to know what to fix, not just that something failed.
+    **Verified by:** Config without default export returns error, Config with invalid project config returns Zod error
 
 _Verified by: Config without default export returns error, Config with invalid project config returns Zod error_
 

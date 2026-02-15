@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 Tests the orchestrator's pattern merging, conflict detection, and generator
-  coordination capabilities. The orchestrator coordinates the full documentation
-  generation pipeline: Scanner -> Extractor -> Generators -> File Writer.
+coordination capabilities. The orchestrator coordinates the full documentation
+generation pipeline: Scanner -> Extractor -> Generators -> File Writer.
 
 ## Acceptance Criteria
 
@@ -28,23 +28,23 @@ Tests the orchestrator's pattern merging, conflict detection, and generator
 - And the merged dataset should contain 5 unique patterns
 - And the merged dataset should include patterns:
 
-| name | status |
-| --- | --- |
-| CoreTypes | completed |
-| ApiHandler | active |
-| DataValidator | roadmap |
+| name          | status    |
+| ------------- | --------- |
+| CoreTypes     | completed |
+| ApiHandler    | active    |
+| DataValidator | roadmap   |
 
-| name | status |
-| --- | --- |
-| LoginBehavior | completed |
-| SearchBehavior | active |
+| name           | status    |
+| -------------- | --------- |
+| LoginBehavior  | completed |
+| SearchBehavior | active    |
 
-| name |
-| --- |
-| CoreTypes |
-| ApiHandler |
-| DataValidator |
-| LoginBehavior |
+| name           |
+| -------------- |
+| CoreTypes      |
+| ApiHandler     |
+| DataValidator  |
+| LoginBehavior  |
 | SearchBehavior |
 
 **Orchestrator detects pattern name conflicts**
@@ -56,15 +56,15 @@ Tests the orchestrator's pattern merging, conflict detection, and generator
 - And the error message should contain "Pattern conflicts detected"
 - And the error message should mention "MyFeature"
 
-| name | status |
-| --- | --- |
+| name      | status    |
+| --------- | --------- |
 | MyFeature | completed |
-| CoreTypes | active |
+| CoreTypes | active    |
 
-| name | status |
-| --- | --- |
+| name      | status  |
+| --------- | ------- |
 | MyFeature | roadmap |
-| OtherSpec | active |
+| OtherSpec | active  |
 
 **Orchestrator detects pattern name conflicts with status mismatch**
 
@@ -89,15 +89,19 @@ Tests the orchestrator's pattern merging, conflict detection, and generator
 - When checking which generators are available
 - Then generator availability should match expectations
 
-| name | expectedAvailable |
-| --- | --- |
-| patterns | true |
-| invalid-gen | false |
-| another-invalid | false |
+| name            | expectedAvailable |
+| --------------- | ----------------- |
+| patterns        | true              |
+| invalid-gen     | false             |
+| another-invalid | false             |
 
 ## Business Rules
 
 **Orchestrator coordinates full documentation generation pipeline**
+
+**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
+**Verified by:** Non-overlapping patterns merge successfully, Orchestrator detects pattern name conflicts, Orchestrator detects pattern name conflicts with status mismatch, Unknown generator name fails gracefully, Partial success when some generators are invalid
 
 _Verified by: Non-overlapping patterns merge successfully, Orchestrator detects pattern name conflicts, Orchestrator detects pattern name conflicts with status mismatch, Unknown generator name fails gracefully, Partial success when some generators are invalid_
 

@@ -6,26 +6,28 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The transformToMasterDataset function transforms raw extracted patterns
-  into a MasterDataset with all pre-computed views in a single pass.
-  This is the core of the unified transformation pipeline.
+into a MasterDataset with all pre-computed views in a single pass.
+This is the core of the unified transformation pipeline.
 
-  **Problem:**
-  - Generators need multiple views of the same pattern data
-  - Computing views lazily leads to O(n*v) complexity
-  - Views must be consistent with each other
+**Problem:**
 
-  **Solution:**
-  - Single-pass transformation computes all views in O(n)
-  - All views are immutable and pre-computed
-  - MasterDataset is the source of truth for all generators
+- Generators need multiple views of the same pattern data
+- Computing views lazily leads to O(n\*v) complexity
+- Views must be consistent with each other
+
+**Solution:**
+
+- Single-pass transformation computes all views in O(n)
+- All views are immutable and pre-computed
+- MasterDataset is the source of truth for all generators
 
 ## Acceptance Criteria
 
@@ -47,11 +49,11 @@ The transformToMasterDataset function transforms raw extracted patterns
 - And byStatus.planned has 2 patterns
 - And counts.total is 10
 
-| status | count |
-| --- | --- |
-| completed | 5 |
-| active | 3 |
-| planned | 2 |
+| status    | count |
+| --------- | ----- |
+| completed | 5     |
+| active    | 3     |
+| planned   | 2     |
 
 **Normalize status variants to canonical values**
 
@@ -59,12 +61,12 @@ The transformToMasterDataset function transforms raw extracted patterns
 - When transforming to MasterDataset
 - Then each pattern is grouped in the expected status bucket
 
-| status | expected |
-| --- | --- |
+| status    | expected  |
+| --------- | --------- |
 | completed | completed |
-| active | active |
-| roadmap | planned |
-| deferred | planned |
+| active    | active    |
+| roadmap   | planned   |
+| deferred  | planned   |
 
 **Group patterns by phase**
 
@@ -73,16 +75,16 @@ The transformToMasterDataset function transforms raw extracted patterns
 - Then byPhase has 3 phase groups with counts:
 
 | phase | count |
-| --- | --- |
-| 1 | 2 |
-| 2 | 3 |
-| 3 | 1 |
+| ----- | ----- |
+| 1     | 2     |
+| 2     | 3     |
+| 3     | 1     |
 
 | phase | count |
-| --- | --- |
-| 1 | 2 |
-| 2 | 3 |
-| 3 | 1 |
+| ----- | ----- |
+| 1     | 2     |
+| 2     | 3     |
+| 3     | 1     |
 
 **Sort phases by phase number**
 
@@ -96,12 +98,12 @@ The transformToMasterDataset function transforms raw extracted patterns
 - When transforming to MasterDataset
 - Then phase 1 counts are:
 
-| field | value |
-| --- | --- |
-| completed | 2 |
-| active | 1 |
-| planned | 0 |
-| total | 3 |
+| field     | value |
+| --------- | ----- |
+| completed | 2     |
+| active    | 1     |
+| planned   | 0     |
+| total     | 3     |
 
 **Patterns without phase are not in byPhase**
 
@@ -118,16 +120,16 @@ The transformToMasterDataset function transforms raw extracted patterns
 - Then byQuarter has 3 quarters with counts:
 
 | quarter | count |
-| --- | --- |
-| Q1-2024 | 2 |
-| Q2-2024 | 3 |
-| Q4-2024 | 1 |
+| ------- | ----- |
+| Q1-2024 | 2     |
+| Q2-2024 | 3     |
+| Q4-2024 | 1     |
 
 | quarter | count |
-| --- | --- |
-| Q1-2024 | 2 |
-| Q2-2024 | 3 |
-| Q4-2024 | 1 |
+| ------- | ----- |
+| Q1-2024 | 2     |
+| Q2-2024 | 3     |
+| Q4-2024 | 1     |
 
 **Patterns without quarter are not in byQuarter**
 
@@ -144,16 +146,16 @@ The transformToMasterDataset function transforms raw extracted patterns
 - And categoryCount is 3
 
 | category | count |
-| --- | --- |
-| core | 3 |
-| ddd | 2 |
-| saga | 1 |
+| -------- | ----- |
+| core     | 3     |
+| ddd      | 2     |
+| saga     | 1     |
 
 | category | count |
-| --- | --- |
-| core | 3 |
-| ddd | 2 |
-| saga | 1 |
+| -------- | ----- |
+| core     | 3     |
+| ddd      | 2     |
+| saga     | 1     |
 
 **Group patterns by source file type**
 
@@ -162,11 +164,11 @@ The transformToMasterDataset function transforms raw extracted patterns
 - Then bySource.typescript has 2 patterns
 - And bySource.gherkin has 1 pattern
 
-| source | expectedView |
-| --- | --- |
-| src/patterns/core.ts | typescript |
-| src/patterns/ddd.ts | typescript |
-| tests/features/saga.feature | gherkin |
+| source                      | expectedView |
+| --------------------------- | ------------ |
+| src/patterns/core.ts        | typescript   |
+| src/patterns/ddd.ts         | typescript   |
+| tests/features/saga.feature | gherkin      |
 
 **Patterns with phase are also in roadmap view**
 
@@ -189,19 +191,19 @@ The transformToMasterDataset function transforms raw extracted patterns
 - When transforming to MasterDataset
 - Then the relationship index for "Feature" contains:
 
-| type | targets |
-| --- | --- |
-| uses | Utility |
-| usedBy | Application |
+| type      | targets        |
+| --------- | -------------- |
+| uses      | Utility        |
+| usedBy    | Application    |
 | dependsOn | Infrastructure |
-| enables | Extension |
+| enables   | Extension      |
 
-| field | value |
-| --- | --- |
-| uses | Utility |
-| usedBy | Application |
+| field     | value          |
+| --------- | -------------- |
+| uses      | Utility        |
+| usedBy    | Application    |
 | dependsOn | Infrastructure |
-| enables | Extension |
+| enables   | Extension      |
 
 **Reverse lookup computes enables from dependsOn**
 
@@ -244,22 +246,84 @@ The transformToMasterDataset function transforms raw extracted patterns
 - When transforming with the workflow
 - Then the result includes the workflow with phase names:
 
-| order | name |
-| --- | --- |
-| 1 | Foundation |
-| 2 | Core Patterns |
-| 3 | Advanced Integration |
+| order | name                 |
+| ----- | -------------------- |
+| 1     | Foundation           |
+| 2     | Core Patterns        |
+| 3     | Advanced Integration |
 
-| phase | name |
-| --- | --- |
-| 1 | Foundation |
-| 2 | Core Patterns |
+| phase | name          |
+| ----- | ------------- |
+| 1     | Foundation    |
+| 2     | Core Patterns |
 
 **Result omits workflow when not provided**
 
 - Given patterns without a workflow
 - When transforming to MasterDataset
 - Then the result does not include workflow
+
+## Business Rules
+
+**Empty dataset produces valid zero-state views**
+
+**Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+
+    **Verified by:** Transform empty dataset
+
+_Verified by: Transform empty dataset_
+
+**Status and phase grouping creates navigable views**
+
+**Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
+
+    **Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
+
+    **Verified by:** Group patterns by status, Normalize status variants to canonical values, Group patterns by phase, Sort phases by phase number, Compute per-phase status counts, Patterns without phase are not in byPhase
+
+_Verified by: Group patterns by status, Normalize status variants to canonical values, Group patterns by phase, Sort phases by phase number, Compute per-phase status counts, Patterns without phase are not in byPhase_
+
+**Quarter and category grouping organizes by timeline and domain**
+
+**Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+
+    **Verified by:** Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category
+
+_Verified by: Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category_
+
+**Source grouping separates TypeScript and Gherkin origins**
+
+**Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+
+    **Verified by:** Group patterns by source file type, Patterns with phase are also in roadmap view
+
+_Verified by: Group patterns by source file type, Patterns with phase are also in roadmap view_
+
+**Relationship index builds bidirectional dependency graph**
+
+**Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
+
+    **Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
+
+    **Verified by:** Build relationship index from patterns, Build relationship index with all relationship types, Reverse lookup computes enables from dependsOn, Reverse lookup computes usedBy from uses, Reverse lookup merges with explicit annotations without duplicates
+
+_Verified by: Build relationship index from patterns, Build relationship index with all relationship types, Reverse lookup computes enables from dependsOn, Reverse lookup computes usedBy from uses, Reverse lookup merges with explicit annotations without duplicates_
+
+**Completion tracking computes project progress**
+
+**Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+
+    **Verified by:** Calculate completion percentage, Check if fully completed
+
+_Verified by: Calculate completion percentage, Check if fully completed_
+
+**Workflow integration conditionally includes delivery process data**
+
+**Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+
+    **Verified by:** Include workflow in result when provided, Result omits workflow when not provided
+
+_Verified by: Include workflow in result when provided, Result omits workflow when not provided_
 
 ---
 

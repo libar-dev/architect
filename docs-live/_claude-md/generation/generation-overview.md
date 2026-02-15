@@ -74,9 +74,9 @@ Detail Level: Compact summary
 
 --- DocumentationOrchestrator ---
 
-| Rule                                                            | Description |
-| --------------------------------------------------------------- | ----------- |
-| Orchestrator coordinates full documentation generation pipeline |             |
+| Rule                                                            | Description                                                                                                       |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Orchestrator coordinates full documentation generation pipeline | **Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset;... |
 
 --- CodecBasedGeneratorTesting ---
 
@@ -97,42 +97,42 @@ Detail Level: Compact summary
 | Empty rules show placeholder instead of blank content          |             |
 | Rules always render flat for full visibility                   |             |
 | Source file shown as filename text                             |             |
-| Verified-by renders as compact italic line at standard level   |             |
+| Verified-by renders as checkbox list at standard level         |             |
 | Feature names are humanized from camelCase pattern names       |             |
 
 --- WarningCollectorTesting ---
 
-| Rule                                                  | Description                                                                                                              |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Warnings are captured with source context             | Each warning includes the source location, category, and message to<br> enable debugging and targeted fixes.             |
-| Warnings are categorized for filtering and grouping   | Warning categories enable filtering by severity, source, or type<br> for different reporting needs.                      |
-| Warnings are aggregated across the pipeline           | The collector aggregates warnings from all pipeline stages, maintaining<br> insertion order and source attribution.      |
-| Warnings integrate with the Result pattern            | The warning collector integrates with Result<T, E> to include warnings<br> in successful results, enabling callers to... |
-| Warnings can be formatted for different outputs       | The collector provides formatters for console output, JSON, and<br> markdown to support different reporting needs.       |
-| Existing console.warn calls are migrated to collector | All console.warn calls in the source mapper and related modules<br> are replaced with warning collector calls.           |
+| Rule                                                  | Description                                                                                                             |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Warnings are captured with source context             | **Invariant:** Each captured warning must include the source file path, optional line number, and category for...       |
+| Warnings are categorized for filtering and grouping   | **Invariant:** Warnings must support multiple categories and be filterable by both category and source file....         |
+| Warnings are aggregated across the pipeline           | **Invariant:** Warnings from multiple pipeline stages must be collected into a single aggregated view, groupable by...  |
+| Warnings integrate with the Result pattern            | **Invariant:** Warnings must propagate through the Result monad, being preserved in both successful and failed...       |
+| Warnings can be formatted for different outputs       | **Invariant:** Warnings must be formattable as colored console output, machine-readable JSON, and markdown for...       |
+| Existing console.warn calls are migrated to collector | **Invariant:** Pipeline components (source mapper, shape extractor) must use the warning collector instead of direct... |
 
 --- ValidationRulesCodecTesting ---
 
-| Rule                                                | Description                                                                                                        |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Document metadata is correctly set                  | The validation rules document has standard metadata fields for title,<br> purpose, and detail level.               |
-| All validation rules are documented in a table      | The rules table includes all 6 Process Guard validation rules with<br> their severity levels and descriptions.     |
-| FSM state diagram is generated from transitions     | The Mermaid diagram shows all valid state transitions for the<br> Process Guard FSM.                               |
-| Protection level matrix shows status protections    | The protection matrix documents which statuses have which protection<br> levels (none, scope-locked, hard-locked). |
-| CLI usage is documented with options and exit codes | The CLI section shows how to invoke the Process Guard linter<br> with various options.                             |
-| Escape hatches are documented for special cases     | The escape hatches section documents how to override Process Guard<br> validation for legitimate use cases.        |
+| Rule                                                | Description                                                                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Document metadata is correctly set                  | **Invariant:** The validation rules document must have the title "Validation Rules", a purpose describing Process...     |
+| All validation rules are documented in a table      | **Invariant:** All 6 Process Guard validation rules must appear in the rules table with their correct severity levels... |
+| FSM state diagram is generated from transitions     | **Invariant:** When includeFSMDiagram is enabled, a Mermaid state diagram showing all 4 FSM states and their...          |
+| Protection level matrix shows status protections    | **Invariant:** When includeProtectionMatrix is enabled, a matrix showing all 4 statuses with their protection levels...  |
+| CLI usage is documented with options and exit codes | **Invariant:** When includeCLIUsage is enabled, the document must include CLI example code, all 6 options, and exit...   |
+| Escape hatches are documented for special cases     | **Invariant:** When includeEscapeHatches is enabled, all 3 escape hatch mechanisms must be documented; when disabled,... |
 
 --- TaxonomyCodecTesting ---
 
-| Rule                                                       | Description                                                                                                              |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Document metadata is correctly set                         | The taxonomy document has standard metadata fields for title, purpose,<br> and detail level that describe the...         |
-| Categories section is generated from TagRegistry           | The categories section lists all configured tag categories with their<br> domain, priority, and description in a...      |
-| Metadata tags can be grouped by domain                     | The groupByDomain option organizes metadata tags into subsections<br> by their semantic domain (Core, Relationship,...   |
-| Tags are classified into domains by hardcoded mapping      | The domain classification is intentionally hardcoded for documentation<br> stability. Core, Relationship, Timeline,...   |
-| Optional sections can be disabled via codec options        | The codec supports disabling format types, presets, and architecture<br> diagram sections for compact output generation. |
-| Detail files are generated for progressive disclosure      | The generateDetailFiles option creates additional files for<br> categories, metadata tags, and format types with...      |
-| Format types are documented with descriptions and examples | The Format Types section documents all supported tag value formats<br> with descriptions and examples for each type.     |
+| Rule                                                       | Description                                                                                                             |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Document metadata is correctly set                         | **Invariant:** The taxonomy document must have the title "Taxonomy Reference", a descriptive purpose string, and a...   |
+| Categories section is generated from TagRegistry           | **Invariant:** The categories section must render all categories from the configured TagRegistry as a table, with...    |
+| Metadata tags can be grouped by domain                     | **Invariant:** When groupByDomain is enabled, metadata tags must be organized into domain-specific subsections; when... |
+| Tags are classified into domains by hardcoded mapping      | **Invariant:** Tags must be classified into domains (Core, Relationship, Timeline, etc.) using a hardcoded mapping,...  |
+| Optional sections can be disabled via codec options        | **Invariant:** Format Types, Presets, and Architecture sections must each be independently disableable via their...     |
+| Detail files are generated for progressive disclosure      | **Invariant:** When generateDetailFiles is enabled, the codec must produce additional detail files (one per domain...   |
+| Format types are documented with descriptions and examples | **Invariant:** All 6 format types must be documented with descriptions and usage examples in the generated taxonomy.... |
 
 --- SourceMappingValidatorTesting ---
 
@@ -146,14 +146,14 @@ Detail Level: Compact summary
 
 --- SourceMapperTesting ---
 
-| Rule                                                   | Description                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Extraction methods dispatch to correct handlers        | The source mapper dispatches to different extraction functions based on<br> the extraction method specified in the...    |
-| Self-references extract from current decision document | THIS DECISION markers extract content from the current decision document<br> rather than requiring a separate file path. |
-| Multiple sources are aggregated in mapping order       | Multiple source mappings result in content extraction from each file.<br> The aggregated content preserves the order...  |
-| Missing files produce warnings without failing         | A referenced source file that does not exist produces a warning,<br> but generation continues with available sources.    |
-| Empty extraction results produce info warnings         | Extraction that succeeds but produces no content (e.g., no shapes found)<br> results in an informational warning...      |
-| Extraction methods are normalized for dispatch         | The extraction method column can be written in various formats<br> and is normalized before dispatch.                    |
+| Rule                                                   | Description                                                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Extraction methods dispatch to correct handlers        | **Invariant:** Each extraction method type (self-reference, TypeScript, Gherkin) must dispatch to the correct...       |
+| Self-references extract from current decision document | **Invariant:** THIS DECISION self-references must extract content from the current decision document using rule...     |
+| Multiple sources are aggregated in mapping order       | **Invariant:** When multiple source mappings target the same section, their extracted content must be aggregated in... |
+| Missing files produce warnings without failing         | **Invariant:** When a referenced source file does not exist, the mapper must produce a warning and continue...         |
+| Empty extraction results produce info warnings         | **Invariant:** When extraction succeeds but produces empty results (no matching shapes, no matching rules), an...      |
+| Extraction methods are normalized for dispatch         | **Invariant:** Extraction method strings must be normalized to canonical forms before dispatch, with unrecognized...   |
 
 --- RobustnessIntegration ---
 
@@ -167,40 +167,40 @@ Detail Level: Compact summary
 
 --- PocIntegration ---
 
-| Rule                                              | Description |
-| ------------------------------------------------- | ----------- |
-| POC decision document is parsed correctly         |             |
-| Self-references extract content from POC decision |             |
-| TypeScript shapes are extracted from real files   |             |
-| Behavior spec content is extracted correctly      |             |
-| JSDoc sections are extracted from CLI files       |             |
-| All source mappings execute successfully          |             |
-| Compact output generates correctly                |             |
-| Detailed output generates correctly               |             |
-| Generated output matches quality expectations     |             |
+| Rule                                              | Description                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| POC decision document is parsed correctly         | **Invariant:** The real POC decision document (Process Guard) must be parseable by the codec, extracting all source...   |
+| Self-references extract content from POC decision | **Invariant:** THIS DECISION self-references in the POC document must successfully extract Context rules, Decision...    |
+| TypeScript shapes are extracted from real files   | **Invariant:** The source mapper must successfully extract type shapes and patterns from real TypeScript source files... |
+| Behavior spec content is extracted correctly      | **Invariant:** The source mapper must successfully extract Rule blocks and ScenarioOutline Examples from real Gherkin... |
+| JSDoc sections are extracted from CLI files       | **Invariant:** The source mapper must successfully extract JSDoc comment sections from real TypeScript CLI files...      |
+| All source mappings execute successfully          | **Invariant:** All source mappings defined in the POC decision document must execute without errors, producing...        |
+| Compact output generates correctly                | **Invariant:** The compact output for the POC document must generate successfully and contain all essential sections...  |
+| Detailed output generates correctly               | **Invariant:** The detailed output for the POC document must generate successfully and contain all sections including... |
+| Generated output matches quality expectations     | **Invariant:** The generated output structure must match the expected target format, with complete validation rules...   |
 
 --- DecisionDocGeneratorTesting ---
 
-| Rule                                              | Description                                                                                                              |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Output paths are determined from pattern metadata | The generator computes output paths based on pattern name and optional<br> section configuration. Compact output goes... |
-| Compact output includes only essential content    | Summary/compact output is limited to ~50 lines and includes only<br> essential tables and type definitions for Claude... |
-| Detailed output includes full content             | Detailed output is ~300 lines and includes everything: JSDoc, examples,<br> full descriptions, and all extracted...      |
-| Multi-level generation produces both outputs      | The generator can produce both compact and detailed outputs in a single<br> pass for maximum utility.                    |
-| Generator is registered with the registry         | The generator is available in the registry under the name "doc-from-decision"<br> and can be invoked through the...      |
-| Source mappings are executed during generation    | Decision documents with source mapping tables trigger content aggregation<br> from the referenced files during the...    |
+| Rule                                              | Description                                                                                                             |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Output paths are determined from pattern metadata | **Invariant:** Output file paths must be derived from pattern metadata using kebab-case conversion of the pattern...    |
+| Compact output includes only essential content    | **Invariant:** Compact output mode must include only essential decision content (type shapes, key constraints) while... |
+| Detailed output includes full content             | **Invariant:** Detailed output mode must include all decision content including full descriptions, consequences, and... |
+| Multi-level generation produces both outputs      | **Invariant:** The generator must produce both compact and detailed output files from a single generation run, using... |
+| Generator is registered with the registry         | **Invariant:** The decision document generator must be registered with the generator registry under a canonical name... |
+| Source mappings are executed during generation    | **Invariant:** Source mapping tables must be executed during generation to extract content from referenced files,...    |
 
 --- DecisionDocCodecTesting ---
 
-| Rule                                                    | Description                                                                                                       |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Rule blocks are partitioned by semantic prefix          | Decision documents use Rule: blocks with semantic prefixes to organize<br> content into Context, Decision, and... |
-| DocStrings are extracted with language tags             | Decision documents contain code examples as Gherkin DocStrings.                                                   |
-| Source mapping tables are parsed from rule descriptions | Decision documents define source mappings in markdown tables.                                                     |
-| Self-reference markers are correctly detected           | Source files can reference the current decision document using special<br> markers like "THIS DECISION", "THIS... |
-| Extraction methods are normalized to known types        | The extraction method column can be written in various formats.                                                   |
-| Complete decision documents are parsed with all content | The parseDecisionDocument function extracts all content from an ADR/PDR.                                          |
-| Rules can be found by name with partial matching        | Self-references may not have an exact rule name match.                                                            |
+| Rule                                                    | Description                                                                                                              |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Rule blocks are partitioned by semantic prefix          | **Invariant:** Decision document rules must be partitioned into ADR sections based on their semantic prefix (e.g.,...    |
+| DocStrings are extracted with language tags             | **Invariant:** DocStrings within rule descriptions must be extracted preserving their language tag (e.g., typescript,... |
+| Source mapping tables are parsed from rule descriptions | **Invariant:** Markdown tables in rule descriptions with source mapping columns must be parsed into structured data,...  |
+| Self-reference markers are correctly detected           | **Invariant:** The "THIS DECISION" marker must be recognized as a self-reference to the current decision document,...    |
+| Extraction methods are normalized to known types        | **Invariant:** Extraction method strings from source mapping tables must be normalized to canonical method names for...  |
+| Complete decision documents are parsed with all content | **Invariant:** A complete decision document must be parseable into its constituent parts including rules, DocStrings,... |
+| Rules can be found by name with partial matching        | **Invariant:** Rules must be findable by exact name match or partial (substring) name match, returning undefined when... |
 
 --- ContentDeduplication ---
 
@@ -212,6 +212,16 @@ Detail Level: Compact summary
 | Deduplicator integrates with source mapper pipeline | **Invariant:** Deduplication runs after extraction and before document assembly.<br> **Rationale:** All content must... |
 
 --- TransformDatasetTesting ---
+
+| Rule                                                              | Description                                                                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Empty dataset produces valid zero-state views                     | **Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.<br><br> \*\*Verified... |
+| Status and phase grouping creates navigable views                 | **Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts...      |
+| Quarter and category grouping organizes by timeline and domain    | **Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata...         |
+| Source grouping separates TypeScript and Gherkin origins          | **Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap...   |
+| Relationship index builds bidirectional dependency graph          | **Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and...           |
+| Completion tracking computes project progress                     | **Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in...  |
+| Workflow integration conditionally includes delivery process data | **Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from...    |
 
 --- RichContentHelpersTesting ---
 
@@ -239,6 +249,14 @@ Detail Level: Compact summary
 --- PrChangesGeneration ---
 
 --- PatternsCodecTesting ---
+
+| Rule                                                                  | Description                                                                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Document structure includes progress tracking and category navigation | **Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and...         |
+| Pattern table presents all patterns sorted by status then name        | **Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category,...        |
+| Category sections group patterns by domain                            | **Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories... |
+| Dependency graph visualizes pattern relationships                     | **Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the...                   |
+| Detail file generation creates per-pattern pages                      | **Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at...          |
 
 --- ImplementationLinkPathNormalization ---
 
@@ -269,6 +287,142 @@ Detail Level: Compact summary
 | stripLeadingHeaders removes only leading headers       |             |
 
 --- ZodCodecMigration ---
+
+--- TimelineCodecTesting ---
+
+| Rule                                                                      | Description                                                                                                             |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| RoadmapDocumentCodec groups patterns by phase with progress tracking      | **Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections... |
+| CompletedMilestonesCodec shows only completed patterns grouped by quarter | **Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and...           |
+| CurrentWorkCodec shows only active patterns with deliverables             | **Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns...      |
+
+--- ShapeSelectorTesting ---
+
+| Rule                                                   | Description                                                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Reference doc configs select shapes via shapeSelectors | **Invariant:** shapeSelectors provides three selection modes: by<br> source path + specific names, by group tag, or... |
+
+--- ShapeMatcherTesting ---
+
+| Rule                                          | Description |
+| --------------------------------------------- | ----------- |
+| Exact paths match without wildcards           |             |
+| Single-level globs match one directory level  |             |
+| Recursive globs match any depth               |             |
+| Dataset shape extraction deduplicates by name |             |
+
+--- SessionCodecTesting ---
+
+| Rule                                                         | Description                                                                                                            |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| SessionContextCodec provides working context for AI sessions | **Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation... |
+| RemainingWorkCodec aggregates incomplete work by phase       | **Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification...            |
+
+--- RequirementsAdrCodecTesting ---
+
+| Rule                                                                      | Description |
+| ------------------------------------------------------------------------- | ----------- |
+| RequirementsDocumentCodec generates PRD-style documentation from patterns |             |
+| AdrDocumentCodec documents architecture decisions                         |             |
+
+--- ReportingCodecTesting ---
+
+| Rule                                                       | Description                                                                                                            |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| ChangelogCodec follows Keep a Changelog format             | **Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and...  |
+| TraceabilityCodec maps timeline patterns to behavior tests | **Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a... |
+| OverviewCodec provides project architecture summary        | **Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with...  |
+
+--- ReferenceGeneratorTesting ---
+
+| Rule                                                   | Description                                                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Registration produces the correct number of generators | **Invariant:** Each reference config produces exactly 2 generators (detailed + summary), plus meta-generators for...   |
+| Product area configs produce a separate meta-generator | **Invariant:** Configs with productArea set route to "product-area-docs" meta-generator; configs without route to...   |
+| Generator naming follows kebab-case convention         | **Invariant:** Detailed generators end in "-reference" and summary generators end in "-reference-claude"....           |
+| Generator execution produces markdown output           | **Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.... |
+
+--- ReferenceCodecTesting ---
+
+| Rule                                                                   | Description                                                                                                              |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Empty datasets produce fallback content                                |                                                                                                                          |
+| Convention content is rendered as sections                             |                                                                                                                          |
+| Detail level controls output density                                   |                                                                                                                          |
+| Behavior sections are rendered from category-matching patterns         |                                                                                                                          |
+| Shape sources are extracted from matching patterns                     |                                                                                                                          |
+| Convention and behavior content compose in a single document           |                                                                                                                          |
+| Composition order follows AD-5: conventions then shapes then behaviors |                                                                                                                          |
+| Convention code examples render as mermaid blocks                      |                                                                                                                          |
+| Scoped diagrams are generated from diagramScope config                 |                                                                                                                          |
+| Multiple diagram scopes produce multiple mermaid blocks                |                                                                                                                          |
+| Standard detail level includes narrative but omits rationale           |                                                                                                                          |
+| Deep behavior rendering with structured annotations                    |                                                                                                                          |
+| Shape JSDoc prose renders at standard and detailed levels              |                                                                                                                          |
+| Shape sections render param returns and throws documentation           |                                                                                                                          |
+| Diagram type controls Mermaid output format                            | **Invariant:** The diagramType field on DiagramScope selects the Mermaid<br> output format. Supported types are graph... |
+| Edge labels and custom node shapes enrich diagram readability          | **Invariant:** Relationship edges display labels describing the relationship<br> type (uses, depends on, implements,...  |
+| Collapsible blocks wrap behavior rules for progressive disclosure      | **Invariant:** When a behavior pattern has 3 or more rules and detail level<br> is not summary, each rule's content...   |
+| Link-out blocks provide source file cross-references                   | **Invariant:** At standard and detailed levels, each behavior pattern includes<br> a link-out block referencing its...   |
+| Include tags route cross-cutting content into reference documents      | **Invariant:** Patterns with matching include tags appear alongside<br> category-selected patterns in the behavior...    |
+
+--- PrChangesCodecTesting ---
+
+| Rule                                                                              | Description |
+| --------------------------------------------------------------------------------- | ----------- |
+| PrChangesCodec handles empty results gracefully                                   |             |
+| PrChangesCodec generates summary with filter information                          |             |
+| PrChangesCodec groups changes by phase when sortBy is "phase"                     |             |
+| PrChangesCodec groups changes by priority when sortBy is "priority"               |             |
+| PrChangesCodec shows flat list when sortBy is "workflow"                          |             |
+| PrChangesCodec renders pattern details with metadata and description              |             |
+| PrChangesCodec renders deliverables when includeDeliverables is enabled           |             |
+| PrChangesCodec renders acceptance criteria from scenarios                         |             |
+| PrChangesCodec renders business rules from Gherkin Rule keyword                   |             |
+| PrChangesCodec generates review checklist when includeReviewChecklist is enabled  |             |
+| PrChangesCodec generates dependencies section when includeDependencies is enabled |             |
+| PrChangesCodec filters patterns by changedFiles                                   |             |
+| PrChangesCodec filters patterns by releaseFilter                                  |             |
+| PrChangesCodec uses OR logic for combined filters                                 |             |
+| PrChangesCodec only includes active and completed patterns                        |             |
+
+--- PlanningCodecTesting ---
+
+| Rule                                                        | Description                                                                                                              |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| PlanningChecklistCodec prepares for implementation sessions | **Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and...           |
+| SessionPlanCodec generates implementation plans             | **Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with...        |
+| SessionFindingsCodec captures retrospective discoveries     | **Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the... |
+
+--- DedentHelper ---
+
+| Rule                                        | Description |
+| ------------------------------------------- | ----------- |
+| Tabs are normalized to spaces before dedent |             |
+| Empty lines are handled correctly           |             |
+| Single line input is handled                |             |
+| Unicode whitespace is handled               |             |
+| Relative indentation is preserved           |             |
+
+--- ConventionExtractorTesting ---
+
+| Rule                                                         | Description |
+| ------------------------------------------------------------ | ----------- |
+| Empty and missing inputs produce empty results               |             |
+| Convention bundles are extracted from matching patterns      |             |
+| Structured content is extracted from rule descriptions       |             |
+| Code examples in rule descriptions are preserved             |             |
+| TypeScript JSDoc conventions are extracted alongside Gherkin |             |
+
+--- CompositeCodecTesting ---
+
+| Rule                                                      | Description                                                                                                            |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| CompositeCodec concatenates sections in codec array order | **Invariant:** Sections from child codecs appear in the composite<br> output in the same order as the codecs array.... |
+| Separators between codec outputs are configurable         | **Invariant:** By default, a separator block is inserted between<br> each child codec's sections. When...              |
+| additionalFiles merge with last-wins semantics            | **Invariant:** additionalFiles from all children are merged into<br> a single record. When keys collide, the later...  |
+| composeDocuments works at document level without codecs   | **Invariant:** composeDocuments accepts RenderableDocument array and<br> produces a composed RenderableDocument...     |
+| Empty codec outputs are handled gracefully                | **Invariant:** Codecs producing empty sections arrays contribute<br> nothing to the output. No separator is emitted... |
 
 --- MermaidRelationshipRendering ---
 
@@ -332,139 +486,3 @@ Detail Level: Compact summary
 | archIndex groups patterns by arch-layer                | The archIndex.byLayer map groups patterns by architectural layer<br> (domain, application, infrastructure) for...        |
 | archIndex.all contains all patterns with any arch tag  | The archIndex.all array contains all patterns that have at least<br> one arch tag (role, context, or layer). Patterns... |
 | Patterns without arch tags are excluded from archIndex | Patterns that have no arch-role, arch-context, or arch-layer are<br> not included in the archIndex at all.               |
-
---- TimelineCodecTesting ---
-
-| Rule                                                                      | Description |
-| ------------------------------------------------------------------------- | ----------- |
-| RoadmapDocumentCodec groups patterns by phase with progress tracking      |             |
-| CompletedMilestonesCodec shows only completed patterns grouped by quarter |             |
-| CurrentWorkCodec shows only active patterns with deliverables             |             |
-
---- ShapeSelectorTesting ---
-
-| Rule                                                   | Description                                                                                                            |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Reference doc configs select shapes via shapeSelectors | **Invariant:** shapeSelectors provides three selection modes: by<br> source path + specific names, by group tag, or... |
-
---- ShapeMatcherTesting ---
-
-| Rule                                          | Description |
-| --------------------------------------------- | ----------- |
-| Exact paths match without wildcards           |             |
-| Single-level globs match one directory level  |             |
-| Recursive globs match any depth               |             |
-| Dataset shape extraction deduplicates by name |             |
-
---- SessionCodecTesting ---
-
-| Rule                                                         | Description |
-| ------------------------------------------------------------ | ----------- |
-| SessionContextCodec provides working context for AI sessions |             |
-| RemainingWorkCodec aggregates incomplete work by phase       |             |
-
---- RequirementsAdrCodecTesting ---
-
-| Rule                                                                      | Description |
-| ------------------------------------------------------------------------- | ----------- |
-| RequirementsDocumentCodec generates PRD-style documentation from patterns |             |
-| AdrDocumentCodec documents architecture decisions                         |             |
-
---- ReportingCodecTesting ---
-
-| Rule                                                       | Description |
-| ---------------------------------------------------------- | ----------- |
-| ChangelogCodec follows Keep a Changelog format             |             |
-| TraceabilityCodec maps timeline patterns to behavior tests |             |
-| OverviewCodec provides project architecture summary        |             |
-
---- ReferenceGeneratorTesting ---
-
-| Rule                                                   | Description |
-| ------------------------------------------------------ | ----------- |
-| Registration produces the correct number of generators |             |
-| Product area configs produce a separate meta-generator |             |
-| Generator naming follows kebab-case convention         |             |
-| Generator execution produces markdown output           |             |
-
---- ReferenceCodecTesting ---
-
-| Rule                                                                   | Description                                                                                                              |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Empty datasets produce fallback content                                |                                                                                                                          |
-| Convention content is rendered as sections                             |                                                                                                                          |
-| Detail level controls output density                                   |                                                                                                                          |
-| Behavior sections are rendered from category-matching patterns         |                                                                                                                          |
-| Shape sources are extracted from matching patterns                     |                                                                                                                          |
-| Convention and behavior content compose in a single document           |                                                                                                                          |
-| Composition order follows AD-5: conventions then shapes then behaviors |                                                                                                                          |
-| Convention code examples render as mermaid blocks                      |                                                                                                                          |
-| Scoped diagrams are generated from diagramScope config                 |                                                                                                                          |
-| Multiple diagram scopes produce multiple mermaid blocks                |                                                                                                                          |
-| Standard detail level includes narrative but omits rationale           |                                                                                                                          |
-| Deep behavior rendering with structured annotations                    |                                                                                                                          |
-| Shape JSDoc prose renders at standard and detailed levels              |                                                                                                                          |
-| Shape sections render param returns and throws documentation           |                                                                                                                          |
-| Diagram type controls Mermaid output format                            | **Invariant:** The diagramType field on DiagramScope selects the Mermaid<br> output format. Supported types are graph... |
-| Edge labels and custom node shapes enrich diagram readability          | **Invariant:** Relationship edges display labels describing the relationship<br> type (uses, depends on, implements,...  |
-| Collapsible blocks wrap behavior rules for progressive disclosure      | **Invariant:** When a behavior pattern has 3 or more rules and detail level<br> is not summary, each rule's content...   |
-| Link-out blocks provide source file cross-references                   | **Invariant:** At standard and detailed levels, each behavior pattern includes<br> a link-out block referencing its...   |
-| Include tags route cross-cutting content into reference documents      | **Invariant:** Patterns with matching include tags appear alongside<br> category-selected patterns in the behavior...    |
-
---- PrChangesCodecTesting ---
-
-| Rule                                                                              | Description |
-| --------------------------------------------------------------------------------- | ----------- |
-| PrChangesCodec handles empty results gracefully                                   |             |
-| PrChangesCodec generates summary with filter information                          |             |
-| PrChangesCodec groups changes by phase when sortBy is "phase"                     |             |
-| PrChangesCodec groups changes by priority when sortBy is "priority"               |             |
-| PrChangesCodec shows flat list when sortBy is "workflow"                          |             |
-| PrChangesCodec renders pattern details with metadata and description              |             |
-| PrChangesCodec renders deliverables when includeDeliverables is enabled           |             |
-| PrChangesCodec renders acceptance criteria from scenarios                         |             |
-| PrChangesCodec renders business rules from Gherkin Rule keyword                   |             |
-| PrChangesCodec generates review checklist when includeReviewChecklist is enabled  |             |
-| PrChangesCodec generates dependencies section when includeDependencies is enabled |             |
-| PrChangesCodec filters patterns by changedFiles                                   |             |
-| PrChangesCodec filters patterns by releaseFilter                                  |             |
-| PrChangesCodec uses OR logic for combined filters                                 |             |
-| PrChangesCodec only includes active and completed patterns                        |             |
-
---- PlanningCodecTesting ---
-
-| Rule                                                        | Description |
-| ----------------------------------------------------------- | ----------- |
-| PlanningChecklistCodec prepares for implementation sessions |             |
-| SessionPlanCodec generates implementation plans             |             |
-| SessionFindingsCodec captures retrospective discoveries     |             |
-
---- DedentHelper ---
-
-| Rule                                        | Description |
-| ------------------------------------------- | ----------- |
-| Tabs are normalized to spaces before dedent |             |
-| Empty lines are handled correctly           |             |
-| Single line input is handled                |             |
-| Unicode whitespace is handled               |             |
-| Relative indentation is preserved           |             |
-
---- ConventionExtractorTesting ---
-
-| Rule                                                         | Description |
-| ------------------------------------------------------------ | ----------- |
-| Empty and missing inputs produce empty results               |             |
-| Convention bundles are extracted from matching patterns      |             |
-| Structured content is extracted from rule descriptions       |             |
-| Code examples in rule descriptions are preserved             |             |
-| TypeScript JSDoc conventions are extracted alongside Gherkin |             |
-
---- CompositeCodecTesting ---
-
-| Rule                                                      | Description                                                                                                            |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| CompositeCodec concatenates sections in codec array order | **Invariant:** Sections from child codecs appear in the composite<br> output in the same order as the codecs array.... |
-| Separators between codec outputs are configurable         | **Invariant:** By default, a separator block is inserted between<br> each child codec's sections. When...              |
-| additionalFiles merge with last-wins semantics            | **Invariant:** additionalFiles from all children are merged into<br> a single record. When keys collide, the later...  |
-| composeDocuments works at document level without codecs   | **Invariant:** composeDocuments accepts RenderableDocument array and<br> produces a composed RenderableDocument...     |
-| Empty codec outputs are handled gracefully                | **Invariant:** Codecs producing empty sections arrays contribute<br> nothing to the output. No separator is emitted... |

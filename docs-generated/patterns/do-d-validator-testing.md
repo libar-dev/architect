@@ -261,25 +261,49 @@ Validates that completed phases meet Definition of Done criteria:
 
 **Deliverable completion uses canonical status taxonomy**
 
+**Invariant:** Deliverable completion status must be determined exclusively using the 6 canonical values from the deliverable status taxonomy.
+    **Rationale:** Freeform status strings bypass schema validation and produce inconsistent completion tracking across the monorepo.
+    **Verified by:** Complete status is detected as complete, Non-complete canonical statuses are correctly identified
+
 _Verified by: Complete status is detected as complete, Non-complete canonical statuses are correctly identified_
 
 **Acceptance criteria must be tagged with @acceptance-criteria**
+
+**Invariant:** Every completed pattern must have at least one scenario tagged with @acceptance-criteria in its feature file.
+    **Rationale:** Without explicit acceptance criteria tags, there is no machine-verifiable proof that the delivered work meets its requirements.
+    **Verified by:** Feature with @acceptance-criteria scenario passes, Feature without @acceptance-criteria fails, Tag matching is case-insensitive
 
 _Verified by: Feature with @acceptance-criteria scenario passes, Feature without @acceptance-criteria fails, Tag matching is case-insensitive_
 
 **Acceptance criteria scenarios can be extracted by name**
 
+**Invariant:** The validator must be able to extract scenario names from @acceptance-criteria-tagged scenarios for reporting.
+    **Rationale:** Extracted names appear in traceability reports and DoD summaries, providing an audit trail from requirement to verification.
+    **Verified by:** Extract multiple AC scenario names, No AC scenarios returns empty list
+
 _Verified by: Extract multiple AC scenario names, No AC scenarios returns empty list_
 
 **DoD requires all deliverables complete and AC present**
+
+**Invariant:** A pattern passes Definition of Done only when ALL deliverables have complete status AND at least one @acceptance-criteria scenario exists.
+    **Rationale:** Partial completion or missing acceptance criteria means the pattern is not verified — marking it complete would bypass quality gates.
+    **Verified by:** Phase with all deliverables complete and AC passes, Phase with incomplete deliverables fails, Phase without acceptance criteria fails, Phase without deliverables fails
 
 _Verified by: Phase with all deliverables complete and AC passes, Phase with incomplete deliverables fails, Phase without acceptance criteria fails, Phase without deliverables fails_
 
 **DoD can be validated across multiple completed phases**
 
+**Invariant:** DoD validation must evaluate all completed phases independently and report per-phase pass/fail results.
+    **Rationale:** Multi-phase patterns need granular validation — a single aggregate result would hide which specific phase failed its Definition of Done.
+    **Verified by:** All completed phases passing DoD, Mixed pass/fail results, Only completed phases are validated by default, Filter to specific phases
+
 _Verified by: All completed phases passing DoD, Mixed pass/fail results, Only completed phases are validated by default, Filter to specific phases_
 
 **Summary can be formatted for console output**
+
+**Invariant:** DoD validation results must be renderable as structured console output showing phase-level pass/fail details.
+    **Rationale:** Developers need immediate, actionable feedback during pre-commit validation — raw data structures are not human-readable.
+    **Verified by:** Empty summary shows no completed phases message, Summary with passed phases shows details, Summary with failed phases shows details
 
 _Verified by: Empty summary shows no completed phases message, Summary with passed phases shows details, Summary with failed phases shows details_
 

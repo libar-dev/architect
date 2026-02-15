@@ -25,26 +25,16 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
---- ProcessStateAPITesting ---
-
-| Rule                                           | Description |
-| ---------------------------------------------- | ----------- |
-| Status queries return correct patterns         |             |
-| Phase queries return correct phase data        |             |
-| FSM queries expose transition validation       |             |
-| Pattern queries find and retrieve pattern data |             |
-| Timeline queries group patterns by time        |             |
-
 --- ValidatePatternsCli ---
 
-| Rule                                                         | Description |
-| ------------------------------------------------------------ | ----------- |
-| CLI displays help and version information                    |             |
-| CLI requires input and feature patterns                      |             |
-| CLI validates patterns across TypeScript and Gherkin sources |             |
-| CLI supports multiple output formats                         |             |
-| Strict mode treats warnings as errors                        |             |
-| CLI warns about unknown flags                                |             |
+| Rule                                                         | Description                                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| CLI displays help and version information                    | **Invariant:** The --help/-h and --version/-v flags must produce usage/version output and exit successfully without...   |
+| CLI requires input and feature patterns                      | **Invariant:** The validate-patterns CLI must fail with clear errors when either --input or --features flags are...      |
+| CLI validates patterns across TypeScript and Gherkin sources | **Invariant:** The validator must detect mismatches between TypeScript and Gherkin sources including phase and status... |
+| CLI supports multiple output formats                         | **Invariant:** The CLI must support JSON and pretty (human-readable) output formats, with pretty as the default....      |
+| Strict mode treats warnings as errors                        | **Invariant:** When --strict is enabled, warnings must be promoted to errors causing a non-zero exit code (exit 2);...   |
+| CLI warns about unknown flags                                | **Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue....                 |
 
 --- ProcessApiCli ---
 
@@ -69,133 +59,143 @@ Detail Level: Compact summary
 
 --- LintProcessCli ---
 
-| Rule                                       | Description |
-| ------------------------------------------ | ----------- |
-| CLI displays help and version information  |             |
-| CLI requires git repository for validation |             |
-| CLI validates file mode input              |             |
-| CLI handles no changes gracefully          |             |
-| CLI supports multiple output formats       |             |
-| CLI supports debug options                 |             |
-| CLI warns about unknown flags              |             |
+| Rule                                       | Description                                                                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| CLI displays help and version information  | **Invariant:** The --help/-h and --version/-v flags must produce usage/version output and exit successfully without...   |
+| CLI requires git repository for validation | **Invariant:** The lint-process CLI must fail with a clear error when run outside a git repository in both staged and... |
+| CLI validates file mode input              | **Invariant:** In file mode, the CLI must require at least one file path via positional argument or --file flag, and...  |
+| CLI handles no changes gracefully          | **Invariant:** When no relevant changes are detected (empty diff), the CLI must exit successfully with a zero exit...    |
+| CLI supports multiple output formats       | **Invariant:** The CLI must support JSON and pretty (human-readable) output formats, with pretty as the default....      |
+| CLI supports debug options                 | **Invariant:** The --show-state flag must display the derived process state (FSM states, protection levels,...           |
+| CLI warns about unknown flags              | **Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue....                 |
 
 --- LintPatternsCli ---
 
-| Rule                                           | Description |
-| ---------------------------------------------- | ----------- |
-| CLI displays help and version information      |             |
-| CLI requires input patterns                    |             |
-| Lint passes for valid patterns                 |             |
-| Lint detects violations in incomplete patterns |             |
-| CLI supports multiple output formats           |             |
-| Strict mode treats warnings as errors          |             |
+| Rule                                           | Description                                                                                                           |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| CLI displays help and version information      | **Invariant:** The --help and -v flags must produce usage/version output and exit successfully without requiring...   |
+| CLI requires input patterns                    | **Invariant:** The lint-patterns CLI must fail with a clear error when the --input flag is not provided....           |
+| Lint passes for valid patterns                 | **Invariant:** Fully annotated patterns with all required tags must pass linting with zero violations....             |
+| Lint detects violations in incomplete patterns | **Invariant:** Patterns with missing or incomplete annotations must produce specific violation reports identifying... |
+| CLI supports multiple output formats           | **Invariant:** The CLI must support JSON and pretty (human-readable) output formats, with pretty as the default....   |
+| Strict mode treats warnings as errors          | **Invariant:** When --strict is enabled, warnings must be promoted to errors causing a non-zero exit code; without... |
 
 --- GenerateTagTaxonomyCli ---
 
-| Rule                                            | Description |
-| ----------------------------------------------- | ----------- |
-| CLI displays help and version information       |             |
-| CLI generates taxonomy at specified output path |             |
-| CLI respects overwrite flag for existing files  |             |
-| Generated taxonomy contains expected sections   |             |
-| CLI warns about unknown flags                   |             |
+| Rule                                            | Description                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| CLI displays help and version information       | **Invariant:** The --help/-h and --version/-v flags must produce usage/version output and exit successfully without...   |
+| CLI generates taxonomy at specified output path | **Invariant:** The taxonomy generator must write output to the specified path, creating parent directories if they do... |
+| CLI respects overwrite flag for existing files  | **Invariant:** The CLI must refuse to overwrite existing output files unless the --overwrite or -f flag is explicitly... |
+| Generated taxonomy contains expected sections   | **Invariant:** The generated taxonomy file must include category documentation and statistics sections reflecting the... |
+| CLI warns about unknown flags                   | **Invariant:** Unrecognized CLI flags must produce a warning message but allow execution to continue....                 |
 
 --- GenerateDocsCli ---
 
-| Rule                                          | Description |
-| --------------------------------------------- | ----------- |
-| CLI displays help and version information     |             |
-| CLI requires input patterns                   |             |
-| CLI lists available generators                |             |
-| CLI generates documentation from source files |             |
-| CLI rejects unknown options                   |             |
+| Rule                                          | Description                                                                                                         |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| CLI displays help and version information     | **Invariant:** The --help and -v flags must produce usage/version output and exit successfully without requiring... |
+| CLI requires input patterns                   | **Invariant:** The generate-docs CLI must fail with a clear error when the --input flag is not provided....         |
+| CLI lists available generators                | **Invariant:** The --list-generators flag must display all registered generator names without performing any...     |
+| CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
+| CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
 
---- ScopeValidatorTests ---
+--- ProcessStateAPITesting ---
 
-| Rule                                                     | Description |
-| -------------------------------------------------------- | ----------- |
-| Implementation scope validation checks all prerequisites |             |
-| Design scope validation checks dependency stubs          |             |
-| Formatter produces structured text output                |             |
-
---- HandoffGeneratorTests ---
-
-| Rule                                            | Description |
-| ----------------------------------------------- | ----------- |
-| Handoff generates compact session state summary |             |
-| Formatter produces structured text output       |             |
-
---- StubTaxonomyTagTests ---
-
-| Rule                                         | Description |
-| -------------------------------------------- | ----------- |
-| Taxonomy tags are registered in the registry |             |
-| Tags are part of the stub metadata group     |             |
-
---- StubResolverTests ---
-
-| Rule                                            | Description |
-| ----------------------------------------------- | ----------- |
-| Stubs are identified by path or target metadata |             |
-| Stubs are resolved against the filesystem       |             |
-| Decision items are extracted from descriptions  |             |
-| PDR references are found across patterns        |             |
+| Rule                                           | Description                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
+| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
+| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
+| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
+| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
 
 --- PatternSummarizeTests ---
 
-| Rule                                         | Description |
-| -------------------------------------------- | ----------- |
-| summarizePattern projects to compact summary |             |
-| summarizePatterns batch processes arrays     |             |
+| Rule                                         | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| summarizePattern projects to compact summary | **Invariant:** summarizePattern must project a full pattern object to a compact summary containing exactly 6 fields,... |
+| summarizePatterns batch processes arrays     | **Invariant:** summarizePatterns must batch-process an array of patterns, returning a correctly-sized array of...       |
 
 --- PatternHelpersTests ---
 
-| Rule                                                     | Description |
-| -------------------------------------------------------- | ----------- |
-| getPatternName uses patternName tag when available       |             |
-| findPatternByName performs case-insensitive matching     |             |
-| getRelationships looks up with case-insensitive fallback |             |
-| suggestPattern provides fuzzy suggestions                |             |
+| Rule                                                     | Description                                                                                                           |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| getPatternName uses patternName tag when available       | **Invariant:** getPatternName must return the patternName tag value when set, falling back to the pattern's name...   |
+| findPatternByName performs case-insensitive matching     | **Invariant:** findPatternByName must match pattern names case-insensitively, returning undefined when no match...    |
+| getRelationships looks up with case-insensitive fallback | **Invariant:** getRelationships must first try exact key lookup in the relationship index, then fall back to...       |
+| suggestPattern provides fuzzy suggestions                | **Invariant:** suggestPattern must return fuzzy match suggestions for close pattern names, returning empty results... |
 
 --- OutputPipelineTests ---
 
-| Rule                                           | Description |
-| ---------------------------------------------- | ----------- |
-| Output modifiers apply with correct precedence |             |
-| Modifier conflicts are rejected                |             |
-| List filters compose via AND logic             |             |
-| Empty stripping removes noise                  |             |
+| Rule                                           | Description                                                                                                             |
+| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Output modifiers apply with correct precedence | **Invariant:** Output modifiers (count, names-only, fields, full) must apply to pattern arrays with correct...          |
+| Modifier conflicts are rejected                | **Invariant:** Mutually exclusive modifier combinations (full+names-only, full+count, full+fields) and invalid field... |
+| List filters compose via AND logic             | **Invariant:** Multiple list filters (status, category) must compose via AND logic, with pagination (limit/offset)...   |
+| Empty stripping removes noise                  | **Invariant:** Null and empty values must be stripped from output objects to reduce noise in API responses....          |
 
 --- FuzzyMatchTests ---
 
-| Rule                                    | Description |
-| --------------------------------------- | ----------- |
-| Fuzzy matching uses tiered scoring      |             |
-| findBestMatch returns single suggestion |             |
-| Levenshtein distance computation        |             |
+| Rule                                    | Description                                                                                                             |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
+| findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
+| Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
 
 --- ContextFormatterTests ---
 
-| Rule                                                 | Description |
-| ---------------------------------------------------- | ----------- |
-| formatContextBundle renders section markers          |             |
-| formatDepTree renders indented tree                  |             |
-| formatOverview renders progress summary              |             |
-| formatFileReadingList renders categorized file paths |             |
+| Rule                                                 | Description                                                                                                              |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| formatContextBundle renders section markers          | **Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with... |
+| formatDepTree renders indented tree                  | **Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to...        |
+| formatOverview renders progress summary              | **Invariant:** The overview formatter must render a progress summary line showing completion metrics for the...          |
+| formatFileReadingList renders categorized file paths | **Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing...  |
 
 --- ContextAssemblerTests ---
 
-| Rule                                                      | Description |
-| --------------------------------------------------------- | ----------- |
-| assembleContext produces session-tailored context bundles |             |
-| buildDepTree walks dependency chains with cycle detection |             |
-| buildOverview provides executive project summary          |             |
-| buildFileReadingList returns paths by relevance           |             |
+| Rule                                                      | Description                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| assembleContext produces session-tailored context bundles | **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its... |
+| buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
+| buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
+| buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
+
+--- StubTaxonomyTagTests ---
+
+| Rule                                         | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
+| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
+
+--- StubResolverTests ---
+
+| Rule                                            | Description                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
+| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
+| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
+| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
+
+--- ScopeValidatorTests ---
+
+| Rule                                                     | Description                                                                                                             |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
+| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
+| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
+
+--- HandoffGeneratorTests ---
+
+| Rule                                            | Description                                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
+| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
 
 --- ArchQueriesTest ---
 
-| Rule                                              | Description |
-| ------------------------------------------------- | ----------- |
-| Neighborhood and comparison views                 |             |
-| Taxonomy discovery via tags and sources           |             |
-| Coverage analysis reports annotation completeness |             |
+| Rule                                              | Description                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
+| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
+| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |

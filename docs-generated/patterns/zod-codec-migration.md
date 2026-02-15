@@ -74,7 +74,7 @@ All JSON parsing and serialization uses type-safe Zod codec pattern,
 - When I parse JSON '{"$schema": "http://json-schema.org/draft-07/schema#", "name": "test", "count": 1}'
 - Then the parse result should be successful
 - And the parsed value should have name "test"
-- And the parsed value should not have a $schema property
+- And the parsed value should not have a "$schema" property
 
 **Output codec serializes valid object to JSON**
 

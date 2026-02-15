@@ -32,7 +32,7 @@
   at test runtime. These are semantic traps at the boundary between .feature
   files and .steps.ts files: using {string} function params inside
   ScenarioOutline (should use variables object), forgetting to destructure
-  And (causes StepAbleUnknowStepError), missing Rule() wrappers, and hash
+  the And keyword (causes StepAbleUnknowStepError), missing Rule() wrappers, and hash
   comments inside description pseudo-code-blocks. All are statically
   detectable but no existing linter catches them.
 
@@ -52,19 +52,19 @@
 
 **Hash inside description pseudo-code-block is flagged**
 
-- Given a feature file with a Rule description containing a """ block with #
+- Given a feature file with a Rule description containing a """ block with a hash character
 - When the step linter checks the file
 - Then a hash-in-description error is reported
 
 **Hash in step DocString is not flagged**
 
-- Given a feature file with # inside a Given step DocString
+- Given a feature file with a hash character inside a Given step DocString
 - When the step linter checks the file
 - Then no hash-in-description errors are reported
 
 **Section separator comments are not flagged**
 
-- Given a feature file with # section separators between keywords
+- Given a feature file with hash section separators between keywords
 - When the step linter checks the file
 - Then no hash-in-description errors are reported
 
@@ -82,7 +82,7 @@
 
 **Dollar in step text produces warning**
 
-- Given a feature file with $ in a When step
+- Given a feature file with a dollar sign in a When step
 - When the step linter checks the file
 - Then a dollar-in-step-text warning is reported
 

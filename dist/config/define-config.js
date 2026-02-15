@@ -3,6 +3,9 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern DefineConfig
  * @libar-docs-status active
+ * @libar-docs-arch-layer infrastructure
+ * @libar-docs-arch-context config
+ * @libar-docs-arch-role infrastructure
  * @libar-docs-include reference-sample
  * @libar-docs-uses ProjectConfigTypes
  * @libar-docs-used-by ConfigLoader

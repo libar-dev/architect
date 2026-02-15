@@ -253,13 +253,13 @@ _Verified by: Protection level from status, Completed file modification without 
 
 Optional session files (`delivery-process/sessions/*.feature`) explicitly
     declare which specs are in-scope for modification during a work session.
-    When active, modifications outside scope trigger warnings or errors.
+    If active, modifications outside scope trigger warnings or errors.
 
 _Verified by: Session file defines modification scope, Modifying spec outside active session scope warns, Modifying explicitly excluded spec fails, No active session allows all modifications_
 
 **Status transitions follow PDR-005 FSM**
 
-When a file's status changes, the transition must be valid per PDR-005.
+Status changes in a file must follow a valid transition per PDR-005.
     This extends phase-state-machine.feature to the linter context.
 
 _Verified by: Valid status transitions, Invalid status transitions_

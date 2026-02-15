@@ -6,25 +6,27 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCodec)
-  transform MasterDataset into RenderableDocuments for planning and retrospective views.
+transform MasterDataset into RenderableDocuments for planning and retrospective views.
 
-  **Problem:**
-  - Need to generate planning checklists, session plans, and findings documents from patterns
-  - Each view requires different filtering, grouping, and content rendering
+**Problem:**
 
-  **Solution:**
-  - Three specialized codecs for different planning perspectives
-  - PlanningChecklistCodec prepares for implementation sessions
-  - SessionPlanCodec generates structured implementation plans
-  - SessionFindingsCodec captures retrospective discoveries
+- Need to generate planning checklists, session plans, and findings documents from patterns
+- Each view requires different filtering, grouping, and content rendering
+
+**Solution:**
+
+- Three specialized codecs for different planning perspectives
+- PlanningChecklistCodec prepares for implementation sessions
+- SessionPlanCodec generates structured implementation plans
+- SessionFindingsCodec captures retrospective discoveries
 
 ## Acceptance Criteria
 
@@ -42,11 +44,11 @@ The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCo
 - Then the document title is "Planning Checklist"
 - And the summary table shows:
 
-| metric | value |
-| --- | --- |
-| Phases to Plan | 2 |
-| Active | 1 |
-| Next Actionable | 1 |
+| metric          | value |
+| --------------- | ----- |
+| Phases to Plan  | 2     |
+| Active          | 1     |
+| Next Actionable | 1     |
 
 **Pre-planning questions section**
 
@@ -55,12 +57,12 @@ The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCo
 - Then the document contains a "Pre-Planning" section
 - And the pre-planning section contains checklist items:
 
-| item |
-| --- |
-| Context and requirements understood? |
+| item                                  |
+| ------------------------------------- |
+| Context and requirements understood?  |
 | Dependencies identified and verified? |
-| Implementation approach chosen? |
-| Risks assessed and mitigated? |
+| Implementation approach chosen?       |
+| Risks assessed and mitigated?         |
 
 **Definition of Done with deliverables**
 
@@ -83,11 +85,11 @@ The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCo
 - Then the document contains a "Risk Assessment" section
 - And the risk assessment contains checklist items:
 
-| item |
-| --- |
-| Technical risks identified? |
+| item                           |
+| ------------------------------ |
+| Technical risks identified?    |
 | Scope creep controls in place? |
-| Fallback options available? |
+| Fallback options available?    |
 
 **Dependency status shows met vs unmet**
 
@@ -123,11 +125,11 @@ The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCo
 - Then the document title is "Session Implementation Plan"
 - And the summary table shows:
 
-| status | count |
-| --- | --- |
-| Active | 1 |
-| Planned | 1 |
-| Total | 2 |
+| status  | count |
+| ------- | ----- |
+| Active  | 1     |
+| Planned | 1     |
+| Total   | 2     |
 
 **Implementation approach from useCases**
 
@@ -183,12 +185,12 @@ The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCo
 - Then the document title is "Session Findings"
 - And the summary table shows:
 
-| type | count |
-| --- | --- |
-| Gaps | 2 |
-| Improvements | 2 |
-| Risks | 2 |
-| Learnings | 2 |
+| type         | count |
+| ------------ | ----- |
+| Gaps         | 2     |
+| Improvements | 2     |
+| Risks        | 2     |
+| Learnings    | 2     |
 
 **Gaps section**
 
@@ -252,13 +254,25 @@ The planning codecs (PlanningChecklistCodec, SessionPlanCodec, SessionFindingsCo
 
 **PlanningChecklistCodec prepares for implementation sessions**
 
+**Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
+**Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
+**Verified by:** No actionable phases produces empty message, Summary shows phases to plan count, Pre-planning questions section, Definition of Done with deliverables, Acceptance criteria from scenarios, Risk assessment section, Dependency status shows met vs unmet, forActivePhases option, forNextActionable option
+
 _Verified by: No actionable phases produces empty message, Summary shows phases to plan count, Pre-planning questions section, Definition of Done with deliverables, Acceptance criteria from scenarios, Risk assessment section, Dependency status shows met vs unmet, forActivePhases option, forNextActionable option_
 
 **SessionPlanCodec generates implementation plans**
 
+**Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
+**Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
+**Verified by:** No phases to plan produces empty message, Summary shows status counts, Implementation approach from useCases, Deliverables rendering, Acceptance criteria with steps, Business rules section, statusFilter option for active only, statusFilter option for planned only
+
 _Verified by: No phases to plan produces empty message, Summary shows status counts, Implementation approach from useCases, Deliverables rendering, Acceptance criteria with steps, Business rules section, statusFilter option for active only, statusFilter option for planned only_
 
 **SessionFindingsCodec captures retrospective discoveries**
+
+**Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
+**Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
+**Verified by:** No findings produces empty message, Summary shows finding type counts, Gaps section, Improvements section, Risks section includes risk field, Learnings section, groupBy category option, groupBy phase option, groupBy type option, showSourcePhase option enabled, showSourcePhase option disabled
 
 _Verified by: No findings produces empty message, Summary shows finding type counts, Gaps section, Improvements section, Risks section includes risk field, Learnings section, groupBy category option, groupBy phase option, groupBy type option, showSourcePhase option enabled, showSourcePhase option disabled_
 

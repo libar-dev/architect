@@ -506,29 +506,35 @@ function renderFeatureWithRules(feature, options) {
 /**
  * Render a single rule inline with its annotations.
  *
- * Rule title + Invariant + Rationale are always visible (essential business
- * knowledge). Verified-by is rendered as a compact italic line — it's
- * metadata for traceability, not primary content. Scenario names from the
+ * Each rule is preceded by a separator. Invariant + Rationale are combined
+ * into a blockquote "constraint card" for visual emphasis. Verified-by is
+ * rendered as a checkbox list for scanability. Scenario names from the
  * Rule block are deduplicated against explicit **Verified by:** annotations.
  */
 function renderRuleInline(ruleCtx, options, isDetailed) {
     const sections = [];
     const { rule, annotations } = ruleCtx;
+    // Visual separator before each rule
+    sections.push(separator());
     // Rule name as H4 heading
     sections.push(heading(4, rule.name));
-    // Invariant (or first line of description if no invariant)
+    // Constraint card: blockquote combining Invariant + Rationale
+    const cardLines = [];
     if (annotations.invariant) {
-        sections.push(paragraph(`**Invariant:** ${annotations.invariant}`));
+        cardLines.push(`> **Invariant:** ${annotations.invariant}`);
+    }
+    if (options.includeRationale && annotations.rationale) {
+        cardLines.push(`> **Rationale:** ${annotations.rationale}`);
+    }
+    if (cardLines.length > 0) {
+        sections.push(paragraph(cardLines.join('\n>\n')));
     }
     else if (annotations.remainingContent) {
+        // Fallback first-line stays as plain paragraph (not blockquoted)
         const firstLine = extractFirstSentence(annotations.remainingContent);
         if (firstLine) {
             sections.push(paragraph(firstLine));
         }
-    }
-    // Rationale (if enabled and present)
-    if (options.includeRationale && annotations.rationale) {
-        sections.push(paragraph(`**Rationale:** ${annotations.rationale}`));
     }
     // Tables from rule description
     if (options.includeTables && rule.description) {
@@ -543,11 +549,12 @@ function renderRuleInline(ruleCtx, options, isDetailed) {
             sections.push(codeBlock);
         }
     }
-    // Compact verified-by as italic line (metadata, not primary content)
+    // Verified-by as compact bullet list (label + items in one block, no blank line gap)
     if (options.includeVerifiedBy) {
         const names = deduplicateScenarioNames(rule.scenarioNames, annotations.verifiedBy);
         if (names.length > 0) {
-            sections.push(paragraph(`_Verified by: ${names.join(', ')}_`));
+            const bullets = names.map((name) => `- ${name}`).join('\n');
+            sections.push(paragraph(`**Verified by:**\n${bullets}`));
         }
     }
     // API implementation references

@@ -6,27 +6,29 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Validation |
 
 ## Description
 
 Detects violations of the dual-source documentation architecture and
-  process hygiene issues that lead to documentation drift.
+process hygiene issues that lead to documentation drift.
 
-  **Problem:**
-  - Dependencies in features (should be code-only) cause drift
-  - Process metadata in code (should be features-only) violates separation
-  - Generator hints in features create tight coupling
-  - Large feature files are hard to maintain
+**Problem:**
 
-  **Solution:**
-  - detectProcessInCode() finds feature-only tags in code
-  - detectMagicComments() finds generator hints in features
-  - detectScenarioBloat() warns about too many scenarios
-  - detectMegaFeature() warns about large feature files
+- Dependencies in features (should be code-only) cause drift
+- Process metadata in code (should be features-only) violates separation
+- Generator hints in features create tight coupling
+- Large feature files are hard to maintain
+
+**Solution:**
+
+- detectProcessInCode() finds feature-only tags in code
+- detectMagicComments() finds generator hints in features
+- detectScenarioBloat() warns about too many scenarios
+- detectMegaFeature() warns about large feature files
 
 ## Acceptance Criteria
 
@@ -36,11 +38,11 @@ Detects violations of the dual-source documentation architecture and
 - When detecting process-in-code anti-patterns
 - Then no violations are found
 
-| tag |
-| --- |
-| @libar-docs |
-| @libar-docs-pattern |
-| @libar-docs-status |
+| tag                    |
+| ---------------------- |
+| @libar-docs            |
+| @libar-docs-pattern    |
+| @libar-docs-status     |
 | @libar-docs-depends-on |
 
 **Feature-only process tags in code are flagged**
@@ -59,11 +61,11 @@ Detects violations of the dual-source documentation architecture and
 
 ```markdown
 Feature: Normal Feature
-  A normal feature without generator hints.
+A normal feature without generator hints.
 
 Scenario: Normal scenario
-  Given some precondition
-  Then some result
+Given some precondition
+Then some result
 ```
 
 **Features with excessive magic comments are flagged**
@@ -82,8 +84,9 @@ Scenario: Normal scenario
 
 ```markdown
 # GENERATOR: header
+
 Feature: Acceptable Feature
-  Some generator hint is OK.
+Some generator hint is OK.
 ```
 
 **Feature with few scenarios passes**
@@ -122,13 +125,13 @@ Feature: Acceptable Feature
 - Then 1 violation is found
 - And violations include "process-in-code"
 
-| tag |
-| --- |
-| @libar-docs |
+| tag                 |
+| ------------------- |
+| @libar-docs         |
 | @libar-docs-quarter |
 
-| tag |
-| --- |
+| tag                       |
+| ------------------------- |
 | libar-docs-pattern:MyTest |
 
 **Empty violations produce clean report**
@@ -145,35 +148,59 @@ Feature: Acceptable Feature
 - And the report contains "Warnings (hygiene issues)"
 - And the report shows "2 errors, 1 warning"
 
-| id | severity |
-| --- | --- |
-| tag-duplication | error |
-| magic-comments | warning |
-| process-in-code | error |
+| id              | severity |
+| --------------- | -------- |
+| tag-duplication | error    |
+| magic-comments  | warning  |
+| process-in-code | error    |
 
 ## Business Rules
 
 **Process metadata should not appear in TypeScript code**
 
+**Invariant:** Process metadata tags (@libar-docs-status, @libar-docs-phase, etc.) must only appear in Gherkin feature files, never in TypeScript source code.
+**Rationale:** TypeScript owns runtime behavior while Gherkin owns delivery process metadata — mixing them creates dual-source conflicts and validation ambiguity.
+**Verified by:** Code without process tags passes, Feature-only process tags in code are flagged
+
 _Verified by: Code without process tags passes, Feature-only process tags in code are flagged_
 
 **Generator hints should not appear in feature files**
+
+**Invariant:** Feature files must not contain generator magic comments beyond a configurable threshold.
+**Rationale:** Generator hints are implementation details that belong in TypeScript — excessive magic comments in specs indicate leaking implementation concerns into business requirements.
+**Verified by:** Feature without magic comments passes, Features with excessive magic comments are flagged, Magic comments within threshold pass
 
 _Verified by: Feature without magic comments passes, Features with excessive magic comments are flagged, Magic comments within threshold pass_
 
 **Feature files should not have excessive scenarios**
 
+**Invariant:** A single feature file must not exceed the configured maximum scenario count.
+**Rationale:** Oversized feature files indicate missing decomposition — they become hard to maintain and slow to execute.
+**Verified by:** Feature with few scenarios passes, Feature exceeding scenario threshold is flagged
+
 _Verified by: Feature with few scenarios passes, Feature exceeding scenario threshold is flagged_
 
 **Feature files should not exceed size thresholds**
+
+**Invariant:** A single feature file must not exceed the configured maximum line count.
+**Rationale:** Excessively large files indicate a feature that should be split into focused, independently testable specifications.
+**Verified by:** Normal-sized feature passes, Oversized feature is flagged
 
 _Verified by: Normal-sized feature passes, Oversized feature is flagged_
 
 **All anti-patterns can be detected in one pass**
 
+**Invariant:** The anti-pattern detector must evaluate all registered rules in a single scan pass over the source files.
+**Rationale:** Single-pass detection ensures consistent results and avoids O(n\*m) performance degradation with multiple file traversals.
+**Verified by:** Combined detection finds process-in-code issues
+
 _Verified by: Combined detection finds process-in-code issues_
 
 **Violations can be formatted for console output**
+
+**Invariant:** Anti-pattern violations must be renderable as grouped, human-readable console output.
+**Rationale:** Developers need actionable feedback at commit time — ungrouped or unformatted violations are hard to triage and fix.
+**Verified by:** Empty violations produce clean report, Violations are grouped by severity
 
 _Verified by: Empty violations produce clean report, Violations are grouped by severity_
 

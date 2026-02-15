@@ -6,21 +6,21 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | DataAPI |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | completed |
+| Product Area | DataAPI   |
 
 ## Description
 
 **Problem:**
-  Multi-session work loses critical state between sessions when handoff
-  documentation is manual or forgotten.
+Multi-session work loses critical state between sessions when handoff
+documentation is manual or forgotten.
 
-  **Solution:**
-  HandoffGenerator assembles a structured handoff document from ProcessStateAPI
-  and MasterDataset, capturing completed work, remaining items, discovered
-  issues, and next-session priorities.
+**Solution:**
+HandoffGenerator assembles a structured handoff document from ProcessStateAPI
+and MasterDataset, capturing completed work, remaining items, discovered
+issues, and next-session priorities.
 
 ## Acceptance Criteria
 
@@ -88,9 +88,17 @@
 
 **Handoff generates compact session state summary**
 
+**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
+**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
+**Verified by:** Generate handoff for in-progress pattern, Handoff captures discovered items, Session type is inferred from status, Completed pattern infers review session type, Deferred pattern infers design session type, Files modified section included when provided, Blockers section shows incomplete dependencies, Pattern not found throws error
+
 _Verified by: Generate handoff for in-progress pattern, Handoff captures discovered items, Session type is inferred from status, Completed pattern infers review session type, Deferred pattern infers design session type, Files modified section included when provided, Blockers section shows incomplete dependencies, Pattern not found throws error_
 
 **Formatter produces structured text output**
+
+**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
+**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
+**Verified by:** Handoff formatter produces markers per ADR-008
 
 _Verified by: Handoff formatter produces markers per ADR-008_
 

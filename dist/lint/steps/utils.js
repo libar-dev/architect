@@ -13,7 +13,7 @@
 export function stripQuotedContent(text) {
     return text.replace(/"[^"]*"|'[^']*'/g, (match) => {
         // Preserve the quote characters but remove inner content
-        const quote = match[0];
+        const quote = match.charAt(0);
         return `${quote}${quote}`;
     });
 }

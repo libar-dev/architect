@@ -137,6 +137,24 @@ This is not valid Gherkin
 # Just a comment
 ```
 
+## Business Rules
+
+**Successful feature file parsing extracts complete metadata**
+
+**Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all nested scenarios with their steps.
+    **Rationale:** Downstream generators (timeline, business rules) depend on complete AST extraction; missing fields cause silent gaps in generated documentation.
+    **Verified by:** Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags
+
+_Verified by: Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags_
+
+**Invalid Gherkin produces structured errors**
+
+**Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a descriptive error message.
+    **Rationale:** The scanner processes many feature files in batch; structured errors allow graceful degradation and per-file error reporting rather than aborting the entire scan.
+    **Verified by:** Return error for malformed Gherkin, Return error for file without feature
+
+_Verified by: Return error for malformed Gherkin, Return error for file without feature_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

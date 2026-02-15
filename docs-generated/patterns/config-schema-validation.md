@@ -167,6 +167,44 @@ Configuration schemas validate scanner and generator inputs with security
 - When I check if it is a generator config
 - Then isGeneratorConfig should return false
 
+## Business Rules
+
+**ScannerConfigSchema validates scanner configuration**
+
+**Invariant:** Scanner configuration must contain at least one valid glob pattern with no parent directory traversal, and baseDir must resolve to an absolute path.
+
+    **Rationale:** Malformed or malicious glob patterns could scan outside project boundaries, exposing sensitive files.
+
+    **Verified by:** ScannerConfigSchema validates correct configuration, ScannerConfigSchema accepts multiple patterns, ScannerConfigSchema rejects empty patterns array, ScannerConfigSchema rejects parent traversal in patterns, ScannerConfigSchema rejects hidden parent traversal, ScannerConfigSchema normalizes baseDir to absolute path, ScannerConfigSchema accepts optional exclude patterns
+
+_Verified by: ScannerConfigSchema validates correct configuration, ScannerConfigSchema accepts multiple patterns, ScannerConfigSchema rejects empty patterns array, ScannerConfigSchema rejects parent traversal in patterns, ScannerConfigSchema rejects hidden parent traversal, ScannerConfigSchema normalizes baseDir to absolute path, ScannerConfigSchema accepts optional exclude patterns_
+
+**GeneratorConfigSchema validates generator configuration**
+
+**Invariant:** Generator configuration must use a .json registry file and an output directory that does not escape the project root via parent traversal.
+
+    **Rationale:** Non-JSON registry files could introduce parsing vulnerabilities, and unrestricted output paths could overwrite files outside the project.
+
+    **Verified by:** GeneratorConfigSchema validates correct configuration, GeneratorConfigSchema requires .json registry file, GeneratorConfigSchema rejects outputDir with parent traversal, GeneratorConfigSchema accepts relative output directory, GeneratorConfigSchema defaults overwrite to false, GeneratorConfigSchema defaults readmeOnly to false
+
+_Verified by: GeneratorConfigSchema validates correct configuration, GeneratorConfigSchema requires .json registry file, GeneratorConfigSchema rejects outputDir with parent traversal, GeneratorConfigSchema accepts relative output directory, GeneratorConfigSchema defaults overwrite to false, GeneratorConfigSchema defaults readmeOnly to false_
+
+**isScannerConfig type guard narrows unknown values**
+
+**Invariant:** isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir.
+
+    **Verified by:** isScannerConfig returns true for valid config, isScannerConfig returns false for invalid config, isScannerConfig returns false for null, isScannerConfig returns false for non-object
+
+_Verified by: isScannerConfig returns true for valid config, isScannerConfig returns false for invalid config, isScannerConfig returns false for null, isScannerConfig returns false for non-object_
+
+**isGeneratorConfig type guard narrows unknown values**
+
+**Invariant:** isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath.
+
+    **Verified by:** isGeneratorConfig returns true for valid config, isGeneratorConfig returns false for invalid config, isGeneratorConfig returns false for non-json registry
+
+_Verified by: isGeneratorConfig returns true for valid config, isGeneratorConfig returns false for invalid config, isGeneratorConfig returns false for non-json registry_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

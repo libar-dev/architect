@@ -6,25 +6,27 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The session codecs (SessionContextCodec, RemainingWorkCodec)
-  transform MasterDataset into RenderableDocuments for AI session context
-  and incomplete work aggregation views.
+transform MasterDataset into RenderableDocuments for AI session context
+and incomplete work aggregation views.
 
-  **Problem:**
-  - Need to generate session context and remaining work documents from patterns
-  - Each view requires different filtering, grouping, and prioritization logic
+**Problem:**
 
-  **Solution:**
-  - Two specialized codecs for session planning perspectives
-  - SessionContextCodec focuses on current work and phase navigation
-  - RemainingWorkCodec aggregates incomplete work with priority sorting
+- Need to generate session context and remaining work documents from patterns
+- Each view requires different filtering, grouping, and prioritization logic
+
+**Solution:**
+
+- Two specialized codecs for session planning perspectives
+- SessionContextCodec focuses on current work and phase navigation
+- RemainingWorkCodec aggregates incomplete work with priority sorting
 
 ## Acceptance Criteria
 
@@ -43,10 +45,10 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - Then the document title is "Session Context"
 - And the document contains sections:
 
-| heading |
-| --- |
+| heading        |
+| -------------- |
 | Session Status |
-| Active Work |
+| Active Work    |
 
 **Session status shows current focus**
 
@@ -55,17 +57,17 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - Then the session status section shows:
 - And the session status shows current focus
 
-| status | count |
-| --- | --- |
-| completed | 3 |
-| active | 2 |
-| planned | 5 |
+| status    | count |
+| --------- | ----- |
+| completed | 3     |
+| active    | 2     |
+| planned   | 5     |
 
-| metric | value |
-| --- | --- |
-| Active Patterns | 2 |
-| Completed | 3 |
-| Remaining | 7 |
+| metric          | value |
+| --------------- | ----- |
+| Active Patterns | 2     |
+| Completed       | 3     |
+| Remaining       | 7     |
 
 **Phase navigation for incomplete phases**
 
@@ -75,11 +77,11 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - And the phase navigation table has columns:
 - And the phase navigation shows only incomplete phases
 
-| column |
-| --- |
-| Phase |
+| column    |
+| --------- |
+| Phase     |
 | Remaining |
-| Complete |
+| Complete  |
 
 **Active work grouped by phase**
 
@@ -114,10 +116,10 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - When decoding with generateDetailFiles enabled for session
 - Then the document has session detail files:
 
-| path |
-| --- |
+| path                                         |
+| -------------------------------------------- |
 | sessions/phase-03-event-store-enhancement.md |
-| sessions/phase-04-advanced-projections.md |
+| sessions/phase-04-advanced-projections.md    |
 
 **No detail files when disabled**
 
@@ -139,17 +141,17 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - Then the document title is "Remaining Work"
 - And the summary table shows:
 
-| status | count |
-| --- | --- |
-| completed | 3 |
-| active | 2 |
-| planned | 5 |
+| status    | count |
+| --------- | ----- |
+| completed | 3     |
+| active    | 2     |
+| planned   | 5     |
 
-| status | count |
-| --- | --- |
-| Active | 2 |
-| Planned | 5 |
-| Total Remaining | 7 |
+| status          | count |
+| --------------- | ----- |
+| Active          | 2     |
+| Planned         | 5     |
+| Total Remaining | 7     |
 
 **Phase navigation with remaining count**
 
@@ -158,12 +160,12 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - Then the document contains a "By Phase" section
 - And the by phase table has columns:
 
-| column |
-| --- |
-| Phase |
+| column    |
+| --------- |
+| Phase     |
 | Remaining |
-| Active |
-| Complete |
+| Active    |
+| Complete  |
 
 **By priority shows ready vs blocked**
 
@@ -172,11 +174,11 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - Then the document contains a "By Priority" section
 - And the by priority table shows:
 
-| priority | present |
-| --- | --- |
-| In Progress | yes |
-| Ready to Start | yes |
-| Blocked | yes |
+| priority       | present |
+| -------------- | ------- |
+| In Progress    | yes     |
+| Ready to Start | yes     |
+| Blocked        | yes     |
 
 **Next actionable items section**
 
@@ -209,10 +211,10 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 - When decoding with generateDetailFiles enabled for remaining
 - Then the document has remaining detail files:
 
-| path |
-| --- |
+| path                                          |
+| --------------------------------------------- |
 | remaining/phase-03-event-store-enhancement.md |
-| remaining/phase-04-advanced-projections.md |
+| remaining/phase-04-advanced-projections.md    |
 
 **No detail files when disabled for remaining**
 
@@ -224,9 +226,17 @@ The session codecs (SessionContextCodec, RemainingWorkCodec)
 
 **SessionContextCodec provides working context for AI sessions**
 
+**Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation for incomplete phases, and active work grouped by phase.
+**Rationale:** AI agents need a compact, navigable view of current project state to make informed implementation decisions.
+**Verified by:** Decode empty dataset produces minimal session context, Decode dataset with timeline patterns, Session status shows current focus, Phase navigation for incomplete phases, Active work grouped by phase, Blocked items section with dependencies, No blocked items section when disabled, Recent completions collapsible, Generate session phase detail files when enabled, No detail files when disabled
+
 _Verified by: Decode empty dataset produces minimal session context, Decode dataset with timeline patterns, Session status shows current focus, Phase navigation for incomplete phases, Active work grouped by phase, Blocked items section with dependencies, No blocked items section when disabled, Recent completions collapsible, Generate session phase detail files when enabled, No detail files when disabled_
 
 **RemainingWorkCodec aggregates incomplete work by phase**
+
+**Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification (in-progress/ready/blocked), and next actionable items.
+**Rationale:** Remaining work visibility prevents scope blindness — knowing what's left, what's blocked, and what's ready drives efficient session planning.
+**Verified by:** All work complete produces celebration message, Summary shows remaining counts, Phase navigation with remaining count, By priority shows ready vs blocked, Next actionable items section, Next actionable respects maxNextActionable limit, Sort by phase option, Sort by priority option, Generate remaining work detail files when enabled, No detail files when disabled for remaining
 
 _Verified by: All work complete produces celebration message, Summary shows remaining counts, Phase navigation with remaining count, By priority shows ready vs blocked, Next actionable items section, Next actionable respects maxNextActionable limit, Sort by phase option, Sort by priority option, Generate remaining work detail files when enabled, No detail files when disabled for remaining_
 

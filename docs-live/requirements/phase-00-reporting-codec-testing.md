@@ -6,25 +6,27 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
-  transform MasterDataset into RenderableDocuments for reporting outputs.
+transform MasterDataset into RenderableDocuments for reporting outputs.
 
-  **Problem:**
-  - Need to generate changelog, traceability, and overview documents
-  - Each view requires different filtering, grouping, and formatting logic
+**Problem:**
 
-  **Solution:**
-  - Three specialized codecs for different reporting perspectives
-  - Keep a Changelog format for ChangelogCodec
-  - Coverage statistics and gap reporting for TraceabilityCodec
-  - Architecture and summary views for OverviewCodec
+- Need to generate changelog, traceability, and overview documents
+- Each view requires different filtering, grouping, and formatting logic
+
+**Solution:**
+
+- Three specialized codecs for different reporting perspectives
+- Keep a Changelog format for ChangelogCodec
+- Coverage statistics and gap reporting for TraceabilityCodec
+- Architecture and summary views for OverviewCodec
 
 ## Acceptance Criteria
 
@@ -50,16 +52,16 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - Then the release sections appear in order:
 
 | release | count |
-| --- | --- |
-| v0.1.0 | 2 |
-| v0.2.0 | 3 |
-| v1.0.0 | 1 |
+| ------- | ----- |
+| v0.1.0  | 2     |
+| v0.2.0  | 3     |
+| v1.0.0  | 1     |
 
 | release |
-| --- |
-| v1.0.0 |
-| v0.2.0 |
-| v0.1.0 |
+| ------- |
+| v1.0.0  |
+| v0.2.0  |
+| v0.1.0  |
 
 **Quarter fallback for patterns without release**
 
@@ -81,13 +83,13 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - When decoding with ChangelogCodec
 - Then each category maps to correct change type
 
-| category | expectedType |
-| --- | --- |
-| fix | Fixed |
-| bugfix | Fixed |
-| refactor | Changed |
-| security | Security |
-| deprecated | Removed |
+| category   | expectedType |
+| ---------- | ------------ |
+| fix        | Fixed        |
+| bugfix     | Fixed        |
+| refactor   | Changed      |
+| security   | Security     |
+| deprecated | Removed      |
 
 **Exclude unreleased when option disabled**
 
@@ -101,14 +103,14 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - When decoding with ChangelogCodec
 - Then change type sections follow order:
 
-| type |
-| --- |
-| Added |
-| Changed |
+| type       |
+| ---------- |
+| Added      |
+| Changed    |
 | Deprecated |
-| Removed |
-| Fixed |
-| Security |
+| Removed    |
+| Fixed      |
+| Security   |
 
 **No timeline patterns produces empty message**
 
@@ -123,18 +125,18 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - When decoding with TraceabilityCodec
 - Then the coverage statistics table shows:
 
-| name | phase | hasBehaviorFile |
-| --- | --- | --- |
-| Pattern A | 1 | true |
-| Pattern B | 1 | true |
-| Pattern C | 2 | false |
+| name      | phase | hasBehaviorFile |
+| --------- | ----- | --------------- |
+| Pattern A | 1     | true            |
+| Pattern B | 1     | true            |
+| Pattern C | 2     | false           |
 
-| metric | value |
-| --- | --- |
-| Timeline Phases | 3 |
-| With Behavior Tests | 2 |
-| Missing Behavior Tests | 1 |
-| Coverage | 67% |
+| metric                 | value |
+| ---------------------- | ----- |
+| Timeline Phases        | 3     |
+| With Behavior Tests    | 2     |
+| Missing Behavior Tests | 1     |
+| Coverage               | 67%   |
 
 **Coverage gaps table shows missing coverage**
 
@@ -162,9 +164,9 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - When decoding with includeStats disabled
 - Then the document does not contain "Coverage Statistics" heading
 
-| name | phase | hasBehaviorFile |
-| --- | --- | --- |
-| Pattern A | 1 | true |
+| name      | phase | hasBehaviorFile |
+| --------- | ----- | --------------- |
+| Pattern A | 1     | true            |
 
 **Exclude covered when option disabled**
 
@@ -200,11 +202,11 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - And the patterns summary shows progress percentage
 - And the patterns summary shows category counts table
 
-| status | count |
-| --- | --- |
-| completed | 6 |
-| active | 2 |
-| planned | 2 |
+| status    | count |
+| --------- | ----- |
+| completed | 6     |
+| active    | 2     |
+| planned   | 2     |
 
 **Timeline summary with phase counts**
 
@@ -213,12 +215,12 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - Then the document contains "Timeline Summary" heading
 - And the timeline summary table shows:
 
-| metric |
-| --- |
-| Total Phases |
+| metric           |
+| ---------------- |
+| Total Phases     |
 | Completed Phases |
-| Active Phases |
-| Patterns |
+| Active Phases    |
+| Patterns         |
 
 **Exclude architecture when option disabled**
 
@@ -232,9 +234,9 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - When decoding with includePatternsSummary disabled
 - Then the document does not contain "Patterns Summary" heading
 
-| status | count |
-| --- | --- |
-| completed | 5 |
+| status    | count |
+| --------- | ----- |
+| completed | 5     |
 
 **Exclude timeline summary when option disabled**
 
@@ -248,23 +250,35 @@ The reporting codecs (ChangelogCodec, TraceabilityCodec, OverviewCodec)
 - When decoding with OverviewCodec
 - Then the architecture section has 3 subsections
 
-| name | description |
-| --- | --- |
-| Event Store | Core event persistence |
-| Projection Engine | Read model generation |
-| Command Handler | Write side orchestration |
+| name              | description              |
+| ----------------- | ------------------------ |
+| Event Store       | Core event persistence   |
+| Projection Engine | Read model generation    |
+| Command Handler   | Write side orchestration |
 
 ## Business Rules
 
 **ChangelogCodec follows Keep a Changelog format**
 
+**Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
+**Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
+**Verified by:** Decode empty dataset produces changelog header only, Unreleased section shows active and vNEXT patterns, Release sections sorted by semver descending, Quarter fallback for patterns without release, Earlier section for undated patterns, Category mapping to change types, Exclude unreleased when option disabled, Change type sections follow standard order
+
 _Verified by: Decode empty dataset produces changelog header only, Unreleased section shows active and vNEXT patterns, Release sections sorted by semver descending, Quarter fallback for patterns without release, Earlier section for undated patterns, Category mapping to change types, Exclude unreleased when option disabled, Change type sections follow standard order_
 
 **TraceabilityCodec maps timeline patterns to behavior tests**
 
+**Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
+**Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
+**Verified by:** No timeline patterns produces empty message, Coverage statistics show totals and percentage, Coverage gaps table shows missing coverage, Covered phases in collapsible section, Exclude gaps when option disabled, Exclude stats when option disabled, Exclude covered when option disabled, Verified behavior files indicated in output
+
 _Verified by: No timeline patterns produces empty message, Coverage statistics show totals and percentage, Coverage gaps table shows missing coverage, Covered phases in collapsible section, Exclude gaps when option disabled, Exclude stats when option disabled, Exclude covered when option disabled, Verified behavior files indicated in output_
 
 **OverviewCodec provides project architecture summary**
+
+**Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
+**Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
+**Verified by:** Decode empty dataset produces minimal overview, Architecture section from overview-tagged patterns, Patterns summary with progress bar, Timeline summary with phase counts, Exclude architecture when option disabled, Exclude patterns summary when option disabled, Exclude timeline summary when option disabled, Multiple overview patterns create multiple architecture subsections
 
 _Verified by: Decode empty dataset produces minimal overview, Architecture section from overview-tagged patterns, Patterns summary with progress bar, Timeline summary with phase counts, Exclude architecture when option disabled, Exclude patterns summary when option disabled, Exclude timeline summary when option disabled, Multiple overview patterns create multiple architecture subsections_
 

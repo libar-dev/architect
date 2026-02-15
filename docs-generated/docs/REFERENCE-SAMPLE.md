@@ -118,8 +118,8 @@ Scoped architecture diagram showing component relationships:
 graph TB
     subgraph config["Config"]
         DeliveryProcessFactory("DeliveryProcessFactory")
+        DefineConfig[/"DefineConfig"/]
     end
-    DefineConfig["DefineConfig"]
     ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
     ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
     ProcessGuardTesting["ProcessGuardTesting"]
@@ -297,6 +297,12 @@ graph LR
         PatternHelpers["PatternHelpers"]
         ArchQueriesImpl("ArchQueriesImpl")
     end
+    subgraph config["Config"]
+        ConfigurationTypes["ConfigurationTypes"]
+        ProjectConfigTypes["ProjectConfigTypes"]
+        ConfigurationPresets["ConfigurationPresets"]
+        ConfigurationDefaults["ConfigurationDefaults"]
+    end
     subgraph renderer["Renderer"]
         RenderableDocument[/"RenderableDocument"/]
     end
@@ -320,6 +326,9 @@ graph LR
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
@@ -331,6 +340,21 @@ graph LR
 ---
 
 ## API Types
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ### normalizeStatus (function)
 
@@ -425,21 +449,6 @@ interface CategoryDefinition {
 | description | Brief description of the category's purpose and typical patterns |
 | aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
 
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
-
 ---
 
 ## Behavior Specifications
@@ -528,7 +537,7 @@ export default defineConfig({
 
 **Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
 
-**Rationale:** Pure functions are deterministic and trivially testable. Given the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
+**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
 
 **Codec call signature:**
 

@@ -143,6 +143,44 @@ Error factories create structured, discriminated error types with consistent
 | name: Required |
 | tests: Expected number |
 
+## Business Rules
+
+**createFileSystemError produces discriminated FILE_SYSTEM_ERROR types**
+
+**Invariant:** Every FileSystemError must have type "FILE_SYSTEM_ERROR", the source file path, a reason enum value, and a human-readable message derived from the reason.
+    **Rationale:** File system errors are the most common failure mode in the scanner; discriminated types enable exhaustive switch/case handling in error recovery paths.
+    **Verified by:** createFileSystemError generates correct message for each reason, createFileSystemError includes optional originalError, createFileSystemError omits originalError when not provided
+
+_Verified by: createFileSystemError generates correct message for each reason, createFileSystemError includes optional originalError, createFileSystemError omits originalError when not provided_
+
+**createDirectiveValidationError formats file location with line number**
+
+**Invariant:** Every DirectiveValidationError must include the source file path, line number, and reason, with the message formatted as "file:line" for IDE-clickable error output.
+    **Verified by:** createDirectiveValidationError includes line number in message, createDirectiveValidationError includes optional directive snippet, createDirectiveValidationError omits directive when not provided
+
+_Verified by: createDirectiveValidationError includes line number in message, createDirectiveValidationError includes optional directive snippet, createDirectiveValidationError omits directive when not provided_
+
+**createPatternValidationError captures pattern identity and validation details**
+
+**Invariant:** Every PatternValidationError must include the pattern name, source file path, and reason, with an optional array of specific validation errors for detailed diagnostics.
+    **Verified by:** createPatternValidationError formats pattern name and file, createPatternValidationError includes validation errors array, createPatternValidationError omits validationErrors when not provided
+
+_Verified by: createPatternValidationError formats pattern name and file, createPatternValidationError includes validation errors array, createPatternValidationError omits validationErrors when not provided_
+
+**createProcessMetadataValidationError validates Gherkin process metadata**
+
+**Invariant:** Every ProcessMetadataValidationError must include the feature file path and a reason describing which metadata field failed validation.
+    **Verified by:** createProcessMetadataValidationError formats file and reason, createProcessMetadataValidationError includes readonly validation errors
+
+_Verified by: createProcessMetadataValidationError formats file and reason, createProcessMetadataValidationError includes readonly validation errors_
+
+**createDeliverableValidationError tracks deliverable-specific failures**
+
+**Invariant:** Every DeliverableValidationError must include the feature file path and reason, with optional deliverableName for pinpointing which deliverable failed validation.
+    **Verified by:** createDeliverableValidationError formats file and reason, createDeliverableValidationError includes optional deliverableName, createDeliverableValidationError omits deliverableName when not provided, createDeliverableValidationError includes validation errors
+
+_Verified by: createDeliverableValidationError formats file and reason, createDeliverableValidationError includes optional deliverableName, createDeliverableValidationError omits deliverableName when not provided, createDeliverableValidationError includes validation errors_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

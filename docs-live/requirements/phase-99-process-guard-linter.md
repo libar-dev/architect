@@ -6,45 +6,49 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | Validation |
+| Property       | Value                                                        |
+| -------------- | ------------------------------------------------------------ |
+| Status         | completed                                                    |
+| Product Area   | Validation                                                   |
 | Business Value | prevent accidental scope creep and locked file modifications |
-| Phase | 99 |
+| Phase          | 99                                                           |
 
 ## Description
 
 **Problem:**
-  During planning and implementation sessions, accidental modifications occur:
-  - Specs outside the intended scope get modified in bulk
-  - Completed/approved work gets inadvertently changed
-  - No enforcement boundary between "planning what to do" and "doing it"
+During planning and implementation sessions, accidental modifications occur:
 
-  The delivery process has implicit states (planning, implementing) but no
-  programmatic guard preventing invalid state transitions or out-of-scope changes.
+- Specs outside the intended scope get modified in bulk
+- Completed/approved work gets inadvertently changed
+- No enforcement boundary between "planning what to do" and "doing it"
 
-  **Solution:**
-  Implement a Decider-based linter that:
-  1. Derives process state from existing file annotations (no separate state file)
-  2. Validates proposed changes (git diff) against derived state
-  3. Enforces file protection levels per PDR-005 state machine
-  4. Supports explicit session scoping via session definition files
-  5. Protects taxonomy from changes that would break protected specs
+The delivery process has implicit states (planning, implementing) but no
+programmatic guard preventing invalid state transitions or out-of-scope changes.
 
-  **Design Principles:**
-  - State is derived from annotations, not maintained separately
-  - Decider logic is pure (no I/O), enabling unit testing
-  - Integrates with existing lint infrastructure (`lint-process.ts`)
-  - Warnings for soft rules, errors for hard rules
-  - Escape hatch via `@libar-docs-unlock-reason` annotation
+**Solution:**
+Implement a Decider-based linter that:
 
-  **Relationship to PDR-005:**
-  Uses the phase-state-machine FSM as protection levels:
-  - `roadmap`: Fully editable, no restrictions (planning phase)
-  - `active`: Scope-locked, errors on new deliverables (work in progress)
-  - `completed`: Hard-locked, requires explicit unlock to modify
-  - `deferred`: Fully editable, no restrictions (parked work)
+1. Derives process state from existing file annotations (no separate state file)
+2. Validates proposed changes (git diff) against derived state
+3. Enforces file protection levels per PDR-005 state machine
+4. Supports explicit session scoping via session definition files
+5. Protects taxonomy from changes that would break protected specs
+
+**Design Principles:**
+
+- State is derived from annotations, not maintained separately
+- Decider logic is pure (no I/O), enabling unit testing
+- Integrates with existing lint infrastructure (`lint-process.ts`)
+- Warnings for soft rules, errors for hard rules
+- Escape hatch via `@libar-docs-unlock-reason` annotation
+
+**Relationship to PDR-005:**
+Uses the phase-state-machine FSM as protection levels:
+
+- `roadmap`: Fully editable, no restrictions (planning phase)
+- `active`: Scope-locked, errors on new deliverables (work in progress)
+- `completed`: Hard-locked, requires explicit unlock to modify
+- `deferred`: Fully editable, no restrictions (parked work)
 
 ## Acceptance Criteria
 
@@ -85,10 +89,10 @@
 - And "mvp-workflow-implementation" is modifiable
 - And "short-form-tag-migration" is review-only
 
-| spec | intent |
-| --- | --- |
+| spec                        | intent |
+| --------------------------- | ------ |
 | mvp-workflow-implementation | modify |
-| short-form-tag-migration | review |
+| short-form-tag-migration    | review |
 
 **Modifying spec outside active session scope warns**
 
@@ -98,8 +102,8 @@
 - And message contains "not in session scope"
 - And suggestion is "Add to session scope or use --ignore-session flag"
 
-| spec |
-| --- |
+| spec                        |
+| --------------------------- |
 | mvp-workflow-implementation |
 
 **Modifying explicitly excluded spec fails**
@@ -138,10 +142,10 @@
 - And message is "Cannot add deliverables to active spec"
 - And suggestion is "Create new spec or revert to roadmap status"
 
-| Deliverable | Status |
-| --- | --- |
-| Task A | complete |
-| Task B | pending |
+| Deliverable | Status   |
+| ----------- | -------- |
+| Task A      | complete |
+| Task B      | pending  |
 
 **Updating deliverable status in active spec passes**
 
@@ -150,9 +154,9 @@
 - When changing Task A status to "Done"
 - Then linting passes
 
-| Deliverable | Status |
-| --- | --- |
-| Task A | pending |
+| Deliverable | Status  |
+| ----------- | ------- |
+| Task A      | pending |
 
 **Removing deliverable from active spec warns**
 
@@ -178,10 +182,10 @@
 - When running "pnpm lint:process --show-state"
 - Then output includes:
 
-| Section | Content |
-| --- | --- |
-| Active Session | Session ID and status, or "none" |
-| Scoped Specs | List of specs in scope |
+| Section         | Content                            |
+| --------------- | ---------------------------------- |
+| Active Session  | Session ID and status, or "none"   |
+| Scoped Specs    | List of specs in scope             |
 | Protected Specs | Specs with active/completed status |
 
 **Strict mode treats warnings as errors**
@@ -214,50 +218,50 @@
 - Given the taxonomy includes session tags
 - Then the following tags are valid:
 
-| Tag | Format | Purpose |
-| --- | --- | --- |
-| session-id | value | Unique session identifier |
-| session-status | enum | Session lifecycle: draft, active, closed |
-| session-scope | flag | Marks file as session definition |
+| Tag            | Format | Purpose                                  |
+| -------------- | ------ | ---------------------------------------- |
+| session-id     | value  | Unique session identifier                |
+| session-status | enum   | Session lifecycle: draft, active, closed |
+| session-scope  | flag   | Marks file as session definition         |
 
 **Protection-related tags are recognized**
 
 - Given the taxonomy includes protection tags
 - Then the following tags are valid:
 
-| Tag | Format | Purpose |
-| --- | --- | --- |
+| Tag           | Format       | Purpose                            |
+| ------------- | ------------ | ---------------------------------- |
 | unlock-reason | quoted-value | Required to modify protected files |
-| locked-by | value | Session ID that locked the file |
+| locked-by     | value        | Session ID that locked the file    |
 
 ## Business Rules
 
 **Protection levels determine modification restrictions**
 
 Files inherit protection from their `@libar-docs-status` tag. Higher
-    protection levels require explicit unlock to modify.
+protection levels require explicit unlock to modify.
 
 _Verified by: Protection level from status, Completed file modification without unlock fails, Completed file modification with unlock passes, Active file modification is allowed but scope-locked_
 
 **Session definition files scope what can be modified**
 
 Optional session files (`delivery-process/sessions/*.feature`) explicitly
-    declare which specs are in-scope for modification during a work session.
-    When active, modifications outside scope trigger warnings or errors.
+declare which specs are in-scope for modification during a work session.
+If active, modifications outside scope trigger warnings or errors.
 
 _Verified by: Session file defines modification scope, Modifying spec outside active session scope warns, Modifying explicitly excluded spec fails, No active session allows all modifications_
 
 **Status transitions follow PDR-005 FSM**
 
-When a file's status changes, the transition must be valid per PDR-005.
-    This extends phase-state-machine.feature to the linter context.
+Status changes in a file must follow a valid transition per PDR-005.
+This extends phase-state-machine.feature to the linter context.
 
 _Verified by: Valid status transitions, Invalid status transitions_
 
 **Active specs cannot add new deliverables**
 
 Once a spec transitions to `active`, its deliverables table is
-    considered scope-locked. Adding new rows indicates scope creep.
+considered scope-locked. Adding new rows indicates scope creep.
 
 _Verified by: Adding deliverable to active spec fails, Updating deliverable status in active spec passes, Removing deliverable from active spec warns_
 

@@ -6,25 +6,27 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Validation |
 
 ## Description
 
 Pure validation functions for the 4-state FSM defined in PDR-005.
-  All validation follows the Decider pattern: no I/O, no side effects.
+All validation follows the Decider pattern: no I/O, no side effects.
 
-  **Problem:**
-  - Status values must conform to PDR-005 FSM states
-  - Status transitions must follow valid paths in the state machine
-  - Completed patterns should have proper metadata (date, effort)
+**Problem:**
 
-  **Solution:**
-  - validateStatus() checks status values against allowed enum
-  - validateTransition() validates transitions against FSM matrix
-  - validateCompletionMetadata() warns about missing completion info
+- Status values must conform to PDR-005 FSM states
+- Status transitions must follow valid paths in the state machine
+- Completed patterns should have proper metadata (date, effort)
+
+**Solution:**
+
+- validateStatus() checks status values against allowed enum
+- validateTransition() validates transitions against FSM matrix
+- validateCompletionMetadata() warns about missing completion info
 
 ## Acceptance Criteria
 
@@ -151,21 +153,41 @@ Pure validation functions for the 4-state FSM defined in PDR-005.
 
 **Status values must be valid PDR-005 FSM states**
 
+**Invariant:** Every pattern status value must be one of the states defined in the PDR-005 finite state machine (roadmap, active, completed, deferred).
+**Rationale:** Invalid status values bypass FSM transition validation and produce undefined behavior in process guard enforcement.
+**Verified by:** Valid status values are accepted, Invalid status values are rejected, Terminal state returns warning
+
 _Verified by: Valid status values are accepted, Invalid status values are rejected, Terminal state returns warning_
 
 **Status transitions must follow FSM rules**
+
+**Invariant:** Every status change must follow a valid edge in the PDR-005 state machine graph — no skipping states or invalid paths.
+**Rationale:** The FSM encodes the delivery workflow contract — invalid transitions indicate process violations that could corrupt delivery tracking.
+**Verified by:** Valid transitions are accepted, Invalid transitions are rejected with alternatives, Terminal state has no valid transitions, Invalid source status in transition, Invalid target status in transition
 
 _Verified by: Valid transitions are accepted, Invalid transitions are rejected with alternatives, Terminal state has no valid transitions, Invalid source status in transition, Invalid target status in transition_
 
 **Completed patterns should have proper metadata**
 
+**Invariant:** Patterns in completed status must carry completion date and actual effort metadata to pass validation without warnings.
+**Rationale:** Completion metadata enables retrospective analysis and effort estimation — missing metadata degrades project planning accuracy over time.
+**Verified by:** Completed pattern with full metadata has no warnings, Completed pattern without date shows warning, Completed pattern with planned but no actual effort shows warning, Non-completed pattern skips metadata validation
+
 _Verified by: Completed pattern with full metadata has no warnings, Completed pattern without date shows warning, Completed pattern with planned but no actual effort shows warning, Non-completed pattern skips metadata validation_
 
 **Protection levels match FSM state definitions**
 
+**Invariant:** Each FSM state must map to exactly one protection level (none, scope-locked, or hard-locked) as defined in PDR-005.
+**Rationale:** Protection levels enforce edit constraints per state — mismatched protection would allow prohibited modifications to active or completed specs.
+**Verified by:** Roadmap status has no protection, Active status has scope protection, Completed status has hard protection, Deferred status has no protection
+
 _Verified by: Roadmap status has no protection, Active status has scope protection, Completed status has hard protection, Deferred status has no protection_
 
 **Combined validation provides complete results**
+
+**Invariant:** The FSM validator must return a combined result including status validity, transition validity, metadata warnings, and protection level in a single call.
+**Rationale:** Callers need a complete validation picture — requiring multiple separate calls risks partial validation and inconsistent error reporting.
+**Verified by:** Valid completed pattern returns combined results
 
 _Verified by: Valid completed pattern returns combined results_
 

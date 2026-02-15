@@ -6,45 +6,47 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
-| Product Area | DataAPI |
+| Property       | Value                               |
+| -------------- | ----------------------------------- |
+| Status         | completed                           |
+| Product Area   | DataAPI                             |
 | Business Value | unlock design session stub metadata |
-| Phase | 25 |
+| Phase          | 25                                  |
 
 ## Description
 
 **Problem:**
-  Design sessions produce code stubs in `delivery-process/stubs/` with rich
-  metadata: `@target` (destination file path), `@since` (design session ID),
-  `@see` (PDR references), and `AD-N` numbered decisions. But 14 of 22 stubs
-  lack the libar-docs opt-in marker, making them invisible to the scanner pipeline.
-  The 8 stubs that ARE scanned silently drop the target and see annotations because
-  they are not prefixed with the libar-docs namespace.
+Design sessions produce code stubs in `delivery-process/stubs/` with rich
+metadata: `@target` (destination file path), `@since` (design session ID),
+`@see` (PDR references), and `AD-N` numbered decisions. But 14 of 22 stubs
+lack the libar-docs opt-in marker, making them invisible to the scanner pipeline.
+The 8 stubs that ARE scanned silently drop the target and see annotations because
+they are not prefixed with the libar-docs namespace.
 
-  This means: the richest source of design context (stubs with architectural
-  decisions, target paths, and session provenance) is invisible to the API.
+This means: the richest source of design context (stubs with architectural
+decisions, target paths, and session provenance) is invisible to the API.
 
-  **Solution:**
-  A two-phase integration approach:
-  1. **Phase A (Annotation):** Add the libar-docs opt-in + implements tag to
-     the 14 non-annotated stubs. This makes them scannable with zero pipeline changes.
-  2. **Phase B (Taxonomy):** Register libar-docs-target and libar-docs-since
-     as new taxonomy tags. Rename existing `@target` and `@since` annotations in
-     all stubs. This gives structured access to stub-specific metadata.
+**Solution:**
+A two-phase integration approach:
 
-  Then add query commands:
-  - `stubs [pattern]` lists design stubs with target paths
-  - `decisions [pattern]` surfaces PDR references and AD-N items
-  - `pdr <number>` finds all patterns referencing a specific PDR
+1. **Phase A (Annotation):** Add the libar-docs opt-in + implements tag to
+   the 14 non-annotated stubs. This makes them scannable with zero pipeline changes.
+2. **Phase B (Taxonomy):** Register libar-docs-target and libar-docs-since
+   as new taxonomy tags. Rename existing `@target` and `@since` annotations in
+   all stubs. This gives structured access to stub-specific metadata.
 
-  **Business Value:**
-  | Benefit | Impact |
-  | 14 invisible stubs become visible | Full design context available to API |
-  | Target path tracking | Know where stubs will be implemented |
-  | Design decision queries | Surface AD-N decisions for review |
-  | PDR cross-referencing | Find all patterns related to a decision |
+3. **Phase C (Commands):** Add query commands:
+
+- `stubs [pattern]` lists design stubs with target paths
+- `decisions [pattern]` surfaces PDR references and AD-N items
+- `pdr <number>` finds all patterns referencing a specific PDR
+
+**Business Value:**
+| Benefit | Impact |
+| 14 invisible stubs become visible | Full design context available to API |
+| Target path tracking | Know where stubs will be implemented |
+| Design decision queries | Surface AD-N decisions for review |
+| PDR cross-referencing | Find all patterns related to a decision |
 
 ## Acceptance Criteria
 
@@ -125,7 +127,7 @@
 **All stubs are visible to the scanner pipeline**
 
 **Invariant:** Every stub file in `delivery-process/stubs/` has `@libar-docs`
-    opt-in and `@libar-docs-implements` linking it to its parent pattern.
+opt-in and `@libar-docs-implements` linking it to its parent pattern.
 
     **Rationale:** The scanner requires `@libar-docs` opt-in marker to include a
     file. Without it, stubs are invisible regardless of other annotations. The
@@ -146,7 +148,7 @@ _Verified by: Annotated stubs are discoverable by the scanner, Stub target path 
 **Stubs subcommand lists design stubs with implementation status**
 
 **Invariant:** `stubs` returns stub files with their target paths, design
-    session origins, and whether the target file already exists.
+session origins, and whether the target file already exists.
 
     **Rationale:** Before implementation, agents need to know: which stubs
     exist for a pattern, where they should be moved to, and which have already
@@ -168,7 +170,7 @@ _Verified by: List all stubs with implementation status, List stubs for a specif
 **Decisions and PDR commands surface design rationale**
 
 **Invariant:** Design decisions (AD-N items) and PDR references from stub
-    annotations are queryable by pattern name or PDR number.
+annotations are queryable by pattern name or PDR number.
 
     **Rationale:** Design sessions produce numbered decisions (AD-1, AD-2, etc.)
     and reference PDR decision records (see PDR-012). When reviewing designs

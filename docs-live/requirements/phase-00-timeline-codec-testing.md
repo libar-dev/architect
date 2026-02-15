@@ -6,23 +6,25 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWorkCodec)
-  transform MasterDataset into RenderableDocuments for different timeline views.
+transform MasterDataset into RenderableDocuments for different timeline views.
 
-  **Problem:**
-  - Need to generate roadmap, milestones, and current work documents from patterns
-  - Each view requires different filtering and grouping logic
+**Problem:**
 
-  **Solution:**
-  - Three specialized codecs for different timeline perspectives
-  - Shared phase grouping with status-specific filtering
+- Need to generate roadmap, milestones, and current work documents from patterns
+- Each view requires different filtering and grouping logic
+
+**Solution:**
+
+- Three specialized codecs for different timeline perspectives
+- Shared phase grouping with status-specific filtering
 
 ## Acceptance Criteria
 
@@ -41,11 +43,11 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - Then the document title is "Development Roadmap"
 - And the document contains sections:
 
-| heading |
-| --- |
+| heading          |
+| ---------------- |
 | Overall Progress |
 | Phase Navigation |
-| Phases |
+| Phases           |
 
 **Progress section shows correct status counts**
 
@@ -54,18 +56,18 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - Then the overall progress table shows:
 - And the overall progress shows "50%"
 
-| status | count |
-| --- | --- |
-| completed | 5 |
-| active | 3 |
-| planned | 2 |
+| status    | count |
+| --------- | ----- |
+| completed | 5     |
+| active    | 3     |
+| planned   | 2     |
 
-| metric | value |
-| --- | --- |
-| Total Patterns | 10 |
-| Completed | 5 |
-| Active | 3 |
-| Planned | 2 |
+| metric         | value |
+| -------------- | ----- |
+| Total Patterns | 10    |
+| Completed      | 5     |
+| Active         | 3     |
+| Planned        | 2     |
 
 **Phase navigation table with progress**
 
@@ -74,9 +76,9 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - Then the phase navigation table has columns:
 - And the phase navigation has 4 rows
 
-| column |
-| --- |
-| Phase |
+| column   |
+| -------- |
+| Phase    |
 | Progress |
 | Complete |
 
@@ -93,12 +95,12 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - When decoding with generateDetailFiles enabled for roadmap
 - Then the document has phase detail files:
 
-| path |
-| --- |
-| phases/phase-01-foundation-types.md |
-| phases/phase-02-cms-integration.md |
+| path                                       |
+| ------------------------------------------ |
+| phases/phase-01-foundation-types.md        |
+| phases/phase-02-cms-integration.md         |
 | phases/phase-03-event-store-enhancement.md |
-| phases/phase-04-advanced-projections.md |
+| phases/phase-04-advanced-projections.md    |
 
 **No detail files when disabled**
 
@@ -114,7 +116,7 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - And the quarterly timeline table has quarters:
 
 | quarter |
-| --- |
+| ------- |
 | Q4-2025 |
 | Q1-2026 |
 | Q2-2026 |
@@ -133,9 +135,9 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - Then the document title is "Completed Milestones"
 - And the summary table shows:
 
-| metric | value |
-| --- | --- |
-| Completed Patterns | 2 |
+| metric             | value |
+| ------------------ | ----- |
+| Completed Patterns | 2     |
 
 **Quarterly navigation with completed patterns**
 
@@ -164,8 +166,8 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - When decoding with generateDetailFiles enabled for milestones
 - Then the document has quarterly milestone files:
 
-| path |
-| --- |
+| path                  |
+| --------------------- |
 | milestones/Q4-2025.md |
 | milestones/Q1-2026.md |
 
@@ -204,11 +206,11 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - Then the document contains an "All Active Patterns" section
 - And the active patterns table has columns:
 
-| column |
-| --- |
-| Pattern |
-| Phase |
-| Effort |
+| column      |
+| ----------- |
+| Pattern     |
+| Phase       |
+| Effort      |
 | Description |
 
 **Generate current work detail files when enabled**
@@ -217,21 +219,33 @@ The timeline codecs (RoadmapDocumentCodec, CompletedMilestonesCodec, CurrentWork
 - When decoding with generateDetailFiles enabled for current work
 - Then the document has current work detail files:
 
-| path |
-| --- |
+| path                                        |
+| ------------------------------------------- |
 | current/phase-03-event-store-enhancement.md |
 
 ## Business Rules
 
 **RoadmapDocumentCodec groups patterns by phase with progress tracking**
 
+**Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
+**Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
+**Verified by:** Decode empty dataset produces minimal roadmap, Decode dataset with multiple phases, Progress section shows correct status counts, Phase navigation table with progress, Phase sections show pattern tables, Generate phase detail files when enabled, No detail files when disabled, Quarterly timeline shown when quarters exist
+
 _Verified by: Decode empty dataset produces minimal roadmap, Decode dataset with multiple phases, Progress section shows correct status counts, Phase navigation table with progress, Phase sections show pattern tables, Generate phase detail files when enabled, No detail files when disabled, Quarterly timeline shown when quarters exist_
 
 **CompletedMilestonesCodec shows only completed patterns grouped by quarter**
 
+**Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
+**Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
+**Verified by:** No completed patterns produces empty message, Summary shows completed counts, Quarterly navigation with completed patterns, Completed phases shown in collapsible sections, Recent completions section with limit, Generate quarterly detail files when enabled
+
 _Verified by: No completed patterns produces empty message, Summary shows completed counts, Quarterly navigation with completed patterns, Completed phases shown in collapsible sections, Recent completions section with limit, Generate quarterly detail files when enabled_
 
 **CurrentWorkCodec shows only active patterns with deliverables**
+
+**Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
+**Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
+**Verified by:** No active work produces empty message, Summary shows overall progress, Active phases with progress bars, Deliverables rendered when configured, All active patterns table, Generate current work detail files when enabled
 
 _Verified by: No active work produces empty message, Summary shows overall progress, Active phases with progress bars, Deliverables rendered when configured, All active patterns table, Generate current work detail files when enabled_
 

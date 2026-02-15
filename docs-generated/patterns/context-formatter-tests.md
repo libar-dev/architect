@@ -83,17 +83,33 @@ Tests for formatContextBundle(), formatDepTree(), formatFileReadingList(),
 
 **formatContextBundle renders section markers**
 
+**Invariant:** The context formatter must render section markers for all populated sections in a context bundle, with design bundles rendering all sections and implement bundles focusing on deliverables and FSM.
+    **Rationale:** Section markers enable structured parsing of context output — without them, AI consumers cannot reliably extract specific sections from the formatted bundle.
+    **Verified by:** Design bundle renders all populated sections, Implement bundle renders deliverables and FSM
+
 _Verified by: Design bundle renders all populated sections, Implement bundle renders deliverables and FSM_
 
 **formatDepTree renders indented tree**
+
+**Invariant:** The dependency tree formatter must render with indentation arrows and a focal pattern marker to visually distinguish the target pattern from its dependencies.
+    **Rationale:** Visual hierarchy in the dependency tree makes dependency chains scannable at a glance — flat output would require mental parsing to understand depth and relationships.
+    **Verified by:** Tree renders with arrows and focal marker
 
 _Verified by: Tree renders with arrows and focal marker_
 
 **formatOverview renders progress summary**
 
+**Invariant:** The overview formatter must render a progress summary line showing completion metrics for the project.
+    **Rationale:** The progress line is the first thing developers see when starting a session — it provides immediate project health awareness without requiring detailed exploration.
+    **Verified by:** Overview renders progress line
+
 _Verified by: Overview renders progress line_
 
 **formatFileReadingList renders categorized file paths**
+
+**Invariant:** The file reading list formatter must categorize paths into primary and dependency sections, producing minimal output when the list is empty.
+    **Rationale:** Categorized file lists tell developers which files to read first (primary) versus reference (dependency) — uncategorized lists waste time on low-priority files.
+    **Verified by:** File list renders primary and dependency sections, Empty file reading list renders minimal output
 
 _Verified by: File list renders primary and dependency sections, Empty file reading list renders minimal output_
 

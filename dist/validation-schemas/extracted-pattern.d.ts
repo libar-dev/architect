@@ -167,8 +167,8 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
             }, z.core.$strict>>;
         }, z.core.$strict>>>>;
         layer: z.ZodOptional<z.ZodEnum<{
-            domain: "domain";
             unknown: "unknown";
+            domain: "domain";
             timeline: "timeline";
             integration: "integration";
             e2e: "e2e";
@@ -245,12 +245,12 @@ export declare const ExtractedPatternSchema: z.ZodObject<{
         scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
     }, z.core.$strip>>>>;
     archRole: z.ZodOptional<z.ZodEnum<{
+        infrastructure: "infrastructure";
         "bounded-context": "bounded-context";
         "command-handler": "command-handler";
         projection: "projection";
         saga: "saga";
         "process-manager": "process-manager";
-        infrastructure: "infrastructure";
         repository: "repository";
         decider: "decider";
         "read-model": "read-model";

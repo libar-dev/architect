@@ -3,6 +3,8 @@
  * @libar-docs-core @libar-docs-config
  * @libar-docs-pattern ConfigurationPresets
  * @libar-docs-status completed
+ * @libar-docs-arch-layer domain
+ * @libar-docs-arch-context config
  * @libar-docs-uses ConfigurationTypes, Categories, RegistryBuilder
  * @libar-docs-used-by DeliveryProcessFactory
  * @libar-docs-extract-shapes GENERIC_PRESET, LIBAR_GENERIC_PRESET, DDD_ES_CQRS_PRESET, PresetName, PRESETS

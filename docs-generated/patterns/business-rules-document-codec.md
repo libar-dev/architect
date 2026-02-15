@@ -166,7 +166,7 @@ Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocu
 - When decoding with BusinessRulesCodec in standard mode
 - Then the document contains "my-feature.feature"
 
-**Rules with scenarios show compact verified-by line**
+**Rules with scenarios show verified-by checklist**
 
 - Given a pattern with a rule having scenarios "Create order" and "Cancel order"
 - When decoding with BusinessRulesCodec in standard mode
@@ -176,7 +176,7 @@ Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocu
 
 - Given a pattern with a rule having duplicate scenario names
 - When decoding with BusinessRulesCodec in standard mode
-- Then the verified-by line contains each scenario name only once
+- Then the verified-by list contains each scenario name only once
 
 **CamelCase pattern name becomes spaced heading**
 
@@ -228,9 +228,9 @@ _Verified by: Features with many rules render flat without collapsible blocks_
 
 _Verified by: Source file rendered as plain text not link_
 
-**Verified-by renders as compact italic line at standard level**
+**Verified-by renders as checkbox list at standard level**
 
-_Verified by: Rules with scenarios show compact verified-by line, Duplicate scenario names are deduplicated_
+_Verified by: Rules with scenarios show verified-by checklist, Duplicate scenario names are deduplicated_
 
 **Feature names are humanized from camelCase pattern names**
 

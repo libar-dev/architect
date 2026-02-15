@@ -30,7 +30,18 @@ Detail Level: Compact summary
 
 --- GherkinAstParser ---
 
+| Rule                                                       | Description                                                                                                         |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Successful feature file parsing extracts complete metadata | **Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all... |
+| Invalid Gherkin produces structured errors                 | **Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a...    |
+
 --- FileDiscovery ---
+
+| Rule                                            | Description                                                                                                             |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Glob patterns match TypeScript source files     | **Invariant:** findFilesToScan must return absolute paths for all files matching the configured glob patterns....       |
+| Default exclusions filter non-source files      | **Invariant:** node_modules, dist, .test.ts, .spec.ts, and .d.ts files must be excluded by default without explicit...  |
+| Custom configuration extends discovery behavior | **Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.... |
 
 --- DocStringMediaType ---
 
@@ -90,11 +101,23 @@ Detail Level: Compact summary
 
 --- ScannerCore ---
 
+| Rule                                                   | Description                                                                                                             |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| scanPatterns extracts directives from TypeScript files | **Invariant:** Every file with a valid opt-in marker and JSDoc directives produces a complete ScannedFile with tags,... |
+| scanPatterns collects errors without aborting          | **Invariant:** A parse failure in one file never prevents other files from being scanned; the result is always Ok...    |
+| Pattern matching and exclusion filtering               | **Invariant:** Glob patterns control file discovery and exclusion patterns remove matched files before scanning....     |
+| File opt-in requirement gates scanning                 | **Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-\*) are eligible for directive... |
+
 --- PatternTagExtraction ---
 
 --- LayerInferenceTesting ---
 
 --- DirectiveDetection ---
+
+| Rule                                                       | Description                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| hasDocDirectives detects @libar-docs-\* section directives | **Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix}... |
+| hasFileOptIn detects file-level @libar-docs marker         | **Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed...  |
 
 --- ContextInference ---
 

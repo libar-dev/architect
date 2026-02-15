@@ -138,6 +138,24 @@ Pure functions that detect @libar-docs directives in TypeScript source code.
 - When checking for file opt-in
 - Then hasFileOptIn should return false
 
+## Business Rules
+
+**hasDocDirectives detects @libar-docs-* section directives**
+
+**Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix} directive (case-sensitive, @ required, suffix required).
+    **Rationale:** This is the first-pass filter in the scanner pipeline; false negatives cause patterns to be silently missed, while false positives only waste AST parsing time.
+    **Verified by:** Detect @libar-docs-core directive in JSDoc block, Detect various @libar-docs-* directives, Detect directive anywhere in file content, Detect multiple directives on same line, Detect directive in inline comment, Return false for content without directives, Return false for empty content in hasDocDirectives, Reject similar but non-matching patterns
+
+_Verified by: Detect @libar-docs-core directive in JSDoc block, Detect various @libar-docs-* directives, Detect directive anywhere in file content, Detect multiple directives on same line, Detect directive in inline comment, Return false for content without directives, Return false for empty content in hasDocDirectives, Reject similar but non-matching patterns_
+
+**hasFileOptIn detects file-level @libar-docs marker**
+
+**Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @libar-docs-* suffixed tags must not match.
+    **Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @libar-docs-core (a section tag) with @libar-docs (file opt-in) would either miss files or over-include them.
+    **Verified by:** Detect @libar-docs in JSDoc block comment, Detect @libar-docs with description on same line, Detect @libar-docs in multi-line JSDoc, Detect @libar-docs anywhere in file, Detect @libar-docs combined with section tags, Return false when only section tags present, Return false for multiple section tags without opt-in, Return false for empty content in hasFileOptIn, Return false for @libar-docs in line comment, Not confuse @libar-docs-* with @libar-docs opt-in
+
+_Verified by: Detect @libar-docs in JSDoc block comment, Detect @libar-docs with description on same line, Detect @libar-docs in multi-line JSDoc, Detect @libar-docs anywhere in file, Detect @libar-docs combined with section tags, Return false when only section tags present, Return false for multiple section tags without opt-in, Return false for empty content in hasFileOptIn, Return false for @libar-docs in line comment, Not confuse @libar-docs-* with @libar-docs opt-in_
+
 ---
 
 [← Back to Pattern Registry](../PATTERNS.md)

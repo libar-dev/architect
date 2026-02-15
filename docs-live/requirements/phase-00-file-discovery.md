@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 The file discovery system uses glob patterns to find TypeScript files
-  for documentation extraction. It applies sensible defaults to exclude
-  common non-source directories like node_modules, dist, and test files.
+for documentation extraction. It applies sensible defaults to exclude
+common non-source directories like node_modules, dist, and test files.
 
 ## Acceptance Criteria
 
@@ -27,19 +27,58 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then 2 files should be found
 - And files ending with should be found:
 
-| path | content |
-| --- | --- |
+| path         | content |
+| ------------ | ------- |
 | src/file1.ts | // test |
 | src/file2.ts | // test |
 
-| pattern |
-| --- |
-| src/**/*.ts |
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
 
-| ending |
-| --- |
+| ending   |
+| -------- |
 | file1.ts |
 | file2.ts |
+
+**Return absolute paths**
+
+- Given a directory structure:
+- And scanner config with patterns:
+- When files are scanned
+- Then 1 file should be found
+- And all found paths should be absolute
+
+| path       | content |
+| ---------- | ------- |
+| src/app.ts | // test |
+
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
+
+**Support multiple glob patterns**
+
+- Given a directory structure:
+- And scanner config with patterns:
+- When files are scanned
+- Then 2 files should be found
+- And files containing should be found:
+
+| path         | content |
+| ------------ | ------- |
+| src/app.ts   | // src  |
+| lib/utils.ts | // lib  |
+
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
+| lib/\*_/_.ts |
+
+| substring |
+| --------- |
+| src       |
+| lib       |
 
 **Exclude node_modules by default**
 
@@ -49,14 +88,14 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then no files containing "node_modules" should be found
 - And a file ending with "app.ts" should be found
 
-| path | content |
-| --- | --- |
+| path                    | content |
+| ----------------------- | ------- |
 | node_modules/package.ts | // test |
-| src/app.ts | // test |
+| src/app.ts              | // test |
 
-| pattern |
-| --- |
-| **/*.ts |
+| pattern  |
+| -------- |
+| \*_/_.ts |
 
 **Exclude dist directory by default**
 
@@ -66,14 +105,14 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then no files containing "dist" should be found
 - And a file ending with "source.ts" should be found
 
-| path | content |
-| --- | --- |
+| path             | content |
+| ---------------- | ------- |
 | dist/compiled.ts | // test |
-| src/source.ts | // test |
+| src/source.ts    | // test |
 
-| pattern |
-| --- |
-| **/*.ts |
+| pattern  |
+| -------- |
+| \*_/_.ts |
 
 **Exclude test files by default**
 
@@ -83,18 +122,18 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then files ending with should NOT be found:
 - And a file ending with "app.ts" should be found
 
-| path | content |
-| --- | --- |
+| path            | content |
+| --------------- | ------- |
 | src/app.test.ts | // test |
 | src/app.spec.ts | // test |
-| src/app.ts | // test |
+| src/app.ts      | // test |
 
-| pattern |
-| --- |
-| src/**/*.ts |
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
 
-| ending |
-| --- |
+| ending   |
+| -------- |
 | .test.ts |
 | .spec.ts |
 
@@ -106,14 +145,14 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then no files ending with ".d.ts" should be found
 - And a file ending with "app.ts" should be found
 
-| path | content |
-| --- | --- |
+| path           | content         |
+| -------------- | --------------- |
 | src/types.d.ts | // declarations |
-| src/app.ts | // source |
+| src/app.ts     | // source       |
 
-| pattern |
-| --- |
-| src/**/*.ts |
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
 
 **Respect custom exclude patterns**
 
@@ -124,57 +163,18 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then no files containing "internal" should be found
 - And a file containing "public" should be found
 
-| path | content |
-| --- | --- |
+| path                   | content     |
+| ---------------------- | ----------- |
 | src/internal/secret.ts | // internal |
-| src/public/api.ts | // public |
+| src/public/api.ts      | // public   |
 
-| pattern |
-| --- |
-| src/**/*.ts |
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
 
-| pattern |
-| --- |
+| pattern        |
+| -------------- |
 | **/internal/** |
-
-**Return absolute paths**
-
-- Given a directory structure:
-- And scanner config with patterns:
-- When files are scanned
-- Then 1 file should be found
-- And all found paths should be absolute
-
-| path | content |
-| --- | --- |
-| src/app.ts | // test |
-
-| pattern |
-| --- |
-| src/**/*.ts |
-
-**Support multiple glob patterns**
-
-- Given a directory structure:
-- And scanner config with patterns:
-- When files are scanned
-- Then 2 files should be found
-- And files containing should be found:
-
-| path | content |
-| --- | --- |
-| src/app.ts | // src |
-| lib/utils.ts | // lib |
-
-| pattern |
-| --- |
-| src/**/*.ts |
-| lib/**/*.ts |
-
-| substring |
-| --- |
-| src |
-| lib |
 
 **Return empty array when no files match**
 
@@ -182,9 +182,9 @@ The file discovery system uses glob patterns to find TypeScript files
 - When files are scanned
 - Then 0 files should be found
 
-| pattern |
-| --- |
-| nonexistent/**/*.ts |
+| pattern              |
+| -------------------- |
+| nonexistent/\*_/_.ts |
 
 **Handle nested directory structures**
 
@@ -194,13 +194,38 @@ The file discovery system uses glob patterns to find TypeScript files
 - Then 1 file should be found
 - And a file containing "components/auth/login.ts" should be found
 
-| path | content |
-| --- | --- |
+| path                         | content  |
+| ---------------------------- | -------- |
 | src/components/auth/login.ts | // login |
 
-| pattern |
-| --- |
-| src/**/*.ts |
+| pattern      |
+| ------------ |
+| src/\*_/_.ts |
+
+## Business Rules
+
+**Glob patterns match TypeScript source files**
+
+**Invariant:** findFilesToScan must return absolute paths for all files matching the configured glob patterns.
+**Rationale:** Downstream pipeline stages (AST parser, extractor) require absolute paths to read file contents; relative paths would break when baseDir differs from cwd.
+**Verified by:** Find TypeScript files matching glob patterns, Return absolute paths, Support multiple glob patterns
+
+_Verified by: Find TypeScript files matching glob patterns, Return absolute paths, Support multiple glob patterns_
+
+**Default exclusions filter non-source files**
+
+**Invariant:** node_modules, dist, .test.ts, .spec.ts, and .d.ts files must be excluded by default without explicit configuration.
+**Rationale:** Scanning generated output (dist), third-party code (node_modules), or test files would produce false positives in the pattern registry and waste processing time.
+**Verified by:** Exclude node_modules by default, Exclude dist directory by default, Exclude test files by default, Exclude .d.ts declaration files
+
+_Verified by: Exclude node_modules by default, Exclude dist directory by default, Exclude test files by default, Exclude .d.ts declaration files_
+
+**Custom configuration extends discovery behavior**
+
+**Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.
+**Verified by:** Respect custom exclude patterns, Return empty array when no files match, Handle nested directory structures
+
+_Verified by: Respect custom exclude patterns, Return empty array when no files match, Handle nested directory structures_
 
 ---
 

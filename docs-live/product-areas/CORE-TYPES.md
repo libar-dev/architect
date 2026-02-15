@@ -31,6 +31,30 @@ handling of edge cases like acronyms and special characters.
 
 **Note:** `toKebabCase` is already tested in kebab-case-slugs.feature
 
+#### slugify generates URL-safe slugs
+
+**Invariant:** slugify must produce lowercase, alphanumeric, hyphen-only strings with no leading/trailing hyphens.
+
+**Rationale:** URL slugs appear in file paths and links across all generated documentation; inconsistent slugification would break cross-references.
+
+**Verified by:**
+
+- slugify converts text to URL-safe format
+- slugify handles empty-ish input
+- slugify handles single word
+
+#### camelCaseToTitleCase generates readable titles
+
+**Invariant:** camelCaseToTitleCase must insert spaces at camelCase boundaries and preserve known acronyms (HTTP, XML, API, DoD, AST, GraphQL).
+
+**Rationale:** Pattern names stored as PascalCase identifiers appear as human-readable titles in generated documentation; incorrect splitting would produce unreadable headings.
+
+**Verified by:**
+
+- camelCaseToTitleCase converts to title case
+- camelCaseToTitleCase handles all-uppercase acronym
+- camelCaseToTitleCase handles lowercase word
+
 ### ResultMonad
 
 [View ResultMonad source](tests/features/types/result-monad.feature)
@@ -59,6 +83,83 @@ pattern matching in switch statements.
 - Consistent message formatting across the codebase
 - Structured data for logging and reporting
 - Type narrowing via discriminator field
+
+<details>
+<summary>createFileSystemError produces discriminated FILE_SYSTEM_ERROR types (3 scenarios)</summary>
+
+#### createFileSystemError produces discriminated FILE_SYSTEM_ERROR types
+
+**Invariant:** Every FileSystemError must have type "FILE_SYSTEM_ERROR", the source file path, a reason enum value, and a human-readable message derived from the reason.
+
+**Rationale:** File system errors are the most common failure mode in the scanner; discriminated types enable exhaustive switch/case handling in error recovery paths.
+
+**Verified by:**
+
+- createFileSystemError generates correct message for each reason
+- createFileSystemError includes optional originalError
+- createFileSystemError omits originalError when not provided
+
+</details>
+
+<details>
+<summary>createDirectiveValidationError formats file location with line number (3 scenarios)</summary>
+
+#### createDirectiveValidationError formats file location with line number
+
+**Invariant:** Every DirectiveValidationError must include the source file path, line number, and reason, with the message formatted as "file:line" for IDE-clickable error output.
+
+**Verified by:**
+
+- createDirectiveValidationError includes line number in message
+- createDirectiveValidationError includes optional directive snippet
+- createDirectiveValidationError omits directive when not provided
+
+</details>
+
+<details>
+<summary>createPatternValidationError captures pattern identity and validation details (3 scenarios)</summary>
+
+#### createPatternValidationError captures pattern identity and validation details
+
+**Invariant:** Every PatternValidationError must include the pattern name, source file path, and reason, with an optional array of specific validation errors for detailed diagnostics.
+
+**Verified by:**
+
+- createPatternValidationError formats pattern name and file
+- createPatternValidationError includes validation errors array
+- createPatternValidationError omits validationErrors when not provided
+
+</details>
+
+<details>
+<summary>createProcessMetadataValidationError validates Gherkin process metadata (2 scenarios)</summary>
+
+#### createProcessMetadataValidationError validates Gherkin process metadata
+
+**Invariant:** Every ProcessMetadataValidationError must include the feature file path and a reason describing which metadata field failed validation.
+
+**Verified by:**
+
+- createProcessMetadataValidationError formats file and reason
+- createProcessMetadataValidationError includes readonly validation errors
+
+</details>
+
+<details>
+<summary>createDeliverableValidationError tracks deliverable-specific failures (4 scenarios)</summary>
+
+#### createDeliverableValidationError tracks deliverable-specific failures
+
+**Invariant:** Every DeliverableValidationError must include the feature file path and reason, with optional deliverableName for pinpointing which deliverable failed validation.
+
+**Verified by:**
+
+- createDeliverableValidationError formats file and reason
+- createDeliverableValidationError includes optional deliverableName
+- createDeliverableValidationError omits deliverableName when not provided
+- createDeliverableValidationError includes validation errors
+
+</details>
 
 ### KebabCaseSlugs
 
