@@ -19,134 +19,138 @@ Feature: Directive Detection
   - Both use regex patterns optimized for quick filtering before AST parsing
   - Negative lookahead ensures @libar-docs doesn't match @libar-docs-*
 
-  # ==========================================================================
-  # hasDocDirectives - Directive Detection
-  # ==========================================================================
+  Rule: hasDocDirectives detects @libar-docs-* section directives
 
-  @happy-path @has-doc-directives
-  Scenario: Detect @libar-docs-core directive in JSDoc block
-    Given source code with JSDoc containing "@libar-docs-core"
-    When checking for documentation directives
-    Then hasDocDirectives should return true
+    **Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix} directive (case-sensitive, @ required, suffix required).
+    **Rationale:** This is the first-pass filter in the scanner pipeline; false negatives cause patterns to be silently missed, while false positives only waste AST parsing time.
+    **Verified by:** Detect @libar-docs-core directive in JSDoc block, Detect various @libar-docs-* directives, Detect directive anywhere in file content, Detect multiple directives on same line, Detect directive in inline comment, Return false for content without directives, Return false for empty content in hasDocDirectives, Reject similar but non-matching patterns
 
-  @happy-path @has-doc-directives
-  Scenario Outline: Detect various @libar-docs-* directives
-    Given source code containing directive "<directive>"
-    When checking for documentation directives
-    Then hasDocDirectives should return true
+    @happy-path @has-doc-directives
+    Scenario: Detect @libar-docs-core directive in JSDoc block
+      Given source code with JSDoc containing "@libar-docs-core"
+      When checking for documentation directives
+      Then hasDocDirectives should return true
 
-    Examples: Standard category directives
-      | directive               |
-      | @libar-docs-core        |
-      | @libar-docs-domain      |
-      | @libar-docs-validation  |
-      | @libar-docs-testing     |
-      | @libar-docs-arch        |
-      | @libar-docs-infra       |
+    @happy-path @has-doc-directives
+    Scenario Outline: Detect various @libar-docs-* directives
+      Given source code containing directive "<directive>"
+      When checking for documentation directives
+      Then hasDocDirectives should return true
 
-  @happy-path @has-doc-directives
-  Scenario: Detect directive anywhere in file content
-    Given source code with directive in middle of file
-    When checking for documentation directives
-    Then hasDocDirectives should return true
+      Examples: Standard category directives
+        | directive               |
+        | @libar-docs-core        |
+        | @libar-docs-domain      |
+        | @libar-docs-validation  |
+        | @libar-docs-testing     |
+        | @libar-docs-arch        |
+        | @libar-docs-infra       |
 
-  @happy-path @has-doc-directives
-  Scenario: Detect multiple directives on same line
-    Given source code "/** @libar-docs-core @libar-docs-validation */"
-    When checking for documentation directives
-    Then hasDocDirectives should return true
+    @happy-path @has-doc-directives
+    Scenario: Detect directive anywhere in file content
+      Given source code with directive in middle of file
+      When checking for documentation directives
+      Then hasDocDirectives should return true
 
-  @happy-path @has-doc-directives
-  Scenario: Detect directive in inline comment
-    Given source code "// @libar-docs-core Quick directive"
-    When checking for documentation directives
-    Then hasDocDirectives should return true
+    @happy-path @has-doc-directives
+    Scenario: Detect multiple directives on same line
+      Given source code "/** @libar-docs-core @libar-docs-validation */"
+      When checking for documentation directives
+      Then hasDocDirectives should return true
 
-  @edge-case @has-doc-directives
-  Scenario: Return false for content without directives
-    Given source code with only standard JSDoc tags
-    When checking for documentation directives
-    Then hasDocDirectives should return false
+    @happy-path @has-doc-directives
+    Scenario: Detect directive in inline comment
+      Given source code "// @libar-docs-core Quick directive"
+      When checking for documentation directives
+      Then hasDocDirectives should return true
 
-  @edge-case @has-doc-directives
-  Scenario: Return false for empty content in hasDocDirectives
-    Given empty source code
-    When checking for documentation directives
-    Then hasDocDirectives should return false
+    @edge-case @has-doc-directives
+    Scenario: Return false for content without directives
+      Given source code with only standard JSDoc tags
+      When checking for documentation directives
+      Then hasDocDirectives should return false
 
-  @edge-case @has-doc-directives
-  Scenario Outline: Reject similar but non-matching patterns
-    Given source code containing pattern "<pattern>"
-    When checking for documentation directives
-    Then hasDocDirectives should return false because "<reason>"
+    @edge-case @has-doc-directives
+    Scenario: Return false for empty content in hasDocDirectives
+      Given empty source code
+      When checking for documentation directives
+      Then hasDocDirectives should return false
 
-    Examples: Invalid patterns
-      | pattern          | reason                  |
-      | @libar-docs      | Missing category suffix |
-      | @libar-doc-core  | Wrong prefix (doc)      |
-      | libar-docs-core  | Missing @ symbol        |
-      | @LIBAR-DOCS-CORE | Wrong case              |
+    @edge-case @has-doc-directives
+    Scenario Outline: Reject similar but non-matching patterns
+      Given source code containing pattern "<pattern>"
+      When checking for documentation directives
+      Then hasDocDirectives should return false because "<reason>"
 
-  # ==========================================================================
-  # hasFileOptIn - File-Level Opt-In Detection
-  # ==========================================================================
+      Examples: Invalid patterns
+        | pattern          | reason                  |
+        | @libar-docs      | Missing category suffix |
+        | @libar-doc-core  | Wrong prefix (doc)      |
+        | libar-docs-core  | Missing @ symbol        |
+        | @LIBAR-DOCS-CORE | Wrong case              |
 
-  @happy-path @has-file-opt-in
-  Scenario: Detect @libar-docs in JSDoc block comment
-    Given source code with file-level "@libar-docs" opt-in
-    When checking for file opt-in
-    Then hasFileOptIn should return true
+  Rule: hasFileOptIn detects file-level @libar-docs marker
 
-  @happy-path @has-file-opt-in
-  Scenario: Detect @libar-docs with description on same line
-    Given source code "/** @libar-docs This file is documented */"
-    When checking for file opt-in
-    Then hasFileOptIn should return true
+    **Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @libar-docs-* suffixed tags must not match.
+    **Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @libar-docs-core (a section tag) with @libar-docs (file opt-in) would either miss files or over-include them.
+    **Verified by:** Detect @libar-docs in JSDoc block comment, Detect @libar-docs with description on same line, Detect @libar-docs in multi-line JSDoc, Detect @libar-docs anywhere in file, Detect @libar-docs combined with section tags, Return false when only section tags present, Return false for multiple section tags without opt-in, Return false for empty content in hasFileOptIn, Return false for @libar-docs in line comment, Not confuse @libar-docs-* with @libar-docs opt-in
 
-  @happy-path @has-file-opt-in
-  Scenario: Detect @libar-docs in multi-line JSDoc
-    Given source code with @libar-docs in middle of multi-line JSDoc
-    When checking for file opt-in
-    Then hasFileOptIn should return true
+    @happy-path @has-file-opt-in
+    Scenario: Detect @libar-docs in JSDoc block comment
+      Given source code with file-level "@libar-docs" opt-in
+      When checking for file opt-in
+      Then hasFileOptIn should return true
 
-  @happy-path @has-file-opt-in
-  Scenario: Detect @libar-docs anywhere in file
-    Given source code with @libar-docs after other content
-    When checking for file opt-in
-    Then hasFileOptIn should return true
+    @happy-path @has-file-opt-in
+    Scenario: Detect @libar-docs with description on same line
+      Given source code "/** @libar-docs This file is documented */"
+      When checking for file opt-in
+      Then hasFileOptIn should return true
 
-  @happy-path @has-file-opt-in
-  Scenario: Detect @libar-docs combined with section tags
-    Given source code "/** @libar-docs @libar-docs-core */"
-    When checking for file opt-in
-    Then hasFileOptIn should return true
+    @happy-path @has-file-opt-in
+    Scenario: Detect @libar-docs in multi-line JSDoc
+      Given source code with @libar-docs in middle of multi-line JSDoc
+      When checking for file opt-in
+      Then hasFileOptIn should return true
 
-  @edge-case @has-file-opt-in
-  Scenario: Return false when only section tags present
-    Given source code with only "@libar-docs-core" section tag
-    When checking for file opt-in
-    Then hasFileOptIn should return false
+    @happy-path @has-file-opt-in
+    Scenario: Detect @libar-docs anywhere in file
+      Given source code with @libar-docs after other content
+      When checking for file opt-in
+      Then hasFileOptIn should return true
 
-  @edge-case @has-file-opt-in
-  Scenario: Return false for multiple section tags without opt-in
-    Given source code "/** @libar-docs-core @libar-docs-validation */"
-    When checking for file opt-in
-    Then hasFileOptIn should return false
+    @happy-path @has-file-opt-in
+    Scenario: Detect @libar-docs combined with section tags
+      Given source code "/** @libar-docs @libar-docs-core */"
+      When checking for file opt-in
+      Then hasFileOptIn should return true
 
-  @edge-case @has-file-opt-in
-  Scenario: Return false for empty content in hasFileOptIn
-    Given empty source code
-    When checking for file opt-in
-    Then hasFileOptIn should return false
+    @edge-case @has-file-opt-in
+    Scenario: Return false when only section tags present
+      Given source code with only "@libar-docs-core" section tag
+      When checking for file opt-in
+      Then hasFileOptIn should return false
 
-  @edge-case @has-file-opt-in
-  Scenario: Return false for @libar-docs in line comment
-    Given source code "// @libar-docs This is a line comment, not JSDoc"
-    When checking for file opt-in
-    Then hasFileOptIn should return false
+    @edge-case @has-file-opt-in
+    Scenario: Return false for multiple section tags without opt-in
+      Given source code "/** @libar-docs-core @libar-docs-validation */"
+      When checking for file opt-in
+      Then hasFileOptIn should return false
 
-  @edge-case @has-file-opt-in
-  Scenario: Not confuse @libar-docs-* with @libar-docs opt-in
-    Given source code "/** @libar-docs-event-sourcing */"
-    When checking for file opt-in
-    Then hasFileOptIn should return false
+    @edge-case @has-file-opt-in
+    Scenario: Return false for empty content in hasFileOptIn
+      Given empty source code
+      When checking for file opt-in
+      Then hasFileOptIn should return false
+
+    @edge-case @has-file-opt-in
+    Scenario: Return false for @libar-docs in line comment
+      Given source code "// @libar-docs This is a line comment, not JSDoc"
+      When checking for file opt-in
+      Then hasFileOptIn should return false
+
+    @edge-case @has-file-opt-in
+    Scenario: Not confuse @libar-docs-* with @libar-docs opt-in
+      Given source code "/** @libar-docs-event-sourcing */"
+      When checking for file opt-in
+      Then hasFileOptIn should return false

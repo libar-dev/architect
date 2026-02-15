@@ -4,7 +4,7 @@
 
 ---
 
-**56 rules** from 10 features. 7 rules have explicit invariants.
+**67 rules** from 14 features. 18 rules have explicit invariants.
 
 ---
 
@@ -97,6 +97,28 @@ The relationship index stores dependsOn and enables relationships
 _Verified by: DependsOn relationships stored in relationship index, Enables relationships stored explicitly_
 
 *depends-on-tag.feature*
+
+### Directive Detection
+
+*- Full AST parsing of every TypeScript file is expensive and slow*
+
+#### hasDocDirectives detects @libar-docs-* section directives
+
+**Invariant:** hasDocDirectives must return true if and only if the source contains at least one @libar-docs-{suffix} directive (case-sensitive, @ required, suffix required).
+
+**Rationale:** This is the first-pass filter in the scanner pipeline; false negatives cause patterns to be silently missed, while false positives only waste AST parsing time.
+
+_Verified by: Detect @libar-docs-core directive in JSDoc block, Detect various @libar-docs-* directives, Detect directive anywhere in file content, Detect multiple directives on same line, Detect directive in inline comment, Return false for content without directives, Return false for empty content in hasDocDirectives, Reject similar but non-matching patterns_
+
+#### hasFileOptIn detects file-level @libar-docs marker
+
+**Invariant:** hasFileOptIn must return true if and only if the source contains a bare @libar-docs tag (not followed by a hyphen) inside a JSDoc block comment; line comments and @libar-docs-* suffixed tags must not match.
+
+**Rationale:** File-level opt-in is the gate for including a file in the scanner pipeline; confusing @libar-docs-core (a section tag) with @libar-docs (file opt-in) would either miss files or over-include them.
+
+_Verified by: Detect @libar-docs in JSDoc block comment, Detect @libar-docs with description on same line, Detect @libar-docs in multi-line JSDoc, Detect @libar-docs anywhere in file, Detect @libar-docs combined with section tags, Return false when only section tags present, Return false for multiple section tags without opt-in, Return false for empty content in hasFileOptIn, Return false for @libar-docs in line comment, Not confuse @libar-docs-* with @libar-docs opt-in_
+
+*directive-detection.feature*
 
 ### Doc String Media Type
 
@@ -197,6 +219,56 @@ _Verified by: Wildcard extracts all exported declarations, Mixed wildcard and na
 
 *extraction-pipeline-enhancements.feature*
 
+### File Discovery
+
+*The file discovery system uses glob patterns to find TypeScript files*
+
+#### Glob patterns match TypeScript source files
+
+**Invariant:** findFilesToScan must return absolute paths for all files matching the configured glob patterns.
+
+**Rationale:** Downstream pipeline stages (AST parser, extractor) require absolute paths to read file contents; relative paths would break when baseDir differs from cwd.
+
+_Verified by: Find TypeScript files matching glob patterns, Return absolute paths, Support multiple glob patterns_
+
+#### Default exclusions filter non-source files
+
+**Invariant:** node_modules, dist, .test.ts, .spec.ts, and .d.ts files must be excluded by default without explicit configuration.
+
+**Rationale:** Scanning generated output (dist), third-party code (node_modules), or test files would produce false positives in the pattern registry and waste processing time.
+
+_Verified by: Exclude node_modules by default, Exclude dist directory by default, Exclude test files by default, Exclude .d.ts declaration files_
+
+#### Custom configuration extends discovery behavior
+
+**Invariant:** User-provided exclude patterns must be applied in addition to (not replacing) the default exclusions.
+
+_Verified by: Respect custom exclude patterns, Return empty array when no files match, Handle nested directory structures_
+
+*file-discovery.feature*
+
+### Gherkin Ast Parser
+
+*The Gherkin AST parser extracts feature metadata, scenarios, and steps*
+
+#### Successful feature file parsing extracts complete metadata
+
+**Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all nested scenarios with their steps.
+
+**Rationale:** Downstream generators (timeline, business rules) depend on complete AST extraction; missing fields cause silent gaps in generated documentation.
+
+_Verified by: Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags_
+
+#### Invalid Gherkin produces structured errors
+
+**Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a descriptive error message.
+
+**Rationale:** The scanner processes many feature files in batch; structured errors allow graceful degradation and per-file error reporting rather than aborting the entire scan.
+
+_Verified by: Return error for malformed Gherkin, Return error for file without feature_
+
+*gherkin-parser.feature*
+
 ### Implements Tag Processing
 
 *Tests for the @libar-docs-implements tag which links implementation files*
@@ -225,6 +297,42 @@ _Verified by: Single implementation creates reverse lookup, Multiple implementat
 _Verified by: DocDirective schema accepts implements, RelationshipEntry schema accepts implementedBy_
 
 *implements-tag.feature*
+
+### Scanner Core
+
+*- Need to scan entire codebases for documentation directives efficiently*
+
+#### scanPatterns extracts directives from TypeScript files
+
+**Invariant:** Every file with a valid opt-in marker and JSDoc directives produces a complete ScannedFile with tags, description, examples, and exports.
+
+**Rationale:** Downstream generators depend on complete directive data; partial extraction causes silent documentation gaps across the monorepo.
+
+_Verified by: Scan files and extract directives, Skip files without directives, Extract complete directive information_
+
+#### scanPatterns collects errors without aborting
+
+**Invariant:** A parse failure in one file never prevents other files from being scanned; the result is always Ok with errors collected separately.
+
+**Rationale:** In a monorepo with hundreds of files, a single syntax error must not block the entire documentation pipeline.
+
+_Verified by: Collect errors for files that fail to parse, Always return Ok result even with broken files_
+
+#### Pattern matching and exclusion filtering
+
+**Invariant:** Glob patterns control file discovery and exclusion patterns remove matched files before scanning.
+
+_Verified by: Return empty results when no patterns match, Respect exclusion patterns, Handle multiple files with multiple directives each_
+
+#### File opt-in requirement gates scanning
+
+**Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-*) are eligible for directive extraction.
+
+**Rationale:** Without opt-in gating, every TypeScript file in the monorepo would be parsed, wasting processing time on files that have no documentation directives.
+
+_Verified by: Handle files with quick directive check optimization, Skip files without @libar-docs file-level opt-in, Not confuse @libar-docs-* with @libar-docs opt-in, Detect @libar-docs opt-in combined with section tags_
+
+*scanner-core.feature*
 
 ### Shape Extraction
 

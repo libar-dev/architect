@@ -4,7 +4,7 @@
 
 ---
 
-**37 rules** from 7 features. 6 rules have explicit invariants.
+**41 rules** from 8 features. 10 rules have explicit invariants.
 
 ---
 
@@ -39,6 +39,40 @@ _Verified by: Combined detection finds process-in-code issues_
 _Verified by: Empty violations produce clean report, Violations are grouped by severity_
 
 *anti-patterns.feature*
+
+### Config Schema Validation
+
+*Configuration schemas validate scanner and generator inputs with security*
+
+#### ScannerConfigSchema validates scanner configuration
+
+**Invariant:** Scanner configuration must contain at least one valid glob pattern with no parent directory traversal, and baseDir must resolve to an absolute path.
+
+**Rationale:** Malformed or malicious glob patterns could scan outside project boundaries, exposing sensitive files.
+
+_Verified by: ScannerConfigSchema validates correct configuration, ScannerConfigSchema accepts multiple patterns, ScannerConfigSchema rejects empty patterns array, ScannerConfigSchema rejects parent traversal in patterns, ScannerConfigSchema rejects hidden parent traversal, ScannerConfigSchema normalizes baseDir to absolute path, ScannerConfigSchema accepts optional exclude patterns_
+
+#### GeneratorConfigSchema validates generator configuration
+
+**Invariant:** Generator configuration must use a .json registry file and an output directory that does not escape the project root via parent traversal.
+
+**Rationale:** Non-JSON registry files could introduce parsing vulnerabilities, and unrestricted output paths could overwrite files outside the project.
+
+_Verified by: GeneratorConfigSchema validates correct configuration, GeneratorConfigSchema requires .json registry file, GeneratorConfigSchema rejects outputDir with parent traversal, GeneratorConfigSchema accepts relative output directory, GeneratorConfigSchema defaults overwrite to false, GeneratorConfigSchema defaults readmeOnly to false_
+
+#### isScannerConfig type guard narrows unknown values
+
+**Invariant:** isScannerConfig returns true only for objects that have a non-empty patterns array and a string baseDir.
+
+_Verified by: isScannerConfig returns true for valid config, isScannerConfig returns false for invalid config, isScannerConfig returns false for null, isScannerConfig returns false for non-object_
+
+#### isGeneratorConfig type guard narrows unknown values
+
+**Invariant:** isGeneratorConfig returns true only for objects that have a string outputDir and a .json registryPath.
+
+_Verified by: isGeneratorConfig returns true for valid config, isGeneratorConfig returns false for invalid config, isGeneratorConfig returns false for non-json registry_
+
+*config-schemas.feature*
 
 ### Detect Changes
 

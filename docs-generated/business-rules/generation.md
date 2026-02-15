@@ -4,7 +4,7 @@
 
 ---
 
-**211 rules** from 43 features. 41 rules have explicit invariants.
+**223 rules** from 45 features. 53 rules have explicit invariants.
 
 ---
 
@@ -693,6 +693,48 @@ _Verified by: Special characters are replaced_
 _Verified by: Complete dependency graph with all relationship types_
 
 *mermaid-rendering.feature*
+
+### Patterns Codec
+
+*- Need to generate a comprehensive pattern registry from extracted patterns*
+
+#### Document structure includes progress tracking and category navigation
+
+**Invariant:** Every decoded document must contain a title, purpose, Progress section with status counts, and category navigation regardless of dataset size.
+
+**Rationale:** The PATTERNS.md is the primary entry point for understanding project scope; incomplete structure would leave consumers without context.
+
+_Verified by: Decode empty dataset, Decode dataset with patterns - document structure, Progress summary shows correct counts_
+
+#### Pattern table presents all patterns sorted by status then name
+
+**Invariant:** The pattern table must include every pattern in the dataset with columns for Pattern, Category, Status, and Description, sorted by status priority (completed first) then alphabetically by name.
+
+**Rationale:** Consistent ordering allows quick scanning of project progress; completed patterns at top confirm done work, while roadmap items at bottom show remaining scope.
+
+_Verified by: Pattern table includes all patterns, Pattern table is sorted by status then name_
+
+#### Category sections group patterns by domain
+
+**Invariant:** Each category in the dataset must produce an H3 section listing its patterns, and the filterCategories option must restrict output to only the specified categories.
+
+_Verified by: Category sections with pattern lists, Filter to specific categories_
+
+#### Dependency graph visualizes pattern relationships
+
+**Invariant:** A Mermaid dependency graph must be included when pattern relationships exist and the includeDependencyGraph option is not disabled; it must be omitted when no relationships exist or when explicitly disabled.
+
+_Verified by: Dependency graph included when relationships exist, No dependency graph when no relationships, Dependency graph disabled by option_
+
+#### Detail file generation creates per-pattern pages
+
+**Invariant:** When generateDetailFiles is enabled, each pattern must produce an individual markdown file at patterns/{slug}.md containing an Overview section; when disabled, no additional files must be generated.
+
+**Rationale:** Detail files enable deep-linking into specific patterns from the main registry while keeping the index document scannable.
+
+_Verified by: Generate individual pattern files when enabled, No detail files when disabled, Individual pattern file contains full details_
+
+*patterns-codec.feature*
 
 ### Planning Codec
 
@@ -1398,6 +1440,58 @@ _Verified by: No completed patterns produces empty message, Summary shows comple
 _Verified by: No active work produces empty message, Summary shows overall progress, Active phases with progress bars, Deliverables rendered when configured, All active patterns table, Generate current work detail files when enabled_
 
 *timeline-codecs.feature*
+
+### Transform Dataset
+
+*- Generators need multiple views of the same pattern data*
+
+#### Empty dataset produces valid zero-state views
+
+**Invariant:** An empty input produces a MasterDataset with all counts at zero and no groupings.
+
+_Verified by: Transform empty dataset_
+
+#### Status and phase grouping creates navigable views
+
+**Invariant:** Patterns are grouped by canonical status and sorted by phase number, with per-phase status counts computed.
+
+**Rationale:** Generators need O(1) access to status-filtered and phase-ordered views without recomputing on each render pass.
+
+_Verified by: Group patterns by status, Normalize status variants to canonical values, Group patterns by phase, Sort phases by phase number, Compute per-phase status counts, Patterns without phase are not in byPhase_
+
+#### Quarter and category grouping organizes by timeline and domain
+
+**Invariant:** Patterns are grouped by quarter and category, with only patterns bearing the relevant metadata included in each view.
+
+_Verified by: Group patterns by quarter, Patterns without quarter are not in byQuarter, Group patterns by category_
+
+#### Source grouping separates TypeScript and Gherkin origins
+
+**Invariant:** Patterns are partitioned by source file type, and patterns with phase metadata appear in the roadmap view.
+
+_Verified by: Group patterns by source file type, Patterns with phase are also in roadmap view_
+
+#### Relationship index builds bidirectional dependency graph
+
+**Invariant:** The relationship index contains forward and reverse lookups, with reverse lookups merged and deduplicated against explicit annotations.
+
+**Rationale:** Bidirectional navigation is required for dependency tree queries without O(n) scans per lookup.
+
+_Verified by: Build relationship index from patterns, Build relationship index with all relationship types, Reverse lookup computes enables from dependsOn, Reverse lookup computes usedBy from uses, Reverse lookup merges with explicit annotations without duplicates_
+
+#### Completion tracking computes project progress
+
+**Invariant:** Completion percentage is rounded to the nearest integer, and fully-completed requires all patterns in completed status with a non-zero total.
+
+_Verified by: Calculate completion percentage, Check if fully completed_
+
+#### Workflow integration conditionally includes delivery process data
+
+**Invariant:** The workflow is included in the MasterDataset only when provided, and phase names are resolved from the workflow configuration.
+
+_Verified by: Include workflow in result when provided, Result omits workflow when not provided_
+
+*transform-dataset.feature*
 
 ### Validation Rules Codec
 

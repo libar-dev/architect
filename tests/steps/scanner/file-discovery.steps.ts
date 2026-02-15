@@ -51,7 +51,7 @@ function initState(): FileDiscoveryState {
 
 const feature = await loadFeature('tests/features/scanner/file-discovery.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Rule, Background, AfterEachScenario }) => {
   // ---------------------------------------------------------------------------
   // Cleanup
   // ---------------------------------------------------------------------------
@@ -170,85 +170,99 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   };
 
   // ---------------------------------------------------------------------------
-  // Scenario Definitions
+  // Rule: Glob patterns match TypeScript source files
   // ---------------------------------------------------------------------------
 
-  Scenario('Find TypeScript files matching glob patterns', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('{int} files should be found', thenFileCountShouldBe);
-    And('files ending with should be found:', thenFilesEndingWithShouldBeFound);
+  Rule('Glob patterns match TypeScript source files', ({ RuleScenario }) => {
+    RuleScenario('Find TypeScript files matching glob patterns', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('{int} files should be found', thenFileCountShouldBe);
+      And('files ending with should be found:', thenFilesEndingWithShouldBeFound);
+    });
+
+    RuleScenario('Return absolute paths', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('{int} file should be found', thenFileCountShouldBe);
+      And('all found paths should be absolute', thenAllPathsShouldBeAbsolute);
+    });
+
+    RuleScenario('Support multiple glob patterns', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('{int} files should be found', thenFileCountShouldBe);
+      And('files containing should be found:', thenFilesContainingShouldBeFound);
+    });
   });
 
-  Scenario('Exclude node_modules by default', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
-    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
+  // ---------------------------------------------------------------------------
+  // Rule: Default exclusions filter non-source files
+  // ---------------------------------------------------------------------------
+
+  Rule('Default exclusions filter non-source files', ({ RuleScenario }) => {
+    RuleScenario('Exclude node_modules by default', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
+      And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
+    });
+
+    RuleScenario('Exclude dist directory by default', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
+      And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
+    });
+
+    RuleScenario('Exclude test files by default', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('files ending with should NOT be found:', thenFilesEndingWithShouldNotBeFound);
+      And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
+    });
+
+    RuleScenario('Exclude .d.ts declaration files', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('no files ending with {string} should be found', thenNoFilesEndingWithShouldBeFound);
+      And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
+    });
   });
 
-  Scenario('Exclude dist directory by default', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
-    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
-  });
+  // ---------------------------------------------------------------------------
+  // Rule: Custom configuration extends discovery behavior
+  // ---------------------------------------------------------------------------
 
-  Scenario('Exclude test files by default', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('files ending with should NOT be found:', thenFilesEndingWithShouldNotBeFound);
-    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
-  });
+  Rule('Custom configuration extends discovery behavior', ({ RuleScenario }) => {
+    RuleScenario('Respect custom exclude patterns', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      And('exclude patterns:', givenExcludePatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
+      And('a file containing {string} should be found', thenFileContainingShouldBeFound);
+    });
 
-  Scenario('Exclude .d.ts declaration files', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('no files ending with {string} should be found', thenNoFilesEndingWithShouldBeFound);
-    And('a file ending with {string} should be found', thenFileEndingWithShouldBeFound);
-  });
+    RuleScenario('Return empty array when no files match', ({ Given, When, Then }) => {
+      Given('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('{int} files should be found', thenFileCountShouldBe);
+    });
 
-  Scenario('Respect custom exclude patterns', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    And('exclude patterns:', givenExcludePatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('no files containing {string} should be found', thenNoFilesContainingShouldBeFound);
-    And('a file containing {string} should be found', thenFileContainingShouldBeFound);
-  });
-
-  Scenario('Return absolute paths', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('{int} file should be found', thenFileCountShouldBe);
-    And('all found paths should be absolute', thenAllPathsShouldBeAbsolute);
-  });
-
-  Scenario('Support multiple glob patterns', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('{int} files should be found', thenFileCountShouldBe);
-    And('files containing should be found:', thenFilesContainingShouldBeFound);
-  });
-
-  Scenario('Return empty array when no files match', ({ Given, When, Then }) => {
-    Given('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('{int} files should be found', thenFileCountShouldBe);
-  });
-
-  Scenario('Handle nested directory structures', ({ Given, When, Then, And }) => {
-    Given('a directory structure:', givenDirectoryStructure);
-    And('scanner config with patterns:', givenScannerConfigWithPatterns);
-    When('files are scanned', whenFilesAreScanned);
-    Then('{int} file should be found', thenFileCountShouldBe);
-    And('a file containing {string} should be found', thenFileContainingShouldBeFound);
+    RuleScenario('Handle nested directory structures', ({ Given, When, Then, And }) => {
+      Given('a directory structure:', givenDirectoryStructure);
+      And('scanner config with patterns:', givenScannerConfigWithPatterns);
+      When('files are scanned', whenFilesAreScanned);
+      Then('{int} file should be found', thenFileCountShouldBe);
+      And('a file containing {string} should be found', thenFileContainingShouldBeFound);
+    });
   });
 });

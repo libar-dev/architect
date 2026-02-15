@@ -9,112 +9,116 @@ Feature: Gherkin AST Parser
   Background:
     Given a Gherkin parser context
 
-  # ===========================================================================
-  # Success Scenarios
-  # ===========================================================================
+  Rule: Successful feature file parsing extracts complete metadata
 
-  @function:parseFeatureFile @happy-path
-  Scenario: Parse valid feature file with pattern metadata
-    Given a Gherkin feature file with content:
-      """
-      @libar-docs-pattern:ProjectionCategories @libar-docs-phase:15 @libar-docs-status:roadmap
-      Feature: Projection Categories
-        A taxonomy that categorizes projections by purpose.
+    **Invariant:** A valid feature file must produce a ParsedFeature with name, description, language, tags, and all nested scenarios with their steps.
+    **Rationale:** Downstream generators (timeline, business rules) depend on complete AST extraction; missing fields cause silent gaps in generated documentation.
+    **Verified by:** Parse valid feature file with pattern metadata, Parse multiple scenarios, Handle feature without tags
 
-        @acceptance-criteria @happy-path
-        Scenario: Define a View projection
-          Given a projection definition
-          When category is set to "view"
-          Then projection is client-exposed
-      """
-    When the feature file is parsed
-    Then parsing should succeed
-    And the feature should have properties:
-      | field       | value                                               |
-      | name        | Projection Categories                               |
-      | description | A taxonomy that categorizes projections by purpose. |
-      | language    | en                                                  |
-    And the feature tags should be:
-      | tag                          |
-      | pattern:ProjectionCategories |
-      | phase:15                     |
-      | status:roadmap               |
-    And 1 scenario should be parsed
-    And scenario 1 should have properties:
-      | field | value                    |
-      | name  | Define a View projection |
-    And scenario 1 should have tags:
-      | tag                 |
-      | acceptance-criteria |
-      | happy-path          |
-    And scenario 1 should have 3 steps
-    And scenario 1 step 1 should be:
-      | field   | value                   |
-      | keyword | Given                   |
-      | text    | a projection definition |
+    @function:parseFeatureFile @happy-path
+    Scenario: Parse valid feature file with pattern metadata
+      Given a Gherkin feature file with content:
+        """
+        @libar-docs-pattern:ProjectionCategories @libar-docs-phase:15 @libar-docs-status:roadmap
+        Feature: Projection Categories
+          A taxonomy that categorizes projections by purpose.
 
-  @function:parseFeatureFile
-  Scenario: Parse multiple scenarios
-    Given a Gherkin feature file with content:
-      """
-      @libar-docs-pattern:MyPattern
-      Feature: My Pattern
-        Description
+          @acceptance-criteria @happy-path
+          Scenario: Define a View projection
+            Given a projection definition
+            When category is set to "view"
+            Then projection is client-exposed
+        """
+      When the feature file is parsed
+      Then parsing should succeed
+      And the feature should have properties:
+        | field       | value                                               |
+        | name        | Projection Categories                               |
+        | description | A taxonomy that categorizes projections by purpose. |
+        | language    | en                                                  |
+      And the feature tags should be:
+        | tag                          |
+        | pattern:ProjectionCategories |
+        | phase:15                     |
+        | status:roadmap               |
+      And 1 scenario should be parsed
+      And scenario 1 should have properties:
+        | field | value                    |
+        | name  | Define a View projection |
+      And scenario 1 should have tags:
+        | tag                 |
+        | acceptance-criteria |
+        | happy-path          |
+      And scenario 1 should have 3 steps
+      And scenario 1 step 1 should be:
+        | field   | value                   |
+        | keyword | Given                   |
+        | text    | a projection definition |
 
-        Scenario: First scenario
-          Given setup
-          When action
-          Then result
+    @function:parseFeatureFile
+    Scenario: Parse multiple scenarios
+      Given a Gherkin feature file with content:
+        """
+        @libar-docs-pattern:MyPattern
+        Feature: My Pattern
+          Description
 
-        Scenario: Second scenario
-          Given other setup
-          When other action
-          Then other result
-      """
-    When the feature file is parsed
-    Then parsing should succeed
-    And 2 scenarios should be parsed
-    And the scenarios should have names:
-      | name            |
-      | First scenario  |
-      | Second scenario |
+          Scenario: First scenario
+            Given setup
+            When action
+            Then result
 
-  @function:parseFeatureFile
-  Scenario: Handle feature without tags
-    Given a Gherkin feature file with content:
-      """
-      Feature: Simple Feature
-        A feature without tags
+          Scenario: Second scenario
+            Given other setup
+            When other action
+            Then other result
+        """
+      When the feature file is parsed
+      Then parsing should succeed
+      And 2 scenarios should be parsed
+      And the scenarios should have names:
+        | name            |
+        | First scenario  |
+        | Second scenario |
 
-        Scenario: Simple scenario
-          Given setup
-      """
-    When the feature file is parsed
-    Then parsing should succeed
-    And the feature should have no tags
+    @function:parseFeatureFile
+    Scenario: Handle feature without tags
+      Given a Gherkin feature file with content:
+        """
+        Feature: Simple Feature
+          A feature without tags
 
-  # ===========================================================================
-  # Error Scenarios
-  # ===========================================================================
+          Scenario: Simple scenario
+            Given setup
+        """
+      When the feature file is parsed
+      Then parsing should succeed
+      And the feature should have no tags
 
-  @function:parseFeatureFile @error-handling
-  Scenario: Return error for malformed Gherkin
-    Given a Gherkin feature file with content:
-      """
-      This is not valid Gherkin
-      @libar-docs-pattern:Invalid
-      """
-    When the feature file is parsed
-    Then parsing should fail
-    And the error should reference file "test.feature"
+  Rule: Invalid Gherkin produces structured errors
 
-  @function:parseFeatureFile @error-handling
-  Scenario: Return error for file without feature
-    Given a Gherkin feature file with content:
-      """
-      @libar-docs-pattern:Invalid
-      # Just a comment
-      """
-    When the feature file is parsed
-    Then parsing should fail
-    And the error should reference file "test.feature"
+    **Invariant:** Malformed or incomplete Gherkin input must return a Result.err with the source file path and a descriptive error message.
+    **Rationale:** The scanner processes many feature files in batch; structured errors allow graceful degradation and per-file error reporting rather than aborting the entire scan.
+    **Verified by:** Return error for malformed Gherkin, Return error for file without feature
+
+    @function:parseFeatureFile @error-handling
+    Scenario: Return error for malformed Gherkin
+      Given a Gherkin feature file with content:
+        """
+        This is not valid Gherkin
+        @libar-docs-pattern:Invalid
+        """
+      When the feature file is parsed
+      Then parsing should fail
+      And the error should reference file "test.feature"
+
+    @function:parseFeatureFile @error-handling
+    Scenario: Return error for file without feature
+      Given a Gherkin feature file with content:
+        """
+        @libar-docs-pattern:Invalid
+        # Just a comment
+        """
+      When the feature file is parsed
+      Then parsing should fail
+      And the error should reference file "test.feature"
