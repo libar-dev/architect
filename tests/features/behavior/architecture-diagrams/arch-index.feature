@@ -19,6 +19,10 @@ Feature: Architecture Index in MasterDataset
 
   Rule: archIndex groups patterns by arch-role
 
+    **Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
+    **Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
+    **Verified by:** Group patterns by role
+
     The archIndex.byRole map groups patterns by their architectural role
     (command-handler, projection, saga, etc.) for efficient lookup.
 
@@ -35,6 +39,10 @@ Feature: Architecture Index in MasterDataset
 
   Rule: archIndex groups patterns by arch-context
 
+    **Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
+    **Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
+    **Verified by:** Group patterns by context
+
     The archIndex.byContext map groups patterns by bounded context
     for subgraph rendering in component diagrams.
 
@@ -50,6 +58,10 @@ Feature: Architecture Index in MasterDataset
       And archIndex byContext for "inventory" should contain 1 pattern
 
   Rule: archIndex groups patterns by arch-layer
+
+    **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
+    **Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
+    **Verified by:** Group patterns by layer
 
     The archIndex.byLayer map groups patterns by architectural layer
     (domain, application, infrastructure) for layered diagram rendering.
@@ -70,6 +82,9 @@ Feature: Architecture Index in MasterDataset
 
   Rule: archIndex.all contains all patterns with any arch tag
 
+    **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
+    **Verified by:** archIndex.all includes all annotated patterns
+
     The archIndex.all array contains all patterns that have at least
     one arch tag (role, context, or layer). Patterns without any arch
     tags are excluded.
@@ -89,6 +104,10 @@ Feature: Architecture Index in MasterDataset
       And archIndex all should not contain pattern "NoArchTags"
 
   Rule: Patterns without arch tags are excluded from archIndex
+
+    **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
+    **Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
+    **Verified by:** Non-annotated patterns excluded
 
     Patterns that have no arch-role, arch-context, or arch-layer are
     not included in the archIndex at all.

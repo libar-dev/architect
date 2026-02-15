@@ -4,7 +4,7 @@
 
 ---
 
-**67 rules** from 14 features. 18 rules have explicit invariants.
+**67 rules** from 14 features. 40 rules have explicit invariants.
 
 ---
 
@@ -18,12 +18,20 @@
 
 #### matchPattern supports recursive wildcard **
 
+> **Invariant:** The `**` wildcard matches files at any nesting depth below the specified directory prefix.
+>
+> **Rationale:** Directory hierarchies vary in depth; recursive matching ensures all nested files inherit context.
+
 **Verified by:**
 - Recursive wildcard matches nested paths
 
 ---
 
 #### matchPattern supports single-level wildcard /*
+
+> **Invariant:** The `/*` wildcard matches only direct children of the specified directory, not deeper nested files.
+>
+> **Rationale:** Some contexts apply only to a specific directory level, not its entire subtree.
 
 **Verified by:**
 - Single-level wildcard matches direct children only
@@ -32,12 +40,18 @@
 
 #### matchPattern supports prefix matching
 
+> **Invariant:** A trailing slash pattern matches any file whose path starts with that directory prefix.
+
 **Verified by:**
 - Prefix matching behavior
 
 ---
 
 #### inferContext returns undefined when no rules match
+
+> **Invariant:** When no inference rule matches a file path, the pattern receives no inferred context and is excluded from the byContext index.
+>
+> **Rationale:** Unmatched files must not receive a spurious context assignment; absence of context is a valid state.
 
 **Verified by:**
 - Empty rules array returns undefined
@@ -47,6 +61,10 @@
 
 #### inferContext applies first matching rule
 
+> **Invariant:** When multiple rules could match a file path, only the first matching rule determines the inferred context.
+>
+> **Rationale:** Deterministic ordering prevents ambiguous context assignment when rules overlap.
+
 **Verified by:**
 - Single matching rule infers context
 - First matching rule wins when multiple could match
@@ -55,6 +73,10 @@
 
 #### Explicit archContext is not overridden
 
+> **Invariant:** A pattern with an explicitly annotated archContext retains that value regardless of matching inference rules.
+>
+> **Rationale:** Explicit annotations represent intentional developer decisions that must not be silently overwritten by automation.
+
 **Verified by:**
 - Explicit context takes precedence over inference
 
@@ -62,12 +84,18 @@
 
 #### Inference works independently of archLayer
 
+> **Invariant:** Context inference operates on file path alone; the presence or absence of archLayer does not affect context assignment.
+
 **Verified by:**
 - Pattern without archLayer is still added to byContext if context is inferred
 
 ---
 
 #### Default rules map standard directories
+
+> **Invariant:** Each standard source directory (validation, scanner, extractor, etc.) maps to a well-known bounded context name via the default rule set.
+>
+> **Rationale:** Convention-based mapping eliminates the need for explicit context annotations on every file in standard directories.
 
 **Verified by:**
 - Default directory mappings
@@ -120,6 +148,8 @@
 
 #### Depends-on tag is defined in taxonomy registry
 
+> **Invariant:** The depends-on and enables tags must exist in the taxonomy registry with CSV format.
+
 **Verified by:**
 - Depends-on tag exists in registry
 - Enables tag exists in registry
@@ -127,6 +157,8 @@
 ---
 
 #### Depends-on tag is extracted from Gherkin files
+
+> **Invariant:** The Gherkin parser must extract depends-on values from feature file tags, including CSV multi-value lists.
 
 **Verified by:**
 - Depends-on extracted from feature file
@@ -136,15 +168,24 @@
 
 #### Depends-on in TypeScript triggers anti-pattern warning
 
-The depends-on tag is for planning dependencies and belongs in feature
-    files, not TypeScript code.
+> **Invariant:** The depends-on tag must only appear in Gherkin files; its presence in TypeScript is an anti-pattern.
+>
+> **Rationale:** Depends-on represents planning dependencies owned by Gherkin specs, not runtime dependencies owned by TypeScript.
 
 **Verified by:**
 - Depends-on in TypeScript is detected by lint rule
+- Depends-on in TypeScript is detected by lint rule
+
+    The depends-on tag is for planning dependencies and belongs in feature
+    files
+- not TypeScript code. TypeScript files should use "uses" for
+    runtime dependencies.
 
 ---
 
 #### Enables tag is extracted from Gherkin files
+
+> **Invariant:** The Gherkin parser must extract enables values from feature file tags, including CSV multi-value lists.
 
 **Verified by:**
 - Enables extracted from feature file
@@ -154,12 +195,15 @@ The depends-on tag is for planning dependencies and belongs in feature
 
 #### Planning dependencies are stored in relationship index
 
-The relationship index stores dependsOn and enables relationships
-    directly from pattern metadata.
+> **Invariant:** The relationship index must store dependsOn and enables relationships extracted from pattern metadata.
 
 **Verified by:**
 - DependsOn relationships stored in relationship index
 - Enables relationships stored explicitly
+- Enables relationships stored explicitly
+
+    The relationship index stores dependsOn and enables relationships
+    directly from pattern metadata. These are explicit declarations.
 
 *depends-on-tag.feature*
 
@@ -304,6 +348,8 @@ The relationship index stores dependsOn and enables relationships
 
 #### Extends tag is defined in taxonomy registry
 
+> **Invariant:** The extends tag must exist in the taxonomy registry with single-value format.
+
 **Verified by:**
 - Extends tag exists in registry
 
@@ -311,16 +357,23 @@ The relationship index stores dependsOn and enables relationships
 
 #### Patterns can extend exactly one base pattern
 
-Extends uses single-value format because pattern inheritance should be
-    single-inheritance to avoid diamond problems.
+> **Invariant:** A pattern may extend at most one base pattern, enforced by single-value tag format.
+>
+> **Rationale:** Single inheritance avoids diamond-problem ambiguity in pattern generalization hierarchies.
 
 **Verified by:**
 - Parse extends from feature file
 - Extends preserved through extraction pipeline
+- Extends preserved through extraction pipeline
+
+    Extends uses single-value format because pattern inheritance should be
+    single-inheritance to avoid diamond problems.
 
 ---
 
 #### Transform builds extendedBy reverse lookup
+
+> **Invariant:** The transform must compute an extendedBy reverse index so base patterns know which patterns extend them.
 
 **Verified by:**
 - Extended pattern knows its extensions
@@ -328,6 +381,10 @@ Extends uses single-value format because pattern inheritance should be
 ---
 
 #### Linter detects circular inheritance chains
+
+> **Invariant:** Circular inheritance chains (direct or transitive) must be detected and reported as errors.
+>
+> **Rationale:** Circular extends relationships create infinite resolution loops and undefined behavior.
 
 **Verified by:**
 - Direct circular inheritance detected
@@ -481,15 +538,21 @@ Extends uses single-value format because pattern inheritance should be
 
 #### Implements tag is defined in taxonomy registry
 
-The tag registry defines `implements` with CSV format, enabling the
-    data-driven AST parser to automatically extract it.
+> **Invariant:** The implements tag must exist in the taxonomy registry with CSV format.
 
 **Verified by:**
 - Implements tag exists in registry
+- Implements tag exists in registry
+
+    The tag registry defines `implements` with CSV format
+- enabling the
+    data-driven AST parser to automatically extract it.
 
 ---
 
 #### Files can implement a single pattern
+
+> **Invariant:** The AST parser must extract a single implements value and preserve it through the extraction pipeline.
 
 **Verified by:**
 - Parse implements with single pattern
@@ -499,6 +562,8 @@ The tag registry defines `implements` with CSV format, enabling the
 
 #### Files can implement multiple patterns using CSV format
 
+> **Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace trimming.
+
 **Verified by:**
 - Parse implements with multiple patterns
 - CSV values are trimmed
@@ -507,6 +572,8 @@ The tag registry defines `implements` with CSV format, enabling the
 
 #### Transform builds implementedBy reverse lookup
 
+> **Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement them.
+
 **Verified by:**
 - Single implementation creates reverse lookup
 - Multiple implementations aggregate
@@ -514,6 +581,8 @@ The tag registry defines `implements` with CSV format, enabling the
 ---
 
 #### Schemas validate implements field correctly
+
+> **Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types.
 
 **Verified by:**
 - DocDirective schema accepts implements

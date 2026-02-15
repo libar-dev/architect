@@ -76,6 +76,9 @@ Tests the GeneratorRegistry registration, lookup, and listing capabilities.
 
 **Registry manages generator registration and retrieval**
 
+**Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+    **Verified by:** Register generator with unique name, Duplicate registration throws error, Get registered generator, Get unknown generator returns undefined, Available returns sorted list
+
 _Verified by: Register generator with unique name, Duplicate registration throws error, Get registered generator, Get unknown generator returns undefined, Available returns sorted list_
 
 ---

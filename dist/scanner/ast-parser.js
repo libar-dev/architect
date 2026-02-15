@@ -479,6 +479,8 @@ function parseDirective(commentText, loc, filePath, registry) {
     const since = metadataResults.get('since');
     // Shape extraction tags
     const extractShapes = metadataResults.get('extract-shapes');
+    // PRD metadata tags (product area, user role, business value)
+    const productArea = metadataResults.get('product-area');
     // Convention tags for reference document generation
     const convention = metadataResults.get('convention');
     // Extract "### When to Use" section or "**When to use:**" inline format
@@ -561,6 +563,8 @@ function parseDirective(commentText, loc, filePath, registry) {
         ...(include && include.length > 0 && { include }),
         // Shape extraction fields
         ...(extractShapes && extractShapes.length > 0 && { extractShapes }),
+        // PRD metadata fields
+        ...(productArea && { productArea }),
         // Convention tags for reference document generation
         ...(convention && convention.length > 0 && { convention }),
     };

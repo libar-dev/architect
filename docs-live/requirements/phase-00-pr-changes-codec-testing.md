@@ -6,27 +6,29 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The PrChangesCodec transforms MasterDataset into RenderableDocument for
-  PR-scoped documentation. It filters patterns by changed files and/or
-  release version tags, groups by phase or priority, and generates
-  review-focused output.
+PR-scoped documentation. It filters patterns by changed files and/or
+release version tags, groups by phase or priority, and generates
+review-focused output.
 
-  **Problem:**
-  - Need to generate PR-specific documentation from patterns
-  - Filters by changed files and release version tags
-  - Different grouping options (phase, priority, workflow)
+**Problem:**
 
-  **Solution:**
-  - PrChangesCodec with configurable filtering and grouping
-  - Generates review checklists and dependency sections
-  - OR logic for combined filters
+- Need to generate PR-specific documentation from patterns
+- Filters by changed files and release version tags
+- Different grouping options (phase, priority, workflow)
+
+**Solution:**
+
+- PrChangesCodec with configurable filtering and grouping
+- Generates review checklists and dependency sections
+- OR logic for combined filters
 
 ## Acceptance Criteria
 
@@ -60,11 +62,11 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - And the document contains a "Summary" section
 - And the summary table shows:
 
-| metric | value |
-| --- | --- |
-| Patterns in PR | 3 |
-| Completed | 1 |
-| Active | 2 |
+| metric         | value |
+| -------------- | ----- |
+| Patterns in PR | 3     |
+| Completed      | 1     |
+| Active         | 2     |
 
 **Summary shows release tag when releaseFilter is set**
 
@@ -86,7 +88,7 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - And the document contains phase headings:
 
 | heading |
-| --- |
+| ------- |
 | Phase 1 |
 | Phase 2 |
 
@@ -103,11 +105,11 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - Then the document contains a "Changes by Priority" section
 - And the document contains priority headings:
 
-| heading |
-| --- |
-| High Priority |
+| heading         |
+| --------------- |
+| High Priority   |
 | Medium Priority |
-| Low Priority |
+| Low Priority    |
 
 **Priority groups show correct patterns**
 
@@ -130,9 +132,9 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - Then pattern details include metadata table with:
 
 | property |
-| --- |
-| Status |
-| Phase |
+| -------- |
+| Status   |
+| Phase    |
 
 **Pattern detail shows business value when available**
 
@@ -140,8 +142,8 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - When decoding with PrChangesCodec
 - Then pattern details include metadata table with:
 
-| property |
-| --- |
+| property       |
+| -------------- |
 | Business Value |
 
 **Pattern detail shows description**
@@ -200,11 +202,11 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 - Then the document contains a "Review Checklist" section
 - And the review checklist contains standard items:
 
-| item |
-| --- |
+| item                             |
+| -------------------------------- |
 | Code follows project conventions |
-| Tests added/updated for changes |
-| Documentation updated if needed |
+| Tests added/updated for changes  |
+| Documentation updated if needed  |
 
 **Review checklist includes completed patterns item when applicable**
 
@@ -307,61 +309,110 @@ The PrChangesCodec transforms MasterDataset into RenderableDocument for
 
 **PrChangesCodec handles empty results gracefully**
 
+**Invariant:** When no patterns match the applied filters, the codec must produce a valid document with a "No Changes" section describing which filters were active.
+**Rationale:** Reviewers need to distinguish "nothing matched" from "codec error" and understand why no patterns appear.
+**Verified by:** No changes when no patterns match changedFiles filter, No changes when no patterns match releaseFilter, No changes with combined filters when nothing matches
+
 _Verified by: No changes when no patterns match changedFiles filter, No changes when no patterns match releaseFilter, No changes with combined filters when nothing matches_
 
 **PrChangesCodec generates summary with filter information**
+
+**Invariant:** Every PR changes document must contain a Summary section with pattern counts and active filter information.
+**Verified by:** Summary section shows pattern counts, Summary shows release tag when releaseFilter is set, Summary shows files filter count when changedFiles is set
 
 _Verified by: Summary section shows pattern counts, Summary shows release tag when releaseFilter is set, Summary shows files filter count when changedFiles is set_
 
 **PrChangesCodec groups changes by phase when sortBy is "phase"**
 
+**Invariant:** When sortBy is "phase" (the default), patterns must be grouped under phase headings in ascending phase order.
+**Verified by:** Changes grouped by phase with default sortBy, Pattern details shown within phase groups
+
 _Verified by: Changes grouped by phase with default sortBy, Pattern details shown within phase groups_
 
 **PrChangesCodec groups changes by priority when sortBy is "priority"**
+
+**Invariant:** When sortBy is "priority", patterns must be grouped under High/Medium/Low priority headings with correct pattern assignment.
+**Verified by:** Changes grouped by priority, Priority groups show correct patterns
 
 _Verified by: Changes grouped by priority, Priority groups show correct patterns_
 
 **PrChangesCodec shows flat list when sortBy is "workflow"**
 
+**Invariant:** When sortBy is "workflow", patterns must be rendered as a flat list without phase or priority grouping.
+**Rationale:** Workflow sorting presents patterns in review order without structural grouping, suited for quick PR reviews.
+**Verified by:** Flat changes list with workflow sort
+
 _Verified by: Flat changes list with workflow sort_
 
 **PrChangesCodec renders pattern details with metadata and description**
+
+**Invariant:** Each pattern entry must include a metadata table (status, phase, business value when available) and description text.
+**Verified by:** Pattern detail shows metadata table, Pattern detail shows business value when available, Pattern detail shows description
 
 _Verified by: Pattern detail shows metadata table, Pattern detail shows business value when available, Pattern detail shows description_
 
 **PrChangesCodec renders deliverables when includeDeliverables is enabled**
 
+**Invariant:** Deliverables are only rendered when includeDeliverables is enabled, and when releaseFilter is set, only deliverables matching that release are shown.
+**Verified by:** Deliverables shown when patterns have deliverables, Deliverables filtered by release when releaseFilter is set, No deliverables section when includeDeliverables is disabled
+
 _Verified by: Deliverables shown when patterns have deliverables, Deliverables filtered by release when releaseFilter is set, No deliverables section when includeDeliverables is disabled_
 
 **PrChangesCodec renders acceptance criteria from scenarios**
+
+**Invariant:** When patterns have associated scenarios, the codec must render an "Acceptance Criteria" section containing scenario names and step lists.
+**Verified by:** Acceptance criteria rendered when patterns have scenarios, Acceptance criteria shows scenario steps
 
 _Verified by: Acceptance criteria rendered when patterns have scenarios, Acceptance criteria shows scenario steps_
 
 **PrChangesCodec renders business rules from Gherkin Rule keyword**
 
+**Invariant:** When patterns have Gherkin Rule blocks, the codec must render a "Business Rules" section containing rule names and verification information.
+**Verified by:** Business rules rendered when patterns have rules, Business rules show rule names and verification info
+
 _Verified by: Business rules rendered when patterns have rules, Business rules show rule names and verification info_
 
 **PrChangesCodec generates review checklist when includeReviewChecklist is enabled**
+
+**Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
+**Verified by:** Review checklist generated with standard items, Review checklist includes completed patterns item when applicable, Review checklist includes active work item when applicable, Review checklist includes dependencies item when patterns have dependencies, Review checklist includes deliverables item when patterns have deliverables, No review checklist when includeReviewChecklist is disabled
 
 _Verified by: Review checklist generated with standard items, Review checklist includes completed patterns item when applicable, Review checklist includes active work item when applicable, Review checklist includes dependencies item when patterns have dependencies, Review checklist includes deliverables item when patterns have deliverables, No review checklist when includeReviewChecklist is disabled_
 
 **PrChangesCodec generates dependencies section when includeDependencies is enabled**
 
+**Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
+**Verified by:** Dependencies section shows depends on relationships, Dependencies section shows enables relationships, No dependencies section when patterns have no dependencies, No dependencies section when includeDependencies is disabled
+
 _Verified by: Dependencies section shows depends on relationships, Dependencies section shows enables relationships, No dependencies section when patterns have no dependencies, No dependencies section when includeDependencies is disabled_
 
 **PrChangesCodec filters patterns by changedFiles**
+
+**Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
+**Verified by:** Patterns filtered by changedFiles match, changedFiles filter matches partial paths
 
 _Verified by: Patterns filtered by changedFiles match, changedFiles filter matches partial paths_
 
 **PrChangesCodec filters patterns by releaseFilter**
 
+**Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
+**Verified by:** Patterns filtered by release version
+
 _Verified by: Patterns filtered by release version_
 
 **PrChangesCodec uses OR logic for combined filters**
 
+**Invariant:** When both changedFiles and releaseFilter are set, patterns matching either criterion are included (OR logic), and patterns matching both criteria appear only once (no duplicates).
+**Rationale:** OR logic maximizes PR coverage — a change may affect files not yet assigned to a release, or a release may include patterns from unchanged files.
+**Verified by:** Combined filters match patterns meeting either criterion, Patterns matching both criteria are not duplicated
+
 _Verified by: Combined filters match patterns meeting either criterion, Patterns matching both criteria are not duplicated_
 
 **PrChangesCodec only includes active and completed patterns**
+
+**Invariant:** The codec must exclude roadmap and deferred patterns, including only active and completed patterns in the PR changes output.
+**Rationale:** PR changes reflect work that is in progress or done — roadmap and deferred patterns have no code changes to review.
+**Verified by:** Roadmap patterns are excluded, Deferred patterns are excluded
 
 _Verified by: Roadmap patterns are excluded, Deferred patterns are excluded_
 

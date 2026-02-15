@@ -148,21 +148,32 @@ As a documentation generator
 
 **Component diagrams group patterns by bounded context**
 
-Patterns with arch-context are grouped into Mermaid subgraphs.
+**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
+    **Verified by:** Generate subgraphs for bounded contexts
+
+    Patterns with arch-context are grouped into Mermaid subgraphs.
     Each bounded context becomes a visual container.
 
 _Verified by: Generate subgraphs for bounded contexts_
 
 **Context-less patterns go to Shared Infrastructure**
 
-Patterns without arch-context are grouped into a
+**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
+    **Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
+    **Verified by:** Shared infrastructure subgraph for context-less patterns
+
+    Patterns without arch-context are grouped into a
     "Shared Infrastructure" subgraph.
 
 _Verified by: Shared infrastructure subgraph for context-less patterns_
 
 **Relationship types render with distinct arrow styles**
 
-Arrow styles follow UML conventions:
+**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
+    **Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
+    **Verified by:** Arrow styles for relationship types
+
+    Arrow styles follow UML conventions:
     - uses: solid arrow (-->)
     - depends-on: dashed arrow (-.->)
     - implements: dotted arrow (..->)
@@ -172,33 +183,50 @@ _Verified by: Arrow styles for relationship types_
 
 **Arrows only connect annotated components**
 
-Relationships pointing to non-annotated patterns
+**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
+    **Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
+    **Verified by:** Skip arrows to non-annotated targets
+
+    Relationships pointing to non-annotated patterns
     are not rendered (target would not exist in diagram).
 
 _Verified by: Skip arrows to non-annotated targets_
 
 **Component diagram includes summary section**
 
-The generated document starts with an overview section
+**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
+    **Verified by:** Summary section with counts
+
+    The generated document starts with an overview section
     showing component counts and bounded context statistics.
 
 _Verified by: Summary section with counts_
 
 **Component diagram includes legend when enabled**
 
-The legend explains arrow style meanings for readers.
+**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
+    **Verified by:** Legend section with arrow explanations
+
+    The legend explains arrow style meanings for readers.
 
 _Verified by: Legend section with arrow explanations_
 
 **Component diagram includes inventory table when enabled**
 
-The inventory lists all components with their metadata.
+**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
+    **Verified by:** Inventory table with component details
+
+    The inventory lists all components with their metadata.
 
 _Verified by: Inventory table with component details_
 
 **Empty architecture data shows guidance message**
 
-If no patterns have architecture annotations,
+**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
+    **Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
+    **Verified by:** No architecture data message
+
+    If no patterns have architecture annotations,
     the document explains how to add them.
 
 _Verified by: No architecture data message_

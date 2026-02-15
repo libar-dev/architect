@@ -260,6 +260,9 @@ export const DocDirectiveSchema = z
     /** Cross-cutting document inclusion for content routing and diagram scoping (from @libar-docs-include CSV tag) */
     include: z.array(z.string().min(1)).readonly().optional(),
 
+    /** Product area for PRD grouping (from @libar-docs-product-area tag) */
+    productArea: z.string().optional(),
+
     // Shape extraction fields
 
     /** Shape names to extract from this file (from @libar-docs-extract-shapes tag) */

@@ -1,4 +1,17 @@
 /**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern ErrorFactoryTypes
+ * @libar-docs-status completed
+ * @libar-docs-implements ErrorFactories
+ * @libar-docs-product-area CoreTypes
+ *
+ * ## Error Factories - Type Definitions
+ *
+ * Structured, discriminated error types with factory functions.
+ * Each error type has a unique `type` discriminator for exhaustive pattern matching.
+ */
+/**
  * Create a FileSystemError
  *
  * @param file - File path that caused the error

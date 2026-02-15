@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 Tests the PrChangesCodec filtering capabilities for generating PR-scoped
-  documentation. The codec filters patterns by changed files and/or release
-  version, supporting combined OR logic when both filters are provided.
+documentation. The codec filters patterns by changed files and/or release
+version, supporting combined OR logic when both filters are provided.
 
 ## Acceptance Criteria
 
@@ -26,21 +26,21 @@ Tests the PrChangesCodec filtering capabilities for generating PR-scoped
 - When generating pr-changes document
 - Then only patterns from the changed files are included:
 
-| name | status | filePath |
-| --- | --- | --- |
-| Core Types | completed | src/core/types.ts |
-| Core Utils | active | src/core/utils.ts |
-| Api Endpoint | completed | src/api/endpoint.ts |
-| Other Pattern | completed | src/other/file.ts |
+| name          | status    | filePath            |
+| ------------- | --------- | ------------------- |
+| Core Types    | completed | src/core/types.ts   |
+| Core Utils    | active    | src/core/utils.ts   |
+| Api Endpoint  | completed | src/api/endpoint.ts |
+| Other Pattern | completed | src/other/file.ts   |
 
-| file |
-| --- |
-| src/core/types.ts |
+| file                |
+| ------------------- |
+| src/core/types.ts   |
 | src/api/endpoint.ts |
 
-| name |
-| --- |
-| Core Types |
+| name         |
+| ------------ |
+| Core Types   |
 | Api Endpoint |
 
 **PR changes filters by release version**
@@ -50,15 +50,15 @@ Tests the PrChangesCodec filtering capabilities for generating PR-scoped
 - When generating pr-changes document
 - Then only release filtered patterns are included:
 
-| name | status | release |
-| --- | --- | --- |
-| Feature A | completed | v0.1.0 |
-| Feature B | completed | v0.2.0 |
-| Feature C | active | v0.2.0 |
-| Feature D | completed | v0.3.0 |
+| name      | status    | release |
+| --------- | --------- | ------- |
+| Feature A | completed | v0.1.0  |
+| Feature B | completed | v0.2.0  |
+| Feature C | active    | v0.2.0  |
+| Feature D | completed | v0.3.0  |
 
-| name |
-| --- |
+| name      |
+| --------- |
 | Feature B |
 | Feature C |
 
@@ -70,19 +70,19 @@ Tests the PrChangesCodec filtering capabilities for generating PR-scoped
 - When generating pr-changes document
 - Then patterns matching EITHER file OR release are included:
 
-| name | status | filePath | release |
-| --- | --- | --- | --- |
-| Pattern A | completed | src/core/types.ts | v0.1.0 |
-| Pattern B | completed | src/api/endpoint.ts | v0.2.0 |
-| Pattern C | active | src/other/file.ts | v0.2.0 |
-| Pattern D | completed | src/util/helper.ts | v0.3.0 |
+| name      | status    | filePath            | release |
+| --------- | --------- | ------------------- | ------- |
+| Pattern A | completed | src/core/types.ts   | v0.1.0  |
+| Pattern B | completed | src/api/endpoint.ts | v0.2.0  |
+| Pattern C | active    | src/other/file.ts   | v0.2.0  |
+| Pattern D | completed | src/util/helper.ts  | v0.3.0  |
 
-| file |
-| --- |
+| file              |
+| ----------------- |
 | src/core/types.ts |
 
-| name |
-| --- |
+| name      |
+| --------- |
 | Pattern A |
 | Pattern B |
 | Pattern C |
@@ -90,6 +90,10 @@ Tests the PrChangesCodec filtering capabilities for generating PR-scoped
 ## Business Rules
 
 **Orchestrator supports PR changes generation options**
+
+**Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
+**Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
+**Verified by:** PR changes filters to explicit file list, PR changes filters by release version, Combined filters use OR logic
 
 _Verified by: PR changes filters to explicit file list, PR changes filters by release version, Combined filters use OR logic_
 

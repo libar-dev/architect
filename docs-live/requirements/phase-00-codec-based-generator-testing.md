@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
-  codec system to the DocumentGenerator interface. This enables codec-based
-  document generation to work seamlessly with the existing orchestrator.
+codec system to the DocumentGenerator interface. This enables codec-based
+document generation to work seamlessly with the existing orchestrator.
 
 ## Acceptance Criteria
 
@@ -43,14 +43,18 @@ Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
 - When the generator generate method is called
 - Then the output should contain a file with path "working/PR-CHANGES.md"
 
-| file |
-| --- |
+| file              |
+| ----------------- |
 | src/core/types.ts |
-| src/api/index.ts |
+| src/api/index.ts  |
 
 ## Business Rules
 
 **CodecBasedGenerator adapts codecs to generator interface**
+
+**Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
+**Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+**Verified by:** Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through
 
 _Verified by: Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through_
 

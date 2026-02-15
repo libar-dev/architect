@@ -6,26 +6,28 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The dedent helper function normalizes indentation in code blocks extracted
-  from DocStrings. It handles various whitespace patterns including tabs,
-  mixed indentation, and edge cases.
+from DocStrings. It handles various whitespace patterns including tabs,
+mixed indentation, and edge cases.
 
-  **Problem:**
-  - DocStrings in Gherkin files have consistent indentation for alignment
-  - Tab characters vs spaces create inconsistent indentation calculation
-  - Edge cases like empty lines, all-empty input, single lines need handling
+**Problem:**
 
-  **Solution:**
-  - Normalize tabs to spaces before calculating minimum indentation
-  - Handle edge cases gracefully without throwing errors
-  - Preserve relative indentation after removing common prefix
+- DocStrings in Gherkin files have consistent indentation for alignment
+- Tab characters vs spaces create inconsistent indentation calculation
+- Edge cases like empty lines, all-empty input, single lines need handling
+
+**Solution:**
+
+- Normalize tabs to spaces before calculating minimum indentation
+- Handle edge cases gracefully without throwing errors
+- Preserve relative indentation after removing common prefix
 
 ## Acceptance Criteria
 
@@ -36,8 +38,8 @@ The dedent helper function normalizes indentation in code blocks extracted
 - Then the output is:
 
 ```markdown
-		const x = 1;
-		const y = 2;
+    	const x = 1;
+    	const y = 2;
 ```
 
 ```markdown
@@ -52,8 +54,8 @@ const y = 2;
 - Then the output has no leading whitespace on first non-empty line
 
 ```markdown
-	  const x = 1;
-	  const y = 2;
+      const x = 1;
+      const y = 2;
 ```
 
 **Empty lines with trailing spaces are preserved**
@@ -78,7 +80,7 @@ const y = 2;
 
 **Single line with indentation is dedented**
 
-- Given input text "    const x = 1;"
+- Given input text " const x = 1;"
 - When dedenting the text
 - Then the output is "const x = 1;"
 
@@ -110,9 +112,9 @@ const y = 2;
 
 ```markdown
 function foo() {
-  if (true) {
-    return 42;
-  }
+if (true) {
+return 42;
+}
 }
 ```
 
@@ -132,9 +134,9 @@ function foo() {
 
 ```markdown
 level0
-  level1
-    level2
-  level1
+level1
+level2
+level1
 level0
 ```
 
@@ -142,21 +144,37 @@ level0
 
 **Tabs are normalized to spaces before dedent**
 
+**Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
+**Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
+**Verified by:** Tab-indented code is properly dedented, Mixed tabs and spaces are normalized
+
 _Verified by: Tab-indented code is properly dedented, Mixed tabs and spaces are normalized_
 
 **Empty lines are handled correctly**
+
+**Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+**Verified by:** Empty lines with trailing spaces are preserved, All empty lines returns original text
 
 _Verified by: Empty lines with trailing spaces are preserved, All empty lines returns original text_
 
 **Single line input is handled**
 
+**Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+**Verified by:** Single line with indentation is dedented, Single line without indentation is unchanged
+
 _Verified by: Single line with indentation is dedented, Single line without indentation is unchanged_
 
 **Unicode whitespace is handled**
 
+**Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+**Verified by:** Non-breaking space is treated as content
+
 _Verified by: Non-breaking space is treated as content_
 
 **Relative indentation is preserved**
+
+**Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+**Verified by:** Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively
 
 _Verified by: Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively_
 

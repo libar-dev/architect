@@ -3,14 +3,27 @@
 Purpose: CoreTypes product area overview
 Detail Level: Compact summary
 
-**What foundational types exist?** Foundation types used across all other areas. The Result monad replaces try/catch with explicit error handling — functions return `Result.ok(value)` or `Result.err(error)` instead of throwing. DocError provides structured error context with type, file, line, and reason fields.
+**What foundational types exist?** CoreTypes provides the foundational type system used across all other areas. Three pillars enforce discipline at compile time: the Result monad replaces try/catch with explicit error handling — functions return `Result.ok(value)` or `Result.err(error)` instead of throwing. The DocError discriminated union provides structured error context with type, file, line, and reason fields, enabling exhaustive pattern matching in error handlers. Branded types create nominal typing from structural TypeScript — `PatternId`, `CategoryName`, and `SourceFilePath` are compile-time distinct despite all being strings. String utilities handle slugification and case conversion with acronym-aware title casing.
 
 === KEY INVARIANTS ===
 
-- Result over try/catch: All functions return `Result<T, E>` instead of throwing. Compile-time verification that errors are handled
-- DocError discriminated union: Structured errors with type, file, line, reason. `isDocError` type guard for safe classification
+- Result over try/catch: All functions return `Result<T, E>` instead of throwing. Compile-time verification that errors are handled. `isOk`/`isErr` type guards enable safe narrowing
+- DocError discriminated union: 12 structured error types with `type` discriminator field. `isDocError` type guard for safe classification. Specialized union aliases (`ScanError`, `ExtractionError`) scope error handling per operation
+- Branded nominal types: `Branded<T, Brand>` creates compile-time distinct types from structural TypeScript. Prevents mixing `PatternId` with `CategoryName` even though both are `string` at runtime
+- String transformation consistency: `slugify` produces URL-safe identifiers, `camelCaseToTitleCase` preserves acronyms (e.g., "APIEndpoint" becomes "API Endpoint"), `toKebabCase` handles consecutive uppercase correctly
+
+=== API TYPES ===
+
+| Type         | Kind      |
+| ------------ | --------- |
+| BaseDocError | interface |
+| DocError     | type      |
 
 === BEHAVIOR SPECIFICATIONS ===
+
+--- ResultMonadTypes ---
+
+--- ErrorFactoryTypes ---
 
 --- StringUtils ---
 
@@ -33,11 +46,11 @@ Detail Level: Compact summary
 
 --- KebabCaseSlugs ---
 
-| Rule                                  | Description |
-| ------------------------------------- | ----------- |
-| CamelCase names convert to kebab-case |             |
-| Edge cases are handled correctly      |             |
-| Requirements include phase prefix     |             |
-| Phase slugs use kebab-case for names  |             |
+| Rule                                  | Description                                                                                                            |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| CamelCase names convert to kebab-case | **Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase....       |
+| Edge cases are handled correctly      | **Invariant:** Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens... |
+| Requirements include phase prefix     | **Invariant:** Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number,...        |
+| Phase slugs use kebab-case for names  | **Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format...           |
 
 --- ErrorHandlingUnification ---

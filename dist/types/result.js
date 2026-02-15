@@ -1,4 +1,17 @@
 /**
+ * @libar-docs
+ * @libar-docs-core
+ * @libar-docs-pattern ResultMonadTypes
+ * @libar-docs-status completed
+ * @libar-docs-implements ResultMonad
+ * @libar-docs-product-area CoreTypes
+ *
+ * ## Result Monad - Type Definitions
+ *
+ * Explicit error handling via discriminated union.
+ * Functions return `Result.ok(value)` or `Result.err(error)` instead of throwing.
+ */
+/**
  * Result utilities for creating and inspecting Result values
  */
 export const Result = {

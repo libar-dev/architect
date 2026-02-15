@@ -96,13 +96,23 @@ Links to implementation files in generated pattern documents should have
 
 **Repository prefixes are stripped from implementation paths**
 
+**Invariant:** Implementation file paths must not contain repository-level prefixes like "libar-platform/" or "monorepo/".
+    **Rationale:** Generated links are relative to the output directory; repository prefixes produce broken paths.
+    **Verified by:** Strip libar-platform prefix from implementation paths, Strip monorepo prefix from implementation paths, Preserve paths without repository prefix
+
 _Verified by: Strip libar-platform prefix from implementation paths, Strip monorepo prefix from implementation paths, Preserve paths without repository prefix_
 
 **All implementation links in a pattern are normalized**
 
+**Invariant:** Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.
+    **Verified by:** Multiple implementations with mixed prefixes
+
 _Verified by: Multiple implementations with mixed prefixes_
 
 **normalizeImplPath strips known prefixes**
+
+**Invariant:** normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged.
+    **Verified by:** Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path
 
 _Verified by: Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path_
 

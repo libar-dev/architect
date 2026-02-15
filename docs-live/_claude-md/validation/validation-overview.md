@@ -118,7 +118,7 @@ Detail Level: Compact summary
 
 | Rule                                                  | Description                                                                                                             |
 | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Pattern cannot implement itself (circular reference)  | A file cannot define a pattern that implements itself. This creates a<br> circular reference. Different patterns are... |
-| Relationship targets should exist (strict mode)       | In strict mode, all relationship targets are validated against known patterns.                                          |
-| Bidirectional traceability links should be consistent |                                                                                                                         |
-| Parent references must be valid                       |                                                                                                                         |
+| Pattern cannot implement itself (circular reference)  | **Invariant:** A pattern's implements tag must reference a different pattern than its own pattern tag....               |
+| Relationship targets should exist (strict mode)       | **Invariant:** Every relationship target must reference a pattern that exists in the known pattern registry when...     |
+| Bidirectional traceability links should be consistent | **Invariant:** Every forward traceability link (executable-specs, roadmap-spec) must have a corresponding back-link...  |
+| Parent references must be valid                       | **Invariant:** A pattern's parent reference must point to an existing epic pattern in the registry.<br> \*\*Verified... |

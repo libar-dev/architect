@@ -113,17 +113,32 @@ Tests the Implementations section rendering in pattern documents.
 
 **Implementation files appear in pattern docs via @libar-docs-implements**
 
+**Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+    **Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
+    **Verified by:** Implementations section renders with file links, Implementation includes description when available
+
 _Verified by: Implementations section renders with file links, Implementation includes description when available_
 
 **Multiple implementations are listed alphabetically**
+
+**Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
+    **Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
+    **Verified by:** Multiple implementations sorted by file path
 
 _Verified by: Multiple implementations sorted by file path_
 
 **Patterns without implementations omit the section**
 
+**Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+    **Verified by:** No implementations section when none exist
+
 _Verified by: No implementations section when none exist_
 
 **Implementation references use relative file links**
+
+**Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
+    **Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
+    **Verified by:** Links are relative from patterns directory
 
 _Verified by: Links are relative from patterns directory_
 

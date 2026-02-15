@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 Links to implementation files in generated pattern documents should have
-  correct relative paths. Repository prefixes like "libar-platform/" must
-  be stripped to produce valid links from the output directory.
+correct relative paths. Repository prefixes like "libar-platform/" must
+be stripped to produce valid links from the output directory.
 
 ## Acceptance Criteria
 
@@ -26,8 +26,8 @@ Links to implementation files in generated pattern documents should have
 - Then the implementation link path is "../../packages/core/src/handler.ts"
 - And the link text is "`handler.ts`"
 
-| file | description |
-| --- | --- |
+| file                                        | description  |
+| ------------------------------------------- | ------------ |
 | libar-platform/packages/core/src/handler.ts | Main handler |
 
 **Strip monorepo prefix from implementation paths**
@@ -36,9 +36,9 @@ Links to implementation files in generated pattern documents should have
 - When the pattern detail document is generated
 - Then the implementation link path is "../../packages/api/src/client.ts"
 
-| file | description |
-| --- | --- |
-| monorepo/packages/api/src/client.ts | API client |
+| file                                | description |
+| ----------------------------------- | ----------- |
+| monorepo/packages/api/src/client.ts | API client  |
 
 **Preserve paths without repository prefix**
 
@@ -46,8 +46,8 @@ Links to implementation files in generated pattern documents should have
 - When the pattern detail document is generated
 - Then the implementation link path is "../../packages/core/src/handler.ts"
 
-| file | description |
-| --- | --- |
+| file                         | description  |
+| ---------------------------- | ------------ |
 | packages/core/src/handler.ts | Main handler |
 
 **Multiple implementations with mixed prefixes**
@@ -56,17 +56,17 @@ Links to implementation files in generated pattern documents should have
 - When the pattern detail document is generated
 - Then the implementation links should be:
 
-| file | description |
-| --- | --- |
-| libar-platform/packages/core/src/a.ts | File A |
-| packages/core/src/b.ts | File B |
-| libar-platform/packages/api/src/c.ts | File C |
+| file                                  | description |
+| ------------------------------------- | ----------- |
+| libar-platform/packages/core/src/a.ts | File A      |
+| packages/core/src/b.ts                | File B      |
+| libar-platform/packages/api/src/c.ts  | File C      |
 
-| index | path |
-| --- | --- |
-| 1 | ../../packages/api/src/c.ts |
-| 2 | ../../packages/core/src/a.ts |
-| 3 | ../../packages/core/src/b.ts |
+| index | path                         |
+| ----- | ---------------------------- |
+| 1     | ../../packages/api/src/c.ts  |
+| 2     | ../../packages/core/src/a.ts |
+| 3     | ../../packages/core/src/b.ts |
 
 **Strips libar-platform/ prefix**
 
@@ -96,13 +96,23 @@ Links to implementation files in generated pattern documents should have
 
 **Repository prefixes are stripped from implementation paths**
 
+**Invariant:** Implementation file paths must not contain repository-level prefixes like "libar-platform/" or "monorepo/".
+**Rationale:** Generated links are relative to the output directory; repository prefixes produce broken paths.
+**Verified by:** Strip libar-platform prefix from implementation paths, Strip monorepo prefix from implementation paths, Preserve paths without repository prefix
+
 _Verified by: Strip libar-platform prefix from implementation paths, Strip monorepo prefix from implementation paths, Preserve paths without repository prefix_
 
 **All implementation links in a pattern are normalized**
 
+**Invariant:** Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.
+**Verified by:** Multiple implementations with mixed prefixes
+
 _Verified by: Multiple implementations with mixed prefixes_
 
 **normalizeImplPath strips known prefixes**
+
+**Invariant:** normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged.
+**Verified by:** Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path
 
 _Verified by: Strips libar-platform/ prefix, Strips monorepo/ prefix, Returns unchanged path without known prefix, Only strips prefix at start of path_
 

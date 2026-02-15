@@ -17,6 +17,10 @@ Feature: Table Extraction Without Duplication
 
   Rule: Tables in rule descriptions render exactly once
 
+    **Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no residual pipe characters in surrounding text.
+    **Rationale:** Without deduplication, tables extracted for formatting would also remain in the raw description text, producing duplicate output.
+    **Verified by:** Single table renders once in detailed mode, Table is extracted and properly formatted
+
     Scenario: Single table renders once in detailed mode
       Given a pattern with a rule named "Command categories" and description:
         """
@@ -43,6 +47,9 @@ Feature: Table Extraction Without Duplication
 
   Rule: Multiple tables in description each render exactly once
 
+    **Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
+    **Verified by:** Two tables in description render as two separate tables
+
     Scenario: Two tables in description render as two separate tables
       Given a pattern with a rule named "Multiple table rule" and description:
         """
@@ -66,6 +73,9 @@ Feature: Table Extraction Without Duplication
   # ===========================================================================
 
   Rule: stripMarkdownTables removes table syntax from text
+
+    **Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
+    **Verified by:** Strips single table from text, Strips multiple tables from text, Preserves text without tables
 
     Scenario: Strips single table from text
       Given text containing a markdown table:

@@ -2,6 +2,8 @@
 @libar-docs-pattern:ErrorHandlingUnification
 @libar-docs-status:completed
 @libar-docs-product-area:CoreTypes
+@libar-docs-include:core-types
+@libar-docs-depends-on:ResultMonad,ErrorFactories
 @behavior @error-handling
 Feature: Error Handling Unification
   All CLI commands and extractors should use the DocError discriminated

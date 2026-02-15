@@ -17,6 +17,10 @@ Feature: Remaining Work Summary Accuracy
 
   Rule: Summary totals equal sum of phase table rows
 
+    **Invariant:** The summary Active and Total Remaining counts must exactly equal the sum of the corresponding counts across all phase table rows.
+    **Rationale:** A mismatch between summary and phase-level totals indicates patterns are being double-counted or dropped.
+    **Verified by:** Summary matches phase table with all patterns having phases, Summary includes completed patterns correctly
+
     Scenario: Summary matches phase table with all patterns having phases
       Given a dataset with patterns:
         | id | patternName | status | phase |
@@ -44,6 +48,10 @@ Feature: Remaining Work Summary Accuracy
   # ===========================================================================
 
   Rule: Patterns without phases appear in Backlog row
+
+    **Invariant:** Patterns that have no assigned phase must be grouped into a "Backlog" row in the phase table rather than being omitted.
+    **Rationale:** Unphased patterns are still remaining work; omitting them would undercount the total.
+    **Verified by:** Summary includes backlog patterns without phase, All patterns in backlog when none have phases
 
     Scenario: Summary includes backlog patterns without phase
       Given a dataset with patterns:
@@ -76,6 +84,10 @@ Feature: Remaining Work Summary Accuracy
 
   Rule: Patterns without patternName are counted using id
 
+    **Invariant:** Pattern counting must use pattern.id as the identifier, never patternName, so that patterns with undefined names are neither double-counted nor omitted.
+    **Rationale:** patternName is optional; relying on it for counting would miss unnamed patterns entirely.
+    **Verified by:** Patterns with undefined patternName counted correctly, Mixed patterns with and without patternName
+
     Scenario: Patterns with undefined patternName counted correctly
       Given a dataset with patterns:
         | id | patternName | status | phase |
@@ -104,6 +116,9 @@ Feature: Remaining Work Summary Accuracy
   # ===========================================================================
 
   Rule: All phases with incomplete patterns are shown
+
+    **Invariant:** The phase table must include every phase that contains at least one incomplete pattern, and phases with only completed patterns must be excluded.
+    **Verified by:** Multiple phases shown in order, Completed phases not shown in remaining work
 
     Scenario: Multiple phases shown in order
       Given a dataset with patterns:

@@ -1147,6 +1147,221 @@ Command-line interface for generating documentation from annotated TypeScript.
 
 </details>
 
+### StubTaxonomyTagTests
+
+[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
+
+**Problem:**
+Stub metadata (target path, design session) was stored as plain text
+in JSDoc descriptions, invisible to structured queries.
+
+**Solution:**
+Register libar-docs-target and libar-docs-since as taxonomy tags
+so they flow through the extraction pipeline as structured fields.
+
+#### Taxonomy tags are registered in the registry
+
+**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
+
+**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
+
+**Verified by:**
+
+- Target and since tags exist in registry
+
+#### Tags are part of the stub metadata group
+
+**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
+
+**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
+
+**Verified by:**
+
+- Built registry groups target and since as stub tags
+
+### StubResolverTests
+
+[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
+
+**Problem:**
+Design session stubs need structured discovery and resolution
+to determine which stubs have been implemented and which remain.
+
+**Solution:**
+StubResolver functions identify, resolve, and group stubs from
+the MasterDataset with filesystem existence checks.
+
+<details>
+<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
+
+#### Stubs are identified by path or target metadata
+
+**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+
+**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+
+**Verified by:**
+
+- Patterns in stubs directory are identified as stubs
+- Patterns with targetPath are identified as stubs
+
+</details>
+
+<details>
+<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
+
+#### Stubs are resolved against the filesystem
+
+**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
+
+**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
+
+**Verified by:**
+
+- Resolved stubs show target existence status
+- Stubs are grouped by implementing pattern
+
+</details>
+
+<details>
+<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
+
+#### Decision items are extracted from descriptions
+
+**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
+
+**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
+
+**Verified by:**
+
+- AD-N items are extracted from description text
+- Empty description returns no decision items
+- Malformed AD items are skipped
+
+</details>
+
+<details>
+<summary>PDR references are found across patterns (2 scenarios)</summary>
+
+#### PDR references are found across patterns
+
+**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
+
+**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
+
+**Verified by:**
+
+- Patterns referencing a PDR are found
+- No references returns empty result
+
+</details>
+
+### ScopeValidatorTests
+
+[View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
+
+**Problem:**
+Starting an implementation or design session without checking prerequisites
+wastes time when blockers are discovered mid-session.
+
+**Solution:**
+ScopeValidator runs composable checks and aggregates results into a verdict
+(ready, blocked, or warnings) before a session starts.
+
+<details>
+<summary>Implementation scope validation checks all prerequisites (7 scenarios)</summary>
+
+#### Implementation scope validation checks all prerequisites
+
+**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
+
+**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
+
+**Verified by:**
+
+- All implementation checks pass
+- Incomplete dependency blocks implementation
+- FSM transition from completed blocks implementation
+- Missing PDR references produce WARN
+- No deliverables blocks implementation
+- Strict mode promotes WARN to BLOCKED
+- Pattern not found throws error
+
+</details>
+
+<details>
+<summary>Design scope validation checks dependency stubs (2 scenarios)</summary>
+
+#### Design scope validation checks dependency stubs
+
+**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
+
+**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
+
+**Verified by:**
+
+- Design session with no dependencies passes
+- Design session with dependencies lacking stubs produces WARN
+
+</details>
+
+<details>
+<summary>Formatter produces structured text output (3 scenarios)</summary>
+
+#### Formatter produces structured text output
+
+**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
+
+**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
+
+**Verified by:**
+
+- Formatter produces markers per ADR-008
+- Formatter shows warnings verdict text
+- Formatter shows blocker details for blocked verdict
+
+</details>
+
+### HandoffGeneratorTests
+
+[View HandoffGeneratorTests source](tests/features/api/session-support/handoff-generator.feature)
+
+**Problem:**
+Multi-session work loses critical state between sessions when handoff
+documentation is manual or forgotten.
+
+**Solution:**
+HandoffGenerator assembles a structured handoff document from ProcessStateAPI
+and MasterDataset, capturing completed work, remaining items, discovered
+issues, and next-session priorities.
+
+#### Handoff generates compact session state summary
+
+**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
+
+**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
+
+**Verified by:**
+
+- Generate handoff for in-progress pattern
+- Handoff captures discovered items
+- Session type is inferred from status
+- Completed pattern infers review session type
+- Deferred pattern infers design session type
+- Files modified section included when provided
+- Blockers section shows incomplete dependencies
+- Pattern not found throws error
+
+#### Formatter produces structured text output
+
+**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
+
+**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
+
+**Verified by:**
+
+- Handoff formatter produces markers per ADR-008
+
 ### ContextFormatterTests
 
 [View ContextFormatterTests source](tests/features/api/context-assembly/context-formatter.feature)
@@ -1298,221 +1513,6 @@ buildOverview() pure functions that operate on MasterDataset.
 - File list includes primary and related files
 - File list includes implementation files for completed dependencies
 - File list without related returns only primary
-
-</details>
-
-### ScopeValidatorTests
-
-[View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
-
-**Problem:**
-Starting an implementation or design session without checking prerequisites
-wastes time when blockers are discovered mid-session.
-
-**Solution:**
-ScopeValidator runs composable checks and aggregates results into a verdict
-(ready, blocked, or warnings) before a session starts.
-
-<details>
-<summary>Implementation scope validation checks all prerequisites (7 scenarios)</summary>
-
-#### Implementation scope validation checks all prerequisites
-
-**Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR references, and deliverable presence, with strict mode promoting warnings to blockers.
-
-**Rationale:** Starting implementation without passing scope validation wastes an entire session — the validator catches all known blockers before any code is written.
-
-**Verified by:**
-
-- All implementation checks pass
-- Incomplete dependency blocks implementation
-- FSM transition from completed blocks implementation
-- Missing PDR references produce WARN
-- No deliverables blocks implementation
-- Strict mode promotes WARN to BLOCKED
-- Pattern not found throws error
-
-</details>
-
-<details>
-<summary>Design scope validation checks dependency stubs (2 scenarios)</summary>
-
-#### Design scope validation checks dependency stubs
-
-**Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing warnings when stubs are missing.
-
-**Rationale:** Design sessions that reference unstubbed dependencies cannot produce actionable interfaces — stub presence indicates the dependency's API surface is at least sketched.
-
-**Verified by:**
-
-- Design session with no dependencies passes
-- Design session with dependencies lacking stubs produces WARN
-
-</details>
-
-<details>
-<summary>Formatter produces structured text output (3 scenarios)</summary>
-
-#### Formatter produces structured text output
-
-**Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text for warnings and blocker details for blocked verdicts.
-
-**Rationale:** Structured formatter output enables the CLI to display verdicts consistently — unstructured output would vary by validation type and be hard to parse.
-
-**Verified by:**
-
-- Formatter produces markers per ADR-008
-- Formatter shows warnings verdict text
-- Formatter shows blocker details for blocked verdict
-
-</details>
-
-### HandoffGeneratorTests
-
-[View HandoffGeneratorTests source](tests/features/api/session-support/handoff-generator.feature)
-
-**Problem:**
-Multi-session work loses critical state between sessions when handoff
-documentation is manual or forgotten.
-
-**Solution:**
-HandoffGenerator assembles a structured handoff document from ProcessStateAPI
-and MasterDataset, capturing completed work, remaining items, discovered
-issues, and next-session priorities.
-
-#### Handoff generates compact session state summary
-
-**Invariant:** The handoff generator must produce a compact session state summary including pattern status, discovered items, inferred session type, modified files, and dependency blockers, throwing an error for unknown patterns.
-
-**Rationale:** Handoff documents are the bridge between multi-session work — without compact state capture, the next session starts from scratch instead of resuming where the previous one left off.
-
-**Verified by:**
-
-- Generate handoff for in-progress pattern
-- Handoff captures discovered items
-- Session type is inferred from status
-- Completed pattern infers review session type
-- Deferred pattern infers design session type
-- Files modified section included when provided
-- Blockers section shows incomplete dependencies
-- Pattern not found throws error
-
-#### Formatter produces structured text output
-
-**Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for machine-parseable session state.
-
-**Rationale:** ADR-008 markers enable the context assembler to parse handoff output programmatically — unstructured text would require fragile regex parsing.
-
-**Verified by:**
-
-- Handoff formatter produces markers per ADR-008
-
-### StubTaxonomyTagTests
-
-[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
-
-**Problem:**
-Stub metadata (target path, design session) was stored as plain text
-in JSDoc descriptions, invisible to structured queries.
-
-**Solution:**
-Register libar-docs-target and libar-docs-since as taxonomy tags
-so they flow through the extraction pipeline as structured fields.
-
-#### Taxonomy tags are registered in the registry
-
-**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
-
-**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
-
-**Verified by:**
-
-- Target and since tags exist in registry
-
-#### Tags are part of the stub metadata group
-
-**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
-
-**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
-
-**Verified by:**
-
-- Built registry groups target and since as stub tags
-
-### StubResolverTests
-
-[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
-
-**Problem:**
-Design session stubs need structured discovery and resolution
-to determine which stubs have been implemented and which remain.
-
-**Solution:**
-StubResolver functions identify, resolve, and group stubs from
-the MasterDataset with filesystem existence checks.
-
-<details>
-<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
-
-#### Stubs are identified by path or target metadata
-
-**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
-
-**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
-
-**Verified by:**
-
-- Patterns in stubs directory are identified as stubs
-- Patterns with targetPath are identified as stubs
-
-</details>
-
-<details>
-<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
-
-#### Stubs are resolved against the filesystem
-
-**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
-
-**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
-
-**Verified by:**
-
-- Resolved stubs show target existence status
-- Stubs are grouped by implementing pattern
-
-</details>
-
-<details>
-<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
-
-#### Decision items are extracted from descriptions
-
-**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
-
-**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
-
-**Verified by:**
-
-- AD-N items are extracted from description text
-- Empty description returns no decision items
-- Malformed AD items are skipped
-
-</details>
-
-<details>
-<summary>PDR references are found across patterns (2 scenarios)</summary>
-
-#### PDR references are found across patterns
-
-**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
-
-**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
-
-**Verified by:**
-
-- Patterns referencing a PDR are found
-- No references returns empty result
 
 </details>
 

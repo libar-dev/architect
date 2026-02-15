@@ -28,6 +28,11 @@ All CLI commands and extractors should use the DocError discriminated
   - formatDocError for human-readable output with all context fields
   - Error collection pattern that captures warnings without console output
 
+## Dependencies
+
+- Depends on: ResultMonad
+- Depends on: ErrorFactories
+
 ## Acceptance Criteria
 
 **isDocError detects valid DocError instances**

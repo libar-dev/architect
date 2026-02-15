@@ -15,6 +15,9 @@ Feature: Planning Dependency Tags
 
   Rule: Depends-on tag is defined in taxonomy registry
 
+    **Invariant:** The depends-on and enables tags must exist in the taxonomy registry with CSV format.
+    **Verified by:** Depends-on tag exists in registry, Enables tag exists in registry
+
     @unit
     Scenario: Depends-on tag exists in registry
       Given the tag registry is loaded
@@ -36,6 +39,9 @@ Feature: Planning Dependency Tags
   # ===========================================================================
 
   Rule: Depends-on tag is extracted from Gherkin files
+
+    **Invariant:** The Gherkin parser must extract depends-on values from feature file tags, including CSV multi-value lists.
+    **Verified by:** Depends-on extracted from feature file, Multiple depends-on values extracted as CSV
 
     @acceptance-criteria @happy-path
     Scenario: Depends-on extracted from feature file
@@ -69,6 +75,10 @@ Feature: Planning Dependency Tags
 
   Rule: Depends-on in TypeScript triggers anti-pattern warning
 
+    **Invariant:** The depends-on tag must only appear in Gherkin files; its presence in TypeScript is an anti-pattern.
+    **Rationale:** Depends-on represents planning dependencies owned by Gherkin specs, not runtime dependencies owned by TypeScript.
+    **Verified by:** Depends-on in TypeScript is detected by lint rule
+
     The depends-on tag is for planning dependencies and belongs in feature
     files, not TypeScript code. TypeScript files should use "uses" for
     runtime dependencies.
@@ -84,6 +94,9 @@ Feature: Planning Dependency Tags
   # ===========================================================================
 
   Rule: Enables tag is extracted from Gherkin files
+
+    **Invariant:** The Gherkin parser must extract enables values from feature file tags, including CSV multi-value lists.
+    **Verified by:** Enables extracted from feature file, Multiple enables values extracted as CSV
 
     @acceptance-criteria @happy-path
     Scenario: Enables extracted from feature file
@@ -116,6 +129,9 @@ Feature: Planning Dependency Tags
   # ===========================================================================
 
   Rule: Planning dependencies are stored in relationship index
+
+    **Invariant:** The relationship index must store dependsOn and enables relationships extracted from pattern metadata.
+    **Verified by:** DependsOn relationships stored in relationship index, Enables relationships stored explicitly
 
     The relationship index stores dependsOn and enables relationships
     directly from pattern metadata. These are explicit declarations.

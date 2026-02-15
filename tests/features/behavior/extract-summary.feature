@@ -24,6 +24,9 @@ Feature: Extract Summary from Pattern Descriptions
   @function:extractSummary @happy-path
   Rule: Single-line descriptions are returned as-is when complete
 
+    **Invariant:** A single-line description that ends with sentence-ending punctuation is returned verbatim; one without gets an appended ellipsis.
+    **Verified by:** Complete sentence on single line, Single line without sentence ending gets ellipsis
+
     Scenario: Complete sentence on single line
       When I extract summary from:
         """
@@ -44,6 +47,9 @@ Feature: Extract Summary from Pattern Descriptions
 
   @function:extractSummary
   Rule: Multi-line descriptions are combined until sentence ending
+
+    **Invariant:** Lines are concatenated until a sentence-ending punctuation mark is found or the character limit is reached, whichever comes first.
+    **Verified by:** Two lines combine into complete sentence, Combines lines up to sentence boundary within limit, Long multi-line text truncates when exceeds limit, Multi-line without sentence ending gets ellipsis
 
     Scenario: Two lines combine into complete sentence
       When I extract summary from:
@@ -88,6 +94,10 @@ Feature: Extract Summary from Pattern Descriptions
   @function:extractSummary
   Rule: Long descriptions are truncated at sentence or word boundaries
 
+    **Invariant:** Summaries exceeding the character limit are truncated at the nearest sentence boundary if possible, otherwise at a word boundary with an appended ellipsis.
+    **Rationale:** Sentence-boundary truncation preserves semantic completeness; word-boundary fallback avoids mid-word breaks.
+    **Verified by:** Long text truncates at sentence boundary within limit, Long text without sentence boundary truncates at word with ellipsis
+
     Scenario: Long text truncates at sentence boundary within limit
       When I extract summary from:
         """
@@ -109,6 +119,10 @@ Feature: Extract Summary from Pattern Descriptions
 
   @function:extractSummary
   Rule: Tautological and header lines are skipped
+
+    **Invariant:** Lines that merely repeat the pattern name or consist only of a section header label (e.g., "Problem:", "Solution:") are skipped; the summary begins with the first substantive line.
+    **Rationale:** Tautological opening lines waste the limited summary space without adding information.
+    **Verified by:** Skips pattern name as first line, Skips section header labels, Skips multiple header patterns
 
     Scenario: Skips pattern name as first line
       When I extract summary from "EventBusRouting":
@@ -140,6 +154,9 @@ Feature: Extract Summary from Pattern Descriptions
 
   @function:extractSummary @edge-case
   Rule: Edge cases are handled gracefully
+
+    **Invariant:** Degenerate inputs (empty strings, markdown-only content, bold markers) produce valid output without errors: empty input yields empty string, formatting is stripped, and multiple sentence endings use the first.
+    **Verified by:** Empty description returns empty string, Markdown headers are stripped, Bold markdown is stripped, Multiple sentence endings - takes first complete sentence, Question mark as sentence ending
 
     Scenario: Empty description returns empty string
       When I extract summary from:

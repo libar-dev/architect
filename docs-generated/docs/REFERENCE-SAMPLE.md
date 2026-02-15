@@ -322,13 +322,13 @@ graph LR
         DataAPIArchitectureQueries["DataAPIArchitectureQueries"]:::neighbor
     end
     TagRegistryBuilder ..->|implements| TypeScriptTaxonomyImplementation
+    ProjectConfigTypes -->|uses| ConfigurationTypes
+    ProjectConfigTypes -->|uses| ConfigurationPresets
+    ConfigurationPresets -->|uses| ConfigurationTypes
     PatternHelpers ..->|implements| DataAPIOutputShaping
     ArchQueriesImpl -->|uses| ProcessStateAPI
     ArchQueriesImpl -->|uses| MasterDataset
     ArchQueriesImpl ..->|implements| DataAPIArchitectureQueries
-    ProjectConfigTypes -->|uses| ConfigurationTypes
-    ProjectConfigTypes -->|uses| ConfigurationPresets
-    ConfigurationPresets -->|uses| ConfigurationTypes
     FSMTransitions ..->|implements| PhaseStateMachineValidation
     FSMStates ..->|implements| PhaseStateMachineValidation
     ProcessStateAPI -->|uses| MasterDataset
@@ -340,21 +340,6 @@ graph LR
 ---
 
 ## API Types
-
-### SectionBlock (type)
-
-```typescript
-type SectionBlock =
-  | HeadingBlock
-  | ParagraphBlock
-  | SeparatorBlock
-  | TableBlock
-  | ListBlock
-  | CodeBlock
-  | MermaidBlock
-  | CollapsibleBlock
-  | LinkOutBlock;
-```
 
 ### normalizeStatus (function)
 
@@ -448,6 +433,21 @@ interface CategoryDefinition {
 | priority | Display order priority - lower values appear first in sorted output |
 | description | Brief description of the category's purpose and typical patterns |
 | aliases | Alternative tag names that map to this category (e.g., "es" for "event-sourcing") |
+
+### SectionBlock (type)
+
+```typescript
+type SectionBlock =
+  | HeadingBlock
+  | ParagraphBlock
+  | SeparatorBlock
+  | TableBlock
+  | ListBlock
+  | CodeBlock
+  | MermaidBlock
+  | CollapsibleBlock
+  | LinkOutBlock;
+```
 
 ---
 

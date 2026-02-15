@@ -133,13 +133,23 @@ They are moved to a poison queue for manual review.
 
 **Leading headers are stripped from pattern descriptions**
 
+**Invariant:** Markdown headers at the start of a pattern description are removed before rendering to prevent duplicate headings under the Description section.
+    **Rationale:** The codec already emits a "## Description" header; preserving the source header would create a redundant or conflicting heading hierarchy.
+    **Verified by:** Strip single leading markdown header, Strip multiple leading headers, Preserve description without leading header
+
 _Verified by: Strip single leading markdown header, Strip multiple leading headers, Preserve description without leading header_
 
 **Edge cases are handled correctly**
 
+**Invariant:** Header stripping handles degenerate inputs (header-only, whitespace-only, mid-description headers) without data loss or rendering errors.
+    **Verified by:** Empty description after stripping headers, Description with only whitespace and headers, Header in middle of description is preserved
+
 _Verified by: Empty description after stripping headers, Description with only whitespace and headers, Header in middle of description is preserved_
 
 **stripLeadingHeaders removes only leading headers**
+
+**Invariant:** The helper function strips only headers that appear before any non-header content; headers occurring after body text are preserved.
+    **Verified by:** Strips h1 header, Strips h2 through h6 headers, Strips leading empty lines before header, Preserves content starting with text, Returns empty string for header-only input, Handles null/undefined input
 
 _Verified by: Strips h1 header, Strips h2 through h6 headers, Strips leading empty lines before header, Preserves content starting with text, Returns empty string for header-only input, Handles null/undefined input_
 

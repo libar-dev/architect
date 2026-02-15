@@ -107,24 +107,39 @@ export function durabilityPrimitive() {}
 
 **Implements tag is defined in taxonomy registry**
 
-The tag registry defines `implements` with CSV format, enabling the
+**Invariant:** The implements tag must exist in the taxonomy registry with CSV format.
+    **Verified by:** Implements tag exists in registry
+
+    The tag registry defines `implements` with CSV format, enabling the
     data-driven AST parser to automatically extract it.
 
 _Verified by: Implements tag exists in registry_
 
 **Files can implement a single pattern**
 
+**Invariant:** The AST parser must extract a single implements value and preserve it through the extraction pipeline.
+    **Verified by:** Parse implements with single pattern, Implements preserved through extraction pipeline
+
 _Verified by: Parse implements with single pattern, Implements preserved through extraction pipeline_
 
 **Files can implement multiple patterns using CSV format**
+
+**Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace trimming.
+    **Verified by:** Parse implements with multiple patterns, CSV values are trimmed
 
 _Verified by: Parse implements with multiple patterns, CSV values are trimmed_
 
 **Transform builds implementedBy reverse lookup**
 
+**Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement them.
+    **Verified by:** Single implementation creates reverse lookup, Multiple implementations aggregate
+
 _Verified by: Single implementation creates reverse lookup, Multiple implementations aggregate_
 
 **Schemas validate implements field correctly**
+
+**Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types.
+    **Verified by:** DocDirective schema accepts implements, RelationshipEntry schema accepts implementedBy
 
 _Verified by: DocDirective schema accepts implements, RelationshipEntry schema accepts implementedBy_
 

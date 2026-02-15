@@ -45,11 +45,11 @@ Detail Level: Compact summary
 
 --- DocStringMediaType ---
 
-| Rule                                                   | Description |
-| ------------------------------------------------------ | ----------- |
-| Parser preserves DocString mediaType during extraction |             |
-| MediaType is used when rendering code blocks           |             |
-| renderDocString handles both string and object formats |             |
+| Rule                                                   | Description                                                                                                          |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Parser preserves DocString mediaType during extraction | **Invariant:** The Gherkin parser must retain the mediaType annotation from DocString delimiters through to the...   |
+| MediaType is used when rendering code blocks           | **Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the... |
+| renderDocString handles both string and object formats | **Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a...       |
 
 --- AstParser ---
 
@@ -84,13 +84,13 @@ Detail Level: Compact summary
 
 --- DualSourceExtractorTesting ---
 
-| Rule                                                             | Description |
-| ---------------------------------------------------------------- | ----------- |
-| Process metadata is extracted from feature tags                  |             |
-| Deliverables are extracted from Background tables                |             |
-| Code and feature patterns are combined into dual-source patterns |             |
-| Dual-source results are validated for consistency                |             |
-| Include tags are extracted from Gherkin feature tags             |             |
+| Rule                                                             | Description                                                                                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Process metadata is extracted from feature tags                  | **Invariant:** A feature file must have both @pattern and @phase tags to produce valid process metadata; missing...      |
+| Deliverables are extracted from Background tables                | **Invariant:** Deliverables are sourced exclusively from Background tables; features without a Background produce an...  |
+| Code and feature patterns are combined into dual-source patterns | **Invariant:** A combined pattern is produced only when both a code stub and a feature file exist for the same...        |
+| Dual-source results are validated for consistency                | **Invariant:** Cross-source validation reports errors for metadata mismatches and warnings for orphaned patterns that... |
+| Include tags are extracted from Gherkin feature tags             | **Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no...         |
 
 --- DeclarationLevelShapeTaggingTesting ---
 
@@ -121,52 +121,52 @@ Detail Level: Compact summary
 
 --- ContextInference ---
 
-| Rule                                               | Description |
-| -------------------------------------------------- | ----------- |
-| matchPattern supports recursive wildcard \*\*      |             |
-| matchPattern supports single-level wildcard /\*    |             |
-| matchPattern supports prefix matching              |             |
-| inferContext returns undefined when no rules match |             |
-| inferContext applies first matching rule           |             |
-| Explicit archContext is not overridden             |             |
-| Inference works independently of archLayer         |             |
-| Default rules map standard directories             |             |
+| Rule                                               | Description                                                                                                                |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| matchPattern supports recursive wildcard \*\*      | **Invariant:** The `**` wildcard matches files at any nesting depth below the specified directory prefix....               |
+| matchPattern supports single-level wildcard /\*    | **Invariant:** The `/*` wildcard matches only direct children of the specified directory, not deeper nested files....      |
+| matchPattern supports prefix matching              | **Invariant:** A trailing slash pattern matches any file whose path starts with that directory prefix.<br> \*\*Verified... |
+| inferContext returns undefined when no rules match | **Invariant:** When no inference rule matches a file path, the pattern receives no inferred context and is excluded...     |
+| inferContext applies first matching rule           | **Invariant:** When multiple rules could match a file path, only the first matching rule determines the inferred...        |
+| Explicit archContext is not overridden             | **Invariant:** A pattern with an explicitly annotated archContext retains that value regardless of matching inference...   |
+| Inference works independently of archLayer         | **Invariant:** Context inference operates on file path alone; the presence or absence of archLayer does not affect...      |
+| Default rules map standard directories             | **Invariant:** Each standard source directory (validation, scanner, extractor, etc.) maps to a well-known bounded...       |
 
 --- UsesTagTesting ---
 
-| Rule                                                | Description                                                                                                           |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Uses tag is defined in taxonomy registry            |                                                                                                                       |
-| Uses tag is extracted from TypeScript files         |                                                                                                                       |
-| Used-by tag is extracted from TypeScript files      |                                                                                                                       |
-| Uses relationships are stored in relationship index | The relationship index stores uses and usedBy relationships directly<br> from pattern metadata. Unlike implements,... |
-| Schemas validate uses field correctly               |                                                                                                                       |
+| Rule                                                | Description                                                                                                             |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Uses tag is defined in taxonomy registry            | **Invariant:** The uses and used-by tags must be registered in the taxonomy with CSV format and dependency-related...   |
+| Uses tag is extracted from TypeScript files         | **Invariant:** The AST parser must extract single and comma-separated uses values from TypeScript JSDoc annotations.... |
+| Used-by tag is extracted from TypeScript files      | **Invariant:** The AST parser must extract single and comma-separated used-by values from TypeScript JSDoc...           |
+| Uses relationships are stored in relationship index | **Invariant:** All declared uses and usedBy relationships must be stored in the relationship index as explicitly...     |
+| Schemas validate uses field correctly               | **Invariant:** DocDirective and RelationshipEntry schemas must accept uses and usedBy fields as valid CSV string...     |
 
 --- ImplementsTagProcessing ---
 
-| Rule                                                   | Description                                                                                                        |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| Implements tag is defined in taxonomy registry         | The tag registry defines `implements` with CSV format, enabling the<br> data-driven AST parser to automatically... |
-| Files can implement a single pattern                   |                                                                                                                    |
-| Files can implement multiple patterns using CSV format |                                                                                                                    |
-| Transform builds implementedBy reverse lookup          |                                                                                                                    |
-| Schemas validate implements field correctly            |                                                                                                                    |
+| Rule                                                   | Description                                                                                                             |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Implements tag is defined in taxonomy registry         | **Invariant:** The implements tag must exist in the taxonomy registry with CSV format.<br> **Verified by:**...          |
+| Files can implement a single pattern                   | **Invariant:** The AST parser must extract a single implements value and preserve it through the extraction...          |
+| Files can implement multiple patterns using CSV format | **Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace...    |
+| Transform builds implementedBy reverse lookup          | **Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement... |
+| Schemas validate implements field correctly            | **Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types....   |
 
 --- ExtendsTagTesting ---
 
 | Rule                                         | Description                                                                                                              |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Extends tag is defined in taxonomy registry  |                                                                                                                          |
-| Patterns can extend exactly one base pattern | Extends uses single-value format because pattern inheritance should be<br> single-inheritance to avoid diamond problems. |
-| Transform builds extendedBy reverse lookup   |                                                                                                                          |
-| Linter detects circular inheritance chains   |                                                                                                                          |
+| Extends tag is defined in taxonomy registry  | **Invariant:** The extends tag must exist in the taxonomy registry with single-value format.<br> **Verified by:**...     |
+| Patterns can extend exactly one base pattern | **Invariant:** A pattern may extend at most one base pattern, enforced by single-value tag format.<br> **Rationale:**... |
+| Transform builds extendedBy reverse lookup   | **Invariant:** The transform must compute an extendedBy reverse index so base patterns know which patterns extend...     |
+| Linter detects circular inheritance chains   | **Invariant:** Circular inheritance chains (direct or transitive) must be detected and reported as errors....            |
 
 --- DependsOnTagTesting ---
 
-| Rule                                                   | Description                                                                                                          |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Depends-on tag is defined in taxonomy registry         |                                                                                                                      |
-| Depends-on tag is extracted from Gherkin files         |                                                                                                                      |
-| Depends-on in TypeScript triggers anti-pattern warning | The depends-on tag is for planning dependencies and belongs in feature<br> files, not TypeScript code. TypeScript... |
-| Enables tag is extracted from Gherkin files            |                                                                                                                      |
-| Planning dependencies are stored in relationship index | The relationship index stores dependsOn and enables relationships<br> directly from pattern metadata. These are...   |
+| Rule                                                   | Description                                                                                                             |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Depends-on tag is defined in taxonomy registry         | **Invariant:** The depends-on and enables tags must exist in the taxonomy registry with CSV format.<br> \*\*Verified... |
+| Depends-on tag is extracted from Gherkin files         | **Invariant:** The Gherkin parser must extract depends-on values from feature file tags, including CSV multi-value...   |
+| Depends-on in TypeScript triggers anti-pattern warning | **Invariant:** The depends-on tag must only appear in Gherkin files; its presence in TypeScript is an anti-pattern....  |
+| Enables tag is extracted from Gherkin files            | **Invariant:** The Gherkin parser must extract enables values from feature file tags, including CSV multi-value...      |
+| Planning dependencies are stored in relationship index | **Invariant:** The relationship index must store dependsOn and enables relationships extracted from pattern...          |

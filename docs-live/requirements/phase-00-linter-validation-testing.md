@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Validation |
 
 ## Description
 
 Tests for lint rules that validate relationship integrity, detect conflicts,
-  and ensure bidirectional traceability consistency.
+and ensure bidirectional traceability consistency.
 
 ## Acceptance Criteria
 
@@ -105,14 +105,22 @@ Tests for lint rules that validate relationship integrity, detect conflicts,
 
 **Pattern cannot implement itself (circular reference)**
 
-A file cannot define a pattern that implements itself. This creates a
+**Invariant:** A pattern's implements tag must reference a different pattern than its own pattern tag.
+**Rationale:** Self-implementing patterns create circular references that break the sub-pattern hierarchy.
+**Verified by:** Pattern tag with implements tag causes error, Implements without pattern tag is valid
+
+    A file cannot define a pattern that implements itself. This creates a
     circular reference. Different patterns are allowed (sub-pattern hierarchy).
 
 _Verified by: Pattern tag with implements tag causes error, Implements without pattern tag is valid_
 
 **Relationship targets should exist (strict mode)**
 
-In strict mode, all relationship targets are validated against known patterns.
+**Invariant:** Every relationship target must reference a pattern that exists in the known pattern registry when strict mode is enabled.
+**Rationale:** Dangling references to non-existent patterns produce broken dependency graphs and misleading documentation.
+**Verified by:** Uses referencing non-existent pattern warns, Implements referencing non-existent pattern warns, Valid relationship target passes
+
+    In strict mode, all relationship targets are validated against known patterns.
 
 _Verified by: Uses referencing non-existent pattern warns, Implements referencing non-existent pattern warns, Valid relationship target passes_
 

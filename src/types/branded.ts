@@ -1,6 +1,9 @@
 /**
  * Branded type helper
  * Creates nominal types for better compile-time safety
+ *
+ * @libar-docs-shape
+ * @libar-docs-include core-types
  */
 type Branded<T, Brand extends string> = T & { readonly __brand: Brand };
 

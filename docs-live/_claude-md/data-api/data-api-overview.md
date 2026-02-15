@@ -110,6 +110,37 @@ Detail Level: Compact summary
 | CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
 | CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
 
+--- StubTaxonomyTagTests ---
+
+| Rule                                         | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
+| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
+
+--- StubResolverTests ---
+
+| Rule                                            | Description                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
+| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
+| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
+| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
+
+--- ScopeValidatorTests ---
+
+| Rule                                                     | Description                                                                                                             |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
+| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
+| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
+
+--- HandoffGeneratorTests ---
+
+| Rule                                            | Description                                                                                                    |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
+| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
+
 --- ContextFormatterTests ---
 
 | Rule                                                 | Description                                                                                                              |
@@ -127,37 +158,6 @@ Detail Level: Compact summary
 | buildDepTree walks dependency chains with cycle detection | **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate... |
 | buildOverview provides executive project summary          | **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and...        |
 | buildFileReadingList returns paths by relevance           | **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency...                |
-
---- ScopeValidatorTests ---
-
-| Rule                                                     | Description                                                                                                             |
-| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Implementation scope validation checks all prerequisites | **Invariant:** Implementation scope validation must check FSM transition validity, dependency completeness, PDR...      |
-| Design scope validation checks dependency stubs          | **Invariant:** Design scope validation must verify that dependencies have corresponding code stubs, producing...        |
-| Formatter produces structured text output                | **Invariant:** The scope validator formatter must produce structured text with ADR-008 markers, showing verdict text... |
-
---- HandoffGeneratorTests ---
-
-| Rule                                            | Description                                                                                                    |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
-| Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
-
---- StubTaxonomyTagTests ---
-
-| Rule                                         | Description                                                                                                             |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Taxonomy tags are registered in the registry | **Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy... |
-| Tags are part of the stub metadata group     | **Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry....       |
-
---- StubResolverTests ---
-
-| Rule                                            | Description                                                                                                              |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Stubs are identified by path or target metadata | **Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath...        |
-| Stubs are resolved against the filesystem       | **Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the... |
-| Decision items are extracted from descriptions  | **Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions...          |
-| PDR references are found across patterns        | **Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results...     |
 
 --- PatternSummarizeTests ---
 

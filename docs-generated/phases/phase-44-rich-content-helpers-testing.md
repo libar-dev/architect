@@ -36,6 +36,10 @@ As a documentation generator
   - Special characters removal
   - Proper phase prefixing for requirements
 
+#### Dependencies
+
+- Depends on: StringUtils
+
 #### Acceptance Criteria
 
 **Convert pattern names to readable slugs**
@@ -78,17 +82,29 @@ As a documentation generator
 
 **CamelCase names convert to kebab-case**
 
+**Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase.
+    **Verified by:** Convert pattern names to readable slugs
+
 _Verified by: Convert pattern names to readable slugs_
 
 **Edge cases are handled correctly**
+
+**Invariant:** Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens without producing invalid slugs.
+    **Verified by:** Handle edge cases in slug generation
 
 _Verified by: Handle edge cases in slug generation_
 
 **Requirements include phase prefix**
 
+**Invariant:** Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number, defaulting to "00" when no phase is assigned.
+    **Verified by:** Requirement slugs include phase number, Requirement without phase uses phase 00
+
 _Verified by: Requirement slugs include phase number, Requirement without phase uses phase 00_
 
 **Phase slugs use kebab-case for names**
+
+**Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format "phase-NN-name", defaulting to "unnamed" when no name is provided.
+    **Verified by:** Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"
 
 _Verified by: Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"_
 
@@ -266,21 +282,36 @@ line2
 
 **DocString parsing handles edge cases**
 
+**Invariant:** DocString parsing must gracefully handle empty input, missing language hints, unclosed delimiters, and non-LF line endings without throwing errors.
+    **Verified by:** Empty description returns empty array, Description with no DocStrings returns single paragraph, Single DocString parses correctly, DocString without language hint uses text, Unclosed DocString returns plain paragraph fallback, Windows CRLF line endings are normalized
+
 _Verified by: Empty description returns empty array, Description with no DocStrings returns single paragraph, Single DocString parses correctly, DocString without language hint uses text, Unclosed DocString returns plain paragraph fallback, Windows CRLF line endings are normalized_
 
 **DataTable rendering produces valid markdown**
+
+**Invariant:** DataTable rendering must produce a well-formed table block for any number of rows, substituting empty strings for missing cell values.
+    **Verified by:** Single row DataTable renders correctly, Multi-row DataTable renders correctly, Missing cell values become empty strings
 
 _Verified by: Single row DataTable renders correctly, Multi-row DataTable renders correctly, Missing cell values become empty strings_
 
 **Scenario content rendering respects options**
 
+**Invariant:** Scenario rendering must honor the includeSteps option, producing step lists only when enabled, and must include embedded DataTables when present.
+    **Verified by:** Render scenario with steps, Skip steps when includeSteps is false, Render scenario with DataTable in step
+
 _Verified by: Render scenario with steps, Skip steps when includeSteps is false, Render scenario with DataTable in step_
 
 **Business rule rendering handles descriptions**
 
+**Invariant:** Business rule rendering must always include the rule name as a bold paragraph, and must parse descriptions for embedded DocStrings when present.
+    **Verified by:** Rule with simple description, Rule with no description, Rule with embedded DocString in description
+
 _Verified by: Rule with simple description, Rule with no description, Rule with embedded DocString in description_
 
 **DocString content is dedented when parsed**
+
+**Invariant:** DocString code blocks must be dedented to remove common leading whitespace while preserving internal relative indentation, empty lines, and trimming trailing whitespace from each line.
+    **Verified by:** Code block preserves internal relative indentation, Empty lines in code block are preserved, Trailing whitespace is trimmed from each line, Code with mixed indentation is preserved
 
 _Verified by: Code block preserves internal relative indentation, Empty lines in code block are preserved, Trailing whitespace is trimmed from each line, Code with mixed indentation is preserved_
 

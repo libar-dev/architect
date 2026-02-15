@@ -227,9 +227,15 @@ The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset
 
 **RequirementsDocumentCodec generates PRD-style documentation from patterns**
 
+**Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+    **Verified by:** No patterns with PRD metadata produces empty message, Summary shows counts and groupings, By product area section groups patterns correctly, By user role section uses collapsible groups, Group by phase option changes primary grouping, Filter by status option limits patterns, All features table shows complete list, Business value rendering when enabled, Generate individual requirement detail files when enabled, Requirement detail file contains acceptance criteria from scenarios, Requirement detail file contains business rules section, Implementation links from relationshipIndex
+
 _Verified by: No patterns with PRD metadata produces empty message, Summary shows counts and groupings, By product area section groups patterns correctly, By user role section uses collapsible groups, Group by phase option changes primary grouping, Filter by status option limits patterns, All features table shows complete list, Business value rendering when enabled, Generate individual requirement detail files when enabled, Requirement detail file contains acceptance criteria from scenarios, Requirement detail file contains business rules section, Implementation links from relationshipIndex_
 
 **AdrDocumentCodec documents architecture decisions**
+
+**Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+    **Verified by:** No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, ADR entries use clean text without emojis, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content
 
 _Verified by: No ADR patterns produces empty message, Summary shows status counts and categories, ADRs grouped by category, ADRs grouped by phase option, ADRs grouped by date (quarter) option, ADR index table with all decisions, ADR entries use clean text without emojis, Context, Decision, Consequences sections from Rule keywords, ADR supersedes rendering, Generate individual ADR detail files when enabled, ADR detail file contains full content_
 

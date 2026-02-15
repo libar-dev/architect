@@ -5,16 +5,130 @@
 
 ---
 
-**What foundational types exist?** Foundation types used across all other areas. The Result monad replaces try/catch with explicit error handling — functions return `Result.ok(value)` or `Result.err(error)` instead of throwing. DocError provides structured error context with type, file, line, and reason fields.
+**What foundational types exist?** CoreTypes provides the foundational type system used across all other areas. Three pillars enforce discipline at compile time: the Result monad replaces try/catch with explicit error handling — functions return `Result.ok(value)` or `Result.err(error)` instead of throwing. The DocError discriminated union provides structured error context with type, file, line, and reason fields, enabling exhaustive pattern matching in error handlers. Branded types create nominal typing from structural TypeScript — `PatternId`, `CategoryName`, and `SourceFilePath` are compile-time distinct despite all being strings. String utilities handle slugification and case conversion with acronym-aware title casing.
 
 ## Key Invariants
 
-- Result over try/catch: All functions return `Result<T, E>` instead of throwing. Compile-time verification that errors are handled
-- DocError discriminated union: Structured errors with type, file, line, reason. `isDocError` type guard for safe classification
+- Result over try/catch: All functions return `Result<T, E>` instead of throwing. Compile-time verification that errors are handled. `isOk`/`isErr` type guards enable safe narrowing
+- DocError discriminated union: 12 structured error types with `type` discriminator field. `isDocError` type guard for safe classification. Specialized union aliases (`ScanError`, `ExtractionError`) scope error handling per operation
+- Branded nominal types: `Branded<T, Brand>` creates compile-time distinct types from structural TypeScript. Prevents mixing `PatternId` with `CategoryName` even though both are `string` at runtime
+- String transformation consistency: `slugify` produces URL-safe identifiers, `camelCaseToTitleCase` preserves acronyms (e.g., "APIEndpoint" becomes "API Endpoint"), `toKebabCase` handles consecutive uppercase correctly
+
+---
+
+## Core Type System
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+C4Context
+    title Core Type System
+    System(StringUtils, "StringUtils")
+    System(ResultMonad, "ResultMonad")
+    System(ErrorFactories, "ErrorFactories")
+    System(KebabCaseSlugs, "KebabCaseSlugs")
+    System(ErrorHandlingUnification, "ErrorHandlingUnification")
+    Rel(KebabCaseSlugs, StringUtils, "depends on")
+    Rel(ErrorHandlingUnification, ResultMonad, "depends on")
+    Rel(ErrorHandlingUnification, ErrorFactories, "depends on")
+```
+
+---
+
+## Error Handling Flow
+
+Scoped architecture diagram showing component relationships:
+
+```mermaid
+graph LR
+    StringUtils["StringUtils"]
+    ResultMonad["ResultMonad"]
+    ErrorFactories["ErrorFactories"]
+    KebabCaseSlugs["KebabCaseSlugs"]
+    ErrorHandlingUnification["ErrorHandlingUnification"]
+    KebabCaseSlugs -.->|depends on| StringUtils
+    ErrorHandlingUnification -.->|depends on| ResultMonad
+    ErrorHandlingUnification -.->|depends on| ErrorFactories
+```
+
+---
+
+## API Types
+
+### BaseDocError (interface)
+
+```typescript
+/**
+ * Base error interface for all documentation errors
+ *
+ */
+```
+
+```typescript
+interface BaseDocError {
+  /** Error type discriminator for pattern matching */
+  readonly type: string;
+  /** Human-readable error message */
+  readonly message: string;
+}
+```
+
+| Property | Description                                   |
+| -------- | --------------------------------------------- |
+| type     | Error type discriminator for pattern matching |
+| message  | Human-readable error message                  |
+
+### DocError (type)
+
+```typescript
+/**
+ * Discriminated union of all possible errors
+ *
+ * **Benefits**:
+ * - Exhaustive pattern matching in switch statements
+ * - Type narrowing based on `type` field
+ * - Compile-time verification of error handling
+ *
+ */
+```
+
+```typescript
+type DocError =
+  | FileSystemError
+  | FileParseError
+  | DirectiveValidationError
+  | PatternValidationError
+  | RegistryValidationError
+  | MarkdownGenerationError
+  | FileWriteError
+  | FeatureParseError
+  | ConfigError
+  | ProcessMetadataValidationError
+  | DeliverableValidationError
+  | GherkinPatternValidationError;
+```
 
 ---
 
 ## Behavior Specifications
+
+### ResultMonadTypes
+
+[View ResultMonadTypes source](src/types/result.ts)
+
+## Result Monad - Type Definitions
+
+Explicit error handling via discriminated union.
+Functions return `Result.ok(value)` or `Result.err(error)` instead of throwing.
+
+### ErrorFactoryTypes
+
+[View ErrorFactoryTypes source](src/types/errors.ts)
+
+## Error Factories - Type Definitions
+
+Structured, discriminated error types with factory functions.
+Each error type has a unique `type` discriminator for exhaustive pattern matching.
 
 ### StringUtils
 
@@ -182,6 +296,8 @@ The slug generation must handle:
 
 #### CamelCase names convert to kebab-case
 
+**Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase.
+
 **Verified by:**
 
 - Convert pattern names to readable slugs
@@ -192,6 +308,8 @@ The slug generation must handle:
 <summary>Edge cases are handled correctly (1 scenarios)</summary>
 
 #### Edge cases are handled correctly
+
+**Invariant:** Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens without producing invalid slugs.
 
 **Verified by:**
 
@@ -204,6 +322,8 @@ The slug generation must handle:
 
 #### Requirements include phase prefix
 
+**Invariant:** Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number, defaulting to "00" when no phase is assigned.
+
 **Verified by:**
 
 - Requirement slugs include phase number
@@ -215,6 +335,8 @@ The slug generation must handle:
 <summary>Phase slugs use kebab-case for names (2 scenarios)</summary>
 
 #### Phase slugs use kebab-case for names
+
+**Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format "phase-NN-name", defaulting to "unnamed" when no name is provided.
 
 **Verified by:**
 

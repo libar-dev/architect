@@ -418,6 +418,10 @@ from being incorrectly escaped when the language hint is lost.
 
 #### Parser preserves DocString mediaType during extraction
 
+**Invariant:** The Gherkin parser must retain the mediaType annotation from DocString delimiters through to the parsed AST; DocStrings without a mediaType have undefined mediaType.
+
+**Rationale:** Losing the mediaType causes downstream renderers to apply incorrect escaping or default language hints, corrupting code block output.
+
 **Verified by:**
 
 - Parse DocString with typescript mediaType
@@ -432,6 +436,8 @@ from being incorrectly escaped when the language hint is lost.
 
 #### MediaType is used when rendering code blocks
 
+**Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the renderer falls back to a caller-specified default language.
+
 **Verified by:**
 
 - TypeScript mediaType renders as typescript code block
@@ -444,6 +450,10 @@ from being incorrectly escaped when the language hint is lost.
 <summary>renderDocString handles both string and object formats (2 scenarios)</summary>
 
 #### renderDocString handles both string and object formats
+
+**Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a mediaType, it takes precedence over the caller-supplied language parameter.
+
+**Rationale:** Legacy callers pass raw strings while newer code passes structured objects — the renderer must handle both without breaking existing usage.
 
 **Verified by:**
 
@@ -766,6 +776,10 @@ consistency, and composes unified pattern data for documentation.
 
 #### Process metadata is extracted from feature tags
 
+**Invariant:** A feature file must have both @pattern and @phase tags to produce valid process metadata; missing either yields null.
+
+**Rationale:** Pattern name and phase are the minimum identifiers for placing a pattern in the roadmap — without both, the pattern cannot be tracked.
+
 **Verified by:**
 
 - Complete process metadata extraction
@@ -780,6 +794,10 @@ consistency, and composes unified pattern data for documentation.
 
 #### Deliverables are extracted from Background tables
 
+**Invariant:** Deliverables are sourced exclusively from Background tables; features without a Background produce an empty deliverable list.
+
+**Rationale:** The Background table is the single source of truth for deliverable tracking — extracting from other locations would create ambiguity.
+
 **Verified by:**
 
 - Standard deliverables table extraction
@@ -793,6 +811,10 @@ consistency, and composes unified pattern data for documentation.
 <summary>Code and feature patterns are combined into dual-source patterns (5 scenarios)</summary>
 
 #### Code and feature patterns are combined into dual-source patterns
+
+**Invariant:** A combined pattern is produced only when both a code stub and a feature file exist for the same pattern name; unmatched sources are tracked separately as code-only or feature-only.
+
+**Rationale:** Dual-source combination ensures documentation reflects both implementation intent (code) and specification (Gherkin) — mismatches signal inconsistency.
 
 **Verified by:**
 
@@ -809,6 +831,10 @@ consistency, and composes unified pattern data for documentation.
 
 #### Dual-source results are validated for consistency
 
+**Invariant:** Cross-source validation reports errors for metadata mismatches and warnings for orphaned patterns that are still in roadmap status.
+
+**Rationale:** Inconsistencies between code stubs and feature files indicate drift — errors catch conflicts while warnings surface missing counterparts that may be intentional.
+
 **Verified by:**
 
 - Clean results have no errors
@@ -822,6 +848,8 @@ consistency, and composes unified pattern data for documentation.
 <summary>Include tags are extracted from Gherkin feature tags (3 scenarios)</summary>
 
 #### Include tags are extracted from Gherkin feature tags
+
+**Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no includes.
 
 **Verified by:**
 
@@ -1074,6 +1102,10 @@ bounded contexts using wildcard matching.
 
 #### matchPattern supports recursive wildcard \*\*
 
+**Invariant:** The `**` wildcard matches files at any nesting depth below the specified directory prefix.
+
+**Rationale:** Directory hierarchies vary in depth; recursive matching ensures all nested files inherit context.
+
 **Verified by:**
 
 - Recursive wildcard matches nested paths
@@ -1084,6 +1116,10 @@ bounded contexts using wildcard matching.
 <summary>matchPattern supports single-level wildcard /* (1 scenarios)</summary>
 
 #### matchPattern supports single-level wildcard /\*
+
+**Invariant:** The `/*` wildcard matches only direct children of the specified directory, not deeper nested files.
+
+**Rationale:** Some contexts apply only to a specific directory level, not its entire subtree.
 
 **Verified by:**
 
@@ -1096,6 +1132,8 @@ bounded contexts using wildcard matching.
 
 #### matchPattern supports prefix matching
 
+**Invariant:** A trailing slash pattern matches any file whose path starts with that directory prefix.
+
 **Verified by:**
 
 - Prefix matching behavior
@@ -1106,6 +1144,10 @@ bounded contexts using wildcard matching.
 <summary>inferContext returns undefined when no rules match (2 scenarios)</summary>
 
 #### inferContext returns undefined when no rules match
+
+**Invariant:** When no inference rule matches a file path, the pattern receives no inferred context and is excluded from the byContext index.
+
+**Rationale:** Unmatched files must not receive a spurious context assignment; absence of context is a valid state.
 
 **Verified by:**
 
@@ -1119,6 +1161,10 @@ bounded contexts using wildcard matching.
 
 #### inferContext applies first matching rule
 
+**Invariant:** When multiple rules could match a file path, only the first matching rule determines the inferred context.
+
+**Rationale:** Deterministic ordering prevents ambiguous context assignment when rules overlap.
+
 **Verified by:**
 
 - Single matching rule infers context
@@ -1131,6 +1177,10 @@ bounded contexts using wildcard matching.
 
 #### Explicit archContext is not overridden
 
+**Invariant:** A pattern with an explicitly annotated archContext retains that value regardless of matching inference rules.
+
+**Rationale:** Explicit annotations represent intentional developer decisions that must not be silently overwritten by automation.
+
 **Verified by:**
 
 - Explicit context takes precedence over inference
@@ -1142,6 +1192,8 @@ bounded contexts using wildcard matching.
 
 #### Inference works independently of archLayer
 
+**Invariant:** Context inference operates on file path alone; the presence or absence of archLayer does not affect context assignment.
+
 **Verified by:**
 
 - Pattern without archLayer is still added to byContext if context is inferred
@@ -1152,6 +1204,10 @@ bounded contexts using wildcard matching.
 <summary>Default rules map standard directories (1 scenarios)</summary>
 
 #### Default rules map standard directories
+
+**Invariant:** Each standard source directory (validation, scanner, extractor, etc.) maps to a well-known bounded context name via the default rule set.
+
+**Rationale:** Convention-based mapping eliminates the need for explicit context annotations on every file in standard directories.
 
 **Verified by:**
 
@@ -1171,6 +1227,8 @@ relationship tags from TypeScript files.
 
 #### Uses tag is defined in taxonomy registry
 
+**Invariant:** The uses and used-by tags must be registered in the taxonomy with CSV format and dependency-related purpose descriptions.
+
 **Verified by:**
 
 - Uses tag exists in registry
@@ -1182,6 +1240,8 @@ relationship tags from TypeScript files.
 <summary>Uses tag is extracted from TypeScript files (2 scenarios)</summary>
 
 #### Uses tag is extracted from TypeScript files
+
+**Invariant:** The AST parser must extract single and comma-separated uses values from TypeScript JSDoc annotations.
 
 **Verified by:**
 
@@ -1195,6 +1255,8 @@ relationship tags from TypeScript files.
 
 #### Used-by tag is extracted from TypeScript files
 
+**Invariant:** The AST parser must extract single and comma-separated used-by values from TypeScript JSDoc annotations.
+
 **Verified by:**
 
 - Single used-by value extracted
@@ -1207,13 +1269,18 @@ relationship tags from TypeScript files.
 
 #### Uses relationships are stored in relationship index
 
-The relationship index stores uses and usedBy relationships directly
-from pattern metadata. Unlike implements, these are explicit declarations.
+**Invariant:** All declared uses and usedBy relationships must be stored in the relationship index as explicitly declared entries.
 
 **Verified by:**
 
 - Uses relationships stored in relationship index
 - UsedBy relationships stored explicitly
+- UsedBy relationships stored explicitly
+
+  The relationship index stores uses and usedBy relationships directly
+  from pattern metadata. Unlike implements
+
+- these are explicit declarations.
 
 </details>
 
@@ -1221,6 +1288,8 @@ from pattern metadata. Unlike implements, these are explicit declarations.
 <summary>Schemas validate uses field correctly (2 scenarios)</summary>
 
 #### Schemas validate uses field correctly
+
+**Invariant:** DocDirective and RelationshipEntry schemas must accept uses and usedBy fields as valid CSV string values.
 
 **Verified by:**
 
@@ -1241,12 +1310,17 @@ to their corresponding roadmap pattern specifications.
 
 #### Implements tag is defined in taxonomy registry
 
-The tag registry defines `implements` with CSV format, enabling the
-data-driven AST parser to automatically extract it.
+**Invariant:** The implements tag must exist in the taxonomy registry with CSV format.
 
 **Verified by:**
 
 - Implements tag exists in registry
+- Implements tag exists in registry
+
+  The tag registry defines `implements` with CSV format
+
+- enabling the
+  data-driven AST parser to automatically extract it.
 
 </details>
 
@@ -1254,6 +1328,8 @@ data-driven AST parser to automatically extract it.
 <summary>Files can implement a single pattern (2 scenarios)</summary>
 
 #### Files can implement a single pattern
+
+**Invariant:** The AST parser must extract a single implements value and preserve it through the extraction pipeline.
 
 **Verified by:**
 
@@ -1267,6 +1343,8 @@ data-driven AST parser to automatically extract it.
 
 #### Files can implement multiple patterns using CSV format
 
+**Invariant:** The AST parser must split CSV implements values into individual pattern references with whitespace trimming.
+
 **Verified by:**
 
 - Parse implements with multiple patterns
@@ -1279,6 +1357,8 @@ data-driven AST parser to automatically extract it.
 
 #### Transform builds implementedBy reverse lookup
 
+**Invariant:** The transform must compute an implementedBy reverse index so spec patterns know which files implement them.
+
 **Verified by:**
 
 - Single implementation creates reverse lookup
@@ -1290,6 +1370,8 @@ data-driven AST parser to automatically extract it.
 <summary>Schemas validate implements field correctly (2 scenarios)</summary>
 
 #### Schemas validate implements field correctly
+
+**Invariant:** The Zod schemas must accept implements and implementedBy fields with correct array-of-string types.
 
 **Verified by:**
 
@@ -1310,6 +1392,8 @@ relationships between patterns (pattern inheritance).
 
 #### Extends tag is defined in taxonomy registry
 
+**Invariant:** The extends tag must exist in the taxonomy registry with single-value format.
+
 **Verified by:**
 
 - Extends tag exists in registry
@@ -1321,13 +1405,18 @@ relationships between patterns (pattern inheritance).
 
 #### Patterns can extend exactly one base pattern
 
-Extends uses single-value format because pattern inheritance should be
-single-inheritance to avoid diamond problems.
+**Invariant:** A pattern may extend at most one base pattern, enforced by single-value tag format.
+
+**Rationale:** Single inheritance avoids diamond-problem ambiguity in pattern generalization hierarchies.
 
 **Verified by:**
 
 - Parse extends from feature file
 - Extends preserved through extraction pipeline
+- Extends preserved through extraction pipeline
+
+  Extends uses single-value format because pattern inheritance should be
+  single-inheritance to avoid diamond problems.
 
 </details>
 
@@ -1335,6 +1424,8 @@ single-inheritance to avoid diamond problems.
 <summary>Transform builds extendedBy reverse lookup (1 scenarios)</summary>
 
 #### Transform builds extendedBy reverse lookup
+
+**Invariant:** The transform must compute an extendedBy reverse index so base patterns know which patterns extend them.
 
 **Verified by:**
 
@@ -1346,6 +1437,10 @@ single-inheritance to avoid diamond problems.
 <summary>Linter detects circular inheritance chains (2 scenarios)</summary>
 
 #### Linter detects circular inheritance chains
+
+**Invariant:** Circular inheritance chains (direct or transitive) must be detected and reported as errors.
+
+**Rationale:** Circular extends relationships create infinite resolution loops and undefined behavior.
 
 **Verified by:**
 
@@ -1366,6 +1461,8 @@ relationship tags from Gherkin files.
 
 #### Depends-on tag is defined in taxonomy registry
 
+**Invariant:** The depends-on and enables tags must exist in the taxonomy registry with CSV format.
+
 **Verified by:**
 
 - Depends-on tag exists in registry
@@ -1377,6 +1474,8 @@ relationship tags from Gherkin files.
 <summary>Depends-on tag is extracted from Gherkin files (2 scenarios)</summary>
 
 #### Depends-on tag is extracted from Gherkin files
+
+**Invariant:** The Gherkin parser must extract depends-on values from feature file tags, including CSV multi-value lists.
 
 **Verified by:**
 
@@ -1390,13 +1489,20 @@ relationship tags from Gherkin files.
 
 #### Depends-on in TypeScript triggers anti-pattern warning
 
-The depends-on tag is for planning dependencies and belongs in feature
-files, not TypeScript code. TypeScript files should use "uses" for
-runtime dependencies.
+**Invariant:** The depends-on tag must only appear in Gherkin files; its presence in TypeScript is an anti-pattern.
+
+**Rationale:** Depends-on represents planning dependencies owned by Gherkin specs, not runtime dependencies owned by TypeScript.
 
 **Verified by:**
 
 - Depends-on in TypeScript is detected by lint rule
+- Depends-on in TypeScript is detected by lint rule
+
+  The depends-on tag is for planning dependencies and belongs in feature
+  files
+
+- not TypeScript code. TypeScript files should use "uses" for
+  runtime dependencies.
 
 </details>
 
@@ -1404,6 +1510,8 @@ runtime dependencies.
 <summary>Enables tag is extracted from Gherkin files (2 scenarios)</summary>
 
 #### Enables tag is extracted from Gherkin files
+
+**Invariant:** The Gherkin parser must extract enables values from feature file tags, including CSV multi-value lists.
 
 **Verified by:**
 
@@ -1417,13 +1525,16 @@ runtime dependencies.
 
 #### Planning dependencies are stored in relationship index
 
-The relationship index stores dependsOn and enables relationships
-directly from pattern metadata. These are explicit declarations.
+**Invariant:** The relationship index must store dependsOn and enables relationships extracted from pattern metadata.
 
 **Verified by:**
 
 - DependsOn relationships stored in relationship index
 - Enables relationships stored explicitly
+- Enables relationships stored explicitly
+
+  The relationship index stores dependsOn and enables relationships
+  directly from pattern metadata. These are explicit declarations.
 
 </details>
 

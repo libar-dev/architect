@@ -25,6 +25,10 @@ As a documentation generator
   - Special characters removal
   - Proper phase prefixing for requirements
 
+## Dependencies
+
+- Depends on: StringUtils
+
 ## Acceptance Criteria
 
 **Convert pattern names to readable slugs**
@@ -67,17 +71,29 @@ As a documentation generator
 
 **CamelCase names convert to kebab-case**
 
+**Invariant:** CamelCase pattern names must be split at word boundaries and joined with hyphens in lowercase.
+    **Verified by:** Convert pattern names to readable slugs
+
 _Verified by: Convert pattern names to readable slugs_
 
 **Edge cases are handled correctly**
+
+**Invariant:** Slug generation must handle special characters, consecutive separators, and leading/trailing hyphens without producing invalid slugs.
+    **Verified by:** Handle edge cases in slug generation
 
 _Verified by: Handle edge cases in slug generation_
 
 **Requirements include phase prefix**
 
+**Invariant:** Requirement slugs must be prefixed with "phase-NN-" where NN is the zero-padded phase number, defaulting to "00" when no phase is assigned.
+    **Verified by:** Requirement slugs include phase number, Requirement without phase uses phase 00
+
 _Verified by: Requirement slugs include phase number, Requirement without phase uses phase 00_
 
 **Phase slugs use kebab-case for names**
+
+**Invariant:** Phase slugs must combine a zero-padded phase number with the kebab-case name in the format "phase-NN-name", defaulting to "unnamed" when no name is provided.
+    **Verified by:** Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"
 
 _Verified by: Phase slugs combine number and kebab-case name, Phase without name uses "unnamed"_
 

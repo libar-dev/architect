@@ -17,6 +17,10 @@ Feature: DocString MediaType Preservation
 
   Rule: Parser preserves DocString mediaType during extraction
 
+    **Invariant:** The Gherkin parser must retain the mediaType annotation from DocString delimiters through to the parsed AST; DocStrings without a mediaType have undefined mediaType.
+    **Rationale:** Losing the mediaType causes downstream renderers to apply incorrect escaping or default language hints, corrupting code block output.
+    **Verified by:** Parse DocString with typescript mediaType, Parse DocString with json mediaType, Parse DocString with jsdoc mediaType, DocString without mediaType has undefined mediaType
+
     Scenario: Parse DocString with typescript mediaType
       Given a feature file containing a typescript docstring
       When the feature file is parsed
@@ -46,6 +50,9 @@ Feature: DocString MediaType Preservation
 
   Rule: MediaType is used when rendering code blocks
 
+    **Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the renderer falls back to a caller-specified default language.
+    **Verified by:** TypeScript mediaType renders as typescript code block, JSDoc mediaType prevents asterisk escaping, Missing mediaType falls back to default language
+
     Scenario: TypeScript mediaType renders as typescript code block
       Given a docString with content "const x: number = 1;" and mediaType "typescript"
       When the step docString is rendered
@@ -67,6 +74,10 @@ Feature: DocString MediaType Preservation
   # ===========================================================================
 
   Rule: renderDocString handles both string and object formats
+
+    **Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a mediaType, it takes precedence over the caller-supplied language parameter.
+    **Rationale:** Legacy callers pass raw strings while newer code passes structured objects — the renderer must handle both without breaking existing usage.
+    **Verified by:** String docString renders correctly (legacy format), Object docString with mediaType takes precedence
 
     Scenario: String docString renders correctly (legacy format)
       Given a docString as plain string "const x = 1"

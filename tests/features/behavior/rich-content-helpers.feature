@@ -18,6 +18,9 @@ Feature: Rich Content Rendering Helpers
 
   Rule: DocString parsing handles edge cases
 
+    **Invariant:** DocString parsing must gracefully handle empty input, missing language hints, unclosed delimiters, and non-LF line endings without throwing errors.
+    **Verified by:** Empty description returns empty array, Description with no DocStrings returns single paragraph, Single DocString parses correctly, DocString without language hint uses text, Unclosed DocString returns plain paragraph fallback, Windows CRLF line endings are normalized
+
     Scenario: Empty description returns empty array
       Given a description ""
       When parsing for DocStrings
@@ -56,6 +59,9 @@ Feature: Rich Content Rendering Helpers
 
   Rule: DataTable rendering produces valid markdown
 
+    **Invariant:** DataTable rendering must produce a well-formed table block for any number of rows, substituting empty strings for missing cell values.
+    **Verified by:** Single row DataTable renders correctly, Multi-row DataTable renders correctly, Missing cell values become empty strings
+
     Scenario: Single row DataTable renders correctly
       Given a DataTable with headers "Name" and "Value"
       And a row with values "foo" and "bar"
@@ -78,6 +84,9 @@ Feature: Rich Content Rendering Helpers
       Then the row has empty string for "Col2"
 
   Rule: Scenario content rendering respects options
+
+    **Invariant:** Scenario rendering must honor the includeSteps option, producing step lists only when enabled, and must include embedded DataTables when present.
+    **Verified by:** Render scenario with steps, Skip steps when includeSteps is false, Render scenario with DataTable in step
 
     Scenario: Render scenario with steps
       Given a scenario "Test Scenario" with steps:
@@ -102,6 +111,9 @@ Feature: Rich Content Rendering Helpers
 
   Rule: Business rule rendering handles descriptions
 
+    **Invariant:** Business rule rendering must always include the rule name as a bold paragraph, and must parse descriptions for embedded DocStrings when present.
+    **Verified by:** Rule with simple description, Rule with no description, Rule with embedded DocString in description
+
     Scenario: Rule with simple description
       Given a business rule "Must validate input" with description "Ensures all input is validated."
       When rendering the business rule
@@ -125,6 +137,9 @@ Feature: Rich Content Rendering Helpers
   # ═══════════════════════════════════════════════════════════════════════════
 
   Rule: DocString content is dedented when parsed
+
+    **Invariant:** DocString code blocks must be dedented to remove common leading whitespace while preserving internal relative indentation, empty lines, and trimming trailing whitespace from each line.
+    **Verified by:** Code block preserves internal relative indentation, Empty lines in code block are preserved, Trailing whitespace is trimmed from each line, Code with mixed indentation is preserved
 
     Scenario: Code block preserves internal relative indentation
       Given a description with DocString containing nested code

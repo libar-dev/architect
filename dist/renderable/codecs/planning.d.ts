@@ -138,6 +138,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -279,12 +280,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -348,8 +349,8 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -418,6 +419,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -559,12 +561,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -659,6 +661,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -800,12 +803,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -900,6 +903,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -1041,12 +1045,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -1145,6 +1149,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -1286,12 +1291,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -1393,6 +1398,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -1534,12 +1540,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -1634,6 +1640,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -1775,12 +1782,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -1876,6 +1883,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -2017,12 +2025,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2117,6 +2125,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -2258,12 +2267,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2358,6 +2367,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -2499,12 +2509,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2599,6 +2609,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -2740,12 +2751,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -2866,6 +2877,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3007,12 +3019,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3107,6 +3119,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3248,12 +3261,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3348,6 +3361,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3489,12 +3503,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3589,6 +3603,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3730,12 +3745,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -3830,6 +3845,7 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -3971,12 +3987,12 @@ export declare const PlanningChecklistCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -4084,6 +4100,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -4225,12 +4242,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -4294,8 +4311,8 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -4364,6 +4381,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -4505,12 +4523,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -4605,6 +4623,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -4746,12 +4765,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -4846,6 +4865,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -4987,12 +5007,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -5091,6 +5111,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -5232,12 +5253,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -5339,6 +5360,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -5480,12 +5502,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -5580,6 +5602,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -5721,12 +5744,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -5822,6 +5845,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -5963,12 +5987,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -6063,6 +6087,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6204,12 +6229,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -6304,6 +6329,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6445,12 +6471,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -6545,6 +6571,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6686,12 +6713,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -6812,6 +6839,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -6953,12 +6981,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -7053,6 +7081,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -7194,12 +7223,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -7294,6 +7323,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -7435,12 +7465,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -7535,6 +7565,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -7676,12 +7707,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -7776,6 +7807,7 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -7917,12 +7949,12 @@ export declare const SessionPlanCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -8030,6 +8062,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -8171,12 +8204,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -8240,8 +8273,8 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             tag: z.ZodString;
             format: z.ZodEnum<{
                 number: "number";
-                enum: "enum";
                 value: "value";
+                enum: "enum";
                 "quoted-value": "quoted-value";
                 csv: "csv";
                 flag: "flag";
@@ -8310,6 +8343,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -8451,12 +8485,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -8551,6 +8585,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -8692,12 +8727,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -8792,6 +8827,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -8933,12 +8969,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -9037,6 +9073,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -9178,12 +9215,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -9285,6 +9322,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -9426,12 +9464,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -9526,6 +9564,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             archContext: z.ZodOptional<z.ZodString>;
             archLayer: z.ZodOptional<z.ZodString>;
             include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+            productArea: z.ZodOptional<z.ZodString>;
             extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         }, z.core.$strict>;
@@ -9667,12 +9706,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
             scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
         }, z.core.$strip>>>>;
         archRole: z.ZodOptional<z.ZodEnum<{
-            infrastructure: "infrastructure";
             "bounded-context": "bounded-context";
             "command-handler": "command-handler";
             projection: "projection";
             saga: "saga";
             "process-manager": "process-manager";
+            infrastructure: "infrastructure";
             repository: "repository";
             decider: "decider";
             "read-model": "read-model";
@@ -9768,6 +9807,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -9909,12 +9949,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -10009,6 +10049,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -10150,12 +10191,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -10250,6 +10291,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -10391,12 +10433,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -10491,6 +10533,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -10632,12 +10675,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -10758,6 +10801,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -10899,12 +10943,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -10999,6 +11043,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -11140,12 +11185,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -11240,6 +11285,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -11381,12 +11427,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -11481,6 +11527,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -11622,12 +11669,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";
@@ -11722,6 +11769,7 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 archContext: z.ZodOptional<z.ZodString>;
                 archLayer: z.ZodOptional<z.ZodString>;
                 include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+                productArea: z.ZodOptional<z.ZodString>;
                 extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
                 convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             }, z.core.$strict>;
@@ -11863,12 +11911,12 @@ export declare const SessionFindingsCodec: z.ZodCodec<z.ZodObject<{
                 scenarioNames: z.ZodReadonly<z.ZodArray<z.ZodString>>;
             }, z.core.$strip>>>>;
             archRole: z.ZodOptional<z.ZodEnum<{
-                infrastructure: "infrastructure";
                 "bounded-context": "bounded-context";
                 "command-handler": "command-handler";
                 projection: "projection";
                 saga: "saga";
                 "process-manager": "process-manager";
+                infrastructure: "infrastructure";
                 repository: "repository";
                 decider: "decider";
                 "read-model": "read-model";

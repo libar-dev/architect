@@ -19,6 +19,10 @@ Feature: Architecture Tag Extraction
 
   Rule: arch-role tag is defined in the registry
 
+    **Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
+    **Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
+    **Verified by:** arch-role tag exists with enum format, arch-role has required enum values
+
     Architecture roles classify components for diagram rendering.
     Valid roles: command-handler, projection, saga, process-manager,
     infrastructure, repository, decider, read-model, bounded-context.
@@ -40,6 +44,9 @@ Feature: Architecture Tag Extraction
 
   Rule: arch-context tag is defined in the registry
 
+    **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
+    **Verified by:** arch-context tag exists with value format
+
     Context tags group components into bounded context subgraphs.
     Format is "value" (free-form string like "orders", "inventory").
 
@@ -51,6 +58,9 @@ Feature: Architecture Tag Extraction
       And the tag purpose should mention "bounded context"
 
   Rule: arch-layer tag is defined in the registry
+
+    **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
+    **Verified by:** arch-layer tag exists with enum format, arch-layer has exactly three values
 
     Layer tags enable layered architecture diagrams.
     Valid layers: domain, application, infrastructure.
@@ -74,6 +84,9 @@ Feature: Architecture Tag Extraction
   # ============================================================================
 
   Rule: AST parser extracts arch-role from TypeScript annotations
+
+    **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
+    **Verified by:** Extract arch-role projection, Extract arch-role command-handler
 
     The AST parser must extract arch-role alongside other pattern metadata.
 
@@ -109,6 +122,9 @@ Feature: Architecture Tag Extraction
 
   Rule: AST parser extracts arch-context from TypeScript annotations
 
+    **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
+    **Verified by:** Extract arch-context orders, Extract arch-context inventory
+
     Context values are free-form strings naming the bounded context.
 
     @acceptance-criteria @happy-path
@@ -142,6 +158,9 @@ Feature: Architecture Tag Extraction
       Then the directive archContext should be "inventory"
 
   Rule: AST parser extracts arch-layer from TypeScript annotations
+
+    **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
+    **Verified by:** Extract arch-layer application, Extract arch-layer infrastructure
 
     Layer tags classify components by architectural layer.
 
@@ -177,6 +196,9 @@ Feature: Architecture Tag Extraction
 
   Rule: AST parser handles multiple arch tags together
 
+    **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
+    **Verified by:** Extract all three arch tags
+
     Components often have role + context + layer together.
 
     @acceptance-criteria @happy-path
@@ -199,6 +221,10 @@ Feature: Architecture Tag Extraction
       And the directive archLayer should be "application"
 
   Rule: Missing arch tags yield undefined values
+
+    **Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
+    **Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
+    **Verified by:** Missing arch tags are undefined
 
     Components without arch tags should have undefined (not null or empty).
 

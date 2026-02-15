@@ -8,6 +8,9 @@ Feature: Step Lint Extended Rules - Additional vitest-cucumber Traps
 
   Rule: Hash in step text is detected
 
+    **Invariant:** Step text containing a `#` character must produce a warning because it may cause unexpected behavior in Gherkin parsing or pattern matching.
+    **Verified by:** Hash in step text produces warning, Hash at start of comment line is not flagged
+
     @acceptance-criteria @happy-path
     Scenario: Hash in step text produces warning
       Given a feature file with hash inside step text
@@ -22,6 +25,9 @@ Feature: Step Lint Extended Rules - Additional vitest-cucumber Traps
 
   Rule: Keywords in description text are detected
 
+    **Invariant:** Description lines starting with Gherkin keywords (`Given`, `When`, `Then`) must be flagged because the parser interprets them as step lines, breaking the feature file structure.
+    **Verified by:** Description starting with a keyword is flagged, Step lines with keywords are not flagged
+
     @acceptance-criteria @happy-path
     Scenario: Description starting with a keyword is flagged
       Given a feature file with a description line starting with a keyword
@@ -35,6 +41,9 @@ Feature: Step Lint Extended Rules - Additional vitest-cucumber Traps
       Then no keyword-in-description errors are reported
 
   Rule: Scenario Outline steps with quoted values are detected
+
+    **Invariant:** ScenarioOutline steps using quoted values (e.g., `"value"`) instead of angle-bracket placeholders (e.g., `<column>`) must produce a warning because quoted values trigger `{string}` parameter capture, which does not work in ScenarioOutline.
+    **Verified by:** Outline step with quoted value produces warning, Outline step with angle bracket is not flagged
 
     @acceptance-criteria @happy-path
     Scenario: Outline step with quoted value produces warning
@@ -51,6 +60,9 @@ Feature: Step Lint Extended Rules - Additional vitest-cucumber Traps
       Then no outline-quoted-values warnings are reported
 
   Rule: Repeated step patterns in the same scenario are detected
+
+    **Invariant:** Registering the same step pattern text more than once within a single scenario block must be flagged because the second registration overwrites the first, silently skipping assertions.
+    **Verified by:** Duplicate step pattern in one scenario is flagged, Same pattern in different scenarios is not flagged
 
     @acceptance-criteria @happy-path
     Scenario: Duplicate step pattern in one scenario is flagged

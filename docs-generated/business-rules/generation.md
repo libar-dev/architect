@@ -4,7 +4,7 @@
 
 ---
 
-**223 rules** from 45 features. 100 rules have explicit invariants.
+**223 rules** from 45 features. 186 rules have explicit invariants.
 
 ---
 
@@ -18,6 +18,8 @@
 
 #### DocString parsing handles edge cases
 
+> **Invariant:** DocString parsing must gracefully handle empty input, missing language hints, unclosed delimiters, and non-LF line endings without throwing errors.
+
 **Verified by:**
 - Empty description returns empty array
 - Description with no DocStrings returns single paragraph
@@ -30,6 +32,8 @@
 
 #### DataTable rendering produces valid markdown
 
+> **Invariant:** DataTable rendering must produce a well-formed table block for any number of rows, substituting empty strings for missing cell values.
+
 **Verified by:**
 - Single row DataTable renders correctly
 - Multi-row DataTable renders correctly
@@ -38,6 +42,8 @@
 ---
 
 #### Scenario content rendering respects options
+
+> **Invariant:** Scenario rendering must honor the includeSteps option, producing step lists only when enabled, and must include embedded DataTables when present.
 
 **Verified by:**
 - Render scenario with steps
@@ -48,6 +54,8 @@
 
 #### Business rule rendering handles descriptions
 
+> **Invariant:** Business rule rendering must always include the rule name as a bold paragraph, and must parse descriptions for embedded DocStrings when present.
+
 **Verified by:**
 - Rule with simple description
 - Rule with no description
@@ -56,6 +64,8 @@
 ---
 
 #### DocString content is dedented when parsed
+
+> **Invariant:** DocString code blocks must be dedented to remove common leading whitespace while preserving internal relative indentation, empty lines, and trimming trailing whitespace from each line.
 
 **Verified by:**
 - Code block preserves internal relative indentation
@@ -107,41 +117,53 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Architecture generator is registered in the registry
 
-The architecture generator must be registered like other built-in
-    generators so it can be invoked via CLI.
+> **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
 
 **Verified by:**
 - Generator is available in registry
+- Generator is available in registry
+
+    The architecture generator must be registered like other built-in
+    generators so it can be invoked via CLI.
 
 ---
 
 #### Architecture generator produces component diagram by default
 
-Running the architecture generator without options produces
-    a component diagram (bounded context view).
+> **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
 
 **Verified by:**
 - Default generation produces component diagram
+- Default generation produces component diagram
+
+    Running the architecture generator without options produces
+    a component diagram (bounded context view).
 
 ---
 
 #### Architecture generator supports diagram type options
 
-The generator accepts options to specify diagram type
-    (component or layered).
+> **Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
 
 **Verified by:**
 - Generate layered diagram with options
+- Generate layered diagram with options
+
+    The generator accepts options to specify diagram type
+    (component or layered).
 
 ---
 
 #### Architecture generator supports context filtering
 
-The generator can filter to specific bounded contexts
-    for focused diagram output.
+> **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
 
 **Verified by:**
 - Filter to specific contexts
+- Filter to specific contexts
+
+    The generator can filter to specific bounded contexts
+    for focused diagram output.
 
 *generator-registration.feature*
 
@@ -153,51 +175,84 @@ The generator can filter to specific bounded contexts
 
 #### archIndex groups patterns by arch-role
 
-The archIndex.byRole map groups patterns by their architectural role
-    (command-handler, projection, saga, etc.) for efficient lookup.
+> **Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
+>
+> **Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
 
 **Verified by:**
 - Group patterns by role
+- Group patterns by role
+
+    The archIndex.byRole map groups patterns by their architectural role
+    (command-handler
+- projection
+- saga
+- etc.) for efficient lookup.
 
 ---
 
 #### archIndex groups patterns by arch-context
 
-The archIndex.byContext map groups patterns by bounded context
-    for subgraph rendering in component diagrams.
+> **Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
+>
+> **Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
 
 **Verified by:**
 - Group patterns by context
+- Group patterns by context
+
+    The archIndex.byContext map groups patterns by bounded context
+    for subgraph rendering in component diagrams.
 
 ---
 
 #### archIndex groups patterns by arch-layer
 
-The archIndex.byLayer map groups patterns by architectural layer
-    (domain, application, infrastructure) for layered diagram rendering.
+> **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
+>
+> **Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
 
 **Verified by:**
 - Group patterns by layer
+- Group patterns by layer
+
+    The archIndex.byLayer map groups patterns by architectural layer
+    (domain
+- application
+- infrastructure) for layered diagram rendering.
 
 ---
 
 #### archIndex.all contains all patterns with any arch tag
 
-The archIndex.all array contains all patterns that have at least
-    one arch tag (role, context, or layer).
+> **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
 
 **Verified by:**
 - archIndex.all includes all annotated patterns
+- archIndex.all includes all annotated patterns
+
+    The archIndex.all array contains all patterns that have at least
+    one arch tag (role
+- context
+- or layer). Patterns without any arch
+    tags are excluded.
 
 ---
 
 #### Patterns without arch tags are excluded from archIndex
 
-Patterns that have no arch-role, arch-context, or arch-layer are
-    not included in the archIndex at all.
+> **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
+>
+> **Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
 
 **Verified by:**
 - Non-annotated patterns excluded
+- Non-annotated patterns excluded
+
+    Patterns that have no arch-role
+- arch-context
+- or arch-layer are
+    not included in the archIndex at all.
 
 *arch-index.feature*
 
@@ -209,78 +264,120 @@ Patterns that have no arch-role, arch-context, or arch-layer are
 
 #### arch-role tag is defined in the registry
 
-Architecture roles classify components for diagram rendering.
+> **Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
+>
+> **Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
 
 **Verified by:**
 - arch-role tag exists with enum format
 - arch-role has required enum values
+- arch-role has required enum values
+
+    Architecture roles classify components for diagram rendering.
+    Valid roles: command-handler
+- projection
+- saga
+- process-manager
+- infrastructure
+- repository
+- decider
+- read-model
+- bounded-context.
 
 ---
 
 #### arch-context tag is defined in the registry
 
-Context tags group components into bounded context subgraphs.
+> **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
 
 **Verified by:**
 - arch-context tag exists with value format
+- arch-context tag exists with value format
+
+    Context tags group components into bounded context subgraphs.
+    Format is "value" (free-form string like "orders"
+- "inventory").
 
 ---
 
 #### arch-layer tag is defined in the registry
 
-Layer tags enable layered architecture diagrams.
+> **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
 
 **Verified by:**
 - arch-layer tag exists with enum format
 - arch-layer has exactly three values
+- arch-layer has exactly three values
+
+    Layer tags enable layered architecture diagrams.
+    Valid layers: domain
+- application
+- infrastructure.
 
 ---
 
 #### AST parser extracts arch-role from TypeScript annotations
 
-The AST parser must extract arch-role alongside other pattern metadata.
+> **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
 
 **Verified by:**
 - Extract arch-role projection
 - Extract arch-role command-handler
+- Extract arch-role command-handler
+
+    The AST parser must extract arch-role alongside other pattern metadata.
 
 ---
 
 #### AST parser extracts arch-context from TypeScript annotations
 
-Context values are free-form strings naming the bounded context.
+> **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
 
 **Verified by:**
 - Extract arch-context orders
 - Extract arch-context inventory
+- Extract arch-context inventory
+
+    Context values are free-form strings naming the bounded context.
 
 ---
 
 #### AST parser extracts arch-layer from TypeScript annotations
 
-Layer tags classify components by architectural layer.
+> **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
 
 **Verified by:**
 - Extract arch-layer application
 - Extract arch-layer infrastructure
+- Extract arch-layer infrastructure
+
+    Layer tags classify components by architectural layer.
 
 ---
 
 #### AST parser handles multiple arch tags together
 
-Components often have role + context + layer together.
+> **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
 
 **Verified by:**
 - Extract all three arch tags
+- Extract all three arch tags
+
+    Components often have role + context + layer together.
 
 ---
 
 #### Missing arch tags yield undefined values
 
-Components without arch tags should have undefined (not null or empty).
+> **Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
+>
+> **Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
 
 **Verified by:**
 - Missing arch tags are undefined
+- Missing arch tags are undefined
+
+    Components without arch tags should have undefined (not null or empty).
 
 *arch-tag-extraction.feature*
 
@@ -384,6 +481,10 @@ Components without arch tags should have undefined (not null or empty).
 
 #### CodecBasedGenerator adapts codecs to generator interface
 
+> **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
+>
+> **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+
 **Verified by:**
 - Generator delegates to codec
 - Missing MasterDataset returns error
@@ -399,81 +500,114 @@ Components without arch tags should have undefined (not null or empty).
 
 #### Component diagrams group patterns by bounded context
 
-Patterns with arch-context are grouped into Mermaid subgraphs.
+> **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
 
 **Verified by:**
 - Generate subgraphs for bounded contexts
+- Generate subgraphs for bounded contexts
+
+    Patterns with arch-context are grouped into Mermaid subgraphs.
+    Each bounded context becomes a visual container.
 
 ---
 
 #### Context-less patterns go to Shared Infrastructure
 
-Patterns without arch-context are grouped into a
-    "Shared Infrastructure" subgraph.
+> **Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
+>
+> **Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
 
 **Verified by:**
 - Shared infrastructure subgraph for context-less patterns
+- Shared infrastructure subgraph for context-less patterns
+
+    Patterns without arch-context are grouped into a
+    "Shared Infrastructure" subgraph.
 
 ---
 
 #### Relationship types render with distinct arrow styles
 
-Arrow styles follow UML conventions:
+> **Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
+>
+> **Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
+
+**Verified by:**
+- Arrow styles for relationship types
+- Arrow styles for relationship types
+
+    Arrow styles follow UML conventions:
     - uses: solid arrow (-->)
     - depends-on: dashed arrow (-.->)
     - implements: dotted arrow (..->)
     - extends: open arrow (-->>)
 
-**Verified by:**
-- Arrow styles for relationship types
-
 ---
 
 #### Arrows only connect annotated components
 
-Relationships pointing to non-annotated patterns
-    are not rendered (target would not exist in diagram).
+> **Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
+>
+> **Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
 
 **Verified by:**
 - Skip arrows to non-annotated targets
+- Skip arrows to non-annotated targets
+
+    Relationships pointing to non-annotated patterns
+    are not rendered (target would not exist in diagram).
 
 ---
 
 #### Component diagram includes summary section
 
-The generated document starts with an overview section
-    showing component counts and bounded context statistics.
+> **Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
 
 **Verified by:**
 - Summary section with counts
+- Summary section with counts
+
+    The generated document starts with an overview section
+    showing component counts and bounded context statistics.
 
 ---
 
 #### Component diagram includes legend when enabled
 
-The legend explains arrow style meanings for readers.
+> **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
 
 **Verified by:**
 - Legend section with arrow explanations
+- Legend section with arrow explanations
+
+    The legend explains arrow style meanings for readers.
 
 ---
 
 #### Component diagram includes inventory table when enabled
 
-The inventory lists all components with their metadata.
+> **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
 
 **Verified by:**
 - Inventory table with component details
+- Inventory table with component details
+
+    The inventory lists all components with their metadata.
 
 ---
 
 #### Empty architecture data shows guidance message
 
-If no patterns have architecture annotations,
-    the document explains how to add them.
+> **Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
+>
+> **Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
 
 **Verified by:**
 - No architecture data message
+- No architecture data message
+
+    If no patterns have architecture annotations
+- the document explains how to add them.
 
 *component-diagram.feature*
 
@@ -840,6 +974,10 @@ If no patterns have architecture annotations,
 
 #### Tabs are normalized to spaces before dedent
 
+> **Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
+>
+> **Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
+
 **Verified by:**
 - Tab-indented code is properly dedented
 - Mixed tabs and spaces are normalized
@@ -847,6 +985,8 @@ If no patterns have architecture annotations,
 ---
 
 #### Empty lines are handled correctly
+
+> **Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
 
 **Verified by:**
 - Empty lines with trailing spaces are preserved
@@ -856,6 +996,8 @@ If no patterns have architecture annotations,
 
 #### Single line input is handled
 
+> **Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+
 **Verified by:**
 - Single line with indentation is dedented
 - Single line without indentation is unchanged
@@ -864,12 +1006,16 @@ If no patterns have architecture annotations,
 
 #### Unicode whitespace is handled
 
+> **Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+
 **Verified by:**
 - Non-breaking space is treated as content
 
 ---
 
 #### Relative indentation is preserved
+
+> **Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
 
 **Verified by:**
 - Nested code blocks preserve relative indentation
@@ -885,6 +1031,10 @@ If no patterns have architecture annotations,
 
 #### Leading headers are stripped from pattern descriptions
 
+> **Invariant:** Markdown headers at the start of a pattern description are removed before rendering to prevent duplicate headings under the Description section.
+>
+> **Rationale:** The codec already emits a "## Description" header; preserving the source header would create a redundant or conflicting heading hierarchy.
+
 **Verified by:**
 - Strip single leading markdown header
 - Strip multiple leading headers
@@ -894,6 +1044,8 @@ If no patterns have architecture annotations,
 
 #### Edge cases are handled correctly
 
+> **Invariant:** Header stripping handles degenerate inputs (header-only, whitespace-only, mid-description headers) without data loss or rendering errors.
+
 **Verified by:**
 - Empty description after stripping headers
 - Description with only whitespace and headers
@@ -902,6 +1054,8 @@ If no patterns have architecture annotations,
 ---
 
 #### stripLeadingHeaders removes only leading headers
+
+> **Invariant:** The helper function strips only headers that appear before any non-header content; headers occurring after body text are preserved.
 
 **Verified by:**
 - Strips h1 header
@@ -942,6 +1096,8 @@ If no patterns have architecture annotations,
 
 #### Single-line descriptions are returned as-is when complete
 
+> **Invariant:** A single-line description that ends with sentence-ending punctuation is returned verbatim; one without gets an appended ellipsis.
+
 **Verified by:**
 - Complete sentence on single line
 - Single line without sentence ending gets ellipsis
@@ -949,6 +1105,8 @@ If no patterns have architecture annotations,
 ---
 
 #### Multi-line descriptions are combined until sentence ending
+
+> **Invariant:** Lines are concatenated until a sentence-ending punctuation mark is found or the character limit is reached, whichever comes first.
 
 **Verified by:**
 - Two lines combine into complete sentence
@@ -960,6 +1118,10 @@ If no patterns have architecture annotations,
 
 #### Long descriptions are truncated at sentence or word boundaries
 
+> **Invariant:** Summaries exceeding the character limit are truncated at the nearest sentence boundary if possible, otherwise at a word boundary with an appended ellipsis.
+>
+> **Rationale:** Sentence-boundary truncation preserves semantic completeness; word-boundary fallback avoids mid-word breaks.
+
 **Verified by:**
 - Long text truncates at sentence boundary within limit
 - Long text without sentence boundary truncates at word with ellipsis
@@ -967,6 +1129,10 @@ If no patterns have architecture annotations,
 ---
 
 #### Tautological and header lines are skipped
+
+> **Invariant:** Lines that merely repeat the pattern name or consist only of a section header label (e.g., "Problem:", "Solution:") are skipped; the summary begins with the first substantive line.
+>
+> **Rationale:** Tautological opening lines waste the limited summary space without adding information.
 
 **Verified by:**
 - Skips pattern name as first line
@@ -976,6 +1142,8 @@ If no patterns have architecture annotations,
 ---
 
 #### Edge cases are handled gracefully
+
+> **Invariant:** Degenerate inputs (empty strings, markdown-only content, bold markers) produce valid output without errors: empty input yields empty string, formatting is stripped, and multiple sentence endings use the first.
 
 **Verified by:**
 - Empty description returns empty string
@@ -994,6 +1162,8 @@ If no patterns have architecture annotations,
 
 #### Registry manages generator registration and retrieval
 
+> **Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+
 **Verified by:**
 - Register generator with unique name
 - Duplicate registration throws error
@@ -1011,6 +1181,10 @@ If no patterns have architecture annotations,
 
 #### Repository prefixes are stripped from implementation paths
 
+> **Invariant:** Implementation file paths must not contain repository-level prefixes like "libar-platform/" or "monorepo/".
+>
+> **Rationale:** Generated links are relative to the output directory; repository prefixes produce broken paths.
+
 **Verified by:**
 - Strip libar-platform prefix from implementation paths
 - Strip monorepo prefix from implementation paths
@@ -1020,12 +1194,16 @@ If no patterns have architecture annotations,
 
 #### All implementation links in a pattern are normalized
 
+> **Invariant:** Every implementation link in a pattern document must have its path normalized, regardless of how many implementations exist.
+
 **Verified by:**
 - Multiple implementations with mixed prefixes
 
 ---
 
 #### normalizeImplPath strips known prefixes
+
+> **Invariant:** normalizeImplPath removes only recognized repository prefixes from the start of a path and leaves all other path segments unchanged.
 
 **Verified by:**
 - Strips libar-platform/ prefix
@@ -1043,50 +1221,76 @@ If no patterns have architecture annotations,
 
 #### Layered diagrams group patterns by arch-layer
 
-Patterns with arch-layer are grouped into Mermaid subgraphs.
+> **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
 
 **Verified by:**
 - Generate subgraphs for each layer
+- Generate subgraphs for each layer
+
+    Patterns with arch-layer are grouped into Mermaid subgraphs.
+    Each layer becomes a visual container.
 
 ---
 
 #### Layer order is domain to infrastructure (top to bottom)
 
-The layer subgraphs are rendered in Clean Architecture order:
-    domain at top, then application, then infrastructure at bottom.
+> **Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
+>
+> **Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
 
 **Verified by:**
 - Layers render in correct order
+- Layers render in correct order
+
+    The layer subgraphs are rendered in Clean Architecture order:
+    domain at top
+- then application
+- then infrastructure at bottom.
+    This reflects the dependency rule: outer layers depend on inner layers.
 
 ---
 
 #### Context labels included in layered diagram nodes
 
-Unlike component diagrams which group by context, layered diagrams
-    include the context as a label in each node name.
+> **Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
+>
+> **Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
 
 **Verified by:**
 - Nodes include context labels
+- Nodes include context labels
+
+    Unlike component diagrams which group by context
+- layered diagrams
+    include the context as a label in each node name.
 
 ---
 
 #### Patterns without layer go to Other subgraph
 
-Patterns that have arch-role or arch-context but no arch-layer
-    are grouped into an "Other" subgraph.
+> **Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
+>
+> **Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
 
 **Verified by:**
 - Unlayered patterns in Other subgraph
+- Unlayered patterns in Other subgraph
+
+    Patterns that have arch-role or arch-context but no arch-layer
+    are grouped into an "Other" subgraph.
 
 ---
 
 #### Layered diagram includes summary section
 
-The generated document starts with an overview section
-    specific to layered architecture visualization.
+> **Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
 
 **Verified by:**
 - Summary section for layered view
+- Summary section for layered view
+
+    The generated document starts with an overview section
+    specific to layered architecture visualization.
 
 *layered-diagram.feature*
 
@@ -1371,6 +1575,10 @@ The generated document starts with an overview section
 
 #### PrChangesCodec handles empty results gracefully
 
+> **Invariant:** When no patterns match the applied filters, the codec must produce a valid document with a "No Changes" section describing which filters were active.
+>
+> **Rationale:** Reviewers need to distinguish "nothing matched" from "codec error" and understand why no patterns appear.
+
 **Verified by:**
 - No changes when no patterns match changedFiles filter
 - No changes when no patterns match releaseFilter
@@ -1379,6 +1587,8 @@ The generated document starts with an overview section
 ---
 
 #### PrChangesCodec generates summary with filter information
+
+> **Invariant:** Every PR changes document must contain a Summary section with pattern counts and active filter information.
 
 **Verified by:**
 - Summary section shows pattern counts
@@ -1389,6 +1599,8 @@ The generated document starts with an overview section
 
 #### PrChangesCodec groups changes by phase when sortBy is "phase"
 
+> **Invariant:** When sortBy is "phase" (the default), patterns must be grouped under phase headings in ascending phase order.
+
 **Verified by:**
 - Changes grouped by phase with default sortBy
 - Pattern details shown within phase groups
@@ -1396,6 +1608,8 @@ The generated document starts with an overview section
 ---
 
 #### PrChangesCodec groups changes by priority when sortBy is "priority"
+
+> **Invariant:** When sortBy is "priority", patterns must be grouped under High/Medium/Low priority headings with correct pattern assignment.
 
 **Verified by:**
 - Changes grouped by priority
@@ -1405,12 +1619,18 @@ The generated document starts with an overview section
 
 #### PrChangesCodec shows flat list when sortBy is "workflow"
 
+> **Invariant:** When sortBy is "workflow", patterns must be rendered as a flat list without phase or priority grouping.
+>
+> **Rationale:** Workflow sorting presents patterns in review order without structural grouping, suited for quick PR reviews.
+
 **Verified by:**
 - Flat changes list with workflow sort
 
 ---
 
 #### PrChangesCodec renders pattern details with metadata and description
+
+> **Invariant:** Each pattern entry must include a metadata table (status, phase, business value when available) and description text.
 
 **Verified by:**
 - Pattern detail shows metadata table
@@ -1421,6 +1641,8 @@ The generated document starts with an overview section
 
 #### PrChangesCodec renders deliverables when includeDeliverables is enabled
 
+> **Invariant:** Deliverables are only rendered when includeDeliverables is enabled, and when releaseFilter is set, only deliverables matching that release are shown.
+
 **Verified by:**
 - Deliverables shown when patterns have deliverables
 - Deliverables filtered by release when releaseFilter is set
@@ -1430,6 +1652,8 @@ The generated document starts with an overview section
 
 #### PrChangesCodec renders acceptance criteria from scenarios
 
+> **Invariant:** When patterns have associated scenarios, the codec must render an "Acceptance Criteria" section containing scenario names and step lists.
+
 **Verified by:**
 - Acceptance criteria rendered when patterns have scenarios
 - Acceptance criteria shows scenario steps
@@ -1438,6 +1662,8 @@ The generated document starts with an overview section
 
 #### PrChangesCodec renders business rules from Gherkin Rule keyword
 
+> **Invariant:** When patterns have Gherkin Rule blocks, the codec must render a "Business Rules" section containing rule names and verification information.
+
 **Verified by:**
 - Business rules rendered when patterns have rules
 - Business rules show rule names and verification info
@@ -1445,6 +1671,8 @@ The generated document starts with an overview section
 ---
 
 #### PrChangesCodec generates review checklist when includeReviewChecklist is enabled
+
+> **Invariant:** When includeReviewChecklist is enabled, the codec must generate a "Review Checklist" section with standard items and context-sensitive items based on pattern state (completed, active, dependencies, deliverables). When disabled, no checklist appears.
 
 **Verified by:**
 - Review checklist generated with standard items
@@ -1458,6 +1686,8 @@ The generated document starts with an overview section
 
 #### PrChangesCodec generates dependencies section when includeDependencies is enabled
 
+> **Invariant:** When includeDependencies is enabled and patterns have dependency relationships, the codec must render a "Dependencies" section with "Depends On" and "Enables" subsections. When no dependencies exist or the option is disabled, the section is omitted.
+
 **Verified by:**
 - Dependencies section shows depends on relationships
 - Dependencies section shows enables relationships
@@ -1468,6 +1698,8 @@ The generated document starts with an overview section
 
 #### PrChangesCodec filters patterns by changedFiles
 
+> **Invariant:** When changedFiles filter is set, only patterns whose source files match (including partial directory path matches) are included in the output.
+
 **Verified by:**
 - Patterns filtered by changedFiles match
 - changedFiles filter matches partial paths
@@ -1476,12 +1708,18 @@ The generated document starts with an overview section
 
 #### PrChangesCodec filters patterns by releaseFilter
 
+> **Invariant:** When releaseFilter is set, only patterns with deliverables matching the specified release version are included.
+
 **Verified by:**
 - Patterns filtered by release version
 
 ---
 
 #### PrChangesCodec uses OR logic for combined filters
+
+> **Invariant:** When both changedFiles and releaseFilter are set, patterns matching either criterion are included (OR logic), and patterns matching both criteria appear only once (no duplicates).
+>
+> **Rationale:** OR logic maximizes PR coverage — a change may affect files not yet assigned to a release, or a release may include patterns from unchanged files.
 
 **Verified by:**
 - Combined filters match patterns meeting either criterion
@@ -1490,6 +1728,10 @@ The generated document starts with an overview section
 ---
 
 #### PrChangesCodec only includes active and completed patterns
+
+> **Invariant:** The codec must exclude roadmap and deferred patterns, including only active and completed patterns in the PR changes output.
+>
+> **Rationale:** PR changes reflect work that is in progress or done — roadmap and deferred patterns have no code changes to review.
 
 **Verified by:**
 - Roadmap patterns are excluded
@@ -1504,6 +1746,10 @@ The generated document starts with an overview section
 ---
 
 #### Orchestrator supports PR changes generation options
+
+> **Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
+>
+> **Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
 
 **Verified by:**
 - PR changes filters to explicit file list
@@ -1520,6 +1766,10 @@ The generated document starts with an overview section
 
 #### Implementation files appear in pattern docs via @libar-docs-implements
 
+> **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+>
+> **Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
+
 **Verified by:**
 - Implementations section renders with file links
 - Implementation includes description when available
@@ -1528,6 +1778,10 @@ The generated document starts with an overview section
 
 #### Multiple implementations are listed alphabetically
 
+> **Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
+>
+> **Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
+
 **Verified by:**
 - Multiple implementations sorted by file path
 
@@ -1535,12 +1789,18 @@ The generated document starts with an overview section
 
 #### Patterns without implementations omit the section
 
+> **Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+
 **Verified by:**
 - No implementations section when none exist
 
 ---
 
 #### Implementation references use relative file links
+
+> **Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
+>
+> **Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
 
 **Verified by:**
 - Links are relative from patterns directory
@@ -1815,6 +2075,10 @@ The generated document starts with an overview section
 
 #### Summary totals equal sum of phase table rows
 
+> **Invariant:** The summary Active and Total Remaining counts must exactly equal the sum of the corresponding counts across all phase table rows.
+>
+> **Rationale:** A mismatch between summary and phase-level totals indicates patterns are being double-counted or dropped.
+
 **Verified by:**
 - Summary matches phase table with all patterns having phases
 - Summary includes completed patterns correctly
@@ -1822,6 +2086,10 @@ The generated document starts with an overview section
 ---
 
 #### Patterns without phases appear in Backlog row
+
+> **Invariant:** Patterns that have no assigned phase must be grouped into a "Backlog" row in the phase table rather than being omitted.
+>
+> **Rationale:** Unphased patterns are still remaining work; omitting them would undercount the total.
 
 **Verified by:**
 - Summary includes backlog patterns without phase
@@ -1831,6 +2099,10 @@ The generated document starts with an overview section
 
 #### Patterns without patternName are counted using id
 
+> **Invariant:** Pattern counting must use pattern.id as the identifier, never patternName, so that patterns with undefined names are neither double-counted nor omitted.
+>
+> **Rationale:** patternName is optional; relying on it for counting would miss unnamed patterns entirely.
+
 **Verified by:**
 - Patterns with undefined patternName counted correctly
 - Mixed patterns with and without patternName
@@ -1838,6 +2110,8 @@ The generated document starts with an overview section
 ---
 
 #### All phases with incomplete patterns are shown
+
+> **Invariant:** The phase table must include every phase that contains at least one incomplete pattern, and phases with only completed patterns must be excluded.
 
 **Verified by:**
 - Multiple phases shown in order
@@ -1913,6 +2187,8 @@ The generated document starts with an overview section
 
 #### RequirementsDocumentCodec generates PRD-style documentation from patterns
 
+> **Invariant:** RequirementsDocumentCodec transforms MasterDataset patterns into a PRD-style document with flexible grouping (product area, user role, or phase), optional detail file generation, and business value rendering.
+
 **Verified by:**
 - No patterns with PRD metadata produces empty message
 - Summary shows counts and groupings
@@ -1931,6 +2207,8 @@ The generated document starts with an overview section
 
 #### AdrDocumentCodec documents architecture decisions
 
+> **Invariant:** AdrDocumentCodec transforms MasterDataset ADR patterns into an architecture decision record document with status tracking, category/phase/date grouping, supersession relationships, and optional detail file generation.
+
 **Verified by:**
 - No ADR patterns produces empty message
 - Summary shows status counts and categories
@@ -1943,6 +2221,9 @@ The generated document starts with an overview section
 - ADR supersedes rendering
 - Generate individual ADR detail files when enabled
 - ADR detail file contains full content
+- Context
+- Decision
+- Consequences sections from Rule keywords
 
 *requirements-adr-codecs.feature*
 
@@ -2119,6 +2400,8 @@ Division by zero must be handled gracefully to prevent
 
 #### Exact paths match without wildcards
 
+> **Invariant:** A pattern without glob characters must match only the exact file path, character for character.
+
 **Verified by:**
 - Exact path matches identical path
 - Exact path does not match different path
@@ -2126,6 +2409,8 @@ Division by zero must be handled gracefully to prevent
 ---
 
 #### Single-level globs match one directory level
+
+> **Invariant:** A single `*` glob must match files only within the specified directory, never crossing directory boundaries.
 
 **Verified by:**
 - Single glob matches file in target directory
@@ -2136,6 +2421,8 @@ Division by zero must be handled gracefully to prevent
 
 #### Recursive globs match any depth
 
+> **Invariant:** A `**` glob must match files at any nesting depth below the specified prefix, while still respecting extension and prefix constraints.
+
 **Verified by:**
 - Recursive glob matches file at target depth
 - Recursive glob matches file at deeper depth
@@ -2145,6 +2432,10 @@ Division by zero must be handled gracefully to prevent
 ---
 
 #### Dataset shape extraction deduplicates by name
+
+> **Invariant:** When multiple patterns match a source glob, the returned shapes must be deduplicated by name so each shape appears at most once.
+>
+> **Rationale:** Duplicate shape names in generated documentation confuse readers and inflate type registries.
 
 **Verified by:**
 - Shapes are extracted from matching patterns
@@ -2343,6 +2634,10 @@ Division by zero must be handled gracefully to prevent
 
 #### Tables in rule descriptions render exactly once
 
+> **Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no residual pipe characters in surrounding text.
+>
+> **Rationale:** Without deduplication, tables extracted for formatting would also remain in the raw description text, producing duplicate output.
+
 **Verified by:**
 - Single table renders once in detailed mode
 - Table is extracted and properly formatted
@@ -2351,12 +2646,16 @@ Division by zero must be handled gracefully to prevent
 
 #### Multiple tables in description each render exactly once
 
+> **Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
+
 **Verified by:**
 - Two tables in description render as two separate tables
 
 ---
 
 #### stripMarkdownTables removes table syntax from text
+
+> **Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
 
 **Verified by:**
 - Strips single table from text

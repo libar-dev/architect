@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 Tests the GeneratorRegistry registration, lookup, and listing capabilities.
-  The registry manages document generators with name uniqueness constraints.
+The registry manages document generators with name uniqueness constraints.
 
 ## Acceptance Criteria
 
@@ -39,10 +39,10 @@ Tests the GeneratorRegistry registration, lookup, and listing capabilities.
 - Then the generator should be returned
 - And the generator name should be "patterns"
 
-| name |
-| --- |
+| name     |
+| -------- |
 | patterns |
-| roadmap |
+| roadmap  |
 
 **Get unknown generator returns undefined**
 
@@ -50,8 +50,8 @@ Tests the GeneratorRegistry registration, lookup, and listing capabilities.
 - When getting generator "unknown"
 - Then undefined should be returned
 
-| name |
-| --- |
+| name     |
+| -------- |
 | patterns |
 
 **Available returns sorted list**
@@ -60,21 +60,24 @@ Tests the GeneratorRegistry registration, lookup, and listing capabilities.
 - When calling available
 - Then the list should be:
 
-| name |
-| --- |
-| roadmap |
-| patterns |
+| name      |
+| --------- |
+| roadmap   |
+| patterns  |
 | changelog |
 
-| name |
-| --- |
+| name      |
+| --------- |
 | changelog |
-| patterns |
-| roadmap |
+| patterns  |
+| roadmap   |
 
 ## Business Rules
 
 **Registry manages generator registration and retrieval**
+
+**Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+**Verified by:** Register generator with unique name, Duplicate registration throws error, Get registered generator, Get unknown generator returns undefined, Available returns sorted list
 
 _Verified by: Register generator with unique name, Duplicate registration throws error, Get registered generator, Get unknown generator returns undefined, Available returns sorted list_
 

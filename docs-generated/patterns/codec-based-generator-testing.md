@@ -52,6 +52,10 @@ Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
 
 **CodecBasedGenerator adapts codecs to generator interface**
 
+**Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
+    **Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+    **Verified by:** Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through
+
 _Verified by: Generator delegates to codec, Missing MasterDataset returns error, Codec options are passed through_
 
 ---

@@ -77,20 +77,34 @@ Feature: Reactive Projections
 
 **Extends tag is defined in taxonomy registry**
 
+**Invariant:** The extends tag must exist in the taxonomy registry with single-value format.
+    **Verified by:** Extends tag exists in registry
+
 _Verified by: Extends tag exists in registry_
 
 **Patterns can extend exactly one base pattern**
 
-Extends uses single-value format because pattern inheritance should be
+**Invariant:** A pattern may extend at most one base pattern, enforced by single-value tag format.
+    **Rationale:** Single inheritance avoids diamond-problem ambiguity in pattern generalization hierarchies.
+    **Verified by:** Parse extends from feature file, Extends preserved through extraction pipeline
+
+    Extends uses single-value format because pattern inheritance should be
     single-inheritance to avoid diamond problems.
 
 _Verified by: Parse extends from feature file, Extends preserved through extraction pipeline_
 
 **Transform builds extendedBy reverse lookup**
 
+**Invariant:** The transform must compute an extendedBy reverse index so base patterns know which patterns extend them.
+    **Verified by:** Extended pattern knows its extensions
+
 _Verified by: Extended pattern knows its extensions_
 
 **Linter detects circular inheritance chains**
+
+**Invariant:** Circular inheritance chains (direct or transitive) must be detected and reported as errors.
+    **Rationale:** Circular extends relationships create infinite resolution loops and undefined behavior.
+    **Verified by:** Direct circular inheritance detected, Transitive circular inheritance detected
 
 _Verified by: Direct circular inheritance detected, Transitive circular inheritance detected_
 

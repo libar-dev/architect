@@ -6,22 +6,23 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Generation |
 
 ## Description
 
 The extractSummary function transforms multi-line pattern descriptions into
-  concise, single-line summaries suitable for table display in generated docs.
+concise, single-line summaries suitable for table display in generated docs.
 
-  **Key behaviors:**
-  - Combines multiple lines until finding a complete sentence
-  - Truncates at sentence boundaries when possible
-  - Adds "..." for incomplete text (no sentence ending)
-  - Skips tautological first lines (just the pattern name)
-  - Skips section header labels like "Problem:", "Solution:"
+**Key behaviors:**
+
+- Combines multiple lines until finding a complete sentence
+- Truncates at sentence boundaries when possible
+- Adds "..." for incomplete text (no sentence ending)
+- Skips tautological first lines (just the pattern name)
+- Skips section header labels like "Problem:", "Solution:"
 
 ## Acceptance Criteria
 
@@ -63,6 +64,7 @@ Events are stored in the Event Store.
 Additional context follows here.
 
 How It Works:
+
 - Parse annotations in Rule descriptions
 ```
 
@@ -152,6 +154,7 @@ Use a pub/sub pattern with event routing.
 
 ```markdown
 # Pattern Title
+
 This is the actual content.
 ```
 
@@ -186,21 +189,38 @@ Why does this matter? Because it affects everything.
 
 **Single-line descriptions are returned as-is when complete**
 
+**Invariant:** A single-line description that ends with sentence-ending punctuation is returned verbatim; one without gets an appended ellipsis.
+**Verified by:** Complete sentence on single line, Single line without sentence ending gets ellipsis
+
 _Verified by: Complete sentence on single line, Single line without sentence ending gets ellipsis_
 
 **Multi-line descriptions are combined until sentence ending**
+
+**Invariant:** Lines are concatenated until a sentence-ending punctuation mark is found or the character limit is reached, whichever comes first.
+**Verified by:** Two lines combine into complete sentence, Combines lines up to sentence boundary within limit, Long multi-line text truncates when exceeds limit, Multi-line without sentence ending gets ellipsis
 
 _Verified by: Two lines combine into complete sentence, Combines lines up to sentence boundary within limit, Long multi-line text truncates when exceeds limit, Multi-line without sentence ending gets ellipsis_
 
 **Long descriptions are truncated at sentence or word boundaries**
 
+**Invariant:** Summaries exceeding the character limit are truncated at the nearest sentence boundary if possible, otherwise at a word boundary with an appended ellipsis.
+**Rationale:** Sentence-boundary truncation preserves semantic completeness; word-boundary fallback avoids mid-word breaks.
+**Verified by:** Long text truncates at sentence boundary within limit, Long text without sentence boundary truncates at word with ellipsis
+
 _Verified by: Long text truncates at sentence boundary within limit, Long text without sentence boundary truncates at word with ellipsis_
 
 **Tautological and header lines are skipped**
 
+**Invariant:** Lines that merely repeat the pattern name or consist only of a section header label (e.g., "Problem:", "Solution:") are skipped; the summary begins with the first substantive line.
+**Rationale:** Tautological opening lines waste the limited summary space without adding information.
+**Verified by:** Skips pattern name as first line, Skips section header labels, Skips multiple header patterns
+
 _Verified by: Skips pattern name as first line, Skips section header labels, Skips multiple header patterns_
 
 **Edge cases are handled gracefully**
+
+**Invariant:** Degenerate inputs (empty strings, markdown-only content, bold markers) produce valid output without errors: empty input yields empty string, formatting is stripped, and multiple sentence endings use the first.
+**Verified by:** Empty description returns empty string, Markdown headers are stripped, Bold markdown is stripped, Multiple sentence endings - takes first complete sentence, Question mark as sentence ending
 
 _Verified by: Empty description returns empty string, Markdown headers are stripped, Bold markdown is stripped, Multiple sentence endings - takes first complete sentence, Question mark as sentence ending_
 

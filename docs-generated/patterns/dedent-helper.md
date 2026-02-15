@@ -142,21 +142,37 @@ level0
 
 **Tabs are normalized to spaces before dedent**
 
+**Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
+    **Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
+    **Verified by:** Tab-indented code is properly dedented, Mixed tabs and spaces are normalized
+
 _Verified by: Tab-indented code is properly dedented, Mixed tabs and spaces are normalized_
 
 **Empty lines are handled correctly**
+
+**Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+    **Verified by:** Empty lines with trailing spaces are preserved, All empty lines returns original text
 
 _Verified by: Empty lines with trailing spaces are preserved, All empty lines returns original text_
 
 **Single line input is handled**
 
+**Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+    **Verified by:** Single line with indentation is dedented, Single line without indentation is unchanged
+
 _Verified by: Single line with indentation is dedented, Single line without indentation is unchanged_
 
 **Unicode whitespace is handled**
 
+**Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+    **Verified by:** Non-breaking space is treated as content
+
 _Verified by: Non-breaking space is treated as content_
 
 **Relative indentation is preserved**
+
+**Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+    **Verified by:** Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively
 
 _Verified by: Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively_
 

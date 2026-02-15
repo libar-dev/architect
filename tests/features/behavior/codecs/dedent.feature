@@ -28,6 +28,10 @@ Feature: Dedent Helper Function Edge Cases
 
   Rule: Tabs are normalized to spaces before dedent
 
+    **Invariant:** Tab characters must be converted to spaces before calculating the minimum indentation level.
+    **Rationale:** Mixing tabs and spaces produces incorrect indentation calculations — normalizing first ensures consistent dedent depth.
+    **Verified by:** Tab-indented code is properly dedented, Mixed tabs and spaces are normalized
+
     @happy-path @tabs
     Scenario: Tab-indented code is properly dedented
       Given input text with tab indentation:
@@ -58,6 +62,9 @@ Feature: Dedent Helper Function Edge Cases
 
   Rule: Empty lines are handled correctly
 
+    **Invariant:** Empty lines (including lines with only whitespace) must not affect the minimum indentation calculation and must be preserved in output.
+    **Verified by:** Empty lines with trailing spaces are preserved, All empty lines returns original text
+
     @edge-case @empty-lines
     Scenario: Empty lines with trailing spaces are preserved
       Given input text:
@@ -83,6 +90,9 @@ Feature: Dedent Helper Function Edge Cases
 
   Rule: Single line input is handled
 
+    **Invariant:** Single-line input must have its leading whitespace removed without errors or unexpected transformations.
+    **Verified by:** Single line with indentation is dedented, Single line without indentation is unchanged
+
     @edge-case @single-line
     Scenario: Single line with indentation is dedented
       Given input text "    const x = 1;"
@@ -101,6 +111,9 @@ Feature: Dedent Helper Function Edge Cases
 
   Rule: Unicode whitespace is handled
 
+    **Invariant:** Non-breaking spaces and other Unicode whitespace characters must be treated as content, not as indentation to be removed.
+    **Verified by:** Non-breaking space is treated as content
+
     @edge-case @unicode
     Scenario: Non-breaking space is treated as content
       Given input text with non-breaking spaces in content
@@ -112,6 +125,9 @@ Feature: Dedent Helper Function Edge Cases
   # ===========================================================================
 
   Rule: Relative indentation is preserved
+
+    **Invariant:** After removing the common leading whitespace, the relative indentation between lines must remain unchanged.
+    **Verified by:** Nested code blocks preserve relative indentation, Mixed indentation levels are preserved relatively
 
     @happy-path @relative-indent
     Scenario: Nested code blocks preserve relative indentation

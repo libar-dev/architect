@@ -162,6 +162,7 @@ export declare const DocDirectiveSchema: z.ZodObject<{
     archContext: z.ZodOptional<z.ZodString>;
     archLayer: z.ZodOptional<z.ZodString>;
     include: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
+    productArea: z.ZodOptional<z.ZodString>;
     extractShapes: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
     convention: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
 }, z.core.$strict>;

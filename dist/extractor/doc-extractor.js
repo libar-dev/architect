@@ -227,6 +227,8 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
         ...(directive.archLayer !== undefined && { archLayer: directive.archLayer }),
         ...(directive.include !== undefined &&
             directive.include.length > 0 && { include: directive.include }),
+        // PRD metadata fields
+        ...(directive.productArea !== undefined && { productArea: directive.productArea }),
         // Shape extraction fields (extracted from source file when @libar-docs-extract-shapes present)
         ...(extractedShapes && extractedShapes.length > 0 && { extractedShapes }),
         // Convention tags for reference document generation
