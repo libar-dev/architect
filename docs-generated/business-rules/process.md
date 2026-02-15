@@ -4,11 +4,49 @@
 
 ---
 
-**4 rules** from 1 features. 4 rules have explicit invariants.
+**7 rules** from 2 features. 7 rules have explicit invariants.
 
 ---
 
 ## Uncategorized
+
+### Session File Lifecycle
+
+*- Session files for completed phases become orphaned and show stale data*
+
+---
+
+#### Orphaned session files are removed during generation
+
+> **Invariant:** Only session files for active phases are preserved; all other phase files must be deleted during cleanup and replaced with fresh content.
+
+**Verified by:**
+- Orphaned session files are deleted during generation
+- Active phase session files are preserved and regenerated
+
+---
+
+#### Cleanup handles edge cases without errors
+
+> **Invariant:** Cleanup must be idempotent, tolerate missing directories, and produce empty results when no phases are active.
+>
+> **Rationale:** Generator runs are not guarded by precondition checks for directory existence. Cleanup must never crash regardless of filesystem state.
+
+**Verified by:**
+- No active phases results in empty sessions directory
+- Cleanup is idempotent
+- Missing sessions directory is handled gracefully
+
+---
+
+#### Deleted files are tracked in cleanup results
+
+> **Invariant:** The cleanup result must include the relative paths of all deleted session files for transparency and debugging.
+
+**Verified by:**
+- Deleted files are tracked in generator output
+
+*session-file-lifecycle.feature*
 
 ### Session Handoffs
 

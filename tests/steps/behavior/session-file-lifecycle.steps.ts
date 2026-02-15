@@ -69,7 +69,7 @@ async function createSessionFile(tempDir: string, phase: number, content?: strin
 
 const feature = await loadFeature('tests/features/behavior/session-file-lifecycle.feature');
 
-describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
+describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   AfterEachScenario(async () => {
     if (state?.tempContext) {
       await state.tempContext.cleanup();
@@ -88,232 +88,255 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
   });
 
   // ===========================================================================
-  // Happy Path: Cleanup on Generation
+  // Rule: Orphaned session files are removed during generation
   // ===========================================================================
 
-  Scenario('Orphaned session files are deleted during generation', ({ Given, And, When, Then }) => {
-    Given('existing session files for phases 8, 9, and 31', async () => {
-      await createSessionFile(state!.outputDir, 8);
-      await createSessionFile(state!.outputDir, 9);
-      await createSessionFile(state!.outputDir, 31);
-    });
+  Rule('Orphaned session files are removed during generation', ({ RuleScenario }) => {
+    RuleScenario(
+      'Orphaned session files are deleted during generation',
+      ({ Given, And, When, Then }) => {
+        Given('existing session files for phases 8, 9, and 31', async () => {
+          await createSessionFile(state!.outputDir, 8);
+          await createSessionFile(state!.outputDir, 9);
+          await createSessionFile(state!.outputDir, 31);
+        });
 
-    And('patterns with only phase 42 as active', () => {
-      state!.patterns = [{ phase: 42, status: 'active' }];
-      state!.preserveFiles = new Set(['phase-42.md']);
-    });
+        And('patterns with only phase 42 as active', () => {
+          state!.patterns = [{ phase: 42, status: 'active' }];
+          state!.preserveFiles = new Set(['phase-42.md']);
+        });
 
-    When('generating session-context output with cleanup', async () => {
-      // Create the active phase file (simulating generator output)
-      await createSessionFile(state!.outputDir, 42, '# Phase 42 - Active\n\nFresh content.');
+        When('generating session-context output with cleanup', async () => {
+          // Create the active phase file (simulating generator output)
+          await createSessionFile(state!.outputDir, 42, '# Phase 42 - Active\n\nFresh content.');
 
-      // Run cleanup
-      state!.cleanupResult = await cleanupOrphanedSessionFiles(
-        state!.outputDir,
-        state!.sessionsDir,
-        state!.preserveFiles
-      );
-    });
-
-    Then('phase-42.md should exist in sessions directory', async () => {
-      const exists = await fileExists(state!.outputDir, 'sessions/phase-42.md');
-      expect(exists).toBe(true);
-    });
-
-    And('phase-8.md should not exist in sessions directory', async () => {
-      const exists = await fileExists(state!.outputDir, 'sessions/phase-8.md');
-      expect(exists).toBe(false);
-    });
-
-    And('phase-9.md should not exist in sessions directory', async () => {
-      const exists = await fileExists(state!.outputDir, 'sessions/phase-9.md');
-      expect(exists).toBe(false);
-    });
-
-    And('phase-31.md should not exist in sessions directory', async () => {
-      const exists = await fileExists(state!.outputDir, 'sessions/phase-31.md');
-      expect(exists).toBe(false);
-    });
-  });
-
-  Scenario(
-    'Active phase session files are preserved and regenerated',
-    ({ Given, And, When, Then }) => {
-      Given('an existing session file for phase 42 with stale content', async () => {
-        await createSessionFile(state!.outputDir, 42, '# Phase 42\n\nStale content - 0% progress');
-      });
-
-      And('patterns with phase 42 as active', () => {
-        state!.patterns = [{ phase: 42, status: 'active' }];
-        state!.preserveFiles = new Set(['phase-42.md']);
-      });
-
-      When('generating session-context output with cleanup', async () => {
-        // Overwrite with fresh content (simulating generator regeneration)
-        await createSessionFile(state!.outputDir, 42, '# Phase 42\n\nFresh content - 50% progress');
-
-        // Run cleanup - should preserve phase-42.md
-        state!.cleanupResult = await cleanupOrphanedSessionFiles(
-          state!.outputDir,
-          state!.sessionsDir,
-          state!.preserveFiles
-        );
-      });
-
-      Then('phase-42.md should exist in sessions directory', async () => {
-        const exists = await fileExists(state!.outputDir, 'sessions/phase-42.md');
-        expect(exists).toBe(true);
-      });
-
-      And('phase-42.md should have fresh content', async () => {
-        const content = await import('node:fs/promises').then((fs) =>
-          fs.readFile(path.join(state!.outputDir, 'sessions/phase-42.md'), 'utf-8')
-        );
-        expect(content).toContain('Fresh content');
-        expect(content).toContain('50% progress');
-      });
-    }
-  );
-
-  // ===========================================================================
-  // Edge Cases
-  // ===========================================================================
-
-  Scenario('No active phases results in empty sessions directory', ({ Given, And, When, Then }) => {
-    Given('existing session files for phases 8 and 9', async () => {
-      await createSessionFile(state!.outputDir, 8);
-      await createSessionFile(state!.outputDir, 9);
-    });
-
-    And('patterns with no active phases', () => {
-      state!.patterns = [];
-      state!.preserveFiles = new Set(); // No files to preserve
-    });
-
-    When('generating session-context output with cleanup', async () => {
-      state!.cleanupResult = await cleanupOrphanedSessionFiles(
-        state!.outputDir,
-        state!.sessionsDir,
-        state!.preserveFiles
-      );
-    });
-
-    Then('phase-8.md should not exist in sessions directory', async () => {
-      const exists = await fileExists(state!.outputDir, 'sessions/phase-8.md');
-      expect(exists).toBe(false);
-    });
-
-    And('phase-9.md should not exist in sessions directory', async () => {
-      const exists = await fileExists(state!.outputDir, 'sessions/phase-9.md');
-      expect(exists).toBe(false);
-    });
-  });
-
-  Scenario('Cleanup is idempotent', ({ Given, And, When, Then }) => {
-    Given('an empty sessions directory', async () => {
-      // Sessions directory already created in Background
-    });
-
-    And('patterns with no active phases', () => {
-      state!.patterns = [];
-      state!.preserveFiles = new Set();
-    });
-
-    When('generating session-context output with cleanup multiple times', async () => {
-      // Run cleanup 3 times
-      for (let i = 0; i < 3; i++) {
-        try {
+          // Run cleanup
           state!.cleanupResult = await cleanupOrphanedSessionFiles(
             state!.outputDir,
             state!.sessionsDir,
             state!.preserveFiles
           );
-          state!.runCount++;
-        } catch (error) {
-          state!.errors.push(error instanceof Error ? error.message : String(error));
-        }
+        });
+
+        Then('phase-42.md should exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-42.md');
+          expect(exists).toBe(true);
+        });
+
+        And('phase-8.md should not exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-8.md');
+          expect(exists).toBe(false);
+        });
+
+        And('phase-9.md should not exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-9.md');
+          expect(exists).toBe(false);
+        });
+
+        And('phase-31.md should not exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-31.md');
+          expect(exists).toBe(false);
+        });
       }
-    });
+    );
 
-    Then('no errors should occur', () => {
-      expect(state!.errors).toHaveLength(0);
-      expect(state!.runCount).toBe(3);
-      expect(state!.cleanupResult?.errors).toHaveLength(0);
-    });
+    RuleScenario(
+      'Active phase session files are preserved and regenerated',
+      ({ Given, And, When, Then }) => {
+        Given('an existing session file for phase 42 with stale content', async () => {
+          await createSessionFile(
+            state!.outputDir,
+            42,
+            '# Phase 42\n\nStale content - 0% progress'
+          );
+        });
 
-    And('sessions directory should remain empty', async () => {
-      const fs = await import('node:fs/promises');
-      const files = await fs.readdir(path.join(state!.outputDir, 'sessions'));
-      // Only .gitkeep should remain
-      const sessionFiles = files.filter((f) => f.endsWith('.md') && f !== '.gitkeep');
-      expect(sessionFiles).toHaveLength(0);
-    });
+        And('patterns with phase 42 as active', () => {
+          state!.patterns = [{ phase: 42, status: 'active' }];
+          state!.preserveFiles = new Set(['phase-42.md']);
+        });
+
+        When('generating session-context output with cleanup', async () => {
+          // Overwrite with fresh content (simulating generator regeneration)
+          await createSessionFile(
+            state!.outputDir,
+            42,
+            '# Phase 42\n\nFresh content - 50% progress'
+          );
+
+          // Run cleanup - should preserve phase-42.md
+          state!.cleanupResult = await cleanupOrphanedSessionFiles(
+            state!.outputDir,
+            state!.sessionsDir,
+            state!.preserveFiles
+          );
+        });
+
+        Then('phase-42.md should exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-42.md');
+          expect(exists).toBe(true);
+        });
+
+        And('phase-42.md should have fresh content', async () => {
+          const content = await import('node:fs/promises').then((fs) =>
+            fs.readFile(path.join(state!.outputDir, 'sessions/phase-42.md'), 'utf-8')
+          );
+          expect(content).toContain('Fresh content');
+          expect(content).toContain('50% progress');
+        });
+      }
+    );
   });
 
-  Scenario('Missing sessions directory is handled gracefully', ({ Given, And, When, Then }) => {
-    Given('no sessions directory exists', async () => {
-      // Remove the sessions directory created in Background
-      const fs = await import('node:fs/promises');
-      await fs.rm(path.join(state!.outputDir, 'sessions'), { recursive: true, force: true });
+  // ===========================================================================
+  // Rule: Cleanup handles edge cases without errors
+  // ===========================================================================
+
+  Rule('Cleanup handles edge cases without errors', ({ RuleScenario }) => {
+    RuleScenario(
+      'No active phases results in empty sessions directory',
+      ({ Given, And, When, Then }) => {
+        Given('existing session files for phases 8 and 9', async () => {
+          await createSessionFile(state!.outputDir, 8);
+          await createSessionFile(state!.outputDir, 9);
+        });
+
+        And('patterns with no active phases', () => {
+          state!.patterns = [];
+          state!.preserveFiles = new Set(); // No files to preserve
+        });
+
+        When('generating session-context output with cleanup', async () => {
+          state!.cleanupResult = await cleanupOrphanedSessionFiles(
+            state!.outputDir,
+            state!.sessionsDir,
+            state!.preserveFiles
+          );
+        });
+
+        Then('phase-8.md should not exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-8.md');
+          expect(exists).toBe(false);
+        });
+
+        And('phase-9.md should not exist in sessions directory', async () => {
+          const exists = await fileExists(state!.outputDir, 'sessions/phase-9.md');
+          expect(exists).toBe(false);
+        });
+      }
+    );
+
+    RuleScenario('Cleanup is idempotent', ({ Given, And, When, Then }) => {
+      Given('an empty sessions directory', async () => {
+        // Sessions directory already created in Background
+      });
+
+      And('patterns with no active phases', () => {
+        state!.patterns = [];
+        state!.preserveFiles = new Set();
+      });
+
+      When('generating session-context output with cleanup multiple times', async () => {
+        // Run cleanup 3 times
+        for (let i = 0; i < 3; i++) {
+          try {
+            state!.cleanupResult = await cleanupOrphanedSessionFiles(
+              state!.outputDir,
+              state!.sessionsDir,
+              state!.preserveFiles
+            );
+            state!.runCount++;
+          } catch (error) {
+            state!.errors.push(error instanceof Error ? error.message : String(error));
+          }
+        }
+      });
+
+      Then('no errors should occur', () => {
+        expect(state!.errors).toHaveLength(0);
+        expect(state!.runCount).toBe(3);
+        expect(state!.cleanupResult?.errors).toHaveLength(0);
+      });
+
+      And('sessions directory should remain empty', async () => {
+        const fs = await import('node:fs/promises');
+        const files = await fs.readdir(path.join(state!.outputDir, 'sessions'));
+        // Only .gitkeep should remain
+        const sessionFiles = files.filter((f) => f.endsWith('.md') && f !== '.gitkeep');
+        expect(sessionFiles).toHaveLength(0);
+      });
     });
 
-    And('patterns with no active phases', () => {
-      state!.patterns = [];
-      state!.preserveFiles = new Set();
-    });
+    RuleScenario(
+      'Missing sessions directory is handled gracefully',
+      ({ Given, And, When, Then }) => {
+        Given('no sessions directory exists', async () => {
+          // Remove the sessions directory created in Background
+          const fs = await import('node:fs/promises');
+          await fs.rm(path.join(state!.outputDir, 'sessions'), { recursive: true, force: true });
+        });
 
-    When('generating session-context output with cleanup', async () => {
-      try {
+        And('patterns with no active phases', () => {
+          state!.patterns = [];
+          state!.preserveFiles = new Set();
+        });
+
+        When('generating session-context output with cleanup', async () => {
+          try {
+            state!.cleanupResult = await cleanupOrphanedSessionFiles(
+              state!.outputDir,
+              state!.sessionsDir,
+              state!.preserveFiles
+            );
+          } catch (error) {
+            state!.errors.push(error instanceof Error ? error.message : String(error));
+          }
+        });
+
+        Then('no errors should occur', () => {
+          expect(state!.errors).toHaveLength(0);
+          expect(state!.cleanupResult?.errors).toHaveLength(0);
+          expect(state!.cleanupResult?.deleted).toHaveLength(0);
+        });
+      }
+    );
+  });
+
+  // ===========================================================================
+  // Rule: Deleted files are tracked in cleanup results
+  // ===========================================================================
+
+  Rule('Deleted files are tracked in cleanup results', ({ RuleScenario }) => {
+    RuleScenario('Deleted files are tracked in generator output', ({ Given, And, When, Then }) => {
+      Given('existing session files for phases 8 and 31', async () => {
+        await createSessionFile(state!.outputDir, 8);
+        await createSessionFile(state!.outputDir, 31);
+      });
+
+      And('patterns with no active phases', () => {
+        state!.patterns = [];
+        state!.preserveFiles = new Set();
+      });
+
+      When('generating session-context output with cleanup', async () => {
         state!.cleanupResult = await cleanupOrphanedSessionFiles(
           state!.outputDir,
           state!.sessionsDir,
           state!.preserveFiles
         );
-      } catch (error) {
-        state!.errors.push(error instanceof Error ? error.message : String(error));
-      }
-    });
+      });
 
-    Then('no errors should occur', () => {
-      expect(state!.errors).toHaveLength(0);
-      expect(state!.cleanupResult?.errors).toHaveLength(0);
-      expect(state!.cleanupResult?.deleted).toHaveLength(0);
-    });
-  });
+      Then('the generator output should include files to delete', () => {
+        expect(state!.cleanupResult?.deleted.length).toBeGreaterThan(0);
+      });
 
-  // ===========================================================================
-  // Cleanup Results Tracking
-  // ===========================================================================
+      And('the files to delete should include "sessions/phase-8.md"', () => {
+        expect(state!.cleanupResult?.deleted).toContain('sessions/phase-8.md');
+      });
 
-  Scenario('Deleted files are tracked in generator output', ({ Given, And, When, Then }) => {
-    Given('existing session files for phases 8 and 31', async () => {
-      await createSessionFile(state!.outputDir, 8);
-      await createSessionFile(state!.outputDir, 31);
-    });
-
-    And('patterns with no active phases', () => {
-      state!.patterns = [];
-      state!.preserveFiles = new Set();
-    });
-
-    When('generating session-context output with cleanup', async () => {
-      state!.cleanupResult = await cleanupOrphanedSessionFiles(
-        state!.outputDir,
-        state!.sessionsDir,
-        state!.preserveFiles
-      );
-    });
-
-    Then('the generator output should include files to delete', () => {
-      expect(state!.cleanupResult?.deleted.length).toBeGreaterThan(0);
-    });
-
-    And('the files to delete should include "sessions/phase-8.md"', () => {
-      expect(state!.cleanupResult?.deleted).toContain('sessions/phase-8.md');
-    });
-
-    And('the files to delete should include "sessions/phase-31.md"', () => {
-      expect(state!.cleanupResult?.deleted).toContain('sessions/phase-31.md');
+      And('the files to delete should include "sessions/phase-31.md"', () => {
+        expect(state!.cleanupResult?.deleted).toContain('sessions/phase-31.md');
+      });
     });
   });
 });

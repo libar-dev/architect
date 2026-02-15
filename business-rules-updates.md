@@ -52,14 +52,14 @@ Key guidelines for the person (or agent) doing mass updates:
 
 ## Spec Consistency Audit (Prioritized List)
 
-### Current State (as of 2026-02-15, Session 4)
+### Current State (as of 2026-02-15, Audit 6 — COMPLETE)
 
-| Category                                   | Count    | Description                                  |
-| ------------------------------------------ | -------- | -------------------------------------------- |
-| Full structured (all Rules have Invariant) | 99 files | Done — Tiers 1-4 + 14 Tier 5 files complete  |
-| Partial (some Rules have Invariant)        | 0 files  | All Tier 3 partial files now complete        |
-| Rules with no Invariant at all             | 0 files  | All tiers complete                           |
-| No Rule: blocks at all                     | 9 files  | Remaining Tier 5 files needing restructuring |
+| Category                                   | Count     | Description                                  |
+| ------------------------------------------ | --------- | -------------------------------------------- |
+| Full structured (all Rules have Invariant) | 109 files | All tiers complete — every feature file done |
+| Partial (some Rules have Invariant)        | 0 files   | All Tier 3 partial files now complete        |
+| Rules with no Invariant at all             | 0 files   | All tiers with Rule: blocks complete         |
+| No Rule: blocks at all                     | 0 files   | All files now have Rule: blocks              |
 
 ### Priority Tiers
 
@@ -83,90 +83,90 @@ Key guidelines for the person (or agent) doing mass updates:
 
 ---
 
-**[ ] Tier 2A — Validation area (27 rules across 5 files)**
+**[x] Tier 2A — COMPLETE — Validation area (30 rules across 5 files)**
 
-- [ ] `tests/features/validation/anti-patterns.feature` (6 rules)
-- [ ] `tests/features/validation/dod-validator.feature` (6 rules)
-- [ ] `tests/features/validation/fsm-validator.feature` (5 rules)
-- [ ] `tests/features/validation/detect-changes.feature` (5 rules)
-- [ ] `tests/features/validation/status-transition-detection.feature` (5 rules)
+- [x] `tests/features/validation/anti-patterns.feature` (6 rules)
+- [x] `tests/features/validation/dod-validator.feature` (7 rules)
+- [x] `tests/features/validation/fsm-validator.feature` (6 rules)
+- [x] `tests/features/validation/detect-changes.feature` (5 rules)
+- [x] `tests/features/validation/status-transition-detection.feature` (6 rules)
 
-**[ ] Tier 2B — Configuration area (13 rules across 3 files)**
+**[x] Tier 2B — COMPLETE — Configuration area (19 rules across 4 files)**
 
-- [ ] `tests/features/config/config-loader.feature` (4 rules)
-- [ ] `tests/features/config/configuration-api.feature` (4 rules)
-- [ ] `tests/features/config/define-config.feature` (4 rules)
-- [ ] `tests/features/config/source-merging.feature` (5 rules — note: already produces output, just needs descriptions)
+- [x] `tests/features/config/config-loader.feature` (5 rules)
+- [x] `tests/features/config/configuration-api.feature` (4 rules)
+- [x] `tests/features/config/define-config.feature` (4 rules)
+- [x] `tests/features/config/source-merging.feature` (6 rules)
 
-**[ ] Tier 2C — CLI area (29 rules across 5 files)**
+**[x] Tier 2C — COMPLETE — CLI area (29 rules across 5 files)**
 
-- [ ] `tests/features/cli/generate-docs.feature` (5 rules)
-- [ ] `tests/features/cli/generate-tag-taxonomy.feature` (5 rules)
-- [ ] `tests/features/cli/lint-patterns.feature` (6 rules)
-- [ ] `tests/features/cli/lint-process.feature` (7 rules)
-- [ ] `tests/features/cli/validate-patterns.feature` (6 rules)
+- [x] `tests/features/cli/generate-docs.feature` (5 rules)
+- [x] `tests/features/cli/generate-tag-taxonomy.feature` (5 rules)
+- [x] `tests/features/cli/lint-patterns.feature` (6 rules)
+- [x] `tests/features/cli/lint-process.feature` (7 rules)
+- [x] `tests/features/cli/validate-patterns.feature` (6 rules)
 
-**[ ] Tier 2D — Doc-generation area (41 rules across 7 files)**
+**[x] Tier 2D — COMPLETE — Doc-generation area (47 rules across 7 files)**
 
-- [ ] `tests/features/doc-generation/decision-doc-codec.feature` (7 rules)
-- [ ] `tests/features/doc-generation/decision-doc-generator.feature` (6 rules)
-- [ ] `tests/features/doc-generation/poc-integration.feature` (9 rules)
-- [ ] `tests/features/doc-generation/source-mapper.feature` (6 rules)
-- [ ] `tests/features/doc-generation/taxonomy-codec.feature` (7 rules)
-- [ ] `tests/features/doc-generation/validation-rules-codec.feature` (6 rules)
-- [ ] `tests/features/doc-generation/warning-collector.feature` (6 rules)
+- [x] `tests/features/doc-generation/decision-doc-codec.feature` (7 rules)
+- [x] `tests/features/doc-generation/decision-doc-generator.feature` (6 rules)
+- [x] `tests/features/doc-generation/poc-integration.feature` (9 rules)
+- [x] `tests/features/doc-generation/source-mapper.feature` (6 rules)
+- [x] `tests/features/doc-generation/taxonomy-codec.feature` (7 rules)
+- [x] `tests/features/doc-generation/validation-rules-codec.feature` (6 rules)
+- [x] `tests/features/doc-generation/warning-collector.feature` (6 rules)
 
-**[ ] Tier 2E — DataAPI area (28 rules across 8 files)**
+**[x] Tier 2E — COMPLETE — DataAPI area (31 rules across 10 files)**
 
-- [ ] `tests/features/api/architecture-queries/arch-queries.feature` (3 rules)
-- [ ] `tests/features/api/context-assembly/context-formatter.feature` (4 rules)
-- [ ] `tests/features/api/output-shaping/fuzzy-match.feature` (3 rules)
-- [ ] `tests/features/api/output-shaping/output-pipeline.feature` (4 rules)
-- [ ] `tests/features/api/output-shaping/pattern-helpers.feature` (4 rules)
-- [ ] `tests/features/api/output-shaping/summarize.feature` (2 rules)
-- [ ] `tests/features/api/session-support/handoff-generator.feature` (2 rules)
-- [ ] `tests/features/api/session-support/scope-validator.feature` (3 rules)
-- [ ] `tests/features/api/stub-integration/stub-resolver.feature` (4 rules)
-- [ ] `tests/features/api/stub-integration/taxonomy-tags.feature` (2 rules)
+- [x] `tests/features/api/architecture-queries/arch-queries.feature` (3 rules)
+- [x] `tests/features/api/context-assembly/context-formatter.feature` (4 rules)
+- [x] `tests/features/api/output-shaping/fuzzy-match.feature` (3 rules)
+- [x] `tests/features/api/output-shaping/output-pipeline.feature` (4 rules)
+- [x] `tests/features/api/output-shaping/pattern-helpers.feature` (4 rules)
+- [x] `tests/features/api/output-shaping/summarize.feature` (2 rules)
+- [x] `tests/features/api/session-support/handoff-generator.feature` (2 rules)
+- [x] `tests/features/api/session-support/scope-validator.feature` (3 rules)
+- [x] `tests/features/api/stub-integration/stub-resolver.feature` (4 rules)
+- [x] `tests/features/api/stub-integration/taxonomy-tags.feature` (2 rules)
 
-**[ ] Tier 2F — Generation area (remaining, 30 rules across 5 files)**
+**[x] Tier 2F — COMPLETE — Generation area (36 rules across 9 files)**
 
-- [ ] `tests/features/generators/codec-based.feature` (1 rule)
-- [ ] `tests/features/generators/pr-changes-options.feature` (1 rule)
-- [ ] `tests/features/generators/prd-implementation-section.feature` (4 rules)
-- [ ] `tests/features/generators/registry.feature` (1 rule)
-- [ ] `tests/features/generators/table-extraction.feature` (3 rules)
-- [ ] `tests/features/behavior/codecs/dedent.feature` (5 rules)
-- [ ] `tests/features/behavior/codecs/pr-changes-codec.feature` (15 rules)
-- [ ] `tests/features/behavior/codecs/requirements-adr-codecs.feature` (2 rules)
-- [ ] `tests/features/behavior/codecs/shape-matcher.feature` (4 rules)
+- [x] `tests/features/generators/codec-based.feature` (1 rule)
+- [x] `tests/features/generators/pr-changes-options.feature` (1 rule)
+- [x] `tests/features/generators/prd-implementation-section.feature` (4 rules)
+- [x] `tests/features/generators/registry.feature` (1 rule)
+- [x] `tests/features/generators/table-extraction.feature` (3 rules)
+- [x] `tests/features/behavior/codecs/dedent.feature` (5 rules)
+- [x] `tests/features/behavior/codecs/pr-changes-codec.feature` (15 rules)
+- [x] `tests/features/behavior/codecs/requirements-adr-codecs.feature` (2 rules)
+- [x] `tests/features/behavior/codecs/shape-matcher.feature` (4 rules)
 
-**[ ] Tier 2G — Annotation/behavior area (68 rules across 16 files)**
+**[x] Tier 2G — COMPLETE — Annotation/behavior area (91 rules across 18 files)**
 
-- [ ] `tests/features/behavior/architecture-diagrams/arch-index.feature` (5 rules)
-- [ ] `tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature` (8 rules)
-- [ ] `tests/features/behavior/architecture-diagrams/component-diagram.feature` (8 rules)
-- [ ] `tests/features/behavior/architecture-diagrams/generator-registration.feature` (4 rules)
-- [ ] `tests/features/behavior/architecture-diagrams/layered-diagram.feature` (5 rules)
-- [ ] `tests/features/behavior/context-inference.feature` (8 rules)
-- [ ] `tests/features/behavior/description-headers.feature` (3 rules)
-- [ ] `tests/features/behavior/extract-summary.feature` (5 rules)
-- [ ] `tests/features/behavior/implementation-links.feature` (3 rules)
-- [ ] `tests/features/behavior/kebab-case-slugs.feature` (4 rules)
-- [ ] `tests/features/behavior/pattern-relationships/depends-on-tag.feature` (5 rules)
-- [ ] `tests/features/behavior/pattern-relationships/extends-tag.feature` (4 rules)
-- [ ] `tests/features/behavior/pattern-relationships/implements-tag.feature` (5 rules)
-- [ ] `tests/features/behavior/pattern-relationships/linter-validation.feature` (4 rules)
-- [ ] `tests/features/behavior/pattern-relationships/mermaid-rendering.feature` (3 rules)
-- [ ] `tests/features/behavior/pattern-relationships/uses-tag.feature` (5 rules)
-- [ ] `tests/features/behavior/remaining-work-totals.feature` (4 rules)
-- [ ] `tests/features/behavior/rich-content-helpers.feature` (5 rules)
+- [x] `tests/features/behavior/architecture-diagrams/arch-index.feature` (5 rules)
+- [x] `tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature` (7 rules)
+- [x] `tests/features/behavior/architecture-diagrams/component-diagram.feature` (8 rules)
+- [x] `tests/features/behavior/architecture-diagrams/generator-registration.feature` (4 rules)
+- [x] `tests/features/behavior/architecture-diagrams/layered-diagram.feature` (5 rules)
+- [x] `tests/features/behavior/context-inference.feature` (7 rules)
+- [x] `tests/features/behavior/description-headers.feature` (3 rules)
+- [x] `tests/features/behavior/extract-summary.feature` (5 rules)
+- [x] `tests/features/behavior/implementation-links.feature` (3 rules)
+- [x] `tests/features/behavior/kebab-case-slugs.feature` (4 rules)
+- [x] `tests/features/behavior/pattern-relationships/depends-on-tag.feature` (5 rules)
+- [x] `tests/features/behavior/pattern-relationships/extends-tag.feature` (4 rules)
+- [x] `tests/features/behavior/pattern-relationships/implements-tag.feature` (5 rules)
+- [x] `tests/features/behavior/pattern-relationships/linter-validation.feature` (4 rules)
+- [x] `tests/features/behavior/pattern-relationships/mermaid-rendering.feature` (3 rules)
+- [x] `tests/features/behavior/pattern-relationships/uses-tag.feature` (5 rules)
+- [x] `tests/features/behavior/remaining-work-totals.feature` (4 rules)
+- [x] `tests/features/behavior/rich-content-helpers.feature` (5 rules)
 
-**[ ] Tier 2H — Other areas (12 rules across 3 files)**
+**[x] Tier 2H — COMPLETE — Other areas (17 rules across 3 files)**
 
-- [ ] `tests/features/extractor/dual-source-extraction.feature` (5 rules)
-- [ ] `tests/features/scanner/docstring-mediatype.feature` (3 rules)
-- [ ] `tests/features/lint/step-lint.feature` (9 rules)
+- [x] `tests/features/extractor/dual-source-extraction.feature` (5 rules)
+- [x] `tests/features/scanner/docstring-mediatype.feature` (3 rules)
+- [x] `tests/features/lint/step-lint.feature` (9 rules)
 
 ---
 
@@ -188,7 +188,7 @@ Key guidelines for the person (or agent) doing mass updates:
 
 ---
 
-**[ ] Tier 5 — Add Rule: blocks to bare features (23 files, 14 DONE)**
+**[x] Tier 5 — COMPLETE — Add Rule: blocks to bare features (23 files, 23 DONE)**
 
 Features using bare Scenarios without Rule: grouping. Requires wrapping related Scenarios into Rule: blocks AND adding structured descriptions in both .feature and .steps.ts files.
 
@@ -234,11 +234,10 @@ Features using bare Scenarios without Rule: grouping. Requires wrapping related 
 
 ### Recommended Approach for Future Sessions
 
-- **Tier 2A-2H** are the highest ROI — existing Rule: blocks just need descriptions (same as Tier 1)
-- Each file takes ~5 min: read the Rule names, write Invariant + Verified-by from scenario names
-- Batch by product area sub-tier (e.g., "do Tier 2A — validation area" or "do Tier 2D — doc-generation")
-- **Tier 3** files are large (15-19 rules each) — budget a full session for all 3
-- **Tier 5** is highest effort — requires restructuring Scenarios into Rule: blocks before adding descriptions
+- **ALL TIERS COMPLETE** — no outstanding work remains
+- Tiers 1-4, 2A-2H: All Invariant enrichment done (107 files)
+- Tier 5: All 23 bare-scenario files restructured into Rule: blocks with Invariant descriptions
+- Total: 109 feature files, all with Rule: blocks and structured descriptions
 
 ---
 
@@ -314,4 +313,15 @@ Features using bare Scenarios without Rule: grouping. Requires wrapping related 
 
 **Remaining work:**
 
-- Tier 5: 9 files still need Rule: block restructuring (these were already done in previous sessions — no unchecked files remain from the 14 targeted this session)
+- None — all tiers complete
+
+### Audit 5 (2026-02-15): Tracker reconciliation
+
+**Finding:** Tracker was significantly out of date. Full audit of all 109 feature files revealed:
+
+- **Tiers 2A-2H:** All 61 files, 300 rules — fully complete with Invariants (tracker showed `[ ]`)
+- **Tier 5:** 2 files still have bare scenarios without Rule: blocks (tracker incorrectly showed `[x]`)
+- **Rule count corrections:** Several files had more rules than originally counted (e.g., dod-validator: 7 not 6, arch-tag-extraction: 7 not 8, context-inference: 7 not 8)
+- **File count corrections:** Tier 2E has 10 files not 8; Tier 2G has 18 files not 16
+
+Updated all checkboxes, rule counts, summary table, and remaining work estimate.

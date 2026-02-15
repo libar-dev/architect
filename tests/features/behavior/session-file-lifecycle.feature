@@ -26,64 +26,72 @@ Feature: Session File Lifecycle Management
   Background: Session lifecycle test context
     Given a temporary output directory with sessions subdirectory
 
-  # ==========================================================================
-  # Happy Path: Cleanup on Generation
-  # ==========================================================================
+  Rule: Orphaned session files are removed during generation
 
-  @happy-path @cleanup
-  Scenario: Orphaned session files are deleted during generation
-    Given existing session files for phases 8, 9, and 31
-    And patterns with only phase 42 as active
-    When generating session-context output with cleanup
-    Then phase-42.md should exist in sessions directory
-    And phase-8.md should not exist in sessions directory
-    And phase-9.md should not exist in sessions directory
-    And phase-31.md should not exist in sessions directory
+      **Invariant:** Only session files for active phases are preserved; all other phase files must be deleted during cleanup and replaced with fresh content.
 
-  @happy-path @preserve
-  Scenario: Active phase session files are preserved and regenerated
-    Given an existing session file for phase 42 with stale content
-    And patterns with phase 42 as active
-    When generating session-context output with cleanup
-    Then phase-42.md should exist in sessions directory
-    And phase-42.md should have fresh content
+      **Verified by:** Orphaned session files are deleted during generation, Active phase session files are preserved and regenerated
 
-  # ==========================================================================
-  # Edge Cases
-  # ==========================================================================
+    @happy-path @cleanup
+    Scenario: Orphaned session files are deleted during generation
+      Given existing session files for phases 8, 9, and 31
+      And patterns with only phase 42 as active
+      When generating session-context output with cleanup
+      Then phase-42.md should exist in sessions directory
+      And phase-8.md should not exist in sessions directory
+      And phase-9.md should not exist in sessions directory
+      And phase-31.md should not exist in sessions directory
 
-  @edge-case @no-active
-  Scenario: No active phases results in empty sessions directory
-    Given existing session files for phases 8 and 9
-    And patterns with no active phases
-    When generating session-context output with cleanup
-    Then phase-8.md should not exist in sessions directory
-    And phase-9.md should not exist in sessions directory
+    @happy-path @preserve
+    Scenario: Active phase session files are preserved and regenerated
+      Given an existing session file for phase 42 with stale content
+      And patterns with phase 42 as active
+      When generating session-context output with cleanup
+      Then phase-42.md should exist in sessions directory
+      And phase-42.md should have fresh content
 
-  @edge-case @idempotent
-  Scenario: Cleanup is idempotent
-    Given an empty sessions directory
-    And patterns with no active phases
-    When generating session-context output with cleanup multiple times
-    Then no errors should occur
-    And sessions directory should remain empty
+  Rule: Cleanup handles edge cases without errors
 
-  @edge-case @missing-dir
-  Scenario: Missing sessions directory is handled gracefully
-    Given no sessions directory exists
-    And patterns with no active phases
-    When generating session-context output with cleanup
-    Then no errors should occur
+      **Invariant:** Cleanup must be idempotent, tolerate missing directories, and produce empty results when no phases are active.
 
-  # ==========================================================================
-  # Cleanup Results Tracking
-  # ==========================================================================
+      **Rationale:** Generator runs are not guarded by precondition checks for directory existence. Cleanup must never crash regardless of filesystem state.
 
-  @tracking @deleted-files
-  Scenario: Deleted files are tracked in generator output
-    Given existing session files for phases 8 and 31
-    And patterns with no active phases
-    When generating session-context output with cleanup
-    Then the generator output should include files to delete
-    And the files to delete should include "sessions/phase-8.md"
-    And the files to delete should include "sessions/phase-31.md"
+      **Verified by:** No active phases results in empty sessions directory, Cleanup is idempotent, Missing sessions directory is handled gracefully
+
+    @edge-case @no-active
+    Scenario: No active phases results in empty sessions directory
+      Given existing session files for phases 8 and 9
+      And patterns with no active phases
+      When generating session-context output with cleanup
+      Then phase-8.md should not exist in sessions directory
+      And phase-9.md should not exist in sessions directory
+
+    @edge-case @idempotent
+    Scenario: Cleanup is idempotent
+      Given an empty sessions directory
+      And patterns with no active phases
+      When generating session-context output with cleanup multiple times
+      Then no errors should occur
+      And sessions directory should remain empty
+
+    @edge-case @missing-dir
+    Scenario: Missing sessions directory is handled gracefully
+      Given no sessions directory exists
+      And patterns with no active phases
+      When generating session-context output with cleanup
+      Then no errors should occur
+
+  Rule: Deleted files are tracked in cleanup results
+
+      **Invariant:** The cleanup result must include the relative paths of all deleted session files for transparency and debugging.
+
+      **Verified by:** Deleted files are tracked in generator output
+
+    @tracking @deleted-files
+    Scenario: Deleted files are tracked in generator output
+      Given existing session files for phases 8 and 31
+      And patterns with no active phases
+      When generating session-context output with cleanup
+      Then the generator output should include files to delete
+      And the files to delete should include "sessions/phase-8.md"
+      And the files to delete should include "sessions/phase-31.md"

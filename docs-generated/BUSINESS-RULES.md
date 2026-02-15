@@ -1,25 +1,24 @@
-### Business rules generated report - presentation polish
+# Business Rules
 
-Please help me update business rules generated report, which has progressive disclosure by Product Area:
+**Purpose:** Domain constraints and invariants extracted from feature files
+**Detail Level:** Overview with links to detailed business rules by product area
 
-```
-### Product area canonical values
+---
 
-**Invariant:** The product-area tag uses one of 7 canonical values. Each value represents a reader-facing documentation section, not a source module.
+**Domain constraints and invariants extracted from feature specifications. 553 rules from 109 features across 7 product areas.**
 
-| Value | Reader Question | Covers |
-| --- | --- | --- |
-| Annotation | How do I annotate code? | Scanning, extraction, tag parsing, dual-source |
-| Configuration | How do I configure the tool? | Config loading, presets, resolution |
-| Generation | How does code become docs? | Codecs, generators, rendering, diagrams |
-| Validation | How is the workflow enforced? | FSM, DoD, anti-patterns, process guard, lint |
-| DataAPI | How do I query process state? | Process state API, stubs, context assembly, CLI |
-| CoreTypes | What foundational types exist? | Result monad, error factories, string utils |
-| Process | How does the session workflow work? | Session lifecycle, handoffs, conventions |
-```
+---
 
-#### Main task - prolish on the presentation level
+## Product Areas
 
-Make presentation as uniform and as usefull as possible. some work will need to be done by updating actual executable specs from which the business rules come, but hoefully some meaningul chunk of work we can do on the presentation level
+| Product Area | Features | Rules | With Invariants |
+| --- | --- | --- | --- |
+| [Annotation](business-rules/annotation.md) | 17 | 88 | 74 |
+| [Configuration](business-rules/configuration.md) | 7 | 32 | 32 |
+| [CoreTypes](business-rules/core-types.md) | 5 | 22 | 22 |
+| [DataAPI](business-rules/data-api.md) | 18 | 86 | 72 |
+| [Generation](business-rules/generation.md) | 50 | 264 | 230 |
+| [Process](business-rules/process.md) | 2 | 7 | 7 |
+| [Validation](business-rules/validation.md) | 10 | 54 | 54 |
 
-for presentation polish and demonstration of all recent capabilities please check:
+---
