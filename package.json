@@ -107,6 +107,7 @@
     "release:minor": "npm version minor",
     "release:major": "npm version major",
     "prepare": "husky",
+    "session:stats": "bash scripts/session-stats.sh",
     "pr:comments": "node scripts/fetch-pr-comments.mjs",
     "pr:comments:default": "node scripts/fetch-pr-comments.mjs --type thread",
     "claude-md:build": "modular-claude-md build",
