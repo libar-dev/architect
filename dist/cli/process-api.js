@@ -839,13 +839,13 @@ function parseRulesFilters(subArgs) {
     for (let i = 0; i < subArgs.length; i++) {
         const arg = subArgs[i];
         if (arg === '--product-area') {
-            if (i + 1 >= subArgs.length || (subArgs[i + 1]?.startsWith('-') === true)) {
+            if (i + 1 >= subArgs.length || subArgs[i + 1]?.startsWith('-') === true) {
                 throw new QueryApiError('INVALID_ARGUMENT', '--product-area requires a value');
             }
             productArea = subArgs[++i] ?? null;
         }
         else if (arg === '--pattern') {
-            if (i + 1 >= subArgs.length || (subArgs[i + 1]?.startsWith('-') === true)) {
+            if (i + 1 >= subArgs.length || subArgs[i + 1]?.startsWith('-') === true) {
                 throw new QueryApiError('INVALID_ARGUMENT', '--pattern requires a value');
             }
             patternName = subArgs[++i] ?? null;
@@ -881,7 +881,7 @@ function handleRules(ctx) {
         const area = pattern.productArea ?? 'Platform';
         const phase = pattern.phase !== undefined
             ? `Phase ${String(pattern.phase)}`
-            : pattern.release ?? 'Uncategorized';
+            : (pattern.release ?? 'Uncategorized');
         if (!areaMap.has(area)) {
             areaMap.set(area, { features: new Map() });
         }

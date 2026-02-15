@@ -1,7 +1,9 @@
 @libar-docs
 @libar-docs-pattern:SessionFileLifecycle
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-process-workflow-include-tag
 @libar-docs-product-area:Process
+@libar-docs-include:process-workflow
 @behavior @session-lifecycle
 Feature: Session File Lifecycle Management
   Orphaned session files are automatically cleaned up during generation,

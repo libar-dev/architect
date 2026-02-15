@@ -29,6 +29,164 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- UniversalDocGeneratorRobustness ---
+
+| Rule                                                              | Description                                                                                                                |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Context - PoC limitations prevent monorepo-scale operation        | **The Problem:**<br><br> The DecisionDocGenerator PoC (Phase 27) successfully demonstrated code-first<br> documentation... |
+| Decision - Robustness requires four coordinated improvements      | **Architecture:**<br><br> ```<br> Source Mapping Table<br> │<br> ▼<br> ┌─────────────────────────────┐...                  |
+| Duplicate content must be detected and merged                     | Content fingerprinting identifies duplicate sections extracted from multiple<br> sources. When duplicates are found,...    |
+| Invalid source mappings must fail fast with clear errors          | Pre-flight validation catches configuration errors before extraction begins.<br> This prevents silent failures and...      |
+| Warnings must be collected and reported consistently              | The warning collector replaces scattered console.warn calls with a<br> structured system that aggregates warnings and...   |
+| Consequence - Improved reliability at cost of stricter validation | **Positive:**<br><br> - Duplicate content eliminated from generated docs<br> - Configuration errors caught before...       |
+
+--- TraceabilityGenerator ---
+
+| Rule                                                          | Description                                                                                                           |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Parses Verified by annotations to extract scenario references | **Invariant:** Scenario names in `**Verified by:**` are matched against actual<br> scenarios in feature files....     |
+| Generates Rule-to-Scenario traceability matrix                | **Invariant:** Every Rule appears in the matrix with its verification status.<br> Scenarios are linked by name and... |
+| Detects and reports coverage gaps                             | **Invariant:** Orphan scenarios (not referenced by any Rule) and unverified<br> rules are listed in dedicated...      |
+| Supports filtering by phase and domain                        | **Invariant:** CLI flags allow filtering the matrix by phase number or domain<br> category to generate focused...     |
+
+--- TraceabilityEnhancements ---
+
+--- ScopedArchitecturalView ---
+
+| Rule                                                       | Description                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Scope filtering selects patterns by context, view, or name | **Invariant:** A pattern matches a DiagramScope if ANY of three conditions hold:<br> its name is in `scope.patterns`,... |
+| Neighbor discovery finds connected patterns outside scope  | **Invariant:** Patterns connected to scope patterns via relationship edges<br> (uses, dependsOn, implementsPatterns,...  |
+| Multiple diagram scopes compose in sequence                | **Invariant:** When `diagramScopes` is an array, each scope produces its own<br> Mermaid diagram section with...         |
+
+--- ReferenceDocShowcase ---
+
+| Rule                                                                         | Description                                                                                                             |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Deep behavior rendering replaces shallow truncation                          | **Invariant:** At standard and detailed levels, behavior sections render full<br> rule descriptions with parsed...      |
+| Shape sections include JSDoc prose and property documentation                | **Invariant:** At standard level, shape code blocks are preceded by JSDoc<br> prose when available. At detailed...      |
+| Diagram scope supports archLayer filtering and multiple diagram types        | **Invariant:** DiagramScope gains optional archLayer and diagramType fields.<br> The archLayer filter selects...        |
+| Every renderable block type appears in the showcase document                 | **Invariant:** The generated REFERENCE-SAMPLE.md at detailed level must<br> contain at least one instance of each of... |
+| Edge labels and custom node shapes enrich diagram readability                | **Invariant:** Relationship edges in scoped diagrams display labels<br> describing the relationship semantics (uses,... |
+| Extraction pipeline surfaces complete API documentation                      | **Invariant:** ExportInfo.signature shows full function parameter types and<br> return type instead of the...           |
+| Infrastructure enables flexible document composition and AI-optimized output | **Invariant:** CompositeCodec assembles reference documents from multiple<br> codec outputs by concatenating...         |
+
+--- PrdImplementationSection ---
+
+| Rule                                                            | Description                                                                                                          |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| PRD generator discovers implementations from relationship index | **Invariant:** When generating PRD for pattern X, the generator queries the<br> relationship index for all files...  |
+| Implementation metadata appears in dedicated PRD section        | **Invariant:** The PRD output includes a "## Implementations" section listing<br> all files that implement the...    |
+| Patterns without implementations render cleanly                 | **Invariant:** If no files have `@libar-docs-implements:X` for pattern X,<br> the "## Implementations" section is... |
+
+--- GeneratorInfrastructureTesting ---
+
+| Rule                                                            | Description                                                                                                            |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Orchestrator coordinates full documentation generation pipeline | **Invariant:** Orchestrator merges TypeScript and Gherkin patterns,<br> handles conflicts, and produces requested...   |
+| Registry manages generator registration and retrieval           | **Invariant:** Registry prevents duplicate names, returns undefined for<br> unknown generators, and lists available... |
+| CodecBasedGenerator adapts codecs to generator interface        | **Invariant:** Generator delegates to underlying codec for transformation.<br> Missing MasterDataset produces...       |
+| Orchestrator supports PR changes generation options             | **Invariant:** PR changes can filter by git diff, changed files, or release version.<br><br> **API:** See...           |
+
+--- DocGenerationProofOfConcept ---
+
+| Rule                                                                               | Description                                                                                                                    |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Context - Manual documentation maintenance does not scale                          | **The Problem:**<br><br> Common technical documentation is the hardest part to maintain in a repository.<br> The volume...     |
+| Decision - Decisions own convention content and durable context, code owns details | **The Pattern:**<br><br> Documentation is generated from three source types with different durability:<br><br> \| Source...    |
+| Proof of Concept - Self-documentation validates the pattern                        | This POC demonstrates the doc-from-decision pattern by generating docs<br> about ITSELF. The...                                |
+| Expected Output - Compact claude module structure                                  | **File:** `_claude-md/validation/process-guard.md`<br><br> The compact module extracts only essential content for AI...        |
+| Consequences - Durable sources with clear ownership boundaries                     | **Benefits:**<br><br> \| Benefit \| How \|<br> \| Single source of truth \| Each content type owned by one source \|<br> \|... |
+| Consequences - Design stubs live in stubs, not src                                 | **The Problem:**<br><br> Design stubs (pre-implementation API shapes) placed in `src/` cause issues:<br><br> \| Issue \|...    |
+| Decision - Source mapping table parsing and extraction method dispatch             | **Invariant:** The source mapping table in a decision document defines how<br> documentation sections are assembled...         |
+
+--- CrossCuttingDocumentInclusion ---
+
+| Rule                                                | Description                                                                                                             |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Include tag routes content to named documents       | **Invariant:** A pattern or shape with libar-docs-include:X appears in<br> any reference document whose includeTags...  |
+| Include tag scopes diagrams (replaces arch-view)    | **Invariant:** DiagramScope.include matches patterns whose<br> libar-docs-include values contain the specified scope... |
+| Shapes use include tag for document routing         | **Invariant:** A declaration tagged with both libar-docs-shape and<br> libar-docs-include has its include values...     |
+| Conventions use include tag for selective inclusion | **Invariant:** A decision record or convention pattern with<br> libar-docs-include:X appears in a reference document... |
+
+--- CodecDrivenReferenceGeneration ---
+
+| Rule                                                                | Description                                                                                                             |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Config-driven codec replaces per-document recipe features           | **Invariant:** A single `ReferenceDocConfig` object is sufficient to produce<br> a complete reference document. No...   |
+| Four content sources compose in AD-5 order                          | **Invariant:** Reference documents always compose content in this order:<br> conventions, then scoped diagrams, then... |
+| Detail level controls output density                                | **Invariant:** Three detail levels produce progressively more content from the<br> same config. Summary: type tables... |
+| Generator registration produces paired detailed and summary outputs | **Invariant:** Each ReferenceDocConfig produces exactly two generators<br> (detailed for `docs/`, summary for...        |
+
+--- CodecBehaviorTesting ---
+
+| Rule                                                     | Description                                                                                                                 |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Timeline codecs group patterns by phase and status       | **Invariant:** Roadmap shows planned work, Milestones shows completed work,<br> CurrentWork shows active patterns...        |
+| Session codecs provide working context for AI sessions   | **Invariant:** SessionContext shows active patterns with deliverables.<br> RemainingWork aggregates incomplete work...      |
+| Requirements codec produces PRD-style documentation      | **Invariant:** Features include problem, solution, business value.<br> Acceptance criteria are formatted with bold...       |
+| Reporting codecs support release management and auditing | **Invariant:** Changelog follows Keep a Changelog format.<br> Traceability maps rules to scenarios.<br><br> **API:** See... |
+| Planning codecs support implementation sessions          | **Invariant:** Planning checklist includes DoD items.<br> Session plan shows implementation steps.<br><br> **API:** See...  |
+
+--- ClaudeModuleGeneration ---
+
+| Rule                                                            | Description                                                                                                             |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Claude module tags exist in the tag registry                    | **Invariant:** Three claude-specific tags (`claude-module`, `claude-section`,<br> `claude-tags`) must exist in the...   |
+| Gherkin parser extracts claude module tags from feature files   | **Invariant:** The Gherkin extractor must extract `claude-module`, `claude-section`,<br> and `claude-tags` from...      |
+| Module content is extracted from feature file structure         | **Invariant:** The codec must extract content from standard feature file elements:<br> Feature description...           |
+| ClaudeModuleCodec produces compact markdown modules             | **Invariant:** The codec transforms patterns with claude tags into markdown files<br> suitable for the `_claude-md/`... |
+| Claude module generator writes files to correct locations       | **Invariant:** The generator must write module files to `{outputDir}/{section}/{module}.md`<br> based on the...         |
+| Claude module generator is registered with generator registry   | **Invariant:** A "claude-modules" generator must be registered with the generator<br> registry to enable `pnpm...       |
+| Same source generates detailed docs with progressive disclosure | **Invariant:** When running with `detailLevel: "detailed"`, the codec produces<br> expanded documentation including...  |
+
+--- BusinessRulesGenerator ---
+
+| Rule                                              | Description                                                                                                             |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Extracts Rule blocks with Invariant and Rationale | **Invariant:** Every `Rule:` block with `**Invariant:**` annotation must be extracted.<br> Rules without annotations... |
+| Organizes rules by domain category and phase      | **Invariant:** Rules are grouped first by domain category (from `@libar-docs-*` flags),<br> then by phase number for... |
+| Preserves code examples and comparison tables     | **Invariant:** DocStrings (`"""typescript`) and tables in Rule descriptions are<br> rendered in the business rules...   |
+| Generates scenario traceability links             | **Invariant:** Each rule's `**Verified by:**` section generates links to the<br> scenarios that verify the rule....     |
+
+--- ArchitectureDiagramGeneration ---
+
+| Rule                                                         | Description                                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Architecture tags exist in the tag registry                  | **Invariant:** Three architecture-specific tags (`arch-role`, `arch-context`,<br> `arch-layer`) must exist in the tag... |
+| AST parser extracts architecture tags from TypeScript        | **Invariant:** The AST parser must extract `arch-role`, `arch-context`, and<br> `arch-layer` tags from TypeScript...     |
+| MasterDataset builds archIndex during transformation         | **Invariant:** The `transformToMasterDataset` function must build an `archIndex`<br> that groups patterns by role,...    |
+| Component diagrams group patterns by bounded context         | **Invariant:** Component diagrams must render patterns as nodes grouped into<br> bounded context subgraphs, with...      |
+| Layered diagrams group patterns by architectural layer       | **Invariant:** Layered diagrams must render patterns grouped by architectural<br> layer (domain, application,...         |
+| Architecture generator is registered with generator registry | **Invariant:** An "architecture" generator must be registered with the generator<br> registry to enable `pnpm...         |
+| Sequence diagrams render interaction flows                   | **Invariant:** Sequence diagrams must render interaction flows (command flow,<br> saga flow) showing step-by-step...     |
+
+--- ArchitectureDelta ---
+
+--- ADR005CodecBasedMarkdownRendering ---
+
+| Rule                                                              | Description                                                                                                           |
+| ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Codecs implement a decode-only contract                           | **Invariant:** Every codec is a pure function that accepts a MasterDataset<br> and returns a RenderableDocument....   |
+| RenderableDocument is a typed intermediate representation         | **Invariant:** RenderableDocument contains a title, an ordered array of<br> SectionBlock elements, and an optional... |
+| CompositeCodec assembles documents from child codecs              | **Invariant:** CompositeCodec accepts an array of child codecs and<br> produces a single RenderableDocument by...     |
+| ADR content comes from both Feature description and Rule prefixes | **Invariant:** ADR structured content (Context, Decision, Consequences)<br> can appear in two locations within a...   |
+| The markdown renderer is codec-agnostic                           | **Invariant:** The renderer accepts any RenderableDocument regardless of<br> which codec produced it. Rendering...    |
+
+--- TestContentBlocks ---
+
+| Rule                                                 | Description                                                                                                           |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Business rules appear as a separate section          | Rule descriptions provide context for why this business rule exists.<br> You can include multiple paragraphs here.... |
+| Multiple rules create multiple Business Rule entries | Each Rule keyword creates a separate entry in the Business Rules section.<br> This helps organize complex features... |
+
+--- RuleKeywordPoC ---
+
+| Rule                                       | Description                                                                      |
+| ------------------------------------------ | -------------------------------------------------------------------------------- |
+| Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
+| Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
+
 --- TableExtraction ---
 
 | Rule                                                    | Description                                                                                                             |
@@ -85,20 +243,6 @@ Detail Level: Compact summary
 | Source file shown as filename text                             |             |
 | Verified-by renders as checkbox list at standard level         |             |
 | Feature names are humanized from camelCase pattern names       |             |
-
---- TestContentBlocks ---
-
-| Rule                                                 | Description                                                                                                           |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Business rules appear as a separate section          | Rule descriptions provide context for why this business rule exists.<br> You can include multiple paragraphs here.... |
-| Multiple rules create multiple Business Rule entries | Each Rule keyword creates a separate entry in the Business Rules section.<br> This helps organize complex features... |
-
---- RuleKeywordPoC ---
-
-| Rule                                       | Description                                                                      |
-| ------------------------------------------ | -------------------------------------------------------------------------------- |
-| Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
-| Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
 
 --- WarningCollectorTesting ---
 
@@ -235,6 +379,20 @@ Detail Level: Compact summary
 
 --- UniversalMarkdownRenderer ---
 
+| Rule                                                                | Description                                                                                                              |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Document metadata renders as frontmatter before sections            | **Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by...       |
+| Headings render at correct markdown levels with clamping            | **Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.<br> **Verified by:**...      |
+| Paragraphs and separators render as plain text and horizontal rules | **Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render...  |
+| Tables render with headers, alignment, and cell escaping            | **Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match...       |
+| Lists render in unordered, ordered, checkbox, and nested formats    | **Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked...     |
+| Code blocks and mermaid diagrams render with fenced syntax          | **Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the... |
+| Collapsible blocks render as HTML details elements                  | **Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags....   |
+| Link-out blocks render as markdown links with URL encoding          | **Invariant:** Link paths with spaces are percent-encoded for valid URLs.<br> **Verified by:** Render link-out...        |
+| Multi-file documents produce correct output file collections        | **Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the...    |
+| Complex documents render all block types in sequence                | **Invariant:** Multiple block types in a single document render in order without interference.<br> **Verified by:**...   |
+| Claude context renderer produces compact AI-optimized output        | **Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid,...       |
+
 --- RemainingWorkSummaryAccuracy ---
 
 | Rule                                              | Description                                                                                                            |
@@ -246,7 +404,30 @@ Detail Level: Compact summary
 
 --- RemainingWorkEnhancement ---
 
+| Rule                                                                   | Description                                                                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Priority-based sorting surfaces critical work first                    | **Invariant:** Phases with higher priority always appear before lower-priority phases when sorting by priority....     |
+| Effort parsing converts duration strings to comparable hours           | **Invariant:** Effort strings must be parsed to a common unit (hours) for accurate sorting across different time...    |
+| Quarter grouping organizes planned work into time-based buckets        | **Invariant:** Phases with a quarter tag are grouped under their quarter heading; phases without a quarter appear...   |
+| Priority grouping organizes phases by urgency level                    | **Invariant:** Phases are grouped under their priority heading; phases without priority appear under Unprioritized.... |
+| Progressive disclosure prevents information overload in large backlogs | **Invariant:** When the backlog exceeds maxNextActionable, only the top N phases are shown with a link or count for... |
+| Edge cases are handled gracefully                                      | **Invariant:** Empty or fully-blocked backlogs produce meaningful output instead of errors or blank sections....       |
+| Default behavior preserves backward compatibility                      | **Invariant:** Without explicit sortBy or groupPlannedBy options, phases are sorted by phase number in a flat list.... |
+
 --- PrChangesGeneration ---
+
+| Rule                                                                        | Description                                                                                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Release version filtering controls which phases appear in output            | **Invariant:** Only phases with deliverables matching the releaseFilter are included; roadmap phases are always...      |
+| Patterns are grouped by phase number in the output                          | **Invariant:** Each phase number produces a separate heading section in the generated output.<br> **Verified by:**...   |
+| Summary statistics provide a high-level overview of the PR                  | **Invariant:** Summary section always shows pattern counts and release tag when a releaseFilter is active....           |
+| Deliverables are displayed inline with their parent patterns                | **Invariant:** When includeDeliverables is enabled, each pattern lists its deliverables with name, status, and...       |
+| Review checklist includes standard code quality verification items          | **Invariant:** Review checklist always includes code conventions, tests, documentation, and completed pattern...        |
+| Dependencies section shows inter-pattern relationships                      | **Invariant:** Dependencies section surfaces both what patterns enable and what they depend on.<br> \*\*Verified...     |
+| Business value can be included or excluded from pattern metadata            | **Invariant:** Business value display is controlled by the includeBusinessValue option.<br> **Verified by:**...         |
+| Output can be sorted by phase number or priority                            | **Invariant:** Sorting is deterministic and respects the configured sortBy option.<br> **Verified by:** Phases...       |
+| Edge cases produce graceful output                                          | **Invariant:** The generator handles missing phases, missing deliverables, and missing phase numbers without errors.... |
+| Deliverable-level filtering shows only matching deliverables within a phase | **Invariant:** When a phase contains deliverables with different release tags, only those matching the releaseFilter... |
 
 --- PatternsCodecTesting ---
 
@@ -295,6 +476,72 @@ Detail Level: Compact summary
 | stripLeadingHeaders removes only leading headers       | **Invariant:** The helper function strips only headers that appear before any non-header content; headers occurring... |
 
 --- ZodCodecMigration ---
+
+| Rule                                                                 | Description                                                                                                              |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Input codec parses and validates JSON in a single step               | **Invariant:** Every JSON string parsed through the input codec is both syntactically valid JSON and...                  |
+| Output codec validates before serialization                          | **Invariant:** Every object serialized through the output codec is schema-validated before JSON.stringify, preventing... |
+| LintOutputSchema validates CLI lint output structure                 | **Invariant:** Lint output JSON always conforms to the LintOutputSchema, ensuring consistent structure for downstream... |
+| ValidationSummaryOutputSchema validates cross-source analysis output | **Invariant:** Validation summary JSON always conforms to the ValidationSummaryOutputSchema, ensuring consistent...      |
+| RegistryMetadataOutputSchema accepts arbitrary nested structures     | **Invariant:** Registry metadata codec accepts any valid JSON-serializable object without schema constraints on...       |
+| formatCodecError produces human-readable error output                | **Invariant:** Formatted codec errors always include the operation context and all validation error details for...       |
+| safeParse returns typed values or undefined without throwing         | **Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any...           |
+| createFileLoader handles filesystem operations with typed errors     | **Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values... |
+
+--- LayeredDiagramGeneration ---
+
+| Rule                                                    | Description                                                                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Layered diagrams group patterns by arch-layer           | **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with... |
+| Layer order is domain to infrastructure (top to bottom) | **Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then...    |
+| Context labels included in layered diagram nodes        | **Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not... |
+| Patterns without layer go to Other subgraph             | **Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph,... |
+| Layered diagram includes summary section                | **Invariant:** The generated layered diagram document must include an Overview section with annotated source file...    |
+
+--- ArchGeneratorRegistration ---
+
+| Rule                                                         | Description                                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Architecture generator is registered in the registry         | **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation....    |
+| Architecture generator produces component diagram by default | **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with...  |
+| Architecture generator supports diagram type options         | **Invariant:** The architecture generator must accept a diagram type option that selects between component and...        |
+| Architecture generator supports context filtering            | **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified... |
+
+--- ComponentDiagramGeneration ---
+
+| Rule                                                    | Description                                                                                                            |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Component diagrams group patterns by bounded context    | **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns...   |
+| Context-less patterns go to Shared Infrastructure       | **Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never...   |
+| Relationship types render with distinct arrow styles    | **Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on...   |
+| Arrows only connect annotated components                | **Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the...          |
+| Component diagram includes summary section              | **Invariant:** The generated component diagram document must include an Overview section with component count and...   |
+| Component diagram includes legend when enabled          | **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow... |
+| Component diagram includes inventory table when enabled | **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component,... |
+| Empty architecture data shows guidance message          | **Invariant:** When no patterns have architecture annotations, the document must display a guidance message...         |
+
+--- ArchTagExtraction ---
+
+| Rule                                                         | Description                                                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| arch-role tag is defined in the registry                     | **Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role...       |
+| arch-context tag is defined in the registry                  | **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context...      |
+| arch-layer tag is defined in the registry                    | **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain,...     |
+| AST parser extracts arch-role from TypeScript annotations    | **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's...    |
+| AST parser extracts arch-context from TypeScript annotations | **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's... |
+| AST parser extracts arch-layer from TypeScript annotations   | **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's...   |
+| AST parser handles multiple arch tags together               | **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted...  |
+| Missing arch tags yield undefined values                     | **Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or...    |
+
+--- ArchIndexDataset ---
+
+| Rule                                                   | Description                                                                                                              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| archIndex groups patterns by arch-role                 | **Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key....        |
+| archIndex groups patterns by arch-context              | **Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context...    |
+| archIndex groups patterns by arch-layer                | **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key....     |
+| archIndex.all contains all patterns with any arch tag  | **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context,... |
+| Patterns without arch tags are excluded from archIndex | **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view....     |
 
 --- MermaidRelationshipRendering ---
 
@@ -439,58 +686,3 @@ Detail Level: Compact summary
 | additionalFiles merge with last-wins semantics            | **Invariant:** additionalFiles from all children are merged into<br> a single record. When keys collide, the later...  |
 | composeDocuments works at document level without codecs   | **Invariant:** composeDocuments accepts RenderableDocument array and<br> produces a composed RenderableDocument...     |
 | Empty codec outputs are handled gracefully                | **Invariant:** Codecs producing empty sections arrays contribute<br> nothing to the output. No separator is emitted... |
-
---- LayeredDiagramGeneration ---
-
-| Rule                                                    | Description                                                                                                             |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Layered diagrams group patterns by arch-layer           | **Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with... |
-| Layer order is domain to infrastructure (top to bottom) | **Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then...    |
-| Context labels included in layered diagram nodes        | **Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not... |
-| Patterns without layer go to Other subgraph             | **Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph,... |
-| Layered diagram includes summary section                | **Invariant:** The generated layered diagram document must include an Overview section with annotated source file...    |
-
---- ArchGeneratorRegistration ---
-
-| Rule                                                         | Description                                                                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| Architecture generator is registered in the registry         | **Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation....    |
-| Architecture generator produces component diagram by default | **Invariant:** Running the architecture generator without diagram type options must produce a component diagram with...  |
-| Architecture generator supports diagram type options         | **Invariant:** The architecture generator must accept a diagram type option that selects between component and...        |
-| Architecture generator supports context filtering            | **Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified... |
-
---- ComponentDiagramGeneration ---
-
-| Rule                                                    | Description                                                                                                            |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Component diagrams group patterns by bounded context    | **Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns...   |
-| Context-less patterns go to Shared Infrastructure       | **Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never...   |
-| Relationship types render with distinct arrow styles    | **Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on...   |
-| Arrows only connect annotated components                | **Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the...          |
-| Component diagram includes summary section              | **Invariant:** The generated component diagram document must include an Overview section with component count and...   |
-| Component diagram includes legend when enabled          | **Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow... |
-| Component diagram includes inventory table when enabled | **Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component,... |
-| Empty architecture data shows guidance message          | **Invariant:** When no patterns have architecture annotations, the document must display a guidance message...         |
-
---- ArchTagExtraction ---
-
-| Rule                                                         | Description                                                                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| arch-role tag is defined in the registry                     | **Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role...       |
-| arch-context tag is defined in the registry                  | **Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context...      |
-| arch-layer tag is defined in the registry                    | **Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain,...     |
-| AST parser extracts arch-role from TypeScript annotations    | **Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's...    |
-| AST parser extracts arch-context from TypeScript annotations | **Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's... |
-| AST parser extracts arch-layer from TypeScript annotations   | **Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's...   |
-| AST parser handles multiple arch tags together               | **Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted...  |
-| Missing arch tags yield undefined values                     | **Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or...    |
-
---- ArchIndexDataset ---
-
-| Rule                                                   | Description                                                                                                              |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| archIndex groups patterns by arch-role                 | **Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key....        |
-| archIndex groups patterns by arch-context              | **Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context...    |
-| archIndex groups patterns by arch-layer                | **Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key....     |
-| archIndex.all contains all patterns with any arch tag  | **Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context,... |
-| Patterns without arch tags are excluded from archIndex | **Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view....     |

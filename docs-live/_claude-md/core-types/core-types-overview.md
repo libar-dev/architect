@@ -35,6 +35,16 @@ Detail Level: Compact summary
 
 --- ResultMonad ---
 
+| Rule                                                          | Description                                                                                                              |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Result.ok wraps values into success results                   | **Invariant:** Result.ok always produces a result where isOk is true, regardless of the wrapped value type...            |
+| Result.err wraps values into error results                    | **Invariant:** Result.err always produces a result where isErr is true, supporting Error instances, strings, and...      |
+| Type guards distinguish success from error results            | **Invariant:** isOk and isErr are mutually exclusive: exactly one returns true for any Result value.<br> \*\*Verified... |
+| unwrap extracts the value or throws the error                 | **Invariant:** unwrap on a success result returns the value; unwrap on an error result always throws an Error...         |
+| unwrapOr extracts the value or returns a default              | **Invariant:** unwrapOr on a success result returns the contained value (ignoring the default); on an error result it... |
+| map transforms the success value without affecting errors     | **Invariant:** map applies the transformation function only to success results; error results pass through unchanged.... |
+| mapErr transforms the error value without affecting successes | **Invariant:** mapErr applies the transformation function only to error results; success results pass through...         |
+
 --- ErrorFactories ---
 
 | Rule                                                                          | Description                                                                                                             |

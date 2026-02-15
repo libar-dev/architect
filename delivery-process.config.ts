@@ -93,7 +93,6 @@ export default defineConfig({
     },
     'product-area-docs': {
       outputDirectory: 'docs-live',
-      replaceFeatures: ['tests/features/**/*.feature'],
     },
     adrs: {
       outputDirectory: 'docs-live',

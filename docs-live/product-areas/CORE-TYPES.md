@@ -198,6 +198,112 @@ This eliminates thrown exceptions in favor of type-safe error propagation.
 - Chainable transformations via map/mapErr
 - No hidden control flow from thrown exceptions
 
+<details>
+<summary>Result.ok wraps values into success results (4 scenarios)</summary>
+
+#### Result.ok wraps values into success results
+
+**Invariant:** Result.ok always produces a result where isOk is true, regardless of the wrapped value type (primitives, objects, null, undefined).
+
+**Verified by:**
+
+- Result.ok wraps a primitive value
+- Result.ok wraps an object value
+- Result.ok wraps null value
+- Result.ok wraps undefined value
+
+</details>
+
+<details>
+<summary>Result.err wraps values into error results (3 scenarios)</summary>
+
+#### Result.err wraps values into error results
+
+**Invariant:** Result.err always produces a result where isErr is true, supporting Error instances, strings, and structured objects as error values.
+
+**Verified by:**
+
+- Result.err wraps an Error instance
+- Result.err wraps a string error
+- Result.err wraps a structured error object
+
+</details>
+
+<details>
+<summary>Type guards distinguish success from error results (2 scenarios)</summary>
+
+#### Type guards distinguish success from error results
+
+**Invariant:** isOk and isErr are mutually exclusive: exactly one returns true for any Result value.
+
+**Verified by:**
+
+- Type guards correctly identify success results
+- Type guards correctly identify error results
+
+</details>
+
+<details>
+<summary>unwrap extracts the value or throws the error (4 scenarios)</summary>
+
+#### unwrap extracts the value or throws the error
+
+**Invariant:** unwrap on a success result returns the value; unwrap on an error result always throws an Error instance (wrapping non-Error values for stack trace preservation).
+
+**Verified by:**
+
+- unwrap extracts value from success result
+- unwrap throws the Error from error result
+- unwrap wraps non-Error in Error for proper stack trace
+- unwrap serializes object error to JSON in message
+
+</details>
+
+<details>
+<summary>unwrapOr extracts the value or returns a default (3 scenarios)</summary>
+
+#### unwrapOr extracts the value or returns a default
+
+**Invariant:** unwrapOr on a success result returns the contained value (ignoring the default); on an error result it returns the provided default value.
+
+**Verified by:**
+
+- unwrapOr returns value from success result
+- unwrapOr returns default from error result
+- unwrapOr returns numeric default from error result
+
+</details>
+
+<details>
+<summary>map transforms the success value without affecting errors (3 scenarios)</summary>
+
+#### map transforms the success value without affecting errors
+
+**Invariant:** map applies the transformation function only to success results; error results pass through unchanged. Multiple maps can be chained.
+
+**Verified by:**
+
+- map transforms success value
+- map passes through error unchanged
+- map chains multiple transformations
+
+</details>
+
+<details>
+<summary>mapErr transforms the error value without affecting successes (3 scenarios)</summary>
+
+#### mapErr transforms the error value without affecting successes
+
+**Invariant:** mapErr applies the transformation function only to error results; success results pass through unchanged. Error types can be converted.
+
+**Verified by:**
+
+- mapErr transforms error value
+- mapErr passes through success unchanged
+- mapErr converts error type
+
+</details>
+
 ### ErrorFactories
 
 [View ErrorFactories source](tests/features/types/error-factories.feature)

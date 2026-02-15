@@ -28,7 +28,9 @@ graph TB
         DecisionDocGenerator("DecisionDocGenerator")
     end
     subgraph renderer["Renderer"]
+        PatternsCodec[("PatternsCodec")]
         DecisionDocCodec[("DecisionDocCodec")]
+        CompositeCodec[("CompositeCodec")]
         ArchitectureCodec[("ArchitectureCodec")]
     end
     subgraph related["Related"]
@@ -36,15 +38,20 @@ graph TB
         Pattern_Scanner["Pattern Scanner"]:::neighbor
         GherkinASTParser["GherkinASTParser"]:::neighbor
         ShapeExtractor["ShapeExtractor"]:::neighbor
+        ReferenceDocShowcase["ReferenceDocShowcase"]:::neighbor
+        PatternRelationshipModel["PatternRelationshipModel"]:::neighbor
     end
     SourceMapper -.->|depends on| DecisionDocCodec
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    ArchitectureCodec -->|uses| MasterDataset
     TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
     DecisionDocGenerator -.->|depends on| DecisionDocCodec
     DecisionDocGenerator -.->|depends on| SourceMapper
+    PatternsCodec ..->|implements| PatternRelationshipModel
+    CompositeCodec ..->|implements| ReferenceDocShowcase
+    ArchitectureCodec -->|uses| MasterDataset
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -223,6 +230,2295 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 ---
 
 ## Behavior Specifications
+
+### UniversalDocGeneratorRobustness
+
+[View UniversalDocGeneratorRobustness source](delivery-process/specs/universal-doc-generator-robustness.feature)
+
+This feature transforms the PoC document generator into a production-ready
+universal generator capable of operating at monorepo scale (~210 manual docs
+to be replaced across the convex-event-sourcing repository).
+
+**GitHub Issue:** libar-ai/convex-event-sourcing#134
+
+<details>
+<summary>Context - PoC limitations prevent monorepo-scale operation</summary>
+
+#### Context - PoC limitations prevent monorepo-scale operation
+
+**The Problem:**
+
+    The DecisionDocGenerator PoC (Phase 27) successfully demonstrated code-first
+    documentation generation, but has reliability issues that prevent scaling:
+
+    **Why Fix Before Adding Features:**
+
+    The monorepo has 210 manually maintained docs. Before adding ADR generation
+    (33 files), guide generation (6 files), or glossary extraction, the foundation
+    must be reliable. A bug at the source mapper level corrupts ALL generated docs.
+
+    **Target State:**
+
+| Issue               | Impact           | Example                                  |
+| ------------------- | ---------------- | ---------------------------------------- |
+| Content duplication | Confusing output | "Protection Levels" appears twice        |
+| No validation       | Silent failures  | Missing files produce empty sections     |
+| Scattered warnings  | Hard to debug    | console.warn in source-mapper.ts:149,339 |
+| No file validation  | Runtime errors   | Invalid paths crash extraction           |
+
+| Metric                 | Current      | Target                     |
+| ---------------------- | ------------ | -------------------------- |
+| Duplicate sections     | Common       | Zero (fingerprint dedup)   |
+| Invalid mapping errors | Silent       | Explicit validation errors |
+| Warning visibility     | console.warn | Structured Result warnings |
+| File validation        | None         | Pre-flight existence check |
+
+</details>
+
+<details>
+<summary>Decision - Robustness requires four coordinated improvements</summary>
+
+#### Decision - Robustness requires four coordinated improvements
+
+**Architecture:**
+
+    **Deliverable Ownership:**
+
+| Deliverable           | Module                                     | Responsibility            |
+| --------------------- | ------------------------------------------ | ------------------------- |
+| Content Deduplication | src/generators/content-deduplicator.ts     | Remove duplicate sections |
+| Validation Layer      | src/generators/source-mapping-validator.ts | Pre-flight checks         |
+| Warning Collector     | src/generators/warning-collector.ts        | Unified warning handling  |
+| File Validation       | Integrated into validator                  | Existence + readability   |
+
+```text
+Source Mapping Table
+           │
+           ▼
+    ┌─────────────────────────────┐
+    │  Validation Layer (NEW)    │ ◄── Pre-flight checks
+    │  - File existence          │
+    │  - Method validity         │
+    │  - Format validation       │
+    └─────────────────────────────┘
+           │
+           ▼
+    ┌─────────────────────────────┐
+    │  Source Mapper             │
+    │  - Warning collector (NEW) │ ◄── Structured warnings
+    │  - Extraction dispatch     │
+    └─────────────────────────────┘
+           │
+           ▼
+    ┌─────────────────────────────┐
+    │  Content Assembly          │
+    │  - Deduplication (NEW)     │ ◄── Fingerprint-based
+    │  - Section ordering        │
+    └─────────────────────────────┘
+           │
+           ▼
+    ┌─────────────────────────────┐
+    │  RenderableDocument        │
+    └─────────────────────────────┘
+```
+
+</details>
+
+<details>
+<summary>Duplicate content must be detected and merged (2 scenarios)</summary>
+
+#### Duplicate content must be detected and merged
+
+Content fingerprinting identifies duplicate sections extracted from multiple
+sources. When duplicates are found, the system merges them intelligently
+based on source priority.
+
+**Verified by:**
+
+- Identical sections are deduplicated
+- Similar but non-identical sections are preserved
+
+</details>
+
+<details>
+<summary>Invalid source mappings must fail fast with clear errors (4 scenarios)</summary>
+
+#### Invalid source mappings must fail fast with clear errors
+
+Pre-flight validation catches configuration errors before extraction begins.
+This prevents silent failures and provides actionable error messages.
+
+**Verified by:**
+
+- Valid source mapping passes validation
+- Missing file produces validation error
+- Invalid extraction method produces validation error
+- Unreadable file produces validation error
+
+</details>
+
+<details>
+<summary>Warnings must be collected and reported consistently (3 scenarios)</summary>
+
+#### Warnings must be collected and reported consistently
+
+The warning collector replaces scattered console.warn calls with a
+structured system that aggregates warnings and reports them consistently.
+
+**Verified by:**
+
+- Warnings are collected during extraction
+- Multiple warnings from different sources are aggregated
+- Warnings are included in Result type
+
+</details>
+
+<details>
+<summary>Consequence - Improved reliability at cost of stricter validation</summary>
+
+#### Consequence - Improved reliability at cost of stricter validation
+
+**Positive:**
+
+    - Duplicate content eliminated from generated docs
+    - Configuration errors caught before extraction
+    - Debugging simplified with structured warnings
+    - Ready for monorepo-scale operation
+
+    **Negative:**
+
+    - Existing source mappings may need updates to pass validation
+    - Strict validation may require more upfront configuration
+    - Additional processing overhead for deduplication
+
+    **Migration:**
+
+    Existing decision documents using the PoC generator may need updates:
+    1. Run validation in dry-run mode to identify issues
+    2. Fix file paths and extraction methods
+    3. Re-run generation with new robustness checks
+
+</details>
+
+### TraceabilityGenerator
+
+[View TraceabilityGenerator source](delivery-process/specs/traceability-generator.feature)
+
+**Business Value:** Provide audit-ready traceability matrices that demonstrate
+test coverage for business rules without manual documentation.
+
+**How It Works:**
+
+- Parse `**Verified by:**` annotations in Rule descriptions
+- Match scenario names to actual scenarios in feature files
+- Generate traceability matrix showing Rule → Scenario mappings
+- Report coverage gaps (rules without scenarios, orphan scenarios)
+
+**Why It Matters:**
+| Benefit | How |
+| Audit compliance | Demonstrates which tests verify which business rules |
+| Coverage visibility | Identifies rules without verification scenarios |
+| Orphan detection | Finds scenarios not linked to any rule |
+| Impact analysis | Shows which scenarios to run when a rule changes |
+
+<details>
+<summary>Parses Verified by annotations to extract scenario references (2 scenarios)</summary>
+
+#### Parses Verified by annotations to extract scenario references
+
+**Invariant:** Scenario names in `**Verified by:**` are matched against actual scenarios in feature files. Unmatched references are reported as warnings.
+
+**Rationale:** Verified by annotations create explicit traceability. Validating references ensures the traceability matrix reflects actual test coverage.
+
+**Verified by:**
+
+- Parses comma-separated scenario list
+- Reports unmatched scenario references
+- Parses comma-separated scenarios
+- Reports unmatched references
+
+</details>
+
+<details>
+<summary>Generates Rule-to-Scenario traceability matrix (3 scenarios)</summary>
+
+#### Generates Rule-to-Scenario traceability matrix
+
+**Invariant:** Every Rule appears in the matrix with its verification status. Scenarios are linked by name and file location.
+
+**Rationale:** A matrix format enables quick scanning of coverage status and supports audit requirements for bidirectional traceability.
+
+**Verified by:**
+
+- Matrix includes all rules from feature files
+- Matrix shows verification status with scenario count
+- Matrix marks unverified rules
+- Matrix includes all rules
+- Matrix shows verification status
+
+</details>
+
+<details>
+<summary>Detects and reports coverage gaps (2 scenarios)</summary>
+
+#### Detects and reports coverage gaps
+
+**Invariant:** Orphan scenarios (not referenced by any Rule) and unverified rules are listed in dedicated sections.
+
+**Rationale:** Coverage gaps indicate either missing traceability annotations or actual missing test coverage. Surfacing them enables remediation.
+
+**Verified by:**
+
+- Reports orphan scenarios not linked to any rule
+- Reports unverified rules
+- Reports orphan scenarios
+
+</details>
+
+<details>
+<summary>Supports filtering by phase and domain (2 scenarios)</summary>
+
+#### Supports filtering by phase and domain
+
+**Invariant:** CLI flags allow filtering the matrix by phase number or domain category to generate focused traceability reports.
+
+**Rationale:** Large codebases have many rules. Filtering enables relevant subset extraction for specific audits or reviews.
+
+**Verified by:**
+
+- Filters matrix by phase
+- Filters matrix by domain category
+- Filters by phase
+- Filters by domain
+
+</details>
+
+### TraceabilityEnhancements
+
+[View TraceabilityEnhancements source](delivery-process/specs/traceability-enhancements.feature)
+
+**Problem:**
+Current TRACEABILITY.md shows 15% coverage (timeline → behavior).
+No visibility into patterns without scenarios.
+No detection of orphaned scenarios referencing non-existent patterns.
+
+**Solution:**
+Enhance traceability generator to show:
+
+- Pattern coverage matrix (scenarios per pattern)
+- Orphaned scenarios report (scenarios without matching patterns)
+- Patterns missing acceptance criteria
+- Coverage gap trends over time
+
+Implements Convergence Opportunity 4: Requirements ↔ Tests Traceability.
+
+Existing: docs-living/TRACEABILITY.md
+
+### ScopedArchitecturalView
+
+[View ScopedArchitecturalView source](delivery-process/specs/scoped-architectural-view.feature)
+
+**Problem:**
+Full architecture diagrams show every annotated pattern in the project. For focused
+use cases -- design session context, PR descriptions, CLAUDE.md module sections --
+developers need views scoped to a small set of relevant patterns with their immediate
+neighbors. Manually curating diagram content defeats the code-first principle.
+
+**Solution:**
+A `DiagramScope` filter interface that selects patterns by three dimensions
+(`archContext`, `archView`, or explicit pattern names), automatically discovers
+neighbor patterns via relationship edges, and renders scoped Mermaid diagrams
+with subgraph grouping and distinct neighbor styling.
+
+The `arch-view` tag enables patterns to declare membership in named architectural
+views (e.g., `codec-transformation`, `pipeline-stages`). A single pattern can
+belong to multiple views. The transformer groups patterns by view in the
+`ArchIndex.byView` pre-computed index for O(1) access at render time.
+
+**Why It Matters:**
+| Benefit | How |
+| Focused context for AI sessions | Select 3-5 patterns instead of 50+ |
+| Automatic neighbor discovery | Related patterns appear without explicit listing |
+| Multiple views per pattern | One annotation, many documents |
+| Two detail levels from one config | Detailed (with diagram) and summary (table only) |
+| Reusable across document types | PR descriptions, CLAUDE.md, design context |
+
+<details>
+<summary>Scope filtering selects patterns by context, view, or name (3 scenarios)</summary>
+
+#### Scope filtering selects patterns by context, view, or name
+
+**Invariant:** A pattern matches a DiagramScope if ANY of three conditions hold: its name is in `scope.patterns`, its `archContext` is in `scope.archContext`, or any of its `archView` entries is in `scope.archView`. These dimensions are OR'd together -- a pattern need only match one.
+
+**Rationale:** Three filter dimensions cover different authoring workflows. Explicit names for ad-hoc documents, archContext for bounded context views, archView for cross-cutting architectural perspectives.
+
+**Verified by:**
+
+- archContext filter matches patterns in that context
+- archView filter matches patterns with that view
+- Multiple filter dimensions OR together
+- archContext filter matches patterns
+- archView filter matches patterns
+- combined filters OR together
+
+</details>
+
+<details>
+<summary>Neighbor discovery finds connected patterns outside scope (2 scenarios)</summary>
+
+#### Neighbor discovery finds connected patterns outside scope
+
+**Invariant:** Patterns connected to scope patterns via relationship edges (uses, dependsOn, implementsPatterns, extendsPattern) but NOT themselves in scope appear in a "Related" subgraph with dashed border styling.
+
+**Rationale:** Scoped views need context. Showing only in-scope patterns without their dependencies loses critical relationship information. Neighbor patterns provide this context without cluttering the main view.
+
+**Verified by:**
+
+- Neighbor patterns appear with dashed styling
+- Self-contained scope produces no neighbor subgraph
+- Neighbor patterns appear in diagram
+- Self-contained scope has no neighbors
+
+</details>
+
+<details>
+<summary>Multiple diagram scopes compose in sequence (3 scenarios)</summary>
+
+#### Multiple diagram scopes compose in sequence
+
+**Invariant:** When `diagramScopes` is an array, each scope produces its own Mermaid diagram section with independent title, direction, and pattern selection. At summary detail level, all diagrams are suppressed.
+
+**Rationale:** A single reference document may need multiple architectural perspectives. Pipeline Overview shows both a codec transformation view (TB) and a pipeline data flow view (LR) in the same document.
+
+**Verified by:**
+
+- Two diagram scopes produce two mermaid blocks
+- Direction controls diagram orientation
+- Summary detail level omits all diagrams
+- Two scopes produce two mermaid blocks
+- Summary level omits diagrams
+
+</details>
+
+### ReferenceDocShowcase
+
+[View ReferenceDocShowcase source](delivery-process/specs/reference-doc-showcase.feature)
+
+**Problem:**
+The Reference Generation Sample document exercises a small fraction of the
+reference codec's capabilities: 2 convention rules, 1 flowchart diagram,
+2 shapes from a single file, and 1 shallow behavior pattern. Of the 9
+renderable block types (heading, paragraph, separator, table, list, code,
+mermaid, collapsible, link-out), only 6 are used. Behavior rendering truncates
+rule descriptions to 120 characters, discarding invariants, rationale, and
+verified-by content that is already extracted. Shape rendering omits JSDoc
+prose at standard detail level. Diagrams support only flowcharts with no
+edge labels, layer filtering, or alternative diagram types. The extraction
+pipeline drops function signatures, param/returns/throws documentation, and
+full property-level JSDoc.
+
+**Solution:**
+Expand the reference sample into a comprehensive showcase that exercises every
+content block type across all three detail levels. This requires three tiers
+of work: codec rendering enhancements (deep behavior, full shapes, rich
+diagrams), extraction pipeline improvements (function signatures, param docs,
+auto-shape discovery), and infrastructure enablers (codec composition,
+AI-optimized rendering, data-driven tag extraction).
+
+The sample document serves as the integration test: if REFERENCE-SAMPLE.md
+renders every block type correctly at every detail level, the codec system
+works end-to-end.
+
+**Why It Matters:**
+| Benefit | How |
+| Integration validation | Single document tests all 9 renderable block types |
+| Deep behavior content | Full rule descriptions with invariant/rationale replace 120-char truncation |
+| Complete shape documentation | JSDoc prose at standard level, property tables at detailed |
+| Rich diagram vocabulary | Sequence, state, C4, and class diagrams alongside flowcharts |
+| Progressive disclosure | Collapsible sections for large content blocks |
+| Complete API surface | Function signatures and param docs without source navigation |
+| Token-efficient AI context | Dedicated renderer for LLM consumption |
+| Flexible composition | CompositeCodec assembles docs from multiple codec outputs |
+
+<details>
+<summary>Deep behavior rendering replaces shallow truncation (3 scenarios)</summary>
+
+#### Deep behavior rendering replaces shallow truncation
+
+**Invariant:** At standard and detailed levels, behavior sections render full rule descriptions with parsed invariant, rationale, and verified-by content. At summary level, the 120-character truncation is preserved for compact output. Behavior rendering reuses parseBusinessRuleAnnotations from the convention extractor rather than reimplementing structured content parsing.
+
+**Rationale:** The current 120-character truncation discards invariants, rationale, and verified-by content that is already extracted and available in BusinessRule.description. Reference documents need the full rule content to serve as authoritative documentation. The convention extractor already parses this structured content via parseBusinessRuleAnnotations -- the behavior builder should delegate to the same function.
+
+**Verified by:**
+
+- Detailed level renders full rule descriptions with structured content
+- Summary level preserves compact truncation
+- Standard level renders full descriptions without rationale
+- Full rule descriptions at detailed level
+- Truncated descriptions at summary level
+- Scenario names appear as list blocks under rules
+
+</details>
+
+<details>
+<summary>Shape sections include JSDoc prose and property documentation (3 scenarios)</summary>
+
+#### Shape sections include JSDoc prose and property documentation
+
+**Invariant:** At standard level, shape code blocks are preceded by JSDoc prose when available. At detailed level, interface shapes additionally render a property documentation table. At summary level, only the type-kind table appears. Shapes without JSDoc render code blocks without preceding paragraph.
+
+**Rationale:** JSDoc on shapes contains design rationale and usage guidance that is already extracted by the shape extractor. Gating it behind detailed level wastes the data at the most common detail level (standard). The fix is a single condition change: reference.ts line 342 from detailLevel === 'detailed' to detailLevel !== 'summary'.
+
+**Verified by:**
+
+- Standard level includes JSDoc prose above code blocks
+- Detailed level adds property documentation table
+- Shapes without JSDoc render code blocks only
+- JSDoc renders at standard level
+- Property table renders at detailed level
+- Summary shows only type-kind table
+
+</details>
+
+<details>
+<summary>Diagram scope supports archLayer filtering and multiple diagram types (5 scenarios)</summary>
+
+#### Diagram scope supports archLayer filtering and multiple diagram types
+
+**Invariant:** DiagramScope gains optional archLayer and diagramType fields. The archLayer filter selects patterns by their architectural layer (domain, application, infrastructure) and composes with archContext and archView via OR logic, consistent with existing filter dimensions. The diagramType field controls Mermaid output format: graph (default), sequenceDiagram, stateDiagram-v2, C4Context, classDiagram. Each diagram type has its own node and edge syntax appropriate to the Mermaid specification.
+
+**Rationale:** Layer-based views are fundamental to layered architecture documentation -- a developer reviewing the domain layer wants only deciders and value objects, not infrastructure adapters. Multiple diagram types unlock event flow documentation (sequence), FSM visualization (state), architecture overview (C4), and type hierarchy views (class) that flowcharts cannot express naturally.
+
+**Verified by:**
+
+- archLayer filter selects patterns by layer
+- archLayer and archContext compose via OR
+- Sequence diagram renders participant-message format
+- State diagram renders state transitions
+- Default diagramType produces flowchart
+- archLayer filter selects domain-layer patterns
+- archLayer composes with archContext via OR
+- diagramType field controls Mermaid output
+
+</details>
+
+<details>
+<summary>Every renderable block type appears in the showcase document (2 scenarios)</summary>
+
+#### Every renderable block type appears in the showcase document
+
+**Invariant:** The generated REFERENCE-SAMPLE.md at detailed level must contain at least one instance of each of the 9 block types: heading, paragraph, separator, table, list, code, mermaid, collapsible, link-out. At summary level, progressive disclosure blocks (collapsible, link-out) are omitted for compact output.
+
+**Rationale:** The sample document is the integration test for the reference codec. If any block type is missing, there is no automated verification that the codec can produce it. Coverage of all 9 types validates the full rendering pipeline from MasterDataset through codec through renderer.
+
+**Verified by:**
+
+- Detailed output contains all 9 block types
+- Summary output uses compact block subset
+- All 9 block types present in detailed output
+
+</details>
+
+<details>
+<summary>Edge labels and custom node shapes enrich diagram readability (3 scenarios)</summary>
+
+#### Edge labels and custom node shapes enrich diagram readability
+
+**Invariant:** Relationship edges in scoped diagrams display labels describing the relationship semantics (uses, dependsOn, implements, extends). Edge labels are enabled by default and can be disabled via a showEdgeLabels option for compact diagrams. Node shapes vary by archRole value -- services use rounded rectangles, bounded contexts use subgraphs, projections use cylinders, and sagas use hexagons.
+
+**Rationale:** Unlabeled edges are ambiguous -- a reader seeing a solid arrow cannot distinguish "uses" from "implements" without consulting an edge style legend. Custom node shapes leverage Mermaid's shape vocabulary to make archRole visually distinguishable without color reliance, improving accessibility.
+
+**Verified by:**
+
+- Relationship edges display type labels by default
+- Edge labels can be disabled for compact diagrams
+- archRole controls Mermaid node shape
+- Edge labels appear on diagram edges
+- Edge labels can be disabled
+- archRole controls node shape
+
+</details>
+
+<details>
+<summary>Extraction pipeline surfaces complete API documentation (4 scenarios)</summary>
+
+#### Extraction pipeline surfaces complete API documentation
+
+**Invariant:** ExportInfo.signature shows full function parameter types and return type instead of the placeholder value. JSDoc param, returns, and throws tags are extracted and stored on ExtractedShape. Property-level JSDoc preserves full multi-line content without first-line truncation. Auto-shape discovery mode extracts all exported types from files matching shapeSources globs without requiring explicit extract-shapes annotations.
+
+**Rationale:** Function signatures are the most valuable API surface -- they show what a pattern exports without source navigation. The ExportInfo.signature field already exists in the schema but holds a lossy placeholder. The fix is approximately 15 lines in ast-parser.ts: threading sourceCode into extractFromDeclaration and slicing parameter ranges. Auto-shape discovery eliminates manual annotation burden for files that match shapeSources globs.
+
+**Verified by:**
+
+- Function signatures populate ExportInfo
+- JSDoc param and returns tags appear in shape sections
+- Full property-level JSDoc preserved without truncation
+- Auto-shape discovery extracts exports from shapeSources files
+- Param and returns tags appear in shape sections
+- Full property JSDoc preserved
+- Auto-shape discovery extracts without explicit tags
+
+</details>
+
+<details>
+<summary>Infrastructure enables flexible document composition and AI-optimized output (4 scenarios)</summary>
+
+#### Infrastructure enables flexible document composition and AI-optimized output
+
+**Invariant:** CompositeCodec assembles reference documents from multiple codec outputs by concatenating RenderableDocument sections. The renderToClaudeContext renderer produces token-efficient output using section markers optimized for LLM consumption. The Gherkin tag extractor uses TagRegistry metadata instead of hardcoded if/else branches, making new tag addition a zero-code-change operation. Convention content can be extracted from TypeScript JSDoc blocks containing structured Invariant/Rationale annotations, not only from Gherkin Rule blocks.
+
+**Rationale:** CompositeCodec enables referenceDocConfigs to include content from any codec, not just the current 4 sources. The renderToClaudeContext renderer unifies two formatting paths (codec-based markdown vs hand-written markers in context-formatter.ts). Data-driven tag extraction cuts the maintenance burden of the 40-branch if/else in gherkin-ast-parser.ts roughly in half. TypeScript convention extraction enables self-documenting business rules in implementation files alongside their code.
+
+**Verified by:**
+
+- CompositeCodec combines multiple codec outputs
+- renderToClaudeContext produces token-efficient output
+- New Gherkin tags work via registry without code changes
+- TypeScript JSDoc conventions extracted alongside Gherkin
+- Claude context renderer produces marker-delimited output
+- New tags work via registry without code changes
+
+</details>
+
+### PrdImplementationSection
+
+[View PrdImplementationSection source](delivery-process/specs/prd-generator-code-annotations-inclusion.feature)
+
+**Problem:** Implementation files with `@libar-docs-implements:PatternName` contain rich
+relationship metadata (`@libar-docs-uses`, `@libar-docs-used-by`, `@libar-docs-usecase`)
+that is not rendered in generated PRD documentation. This metadata provides valuable API
+guidance and dependency information.
+
+**Solution:** Extend the PRD generator to collect all files with `@libar-docs-implements:X`
+and render their metadata in a dedicated "## Implementations" section. This leverages the
+relationship model from PatternRelationshipModel without requiring specs to list file paths.
+
+**Business Value:**
+| Benefit | How |
+| PRDs include implementation context | `implements` files auto-discovered and rendered |
+| Dependency visibility | `uses`/`used-by` from implementations shown in PRD |
+| Usage guidance in docs | `usecase` annotations rendered as "When to Use" |
+| Zero manual sync | Code declares relationship, PRD reflects it |
+
+<details>
+<summary>PRD generator discovers implementations from relationship index (2 scenarios)</summary>
+
+#### PRD generator discovers implementations from relationship index
+
+**Invariant:** When generating PRD for pattern X, the generator queries the relationship index for all files where `implements === X`. No explicit listing in the spec file is required.
+
+**Rationale:** The `@libar-docs-implements` tag creates a backward link from code to spec. The relationship index aggregates these. PRD generation simply queries the index rather than scanning directories.
+
+**Verified by:**
+
+- Implementations discovered from relationship index
+- Multiple implementations aggregated
+- Implementations discovered
+- Multiple files aggregated
+
+</details>
+
+<details>
+<summary>Implementation metadata appears in dedicated PRD section (4 scenarios)</summary>
+
+#### Implementation metadata appears in dedicated PRD section
+
+**Invariant:** The PRD output includes a "## Implementations" section listing all files that implement the pattern. Each file shows its `uses`, `usedBy`, and `usecase` metadata in a consistent format.
+
+**Rationale:** Developers reading PRDs benefit from seeing the implementation landscape alongside requirements, without cross-referencing code files.
+
+**Verified by:**
+
+- Implementations section generated in PRD
+- Dependencies rendered per implementation
+- Usecases rendered as guidance
+- Used-by rendered for visibility
+- Section generated
+- Dependencies rendered
+- Usecases rendered
+
+</details>
+
+<details>
+<summary>Patterns without implementations render cleanly (1 scenarios)</summary>
+
+#### Patterns without implementations render cleanly
+
+**Invariant:** If no files have `@libar-docs-implements:X` for pattern X, the "## Implementations" section is omitted (not rendered as empty).
+
+**Rationale:** Planned patterns may not have implementations yet. Empty sections add noise without value.
+
+**Verified by:**
+
+- Section omitted when no implementations exist
+- Section omitted when empty
+
+</details>
+
+### GeneratorInfrastructureTesting
+
+[View GeneratorInfrastructureTesting source](delivery-process/specs/generator-infrastructure-testing.feature)
+
+**Problem:**
+Core generator infrastructure lacks behavior specs:
+
+- `src/generators/orchestrator.ts` (~420 lines) - Main entry point, untested
+- `src/generators/registry.ts` - Registry pattern, untested
+- `src/generators/codec-based.ts` - Adapter pattern, untested
+
+These components orchestrate all document generation but have no executable tests.
+
+**Solution:**
+Create behavior specs for:
+
+- Orchestrator integration (dual-source merging, error handling)
+- Registry operations (register, get, list)
+- CodecBasedGenerator adapter (delegation, error handling)
+
+**Business Value:**
+| Benefit | How |
+| Pipeline Reliability | Generation orchestration works correctly |
+| Error Visibility | Failures produce clear error messages |
+| Extension Safety | New generators integrate correctly |
+
+<details>
+<summary>Orchestrator coordinates full documentation generation pipeline (5 scenarios)</summary>
+
+#### Orchestrator coordinates full documentation generation pipeline
+
+**Invariant:** Orchestrator merges TypeScript and Gherkin patterns, handles conflicts, and produces requested document types.
+
+**Verified by:**
+
+- Orchestrator merges TypeScript and Gherkin patterns
+- Orchestrator detects pattern name conflicts
+- Orchestrator generates requested document types
+- Unknown generator name fails gracefully
+- Partial success when some generators fail
+- Dual-source merging
+- Conflict detection
+- Generator selection
+
+</details>
+
+<details>
+<summary>Registry manages generator registration and retrieval (5 scenarios)</summary>
+
+#### Registry manages generator registration and retrieval
+
+**Invariant:** Registry prevents duplicate names, returns undefined for unknown generators, and lists available generators alphabetically.
+
+**Verified by:**
+
+- Register generator with unique name
+- Duplicate registration throws error
+- Get registered generator
+- Get unknown generator returns undefined
+- Available returns sorted list
+- Registration
+- Retrieval
+- Listing
+
+</details>
+
+<details>
+<summary>CodecBasedGenerator adapts codecs to generator interface (3 scenarios)</summary>
+
+#### CodecBasedGenerator adapts codecs to generator interface
+
+**Invariant:** Generator delegates to underlying codec for transformation. Missing MasterDataset produces descriptive error.
+
+**Verified by:**
+
+- Generator delegates to codec
+- Missing MasterDataset returns error
+- Codec options are passed through
+- Delegation
+- Error handling
+
+</details>
+
+<details>
+<summary>Orchestrator supports PR changes generation options (3 scenarios)</summary>
+
+#### Orchestrator supports PR changes generation options
+
+**Invariant:** PR changes can filter by git diff, changed files, or release version.
+
+prChangesOptions
+
+**Verified by:**
+
+- PR changes filters to git diff base
+- PR changes filters to explicit file list
+- PR changes filters by release version
+- Git diff filtering
+- Changed files filtering
+- Release filtering
+
+</details>
+
+### DocGenerationProofOfConcept
+
+[View DocGenerationProofOfConcept source](delivery-process/specs/doc-generation-proof-of-concept.feature)
+
+**Status: SUPERSEDED** - This POC has been implemented. See:
+
+- Convention-tagged decision records (ADR/PDR) with @libar-docs-convention tags
+- `docs-generated/ANNOTATION-GUIDE.md` - Comprehensive guide for fixing generated docs
+
+This decision establishes the pattern for generating technical documentation
+from annotated source files. It serves as both the DECISION (why/how) and
+the PROOF OF CONCEPT (demonstrating the pattern works).
+
+<details>
+<summary>Context - Manual documentation maintenance does not scale</summary>
+
+#### Context - Manual documentation maintenance does not scale
+
+**The Problem:**
+
+    Common technical documentation is the hardest part to maintain in a repository.
+    The volume constantly grows, and AI coding sessions are drastically less effective
+    at updating documentation compared to code. Documentation drifts from source.
+
+    Current state in this package:
+
+    **Root Causes:**
+
+    1. **Duplication** - Same information exists in code comments, feature files,
+       and markdown docs. Changes require updating multiple places.
+
+    2. **No Single Source** - Documentation is authored separately from the code
+       it describes. There's no compilation step to catch drift.
+
+    3. **Detail Level Mismatch** - Compact docs for AI context and detailed docs
+       for humans are maintained separately despite sharing content.
+
+    **What We Have:**
+
+    The delivery-process package already has the required ingredients:
+    - Pattern extraction from TypeScript JSDoc and Gherkin tags
+    - Rich content support (DocStrings, tables, code blocks in features)
+    - Multi-source aggregation via tag taxonomy
+    - Progressive disclosure via codec detail levels
+    - Relationship tags for cross-references
+
+    **What's Missing:**
+
+| Document                     | Lines    | Maintenance Burden                |
+| ---------------------------- | -------- | --------------------------------- |
+| docs/PROCESS-GUARD.md        | ~300     | High - duplicates code behavior   |
+| docs/METHODOLOGY.md          | ~400     | Medium - conceptual, changes less |
+| \_claude-md/validation/\*.md | ~50 each | High - must match detailed docs   |
+| CLAUDE.md                    | ~800     | Very High - aggregates everything |
+
+| Gap                              | Impact | Solution                               |
+| -------------------------------- | ------ | -------------------------------------- |
+| Shape extraction from TypeScript | High   | New @extract-shapes tag                |
+| Convention-tagged content        | Medium | Decision records as convention sources |
+| Durable intro/context content    | Medium | Decision Rule: Context sections        |
+
+</details>
+
+<details>
+<summary>Decision - Decisions own convention content and durable context, code owns details</summary>
+
+#### Decision - Decisions own convention content and durable context, code owns details
+
+**The Pattern:**
+
+    Documentation is generated from three source types with different durability:
+
+    **Why Decisions Own Intro Content:**
+
+    Tier 1 specs (roadmap features) become clutter after implementation - their
+    deliverables are done, status is completed, they pile up. Behavior specs stay
+    current because tests must pass. But neither is appropriate for intro content.
+
+    Decisions (ADR/PDR) are durable by design - they remain valid until explicitly
+    superseded. The `Rule: Context` section of a decision IS the background/intro
+    for any documentation about that topic.
+
+    **Extends Existing ADR Codec:**
+
+    The doc-from-decision generator extends the existing `AdrDocumentCodec` which
+    already parses Rule: prefixes via `partitionAdrRules()` (see adr.ts:627-663):
+
+    **Source Mapping Pattern:**
+
+    Each documentation decision declares its target documents and source mapping:
+
+    **Detail Level Mapping:**
+
+    Uses existing `DetailLevel` enum from `renderable/codecs/types/base.ts`:
+
+    **Extraction by Source Type:**
+
+    **The Generator Command:**
+
+| Source Type                  | Durability | Content Ownership                      |
+| ---------------------------- | ---------- | -------------------------------------- |
+| Decision documents (ADR/PDR) | Permanent  | Intro, context, rationale, conventions |
+| Behavior specs (.feature)    | Permanent  | Rules, examples, acceptance criteria   |
+| Implementation code (.ts)    | Compiled   | API types, error messages, signatures  |
+
+| Rule Prefix      | ADR Section            | Doc Section                  |
+| ---------------- | ---------------------- | ---------------------------- |
+| `Context...`     | context                | ## Background / Introduction |
+| `Decision...`    | decision               | ## How It Works              |
+| `Consequence...` | consequences           | ## Trade-offs                |
+| Other rules      | other (warning logged) | Custom sections              |
+
+| Target Document                         | Sources                               | Detail Level | Effect                   |
+| --------------------------------------- | ------------------------------------- | ------------ | ------------------------ |
+| docs/PROCESS-GUARD.md                   | This decision + behavior specs + code | detailed     | All sections, full JSDoc |
+| \_claude-md/validation/process-guard.md | This decision + behavior specs + code | summary      | Rules table, types only  |
+
+| Level    | Content Included                     | Rendering Style                |
+| -------- | ------------------------------------ | ------------------------------ |
+| summary  | Essential tables, type names only    | Compact - lists vs code blocks |
+| standard | Tables, types, key descriptions      | Balanced                       |
+| detailed | Everything including JSDoc, examples | Full - code blocks with JSDoc  |
+
+| Source                          | What's Extracted                 | How                       |
+| ------------------------------- | -------------------------------- | ------------------------- |
+| Decision Rule: Context          | Intro/background section         | Rule description text     |
+| Decision Rule: Decision         | How it works section             | Rule description text     |
+| Decision Rule: Consequences     | Trade-offs section               | Rule description text     |
+| Decision DocStrings             | Code examples (Husky, API)       | Fenced code blocks        |
+| Behavior spec Rules             | Validation rules, business rules | Rule names + descriptions |
+| Behavior spec Scenario Outlines | Decision tables, lookup tables   | Examples tables           |
+| TypeScript @extract-shapes      | API types, interfaces            | AST extraction            |
+| TypeScript JSDoc                | Implementation notes             | Markdown in comments      |
+
+```bash
+generate-docs --decisions 'specs/**/*.feature' --features 'tests/**/*.feature' --typescript 'src/**/*.ts' --generators doc-from-decision --output docs
+```
+
+</details>
+
+<details>
+<summary>Proof of Concept - Self-documentation validates the pattern</summary>
+
+#### Proof of Concept - Self-documentation validates the pattern
+
+This POC demonstrates the doc-from-decision pattern by generating docs
+about ITSELF. The DocGenerationProofOfConcept pattern produces:
+
+    **Process Guard docs are generated separately from `adr-006-process-guard.feature`.**
+
+    **Source Mapping for POC Self-Documentation:**
+
+    This source mapping demonstrates all extraction methods by extracting content
+    from this POC's own sources. The table serves as both documentation AND test data.
+
+    **Pre-commit Hook Setup:**
+
+    File: `.husky/pre-commit`
+
+
+
+    **Package.json Scripts:**
+
+
+
+    **Programmatic API Example:**
+
+
+
+    **Escape Hatches:**
+
+| Output                                                   | Purpose            | Detail Level |
+| -------------------------------------------------------- | ------------------ | ------------ |
+| docs/DOC-GENERATION-PROOF-OF-CONCEPT.md                  | Detailed reference | detailed     |
+| \_claude-md/generated/doc-generation-proof-of-concept.md | AI context         | summary      |
+
+| Section           | Source File                                         | Extraction Method          |
+| ----------------- | --------------------------------------------------- | -------------------------- |
+| Intro & Context   | THIS DECISION (Rule: Context above)                 | Decision rule description  |
+| How It Works      | THIS DECISION (Rule: Decision above)                | Decision rule description  |
+| Validation Rules  | tests/features/validation/process-guard.feature     | Rule blocks                |
+| Protection Levels | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples  |
+| Valid Transitions | delivery-process/specs/process-guard-linter.feature | Scenario Outline Examples  |
+| API Types         | src/lint/process-guard/types.ts                     | @extract-shapes tag        |
+| Decider API       | src/lint/process-guard/decider.ts                   | @extract-shapes tag        |
+| CLI Options       | src/cli/lint-process.ts                             | JSDoc section              |
+| Error Messages    | src/lint/process-guard/decider.ts                   | createViolation() patterns |
+| Pre-commit Setup  | THIS DECISION (DocString)                           | Fenced code block          |
+| Programmatic API  | THIS DECISION (DocString)                           | Fenced code block          |
+
+| Situation                     | Solution              | Example                                   |
+| ----------------------------- | --------------------- | ----------------------------------------- |
+| Fix bug in completed spec     | Add unlock reason tag | `@libar-docs-unlock-reason:'Fix-typo'`    |
+| Modify outside session scope  | Use ignore flag       | `lint-process --staged --ignore-session`  |
+| CI treats warnings as errors  | Use strict flag       | `lint-process --all --strict`             |
+| Skip workflow (legacy import) | Multiple transitions  | Set roadmap then completed in same commit |
+
+```bash
+npx lint-process --staged
+```
+
+```json
+{
+  "scripts": {
+    "lint:process": "lint-process --staged",
+    "lint:process:ci": "lint-process --all --strict"
+  }
+}
+```
+
+```typescript
+import {
+  deriveProcessState,
+  detectStagedChanges,
+  validateChanges,
+  hasErrors,
+  summarizeResult,
+} from '@libar-dev/delivery-process/lint';
+
+// 1. Derive state from annotations
+const state = (await deriveProcessState({ baseDir: '.' })).value;
+
+// 2. Detect changes
+const changes = detectStagedChanges('.').value;
+
+// 3. Validate
+const { result } = validateChanges({
+  state,
+  changes,
+  options: { strict: false, ignoreSession: false },
+});
+
+// 4. Handle results
+if (hasErrors(result)) {
+  console.log(summarizeResult(result));
+  process.exit(1);
+}
+```
+
+</details>
+
+<details>
+<summary>Expected Output - Compact claude module structure</summary>
+
+#### Expected Output - Compact claude module structure
+
+**File:** `_claude-md/validation/process-guard.md`
+
+    The compact module extracts only essential content for AI context.
+    Output size depends on source mapping entries - there is no artificial line limit.
+
+    **Expected Sections:**
+
+    **Key Characteristics:**
+
+    - Summary detail level (essential tables only)
+    - No JSDoc comments or implementation details
+    - Tables for structured data (rules, protection levels)
+    - Inline code blocks for CLI examples
+    - Cross-reference to detailed documentation
+
+| Section            | Content                                                     |
+| ------------------ | ----------------------------------------------------------- |
+| Header + Intro     | Pattern name, problem/solution summary                      |
+| API Types          | Core interface definitions (DeciderInput, ValidationResult) |
+| 7 Validation Rules | Rule table with severity and description                    |
+| Protection Levels  | Status-to-protection mapping table                          |
+| CLI                | Essential command examples                                  |
+| Link               | Reference to full documentation                             |
+
+</details>
+
+<details>
+<summary>Consequences - Durable sources with clear ownership boundaries</summary>
+
+#### Consequences - Durable sources with clear ownership boundaries
+
+**Benefits:**
+
+    **Trade-offs:**
+
+    **Ownership Boundaries:**
+
+| Benefit                | How                                       |
+| ---------------------- | ----------------------------------------- |
+| Single source of truth | Each content type owned by one source     |
+| Always-current docs    | Generated from tested/compiled sources    |
+| Reduced maintenance    | Change source once, docs regenerate       |
+| Progressive disclosure | Same sources → compact + detailed outputs |
+| Clear ownership        | Decisions own "why", code owns "what"     |
+
+| Trade-off                                         | Mitigation                               |
+| ------------------------------------------------- | ---------------------------------------- |
+| Decisions must be updated for fundamental changes | Appropriate - fundamentals ARE decisions |
+| New @extract-shapes capability required           | Spec created (shape-extraction.feature)  |
+| Initial annotation effort on existing code        | One-time migration, then maintained      |
+| Generated docs in git history                     | Same as current manual approach          |
+
+| Content Type                | Owner                     | Update Trigger                  |
+| --------------------------- | ------------------------- | ------------------------------- |
+| Intro, rationale, context   | Decision document         | Fundamental change to approach  |
+| Rules, examples, edge cases | Behavior specs            | Behavior change (tests fail)    |
+| API types, signatures       | Code with @extract-shapes | Interface change (compile fail) |
+| Error messages              | Code patterns             | Message text change             |
+| Code examples               | Decision DocStrings       | Example needs update            |
+
+</details>
+
+<details>
+<summary>Consequences - Design stubs live in stubs, not src</summary>
+
+#### Consequences - Design stubs live in stubs, not src
+
+**The Problem:**
+
+    Design stubs (pre-implementation API shapes) placed in `src/` cause issues:
+
+    Example of the anti-pattern (from monorepo eslint.config.js):
+
+
+    **The Solution:**
+
+    Design stubs live in `delivery-process/stubs/`:
+
+    **Design Stub Pattern:**
+
+
+
+    **Benefits:**
+
+    **Workflow:**
+
+    1. **Design session:** Create stub in `delivery-process/stubs/{pattern-name}/`
+    2. **Iterate:** Refine API shapes, add JSDoc, test with docs generation
+    3. **Implementation session:** Move/copy to `src/`, implement real logic
+    4. **Stub becomes example:** Original stub stays as reference (optional)
+
+    **What This Enables:**
+
+    Once proven with Process Guard, the pattern applies to all documentation:
+
+| Issue                    | Impact                                      |
+| ------------------------ | ------------------------------------------- |
+| ESLint exceptions needed | Rules relaxed for "not-yet-real" code       |
+| Confusion                | What's production vs. what's design?        |
+| Pollution                | Stubs mixed with implemented code           |
+| Import accidents         | Other code might import unimplemented stubs |
+| Maintenance burden       | Must track which files are stubs            |
+
+| Location                               | Content                                       | When Moved to src/     |
+| -------------------------------------- | --------------------------------------------- | ---------------------- |
+| delivery-process/stubs/{pattern}/\*.ts | API shapes, interfaces, throw-not-implemented | Implementation session |
+| src/\*_/_.ts                           | Production code only                          | Already there          |
+
+| Benefit               | How                                                                  |
+| --------------------- | -------------------------------------------------------------------- |
+| No ESLint exceptions  | Stubs aren't in src/, no relaxation needed                           |
+| Clear separation      | delivery-process/stubs/ = design, src/ = production                  |
+| Documentation source  | Stubs with @extract-shapes generate API docs                         |
+| Safe iteration        | Can refine stub APIs without breaking anything                       |
+| Implementation signal | Moving from delivery-process/stubs/ to src/ = implementation started |
+
+| Document               | Decision Source                                 |
+| ---------------------- | ----------------------------------------------- |
+| docs/METHODOLOGY.md    | ADR for delivery process methodology            |
+| docs/TAXONOMY.md       | PDR-006 TypeScript Taxonomy (exists)            |
+| docs/VALIDATION.md     | ADR for validation approach                     |
+| docs/SESSION-GUIDES.md | ADR for session workflows                       |
+| \_claude-md/\*_/_.md   | Corresponding decisions with compact extraction |
+
+```javascript
+// TODO: Delivery process design artifacts: Relax unused-vars
+    {
+      files: [
+        "**/packages/platform-core/src/durability/durableAppend.ts",
+        "**/packages/platform-core/src/durability/intentCompletion.ts",
+        // ... more stubs in src/ ...
+      ],
+      rules: {
+        "@typescript-eslint/no-unused-vars": "off",
+      },
+    }
+```
+
+```typescript
+// delivery-process/stubs/shape-extractor/shape-extractor.ts
+/**
+ * @libar-docs
+ * @libar-docs-pattern ShapeExtractorStub
+ * @libar-docs-status roadmap
+ *
+ * ## Shape Extractor - Design Stub
+ *
+ * API design for extracting TypeScript types from source files.
+ */
+
+export interface ExtractedShape {
+  name: string;
+  kind: 'interface' | 'type' | 'enum' | 'function';
+  sourceText: string;
+}
+
+export function extractShapes(
+  sourceCode: string,
+  shapeNames: string[]
+): Map<string, ExtractedShape> {
+  throw new Error('ShapeExtractor not yet implemented - roadmap pattern');
+}
+```
+
+</details>
+
+<details>
+<summary>Decision - Source mapping table parsing and extraction method dispatch (9 scenarios)</summary>
+
+#### Decision - Source mapping table parsing and extraction method dispatch
+
+**Invariant:** The source mapping table in a decision document defines how documentation sections are assembled from multiple source files.
+
+**Table Format:**
+
+    **Self-Reference Markers:**
+
+    **Extraction Method Dispatch:**
+
+    **Path Resolution:**
+
+    - Relative paths are resolved from project root
+    - `THIS DECISION` resolves to the current decision document
+    - Missing files produce warnings but generation continues
+
+| Column            | Purpose                                      | Example                          |
+| ----------------- | -------------------------------------------- | -------------------------------- |
+| Section           | Target section heading in generated doc      | "Intro & Context", "API Types"   |
+| Source File       | Path to source file or self-reference marker | "src/types.ts", "THIS DECISION"  |
+| Extraction Method | How to extract content from source           | "@extract-shapes", "Rule blocks" |
+
+| Marker                    | Meaning                                            |
+| ------------------------- | -------------------------------------------------- |
+| THIS DECISION             | Extract from the current decision document         |
+| THIS DECISION (Rule: X)   | Extract specific Rule: block from current document |
+| THIS DECISION (DocString) | Extract fenced code blocks from current document   |
+
+| Extraction Method          | Source Type              | Action                                                |
+| -------------------------- | ------------------------ | ----------------------------------------------------- |
+| Decision rule description  | Decision (.feature)      | Extract Rule: block content (Invariant, Rationale)    |
+| @extract-shapes tag        | TypeScript (.ts)         | Invoke shape extractor for @libar-docs-extract-shapes |
+| Rule blocks                | Behavior spec (.feature) | Extract Rule: names and descriptions                  |
+| Scenario Outline Examples  | Behavior spec (.feature) | Extract Examples tables as markdown                   |
+| JSDoc section              | TypeScript (.ts)         | Extract markdown from JSDoc comments                  |
+| createViolation() patterns | TypeScript (.ts)         | Extract error message literals                        |
+| Fenced code block          | Decision (.feature)      | Extract DocString code blocks with language           |
+
+**Verified by:**
+
+- Decision Rule descriptions become documentation sections
+- Decision DocStrings become code examples
+- Source mapping aggregates multiple files
+- Compact and detailed outputs from same sources
+- Missing source file produces warning
+- Source file exists but extraction method fails
+- Source mapping validated at generation time
+- Full pipeline generates documentation from decision documents
+- Generator registered in CODEC_MAP
+
+</details>
+
+### CrossCuttingDocumentInclusion
+
+[View CrossCuttingDocumentInclusion source](delivery-process/specs/cross-cutting-document-inclusion.feature)
+
+**Problem:**
+The reference doc codec assembles content from four sources, each with its
+own selection mechanism: conventionTags filters by convention tag values,
+behaviorCategories filters by pattern category, shapeSelectors filters by
+shape group or source, and diagramScopes filters by archContext or explicit
+pattern names. These selectors operate at different granularity levels.
+Convention and behavior selectors are coarse -- they pull ALL items matching
+a tag or category, with no way to select a single convention rule or a
+single behavior pattern for a focused showcase.
+
+More fundamentally, content-to-document is a many-to-many relationship.
+A CategoryDefinition interface should be includable in a Taxonomy Reference,
+a Configuration Guide, AND a claude.md architecture section simultaneously.
+However, libar-docs-shape only supports one group, and behaviorCategories only
+supports one category per pattern. There is no cross-cutting tag that says
+"include this specific item in these specific documents."
+
+The experimental libar-docs-arch-view tag partially solved this for diagram
+scoping but its name is misleading -- it routes content, not architectural
+views. It should be replaced by a general-purpose include tag.
+
+**Solution:**
+Replace libar-docs-arch-view with libar-docs-include as a general-purpose
+CSV tag on both patterns and shape declarations. This tag acts as a
+document-routing mechanism alongside existing selectors. The tag controls
+two things: (1) diagram scoping -- DiagramScope gains an include field
+replacing archView, and (2) content routing -- ReferenceDocConfig gains an
+includeTags field. Content matching logic becomes: include if item matches
+existing selectors OR has a matching libar-docs-include tag value. The
+include tag is purely additive -- it never removes content that would be
+selected by existing filters.
+
+The tag is CSV format, so one item can appear in multiple documents:
+libar-docs-include:reference-sample,codec-system,config-guide
+
+This gives every content type (conventions, behaviors, shapes, diagrams)
+uniform per-item opt-in without changing how existing selectors work.
+
+**Design Decisions:**
+
+DD-1: Additive semantics (OR, not AND)
+The includeTags filter is unioned with existing selectors, not
+intersected. A pattern appears in a reference doc if it matches
+behaviorCategories OR has a matching include tag. Configs without
+includeTags behave identically to today. Configs with includeTags
+can pull in additional items that existing selectors cannot reach,
+without disrupting what existing selectors already select.
+
+DD-2: One tag replaces arch-view and adds content routing
+The libar-docs-include tag replaces the experimental arch-view tag
+entirely. DiagramScope.archView is renamed to DiagramScope.include.
+The same tag values that scope diagrams can also route content via
+ReferenceDocConfig.includeTags. One concept, one name. The arch-view
+tag, field names, registry entry, and all references are removed.
+
+DD-3: Works on both patterns and declarations
+For patterns (conventions, behaviors), the include tag lives in the
+file-level or feature-level libar-docs block and is extracted as
+part of the directive. For shapes, the include tag lives in the
+declaration-level JSDoc alongside libar-docs-shape. The shape
+extractor (discoverTaggedShapes) extracts both tags from the same
+JSDoc comment. The include values are stored on ExtractedShape as
+an optional includes: readonly string[] field.
+
+DD-4: Content type determines rendering, include tag determines routing
+The include tag does not change HOW content renders -- only WHERE
+it appears. A pattern with rules still renders as a behavior section.
+A shape still renders as a type code block. A convention still
+renders as convention tables. The include tag is orthogonal to
+content type. The codec determines rendering based on what the
+item IS, not how it was selected.
+
+**Pragmatic Constraints:**
+| Constraint | Rationale |
+| Include values are single tokens (no spaces) | Standard tag value convention, hyphen-separated |
+| No wildcard or glob matching on include values | Exact string match keeps selection predictable |
+| Additive only, no exclusion mechanism | Exclusion adds complexity; use separate configs instead |
+| Shape include requires libar-docs-shape tag too | Include routes a shape, but libar-docs-shape triggers extraction |
+
+**Implementation Path:**
+| Layer | Change | Effort |
+| registry-builder.ts | Replace arch-view with include in metadataTags (format: csv) | ~5 lines |
+| extracted-pattern.ts | Rename archView to include on directive schema | ~5 lines |
+| extracted-shape.ts | Add optional includes: readonly string[] field | ~3 lines |
+| doc-directive.ts | Rename archView to include on DocDirective | ~5 lines |
+| shape-extractor.ts | Extract libar-docs-include CSV from declaration JSDoc | ~15 lines |
+| doc-extractor.ts | Rename archView references to include | ~10 lines |
+| ast-parser.ts | Rename arch-view extraction to include | ~5 lines |
+| gherkin-ast-parser.ts | Rename archView field to include | ~5 lines |
+| reference.ts | Rename DiagramScope.archView to include, add includeTags to ReferenceDocConfig, add inclusion pass | ~35 lines |
+| project-config-schema.ts | Rename archView to include, add includeTags | ~5 lines |
+| transform-dataset.ts | Rename archView references to include in dataset views | ~10 lines |
+| master-dataset.ts | Rename byArchView to byInclude in dataset schema | ~5 lines |
+| reference-generators.ts | Update built-in configs from archView to include | ~5 lines |
+| pattern-scanner.ts | Rename arch-view extraction to include | ~3 lines |
+| delivery-process.config.ts | Update showcase config: rename archView, add includeTags | ~5 lines |
+| Source files (~8 files) | Replace libar-docs-arch-view annotations with libar-docs-include | ~8 lines |
+
+**Integration with Existing Selectors:**
+The reference codec decode method gains a new inclusion pass after the
+existing four content assembly steps. For each content type, the flow is:
+
+1. Existing selector produces initial content set
+2. Include tag pass finds additional items tagged for this document
+3. Results are merged (deduplicated by pattern name or shape name)
+4. Merged set is rendered using the existing section builders
+
+This means the include tag can pull a single behavior pattern into a
+reference doc without needing to create a dedicated behaviorCategory
+for it. It can pull a single convention rule without a unique
+conventionTag. The include tag closes the granularity gap for all
+content types uniformly.
+
+<details>
+<summary>Include tag routes content to named documents (4 scenarios)</summary>
+
+#### Include tag routes content to named documents
+
+**Invariant:** A pattern or shape with libar-docs-include:X appears in any reference document whose includeTags contains X. The tag is CSV, so libar-docs-include:X,Y routes the item to both document X and document Y. This is additive -- the item also appears in any document whose existing selectors (conventionTags, behaviorCategories, shapeSelectors) would already select it.
+
+**Rationale:** Content-to-document is a many-to-many relationship. A type definition may be relevant to an architecture overview, a configuration guide, and an AI context section. The include tag expresses this routing at the source, next to the code, without requiring the document configs to enumerate every item by name.
+
+**Verified by:**
+
+- Pattern with include tag appears in reference doc
+- CSV include routes pattern to multiple documents
+- Include is additive with existing selectors
+- Pattern without include tag is unaffected
+- Pattern with include tag appears in matching doc
+- CSV include routes to multiple docs
+
+</details>
+
+<details>
+<summary>Include tag scopes diagrams (replaces arch-view) (2 scenarios)</summary>
+
+#### Include tag scopes diagrams (replaces arch-view)
+
+**Invariant:** DiagramScope.include matches patterns whose libar-docs-include values contain the specified scope value. This is the same field that existed as archView -- renamed for consistency with the general-purpose include tag. Patterns with libar-docs-include:pipeline-stages appear in any DiagramScope with include: pipeline-stages.
+
+**Rationale:** The experimental arch-view tag was diagram-specific routing under a misleading name. Renaming to include unifies the vocabulary: one tag, two consumption points (diagram scoping via DiagramScope.include, content routing via ReferenceDocConfig.includeTags).
+
+**Verified by:**
+
+- Diagram scope uses include to select patterns
+- Pattern in diagram and content via same include tag
+- Diagram scope with include matches tagged patterns
+- Existing diagram configurations work after rename
+
+</details>
+
+<details>
+<summary>Shapes use include tag for document routing (3 scenarios)</summary>
+
+#### Shapes use include tag for document routing
+
+**Invariant:** A declaration tagged with both libar-docs-shape and libar-docs-include has its include values stored on the ExtractedShape. The reference codec uses these values alongside shapeSelectors for shape filtering. A shape with libar-docs-include:X appears in any document whose includeTags contains X, regardless of whether the shape matches any shapeSelector.
+
+**Rationale:** Shape extraction (via libar-docs-shape) and document routing (via libar-docs-include) are orthogonal concerns. A shape must be extracted before it can be routed. The shape tag triggers extraction; the include tag controls which documents render it. This separation allows one shape to appear in multiple documents without needing multiple group values.
+
+**Verified by:**
+
+- Shape with include tag appears in reference doc
+- Shape with both group and include works
+- Shape without include but with matching group still works
+- Shape with include appears in matching doc
+- Shape without include but with group still works
+
+</details>
+
+<details>
+<summary>Conventions use include tag for selective inclusion (2 scenarios)</summary>
+
+#### Conventions use include tag for selective inclusion
+
+**Invariant:** A decision record or convention pattern with libar-docs-include:X appears in a reference document whose includeTags contains X. This allows selecting a single convention rule for a focused document without pulling all conventions matching a broad conventionTag.
+
+**Rationale:** Convention content is currently selected by conventionTags, which pulls all decision records tagged with a given convention value. For showcase documents or focused guides, this is too coarse. The include tag enables cherry-picking individual conventions alongside broad tag-based selection.
+
+**Verified by:**
+
+- Convention with include tag appears in reference doc
+- Include works alongside conventionTags
+- Convention with include appears in matching doc
+
+</details>
+
+### CodecDrivenReferenceGeneration
+
+[View CodecDrivenReferenceGeneration source](delivery-process/specs/codec-driven-reference-generation.feature)
+
+**Problem:**
+Each reference document (Process Guard, Taxonomy, Validation, etc.) required a
+hand-coded recipe feature that duplicated codec setup, rendering, and file output
+logic. Adding a new reference document meant creating a new feature file, a new
+codec wrapper, and a new generator class -- all following the same pattern.
+
+**Solution:**
+A single `createReferenceCodec` factory driven by `ReferenceDocConfig` objects.
+Each config declares four content sources -- convention tags, diagram scopes,
+shape source globs, and behavior categories -- that compose automatically in
+AD-5 order. 13 configs produce 27 generators (13 detailed for `docs/` +
+13 summary for `_claude-md/` + 1 meta-generator).
+
+**Why It Matters:**
+| Benefit | How |
+| Zero-code new documents | Add a config object, get two output files |
+| Consistent structure | Every reference doc follows the same composition order |
+| Two detail levels | Detailed (full source, diagrams) and summary (compact tables) |
+| Convention-driven content | Decision records auto-populate via tag matching |
+| Shape extraction | TypeScript types rendered from AST, not duplicated in prose |
+
+<details>
+<summary>Config-driven codec replaces per-document recipe features (2 scenarios)</summary>
+
+#### Config-driven codec replaces per-document recipe features
+
+**Invariant:** A single `ReferenceDocConfig` object is sufficient to produce a complete reference document. No per-document codec subclass or recipe feature is required.
+
+**Rationale:** The codec composition logic is identical across all reference documents. Only the content sources differ. Extracting this into a config-driven factory eliminates N duplicated recipe features and makes adding new documents a one-line config addition.
+
+**Verified by:**
+
+- Config with matching data produces a complete document
+- Config with no matching data produces fallback content
+- All 13 configs produce valid documents
+- Empty config produces fallback content
+
+</details>
+
+<details>
+<summary>Four content sources compose in AD-5 order (2 scenarios)</summary>
+
+#### Four content sources compose in AD-5 order
+
+**Invariant:** Reference documents always compose content in this order: conventions, then scoped diagrams, then shapes, then behaviors. Empty sources are omitted without placeholder sections.
+
+**Rationale:** AD-5 established that conceptual context (conventions and architectural diagrams) should precede implementation details (shapes and behaviors). This reading order helps developers understand the "why" before the "what".
+
+**Verified by:**
+
+- Composition follows AD-5 order
+- Empty sources are omitted gracefully
+- Composition order follows conventions-diagrams-shapes-behaviors
+- Convention and behavior content compose together
+
+</details>
+
+<details>
+<summary>Detail level controls output density (2 scenarios)</summary>
+
+#### Detail level controls output density
+
+**Invariant:** Three detail levels produce progressively more content from the same config. Summary: type tables only, no diagrams, no narrative. Standard: narrative and code examples, no rationale. Detailed: full rationale, property documentation, and scoped diagrams.
+
+**Rationale:** AI context windows need compact summaries. Human readers need full documentation. The same config serves both audiences by parameterizing the detail level at generation time.
+
+**Verified by:**
+
+- Summary level produces compact type tables
+- Detailed level includes full source and rationale
+- Summary produces compact tables
+- Detailed includes full rationale
+
+</details>
+
+<details>
+<summary>Generator registration produces paired detailed and summary outputs (2 scenarios)</summary>
+
+#### Generator registration produces paired detailed and summary outputs
+
+**Invariant:** Each ReferenceDocConfig produces exactly two generators (detailed for `docs/`, summary for `_claude-md/`) plus a meta-generator that invokes all pairs. Total: N configs x 2 + 1 = 2N + 1 generators.
+
+**Rationale:** Every reference document needs both a human-readable detailed version and an AI-optimized compact version. The meta-generator enables `pnpm docs:all` to produce every reference document in one pass.
+
+**Verified by:**
+
+- All 27 generators are registered from 13 configs
+- Detailed generators use kebab-case-reference naming
+- All 27 generators are registered
+- Generators follow naming convention
+
+</details>
+
+### CodecBehaviorTesting
+
+[View CodecBehaviorTesting source](delivery-process/specs/codec-behavior-testing.feature)
+
+**Problem:**
+Of 17 document codecs in src/renderable/codecs/, only 3 have behavior specs:
+
+- PatternsDocumentCodec (tested)
+- BusinessRulesCodec (tested)
+- ArchitectureDocumentCodec (tested)
+
+The remaining 14 codecs lack executable specs, meaning document generation
+correctness is unverified.
+
+**Solution:**
+Create behavior specs for each untested codec covering:
+
+- Input transformation (MasterDataset to RenderableDocument)
+- Output structure (correct sections, headings, content)
+- Edge cases (empty data, missing fields)
+
+**Business Value:**
+| Benefit | How |
+| Correctness | Generated docs match expected structure |
+| Regression Prevention | Changes to codecs don't break output |
+| Confidence | Safe to modify codec logic |
+
+<details>
+<summary>Timeline codecs group patterns by phase and status (4 scenarios)</summary>
+
+#### Timeline codecs group patterns by phase and status
+
+**Invariant:** Roadmap shows planned work, Milestones shows completed work, CurrentWork shows active patterns only.
+
+**Verified by:**
+
+- RoadmapDocumentCodec groups by phase
+- CompletedMilestonesCodec shows only completed
+- CurrentWorkCodec shows only active
+- Empty dataset produces minimal output
+- RoadmapCodec grouping
+- MilestonesCodec filtering
+- CurrentWorkCodec filtering
+
+</details>
+
+<details>
+<summary>Session codecs provide working context for AI sessions (2 scenarios)</summary>
+
+#### Session codecs provide working context for AI sessions
+
+**Invariant:** SessionContext shows active patterns with deliverables. RemainingWork aggregates incomplete work by phase.
+
+**Verified by:**
+
+- SessionContextCodec includes active pattern details
+- RemainingWorkCodec aggregates by phase
+- SessionContext content
+- RemainingWork aggregation
+
+</details>
+
+<details>
+<summary>Requirements codec produces PRD-style documentation (2 scenarios)</summary>
+
+#### Requirements codec produces PRD-style documentation
+
+**Invariant:** Features include problem, solution, business value. Acceptance criteria are formatted with bold keywords.
+
+**Verified by:**
+
+- RequirementsDocumentCodec includes full feature descriptions
+- Acceptance criteria have bold keywords
+- PRD structure
+- Acceptance criteria formatting
+
+</details>
+
+<details>
+<summary>Reporting codecs support release management and auditing (2 scenarios)</summary>
+
+#### Reporting codecs support release management and auditing
+
+**Invariant:** Changelog follows Keep a Changelog format. Traceability maps rules to scenarios.
+
+**Verified by:**
+
+- ChangelogCodec follows Keep a Changelog format
+- TraceabilityCodec maps rules to scenarios
+- Changelog format
+- Traceability matrix
+
+</details>
+
+<details>
+<summary>Planning codecs support implementation sessions (2 scenarios)</summary>
+
+#### Planning codecs support implementation sessions
+
+**Invariant:** Planning checklist includes DoD items. Session plan shows implementation steps.
+
+**Verified by:**
+
+- PlanningChecklistCodec includes deliverables
+- SessionFindingsCodec captures discoveries
+- Checklist items
+- Session plan steps
+
+</details>
+
+### ClaudeModuleGeneration
+
+[View ClaudeModuleGeneration source](delivery-process/specs/claude-module-generation.feature)
+
+**Problem:** CLAUDE.md modules are hand-written markdown files that drift from source
+code over time. When behavior specs or implementation details change, module content
+becomes stale. Manual synchronization is tedious and error-prone. Different consumers
+need different detail levels (compact for AI context, detailed for human reference).
+
+**Solution:** Generate CLAUDE.md modules directly from behavior spec feature files using
+dedicated `claude-*` tags. The same source generates both:
+
+- Compact modules for `_claude-md/` (AI context optimized)
+- Detailed documentation for `docs/` (human reference, progressive disclosure)
+
+Three tags control module generation:
+
+- `@libar-docs-claude-module` - Module identifier (becomes filename)
+- `@libar-docs-claude-section` - Target section directory in `_claude-md/`
+- `@libar-docs-claude-tags` - Tags for variation filtering in modular-claude-md
+
+**Why It Matters:**
+| Benefit | How |
+| Single source of truth | Behavior specs ARE the module content |
+| Always-current modules | Generated on each docs build |
+| Progressive disclosure | Same source → compact module + detailed docs |
+| Preserves Rule structure | `Rule:` blocks become module sections |
+| Extracts decision tables | `Scenario Outline Examples:` become lookup tables |
+| CLI integration | `pnpm docs:claude-modules` via generator registry |
+
+**Prototype Example:**
+The Process Guard behavior spec (`tests/features/validation/process-guard.feature`)
+generates both `_claude-md/delivery-process/process-guard.md` and detailed docs.
+
+<details>
+<summary>Claude module tags exist in the tag registry (3 scenarios)</summary>
+
+#### Claude module tags exist in the tag registry
+
+**Invariant:** Three claude-specific tags (`claude-module`, `claude-section`, `claude-tags`) must exist in the tag registry with correct format and values.
+
+**Rationale:** Module generation requires metadata to determine output path, section placement, and variation filtering. Standard tag infrastructure enables consistent extraction via the existing Gherkin parser.
+
+**Verified by:**
+
+- Tag registry contains claude-module
+- Tag registry contains claude-section
+- Tag registry contains claude-tags
+- Tag registry contains
+  claude-section
+- claude-section has enum values
+
+</details>
+
+<details>
+<summary>Gherkin parser extracts claude module tags from feature files (4 scenarios)</summary>
+
+#### Gherkin parser extracts claude module tags from feature files
+
+**Invariant:** The Gherkin extractor must extract `claude-module`, `claude-section`, and `claude-tags` from feature file tags into ExtractedPattern objects.
+
+**Rationale:** Behavior specs are the source of truth for CLAUDE.md module content. Parser must extract module metadata alongside existing pattern metadata.
+
+**Verified by:**
+
+- Extract claude-module from feature tags
+- Extract claude-section from feature tags
+- Extract claude-tags as array
+- Patterns without claude tags are not module candidates
+- Extract claude-section
+  from feature tags
+- Handle missing claude tags gracefully
+
+</details>
+
+<details>
+<summary>Module content is extracted from feature file structure (4 scenarios)</summary>
+
+#### Module content is extracted from feature file structure
+
+**Invariant:** The codec must extract content from standard feature file elements: Feature description (Problem/Solution), Rule blocks, and Scenario Outline Examples.
+
+**Rationale:** Behavior specs already contain well-structured, prescriptive content. The extraction preserves structure rather than flattening to prose.
+
+**Verified by:**
+
+- Feature description becomes module introduction
+- Rule blocks become module sections
+- Scenario Outline Examples become decision tables
+- Scenarios without Examples tables are not extracted
+- Feature description becomes intro
+- Rule names become section headers
+- Rule descriptions become content
+- Scenario Outline Examples become tables
+
+</details>
+
+<details>
+<summary>ClaudeModuleCodec produces compact markdown modules (4 scenarios)</summary>
+
+#### ClaudeModuleCodec produces compact markdown modules
+
+**Invariant:** The codec transforms patterns with claude tags into markdown files suitable for the `_claude-md/` directory structure.
+
+**Rationale:** CLAUDE.md modules must be compact and actionable. The codec produces ready-to-use markdown without truncation (let modular-claude-md handle token budget warnings).
+
+**Verified by:**
+
+- Module uses correct heading levels
+- Tables from rule descriptions are preserved
+- Code blocks in descriptions are preserved
+- See-also link to full documentation is included
+- Output uses H3 for title
+- Output uses H4 for rules
+- Tables are
+  preserved
+- See-also link is included
+
+</details>
+
+<details>
+<summary>Claude module generator writes files to correct locations (4 scenarios)</summary>
+
+#### Claude module generator writes files to correct locations
+
+**Invariant:** The generator must write module files to `{outputDir}/{section}/{module}.md` based on the `claude-section` and `claude-module` tags.
+
+**Rationale:** Output path structure must match modular-claude-md expectations. The `claude-section` determines the subdirectory, `claude-module` determines filename.
+
+**Verified by:**
+
+- Output path uses section as directory
+- Multiple modules generated from single run
+- Generator skips patterns without claude-module tag
+- Generator creates section directories if missing
+- Output filename uses module name
+- Multiple modules from single run
+- Generator respects --overwrite flag
+
+</details>
+
+<details>
+<summary>Claude module generator is registered with generator registry (3 scenarios)</summary>
+
+#### Claude module generator is registered with generator registry
+
+**Invariant:** A "claude-modules" generator must be registered with the generator registry to enable `pnpm docs:claude-modules` via the existing CLI.
+
+**Rationale:** Consistent with architecture-diagram-generation pattern. New generators register with the orchestrator rather than creating separate commands.
+
+**Verified by:**
+
+- Generator is registered with name "claude-modules"
+- CLI command generates modules
+- Generator supports fullDocsPath option
+- Generator is registered
+- CLI command works
+- Generator options supported
+
+</details>
+
+<details>
+<summary>Same source generates detailed docs with progressive disclosure (3 scenarios)</summary>
+
+#### Same source generates detailed docs with progressive disclosure
+
+**Invariant:** When running with `detailLevel: "detailed"`, the codec produces expanded documentation including all Rule content, code examples, and scenario details.
+
+**Rationale:** Single source generates both compact modules (AI context) and detailed docs (human reference). Progressive disclosure is already a codec capability.
+
+**Verified by:**
+
+- Detailed mode includes scenario descriptions
+- Summary mode produces compact output for modules
+- Standard mode is default for module generation
+- Detailed mode includes scenarios
+- Detailed mode includes code examples
+- Summary mode produces compact output
+
+</details>
+
+### BusinessRulesGenerator
+
+[View BusinessRulesGenerator source](delivery-process/specs/business-rules-generator.feature)
+
+**Business Value:** Enable stakeholders to understand domain constraints without reading
+implementation details or full feature files.
+
+**How It Works:**
+
+- Extract `Rule:` blocks from feature files
+- Parse `**Invariant:**` and `**Rationale:**` annotations
+- Generate organized Business Rules document by domain/phase
+- Include traceability via `**Verified by:**` links to scenarios
+
+**Why It Matters:**
+| Benefit | How |
+| Domain knowledge capture | Invariants document what must always be true |
+| Onboarding acceleration | New developers understand constraints quickly |
+| Business alignment | Rationale explains why constraints exist |
+| Audit readiness | Traceability shows which tests verify each rule |
+
+<details>
+<summary>Extracts Rule blocks with Invariant and Rationale (2 scenarios)</summary>
+
+#### Extracts Rule blocks with Invariant and Rationale
+
+**Invariant:** Every `Rule:` block with `**Invariant:**` annotation must be extracted. Rules without annotations are included with rule name only.
+
+**Rationale:** Business rules are the core domain constraints. Extracting them separately from acceptance criteria creates a focused reference document for domain understanding.
+
+**Verified by:**
+
+- Extracts annotated Rule with Invariant and Rationale
+- Extracts unannotated Rule with name only
+- Extracts annotated Rule
+- Extracts unannotated Rule
+
+</details>
+
+<details>
+<summary>Organizes rules by domain category and phase (2 scenarios)</summary>
+
+#### Organizes rules by domain category and phase
+
+**Invariant:** Rules are grouped first by domain category (from `@libar-docs-*` flags), then by phase number for temporal ordering.
+
+**Rationale:** Domain-organized documentation helps stakeholders find rules relevant to their area of concern without scanning all rules.
+
+**Verified by:**
+
+- Groups rules by domain category
+- Orders rules by phase within domain
+- Groups rules by domain
+- Orders by phase within domain
+
+</details>
+
+<details>
+<summary>Preserves code examples and comparison tables (2 scenarios)</summary>
+
+#### Preserves code examples and comparison tables
+
+**Invariant:** DocStrings (`"""typescript`) and tables in Rule descriptions are rendered in the business rules document.
+
+**Rationale:** Code examples and tables provide concrete understanding of abstract rules. Removing them loses critical context.
+
+**Verified by:**
+
+- Includes code examples from DocStrings
+- Includes comparison tables
+- Includes code examples
+- Includes tables
+
+</details>
+
+<details>
+<summary>Generates scenario traceability links (2 scenarios)</summary>
+
+#### Generates scenario traceability links
+
+**Invariant:** Each rule's `**Verified by:**` section generates links to the scenarios that verify the rule.
+
+**Rationale:** Traceability enables audit compliance and helps developers find relevant tests when modifying rules.
+
+**Verified by:**
+
+- Generates scenario verification links
+- Links include feature file locations
+- Generates scenario links
+- Links include file locations
+
+</details>
+
+### ArchitectureDiagramGeneration
+
+[View ArchitectureDiagramGeneration source](delivery-process/specs/architecture-diagram-generation.feature)
+
+**Problem:** Architecture documentation requires manually maintaining mermaid diagrams
+that duplicate information already encoded in source code. When code changes,
+diagrams become stale. Manual sync is error-prone and time-consuming.
+
+**Solution:** Generate architecture diagrams automatically from source code annotations
+using dedicated `arch-*` tags for precise control. Three tags classify components:
+
+- `@libar-docs-arch-role` - Component type (preset-configurable: service, handler, repository, etc.)
+- `@libar-docs-arch-context` - Bounded context for subgraph grouping
+- `@libar-docs-arch-layer` - Architectural layer (domain, application, infrastructure)
+
+**Why It Matters:**
+| Benefit | How |
+| Always-current diagrams | Generated from source annotations |
+| Bounded context isolation | arch-context groups into subgraphs |
+| Multiple diagram types | Component diagrams + layered diagrams |
+| UML-inspired semantics | Relationship arrows match uses/depends-on/implements/extends |
+| CLI integration | `pnpm docs:architecture` via generator registry |
+
+<details>
+<summary>Architecture tags exist in the tag registry (3 scenarios)</summary>
+
+#### Architecture tags exist in the tag registry
+
+**Invariant:** Three architecture-specific tags (`arch-role`, `arch-context`, `arch-layer`) must exist in the tag registry with correct format and enum values.
+
+**Rationale:** Architecture diagram generation requires metadata to classify source files into diagram components. Standard tag infrastructure enables consistent extraction via the existing AST parser.
+
+**Note:** The `arch-role` enum values are configurable via presets: - `libar-generic` preset: generic roles (`service`, `repository`, `handler`, `infrastructure`) - `ddd-es-cqrs` preset: DDD-specific roles (`command-handler`, `projection`, `saga`, etc.)
+
+**Verified by:**
+
+- Tag registry contains arch-role
+- Tag registry contains arch-context
+- Tag registry contains arch-layer
+- arch-role has enum values
+- arch-layer has enum values
+
+</details>
+
+<details>
+<summary>AST parser extracts architecture tags from TypeScript (5 scenarios)</summary>
+
+#### AST parser extracts architecture tags from TypeScript
+
+**Invariant:** The AST parser must extract `arch-role`, `arch-context`, and `arch-layer` tags from TypeScript JSDoc comments into DocDirective objects.
+
+**Rationale:** Source code annotations are the single source of truth for architectural metadata. Parser must extract them alongside existing pattern metadata.
+
+**Verified by:**
+
+- Extract arch-role from TypeScript annotation
+- Extract arch-context from TypeScript annotation
+- Extract arch-layer from TypeScript annotation
+- Extract multiple arch tags together
+- Missing arch tags yield undefined
+- Extract arch-role from TypeScript
+- Extract arch-context from TypeScript
+- Extract arch-layer from TypeScript
+- Extract all three together
+
+</details>
+
+<details>
+<summary>MasterDataset builds archIndex during transformation (4 scenarios)</summary>
+
+#### MasterDataset builds archIndex during transformation
+
+**Invariant:** The `transformToMasterDataset` function must build an `archIndex` that groups patterns by role, context, and layer for efficient diagram generation.
+
+**Rationale:** Single-pass extraction during dataset transformation avoids expensive re-traversal. Index structure enables O(1) lookup by each dimension.
+
+**Verified by:**
+
+- archIndex groups patterns by arch-role
+- archIndex groups patterns by arch-context
+- archIndex groups patterns by arch-layer
+- archIndex.all contains all patterns with any arch tag
+- archIndex groups by role
+- archIndex groups by context
+- archIndex groups by layer
+- archIndex.all contains all arch-annotated patterns
+
+</details>
+
+<details>
+<summary>Component diagrams group patterns by bounded context (7 scenarios)</summary>
+
+#### Component diagrams group patterns by bounded context
+
+**Invariant:** Component diagrams must render patterns as nodes grouped into bounded context subgraphs, with relationship arrows using UML-inspired styles.
+
+**Rationale:** Component diagrams visualize system architecture showing how bounded contexts isolate components. Subgraphs enforce visual separation.
+
+**Verified by:**
+
+- Generate subgraphs per bounded context
+- Patterns without arch-context go to Shared Infrastructure
+- Render uses relationship as solid arrow
+- Render depends-on relationship as dashed arrow
+- Render implements relationship as dotted arrow
+- Render extends relationship as open arrow
+- Arrows only render between annotated components
+- Group context-less patterns
+  in Shared Infrastructure
+- Render uses as solid arrow
+- Render depends-on as dashed arrow
+
+</details>
+
+<details>
+<summary>Layered diagrams group patterns by architectural layer (4 scenarios)</summary>
+
+#### Layered diagrams group patterns by architectural layer
+
+**Invariant:** Layered diagrams must render patterns grouped by architectural layer (domain, application, infrastructure) with top-to-bottom flow.
+
+**Rationale:** Layered architecture visualization shows dependency direction - infrastructure at top, domain at bottom - following conventional layer ordering.
+
+**Verified by:**
+
+- Generate subgraphs per layer
+- Layer order is infrastructure-application-domain
+- Include context label in node names
+- Patterns without layer go to Other subgraph
+
+</details>
+
+<details>
+<summary>Architecture generator is registered with generator registry (5 scenarios)</summary>
+
+#### Architecture generator is registered with generator registry
+
+**Invariant:** An "architecture" generator must be registered with the generator registry to enable `pnpm docs:architecture` via the existing `generate-docs.js` CLI.
+
+**Rationale:** The delivery-process uses a generator registry pattern. New generators register with the orchestrator rather than creating separate CLI commands.
+
+**Verified by:**
+
+- Architecture generator is registered
+- Generator produces component diagram by default
+- Generator option for layered diagram
+- Generator option for context filtering
+- npm script pnpm docs:architecture works
+- Generator is registered
+- Generator produces component diagram
+- Generator produces layered diagram
+- npm script works
+
+</details>
+
+<details>
+<summary>Sequence diagrams render interaction flows (3 scenarios)</summary>
+
+#### Sequence diagrams render interaction flows
+
+**Invariant:** Sequence diagrams must render interaction flows (command flow, saga flow) showing step-by-step message passing between components.
+
+**Rationale:** Component diagrams show structure but not behavior. Sequence diagrams show runtime flow - essential for understanding command/saga execution.
+
+**Verified by:**
+
+- Generate command flow sequence diagram
+- Generate saga flow sequence diagram
+- Participant ordering follows architectural layers
+- Generate command flow sequence
+- Generate saga flow sequence
+
+</details>
+
+### ArchitectureDelta
+
+[View ArchitectureDelta source](delivery-process/specs/architecture-delta.feature)
+
+**Problem:**
+Architecture evolution is not visible between releases.
+Breaking changes are not clearly documented.
+New constraints introduced by phases are hard to track.
+No automated way to generate "what changed" for a release.
+
+**Solution:**
+Generate ARCH-DELTA.md showing changes since last release:
+
+- New patterns introduced (with ADR references)
+- Deprecated patterns (with replacement guidance)
+- New constraints (with rationale)
+- Breaking changes (with migration notes)
+
+Uses git tags to determine release boundaries.
+Uses @libar-docs-decision, @libar-docs-replaces annotations.
+
+Implements Convergence Opportunity 5: Architecture Change Control.
+
+### ADR005CodecBasedMarkdownRendering
+
+[View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
+
+**Context:**
+The documentation generator needs to transform structured pattern data
+(MasterDataset) into markdown files. The initial approach used direct
+string concatenation in generator functions, mixing data selection,
+formatting logic, and output assembly in a single pass. This made
+generators hard to test, difficult to compose, and impossible to
+render the same data in different formats (e.g., full docs vs compact
+AI context).
+
+**Decision:**
+Adopt a codec architecture inspired by serialization codecs (encode/decode).
+Each document type has a codec that decodes a MasterDataset into a
+RenderableDocument — an intermediate representation of sections, headings,
+tables, paragraphs, and code blocks. A separate renderer transforms the
+RenderableDocument into markdown. This separates data selection (what to
+include) from formatting (how it looks) from serialization (markdown syntax).
+
+**Consequences:**
+| Type | Impact |
+| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
+| Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
+| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
+| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
+| Negative | Extra abstraction layer between data and output |
+| Negative | RenderableDocument vocabulary must cover all needed output patterns |
+
+**Benefits:**
+| Benefit | Before (String Concat) | After (Codec) |
+| Testability | Assert on markdown strings | Assert on typed section blocks |
+| Composability | Copy-paste between generators | CompositeCodec assembles children |
+| Format variants | Duplicate generator logic | Same codec, different renderer |
+| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
+
+<details>
+<summary>Codecs implement a decode-only contract (2 scenarios)</summary>
+
+#### Codecs implement a decode-only contract
+
+**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
+
+**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
+
+**Codec call signature:**
+
+```typescript
+interface DocumentCodec {
+  decode(dataset: MasterDataset): RenderableDocument;
+}
+```
+
+**Verified by:**
+
+- Codec produces deterministic output
+- Codec has no side effects
+
+</details>
+
+<details>
+<summary>RenderableDocument is a typed intermediate representation (2 scenarios)</summary>
+
+#### RenderableDocument is a typed intermediate representation
+
+**Invariant:** RenderableDocument contains a title, an ordered array of SectionBlock elements, and an optional record of additional files. Each SectionBlock is a discriminated union: heading, paragraph, table, code, list, separator, or metaRow. The renderer consumes this IR without needing to know which codec produced it.
+
+**Rationale:** A typed IR decouples codecs from rendering. Codecs express intent ("this is a table with these rows") and the renderer handles syntax ("pipe-delimited markdown with separator row"). This means switching output format (e.g., HTML instead of markdown) requires only a new renderer, not changes to every codec.
+
+**Section block types:**
+
+| Block Type | Purpose                       | Markdown Output             |
+| ---------- | ----------------------------- | --------------------------- |
+| heading    | Section title with depth      | ## Title (depth-adjusted)   |
+| paragraph  | Prose text                    | Plain text with blank lines |
+| table      | Structured data               | Pipe-delimited table        |
+| code       | Code sample with language     | Fenced code block           |
+| list       | Ordered or unordered items    | - item or 1. item           |
+| separator  | Visual break between sections | ---                         |
+| metaRow    | Key-value metadata            | **Key:** Value              |
+
+**Verified by:**
+
+- All block types render to markdown
+- Unknown block type is rejected
+
+</details>
+
+<details>
+<summary>CompositeCodec assembles documents from child codecs (2 scenarios)</summary>
+
+#### CompositeCodec assembles documents from child codecs
+
+**Invariant:** CompositeCodec accepts an array of child codecs and produces a single RenderableDocument by concatenating their sections. Child codec order determines section order in the output. Separators are inserted between children by default.
+
+**Rationale:** Reference documents combine content from multiple domains (patterns, conventions, shapes, diagrams). Rather than building a monolithic codec that knows about all content types, CompositeCodec lets each domain own its codec and composes them declaratively.
+
+**Composition example:**
+
+```typescript
+const referenceDoc = CompositeCodec.create({
+  title: 'Architecture Reference',
+  codecs: [
+    behaviorCodec, // patterns with rules
+    conventionCodec, // decision records
+    shapeCodec, // type definitions
+    diagramCodec, // mermaid diagrams
+  ],
+});
+```
+
+**Verified by:**
+
+- Child sections appear in codec array order
+- Empty children are skipped without separators
+
+</details>
+
+<details>
+<summary>ADR content comes from both Feature description and Rule prefixes (3 scenarios)</summary>
+
+#### ADR content comes from both Feature description and Rule prefixes
+
+**Invariant:** ADR structured content (Context, Decision, Consequences) can appear in two locations within a feature file. Both sources must be rendered. Silently dropping either source causes content loss.
+
+**Rationale:** Early ADRs used name prefixes like "Context - ..." and "Decision - ..." on Rule blocks to structure content. Later ADRs placed Context, Decision, and Consequences as bold-annotated prose in the Feature description, reserving Rule: blocks for invariants and design rules. Both conventions are valid. The ADR codec must handle both because the codebase contains ADRs authored in each style. The Feature description lives in pattern.directive.description. If the codec only renders Rules (via partitionRulesByPrefix), then Feature description content is silently dropped -- no error, no warning. This caused confusion across two repos where ADR content appeared in the feature file but was missing from generated docs. The fix renders pattern.directive.description in buildSingleAdrDocument between the Overview metadata table and the partitioned Rules section, using renderFeatureDescription() which walks content linearly and handles prose, tables, and DocStrings with correct interleaving.
+
+| Source              | Location                            | Example                   | Rendered Via               |
+| ------------------- | ----------------------------------- | ------------------------- | -------------------------- |
+| Rule prefix         | Rule: Context - ...                 | ADR-001 (taxonomy)        | partitionRulesByPrefix()   |
+| Feature description | **Context:** prose in Feature block | ADR-005 (codec rendering) | renderFeatureDescription() |
+
+**Verified by:**
+
+- Feature description content is rendered
+- Rule prefix content is rendered
+- Both sources combine in single ADR
+
+</details>
+
+<details>
+<summary>The markdown renderer is codec-agnostic (2 scenarios)</summary>
+
+#### The markdown renderer is codec-agnostic
+
+**Invariant:** The renderer accepts any RenderableDocument regardless of which codec produced it. Rendering depends only on block types, not on document origin. This enables testing codecs and renderers independently.
+
+**Rationale:** If the renderer knew about specific codecs, adding a new codec would require renderer changes. By operating purely on the SectionBlock discriminated union, the renderer is closed for modification but open for extension via new block types.
+
+**Verified by:**
+
+- Same renderer handles different codec outputs
+- Renderer and codec are tested independently
+
+</details>
+
+### TestContentBlocks
+
+[View TestContentBlocks source](tests/features/poc/test-content-blocks.feature)
+
+This feature demonstrates what content blocks are captured and rendered
+by the PRD generator. Use this as a reference for writing rich specs.
+
+**Overview**
+
+The delivery process supports **rich Markdown** in descriptions:
+
+- Bullet points work
+- _Italics_ and **bold** work
+- `inline code` works
+
+**Custom Section**
+
+You can create any section you want using bold headers.
+This content will appear in the PRD Description section.
+
+#### Business rules appear as a separate section
+
+Rule descriptions provide context for why this business rule exists.
+You can include multiple paragraphs here.
+
+    This is a second paragraph explaining edge cases or exceptions.
+
+**Verified by:**
+
+- Scenario with DocString for rich content
+- Scenario with DataTable for structured data
+
+#### Multiple rules create multiple Business Rule entries
+
+Each Rule keyword creates a separate entry in the Business Rules section.
+This helps organize complex features into logical business domains.
+
+**Verified by:**
+
+- Simple scenario under second rule
+- Scenario with examples table
+
+### RuleKeywordPoC
+
+[View RuleKeywordPoC source](tests/features/poc/rule-keyword-poc.feature)
+
+This feature tests whether vitest-cucumber supports the Rule keyword
+for organizing scenarios under business rules.
+
+#### Basic arithmetic operations work correctly
+
+The calculator should perform standard math operations
+with correct results.
+
+**Verified by:**
+
+- Addition of two positive numbers
+- Subtraction of two numbers
+
+#### Division has special constraints
+
+Division by zero must be handled gracefully to prevent
+system errors.
+
+**Verified by:**
+
+- Division of two numbers
+- Division by zero is prevented
 
 ### TableExtraction
 
@@ -560,75 +2856,6 @@ Verifies rule extraction, organization by domain/phase, and progressive disclosu
 - Testing suffix is stripped from feature names
 
 </details>
-
-### TestContentBlocks
-
-[View TestContentBlocks source](tests/features/poc/test-content-blocks.feature)
-
-This feature demonstrates what content blocks are captured and rendered
-by the PRD generator. Use this as a reference for writing rich specs.
-
-**Overview**
-
-The delivery process supports **rich Markdown** in descriptions:
-
-- Bullet points work
-- _Italics_ and **bold** work
-- `inline code` works
-
-**Custom Section**
-
-You can create any section you want using bold headers.
-This content will appear in the PRD Description section.
-
-#### Business rules appear as a separate section
-
-Rule descriptions provide context for why this business rule exists.
-You can include multiple paragraphs here.
-
-    This is a second paragraph explaining edge cases or exceptions.
-
-**Verified by:**
-
-- Scenario with DocString for rich content
-- Scenario with DataTable for structured data
-
-#### Multiple rules create multiple Business Rule entries
-
-Each Rule keyword creates a separate entry in the Business Rules section.
-This helps organize complex features into logical business domains.
-
-**Verified by:**
-
-- Simple scenario under second rule
-- Scenario with examples table
-
-### RuleKeywordPoC
-
-[View RuleKeywordPoC source](tests/features/poc/rule-keyword-poc.feature)
-
-This feature tests whether vitest-cucumber supports the Rule keyword
-for organizing scenarios under business rules.
-
-#### Basic arithmetic operations work correctly
-
-The calculator should perform standard math operations
-with correct results.
-
-**Verified by:**
-
-- Addition of two positive numbers
-- Subtraction of two numbers
-
-#### Division has special constraints
-
-Division by zero must be handled gracefully to prevent
-system errors.
-
-**Verified by:**
-
-- Division of two numbers
-- Division by zero is prevented
 
 ### WarningCollectorTesting
 
@@ -2017,6 +4244,176 @@ The helpers handle edge cases like:
 The universal renderer converts RenderableDocument to markdown.
 It is a "dumb printer" with no domain knowledge - all logic lives in codecs.
 
+<details>
+<summary>Document metadata renders as frontmatter before sections (4 scenarios)</summary>
+
+#### Document metadata renders as frontmatter before sections
+
+**Invariant:** Title always renders as H1, purpose and detail level render as bold key-value pairs separated by horizontal rule.
+
+**Verified by:**
+
+- Render minimal document with title only
+- Render document with purpose
+- Render document with detail level
+- Render document with purpose and detail level
+
+</details>
+
+<details>
+<summary>Headings render at correct markdown levels with clamping (3 scenarios)</summary>
+
+#### Headings render at correct markdown levels with clamping
+
+**Invariant:** Heading levels are clamped to the valid range 1-6 regardless of input value.
+
+**Verified by:**
+
+- Render headings at different levels
+- Clamp heading level 0 to 1
+- Clamp heading level 7 to 6
+
+</details>
+
+<details>
+<summary>Paragraphs and separators render as plain text and horizontal rules (3 scenarios)</summary>
+
+#### Paragraphs and separators render as plain text and horizontal rules
+
+**Invariant:** Paragraph content passes through unmodified, including special markdown characters. Separators render as horizontal rules.
+
+**Verified by:**
+
+- Render paragraph
+- Render paragraph with special characters
+- Render separator
+
+</details>
+
+<details>
+<summary>Tables render with headers, alignment, and cell escaping (6 scenarios)</summary>
+
+#### Tables render with headers, alignment, and cell escaping
+
+**Invariant:** Tables must escape pipe characters, convert newlines to line breaks, and pad short rows to match column count.
+
+**Verified by:**
+
+- Render basic table
+- Render table with alignment
+- Render empty table (no columns)
+- Render table with pipe character in cell
+- Render table with newline in cell
+- Render table with short row (fewer cells than columns)
+
+</details>
+
+<details>
+<summary>Lists render in unordered, ordered, checkbox, and nested formats (4 scenarios)</summary>
+
+#### Lists render in unordered, ordered, checkbox, and nested formats
+
+**Invariant:** List type determines prefix: dash for unordered, numbered for ordered, checkbox syntax for checked items. Nesting adds two-space indentation per level.
+
+**Verified by:**
+
+- Render unordered list
+- Render ordered list
+- Render checkbox list with checked items
+- Render nested list
+
+</details>
+
+<details>
+<summary>Code blocks and mermaid diagrams render with fenced syntax (3 scenarios)</summary>
+
+#### Code blocks and mermaid diagrams render with fenced syntax
+
+**Invariant:** Code blocks use triple backtick fencing with optional language hint. Mermaid blocks use mermaid as the language hint.
+
+**Verified by:**
+
+- Render code block with language
+- Render code block without language
+- Render mermaid diagram
+
+</details>
+
+<details>
+<summary>Collapsible blocks render as HTML details elements (3 scenarios)</summary>
+
+#### Collapsible blocks render as HTML details elements
+
+**Invariant:** Summary text is HTML-escaped to prevent injection. Collapsible content renders between details tags.
+
+**Verified by:**
+
+- Render collapsible block
+- Render collapsible with HTML entities in summary
+- Render nested collapsible content
+
+</details>
+
+<details>
+<summary>Link-out blocks render as markdown links with URL encoding (2 scenarios)</summary>
+
+#### Link-out blocks render as markdown links with URL encoding
+
+**Invariant:** Link paths with spaces are percent-encoded for valid URLs.
+
+**Verified by:**
+
+- Render link-out block
+- Render link-out with spaces in path
+
+</details>
+
+<details>
+<summary>Multi-file documents produce correct output file collections (2 scenarios)</summary>
+
+#### Multi-file documents produce correct output file collections
+
+**Invariant:** Output file count equals 1 (main) plus additional file count. The first output file always uses the provided base path.
+
+**Verified by:**
+
+- Render document with additional files
+- Render document without additional files
+
+</details>
+
+<details>
+<summary>Complex documents render all block types in sequence (1 scenarios)</summary>
+
+#### Complex documents render all block types in sequence
+
+**Invariant:** Multiple block types in a single document render in order without interference.
+
+**Verified by:**
+
+- Render complex document with multiple block types
+
+</details>
+
+<details>
+<summary>Claude context renderer produces compact AI-optimized output (7 scenarios)</summary>
+
+#### Claude context renderer produces compact AI-optimized output
+
+**Invariant:** Claude context replaces markdown syntax with section markers, omits visual-only blocks (mermaid, separators), flattens collapsible content, and produces shorter output than markdown.
+
+**Verified by:**
+
+- Claude context renders title and headings as section markers
+- Claude context renders sub-headings with different markers
+- Claude context omits mermaid blocks
+- Claude context flattens collapsible blocks
+- Claude context renders link-out as plain text
+- Claude context omits separator tokens
+- Claude context produces fewer characters than markdown
+
+</details>
+
 ### RemainingWorkSummaryAccuracy
 
 [View RemainingWorkSummaryAccuracy source](tests/features/behavior/remaining-work-totals.feature)
@@ -2110,6 +4507,107 @@ quarter grouping, and progressive disclosure for better session planning.
 - Effort parsing enables sorting by estimated work duration
 - Visual priority icons provide at-a-glance urgency indicators
 
+<details>
+<summary>Priority-based sorting surfaces critical work first (3 scenarios)</summary>
+
+#### Priority-based sorting surfaces critical work first
+
+**Invariant:** Phases with higher priority always appear before lower-priority phases when sorting by priority.
+
+**Verified by:**
+
+- Next Actionable sorted by priority
+- Undefined priority sorts last
+- Priority icons displayed in table
+
+</details>
+
+<details>
+<summary>Effort parsing converts duration strings to comparable hours (5 scenarios)</summary>
+
+#### Effort parsing converts duration strings to comparable hours
+
+**Invariant:** Effort strings must be parsed to a common unit (hours) for accurate sorting across different time scales.
+
+**Verified by:**
+
+- Phases sorted by effort ascending
+- Effort parsing handles hours
+- Effort parsing handles days
+- Effort parsing handles weeks
+- Effort parsing handles months
+
+</details>
+
+<details>
+<summary>Quarter grouping organizes planned work into time-based buckets (2 scenarios)</summary>
+
+#### Quarter grouping organizes planned work into time-based buckets
+
+**Invariant:** Phases with a quarter tag are grouped under their quarter heading; phases without a quarter appear under Unscheduled.
+
+**Verified by:**
+
+- Planned phases grouped by quarter
+- Quarters sorted chronologically
+
+</details>
+
+<details>
+<summary>Priority grouping organizes phases by urgency level (1 scenarios)</summary>
+
+#### Priority grouping organizes phases by urgency level
+
+**Invariant:** Phases are grouped under their priority heading; phases without priority appear under Unprioritized.
+
+**Verified by:**
+
+- Planned phases grouped by priority
+
+</details>
+
+<details>
+<summary>Progressive disclosure prevents information overload in large backlogs (2 scenarios)</summary>
+
+#### Progressive disclosure prevents information overload in large backlogs
+
+**Invariant:** When the backlog exceeds maxNextActionable, only the top N phases are shown with a link or count for the remainder.
+
+**Verified by:**
+
+- Large backlog uses progressive disclosure
+- Moderate backlog shows count without link
+
+</details>
+
+<details>
+<summary>Edge cases are handled gracefully (2 scenarios)</summary>
+
+#### Edge cases are handled gracefully
+
+**Invariant:** Empty or fully-blocked backlogs produce meaningful output instead of errors or blank sections.
+
+**Verified by:**
+
+- Empty backlog handling
+- All phases blocked
+
+</details>
+
+<details>
+<summary>Default behavior preserves backward compatibility (2 scenarios)</summary>
+
+#### Default behavior preserves backward compatibility
+
+**Invariant:** Without explicit sortBy or groupPlannedBy options, phases are sorted by phase number in a flat list.
+
+**Verified by:**
+
+- Default sorting is by phase number
+- Default grouping is none (flat list)
+
+</details>
+
 ### PrChangesGeneration
 
 [View PrChangesGeneration source](tests/features/behavior/pr-changes-generation.feature)
@@ -2132,6 +4630,147 @@ formatted for PR descriptions, code reviews, and release notes.
 - Surface deliverables inline with each pattern
 - Include review checklist with standard code quality items
 - Include dependency section showing what patterns enable or require
+
+<details>
+<summary>Release version filtering controls which phases appear in output (4 scenarios)</summary>
+
+#### Release version filtering controls which phases appear in output
+
+**Invariant:** Only phases with deliverables matching the releaseFilter are included; roadmap phases are always excluded.
+
+**Verified by:**
+
+- Filter phases by specific release version
+- Show all active and completed phases when no releaseFilter
+- Active phases with matching deliverables are included
+- Roadmap phases are excluded even with matching deliverables
+
+</details>
+
+<details>
+<summary>Patterns are grouped by phase number in the output (1 scenarios)</summary>
+
+#### Patterns are grouped by phase number in the output
+
+**Invariant:** Each phase number produces a separate heading section in the generated output.
+
+**Verified by:**
+
+- Patterns grouped by phase number
+
+</details>
+
+<details>
+<summary>Summary statistics provide a high-level overview of the PR (2 scenarios)</summary>
+
+#### Summary statistics provide a high-level overview of the PR
+
+**Invariant:** Summary section always shows pattern counts and release tag when a releaseFilter is active.
+
+**Verified by:**
+
+- Summary shows pattern counts in table format
+- Summary shows release tag when filtering
+
+</details>
+
+<details>
+<summary>Deliverables are displayed inline with their parent patterns (2 scenarios)</summary>
+
+#### Deliverables are displayed inline with their parent patterns
+
+**Invariant:** When includeDeliverables is enabled, each pattern lists its deliverables with name, status, and release tag.
+
+**Verified by:**
+
+- Deliverables shown inline with patterns
+- Deliverables show release tags
+
+</details>
+
+<details>
+<summary>Review checklist includes standard code quality verification items (2 scenarios)</summary>
+
+#### Review checklist includes standard code quality verification items
+
+**Invariant:** Review checklist always includes code conventions, tests, documentation, and completed pattern verification items.
+
+**Verified by:**
+
+- Review checklist includes standard code quality items
+- Review checklist includes completed pattern verification
+
+</details>
+
+<details>
+<summary>Dependencies section shows inter-pattern relationships (2 scenarios)</summary>
+
+#### Dependencies section shows inter-pattern relationships
+
+**Invariant:** Dependencies section surfaces both what patterns enable and what they depend on.
+
+**Verified by:**
+
+- Dependencies shows what patterns enable
+- Dependencies shows what patterns depend on
+
+</details>
+
+<details>
+<summary>Business value can be included or excluded from pattern metadata (2 scenarios)</summary>
+
+#### Business value can be included or excluded from pattern metadata
+
+**Invariant:** Business value display is controlled by the includeBusinessValue option.
+
+**Verified by:**
+
+- Pattern metadata includes business value when enabled
+- Business value can be excluded
+
+</details>
+
+<details>
+<summary>Output can be sorted by phase number or priority (2 scenarios)</summary>
+
+#### Output can be sorted by phase number or priority
+
+**Invariant:** Sorting is deterministic and respects the configured sortBy option.
+
+**Verified by:**
+
+- Phases sorted by phase number
+- Phases sorted by priority
+
+</details>
+
+<details>
+<summary>Edge cases produce graceful output (3 scenarios)</summary>
+
+#### Edge cases produce graceful output
+
+**Invariant:** The generator handles missing phases, missing deliverables, and missing phase numbers without errors.
+
+**Verified by:**
+
+- No matching phases produces no changes message
+- Patterns without deliverables still display
+- Patterns without phase show in phase 0 group
+
+</details>
+
+<details>
+<summary>Deliverable-level filtering shows only matching deliverables within a phase (1 scenarios)</summary>
+
+#### Deliverable-level filtering shows only matching deliverables within a phase
+
+**Invariant:** When a phase contains deliverables with different release tags, only those matching the releaseFilter are shown.
+
+**Verified by:**
+
+- Mixed releases within single phase shows only matching deliverables
+
+</details>
 
 ### PatternsCodecTesting
 
@@ -2556,6 +5195,735 @@ replacing raw JSON.parse/stringify with single-step validated operations.
 - Structured CodecError type with operation, source, and validation details
 - $schema stripping before validation for JSON Schema compatibility
 - formatCodecError utility for consistent human-readable error output
+
+<details>
+<summary>Input codec parses and validates JSON in a single step (4 scenarios)</summary>
+
+#### Input codec parses and validates JSON in a single step
+
+**Invariant:** Every JSON string parsed through the input codec is both syntactically valid JSON and schema-conformant before returning a typed value.
+
+**Verified by:**
+
+- Input codec parses valid JSON to typed object
+- Input codec returns error for malformed JSON
+- Input codec returns validation errors for schema violations
+- Input codec strips $schema field before validation
+
+</details>
+
+<details>
+<summary>Output codec validates before serialization (3 scenarios)</summary>
+
+#### Output codec validates before serialization
+
+**Invariant:** Every object serialized through the output codec is schema-validated before JSON.stringify, preventing invalid data from reaching consumers.
+
+**Verified by:**
+
+- Output codec serializes valid object to JSON
+- Output codec returns error for schema violations
+- Output codec respects indent option
+
+</details>
+
+<details>
+<summary>LintOutputSchema validates CLI lint output structure (2 scenarios)</summary>
+
+#### LintOutputSchema validates CLI lint output structure
+
+**Invariant:** Lint output JSON always conforms to the LintOutputSchema, ensuring consistent structure for downstream tooling.
+
+**Verified by:**
+
+- LintOutputSchema validates correct lint output
+- LintOutputSchema rejects invalid severity
+
+</details>
+
+<details>
+<summary>ValidationSummaryOutputSchema validates cross-source analysis output (2 scenarios)</summary>
+
+#### ValidationSummaryOutputSchema validates cross-source analysis output
+
+**Invariant:** Validation summary JSON always conforms to the ValidationSummaryOutputSchema, ensuring consistent reporting of cross-source pattern analysis.
+
+**Verified by:**
+
+- ValidationSummaryOutputSchema validates correct validation output
+- ValidationSummaryOutputSchema rejects invalid issue source
+
+</details>
+
+<details>
+<summary>RegistryMetadataOutputSchema accepts arbitrary nested structures (1 scenarios)</summary>
+
+#### RegistryMetadataOutputSchema accepts arbitrary nested structures
+
+**Invariant:** Registry metadata codec accepts any valid JSON-serializable object without schema constraints on nested structure.
+
+**Verified by:**
+
+- RegistryMetadataOutputSchema accepts arbitrary metadata
+
+</details>
+
+<details>
+<summary>formatCodecError produces human-readable error output (1 scenarios)</summary>
+
+#### formatCodecError produces human-readable error output
+
+**Invariant:** Formatted codec errors always include the operation context and all validation error details for debugging.
+
+**Verified by:**
+
+- formatCodecError includes validation errors in output
+
+</details>
+
+<details>
+<summary>safeParse returns typed values or undefined without throwing (3 scenarios)</summary>
+
+#### safeParse returns typed values or undefined without throwing
+
+**Invariant:** safeParse never throws exceptions; it returns the typed value on success or undefined on any failure.
+
+**Verified by:**
+
+- safeParse returns typed value on valid JSON
+- safeParse returns undefined on malformed JSON
+- safeParse returns undefined on schema violation
+
+</details>
+
+<details>
+<summary>createFileLoader handles filesystem operations with typed errors (5 scenarios)</summary>
+
+#### createFileLoader handles filesystem operations with typed errors
+
+**Invariant:** File loader converts all filesystem errors (ENOENT, EACCES, generic) into structured CodecError values with appropriate messages and source paths.
+
+**Verified by:**
+
+- createFileLoader loads and parses valid JSON file
+- createFileLoader handles ENOENT error
+- createFileLoader handles EACCES error
+- createFileLoader handles general read error
+- createFileLoader handles invalid JSON in file
+
+</details>
+
+### LayeredDiagramGeneration
+
+[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
+
+As a documentation generator
+I want to generate layered architecture diagrams from metadata
+So that system architecture is visualized by layer hierarchy
+
+<details>
+<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
+
+#### Layered diagrams group patterns by arch-layer
+
+**Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
+
+**Verified by:**
+
+- Generate subgraphs for each layer
+- Generate subgraphs for each layer
+
+  Patterns with arch-layer are grouped into Mermaid subgraphs.
+  Each layer becomes a visual container.
+
+</details>
+
+<details>
+<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
+
+#### Layer order is domain to infrastructure (top to bottom)
+
+**Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
+
+**Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
+
+**Verified by:**
+
+- Layers render in correct order
+- Layers render in correct order
+
+  The layer subgraphs are rendered in Clean Architecture order:
+  domain at top
+
+- then application
+- then infrastructure at bottom.
+  This reflects the dependency rule: outer layers depend on inner layers.
+
+</details>
+
+<details>
+<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
+
+#### Context labels included in layered diagram nodes
+
+**Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
+
+**Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
+
+**Verified by:**
+
+- Nodes include context labels
+- Nodes include context labels
+
+  Unlike component diagrams which group by context
+
+- layered diagrams
+  include the context as a label in each node name.
+
+</details>
+
+<details>
+<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
+
+#### Patterns without layer go to Other subgraph
+
+**Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
+
+**Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
+
+**Verified by:**
+
+- Unlayered patterns in Other subgraph
+- Unlayered patterns in Other subgraph
+
+  Patterns that have arch-role or arch-context but no arch-layer
+  are grouped into an "Other" subgraph.
+
+</details>
+
+<details>
+<summary>Layered diagram includes summary section (1 scenarios)</summary>
+
+#### Layered diagram includes summary section
+
+**Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
+
+**Verified by:**
+
+- Summary section for layered view
+- Summary section for layered view
+
+  The generated document starts with an overview section
+  specific to layered architecture visualization.
+
+</details>
+
+### ArchGeneratorRegistration
+
+[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
+
+As a CLI user
+I want an architecture generator registered in the generator registry
+So that I can run pnpm docs:architecture to generate diagrams
+
+<details>
+<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
+
+#### Architecture generator is registered in the registry
+
+**Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
+
+**Verified by:**
+
+- Generator is available in registry
+- Generator is available in registry
+
+  The architecture generator must be registered like other built-in
+  generators so it can be invoked via CLI.
+
+</details>
+
+<details>
+<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
+
+#### Architecture generator produces component diagram by default
+
+**Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
+
+**Verified by:**
+
+- Default generation produces component diagram
+- Default generation produces component diagram
+
+  Running the architecture generator without options produces
+  a component diagram (bounded context view).
+
+</details>
+
+<details>
+<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
+
+#### Architecture generator supports diagram type options
+
+**Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
+
+**Verified by:**
+
+- Generate layered diagram with options
+- Generate layered diagram with options
+
+  The generator accepts options to specify diagram type
+  (component or layered).
+
+</details>
+
+<details>
+<summary>Architecture generator supports context filtering (1 scenarios)</summary>
+
+#### Architecture generator supports context filtering
+
+**Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
+
+**Verified by:**
+
+- Filter to specific contexts
+- Filter to specific contexts
+
+  The generator can filter to specific bounded contexts
+  for focused diagram output.
+
+</details>
+
+### ComponentDiagramGeneration
+
+[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
+
+As a documentation generator
+I want to generate component diagrams from architecture metadata
+So that system architecture is automatically visualized with bounded context subgraphs
+
+<details>
+<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
+
+#### Component diagrams group patterns by bounded context
+
+**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
+
+**Verified by:**
+
+- Generate subgraphs for bounded contexts
+- Generate subgraphs for bounded contexts
+
+  Patterns with arch-context are grouped into Mermaid subgraphs.
+  Each bounded context becomes a visual container.
+
+</details>
+
+<details>
+<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
+
+#### Context-less patterns go to Shared Infrastructure
+
+**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
+
+**Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
+
+**Verified by:**
+
+- Shared infrastructure subgraph for context-less patterns
+- Shared infrastructure subgraph for context-less patterns
+
+  Patterns without arch-context are grouped into a
+  "Shared Infrastructure" subgraph.
+
+</details>
+
+<details>
+<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
+
+#### Relationship types render with distinct arrow styles
+
+**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
+
+**Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
+
+**Verified by:**
+
+- Arrow styles for relationship types
+- Arrow styles for relationship types
+
+  Arrow styles follow UML conventions:
+  - uses: solid arrow (-->)
+  - depends-on: dashed arrow (-.->)
+  - implements: dotted arrow (..->)
+  - extends: open arrow (-->>)
+
+</details>
+
+<details>
+<summary>Arrows only connect annotated components (1 scenarios)</summary>
+
+#### Arrows only connect annotated components
+
+**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
+
+**Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
+
+**Verified by:**
+
+- Skip arrows to non-annotated targets
+- Skip arrows to non-annotated targets
+
+  Relationships pointing to non-annotated patterns
+  are not rendered (target would not exist in diagram).
+
+</details>
+
+<details>
+<summary>Component diagram includes summary section (1 scenarios)</summary>
+
+#### Component diagram includes summary section
+
+**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
+
+**Verified by:**
+
+- Summary section with counts
+- Summary section with counts
+
+  The generated document starts with an overview section
+  showing component counts and bounded context statistics.
+
+</details>
+
+<details>
+<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
+
+#### Component diagram includes legend when enabled
+
+**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
+
+**Verified by:**
+
+- Legend section with arrow explanations
+- Legend section with arrow explanations
+
+  The legend explains arrow style meanings for readers.
+
+</details>
+
+<details>
+<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
+
+#### Component diagram includes inventory table when enabled
+
+**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
+
+**Verified by:**
+
+- Inventory table with component details
+- Inventory table with component details
+
+  The inventory lists all components with their metadata.
+
+</details>
+
+<details>
+<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
+
+#### Empty architecture data shows guidance message
+
+**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
+
+**Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
+
+**Verified by:**
+
+- No architecture data message
+- No architecture data message
+
+  If no patterns have architecture annotations
+
+- the document explains how to add them.
+
+</details>
+
+### ArchTagExtraction
+
+[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
+
+As a documentation generator
+I want architecture tags extracted from source code
+So that I can generate accurate architecture diagrams
+
+<details>
+<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-role tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
+
+**Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
+
+**Verified by:**
+
+- arch-role tag exists with enum format
+- arch-role has required enum values
+- arch-role has required enum values
+
+  Architecture roles classify components for diagram rendering.
+  Valid roles: command-handler
+
+- projection
+- saga
+- process-manager
+- infrastructure
+- repository
+- decider
+- read-model
+- bounded-context.
+
+</details>
+
+<details>
+<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
+
+#### arch-context tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
+
+**Verified by:**
+
+- arch-context tag exists with value format
+- arch-context tag exists with value format
+
+  Context tags group components into bounded context subgraphs.
+  Format is "value" (free-form string like "orders"
+
+- "inventory").
+
+</details>
+
+<details>
+<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-layer tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
+
+**Verified by:**
+
+- arch-layer tag exists with enum format
+- arch-layer has exactly three values
+- arch-layer has exactly three values
+
+  Layer tags enable layered architecture diagrams.
+  Valid layers: domain
+
+- application
+- infrastructure.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-role from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
+
+**Verified by:**
+
+- Extract arch-role projection
+- Extract arch-role command-handler
+- Extract arch-role command-handler
+
+  The AST parser must extract arch-role alongside other pattern metadata.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-context from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
+
+**Verified by:**
+
+- Extract arch-context orders
+- Extract arch-context inventory
+- Extract arch-context inventory
+
+  Context values are free-form strings naming the bounded context.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-layer from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
+
+**Verified by:**
+
+- Extract arch-layer application
+- Extract arch-layer infrastructure
+- Extract arch-layer infrastructure
+
+  Layer tags classify components by architectural layer.
+
+</details>
+
+<details>
+<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
+
+#### AST parser handles multiple arch tags together
+
+**Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
+
+**Verified by:**
+
+- Extract all three arch tags
+- Extract all three arch tags
+
+  Components often have role + context + layer together.
+
+</details>
+
+<details>
+<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
+
+#### Missing arch tags yield undefined values
+
+**Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
+
+**Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
+
+**Verified by:**
+
+- Missing arch tags are undefined
+- Missing arch tags are undefined
+
+  Components without arch tags should have undefined (not null or empty).
+
+</details>
+
+### ArchIndexDataset
+
+[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
+
+As a documentation generator
+I want an archIndex built during dataset transformation
+So that I can efficiently look up patterns by role, context, and layer
+
+<details>
+<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-role
+
+**Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
+
+**Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
+
+**Verified by:**
+
+- Group patterns by role
+- Group patterns by role
+
+  The archIndex.byRole map groups patterns by their architectural role
+  (command-handler
+
+- projection
+- saga
+- etc.) for efficient lookup.
+
+</details>
+
+<details>
+<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-context
+
+**Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
+
+**Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
+
+**Verified by:**
+
+- Group patterns by context
+- Group patterns by context
+
+  The archIndex.byContext map groups patterns by bounded context
+  for subgraph rendering in component diagrams.
+
+</details>
+
+<details>
+<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-layer
+
+**Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
+
+**Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
+
+**Verified by:**
+
+- Group patterns by layer
+- Group patterns by layer
+
+  The archIndex.byLayer map groups patterns by architectural layer
+  (domain
+
+- application
+- infrastructure) for layered diagram rendering.
+
+</details>
+
+<details>
+<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
+
+#### archIndex.all contains all patterns with any arch tag
+
+**Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
+
+**Verified by:**
+
+- archIndex.all includes all annotated patterns
+- archIndex.all includes all annotated patterns
+
+  The archIndex.all array contains all patterns that have at least
+  one arch tag (role
+
+- context
+- or layer). Patterns without any arch
+  tags are excluded.
+
+</details>
+
+<details>
+<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
+
+#### Patterns without arch tags are excluded from archIndex
+
+**Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
+
+**Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
+
+**Verified by:**
+
+- Non-annotated patterns excluded
+- Non-annotated patterns excluded
+
+  Patterns that have no arch-role
+
+- arch-context
+- or arch-layer are
+  not included in the archIndex at all.
+
+</details>
 
 ### MermaidRelationshipRendering
 
@@ -3907,618 +7275,6 @@ documents composed from any combination of existing codecs.
 **Verified by:**
 
 - Empty codec skipped without separator
-
-</details>
-
-### LayeredDiagramGeneration
-
-[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
-
-As a documentation generator
-I want to generate layered architecture diagrams from metadata
-So that system architecture is visualized by layer hierarchy
-
-<details>
-<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
-
-#### Layered diagrams group patterns by arch-layer
-
-**Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
-
-**Verified by:**
-
-- Generate subgraphs for each layer
-- Generate subgraphs for each layer
-
-  Patterns with arch-layer are grouped into Mermaid subgraphs.
-  Each layer becomes a visual container.
-
-</details>
-
-<details>
-<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
-
-#### Layer order is domain to infrastructure (top to bottom)
-
-**Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
-
-**Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
-
-**Verified by:**
-
-- Layers render in correct order
-- Layers render in correct order
-
-  The layer subgraphs are rendered in Clean Architecture order:
-  domain at top
-
-- then application
-- then infrastructure at bottom.
-  This reflects the dependency rule: outer layers depend on inner layers.
-
-</details>
-
-<details>
-<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
-
-#### Context labels included in layered diagram nodes
-
-**Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
-
-**Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
-
-**Verified by:**
-
-- Nodes include context labels
-- Nodes include context labels
-
-  Unlike component diagrams which group by context
-
-- layered diagrams
-  include the context as a label in each node name.
-
-</details>
-
-<details>
-<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
-
-#### Patterns without layer go to Other subgraph
-
-**Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
-
-**Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
-
-**Verified by:**
-
-- Unlayered patterns in Other subgraph
-- Unlayered patterns in Other subgraph
-
-  Patterns that have arch-role or arch-context but no arch-layer
-  are grouped into an "Other" subgraph.
-
-</details>
-
-<details>
-<summary>Layered diagram includes summary section (1 scenarios)</summary>
-
-#### Layered diagram includes summary section
-
-**Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
-
-**Verified by:**
-
-- Summary section for layered view
-- Summary section for layered view
-
-  The generated document starts with an overview section
-  specific to layered architecture visualization.
-
-</details>
-
-### ArchGeneratorRegistration
-
-[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
-
-As a CLI user
-I want an architecture generator registered in the generator registry
-So that I can run pnpm docs:architecture to generate diagrams
-
-<details>
-<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
-
-#### Architecture generator is registered in the registry
-
-**Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
-
-**Verified by:**
-
-- Generator is available in registry
-- Generator is available in registry
-
-  The architecture generator must be registered like other built-in
-  generators so it can be invoked via CLI.
-
-</details>
-
-<details>
-<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
-
-#### Architecture generator produces component diagram by default
-
-**Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
-
-**Verified by:**
-
-- Default generation produces component diagram
-- Default generation produces component diagram
-
-  Running the architecture generator without options produces
-  a component diagram (bounded context view).
-
-</details>
-
-<details>
-<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
-
-#### Architecture generator supports diagram type options
-
-**Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
-
-**Verified by:**
-
-- Generate layered diagram with options
-- Generate layered diagram with options
-
-  The generator accepts options to specify diagram type
-  (component or layered).
-
-</details>
-
-<details>
-<summary>Architecture generator supports context filtering (1 scenarios)</summary>
-
-#### Architecture generator supports context filtering
-
-**Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
-
-**Verified by:**
-
-- Filter to specific contexts
-- Filter to specific contexts
-
-  The generator can filter to specific bounded contexts
-  for focused diagram output.
-
-</details>
-
-### ComponentDiagramGeneration
-
-[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
-
-As a documentation generator
-I want to generate component diagrams from architecture metadata
-So that system architecture is automatically visualized with bounded context subgraphs
-
-<details>
-<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
-
-#### Component diagrams group patterns by bounded context
-
-**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
-
-**Verified by:**
-
-- Generate subgraphs for bounded contexts
-- Generate subgraphs for bounded contexts
-
-  Patterns with arch-context are grouped into Mermaid subgraphs.
-  Each bounded context becomes a visual container.
-
-</details>
-
-<details>
-<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
-
-#### Context-less patterns go to Shared Infrastructure
-
-**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
-
-**Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
-
-**Verified by:**
-
-- Shared infrastructure subgraph for context-less patterns
-- Shared infrastructure subgraph for context-less patterns
-
-  Patterns without arch-context are grouped into a
-  "Shared Infrastructure" subgraph.
-
-</details>
-
-<details>
-<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
-
-#### Relationship types render with distinct arrow styles
-
-**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
-
-**Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
-
-**Verified by:**
-
-- Arrow styles for relationship types
-- Arrow styles for relationship types
-
-  Arrow styles follow UML conventions:
-  - uses: solid arrow (-->)
-  - depends-on: dashed arrow (-.->)
-  - implements: dotted arrow (..->)
-  - extends: open arrow (-->>)
-
-</details>
-
-<details>
-<summary>Arrows only connect annotated components (1 scenarios)</summary>
-
-#### Arrows only connect annotated components
-
-**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
-
-**Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
-
-**Verified by:**
-
-- Skip arrows to non-annotated targets
-- Skip arrows to non-annotated targets
-
-  Relationships pointing to non-annotated patterns
-  are not rendered (target would not exist in diagram).
-
-</details>
-
-<details>
-<summary>Component diagram includes summary section (1 scenarios)</summary>
-
-#### Component diagram includes summary section
-
-**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
-
-**Verified by:**
-
-- Summary section with counts
-- Summary section with counts
-
-  The generated document starts with an overview section
-  showing component counts and bounded context statistics.
-
-</details>
-
-<details>
-<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
-
-#### Component diagram includes legend when enabled
-
-**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
-
-**Verified by:**
-
-- Legend section with arrow explanations
-- Legend section with arrow explanations
-
-  The legend explains arrow style meanings for readers.
-
-</details>
-
-<details>
-<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
-
-#### Component diagram includes inventory table when enabled
-
-**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
-
-**Verified by:**
-
-- Inventory table with component details
-- Inventory table with component details
-
-  The inventory lists all components with their metadata.
-
-</details>
-
-<details>
-<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
-
-#### Empty architecture data shows guidance message
-
-**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
-
-**Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
-
-**Verified by:**
-
-- No architecture data message
-- No architecture data message
-
-  If no patterns have architecture annotations
-
-- the document explains how to add them.
-
-</details>
-
-### ArchTagExtraction
-
-[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
-
-As a documentation generator
-I want architecture tags extracted from source code
-So that I can generate accurate architecture diagrams
-
-<details>
-<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-role tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
-
-**Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
-
-**Verified by:**
-
-- arch-role tag exists with enum format
-- arch-role has required enum values
-- arch-role has required enum values
-
-  Architecture roles classify components for diagram rendering.
-  Valid roles: command-handler
-
-- projection
-- saga
-- process-manager
-- infrastructure
-- repository
-- decider
-- read-model
-- bounded-context.
-
-</details>
-
-<details>
-<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
-
-#### arch-context tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
-
-**Verified by:**
-
-- arch-context tag exists with value format
-- arch-context tag exists with value format
-
-  Context tags group components into bounded context subgraphs.
-  Format is "value" (free-form string like "orders"
-
-- "inventory").
-
-</details>
-
-<details>
-<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-layer tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
-
-**Verified by:**
-
-- arch-layer tag exists with enum format
-- arch-layer has exactly three values
-- arch-layer has exactly three values
-
-  Layer tags enable layered architecture diagrams.
-  Valid layers: domain
-
-- application
-- infrastructure.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-role from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
-
-**Verified by:**
-
-- Extract arch-role projection
-- Extract arch-role command-handler
-- Extract arch-role command-handler
-
-  The AST parser must extract arch-role alongside other pattern metadata.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-context from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
-
-**Verified by:**
-
-- Extract arch-context orders
-- Extract arch-context inventory
-- Extract arch-context inventory
-
-  Context values are free-form strings naming the bounded context.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-layer from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
-
-**Verified by:**
-
-- Extract arch-layer application
-- Extract arch-layer infrastructure
-- Extract arch-layer infrastructure
-
-  Layer tags classify components by architectural layer.
-
-</details>
-
-<details>
-<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
-
-#### AST parser handles multiple arch tags together
-
-**Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
-
-**Verified by:**
-
-- Extract all three arch tags
-- Extract all three arch tags
-
-  Components often have role + context + layer together.
-
-</details>
-
-<details>
-<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
-
-#### Missing arch tags yield undefined values
-
-**Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
-
-**Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
-
-**Verified by:**
-
-- Missing arch tags are undefined
-- Missing arch tags are undefined
-
-  Components without arch tags should have undefined (not null or empty).
-
-</details>
-
-### ArchIndexDataset
-
-[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
-
-As a documentation generator
-I want an archIndex built during dataset transformation
-So that I can efficiently look up patterns by role, context, and layer
-
-<details>
-<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-role
-
-**Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
-
-**Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
-
-**Verified by:**
-
-- Group patterns by role
-- Group patterns by role
-
-  The archIndex.byRole map groups patterns by their architectural role
-  (command-handler
-
-- projection
-- saga
-- etc.) for efficient lookup.
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-context
-
-**Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
-
-**Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
-
-**Verified by:**
-
-- Group patterns by context
-- Group patterns by context
-
-  The archIndex.byContext map groups patterns by bounded context
-  for subgraph rendering in component diagrams.
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-layer
-
-**Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
-
-**Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
-
-**Verified by:**
-
-- Group patterns by layer
-- Group patterns by layer
-
-  The archIndex.byLayer map groups patterns by architectural layer
-  (domain
-
-- application
-- infrastructure) for layered diagram rendering.
-
-</details>
-
-<details>
-<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
-
-#### archIndex.all contains all patterns with any arch tag
-
-**Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
-
-**Verified by:**
-
-- archIndex.all includes all annotated patterns
-- archIndex.all includes all annotated patterns
-
-  The archIndex.all array contains all patterns that have at least
-  one arch tag (role
-
-- context
-- or layer). Patterns without any arch
-  tags are excluded.
-
-</details>
-
-<details>
-<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
-
-#### Patterns without arch tags are excluded from archIndex
-
-**Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
-
-**Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
-
-**Verified by:**
-
-- Non-annotated patterns excluded
-- Non-annotated patterns excluded
-
-  Patterns that have no arch-role
-
-- arch-context
-- or arch-layer are
-  not included in the archIndex at all.
 
 </details>
 

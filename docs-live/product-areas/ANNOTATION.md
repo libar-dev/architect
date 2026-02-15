@@ -35,9 +35,13 @@ C4Context
         System(TypeScript_AST_Parser, "TypeScript AST Parser")
     }
     System_Ext(DocDirectiveSchema, "DocDirectiveSchema")
+    System_Ext(GherkinRulesSupport, "GherkinRulesSupport")
     Rel(GherkinScanner, GherkinASTParser, "uses")
+    Rel(GherkinScanner, GherkinRulesSupport, "implements")
+    Rel(GherkinASTParser, GherkinRulesSupport, "implements")
     Rel(TypeScript_AST_Parser, DocDirectiveSchema, "uses")
     Rel(GherkinExtractor, GherkinASTParser, "uses")
+    Rel(GherkinExtractor, GherkinRulesSupport, "implements")
     Rel(DualSourceExtractor, GherkinExtractor, "uses")
     Rel(DualSourceExtractor, GherkinScanner, "uses")
     Rel(Document_Extractor, Pattern_Scanner, "uses")
@@ -64,10 +68,14 @@ graph LR
     end
     subgraph related["Related"]
         DocDirectiveSchema["DocDirectiveSchema"]:::neighbor
+        GherkinRulesSupport["GherkinRulesSupport"]:::neighbor
     end
     GherkinScanner -->|uses| GherkinASTParser
+    GherkinScanner ..->|implements| GherkinRulesSupport
+    GherkinASTParser ..->|implements| GherkinRulesSupport
     TypeScript_AST_Parser -->|uses| DocDirectiveSchema
     GherkinExtractor -->|uses| GherkinASTParser
+    GherkinExtractor ..->|implements| GherkinRulesSupport
     DualSourceExtractor -->|uses| GherkinExtractor
     DualSourceExtractor -->|uses| GherkinScanner
     Document_Extractor -->|uses| Pattern_Scanner
@@ -313,6 +321,764 @@ CATEGORY_TAGS = CATEGORIES.map((c) => c.tag) as readonly CategoryTag[];
 
 ## Behavior Specifications
 
+### TypeScriptTaxonomyImplementation
+
+[View TypeScriptTaxonomyImplementation source](delivery-process/specs/typescript-taxonomy-implementation.feature)
+
+As a delivery-process developer
+I want taxonomy defined in TypeScript with Zod integration
+So that I get compile-time safety and runtime validation
+
+**Note (D12):** Implementation uses TypeScript as the single source of truth,
+with consumers importing directly rather than generating intermediate JSON files.
+
+### ShapeExtraction
+
+[View ShapeExtraction source](delivery-process/specs/shape-extraction.feature)
+
+**Problem:**
+Documentation comments duplicate type definitions that exist in the same file.
+As interfaces change, the JSDoc examples drift. Maintaining two copies of the
+same type information violates DRY and creates documentation rot.
+
+**Relationship to Documentation Generation:**
+This capability is a critical enabler for ADR-021 (DocGenerationProofOfConcept).
+Shape extraction allows code to own API type documentation while decisions own
+intro/context and behavior specs own rules/examples. See the source mapping
+pattern in doc-generation-proof-of-concept.feature.
+
+Current pattern (duplication):
+"""typescript
+/\*\*
+
+- @libar-docs
+-
+- ## API
+-
+- ```typescript
+
+  ```
+- // DUPLICATED from actual interface below
+- interface DeciderInput {
+- state: ProcessState;
+- changes: ChangeDetection;
+- }
+- ```
+  */
+  ```
+
+// The actual source of truth
+export interface DeciderInput {
+state: ProcessState;
+changes: ChangeDetection;
+}
+"""
+
+**Solution:**
+New tag `@libar-docs-extract-shapes` lists type names to extract from the same file.
+The extractor pulls actual TypeScript definitions from AST and inserts them into
+generated documentation as fenced code blocks.
+
+Target pattern (single source):
+"""typescript
+/\*\*
+
+- @libar-docs
+- @libar-docs-extract-shapes DeciderInput, ValidationResult
+-
+- ## API
+-
+- (shapes inserted at generation time)
+  \*/
+
+export interface DeciderInput {
+state: ProcessState;
+changes: ChangeDetection;
+}
+"""
+
+**Why It Matters:**
+| Benefit | How |
+| Single source of truth | Types defined once, extracted for docs |
+| Always-current docs | Generated from actual code definitions |
+| Reduced maintenance | Change type once, docs update automatically |
+| API documentation | Public interfaces documented without duplication |
+
+<details>
+<summary>extract-shapes tag is defined in registry (1 scenarios)</summary>
+
+#### extract-shapes tag is defined in registry
+
+**Invariant:** The `extract-shapes` tag must exist with CSV format to list multiple type names for extraction.
+
+**Verified by:**
+
+- Tag registry contains extract-shapes
+
+</details>
+
+<details>
+<summary>Interfaces are extracted from TypeScript AST (5 scenarios)</summary>
+
+#### Interfaces are extracted from TypeScript AST
+
+**Invariant:** When `@libar-docs-extract-shapes` lists an interface name, the extractor must find and extract the complete interface definition including JSDoc comments, generics, and extends clauses.
+
+**Verified by:**
+
+- Extract simple interface
+- Extract interface with JSDoc
+- Extract interface with generics
+- Extract interface with extends
+- Non-existent shape produces warning
+
+</details>
+
+<details>
+<summary>Type aliases are extracted from TypeScript AST (3 scenarios)</summary>
+
+#### Type aliases are extracted from TypeScript AST
+
+**Invariant:** Type aliases (including union types, intersection types, and mapped types) are extracted when listed in extract-shapes.
+
+**Verified by:**
+
+- Extract union type alias
+- Extract mapped type
+- Extract conditional type
+
+</details>
+
+<details>
+<summary>Enums are extracted from TypeScript AST (2 scenarios)</summary>
+
+#### Enums are extracted from TypeScript AST
+
+**Invariant:** Both string and numeric enums are extracted with their complete member definitions.
+
+**Verified by:**
+
+- Extract string enum
+- Extract const enum
+
+</details>
+
+<details>
+<summary>Function signatures are extracted (body omitted) (3 scenarios)</summary>
+
+#### Function signatures are extracted (body omitted)
+
+**Invariant:** When a function name is listed in extract-shapes, only the signature (parameters, return type, generics) is extracted. The function body is replaced with ellipsis for documentation purposes.
+
+**Verified by:**
+
+- Extract function signature
+- Extract async function signature
+- Extract arrow function with type annotation
+
+</details>
+
+<details>
+<summary>Multiple shapes are extracted in specified order (2 scenarios)</summary>
+
+#### Multiple shapes are extracted in specified order
+
+**Invariant:** When multiple shapes are listed, they appear in the documentation in the order specified in the tag, not source order.
+
+**Verified by:**
+
+- Shapes appear in tag order
+- Mixed shape types in specified order
+
+</details>
+
+<details>
+<summary>Extracted shapes render as fenced code blocks (2 scenarios)</summary>
+
+#### Extracted shapes render as fenced code blocks
+
+**Invariant:** Codecs render extracted shapes as TypeScript fenced code blocks, grouped under an "API Types" or similar section.
+
+**Verified by:**
+
+- Shapes render in claude module
+- Shapes render in detailed docs
+
+</details>
+
+<details>
+<summary>Shapes can reference types from imports (3 scenarios)</summary>
+
+#### Shapes can reference types from imports
+
+**Invariant:** Extracted shapes may reference types from imports. The extractor does NOT resolve imports - it extracts the shape as-is. Consumers understand that referenced types are defined elsewhere.
+
+**Verified by:**
+
+- Shape with imported type reference
+- Shape extraction does not follow imports
+- Re-exported type produces same warning as import
+
+</details>
+
+<details>
+<summary>Overloaded function signatures are all extracted (2 scenarios)</summary>
+
+#### Overloaded function signatures are all extracted
+
+**Invariant:** When a function has multiple overload signatures, all signatures are extracted together as they represent the complete API.
+
+**Verified by:**
+
+- Extract overloaded function signatures
+- Extract method overloads in interface
+
+</details>
+
+<details>
+<summary>Shape rendering supports grouping options (2 scenarios)</summary>
+
+#### Shape rendering supports grouping options
+
+**Invariant:** Codecs can render shapes grouped in a single code block or as separate code blocks, depending on detail level.
+
+**Verified by:**
+
+- Grouped rendering for compact output
+- Separate rendering for detailed output
+
+</details>
+
+### PatternRelationshipModel
+
+[View PatternRelationshipModel source](delivery-process/specs/pattern-relationship-model.feature)
+
+**Problem:** The delivery process lacks a comprehensive relationship model between artifacts.
+Code files, roadmap specs, executable specs, and patterns exist but their relationships
+are implicit or limited to basic dependency tracking (`uses`, `depends-on`).
+
+**Solution:** Implement a relationship taxonomy inspired by UML/TML modeling practices:
+
+- **Realization** (`implements`) - Code realizes a pattern specification
+- **Generalization** (`extends`) - Pattern extends another pattern's capabilities
+- **Dependency** (`uses`, `used-by`) - Technical dependencies between patterns
+- **Composition** (`parent`, `level`) - Hierarchical pattern organization
+- **Traceability** (`roadmap-spec`, `executable-specs`) - Cross-tier linking
+
+**Business Value:**
+| Benefit | How |
+| Complete dependency graphs | All relationships rendered in Mermaid with distinct arrow styles |
+| Implementation tracking | `implements` links code stubs to roadmap specs |
+| Code-sourced documentation | Generated docs pull from both .feature files AND code stubs |
+| Impact analysis | Know what code breaks when pattern spec changes |
+| Agentic workflows | Claude can navigate from pattern to implementations and back |
+| UML-grade modeling | Professional relationship semantics enable rich tooling |
+
+<details>
+<summary>Code files declare pattern realization via implements tag (4 scenarios)</summary>
+
+#### Code files declare pattern realization via implements tag
+
+**Invariant:** Files with `@libar-docs-implements:PatternName,OtherPattern` are linked to the specified patterns without causing conflicts. Pattern definitions remain in roadmap specs; implementation files provide supplementary metadata. Multiple files can implement the same pattern, and one file can implement multiple patterns.
+
+**Rationale:** This mirrors UML's "realization" relationship where a class implements an interface. Code realizes the specification. Direction is code→spec (backward link). CSV format allows a single implementation file to realize multiple patterns when implementing a pattern family (e.g., durability primitives).
+
+**Verified by:**
+
+- Implements tag parsed from TypeScript
+- Multiple patterns implemented by one file
+- No conflict with pattern definition
+- Multiple files implement same pattern
+- Implements tag parsed
+- Multiple patterns supported
+- Multiple implementations of same pattern
+
+</details>
+
+<details>
+<summary>Pattern inheritance uses extends relationship tag (3 scenarios)</summary>
+
+#### Pattern inheritance uses extends relationship tag
+
+**Invariant:** Files with `@libar-docs-extends:BasePattern` declare that they extend another pattern's capabilities. This is a generalization relationship where the extending pattern is a specialization of the base pattern.
+
+**Rationale:** Pattern families exist where specialized patterns build on base patterns. For example, `ReactiveProjections` extends `ProjectionCategories`. The extends relationship enables inheritance-based documentation and validates pattern hierarchy.
+
+**Verified by:**
+
+- Extends tag parsed from feature file
+- Extended-by reverse lookup computed
+- Circular inheritance detected
+- Extends tag parsed
+- Extended-by computed
+- Inheritance chain validated
+
+</details>
+
+<details>
+<summary>Technical dependencies use directed relationship tags (2 scenarios)</summary>
+
+#### Technical dependencies use directed relationship tags
+
+**Invariant:** `@libar-docs-uses` declares outbound dependencies (what this pattern depends on). `@libar-docs-used-by` declares inbound dependencies (what depends on this pattern). Both are CSV format.
+
+**Rationale:** These represent technical coupling between patterns. The distinction matters for impact analysis: changing a pattern affects its `used-by` consumers but not its `uses` dependencies.
+
+**Verified by:**
+
+- Uses rendered as solid arrows in graph
+- Used-by aggregated in pattern detail
+- Uses rendered as solid arrows
+- Used-by aggregated correctly
+
+</details>
+
+<details>
+<summary>Roadmap sequencing uses ordering relationship tags (2 scenarios)</summary>
+
+#### Roadmap sequencing uses ordering relationship tags
+
+**Invariant:** `@libar-docs-depends-on` declares what must be completed first (roadmap sequencing). `@libar-docs-enables` declares what this unlocks when completed. These are planning relationships, not technical dependencies.
+
+**Rationale:** Sequencing is about order of work, not runtime coupling. A pattern may depend on another being complete without using its code.
+
+**Verified by:**
+
+- Depends-on rendered as dashed arrows
+- Enables is inverse of depends-on
+- Enables is inverse
+
+</details>
+
+<details>
+<summary>Cross-tier linking uses traceability tags (PDR-007) (2 scenarios)</summary>
+
+#### Cross-tier linking uses traceability tags (PDR-007)
+
+**Invariant:** `@libar-docs-executable-specs` on roadmap specs points to test locations. `@libar-docs-roadmap-spec` on package specs points back to the pattern. These create bidirectional traceability.
+
+**Rationale:** Two-tier architecture (PDR-007) separates planning specs from executable tests. Traceability tags maintain the connection for navigation and completeness checking.
+
+**Verified by:**
+
+- Bidirectional links established
+- Orphan executable spec detected
+- Orphan detection
+
+</details>
+
+<details>
+<summary>Epic/Phase/Task hierarchy uses parent-child relationships (2 scenarios)</summary>
+
+#### Epic/Phase/Task hierarchy uses parent-child relationships
+
+**Invariant:** `@libar-docs-level` declares the hierarchy tier (epic, phase, task). `@libar-docs-parent` links to the containing pattern. This enables rollup progress tracking.
+
+**Rationale:** Large initiatives decompose into phases and tasks. The hierarchy allows progress aggregation (e.g., "Epic 80% complete based on child phases").
+
+**Verified by:**
+
+- Parent link validated
+- Invalid parent detected
+- Progress rollup calculated
+
+</details>
+
+<details>
+<summary>All relationships appear in generated documentation (2 scenarios)</summary>
+
+#### All relationships appear in generated documentation
+
+**Invariant:** The PATTERNS.md dependency graph renders all relationship types with distinct visual styles. Pattern detail pages list all related artifacts grouped by relationship type.
+
+**Rationale:** Visualization makes the relationship model accessible. Different arrow styles distinguish relationship semantics at a glance.
+
+| Relationship | Arrow Style       | Direction    | Description          |
+| ------------ | ----------------- | ------------ | -------------------- |
+| uses         | --> (solid)       | OUT          | Technical dependency |
+| depends-on   | -.-> (dashed)     | OUT          | Roadmap sequencing   |
+| implements   | ..-> (dotted)     | CODE→SPEC    | Realization          |
+| extends      | -->> (solid open) | CHILD→PARENT | Generalization       |
+
+**Verified by:**
+
+- Graph uses distinct arrow styles
+- Pattern detail page shows all relationships
+- Graph uses distinct styles
+- Detail page sections
+
+</details>
+
+<details>
+<summary>Linter detects relationship violations (3 scenarios)</summary>
+
+#### Linter detects relationship violations
+
+**Invariant:** The pattern linter validates that all relationship targets exist, implements files don't have pattern tags, and bidirectional links are consistent.
+
+**Rationale:** Broken relationships cause confusion and incorrect generated docs. Early detection during linting prevents propagation of errors.
+
+**Verified by:**
+
+- Missing relationship target detected
+- Pattern tag in implements file causes error
+- Asymmetric traceability detected
+- Missing target detected
+- Pattern conflict detected
+- Asymmetric link detected
+
+</details>
+
+### GherkinRulesSupport
+
+[View GherkinRulesSupport source](delivery-process/specs/gherkin-rules-support.feature)
+
+**Problem:**
+Feature files were limited to flat scenario lists. Business rules, rationale,
+and rich descriptions could not be captured in a way that:
+
+- Tests ignore (vitest-cucumber skips descriptions)
+- Generators render (PRD shows business context)
+- Maintains single source of truth (one file, two purposes)
+
+The Gherkin `Rule:` keyword was parsed by @cucumber/gherkin but our pipeline
+dropped the data at scanner/extractor stages.
+
+**Solution:**
+Extended the documentation pipeline to capture and render:
+
+- `Rule:` keyword as Business Rules sections
+- Rule descriptions (rationale, exceptions, context)
+- DataTables in steps as Markdown tables
+- DocStrings in steps as code blocks
+
+Infrastructure changes (schema, scanner, extractor) are shared by all generators.
+Rendering was added to PRD generator as reference implementation.
+
+Confirmed vitest-cucumber supports Rules via `Rule()` + `RuleScenario()` syntax.
+No migration to alternative frameworks needed.
+
+<details>
+<summary>Rules flow through the entire pipeline without data loss (3 scenarios)</summary>
+
+#### Rules flow through the entire pipeline without data loss
+
+The @cucumber/gherkin parser extracts Rules natively. Our pipeline must
+preserve this data through scanner, extractor, and into ExtractedPattern
+so generators can access rule names, descriptions, and nested scenarios.
+
+**Verified by:**
+
+- Rules are captured by AST parser
+- Rules pass through scanner
+- Rules are mapped to ExtractedPattern
+
+</details>
+
+<details>
+<summary>Generators can render rules as business documentation (1 scenarios)</summary>
+
+#### Generators can render rules as business documentation
+
+Business stakeholders see rule names and descriptions as "Business Rules"
+sections, not Given/When/Then syntax. This enables human-readable PRDs
+from the same files used for test execution.
+
+**Verified by:**
+
+- PRD generator renders Business Rules section
+
+</details>
+
+<details>
+<summary>Custom content blocks render in acceptance criteria (2 scenarios)</summary>
+
+#### Custom content blocks render in acceptance criteria
+
+DataTables and DocStrings in steps should appear in generated documentation,
+providing structured data and code examples alongside step descriptions.
+
+**Verified by:**
+
+- DataTables render as Markdown tables
+- DocStrings render as code blocks
+
+</details>
+
+<details>
+<summary>vitest-cucumber executes scenarios inside Rules (1 scenarios)</summary>
+
+#### vitest-cucumber executes scenarios inside Rules
+
+Test execution must work for scenarios inside Rule blocks.
+Use Rule() function with RuleScenario() instead of Scenario().
+
+**Verified by:**
+
+- Rule scenarios execute with vitest-cucumber
+
+</details>
+
+### DeclarationLevelShapeTagging
+
+[View DeclarationLevelShapeTagging source](delivery-process/specs/declaration-level-shape-tagging.feature)
+
+**Problem:**
+The current shape extraction system operates at file granularity. The
+libar-docs-extract-shapes tag on a pattern block extracts named declarations
+from the entire file, and the reference doc config shapeSources field selects
+shapes by file glob only. There is no way for a reference document to request
+"only RiskLevel and RISK_LEVELS from risk-levels.ts" -- it gets every shape
+the file exports. This produces noisy reference documents that include
+irrelevant types alongside the focused content the document is trying to
+present.
+
+The reference doc system is designed for composing focused documents from
+cherry-picked content: conventionTags filters by tag, behaviorCategories
+filters by category, diagramScope filters by arch metadata. But shapeSources
+is the one axis with no content-level filter -- only file-level.
+
+**Solution:**
+Introduce a lightweight libar-docs-shape annotation tag on individual
+TypeScript declarations. Each tagged declaration self-identifies as a
+documentable shape, optionally belonging to a named group. On the consumer
+side, add shapeSelectors to ReferenceDocConfig for fine-grained selection
+by name or group.
+
+This follows how real API doc generators work: they build a symbol graph
+from annotated declarations, not from whole-file text dumps. The tag lives
+next to the code it describes, so refactoring (rename/move) does not break
+extraction. Code remains the single source of truth with one line of
+annotation overhead per declaration.
+
+**Design Decisions:**
+
+DD-1: Tag format is value (not flag)
+The libar-docs-shape tag works bare (no value) for simple opt-in, but
+also accepts an optional group name like libar-docs-shape api-types.
+This enables group-based selection in shapeSelectors without a second
+tag. Using format: value means undefined when bare, string when
+provided. Registry entry: tag: 'shape', format: 'value', with example
+'libar-docs-shape api-types'. Placed in metadataTags array in
+buildRegistry() at src/taxonomy/registry-builder.ts.
+
+DD-2: Stay on typescript-estree parser (no TS compiler API switch)
+The existing extractPrecedingJsDoc() in shape-extractor.ts already finds
+JSDoc above declarations by scanning the AST comments array. Checking
+that JSDoc text for the libar-docs-shape tag is a string search on
+already-extracted content -- zero parser changes needed. The TS compiler
+APIs node.jsDoc property is not available on estree nodes, but the
+comment-based approach is equivalent for declaration-level tag detection.
+Cross-file resolution via parseAndGenerateServices or ts.createProgram
+is deferred to a future pattern when barrel file re-exports become a
+problem.
+
+DD-3: shapeSelectors subsumes shapeSources for new configs
+shapeSources remains for backward compatibility (glob-in, everything-out).
+shapeSelectors provides three selection modes: by source + names, by
+group tag, or by source alone (all tagged shapes from a file). Both
+fields compose -- shapeSources is the coarse filter, shapeSelectors
+adds precision. New configs should prefer shapeSelectors.
+
+DD-4: Top-level declarations only in v1
+Only interface, type, enum, function, and const declarations at the
+module top level are eligible. No namespace-internal, class-internal,
+or function-local declarations. The codebase does not use namespaces
+or nested type declarations, so this constraint matches reality.
+Const must be identifier-based (const X = ...), no destructuring.
+
+DD-5: Group stored on ExtractedShape schema
+The ExtractedShapeSchema gains an optional group: string field from
+the libar-docs-shape tag value. This enables downstream filtering
+by shapeSelectors without re-parsing source files.
+
+DD-6: ShapeSelector is a structural discriminated union
+ShapeSelector is not a tagged union with an explicit kind field.
+Discrimination uses structural key presence: - group key present: group selector (select all shapes with this group) - source key present, names key present: source+names selector - source key present, no names key: source-only selector (all tagged
+shapes from that source file)
+Zod schema uses z.union() with three z.object() variants. The source
+field uses the same glob syntax as shapeSources (exact path, single
+wildcard, or recursive glob). The names field is a readonly string
+array of declaration names to include. The group field is a string
+matching the libar-docs-shape tag value.
+This lives on ReferenceDocConfig as:
+readonly shapeSelectors?: readonly ShapeSelector[]
+
+DD-7: Tagged non-exported declarations are included
+The existing findDeclarations() in shape-extractor.ts discovers all
+top-level declarations regardless of export status. When a declaration
+has the libar-docs-shape tag in its JSDoc, it is extracted even if not
+exported. This is intentional: the tag is an explicit documentation
+opt-in that overrides the export-based filtering used by the
+extractAllExportedShapes() auto-discovery mode. A module-internal
+type tagged for documentation is a valid use case (documenting
+internal architecture in reference docs).
+
+**Pragmatic Constraints:**
+| Constraint | Rationale |
+| Top-level declarations only | Codebase convention, avoids namespace recursion |
+| 5 declaration kinds | interface, type, enum, function, const -- matches existing shape extractor |
+| No cross-file resolution | Deferred to future pattern using parseAndGenerateServices |
+| JSDoc must be within MAX_JSDOC_LINE_DISTANCE (3 lines) | Matches existing extractPrecedingJsDoc logic |
+| const must be identifier-based | No destructuring support -- rare in type documentation |
+| Group names are single tokens | No spaces in tag values (hyphen-separated convention) |
+
+**Implementation Path:**
+| Layer | Change | Effort |
+| registry-builder.ts | Add shape tag to metadataTags array | ~5 lines |
+| extracted-shape.ts | Add optional group field to ExtractedShapeSchema | ~2 lines |
+| shape-extractor.ts | Add discoverTaggedShapes() and extractShapeTag() | ~50 lines |
+| doc-extractor.ts | Call discoverTaggedShapes() alongside processExtractShapesTag() | ~15 lines |
+| reference.ts | Add ShapeSelectorSchema + shapeSelectors to ReferenceDocConfig | ~20 lines |
+| shape-matcher.ts | Add filterShapesBySelectors() function | ~30 lines |
+| delivery-process.config.ts | Update showcase config to use shapeSelectors | ~5 lines |
+
+**Integration Wiring (doc-extractor.ts):**
+The existing shape extraction at doc-extractor.ts lines 167-178 handles
+libar-docs-extract-shapes (pattern-level tag, names shapes by name).
+The new discoverTaggedShapes() is called in addition to that path:
+after parsing the source file, scan all declarations for libar-docs-shape
+JSDoc tags and merge any found shapes into the patterns extractedShapes
+array. Both paths contribute to the same ExtractedPattern.extractedShapes
+field. Deduplication by shape name (existing behavior in shape-matcher.ts
+line 86) prevents duplicates when both paths find the same declaration.
+
+**Explored Alternatives:**
+| Alternative | Why not (for v1) |
+| TypeScript compiler API (ts.createProgram) | Full type resolution but requires tsconfig, slower, overkill for tag detection |
+| ts-morph wrapper | Additional 2MB dependency for nicer API, same capabilities as compiler API |
+| parseAndGenerateServices | Zero new deps, same package, but cross-file resolution not needed yet |
+| Custom ESLint rule | ESLint infrastructure already has type checker, but rules are for linting not extraction |
+| LSP protocol | Designed for IDE interactions, overkill for batch extraction |
+| Name filter only (no tag) | shapeNames on config without source-side tag -- works but loses explicitness |
+| Tagged union for ShapeSelector | kind field adds noise; structural discrimination is idiomatic for Zod unions |
+
+**Future Upgrade Path:**
+When cross-file resolution is needed (barrel file re-exports in monorepo),
+switch shape-extractor.ts from parse() to parseAndGenerateServices() --
+same typescript-eslint/typescript-estree dependency, different function
+call. This gives full TypeScript type checker access: resolve re-exports
+via checker.getAliasedSymbol(), expand type aliases, follow import chains.
+The libar-docs-shape tag and shapeSelectors config remain unchanged.
+
+<details>
+<summary>Declarations opt in via libar-docs-shape tag (5 scenarios)</summary>
+
+#### Declarations opt in via libar-docs-shape tag
+
+**Invariant:** Only declarations with the libar-docs-shape tag in their immediately preceding JSDoc are collected as tagged shapes. Declarations without the tag are ignored even if they are exported. The tag value is optional -- bare libar-docs-shape opts in without a group, while libar-docs-shape group-name assigns the declaration to a named group. Tagged non-exported declarations are included (DD-7).
+
+**Rationale:** Explicit opt-in prevents over-extraction of internal helpers. Unlike auto-discovery mode (extract-shapes \*) which grabs all exports, declaration-level tagging gives precise control. This matches how TypeDoc uses public/internal tags -- the annotation lives next to the code it describes, surviving refactors without breaking extraction.
+
+**Verified by:**
+
+- Tagged declaration is extracted as shape
+- Untagged exported declaration is not extracted
+- Group name is captured from tag value
+- Bare tag works without group name
+- Non-exported tagged declaration is extracted
+- Tagged declaration is extracted
+- Untagged export is ignored
+- Bare tag works without group
+
+</details>
+
+<details>
+<summary>Reference doc configs select shapes via shapeSelectors (4 scenarios)</summary>
+
+#### Reference doc configs select shapes via shapeSelectors
+
+**Invariant:** shapeSelectors provides three selection modes: by source path + specific names (DD-6 source+names variant), by group tag (DD-6 group variant), or by source path alone (DD-6 source-only variant). shapeSources remains for backward compatibility. When both are present, shapeSources provides the coarse file-level filter and shapeSelectors adds fine-grained name/group filtering on top.
+
+**Rationale:** The reference doc system composes focused documents from cherry-picked content. Every other content axis (conventions, behaviors, diagrams) has content-level filtering. shapeSources was the only axis limited to file-level granularity. shapeSelectors closes this gap with the same explicitness as conventionTags.
+
+**Verified by:**
+
+- Select specific shapes by source and names
+- Select all shapes in a group
+- Select all tagged shapes from a source file
+- shapeSources without shapeSelectors returns all shapes
+- Select by source and names
+- Select by group
+- Select by source alone
+- shapeSources backward compatibility preserved
+
+</details>
+
+<details>
+<summary>Discovery uses existing estree parser with JSDoc comment scanning (3 scenarios)</summary>
+
+#### Discovery uses existing estree parser with JSDoc comment scanning
+
+**Invariant:** The discoverTaggedShapes function uses the existing typescript-estree parse() and extractPrecedingJsDoc() approach. It does not require the TypeScript compiler API, ts-morph, or parseAndGenerateServices. Tag detection is a regex match on the JSDoc comment text already extracted by the existing infrastructure. The tag regex pattern is: /libar-docs-shape(?:\s+(\S+))?/ where capture group 1 is the optional group name.
+
+**Rationale:** The shape extractor already traverses declarations and extracts their JSDoc. Adding libar-docs-shape detection is a string search on content that is already available -- approximately 15 lines of new logic. Switching parsers would introduce churn with no benefit for the v1 use case of tag detection on top-level declarations.
+
+**Verified by:**
+
+- All five declaration kinds are discoverable
+- JSDoc with gap larger than MAX_JSDOC_LINE_DISTANCE is not matched
+- Tag coexists with other JSDoc content
+- All 5 declaration kinds supported
+- JSDoc gap enforcement
+- Tag with other JSDoc content
+
+</details>
+
+### CrossSourceValidation
+
+[View CrossSourceValidation source](delivery-process/specs/cross-source-validation.feature)
+
+**Problem:**
+The delivery process uses dual sources (TypeScript phase files and Gherkin
+feature files) that must remain consistent. Currently there's no validation
+to detect:
+
+- Pattern name mismatches
+- Missing spec file references
+- Circular dependency chains
+- Orphaned deliverables (not linked to any phase)
+
+**Solution:**
+Implement cross-source validation that scans both source types and
+detects inconsistencies, broken references, and logical errors.
+
+<details>
+<summary>Pattern names must be consistent across sources (2 scenarios)</summary>
+
+#### Pattern names must be consistent across sources
+
+**Verified by:**
+
+- Pattern name mismatch detected
+- Pattern names match across sources
+
+</details>
+
+<details>
+<summary>Circular dependencies are detected (2 scenarios)</summary>
+
+#### Circular dependencies are detected
+
+**Verified by:**
+
+- Direct circular dependency
+- Transitive circular dependency
+
+</details>
+
+<details>
+<summary>Dependency references must resolve (2 scenarios)</summary>
+
+#### Dependency references must resolve
+
+**Verified by:**
+
+- Dependency references non-existent pattern
+- All dependencies resolve
+
+</details>
+
 ### GherkinAstParser
 
 [View GherkinAstParser source](tests/features/scanner/gherkin-parser.feature)
@@ -465,6 +1231,121 @@ from being incorrectly escaped when the language hint is lost.
 The AST Parser extracts @libar-docs-\* directives from TypeScript source files
 using the TypeScript compiler API. It identifies exports, extracts metadata,
 and validates directive structure.
+
+<details>
+<summary>Export types are correctly identified from TypeScript declarations (15 scenarios)</summary>
+
+#### Export types are correctly identified from TypeScript declarations
+
+**Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract class, arrow function, async function, generic function, default export, re-export) is correctly classified.
+
+**Verified by:**
+
+- Parse function export with directive
+- Parse type export with directive
+- Parse interface export with directive
+- Parse const export with directive
+- Parse class export with directive
+- Parse enum export with directive
+- Parse const enum export with directive
+- Parse abstract class export with directive
+- Parse arrow function export with directive
+- Parse async function export with directive
+- Parse generic function export with directive
+- Parse default export with directive
+- Parse re-exports with directive
+- Parse multiple exports in single statement
+- Parse multiple directives in same file
+
+</details>
+
+<details>
+<summary>Metadata is correctly extracted from JSDoc comments (5 scenarios)</summary>
+
+#### Metadata is correctly extracted from JSDoc comments
+
+**Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all correctly parsed and separated.
+
+**Verified by:**
+
+- Extract examples from directive
+- Extract multi-line description
+- Track line numbers correctly
+- Extract function signature information
+- Ignore @param and @returns in description
+
+</details>
+
+<details>
+<summary>Tags are extracted only from the directive section, not from description or examples (4 scenarios)</summary>
+
+#### Tags are extracted only from the directive section, not from description or examples
+
+**Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in description prose or example code blocks are ignored.
+
+**Verified by:**
+
+- Extract multiple tags from directive section
+- Extract tag with description on same line
+- NOT extract tags mentioned in description
+- NOT extract tags mentioned in @example sections
+
+</details>
+
+<details>
+<summary>When to Use sections are extracted in all supported formats (4 scenarios)</summary>
+
+#### When to Use sections are extracted in all supported formats
+
+**Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and asterisk bullet format. When no When to Use section exists, the field is undefined.
+
+**Verified by:**
+
+- Extract When to Use heading format with bullet points
+- Extract When to use inline format
+- Extract asterisk bullets in When to Use section
+- Not set whenToUse when section is missing
+
+</details>
+
+<details>
+<summary>Relationship tags extract uses and usedBy dependencies (7 scenarios)</summary>
+
+#### Relationship tags extract uses and usedBy dependencies
+
+**Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description content. When no relationship tags exist, the fields are undefined.
+
+**Verified by:**
+
+- Extract @libar-docs-uses with single value
+- Extract @libar-docs-uses with comma-separated values
+- Extract @libar-docs-used-by with single value
+- Extract @libar-docs-used-by with comma-separated values
+- Extract both uses and usedBy from same directive
+- NOT capture uses/usedBy values in description
+- Not set uses/usedBy when no relationship tags exist
+
+</details>
+
+<details>
+<summary>Edge cases and malformed input are handled gracefully (8 scenarios)</summary>
+
+#### Edge cases and malformed input are handled gracefully
+
+**Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed TypeScript returns a structured error with the file path.
+
+**Verified by:**
+
+- Skip comments without @libar-docs-\* tags
+- Skip invalid directive with incomplete tag
+- Handle malformed TypeScript gracefully
+- Handle empty file gracefully
+- Handle whitespace-only file
+- Handle file with only comments and no exports
+- Skip inline comments (non-block)
+- Handle unicode characters in descriptions
+
+</details>
 
 ### ShapeExtractionTesting
 
@@ -1004,6 +1885,116 @@ into structured metadata objects for pattern processing.
 - Normalizes both @tag:value and @libar-process-tag:value formats
 - Splits comma-separated values for dependencies and enables
 - Filters non-category tags (acceptance-criteria, happy-path, etc.)
+
+<details>
+<summary>Single value tags produce scalar metadata fields (7 scenarios)</summary>
+
+#### Single value tags produce scalar metadata fields
+
+**Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the correct type.
+
+**Verified by:**
+
+- Extract pattern name tag
+- Extract phase number tag
+- Extract status roadmap tag
+- Extract status deferred tag
+- Extract status completed tag
+- Extract status active tag
+- Extract brief path tag
+
+</details>
+
+<details>
+<summary>Array value tags accumulate into list metadata fields (3 scenarios)</summary>
+
+#### Array value tags accumulate into list metadata fields
+
+**Invariant:** Tags for depends-on and enables split comma-separated values and accumulate across multiple tag occurrences.
+
+**Verified by:**
+
+- Extract single dependency
+- Extract comma-separated dependencies
+- Extract comma-separated enables
+
+</details>
+
+<details>
+<summary>Category tags are colon-free tags filtered against known non-categories (2 scenarios)</summary>
+
+#### Category tags are colon-free tags filtered against known non-categories
+
+**Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria, happy-path) and the libar-docs opt-in marker.
+
+**Verified by:**
+
+- Extract category tags (no colon)
+- libar-docs opt-in marker is NOT a category
+
+</details>
+
+<details>
+<summary>Complex tag lists produce fully populated metadata (1 scenarios)</summary>
+
+#### Complex tag lists produce fully populated metadata
+
+**Invariant:** All tag types (scalar, array, category) are correctly extracted from a single mixed tag list.
+
+**Verified by:**
+
+- Extract all metadata from complex tag list
+
+</details>
+
+<details>
+<summary>Edge cases produce safe defaults (2 scenarios)</summary>
+
+#### Edge cases produce safe defaults
+
+**Invariant:** Empty or invalid inputs produce empty metadata or omit invalid fields rather than throwing errors.
+
+**Verified by:**
+
+- Empty tag list returns empty metadata
+- Invalid phase number is ignored
+
+</details>
+
+<details>
+<summary>Convention tags support CSV values with whitespace trimming (3 scenarios)</summary>
+
+#### Convention tags support CSV values with whitespace trimming
+
+**Invariant:** Convention tags split comma-separated values and trim whitespace from each value.
+
+**Verified by:**
+
+- Extract single convention tag
+- Extract CSV convention tags
+- Convention tag trims whitespace in CSV values
+
+</details>
+
+<details>
+<summary>Registry-driven extraction handles enums, transforms, and value constraints (8 scenarios)</summary>
+
+#### Registry-driven extraction handles enums, transforms, and value constraints
+
+**Invariant:** Tags defined in the registry use data-driven extraction with enum validation, CSV accumulation, value transforms, and constraint checking.
+
+**Verified by:**
+
+- Registry-driven enum tag without prior if/else branch
+- Registry-driven enum rejects invalid value
+- Registry-driven CSV tag accumulates values
+- Transform applies hyphen-to-space on business value
+- Transform applies ADR number padding
+- Transform strips quotes from title tag
+- Repeatable value tag accumulates multiple occurrences
+- CSV with values constraint rejects invalid values
+
+</details>
 
 ### LayerInferenceTesting
 

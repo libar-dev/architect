@@ -4,8 +4,10 @@
 @libar-docs-adr-category:testing
 @libar-docs-pattern:ADR002GherkinOnlyTesting
 @libar-docs-status:completed
+@libar-docs-unlock-reason:Add-process-workflow-include-tag
 @libar-docs-completed:2026-01-07
 @libar-docs-product-area:Process
+@libar-docs-include:process-workflow
 Feature: ADR-002 - Gherkin-Only Testing Policy
 
   **Context:**

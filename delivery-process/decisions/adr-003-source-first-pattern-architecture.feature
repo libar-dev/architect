@@ -5,6 +5,8 @@
 @libar-docs-pattern:ADR003SourceFirstPatternArchitecture
 @libar-docs-status:roadmap
 @libar-docs-product-area:Process
+@libar-docs-include:process-workflow
+@libar-docs-depends-on:ADR001TaxonomyCanonicalValues
 Feature: ADR-003 - Source-First Pattern Architecture
 
   **Context:**

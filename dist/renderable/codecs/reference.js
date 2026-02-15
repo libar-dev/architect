@@ -254,15 +254,32 @@ export const PRODUCT_AREA_META = {
     },
     Process: {
         question: 'How does the session workflow work?',
-        covers: 'Session lifecycle, handoffs, conventions',
-        intro: 'Process defines the session workflow and canonical taxonomy. Git is the event store; ' +
-            'documentation artifacts are projections; feature files are the single source of truth. ' +
-            'TypeScript source owns pattern identity (ADR-003), while Tier 1 specs are ephemeral ' +
-            'planning documents that lose value after completion.',
+        covers: 'Session lifecycle, handoffs, FSM alignment, governance decisions, conventions',
+        intro: 'Process defines the USDP-inspired session workflow that governs how work moves through ' +
+            'the delivery lifecycle. Three session types (planning, design, implementation) have fixed ' +
+            'input/output contracts: planning creates roadmap specs from pattern briefs, design produces ' +
+            'code stubs and decision records, and implementation writes code against scope-locked specs. ' +
+            'Git is the event store — documentation artifacts are projections of annotated source code, ' +
+            'not hand-maintained files. The FSM enforces state transitions (roadmap → active → completed) ' +
+            'with escalating protection levels, while handoff templates preserve context across LLM session ' +
+            'boundaries. ADR-003 established that TypeScript source owns pattern identity; tier 1 specs ' +
+            'are ephemeral planning documents that lose value after completion.',
+        diagramScopes: [
+            {
+                source: 'fsm-lifecycle',
+                title: 'Delivery Lifecycle FSM',
+            },
+            {
+                include: ['process-workflow'],
+                direction: 'LR',
+                title: 'Process Pattern Relationships',
+            },
+        ],
         keyInvariants: [
             'TypeScript source owns pattern identity: `@libar-docs-pattern` in TypeScript defines the pattern. Tier 1 specs are ephemeral working documents',
             '7 canonical product-area values: Annotation, Configuration, Generation, Validation, DataAPI, CoreTypes, Process — reader-facing sections, not source modules',
             'Two distinct status domains: Pattern FSM status (4 values) vs. deliverable status (6 values). Never cross domains',
+            'Session types define capabilities: planning creates specs, design creates stubs, implementation writes code. Each session type has a fixed input/output contract enforced by convention',
         ],
         keyPatterns: [
             'ADR001TaxonomyCanonicalValues',

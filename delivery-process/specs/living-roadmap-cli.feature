@@ -6,6 +6,8 @@
 @libar-docs-phase:100
 @libar-docs-effort:5d
 @libar-docs-product-area:Process
+@libar-docs-include:process-workflow
+@libar-docs-depends-on:MvpWorkflowImplementation
 @libar-docs-business-value:query-roadmap-with-natural-language
 @libar-docs-priority:high
 Feature: Living Roadmap CLI - Interactive Queries Over Reality

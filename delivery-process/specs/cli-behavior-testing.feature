@@ -4,6 +4,8 @@
 @libar-docs-phase:101
 @libar-docs-effort:3d
 @libar-docs-product-area:Process
+@libar-docs-include:process-workflow
+@libar-docs-depends-on:ADR002GherkinOnlyTesting
 @libar-docs-business-value:ensure-cli-commands-work-correctly-with-all-argument-combinations
 @libar-docs-priority:high
 @libar-docs-executable-specs:tests/features/cli

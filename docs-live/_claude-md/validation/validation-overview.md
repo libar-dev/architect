@@ -39,6 +39,88 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- StreamingGitDiff ---
+
+| Rule                                            | Description |
+| ----------------------------------------------- | ----------- |
+| Git commands stream output instead of buffering |             |
+| Diff content is parsed as it streams            |             |
+| Streaming errors are handled gracefully         |             |
+
+--- StepLintVitestCucumber ---
+
+| Rule                                                             | Description                                                                                                             |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Hash comments inside description pseudo-code-blocks are detected | **Invariant:** A # at the start of a line inside a """ block within a<br> Feature or Rule description terminates the... |
+| Duplicate And steps in the same scenario are detected            | **Invariant:** Multiple And steps with identical text in the same<br> scenario cause vitest-cucumber step matching...   |
+| Dollar sign in step text is detected                             | **Invariant:** The $ character in step text causes matching issues<br> in vitest-cucumber's expression parser....       |
+| Regex step patterns are detected                                 | **Invariant:** vitest-cucumber only supports string patterns with<br> {string} and {int}. Regex patterns throw...       |
+| Unsupported phrase type is detected                              | **Invariant:** vitest-cucumber does not support {phrase}. Use {string}<br> with quoted values in the feature file....   |
+| ScenarioOutline function params are detected                     | **Invariant:** ScenarioOutline step callbacks must use the variables<br> object, not function params. Using (\_ctx,...  |
+| Missing And destructuring is detected                            | **Invariant:** If a feature file has And steps, the step definition<br> must destructure And from the scenario...       |
+| Missing Rule wrapper is detected                                 | **Invariant:** If a feature file has Rule: blocks, the step definition<br> must destructure Rule from...                |
+| Feature-to-step pairing resolves both loadFeature patterns       | **Invariant:** Step files use two loadFeature patterns: simple string<br> paths and resolve(\_\_dirname, relative)...   |
+
+--- StepLintExtendedRules ---
+
+| Rule                                                     | Description                                                                                                             |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Hash in step text is detected                            | **Invariant:** A hash character in the middle of a Gherkin step line<br> can be interpreted as a comment by some...     |
+| Gherkin keywords in description text are detected        | **Invariant:** A Feature or Rule description line that starts with<br> Given, When, Then, And, or But breaks the...     |
+| Scenario Outline steps with quoted values are detected   | **Invariant:** When a feature file has a Scenario Outline and its<br> steps use quoted values instead of...             |
+| Repeated step patterns in the same scenario are detected | **Invariant:** Registering the same step pattern twice in one<br> Scenario block causes vitest-cucumber to overwrite... |
+
+--- StatusAwareEslintSuppression ---
+
+| Rule                                              | Description                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| File status determines unused-vars enforcement    | **Invariant:** Files with `@libar-docs-status roadmap` or `deferred` have relaxed<br> unused-vars rules. Files with...   |
+| Reuses deriveProcessState for status extraction   | **Invariant:** Status extraction logic must be shared with Process Guard Linter.<br> No duplicate parsing or...          |
+| ESLint Processor filters messages based on status | **Invariant:** The processor uses ESLint's postprocess hook to filter or downgrade<br> messages. Source code is never... |
+| CLI can generate static ESLint ignore list        | **Invariant:** Running `pnpm lint:process --eslint-ignores` outputs a list of files<br> that should have relaxed...      |
+| Replaces directory-based ESLint exclusions        | **Invariant:** After implementation, the directory-based exclusions in eslint.config.js<br> (lines 30-57) are...         |
+| Rule relaxation is configurable                   | **Invariant:** The set of rules relaxed for roadmap/deferred files is configurable,<br> defaulting to...                 |
+
+--- ReleaseAssociationRules ---
+
+| Rule                                                  | Description |
+| ----------------------------------------------------- | ----------- |
+| Spec files must not contain release columns           |             |
+| TypeScript phase files must have required annotations |             |
+| Release version follows semantic versioning           |             |
+
+--- ProgressiveGovernance ---
+
+--- ProcessGuardLinter ---
+
+| Rule                                                  | Description                                                                                                              |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Protection levels determine modification restrictions | Files inherit protection from their `@libar-docs-status` tag. Higher<br> protection levels require explicit unlock to... |
+| Session definition files scope what can be modified   | Optional session files (`delivery-process/sessions/*.feature`) explicitly<br> declare which specs are in-scope for...    |
+| Status transitions follow PDR-005 FSM                 | Status changes in a file must follow a valid transition per PDR-005.<br> This extends phase-state-machine.feature to...  |
+| Active specs cannot add new deliverables              | Once a spec transitions to `active`, its deliverables table is<br> considered scope-locked. Adding new rows indicates... |
+| CLI provides flexible validation modes                |                                                                                                                          |
+| Integrates with existing lint infrastructure          |                                                                                                                          |
+| New tags support process guard functionality          | The following tags are defined in the TypeScript taxonomy to support process guard:                                      |
+
+--- PhaseStateMachineValidation ---
+
+| Rule                                          | Description |
+| --------------------------------------------- | ----------- |
+| Valid status values are enforced              |             |
+| Status transitions follow state machine rules |             |
+| Terminal states require completion metadata   |             |
+
+--- PhaseNumberingConventions ---
+
+| Rule                                          | Description |
+| --------------------------------------------- | ----------- |
+| Phase numbers must be unique within a release |             |
+| Phase number gaps are detected                |             |
+| CLI suggests next available phase number      |             |
+
+--- DoDValidation ---
+
 --- StatusTransitionDetectionTesting ---
 
 | Rule                                                 | Description                                                                                                              |
@@ -113,7 +195,26 @@ Detail Level: Compact summary
 
 --- LintRulesTesting ---
 
+| Rule                                                  | Description                                                                                                           |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Files must declare an explicit pattern name           | **Invariant:** Every annotated file must have a non-empty patternName to be identifiable in the registry....          |
+| Files should declare a lifecycle status               | **Invariant:** Every annotated file should have a status tag to track its position in the delivery lifecycle....      |
+| Files should document when to use the pattern         | **Invariant:** Annotated files should include whenToUse guidance so consumers know when to apply the pattern....      |
+| Descriptions must not repeat the pattern name         | **Invariant:** A description that merely echoes the pattern name adds no value and must be rejected....               |
+| Files should declare relationship tags                | **Invariant:** Annotated files should declare uses or usedBy relationships to enable dependency tracking and...       |
+| Default rules collection is complete and well-ordered | **Invariant:** The default rules collection must contain all defined rules with unique IDs, ordered by severity...    |
+| Rules can be filtered by minimum severity             | **Invariant:** Filtering by severity must return only rules at or above the specified level.<br> **Rationale:** CI... |
+
 --- LintEngineTesting ---
+
+| Rule                                                                  | Description                                                                                                             |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Single directive linting validates annotations against rules          | **Invariant:** Every directive is checked against all provided rules and violations include source location....         |
+| Multi-file batch linting aggregates results across files              | **Invariant:** All files and directives are scanned, violations are collected per file, and severity counts are...      |
+| Failure detection respects strict mode for severity escalation        | **Invariant:** Errors always indicate failure. Warnings only indicate failure in strict mode. Info never indicates...   |
+| Violation sorting orders by severity then by line number              | **Invariant:** Sorted output places errors first, then warnings, then info, with stable line-number ordering within...  |
+| Pretty formatting produces human-readable output with severity counts | **Invariant:** Pretty output includes file paths, line numbers, severity labels, rule IDs, and summary counts. Quiet... |
+| JSON formatting produces machine-readable output with full details    | **Invariant:** JSON output is valid, includes all summary fields, and preserves violation details including file,...    |
 
 --- LinterValidationTesting ---
 

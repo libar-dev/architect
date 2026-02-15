@@ -28,6 +28,61 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- TypeScriptTaxonomyImplementation ---
+
+--- ShapeExtraction ---
+
+| Rule                                             | Description                                                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| extract-shapes tag is defined in registry        | **Invariant:** The `extract-shapes` tag must exist with CSV format to list<br> multiple type names for extraction.       |
+| Interfaces are extracted from TypeScript AST     | **Invariant:** When `@libar-docs-extract-shapes` lists an interface name,<br> the extractor must find and extract the... |
+| Type aliases are extracted from TypeScript AST   | **Invariant:** Type aliases (including union types, intersection types,<br> and mapped types) are extracted when...      |
+| Enums are extracted from TypeScript AST          | **Invariant:** Both string and numeric enums are extracted with their<br> complete member definitions.                   |
+| Function signatures are extracted (body omitted) | **Invariant:** When a function name is listed in extract-shapes, only the<br> signature (parameters, return type,...     |
+| Multiple shapes are extracted in specified order | **Invariant:** When multiple shapes are listed, they appear in the<br> documentation in the order specified in the...    |
+| Extracted shapes render as fenced code blocks    | **Invariant:** Codecs render extracted shapes as TypeScript fenced code<br> blocks, grouped under an "API Types" or...   |
+| Shapes can reference types from imports          | **Invariant:** Extracted shapes may reference types from imports. The<br> extractor does NOT resolve imports - it...     |
+| Overloaded function signatures are all extracted | **Invariant:** When a function has multiple overload signatures, all<br> signatures are extracted together as they...    |
+| Shape rendering supports grouping options        | **Invariant:** Codecs can render shapes grouped in a single code block<br> or as separate code blocks, depending on...   |
+
+--- PatternRelationshipModel ---
+
+| Rule                                                      | Description                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Code files declare pattern realization via implements tag | **Invariant:** Files with `@libar-docs-implements:PatternName,OtherPattern` are linked<br> to the specified patterns...  |
+| Pattern inheritance uses extends relationship tag         | **Invariant:** Files with `@libar-docs-extends:BasePattern` declare that they extend<br> another pattern's...            |
+| Technical dependencies use directed relationship tags     | **Invariant:** `@libar-docs-uses` declares outbound dependencies (what this<br> pattern depends on)....                  |
+| Roadmap sequencing uses ordering relationship tags        | **Invariant:** `@libar-docs-depends-on` declares what must be completed first<br> (roadmap sequencing)....               |
+| Cross-tier linking uses traceability tags (PDR-007)       | **Invariant:** `@libar-docs-executable-specs` on roadmap specs points to test<br> locations....                          |
+| Epic/Phase/Task hierarchy uses parent-child relationships | **Invariant:** `@libar-docs-level` declares the hierarchy tier (epic, phase, task).<br> `@libar-docs-parent` links to... |
+| All relationships appear in generated documentation       | **Invariant:** The PATTERNS.md dependency graph renders all relationship types<br> with distinct visual styles....       |
+| Linter detects relationship violations                    | **Invariant:** The pattern linter validates that all relationship targets exist,<br> implements files don't have...      |
+
+--- GherkinRulesSupport ---
+
+| Rule                                                     | Description                                                                                                            |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Rules flow through the entire pipeline without data loss | The @cucumber/gherkin parser extracts Rules natively. Our pipeline must<br> preserve this data through scanner,...     |
+| Generators can render rules as business documentation    | Business stakeholders see rule names and descriptions as "Business Rules"<br> sections, not Given/When/Then syntax.... |
+| Custom content blocks render in acceptance criteria      | DataTables and DocStrings in steps should appear in generated documentation,<br> providing structured data and code... |
+| vitest-cucumber executes scenarios inside Rules          | Test execution must work for scenarios inside Rule blocks.<br> Use Rule() function with RuleScenario() instead of...   |
+
+--- DeclarationLevelShapeTagging ---
+
+| Rule                                                              | Description                                                                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Declarations opt in via libar-docs-shape tag                      | **Invariant:** Only declarations with the libar-docs-shape tag in their<br> immediately preceding JSDoc are collected... |
+| Reference doc configs select shapes via shapeSelectors            | **Invariant:** shapeSelectors provides three selection modes: by<br> source path + specific names (DD-6 source+names...  |
+| Discovery uses existing estree parser with JSDoc comment scanning | **Invariant:** The discoverTaggedShapes function uses the existing<br> typescript-estree parse() and...                  |
+
+--- CrossSourceValidation ---
+
+| Rule                                            | Description |
+| ----------------------------------------------- | ----------- |
+| Pattern names must be consistent across sources |             |
+| Circular dependencies are detected              |             |
+| Dependency references must resolve              |             |
+
 --- GherkinAstParser ---
 
 | Rule                                                       | Description                                                                                                         |
@@ -52,6 +107,15 @@ Detail Level: Compact summary
 | renderDocString handles both string and object formats | **Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a...       |
 
 --- AstParser ---
+
+| Rule                                                                                 | Description                                                                                                              |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Export types are correctly identified from TypeScript declarations                   | **Invariant:** Every exported TypeScript declaration type (function, type, interface, const, class, enum, abstract...    |
+| Metadata is correctly extracted from JSDoc comments                                  | **Invariant:** Examples, multi-line descriptions, line numbers, function signatures, and standard JSDoc tags are all...  |
+| Tags are extracted only from the directive section, not from description or examples | **Invariant:** Only tags appearing in the directive section (before the description) are extracted. Tags mentioned in... |
+| When to Use sections are extracted in all supported formats                          | **Invariant:** When to Use content is extracted from heading format with bullet points, inline bold format, and...       |
+| Relationship tags extract uses and usedBy dependencies                               | **Invariant:** The uses and usedBy relationship arrays are populated from directive tags, not from description...        |
+| Edge cases and malformed input are handled gracefully                                | **Invariant:** The parser never crashes on invalid input. Files without directives return empty results. Malformed...    |
 
 --- ShapeExtractionTesting ---
 
@@ -109,6 +173,16 @@ Detail Level: Compact summary
 | File opt-in requirement gates scanning                 | **Invariant:** Only files containing a standalone @libar-docs marker (not @libar-docs-\*) are eligible for directive... |
 
 --- PatternTagExtraction ---
+
+| Rule                                                                        | Description                                                                                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Single value tags produce scalar metadata fields                            | **Invariant:** Each single-value tag (pattern, phase, status, brief) maps to exactly one metadata field with the...     |
+| Array value tags accumulate into list metadata fields                       | **Invariant:** Tags for depends-on and enables split comma-separated values and accumulate across multiple tag...       |
+| Category tags are colon-free tags filtered against known non-categories     | **Invariant:** Tags without colons become categories, except known non-category tags (acceptance-criteria,...           |
+| Complex tag lists produce fully populated metadata                          | **Invariant:** All tag types (scalar, array, category) are correctly extracted from a single mixed tag list....         |
+| Edge cases produce safe defaults                                            | **Invariant:** Empty or invalid inputs produce empty metadata or omit invalid fields rather than throwing errors....    |
+| Convention tags support CSV values with whitespace trimming                 | **Invariant:** Convention tags split comma-separated values and trim whitespace from each value.<br> \*\*Verified...    |
+| Registry-driven extraction handles enums, transforms, and value constraints | **Invariant:** Tags defined in the registry use data-driven extraction with enum validation, CSV accumulation, value... |
 
 --- LayerInferenceTesting ---
 

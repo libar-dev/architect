@@ -6,7 +6,7 @@
 @libar-docs-status:roadmap
 @libar-docs-product-area:Process
 @libar-docs-convention:taxonomy-rules
-@libar-docs-include:reference-sample
+@libar-docs-include:reference-sample,process-workflow
 Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
 
   **Context:**
