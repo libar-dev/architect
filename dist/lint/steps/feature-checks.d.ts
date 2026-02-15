@@ -36,6 +36,42 @@ export declare function checkDuplicateAndSteps(content: string, filePath: string
  */
 export declare function checkDollarInStepText(content: string, filePath: string): readonly LintViolation[];
 /**
+ * Check 9: Detect # character inside step text (mid-line), outside quoted strings.
+ *
+ * Some Gherkin parsers interpret # as a comment delimiter even when it
+ * appears in the middle of a step line, silently truncating the step text.
+ * For example, "Given a file with # inside" becomes "Given a file with".
+ *
+ * However, # inside quoted string values (e.g. `"## DDD Patterns"`) is
+ * safe — the Gherkin parser treats it as part of the string literal and
+ * does not interpret it as a comment. Only unquoted # is flagged.
+ *
+ * This is distinct from hash-in-description (which catches # inside """
+ * pseudo-code-blocks in descriptions). This check catches # in actual
+ * Given/When/Then/And/But step lines.
+ *
+ * Pure comment lines (starting with #) do not match STEP_LINE, so they
+ * are not flagged.
+ */
+export declare function checkHashInStepText(content: string, filePath: string): readonly LintViolation[];
+/**
+ * Check 10: Detect Gherkin keywords at the start of description lines.
+ *
+ * When a Feature or Rule description line starts with Given, When, Then,
+ * And, or But, the Gherkin parser interprets it as a step definition
+ * rather than description text. This terminates the description context
+ * and causes parse errors on subsequent description lines.
+ *
+ * Detection uses a state machine to track description context — after
+ * Feature: or Rule: lines, before Background:/Scenario:/etc. terminators.
+ * Within that context, lines starting with step keywords are flagged.
+ *
+ * Step DocStrings (""" blocks after Given/When/Then steps) are tracked
+ * separately. Feature:/Rule: appearing inside step DocStrings must NOT
+ * trigger description mode — they are just quoted text content.
+ */
+export declare function checkKeywordInDescription(content: string, filePath: string): readonly LintViolation[];
+/**
  * Run all feature-only checks on a single file.
  */
 export declare function runFeatureChecks(content: string, filePath: string): readonly LintViolation[];

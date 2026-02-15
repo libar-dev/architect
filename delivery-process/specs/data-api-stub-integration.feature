@@ -28,7 +28,7 @@ Feature: Data API Stub Integration - Unlocking Design Session Data
      as new taxonomy tags. Rename existing `@target` and `@since` annotations in
      all stubs. This gives structured access to stub-specific metadata.
 
-  Then add query commands:
+  3. **Phase C (Commands):** Add query commands:
   - `stubs [pattern]` lists design stubs with target paths
   - `decisions [pattern]` surfaces PDR references and AD-N items
   - `pdr <number>` finds all patterns referencing a specific PDR

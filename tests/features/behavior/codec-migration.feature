@@ -68,7 +68,7 @@ Feature: Zod Codec Migration
     When I parse JSON '{"$schema": "http://json-schema.org/draft-07/schema#", "name": "test", "count": 1}'
     Then the parse result should be successful
     And the parsed value should have name "test"
-    And the parsed value should not have a $schema property
+    And the parsed value should not have a "$schema" property
 
   # ============================================================================
   # Output Codec - Serialization with Validation

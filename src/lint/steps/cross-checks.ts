@@ -7,6 +7,7 @@
 
 import type { LintViolation } from '../../validation-schemas/lint.js';
 import { STEP_LINT_RULES } from './types.js';
+import { countBraceBalance } from './utils.js';
 
 /**
  * Check 1: Detect function params used inside ScenarioOutline blocks.
@@ -86,41 +87,6 @@ export function checkScenarioOutlineFunctionParams(
 }
 
 /**
- * Count the net brace balance on a line: +1 for {, -1 for }.
- * Ignores braces inside string literals (single/double/backtick quotes).
- */
-function countBraceBalance(line: string): number {
-  let balance = 0;
-  let inString: string | null = null;
-  let escaped = false;
-
-  for (const ch of line) {
-    if (escaped) {
-      escaped = false;
-      continue;
-    }
-    if (ch === '\\') {
-      escaped = true;
-      continue;
-    }
-    if (inString !== null) {
-      if (ch === inString) {
-        inString = null;
-      }
-      continue;
-    }
-    if (ch === "'" || ch === '"' || ch === '`') {
-      inString = ch;
-      continue;
-    }
-    if (ch === '{') balance++;
-    if (ch === '}') balance--;
-  }
-
-  return balance;
-}
-
-/**
  * Check 2: Detect missing And destructuring.
  *
  * If a feature file has And steps, the step definition must destructure And
@@ -138,8 +104,11 @@ export function checkMissingAndDestructuring(
     return [];
   }
 
-  // Check if step file destructures And anywhere
-  // Patterns: { Given, When, Then, And } or { And, Given, ... } etc.
+  // Check if step file destructures And anywhere.
+  // NOTE: This regex matches And inside ANY curly brace pair, including object
+  // literals with an `And` property. This is a theoretical false negative (would
+  // pass when it should flag), which is the safe direction. In practice, step
+  // files don't have object literals with `And` keys.
   const destructuresAnd = /\{\s*[^}]*\bAnd\b[^}]*\}/.test(stepContent);
   if (destructuresAnd) {
     return [];
@@ -219,16 +188,166 @@ export function checkMissingRuleWrapper(
 }
 
 /**
+ * Step keyword pattern for matching step lines in feature files.
+ */
+const FEATURE_STEP_LINE = /^\s+(Given|When|Then|And|But)\s+(.+)$/;
+
+/**
+ * Extract column names from Examples tables belonging to a Scenario Outline.
+ *
+ * Scans forward from the given start index (the Scenario Outline line) until
+ * the next section boundary. Collects column names from every Examples table
+ * header row found within that range.
+ */
+function extractOutlineExamplesColumns(
+  lines: readonly string[],
+  outlineStartIndex: number
+): ReadonlySet<string> {
+  const columns = new Set<string>();
+  let inExamples = false;
+  let seenExamplesHeader = false;
+
+  for (let i = outlineStartIndex + 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (line === undefined) continue;
+
+    // Stop at next section boundary (another Scenario, Rule, Feature, Background)
+    if (
+      /^\s*(Scenario Outline|Scenario Template|Scenario:|Feature:|Rule:|Background:)/.test(line)
+    ) {
+      break;
+    }
+
+    // Enter Examples block
+    if (/^\s*Examples:/.test(line)) {
+      inExamples = true;
+      seenExamplesHeader = false;
+      continue;
+    }
+
+    // Inside Examples: first table row is the header with column names
+    if (inExamples && !seenExamplesHeader && /^\s*\|/.test(line)) {
+      seenExamplesHeader = true;
+      const cells = line
+        .split('|')
+        .map((cell) => cell.trim())
+        .filter((cell) => cell.length > 0);
+      for (const cell of cells) {
+        columns.add(cell);
+      }
+    }
+  }
+
+  return columns;
+}
+
+/**
+ * Check 12: Detect quoted values in Scenario Outline steps (feature-file side).
+ *
+ * When a Scenario Outline's steps use quoted values (e.g., "foo") instead of
+ * angle-bracket placeholders (e.g., <column>), this suggests the author is
+ * using the Scenario pattern (Cucumber expression matching) instead of the
+ * ScenarioOutline pattern (variable substitution). This is the feature-file
+ * side of the Two-Pattern Problem — the step-file side is caught by
+ * scenario-outline-function-params.
+ *
+ * Detection: Find Scenario Outline sections in the feature file, extract the
+ * Examples table column names, then check if step lines within those sections
+ * contain quoted values whose content matches a column name. Only those are
+ * flagged — constant quoted values (e.g., "error") that don't correspond to
+ * any Examples column are intentionally literal and should not be placeholders.
+ *
+ * This is a cross-file check because it's only meaningful when a paired step
+ * file exists (roadmap specs without implementations shouldn't be flagged).
+ * The _stepContent parameter is unused but maintains the cross-check signature.
+ */
+export function checkOutlineQuotedValues(
+  featureContent: string,
+  _stepContent: string,
+  stepFilePath: string,
+  featurePath?: string
+): readonly LintViolation[] {
+  // Only check if the feature actually has Scenario Outline
+  if (!/^\s*(Scenario Outline|Scenario Template):/m.test(featureContent)) {
+    return [];
+  }
+
+  const violations: LintViolation[] = [];
+  const lines = featureContent.split('\n');
+
+  let inOutlineSection = false;
+  let currentOutlineColumns: ReadonlySet<string> = new Set();
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line === undefined) continue;
+
+    // Enter Scenario Outline section
+    if (/^\s*(Scenario Outline|Scenario Template):/.test(line)) {
+      inOutlineSection = true;
+      currentOutlineColumns = extractOutlineExamplesColumns(lines, i);
+      continue;
+    }
+
+    // Exit on new section boundary (but not Examples, which is part of Outline)
+    if (/^\s*(Scenario:|Feature:|Rule:|Background:)/.test(line)) {
+      inOutlineSection = false;
+      continue;
+    }
+
+    if (!inOutlineSection) continue;
+
+    // Check step lines within the Outline section
+    const stepMatch = FEATURE_STEP_LINE.exec(line);
+    if (stepMatch !== null) {
+      const stepText = stepMatch[2] ?? '';
+
+      // Skip steps that already use placeholders — the author clearly knows
+      // about the ScenarioOutline pattern and chose to keep quoted values literal
+      const hasPlaceholders = /<\w+>/.test(stepText);
+      if (hasPlaceholders) continue;
+
+      // Extract all quoted values from the step
+      const quotedValues: string[] = [];
+      const doubleQuoteMatches = stepText.matchAll(/"([^"]*)"/g);
+      for (const m of doubleQuoteMatches) {
+        if (m[1] !== undefined) quotedValues.push(m[1]);
+      }
+      const singleQuoteMatches = stepText.matchAll(/'([^']*)'/g);
+      for (const m of singleQuoteMatches) {
+        if (m[1] !== undefined) quotedValues.push(m[1]);
+      }
+
+      // Only flag if at least one quoted value matches an Examples column name
+      const matchesColumn = quotedValues.some((val) => currentOutlineColumns.has(val));
+      if (matchesColumn) {
+        violations.push({
+          rule: STEP_LINT_RULES.outlineQuotedValues.id,
+          severity: STEP_LINT_RULES.outlineQuotedValues.severity,
+          message: `Scenario Outline step uses quoted values instead of <placeholder> syntax — this suggests the Scenario pattern (Cucumber expressions) rather than ScenarioOutline pattern (variable substitution)`,
+          file: featurePath ?? stepFilePath,
+          line: i + 1,
+        });
+      }
+    }
+  }
+
+  return violations;
+}
+
+/**
  * Run all cross-file checks on a paired feature + step file.
  */
 export function runCrossChecks(
   featureContent: string,
   stepContent: string,
-  stepFilePath: string
+  stepFilePath: string,
+  featurePath?: string
 ): readonly LintViolation[] {
   return [
     ...checkScenarioOutlineFunctionParams(featureContent, stepContent, stepFilePath),
     ...checkMissingAndDestructuring(featureContent, stepContent, stepFilePath),
     ...checkMissingRuleWrapper(featureContent, stepContent, stepFilePath),
+    ...checkOutlineQuotedValues(featureContent, stepContent, stepFilePath, featurePath),
   ];
 }

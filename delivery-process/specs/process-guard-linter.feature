@@ -104,7 +104,7 @@ Feature: Process Guard Linter
 
     Optional session files (`delivery-process/sessions/*.feature`) explicitly
     declare which specs are in-scope for modification during a work session.
-    When active, modifications outside scope trigger warnings or errors.
+    If active, modifications outside scope trigger warnings or errors.
 
     @acceptance-criteria
     Scenario: Session file defines modification scope
@@ -149,7 +149,7 @@ Feature: Process Guard Linter
 
   Rule: Status transitions follow PDR-005 FSM
 
-    When a file's status changes, the transition must be valid per PDR-005.
+    Status changes in a file must follow a valid transition per PDR-005.
     This extends phase-state-machine.feature to the linter context.
 
     @acceptance-criteria

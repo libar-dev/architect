@@ -66,5 +66,30 @@ export declare const STEP_LINT_RULES: {
         severity: "error";
         description: string;
     };
+    hashInStepText: {
+        id: string;
+        severity: "warning";
+        description: string;
+    };
+    keywordInDescription: {
+        id: string;
+        severity: "error";
+        description: string;
+    };
+    outlineQuotedValues: {
+        id: string;
+        severity: "warning";
+        description: string;
+    };
+    repeatedStepPattern: {
+        id: string;
+        severity: "error";
+        description: string;
+    };
+    pairResolver: {
+        id: string;
+        severity: "warning";
+        description: string;
+    };
 };
 //# sourceMappingURL=types.d.ts.map

@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    globalSetup: ['tests/support/step-lint-setup.ts'],
     testTimeout: 30000, // 30 seconds for CLI tests that spawn subprocesses
     include: [
       // Legacy tests (to be migrated)

@@ -24,19 +24,30 @@ export {
   checkHashInDescription,
   checkDuplicateAndSteps,
   checkDollarInStepText,
+  checkHashInStepText,
+  checkKeywordInDescription,
   runFeatureChecks,
 } from './feature-checks.js';
 
 // Step checks (for targeted use)
-export { checkRegexStepPatterns, checkPhraseUsage, runStepChecks } from './step-checks.js';
+export {
+  checkRegexStepPatterns,
+  checkPhraseUsage,
+  checkRepeatedStepPattern,
+  runStepChecks,
+} from './step-checks.js';
 
 // Cross-file checks (for targeted use)
 export {
   checkScenarioOutlineFunctionParams,
   checkMissingAndDestructuring,
   checkMissingRuleWrapper,
+  checkOutlineQuotedValues,
   runCrossChecks,
 } from './cross-checks.js';
 
 // Pair resolver (for targeted use)
 export { extractFeaturePath, resolveFeatureStepPairs } from './pair-resolver.js';
+
+// Utilities
+export { countBraceBalance } from './utils.js';

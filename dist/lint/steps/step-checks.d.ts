@@ -21,6 +21,20 @@ export declare function checkRegexStepPatterns(content: string, filePath: string
  */
 export declare function checkPhraseUsage(content: string, filePath: string): readonly LintViolation[];
 /**
+ * Check 11: Detect repeated step patterns within the same scenario block.
+ *
+ * When the same step pattern (e.g., Given('a state', ...)) is registered
+ * twice in one Scenario block, vitest-cucumber overwrites the first
+ * registration. Only the last callback runs, causing silent test failures
+ * where assertions appear to pass but the setup was wrong.
+ *
+ * Detection: Track scenario blocks using brace-depth counting, collect
+ * step registration patterns within each block, and flag duplicates.
+ * The same pattern in different scenario blocks is fine — each block
+ * has its own scope.
+ */
+export declare function checkRepeatedStepPattern(content: string, filePath: string): readonly LintViolation[];
+/**
  * Run all step-only checks on a single file.
  */
 export declare function runStepChecks(content: string, filePath: string): readonly LintViolation[];

@@ -71,7 +71,7 @@ Feature: ADR-005 - Codec-Based Markdown Rendering
     becomes a document, never the reverse.
 
     **Rationale:** Pure functions are deterministic and trivially testable.
-    Given the same MasterDataset, a codec always produces the same
+    For the same MasterDataset, a codec always produces the same
     RenderableDocument. This makes snapshot testing reliable and enables
     codec output comparison across versions.
 

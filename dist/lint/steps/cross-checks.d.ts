@@ -39,7 +39,28 @@ export declare function checkMissingAndDestructuring(featureContent: string, ste
  */
 export declare function checkMissingRuleWrapper(featureContent: string, stepContent: string, stepFilePath: string): readonly LintViolation[];
 /**
+ * Check 12: Detect quoted values in Scenario Outline steps (feature-file side).
+ *
+ * When a Scenario Outline's steps use quoted values (e.g., "foo") instead of
+ * angle-bracket placeholders (e.g., <column>), this suggests the author is
+ * using the Scenario pattern (Cucumber expression matching) instead of the
+ * ScenarioOutline pattern (variable substitution). This is the feature-file
+ * side of the Two-Pattern Problem — the step-file side is caught by
+ * scenario-outline-function-params.
+ *
+ * Detection: Find Scenario Outline sections in the feature file, extract the
+ * Examples table column names, then check if step lines within those sections
+ * contain quoted values whose content matches a column name. Only those are
+ * flagged — constant quoted values (e.g., "error") that don't correspond to
+ * any Examples column are intentionally literal and should not be placeholders.
+ *
+ * This is a cross-file check because it's only meaningful when a paired step
+ * file exists (roadmap specs without implementations shouldn't be flagged).
+ * The _stepContent parameter is unused but maintains the cross-check signature.
+ */
+export declare function checkOutlineQuotedValues(featureContent: string, _stepContent: string, stepFilePath: string, featurePath?: string): readonly LintViolation[];
+/**
  * Run all cross-file checks on a paired feature + step file.
  */
-export declare function runCrossChecks(featureContent: string, stepContent: string, stepFilePath: string): readonly LintViolation[];
+export declare function runCrossChecks(featureContent: string, stepContent: string, stepFilePath: string, featurePath?: string): readonly LintViolation[];
 //# sourceMappingURL=cross-checks.d.ts.map

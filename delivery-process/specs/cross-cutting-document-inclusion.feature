@@ -22,7 +22,7 @@ Feature: Cross-Cutting Document Inclusion
   More fundamentally, content-to-document is a many-to-many relationship.
   A CategoryDefinition interface should be includable in a Taxonomy Reference,
   a Configuration Guide, AND a claude.md architecture section simultaneously.
-  But libar-docs-shape only supports one group, and behaviorCategories only
+  However, libar-docs-shape only supports one group, and behaviorCategories only
   supports one category per pattern. There is no cross-cutting tag that says
   "include this specific item in these specific documents."
 

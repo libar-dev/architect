@@ -259,10 +259,12 @@ describeFeature(feature, ({ Scenario, Background, AfterEachScenario }) => {
       expect(state!.parsedValue!.name).toBe(name);
     });
 
-    And('the parsed value should not have a $schema property', () => {
-      // TypeScript type doesn't include $schema, but we verify runtime behavior
-      expect(Object.prototype.hasOwnProperty.call(state!.parsedValue, '$schema')).toBe(false);
-    });
+    And(
+      'the parsed value should not have a {string} property',
+      (_ctx: unknown, propName: string) => {
+        expect(Object.prototype.hasOwnProperty.call(state!.parsedValue, propName)).toBe(false);
+      }
+    );
   });
 
   // ===========================================================================

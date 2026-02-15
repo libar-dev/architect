@@ -427,7 +427,6 @@ function buildSingleProductAreaDocument(group, options) {
     // Sort phases
     const sortedPhases = sortPhaseEntries([...group.phases.entries()]);
     for (const [phaseKey, features] of sortedPhases) {
-        const phaseRuleCount = features.reduce((sum, f) => sum + f.rules.length, 0);
         const sortedFeatures = [...features].sort((a, b) => a.featureName.localeCompare(b.featureName));
         // Render features for this phase
         const phaseContent = [];

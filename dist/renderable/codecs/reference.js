@@ -402,10 +402,10 @@ function decodeProductArea(dataset, config, opts) {
     }
     // 3. Architecture diagrams — priority: config > meta > auto-generate
     if (opts.detailLevel !== 'summary' && contextSet.size > 0) {
-        const scopes = config.diagramScopes
-            ?? (config.diagramScope !== undefined ? [config.diagramScope] : undefined)
-            ?? meta?.diagramScopes
-            ?? [];
+        const scopes = config.diagramScopes ??
+            (config.diagramScope !== undefined ? [config.diagramScope] : undefined) ??
+            meta?.diagramScopes ??
+            [];
         if (scopes.length > 0) {
             for (const scope of scopes) {
                 const diagramSections = buildScopedDiagram(dataset, scope);

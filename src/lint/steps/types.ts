@@ -81,4 +81,37 @@ export const STEP_LINT_RULES = {
     description:
       'Feature has Rule: blocks but step definition does not destructure Rule from describeFeature',
   },
+
+  // Extended rules (step-lint-extended-rules spec)
+  hashInStepText: {
+    id: 'hash-in-step-text',
+    severity: 'warning' as const,
+    description:
+      'Mid-line # in step text is interpreted as a Gherkin comment, silently truncating the step',
+  },
+  keywordInDescription: {
+    id: 'keyword-in-description',
+    severity: 'error' as const,
+    description: 'Description line starting with Given/When/Then/And/But breaks the Gherkin parser',
+  },
+  outlineQuotedValues: {
+    id: 'outline-quoted-values',
+    severity: 'warning' as const,
+    description:
+      'Scenario Outline steps with quoted values suggest Cucumber expression pattern instead of variable substitution',
+  },
+  repeatedStepPattern: {
+    id: 'repeated-step-pattern',
+    severity: 'error' as const,
+    description:
+      'Same step pattern registered twice in one scenario block — second registration overwrites the first',
+  },
+
+  // Infrastructure
+  pairResolver: {
+    id: 'pair-resolver',
+    severity: 'warning' as const,
+    description:
+      'Feature-to-step file pairing issue — could not read step file or extract loadFeature() path',
+  },
 } satisfies Record<string, StepLintRule>;

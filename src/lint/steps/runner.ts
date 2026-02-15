@@ -95,7 +95,12 @@ export function runStepLint(options: StepLintOptions = {}): LintSummary {
     const stepContent = readFileSafe(stepPath);
     if (featureContent === null || stepContent === null) continue;
 
-    addViolations(stepPath, runCrossChecks(featureContent, stepContent, stepPath));
+    const crossViolations = runCrossChecks(featureContent, stepContent, stepPath, featurePath);
+    // Cross-check violations may reference either the step file or the feature file.
+    // Group each violation under its own reported file path.
+    for (const v of crossViolations) {
+      addViolations(v.file, [v]);
+    }
   }
 
   // Build LintSummary

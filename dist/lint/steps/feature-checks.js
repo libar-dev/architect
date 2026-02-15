@@ -5,6 +5,7 @@
  * (which would fail on some of the very issues we're detecting).
  */
 import { STEP_LINT_RULES } from './types.js';
+import { stripQuotedContent } from './utils.js';
 /**
  * Gherkin keywords that terminate a description context.
  * When one of these appears at the expected indentation, the description is over.
@@ -136,9 +137,7 @@ export function checkDollarInStepText(content, filePath) {
         const stepMatch = STEP_LINE.exec(line);
         if (stepMatch !== null) {
             const stepText = stepMatch[3];
-            if (stepText?.includes('$') === true) {
-                // Skip <placeholder> patterns in ScenarioOutline — those are valid
-                // and the $ might be in an Examples table value, not the step text itself
+            if (stepText !== undefined && stripQuotedContent(stepText).includes('$')) {
                 violations.push({
                     rule: STEP_LINT_RULES.dollarInStepText.id,
                     severity: STEP_LINT_RULES.dollarInStepText.severity,
@@ -152,6 +151,120 @@ export function checkDollarInStepText(content, filePath) {
     return violations;
 }
 /**
+ * Check 9: Detect # character inside step text (mid-line), outside quoted strings.
+ *
+ * Some Gherkin parsers interpret # as a comment delimiter even when it
+ * appears in the middle of a step line, silently truncating the step text.
+ * For example, "Given a file with # inside" becomes "Given a file with".
+ *
+ * However, # inside quoted string values (e.g. `"## DDD Patterns"`) is
+ * safe — the Gherkin parser treats it as part of the string literal and
+ * does not interpret it as a comment. Only unquoted # is flagged.
+ *
+ * This is distinct from hash-in-description (which catches # inside """
+ * pseudo-code-blocks in descriptions). This check catches # in actual
+ * Given/When/Then/And/But step lines.
+ *
+ * Pure comment lines (starting with #) do not match STEP_LINE, so they
+ * are not flagged.
+ */
+export function checkHashInStepText(content, filePath) {
+    const violations = [];
+    const lines = content.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line === undefined)
+            continue;
+        const stepMatch = STEP_LINE.exec(line);
+        if (stepMatch !== null) {
+            const stepText = stepMatch[3];
+            if (stepText !== undefined && stripQuotedContent(stepText).includes('#')) {
+                violations.push({
+                    rule: STEP_LINT_RULES.hashInStepText.id,
+                    severity: STEP_LINT_RULES.hashInStepText.severity,
+                    message: `Step text contains # outside quoted strings which may be interpreted as a comment, silently truncating the step`,
+                    file: filePath,
+                    line: i + 1,
+                });
+            }
+        }
+    }
+    return violations;
+}
+/**
+ * Check 10: Detect Gherkin keywords at the start of description lines.
+ *
+ * When a Feature or Rule description line starts with Given, When, Then,
+ * And, or But, the Gherkin parser interprets it as a step definition
+ * rather than description text. This terminates the description context
+ * and causes parse errors on subsequent description lines.
+ *
+ * Detection uses a state machine to track description context — after
+ * Feature: or Rule: lines, before Background:/Scenario:/etc. terminators.
+ * Within that context, lines starting with step keywords are flagged.
+ *
+ * Step DocStrings (""" blocks after Given/When/Then steps) are tracked
+ * separately. Feature:/Rule: appearing inside step DocStrings must NOT
+ * trigger description mode — they are just quoted text content.
+ */
+export function checkKeywordInDescription(content, filePath) {
+    const violations = [];
+    const lines = content.split('\n');
+    let inDescription = false;
+    let inStepDocString = false;
+    /** Keywords that break the parser when at the start of a description line */
+    const KEYWORD_AT_LINE_START = /^\s*(Given|When|Then|And|But)\s/;
+    /** Matches a """ delimiter line (with optional language hint) */
+    const DOCSTRING_DELIMITER = /^\s*"""/;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (line === undefined)
+            continue;
+        // Track step DocString boundaries (""" blocks outside description context).
+        // Inside a step DocString, Feature:/Rule: are just quoted text — skip them.
+        if (DOCSTRING_DELIMITER.test(line)) {
+            if (!inDescription) {
+                inStepDocString = !inStepDocString;
+            }
+            continue;
+        }
+        // While inside a step DocString, skip all other checks
+        if (inStepDocString)
+            continue;
+        // Start of description context
+        if (DESCRIPTION_STARTERS.test(line)) {
+            inDescription = true;
+            continue;
+        }
+        if (!inDescription)
+            continue;
+        // IMPORTANT: This keyword check MUST come before the DESCRIPTION_TERMINATORS
+        // check below. The keyword IS what terminates the description (it's also in
+        // DESCRIPTION_TERMINATORS), but we need to flag it as a violation FIRST
+        // before exiting the description context. Reordering these blocks would
+        // cause keywords to silently exit the description without being flagged.
+        if (KEYWORD_AT_LINE_START.test(line)) {
+            // But only flag if we're still in description context —
+            // actual step lines inside Scenario blocks are fine
+            violations.push({
+                rule: STEP_LINT_RULES.keywordInDescription.id,
+                severity: STEP_LINT_RULES.keywordInDescription.severity,
+                message: `Description line starts with a Gherkin keyword — this breaks the parser. Rephrase to not start with Given/When/Then/And/But`,
+                file: filePath,
+                line: i + 1,
+            });
+            inDescription = false;
+            continue;
+        }
+        // End of description context (non-keyword terminators)
+        if (DESCRIPTION_TERMINATORS.test(line)) {
+            inDescription = false;
+            continue;
+        }
+    }
+    return violations;
+}
+/**
  * Run all feature-only checks on a single file.
  */
 export function runFeatureChecks(content, filePath) {
@@ -159,6 +272,8 @@ export function runFeatureChecks(content, filePath) {
         ...checkHashInDescription(content, filePath),
         ...checkDuplicateAndSteps(content, filePath),
         ...checkDollarInStepText(content, filePath),
+        ...checkHashInStepText(content, filePath),
+        ...checkKeywordInDescription(content, filePath),
     ];
 }
 //# sourceMappingURL=feature-checks.js.map

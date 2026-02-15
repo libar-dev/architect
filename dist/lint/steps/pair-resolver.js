@@ -4,6 +4,7 @@
  */
 import { readFileSync } from 'fs';
 import { dirname, resolve } from 'path';
+import { STEP_LINT_RULES } from './types.js';
 /**
  * Extract the feature file path from a loadFeature() call in step file content.
  *
@@ -44,8 +45,8 @@ export function resolveFeatureStepPairs(stepFiles, baseDir) {
         }
         catch {
             warnings.push({
-                rule: 'pair-resolver',
-                severity: 'warning',
+                rule: STEP_LINT_RULES.pairResolver.id,
+                severity: STEP_LINT_RULES.pairResolver.severity,
                 message: `Could not read step file`,
                 file: stepPath,
                 line: 0,
@@ -55,8 +56,8 @@ export function resolveFeatureStepPairs(stepFiles, baseDir) {
         const extractedPath = extractFeaturePath(content);
         if (extractedPath === null) {
             warnings.push({
-                rule: 'pair-resolver',
-                severity: 'warning',
+                rule: STEP_LINT_RULES.pairResolver.id,
+                severity: STEP_LINT_RULES.pairResolver.severity,
                 message: `Could not extract loadFeature() path — cross-file checks will be skipped`,
                 file: stepPath,
                 line: 0,
