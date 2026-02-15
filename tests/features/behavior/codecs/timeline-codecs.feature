@@ -25,6 +25,10 @@ Feature: Timeline Document Codecs
 
   Rule: RoadmapDocumentCodec groups patterns by phase with progress tracking
 
+    **Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
+    **Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
+    **Verified by:** Decode empty dataset produces minimal roadmap, Decode dataset with multiple phases, Progress section shows correct status counts, Phase navigation table with progress, Phase sections show pattern tables, Generate phase detail files when enabled, No detail files when disabled, Quarterly timeline shown when quarters exist
+
     @happy-path @edge-case
     Scenario: Decode empty dataset produces minimal roadmap
       Given an empty MasterDataset
@@ -108,6 +112,10 @@ Feature: Timeline Document Codecs
 
   Rule: CompletedMilestonesCodec shows only completed patterns grouped by quarter
 
+    **Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
+    **Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
+    **Verified by:** No completed patterns produces empty message, Summary shows completed counts, Quarterly navigation with completed patterns, Completed phases shown in collapsible sections, Recent completions section with limit, Generate quarterly detail files when enabled
+
     @happy-path @edge-case
     Scenario: No completed patterns produces empty message
       Given a MasterDataset with only planned patterns
@@ -156,6 +164,10 @@ Feature: Timeline Document Codecs
   # ═══════════════════════════════════════════════════════════════════════════
 
   Rule: CurrentWorkCodec shows only active patterns with deliverables
+
+    **Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
+    **Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
+    **Verified by:** No active work produces empty message, Summary shows overall progress, Active phases with progress bars, Deliverables rendered when configured, All active patterns table, Generate current work detail files when enabled
 
     @happy-path @edge-case
     Scenario: No active work produces empty message

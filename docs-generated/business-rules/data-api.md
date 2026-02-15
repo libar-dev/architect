@@ -4,7 +4,7 @@
 
 ---
 
-**85 rules** from 18 features. 2 rules have explicit invariants.
+**85 rules** from 18 features. 11 rules have explicit invariants.
 
 ---
 
@@ -56,17 +56,33 @@ _Verified by: Unused taxonomy detection, Cross-context comparison with integrati
 
 #### assembleContext produces session-tailored context bundles
 
-_Verified by: Design session includes stubs, consumers, and architecture, Planning session includes only metadata and dependencies, Implement session includes deliverables and FSM, Multi-pattern context merges metadata from both patterns, Pattern not found returns error with suggestion, Description preserves Problem and Solution structure, Solution text with inline bold is not truncated_
+**Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+
+**Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+
+_Verified by: Design session includes stubs, consumers, and architecture, Planning session includes only metadata and dependencies, Implement session includes deliverables and FSM, Multi-pattern context merges metadata from both patterns, Pattern not found returns error with suggestion, Description preserves Problem and Solution structure, Solution text with inline bold is not truncated, Design session includes stubs, consumers, and architecture_
 
 #### buildDepTree walks dependency chains with cycle detection
+
+**Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+
+**Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
 
 _Verified by: Dependency tree shows chain with status markers, Depth limit truncates branches, Circular dependencies are handled safely, Standalone pattern returns single-node tree_
 
 #### buildOverview provides executive project summary
 
-_Verified by: Overview shows progress, active phases, and blocking, Empty dataset returns zero-state overview_
+**Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+
+**Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+
+_Verified by: Overview shows progress, active phases, and blocking, Empty dataset returns zero-state overview, Overview shows progress, active phases, and blocking_
 
 #### buildFileReadingList returns paths by relevance
+
+**Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+
+**Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
 
 _Verified by: File list includes primary and related files, File list includes implementation files for completed dependencies, File list without related returns only primary_
 
@@ -362,21 +378,41 @@ _Verified by: Arch dangling returns broken references, Arch orphans returns isol
 
 #### Status queries return correct patterns
 
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+
 _Verified by: Get patterns by normalized status, Get patterns by FSM status, Get current work returns active patterns, Get roadmap items returns roadmap and deferred, Get status counts, Get completion percentage_
 
 #### Phase queries return correct phase data
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
 
 _Verified by: Get patterns by phase, Get phase progress, Get nonexistent phase returns undefined, Get active phases_
 
 #### FSM queries expose transition validation
 
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
 _Verified by: Check valid transition, Check invalid transition, Get valid transitions from status, Get protection info_
 
 #### Pattern queries find and retrieve pattern data
 
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
 _Verified by: Find pattern by name (case insensitive), Find nonexistent pattern returns undefined, Get patterns by category, Get all categories with counts_
 
 #### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
 
 _Verified by: Get patterns by quarter, Get all quarters, Get recently completed sorted by date_
 

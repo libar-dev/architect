@@ -4,7 +4,7 @@
 
 ---
 
-**211 rules** from 43 features. 25 rules have explicit invariants.
+**211 rules** from 43 features. 41 rules have explicit invariants.
 
 ---
 
@@ -574,6 +574,10 @@ _Verified by: Strips h1 header, Strips h2 through h6 headers, Strips leading emp
 
 #### Orchestrator coordinates full documentation generation pipeline
 
+**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+
+**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
+
 _Verified by: Non-overlapping patterns merge successfully, Orchestrator detects pattern name conflicts, Orchestrator detects pattern name conflicts with status mismatch, Unknown generator name fails gracefully, Partial success when some generators are invalid_
 
 *orchestrator.feature*
@@ -696,13 +700,25 @@ _Verified by: Complete dependency graph with all relationship types_
 
 #### PlanningChecklistCodec prepares for implementation sessions
 
+**Invariant:** The checklist must include pre-planning questions, definition of done with deliverables, and dependency status for all actionable phases.
+
+**Rationale:** Implementation sessions fail without upfront preparation — the checklist surfaces blockers before work begins.
+
 _Verified by: No actionable phases produces empty message, Summary shows phases to plan count, Pre-planning questions section, Definition of Done with deliverables, Acceptance criteria from scenarios, Risk assessment section, Dependency status shows met vs unmet, forActivePhases option, forNextActionable option_
 
 #### SessionPlanCodec generates implementation plans
 
+**Invariant:** The plan must include status summary, implementation approach from use cases, deliverables with status, and acceptance criteria from scenarios.
+
+**Rationale:** A structured implementation plan ensures all deliverables and acceptance criteria are visible before coding starts.
+
 _Verified by: No phases to plan produces empty message, Summary shows status counts, Implementation approach from useCases, Deliverables rendering, Acceptance criteria with steps, Business rules section, statusFilter option for active only, statusFilter option for planned only_
 
 #### SessionFindingsCodec captures retrospective discoveries
+
+**Invariant:** Findings must be categorized into gaps, improvements, risks, and learnings with per-type counts in the summary.
+
+**Rationale:** Retrospective findings drive continuous improvement — categorization enables prioritized follow-up across sessions.
 
 _Verified by: No findings produces empty message, Summary shows finding type counts, Gaps section, Improvements section, Risks section includes risk field, Learnings section, groupBy category option, groupBy phase option, groupBy type option, showSourcePhase option enabled, showSourcePhase option disabled_
 
@@ -954,17 +970,33 @@ _Verified by: Include-tagged pattern appears in behavior section, Include-tagged
 
 #### Registration produces the correct number of generators
 
+**Invariant:** Each reference config produces exactly 2 generators (detailed + summary), plus meta-generators for product-area and non-product-area routing.
+
+**Rationale:** The count is deterministic from config — any mismatch indicates a registration bug that would silently drop generated documents.
+
 _Verified by: Generators are registered from configs plus meta-generators_
 
 #### Product area configs produce a separate meta-generator
+
+**Invariant:** Configs with productArea set route to "product-area-docs" meta-generator; configs without route to "reference-docs".
+
+**Rationale:** Product area docs are rendered into per-area subdirectories while standalone references go to the root output.
 
 _Verified by: Product area meta-generator is registered_
 
 #### Generator naming follows kebab-case convention
 
+**Invariant:** Detailed generators end in "-reference" and summary generators end in "-reference-claude".
+
+**Rationale:** Consistent naming enables programmatic discovery and distinguishes human-readable from AI-optimized outputs.
+
 _Verified by: Detailed generator has name ending in "-reference", Summary generator has name ending in "-reference-claude"_
 
 #### Generator execution produces markdown output
+
+**Invariant:** Every registered generator must produce at least one non-empty output file when given matching data.
+
+**Rationale:** A generator that produces empty output wastes a pipeline slot and creates confusion when expected docs are missing.
 
 _Verified by: Product area generator with matching data produces non-empty output, Product area generator with no patterns still produces intro_
 
@@ -998,13 +1030,25 @@ _Verified by: Multiple phases shown in order, Completed phases not shown in rema
 
 #### ChangelogCodec follows Keep a Changelog format
 
+**Invariant:** Releases must be sorted by semver descending, unreleased patterns grouped under "[Unreleased]", and change types follow the standard order (Added, Changed, Deprecated, Removed, Fixed, Security).
+
+**Rationale:** Keep a Changelog is an industry standard format — following it ensures the output is immediately familiar to developers.
+
 _Verified by: Decode empty dataset produces changelog header only, Unreleased section shows active and vNEXT patterns, Release sections sorted by semver descending, Quarter fallback for patterns without release, Earlier section for undated patterns, Category mapping to change types, Exclude unreleased when option disabled, Change type sections follow standard order_
 
 #### TraceabilityCodec maps timeline patterns to behavior tests
 
+**Invariant:** Coverage statistics must show total timeline phases, those with behavior tests, those missing, and a percentage. Gaps must be surfaced prominently.
+
+**Rationale:** Traceability ensures every planned pattern has executable verification — gaps represent unverified claims about system behavior.
+
 _Verified by: No timeline patterns produces empty message, Coverage statistics show totals and percentage, Coverage gaps table shows missing coverage, Covered phases in collapsible section, Exclude gaps when option disabled, Exclude stats when option disabled, Exclude covered when option disabled, Verified behavior files indicated in output_
 
 #### OverviewCodec provides project architecture summary
+
+**Invariant:** The overview must include architecture sections from overview-tagged patterns, pattern summary with progress percentage, and timeline summary with phase counts.
+
+**Rationale:** The architecture overview is the primary entry point for understanding the project — it must provide a complete picture at a glance.
 
 _Verified by: Decode empty dataset produces minimal overview, Architecture section from overview-tagged patterns, Patterns summary with progress bar, Timeline summary with phase counts, Exclude architecture when option disabled, Exclude patterns summary when option disabled, Exclude timeline summary when option disabled, Multiple overview patterns create multiple architecture subsections_
 
@@ -1109,9 +1153,17 @@ _Verified by: Division of two numbers, Division by zero is prevented_
 
 #### SessionContextCodec provides working context for AI sessions
 
+**Invariant:** Session context must include session status with active/completed/remaining counts, phase navigation for incomplete phases, and active work grouped by phase.
+
+**Rationale:** AI agents need a compact, navigable view of current project state to make informed implementation decisions.
+
 _Verified by: Decode empty dataset produces minimal session context, Decode dataset with timeline patterns, Session status shows current focus, Phase navigation for incomplete phases, Active work grouped by phase, Blocked items section with dependencies, No blocked items section when disabled, Recent completions collapsible, Generate session phase detail files when enabled, No detail files when disabled_
 
 #### RemainingWorkCodec aggregates incomplete work by phase
+
+**Invariant:** Remaining work must show status counts, phase-grouped navigation, priority classification (in-progress/ready/blocked), and next actionable items.
+
+**Rationale:** Remaining work visibility prevents scope blindness — knowing what's left, what's blocked, and what's ready drives efficient session planning.
 
 _Verified by: All work complete produces celebration message, Summary shows remaining counts, Phase navigation with remaining count, By priority shows ready vs blocked, Next actionable items section, Next actionable respects maxNextActionable limit, Sort by phase option, Sort by priority option, Generate remaining work detail files when enabled, No detail files when disabled for remaining_
 
@@ -1323,13 +1375,25 @@ _Verified by: All 6 format types are documented_
 
 #### RoadmapDocumentCodec groups patterns by phase with progress tracking
 
+**Invariant:** The roadmap must include overall progress with percentage, phase navigation table, and phase sections with pattern tables.
+
+**Rationale:** The roadmap is the primary planning artifact — progress tracking at both project and phase level enables informed prioritization.
+
 _Verified by: Decode empty dataset produces minimal roadmap, Decode dataset with multiple phases, Progress section shows correct status counts, Phase navigation table with progress, Phase sections show pattern tables, Generate phase detail files when enabled, No detail files when disabled, Quarterly timeline shown when quarters exist_
 
 #### CompletedMilestonesCodec shows only completed patterns grouped by quarter
 
+**Invariant:** Only completed patterns appear, grouped by quarter with navigation, recent completions, and collapsible phase details.
+
+**Rationale:** Milestone tracking provides a historical record of delivery — grouping by quarter aligns with typical reporting cadence.
+
 _Verified by: No completed patterns produces empty message, Summary shows completed counts, Quarterly navigation with completed patterns, Completed phases shown in collapsible sections, Recent completions section with limit, Generate quarterly detail files when enabled_
 
 #### CurrentWorkCodec shows only active patterns with deliverables
+
+**Invariant:** Only active patterns appear with progress bars, deliverable tracking, and an all-active-patterns summary table.
+
+**Rationale:** Current work focus eliminates noise from completed and planned items — teams need to see only what's in flight.
 
 _Verified by: No active work produces empty message, Summary shows overall progress, Active phases with progress bars, Deliverables rendered when configured, All active patterns table, Generate current work detail files when enabled_
 

@@ -22,6 +22,10 @@ Feature: Project Config Loader - Unified Configuration Loading
 
   Rule: Missing config returns defaults
 
+    **Invariant:** When no config file exists, loadProjectConfig must return a default resolved config with isDefault=true.
+    **Rationale:** Graceful fallback enables zero-config usage — new projects work without requiring config file creation.
+    **Verified by:** No config file returns default resolved config
+
     @happy-path
     Scenario: No config file returns default resolved config
       Given no config file in the temp directory
@@ -30,6 +34,10 @@ Feature: Project Config Loader - Unified Configuration Loading
       And project config isDefault should be true
 
   Rule: New-style config is loaded and resolved
+
+    **Invariant:** A file exporting defineConfig must be loaded, validated, and resolved with correct preset categories.
+    **Rationale:** defineConfig is the primary config format — correct loading is the critical path for all documentation generation.
+    **Verified by:** defineConfig export loads and resolves correctly
 
     @happy-path
     Scenario: defineConfig export loads and resolves correctly
@@ -41,6 +49,10 @@ Feature: Project Config Loader - Unified Configuration Loading
 
   Rule: Legacy config is loaded with backward compatibility
 
+    **Invariant:** A file exporting createDeliveryProcess must be loaded and produce a valid resolved config.
+    **Rationale:** Backward compatibility prevents breaking existing consumers during migration to the new config format.
+    **Verified by:** Legacy createDeliveryProcess export loads correctly
+
     @happy-path
     Scenario: Legacy createDeliveryProcess export loads correctly
       Given a legacy config file with registry and regexBuilders
@@ -49,6 +61,10 @@ Feature: Project Config Loader - Unified Configuration Loading
       And project config isDefault should be false
 
   Rule: Invalid configs produce clear errors
+
+    **Invariant:** Config files without a default export or with invalid data must produce descriptive error messages.
+    **Rationale:** Actionable error messages reduce debugging time — users need to know what to fix, not just that something failed.
+    **Verified by:** Config without default export returns error, Config with invalid project config returns Zod error
 
     @error-handling
     Scenario: Config without default export returns error

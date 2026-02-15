@@ -18,6 +18,10 @@ Feature: Documentation Generation Orchestrator
 
   Rule: Orchestrator coordinates full documentation generation pipeline
 
+    **Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+    **Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
+    **Verified by:** Non-overlapping patterns merge successfully, Orchestrator detects pattern name conflicts, Orchestrator detects pattern name conflicts with status mismatch, Unknown generator name fails gracefully, Partial success when some generators are invalid
+
     @acceptance-criteria @happy-path
     Scenario: Non-overlapping patterns merge successfully
       Given TypeScript files with patterns:

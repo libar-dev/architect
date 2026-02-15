@@ -9,6 +9,10 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
 
   Rule: assembleContext produces session-tailored context bundles
 
+    **Invariant:** Each session type (design/planning/implement) must include exactly the context sections defined by its profile — no more, no less.
+    **Rationale:** Over-fetching wastes AI context window tokens; under-fetching causes the agent to make uninformed decisions.
+    **Verified by:** Design session includes stubs, consumers, and architecture, Planning session includes only metadata and dependencies, Implement session includes deliverables and FSM, Multi-pattern context merges metadata from both patterns, Pattern not found returns error with suggestion, Description preserves Problem and Solution structure, Solution text with inline bold is not truncated
+
     @acceptance-criteria @happy-path
     Scenario: Design session includes stubs, consumers, and architecture
       Given a pattern "OrderSaga" with status "roadmap" in phase 22
@@ -78,6 +82,10 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
 
   Rule: buildDepTree walks dependency chains with cycle detection
 
+    **Invariant:** The dependency tree must walk the full chain up to the depth limit, mark the focal node, and terminate safely on circular references.
+    **Rationale:** Dependency chains reveal implementation prerequisites — cycles and infinite recursion would crash the CLI.
+    **Verified by:** Dependency tree shows chain with status markers, Depth limit truncates branches, Circular dependencies are handled safely, Standalone pattern returns single-node tree
+
     @acceptance-criteria @happy-path
     Scenario: Dependency tree shows chain with status markers
       Given a dependency chain: "Root" completed -> "Middle" active -> "Leaf" roadmap
@@ -106,6 +114,10 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
 
   Rule: buildOverview provides executive project summary
 
+    **Invariant:** The overview must include progress counts (completed/active/planned), active phase listing, and blocking dependencies.
+    **Rationale:** The overview is the first command in every session start recipe — it must provide a complete project health snapshot.
+    **Verified by:** Overview shows progress, active phases, and blocking, Empty dataset returns zero-state overview
+
     @acceptance-criteria @happy-path
     Scenario: Overview shows progress, active phases, and blocking
       Given a dataset with phased patterns including dependencies
@@ -123,6 +135,10 @@ Feature: Context Assembler - Session-Oriented Context Bundle Builder
       And no blocking is reported
 
   Rule: buildFileReadingList returns paths by relevance
+
+    **Invariant:** Primary files (spec, implementation) must always be included; related files (dependency implementations) are included only when requested.
+    **Rationale:** File reading lists power the "what to read" guidance — relevance sorting ensures the most important files are read first within token budgets.
+    **Verified by:** File list includes primary and related files, File list includes implementation files for completed dependencies, File list without related returns only primary
 
     @acceptance-criteria @happy-path
     Scenario: File list includes primary and related files

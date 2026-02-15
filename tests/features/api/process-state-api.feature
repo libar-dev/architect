@@ -27,6 +27,10 @@ Feature: Process State API
 
   Rule: Status queries return correct patterns
 
+    **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+    **Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+    **Verified by:** Get patterns by normalized status, Get patterns by FSM status, Get current work returns active patterns, Get roadmap items returns roadmap and deferred, Get status counts, Get completion percentage
+
     @happy-path
     Scenario: Get patterns by normalized status
       Given patterns with statuses: completed, active, roadmap, deferred
@@ -74,6 +78,10 @@ Feature: Process State API
 
   Rule: Phase queries return correct phase data
 
+    **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+    **Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+    **Verified by:** Get patterns by phase, Get phase progress, Get nonexistent phase returns undefined, Get active phases
+
     @happy-path
     Scenario: Get patterns by phase
       Given patterns in phase 14 and phase 15
@@ -106,6 +114,10 @@ Feature: Process State API
 
   Rule: FSM queries expose transition validation
 
+    **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+    **Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+    **Verified by:** Check valid transition, Check invalid transition, Get valid transitions from status, Get protection info
+
     @happy-path
     Scenario: Check valid transition
       When checking if transition from "roadmap" to "active" is valid
@@ -135,6 +147,10 @@ Feature: Process State API
   # ==========================================================================
 
   Rule: Pattern queries find and retrieve pattern data
+
+    **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+    **Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+    **Verified by:** Find pattern by name (case insensitive), Find nonexistent pattern returns undefined, Get patterns by category, Get all categories with counts
 
     @happy-path
     Scenario: Find pattern by name (case insensitive)
@@ -166,6 +182,10 @@ Feature: Process State API
   # ==========================================================================
 
   Rule: Timeline queries group patterns by time
+
+    **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+    **Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+    **Verified by:** Get patterns by quarter, Get all quarters, Get recently completed sorted by date
 
     @happy-path
     Scenario: Get patterns by quarter
