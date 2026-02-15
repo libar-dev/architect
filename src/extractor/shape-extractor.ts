@@ -84,6 +84,19 @@ interface ImportOrReExport {
 }
 
 // =============================================================================
+// Parse Helper
+// =============================================================================
+
+/**
+ * Parse TypeScript source with the correct JSX mode.
+ * JSX must only be enabled for .tsx files — enabling it for .ts files causes
+ * generic arrow functions like `<T>(v: T)` to be mis-parsed as JSX elements.
+ */
+function parseSource(sourceCode: string, jsx: boolean): TSESTree.Program {
+  return parse(sourceCode, { loc: true, range: true, comment: true, jsx });
+}
+
+// =============================================================================
 // Main Extraction Function
 // =============================================================================
 
@@ -120,12 +133,7 @@ export function extractShapes(
   // Parse the source code
   let ast: TSESTree.Program;
   try {
-    ast = parse(sourceCode, {
-      loc: true,
-      range: true,
-      comment: true,
-      jsx: true,
-    });
+    ast = parseSource(sourceCode, options.jsx ?? false);
   } catch (error) {
     return Result.err(
       error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
@@ -139,8 +147,9 @@ export function extractShapes(
   // Process each requested shape name
   for (const shapeName of shapeNames) {
     // Check if it's a local declaration
-    const declaration = declarations.get(shapeName);
-    if (declaration) {
+    const declarationList = declarations.get(shapeName);
+    if (declarationList !== undefined) {
+      const declaration = pickBestDeclaration(declarationList);
       const shape = extractShape(sourceCode, declaration, ast.comments ?? [], {
         includeJsDoc,
         preserveFormatting,
@@ -178,8 +187,17 @@ export function extractShapes(
 /**
  * Find all declarations that could be extracted as shapes.
  */
-function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration> {
-  const declarations = new Map<string, FoundDeclaration>();
+function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration[]> {
+  const declarations = new Map<string, FoundDeclaration[]>();
+
+  function pushDeclaration(decl: FoundDeclaration): void {
+    const existing = declarations.get(decl.name);
+    if (existing !== undefined) {
+      existing.push(decl);
+    } else {
+      declarations.set(decl.name, [decl]);
+    }
+  }
 
   for (const node of ast.body) {
     // Handle export declarations
@@ -187,17 +205,19 @@ function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration> 
       if (node.declaration) {
         const found = processDeclaration(node.declaration, true);
         for (const decl of found) {
-          declarations.set(decl.name, decl);
+          pushDeclaration(decl);
         }
       }
       // Handle export { Foo } without a source (local re-export)
       if (!node.source) {
         for (const spec of node.specifiers) {
           const localName = spec.local.name;
-          // This might reference a local declaration - mark it as exported
+          // This might reference a local declaration - mark all as exported
           const existing = declarations.get(localName);
-          if (existing) {
-            existing.exported = true;
+          if (existing !== undefined) {
+            for (const decl of existing) {
+              decl.exported = true;
+            }
           }
         }
       }
@@ -206,15 +226,46 @@ function findDeclarations(ast: TSESTree.Program): Map<string, FoundDeclaration> 
     else {
       const found = processDeclaration(node, false);
       for (const decl of found) {
-        // Only add if not already found (export takes precedence)
-        if (!declarations.has(decl.name)) {
-          declarations.set(decl.name, decl);
+        const existing = declarations.get(decl.name);
+        // Only add if no exported version of same kind already exists
+        if (existing !== undefined) {
+          const hasExportedSameKind = existing.some((e) => e.exported && e.kind === decl.kind);
+          if (!hasExportedSameKind) {
+            existing.push(decl);
+          }
+        } else {
+          declarations.set(decl.name, [decl]);
         }
       }
     }
   }
 
   return declarations;
+}
+
+/** Priority ranking for declaration kinds — type-level preferred for documentation */
+const KIND_PRIORITY: Record<ShapeKind, number> = {
+  interface: 0,
+  type: 1,
+  enum: 2,
+  function: 3,
+  const: 4,
+};
+
+/**
+ * Pick the best declaration from an array of same-name declarations.
+ * Prefers type-level constructs (interface, type, enum) over value-level (function, const).
+ */
+function pickBestDeclaration(declarations: readonly FoundDeclaration[]): FoundDeclaration {
+  if (declarations.length === 1) {
+    const only = declarations[0];
+    if (only === undefined) throw new Error('Empty declarations array');
+    return only;
+  }
+  const sorted = [...declarations].sort((a, b) => KIND_PRIORITY[a.kind] - KIND_PRIORITY[b.kind]);
+  const best = sorted[0];
+  if (best === undefined) throw new Error('Empty declarations array after sort');
+  return best;
 }
 
 /**
@@ -896,7 +947,7 @@ export interface ProcessExtractShapesResult {
  * @param sourceCode - File content
  * @returns Result with all exported shapes
  */
-function extractAllExportedShapes(sourceCode: string): Result<ShapeExtractionResult> {
+function extractAllExportedShapes(sourceCode: string, jsx = false): Result<ShapeExtractionResult> {
   // Validate input size
   if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
     return Result.err(
@@ -908,12 +959,7 @@ function extractAllExportedShapes(sourceCode: string): Result<ShapeExtractionRes
 
   let ast: TSESTree.Program;
   try {
-    ast = parse(sourceCode, {
-      loc: true,
-      range: true,
-      comment: true,
-      jsx: true,
-    });
+    ast = parseSource(sourceCode, jsx);
   } catch (error) {
     return Result.err(
       error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
@@ -924,10 +970,12 @@ function extractAllExportedShapes(sourceCode: string): Result<ShapeExtractionRes
   const shapes: ExtractedShape[] = [];
   const warnings: string[] = [];
 
-  // Extract only exported declarations
-  for (const [, declaration] of declarations) {
-    if (!declaration.exported) continue;
-    const shape = extractShape(sourceCode, declaration, ast.comments ?? [], {
+  // Extract best exported declaration per name (one shape per name)
+  for (const [, declarationList] of declarations) {
+    const exportedDecls = declarationList.filter((d) => d.exported);
+    if (exportedDecls.length === 0) continue;
+    const best = pickBestDeclaration(exportedDecls);
+    const shape = extractShape(sourceCode, best, ast.comments ?? [], {
       includeJsDoc: true,
       preserveFormatting: true,
     });
@@ -958,8 +1006,11 @@ function extractAllExportedShapes(sourceCode: string): Result<ShapeExtractionRes
  */
 export function processExtractShapesTag(
   sourceCode: string,
-  extractShapesTag: string
+  extractShapesTag: string,
+  options?: { readonly jsx?: boolean }
 ): ProcessExtractShapesResult {
+  const jsx = options?.jsx ?? false;
+
   // DD-4: Auto-shape discovery via wildcard
   const shapeNames = extractShapesTag
     .split(',')
@@ -980,7 +1031,7 @@ export function processExtractShapesTag(
       };
     }
 
-    const result = extractAllExportedShapes(sourceCode);
+    const result = extractAllExportedShapes(sourceCode, jsx);
     if (!result.ok) {
       return {
         shapes: [],
@@ -990,7 +1041,7 @@ export function processExtractShapesTag(
     return { shapes: [...result.value.shapes], warnings: [...result.value.warnings] };
   }
 
-  const extractionResult = extractShapes(sourceCode, shapeNames);
+  const extractionResult = extractShapes(sourceCode, shapeNames, { jsx });
 
   // If extraction failed (parse error), return empty shapes with error as warning
   if (!extractionResult.ok) {
@@ -1083,9 +1134,13 @@ function extractIncludeTag(jsDocText: string): readonly string[] | undefined {
  * and extractShape() — no parser changes needed (DD-2).
  *
  * @param sourceCode - TypeScript source code to scan
+ * @param options - Parse options (jsx should match file extension)
  * @returns Result containing discovered shapes and warnings
  */
-export function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractShapesResult> {
+export function discoverTaggedShapes(
+  sourceCode: string,
+  options?: { readonly jsx?: boolean }
+): Result<ProcessExtractShapesResult> {
   // Validate input size
   if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
     return Result.err(
@@ -1095,15 +1150,10 @@ export function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractS
     );
   }
 
-  // Parse with same config as extractShapes (DD-2: stay on estree parser)
+  // Parse with correct JSX mode (DD-2: stay on estree parser)
   let ast: TSESTree.Program;
   try {
-    ast = parse(sourceCode, {
-      loc: true,
-      range: true,
-      comment: true,
-      jsx: true,
-    });
+    ast = parseSource(sourceCode, options?.jsx ?? false);
   } catch (error) {
     return Result.err(
       error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`)
@@ -1116,29 +1166,31 @@ export function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractS
   const shapes: ExtractedShape[] = [];
   const warnings: string[] = [];
 
-  for (const [, declaration] of declarations) {
-    // Get JSDoc for this declaration (respects MAX_JSDOC_LINE_DISTANCE)
-    const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
-    if (jsDoc === undefined) continue;
+  for (const [, declarationList] of declarations) {
+    for (const declaration of declarationList) {
+      // Get JSDoc for this declaration (respects MAX_JSDOC_LINE_DISTANCE)
+      const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
+      if (jsDoc === undefined) continue;
 
-    // Check for @libar-docs-shape tag
-    const tagResult = extractShapeTag(jsDoc);
-    if (!tagResult.tagged) continue;
+      // Check for @libar-docs-shape tag
+      const tagResult = extractShapeTag(jsDoc);
+      if (!tagResult.tagged) continue;
 
-    // Extract the shape using existing infrastructure
-    const shape = extractShape(sourceCode, declaration, comments, {
-      includeJsDoc: true,
-      preserveFormatting: true,
-    });
+      // Extract the shape using existing infrastructure
+      const shape = extractShape(sourceCode, declaration, comments, {
+        includeJsDoc: true,
+        preserveFormatting: true,
+      });
 
-    // DD-5: Add group field from tag value
-    // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
-    const includeValues = extractIncludeTag(jsDoc);
-    shapes.push({
-      ...shape,
-      group: tagResult.group,
-      ...(includeValues !== undefined && { includes: includeValues }),
-    });
+      // DD-5: Add group field from tag value
+      // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
+      const includeValues = extractIncludeTag(jsDoc);
+      shapes.push({
+        ...shape,
+        group: tagResult.group,
+        ...(includeValues !== undefined && { includes: includeValues }),
+      });
+    }
   }
 
   return Result.ok({ shapes, warnings });

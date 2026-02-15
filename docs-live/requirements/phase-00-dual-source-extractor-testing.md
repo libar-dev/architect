@@ -6,28 +6,30 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 Extracts and combines pattern metadata from both TypeScript code stubs
-  (@libar-docs-*) and Gherkin feature files (@libar-process-*), validates
-  consistency, and composes unified pattern data for documentation.
+(@libar-docs-_) and Gherkin feature files (@libar-process-_), validates
+consistency, and composes unified pattern data for documentation.
 
-  **Problem:**
-  - Pattern data split across code stubs and feature files
-  - Need to validate consistency between sources
-  - Deliverables defined in Background tables need extraction
-  - Pattern name collisions need handling
+**Problem:**
 
-  **Solution:**
-  - extractProcessMetadata() extracts tags from features
-  - extractDeliverables() parses Background tables
-  - combineSources() merges code + features into dual-source patterns
-  - validateDualSource() checks cross-source consistency
+- Pattern data split across code stubs and feature files
+- Need to validate consistency between sources
+- Deliverables defined in Background tables need extraction
+- Pattern name collisions need handling
+
+**Solution:**
+
+- extractProcessMetadata() extracts tags from features
+- extractDeliverables() parses Background tables
+- combineSources() merges code + features into dual-source patterns
+- validateDualSource() checks cross-source consistency
 
 ## Acceptance Criteria
 
@@ -40,13 +42,13 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - And the phase is 15
 - And the status is "active"
 
-| tag |
-| --- |
+| tag               |
+| ----------------- |
 | pattern:MyPattern |
-| phase:15 |
-| status:active |
-| quarter:Q1-2024 |
-| effort:medium |
+| phase:15          |
+| status:active     |
+| quarter:Q1-2024   |
+| effort:medium     |
 
 **Minimal required tags extraction**
 
@@ -55,10 +57,10 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - Then metadata is extracted successfully
 - And the status defaults to "roadmap"
 
-| tag |
-| --- |
+| tag                |
+| ------------------ |
 | pattern:MinPattern |
-| phase:01 |
+| phase:01           |
 
 **Missing pattern tag returns null**
 
@@ -66,8 +68,8 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - When extracting process metadata
 - Then no metadata is extracted
 
-| tag |
-| --- |
+| tag      |
+| -------- |
 | phase:10 |
 
 **Missing phase tag returns null**
@@ -76,8 +78,8 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - When extracting process metadata
 - Then no metadata is extracted
 
-| tag |
-| --- |
+| tag             |
+| --------------- |
 | pattern:NoPhase |
 
 **Standard deliverables table extraction**
@@ -88,10 +90,10 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - And deliverable "Implement API" has status "complete"
 - And deliverable "Implement API" has 5 tests
 
-| Deliverable | Status | Tests | Location |
-| --- | --- | --- | --- |
-| Implement API | complete | 5 | src/api/handler.ts |
-| Write docs | complete | Yes | docs/README.md |
+| Deliverable   | Status   | Tests | Location           |
+| ------------- | -------- | ----- | ------------------ |
+| Implement API | complete | 5     | src/api/handler.ts |
+| Write docs    | complete | Yes   | docs/README.md     |
 
 **Extended deliverables with Finding and Release**
 
@@ -100,9 +102,9 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - Then deliverable "Fix bug" has finding "CODE-001"
 - And deliverable "Fix bug" has release "v0.2.0"
 
-| Deliverable | Status | Tests | Location | Finding | Release |
-| --- | --- | --- | --- | --- | --- |
-| Fix bug | complete | 3 | src/fix | CODE-001 | v0.2.0 |
+| Deliverable | Status   | Tests | Location | Finding  | Release |
+| ----------- | -------- | ----- | -------- | -------- | ------- |
+| Fix bug     | complete | 3     | src/fix  | CODE-001 | v0.2.0  |
 
 **Feature without background returns empty**
 
@@ -116,12 +118,12 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - When extracting deliverables
 - Then the test counts are correctly parsed
 
-| Deliverable | Status | Tests | Location |
-| --- | --- | --- | --- |
-| Test Yes | complete | Yes | src/ |
-| Test No | complete | No | src/ |
-| Test Number | complete | 10 | src/ |
-| Test Empty | complete |  | src/ |
+| Deliverable | Status   | Tests | Location |
+| ----------- | -------- | ----- | -------- |
+| Test Yes    | complete | Yes   | src/     |
+| Test No     | complete | No    | src/     |
+| Test Number | complete | 10    | src/     |
+| Test Empty  | complete |       | src/     |
 
 **Matching code and feature are combined**
 
@@ -168,9 +170,9 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - And combined pattern "ServiceX" has merged dependencies
 
 | patternName | phase | category | dependsOn |
-| --- | --- | --- | --- |
-| ServiceX | 15 | core | PatternA |
-| ServiceX | 15 | ddd | PatternB |
+| ----------- | ----- | -------- | --------- |
+| ServiceX    | 15    | core     | PatternA  |
+| ServiceX    | 15    | ddd      | PatternB  |
 
 **Clean results have no errors**
 
@@ -187,9 +189,9 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - Then validation fails
 - And 1 error is reported
 
-| codeName | featureName | message |
-| --- | --- | --- |
-| PatternA | PatternA | Phase mismatch: code 10, feat 20 |
+| codeName | featureName | message                          |
+| -------- | ----------- | -------------------------------- |
+| PatternA | PatternA    | Phase mismatch: code 10, feat 20 |
 
 **Orphaned roadmap code stubs produce warnings**
 
@@ -198,10 +200,10 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - Then validation passes
 - And 1 warning about missing feature file exists
 
-| patternName | status |
-| --- | --- |
-| OrphanA | roadmap |
-| OrphanB | completed |
+| patternName | status    |
+| ----------- | --------- |
+| OrphanA     | roadmap   |
+| OrphanB     | completed |
 
 **Feature-only roadmap patterns produce warnings**
 
@@ -210,10 +212,10 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - Then validation passes
 - And 1 warning about missing code stub exists
 
-| pattern | phase | status |
-| --- | --- | --- |
-| FeatureOnlyA | 10 | roadmap |
-| FeatureOnlyB | 20 | active |
+| pattern      | phase | status  |
+| ------------ | ----- | ------- |
+| FeatureOnlyA | 10    | roadmap |
+| FeatureOnlyB | 20    | active  |
 
 **Single include tag is extracted**
 
@@ -221,12 +223,12 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - When extracting Gherkin patterns
 - Then the extracted pattern has include "reference-sample"
 
-| tag |
-| --- |
-| libar-docs |
-| pattern:IncludeTest |
-| status:roadmap |
-| phase:01 |
+| tag                      |
+| ------------------------ |
+| libar-docs               |
+| pattern:IncludeTest      |
+| status:roadmap           |
+| phase:01                 |
 | include:reference-sample |
 
 **CSV include tag produces multiple values**
@@ -236,13 +238,13 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - Then the extracted pattern has include "doc-a"
 - And the extracted pattern has include "doc-b"
 
-| tag |
-| --- |
-| libar-docs |
+| tag                  |
+| -------------------- |
+| libar-docs           |
 | pattern:MultiInclude |
-| status:roadmap |
-| phase:01 |
-| include:doc-a,doc-b |
+| status:roadmap       |
+| phase:01             |
+| include:doc-a,doc-b  |
 
 **Feature without include tag has no include field**
 
@@ -250,32 +252,51 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 - When extracting Gherkin patterns
 - Then the extracted pattern has no include field
 
-| tag |
-| --- |
-| libar-docs |
+| tag               |
+| ----------------- |
+| libar-docs        |
 | pattern:NoInclude |
-| status:roadmap |
-| phase:01 |
+| status:roadmap    |
+| phase:01          |
 
 ## Business Rules
 
 **Process metadata is extracted from feature tags**
 
+**Invariant:** A feature file must have both @pattern and @phase tags to produce valid process metadata; missing either yields null.
+**Rationale:** Pattern name and phase are the minimum identifiers for placing a pattern in the roadmap — without both, the pattern cannot be tracked.
+**Verified by:** Complete process metadata extraction, Minimal required tags extraction, Missing pattern tag returns null, Missing phase tag returns null
+
 _Verified by: Complete process metadata extraction, Minimal required tags extraction, Missing pattern tag returns null, Missing phase tag returns null_
 
 **Deliverables are extracted from Background tables**
+
+**Invariant:** Deliverables are sourced exclusively from Background tables; features without a Background produce an empty deliverable list.
+**Rationale:** The Background table is the single source of truth for deliverable tracking — extracting from other locations would create ambiguity.
+**Verified by:** Standard deliverables table extraction, Extended deliverables with Finding and Release, Feature without background returns empty, Tests column handles various formats
 
 _Verified by: Standard deliverables table extraction, Extended deliverables with Finding and Release, Feature without background returns empty, Tests column handles various formats_
 
 **Code and feature patterns are combined into dual-source patterns**
 
+**Invariant:** A combined pattern is produced only when both a code stub and a feature file exist for the same pattern name; unmatched sources are tracked separately as code-only or feature-only.
+**Rationale:** Dual-source combination ensures documentation reflects both implementation intent (code) and specification (Gherkin) — mismatches signal inconsistency.
+**Verified by:** Matching code and feature are combined, Code-only pattern has no matching feature, Feature-only pattern has no matching code, Phase mismatch creates validation error, Pattern name collision merges sources
+
 _Verified by: Matching code and feature are combined, Code-only pattern has no matching feature, Feature-only pattern has no matching code, Phase mismatch creates validation error, Pattern name collision merges sources_
 
 **Dual-source results are validated for consistency**
 
+**Invariant:** Cross-source validation reports errors for metadata mismatches and warnings for orphaned patterns that are still in roadmap status.
+**Rationale:** Inconsistencies between code stubs and feature files indicate drift — errors catch conflicts while warnings surface missing counterparts that may be intentional.
+**Verified by:** Clean results have no errors, Cross-validation errors are reported, Orphaned roadmap code stubs produce warnings, Feature-only roadmap patterns produce warnings
+
 _Verified by: Clean results have no errors, Cross-validation errors are reported, Orphaned roadmap code stubs produce warnings, Feature-only roadmap patterns produce warnings_
 
 **Include tags are extracted from Gherkin feature tags**
+
+**Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no includes.
+**Verified by:** Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field
 
 _Verified by: Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field_
 

@@ -150,6 +150,17 @@
       ]
     },
     {
+      "title": "Guides",
+      "tags": ["core"],
+      "subsections": [
+        {
+          "path": "guides/product-area-enrichment.md",
+          "tags": ["core"],
+          "description": "Workflow for adding live diagrams and enriched intros to product area docs"
+        }
+      ]
+    },
+    {
       "title": "Claude MD Management",
       "tags": ["meta"],
       "subsections": [

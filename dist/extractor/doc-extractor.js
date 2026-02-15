@@ -121,6 +121,7 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
     const extractionWarnings = [];
     // Only TypeScript files can have shapes
     if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+        const jsx = filePath.endsWith('.tsx');
         let sourceContent;
         try {
             sourceContent = fs.readFileSync(filePath, 'utf-8');
@@ -132,7 +133,7 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
         if (sourceContent !== undefined &&
             directive.extractShapes !== undefined &&
             directive.extractShapes.length > 0) {
-            const shapeResult = processExtractShapesTag(sourceContent, directive.extractShapes.join(', '));
+            const shapeResult = processExtractShapesTag(sourceContent, directive.extractShapes.join(', '), { jsx });
             extractedShapes = shapeResult.shapes;
             extractionWarnings.push(...shapeResult.warnings);
         }
@@ -141,7 +142,7 @@ export function buildPattern(directive, code, exports, filePath, baseDir, regist
         // twice (once in processExtractShapesTag, once in discoverTaggedShapes). Acceptable
         // for v1 — future optimization could accept a pre-parsed AST.
         if (sourceContent?.includes('libar-docs-shape') === true) {
-            const taggedResult = discoverTaggedShapes(sourceContent);
+            const taggedResult = discoverTaggedShapes(sourceContent, { jsx });
             if (taggedResult.ok && taggedResult.value.shapes.length > 0) {
                 const existingByName = new Map((extractedShapes ?? []).map((s) => [s.name, s]));
                 const newShapes = taggedResult.value.shapes.filter((s) => !existingByName.has(s.name));

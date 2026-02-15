@@ -7,12 +7,12 @@
 
 ## Overview
 
-This diagram was auto-generated from 127 annotated source files across 10 bounded contexts.
+This diagram was auto-generated from 129 annotated source files across 11 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 127 |
-| Bounded Contexts | 10 |
+| Total Components | 129 |
+| Bounded Contexts | 11 |
 | Component Roles | 5 |
 
 ---
@@ -81,12 +81,12 @@ graph TB
         ContentDeduplicator["ContentDeduplicator[infrastructure]"]
         CodecBasedGenerator["CodecBasedGenerator[service]"]
         FileCache["FileCache[infrastructure]"]
+        TransformDataset["TransformDataset[service]"]
+        PipelineModule["PipelineModule"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         BuiltInGenerators["BuiltInGenerators"]
         DecisionDocGenerator["DecisionDocGenerator[service]"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
-        TransformDataset["TransformDataset[service]"]
-        PipelineModule["PipelineModule"]
     end
     subgraph lint["Lint BC"]
         LintRules["LintRules[service]"]
@@ -144,6 +144,10 @@ graph TB
         CategoryDefinitions["CategoryDefinitions[read-model]"]
         CategoryDefinition["CategoryDefinition"]
     end
+    subgraph types["Types BC"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
+    end
     subgraph validation["Validation BC"]
         WorkflowConfigSchema["WorkflowConfigSchema"]
         Tag_Registry_Configuration["Tag Registry Configuration"]
@@ -173,6 +177,8 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -219,10 +225,10 @@ graph TB
         ProcessGuardModule["ProcessGuardModule"]
         DetectChanges["DetectChanges"]
         DeriveProcessState["DeriveProcessState"]
+        PipelineModule["PipelineModule"]
         ReferenceGeneratorRegistration["ReferenceGeneratorRegistration"]
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
-        PipelineModule["PipelineModule"]
         CodecBaseOptions["CodecBaseOptions"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
         ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
@@ -237,12 +243,14 @@ graph TB
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
+    GherkinScanner --> GherkinASTParser
+    TypeScript_AST_Parser --> DocDirectiveSchema
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
-    GherkinScanner --> GherkinASTParser
-    TypeScript_AST_Parser --> DocDirectiveSchema
     SourceMapper -.-> DecisionDocCodec
     SourceMapper -.-> ShapeExtractor
     SourceMapper -.-> GherkinASTParser
@@ -252,6 +260,23 @@ graph TB
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
+    WorkflowLoader --> WorkflowConfigSchema
+    WorkflowLoader --> CodecUtils
+    ConfigResolver --> ProjectConfigTypes
+    ConfigResolver --> DeliveryProcessFactory
+    ConfigResolver --> ConfigurationDefaults
+    RegexBuilders --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationTypes
+    ProjectConfigTypes --> ConfigurationPresets
+    ProjectConfigSchema --> ProjectConfigTypes
+    ConfigurationPresets --> ConfigurationTypes
+    SourceMerger --> ProjectConfigTypes
+    DeliveryProcessFactory --> ConfigurationTypes
+    DeliveryProcessFactory --> ConfigurationPresets
+    DeliveryProcessFactory --> RegexBuilders
+    DefineConfig --> ProjectConfigTypes
+    ConfigLoader --> DeliveryProcessFactory
+    ConfigLoader --> ConfigurationTypes
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -286,31 +311,14 @@ graph TB
     LintPatternsCLI --> LintEngine
     LintPatternsCLI --> LintRules
     TagTaxonomyCLI --> ConfigLoader
-    WorkflowLoader --> WorkflowConfigSchema
-    WorkflowLoader --> CodecUtils
-    ConfigResolver --> ProjectConfigTypes
-    ConfigResolver --> DeliveryProcessFactory
-    ConfigResolver --> ConfigurationDefaults
-    RegexBuilders --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationTypes
-    ProjectConfigTypes --> ConfigurationPresets
-    ProjectConfigSchema --> ProjectConfigTypes
-    ConfigurationPresets --> ConfigurationTypes
-    SourceMerger --> ProjectConfigTypes
-    DeliveryProcessFactory --> ConfigurationTypes
-    DeliveryProcessFactory --> ConfigurationPresets
-    DeliveryProcessFactory --> RegexBuilders
-    DefineConfig --> ProjectConfigTypes
-    ConfigLoader --> DeliveryProcessFactory
-    ConfigLoader --> ConfigurationTypes
     ArchitectureCodec --> MasterDataset
     DetectChanges --> DeriveProcessState
+    TransformDataset --> MasterDataset
+    PipelineModule --> TransformDataset
     BuiltInGenerators --> GeneratorRegistry
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
-    TransformDataset --> MasterDataset
-    PipelineModule --> TransformDataset
     KebabCaseSlugs -.-> StringUtils
     ErrorHandlingUnification -.-> ResultMonad
     ErrorHandlingUnification -.-> ErrorFactories
@@ -414,6 +422,7 @@ All components with architecture annotations:
 | ✅ DoD Validation Types | - | - | - | src/validation/types.ts |
 | ✅ Dual Source Schemas | - | - | - | src/validation-schemas/dual-source.ts |
 | ✅ Error Factories | - | - | - | tests/features/types/error-factories.feature |
+| ✅ Error Factory Types | - | - | - | src/types/errors.ts |
 | ✅ Error Handling Unification | - | - | - | tests/features/behavior/error-handling.feature |
 | ✅ Extracted Pattern Schema | - | - | - | src/validation-schemas/extracted-pattern.ts |
 | ✅ Extracted Shape Schema | - | - | - | src/validation-schemas/extracted-shape.ts |
@@ -444,6 +453,7 @@ All components with architecture annotations:
 | ✅ Reporting Codecs | - | - | - | src/renderable/codecs/reporting.ts |
 | ✅ Requirements Codec | - | - | - | src/renderable/codecs/requirements.ts |
 | ✅ Result Monad | - | - | - | tests/features/types/result-monad.feature |
+| ✅ Result Monad Types | - | - | - | src/types/result.ts |
 | ✅ Rich Content Helpers | - | - | - | src/renderable/codecs/helpers.ts |
 | ✅ Risk Levels | - | - | - | src/taxonomy/risk-levels.ts |
 |  SectionBlock | - | - | - | src/renderable/schema.ts |

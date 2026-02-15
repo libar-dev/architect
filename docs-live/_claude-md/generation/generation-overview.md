@@ -43,6 +43,63 @@ Detail Level: Compact summary
 | Basic arithmetic operations work correctly | The calculator should perform standard math operations<br> with correct results. |
 | Division has special constraints           | Division by zero must be handled gracefully to prevent<br> system errors.        |
 
+--- TableExtraction ---
+
+| Rule                                                    | Description                                                                                                             |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Tables in rule descriptions render exactly once         | **Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no...        |
+| Multiple tables in description each render exactly once | **Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted... |
+| stripMarkdownTables removes table syntax from text      | **Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all...      |
+
+--- GeneratorRegistryTesting ---
+
+| Rule                                                  | Description                                                                                                           |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Registry manages generator registration and retrieval | **Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of... |
+
+--- PrdImplementationSectionTesting ---
+
+| Rule                                                                   | Description                                                                                                            |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Implementation files appear in pattern docs via @libar-docs-implements | **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's... |
+| Multiple implementations are listed alphabetically                     | **Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order....    |
+| Patterns without implementations omit the section                      | **Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist....   |
+| Implementation references use relative file links                      | **Invariant:** Implementation file links must be relative paths starting from the patterns output directory....        |
+
+--- PrChangesOptions ---
+
+| Rule                                                | Description                                                                                                             |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Orchestrator supports PR changes generation options | **Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter,... |
+
+--- DocumentationOrchestrator ---
+
+| Rule                                                            | Description                                                                                                       |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Orchestrator coordinates full documentation generation pipeline | **Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset;... |
+
+--- CodecBasedGeneratorTesting ---
+
+| Rule                                                     | Description                                                                                                           |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| CodecBasedGenerator adapts codecs to generator interface | **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors... |
+
+--- BusinessRulesDocumentCodec ---
+
+| Rule                                                           | Description |
+| -------------------------------------------------------------- | ----------- |
+| Extracts Rule blocks with Invariant and Rationale              |             |
+| Organizes rules by product area and phase                      |             |
+| Summary mode generates compact output                          |             |
+| Preserves code examples and tables in detailed mode            |             |
+| Generates scenario traceability links                          |             |
+| Progressive disclosure generates detail files per product area |             |
+| Empty rules show placeholder instead of blank content          |             |
+| Rules always render flat for full visibility                   |             |
+| Source file shown as filename text                             |             |
+| Verified-by renders as checkbox list at standard level         |             |
+| Feature names are humanized from camelCase pattern names       |             |
+
 --- WarningCollectorTesting ---
 
 | Rule                                                  | Description                                                                                                             |
@@ -153,63 +210,6 @@ Detail Level: Compact summary
 | Duplicates are merged based on source priority      | **Invariant:** Higher-priority sources take precedence when merging duplicate content.<br> **Rationale:** TypeScript... |
 | Section order is preserved after deduplication      | **Invariant:** Section order matches the source mapping table order after deduplication.<br> **Rationale:**...          |
 | Deduplicator integrates with source mapper pipeline | **Invariant:** Deduplication runs after extraction and before document assembly.<br> **Rationale:** All content must... |
-
---- TableExtraction ---
-
-| Rule                                                    | Description                                                                                                             |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Tables in rule descriptions render exactly once         | **Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no...        |
-| Multiple tables in description each render exactly once | **Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted... |
-| stripMarkdownTables removes table syntax from text      | **Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all...      |
-
---- GeneratorRegistryTesting ---
-
-| Rule                                                  | Description                                                                                                           |
-| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Registry manages generator registration and retrieval | **Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of... |
-
---- PrdImplementationSectionTesting ---
-
-| Rule                                                                   | Description                                                                                                            |
-| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Implementation files appear in pattern docs via @libar-docs-implements | **Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's... |
-| Multiple implementations are listed alphabetically                     | **Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order....    |
-| Patterns without implementations omit the section                      | **Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist....   |
-| Implementation references use relative file links                      | **Invariant:** Implementation file links must be relative paths starting from the patterns output directory....        |
-
---- PrChangesOptions ---
-
-| Rule                                                | Description                                                                                                             |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Orchestrator supports PR changes generation options | **Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter,... |
-
---- DocumentationOrchestrator ---
-
-| Rule                                                            | Description                                                                                                       |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Orchestrator coordinates full documentation generation pipeline | **Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset;... |
-
---- CodecBasedGeneratorTesting ---
-
-| Rule                                                     | Description                                                                                                           |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| CodecBasedGenerator adapts codecs to generator interface | **Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors... |
-
---- BusinessRulesDocumentCodec ---
-
-| Rule                                                           | Description |
-| -------------------------------------------------------------- | ----------- |
-| Extracts Rule blocks with Invariant and Rationale              |             |
-| Organizes rules by product area and phase                      |             |
-| Summary mode generates compact output                          |             |
-| Preserves code examples and tables in detailed mode            |             |
-| Generates scenario traceability links                          |             |
-| Progressive disclosure generates detail files per product area |             |
-| Empty rules show placeholder instead of blank content          |             |
-| Rules always render flat for full visibility                   |             |
-| Source file shown as filename text                             |             |
-| Verified-by renders as checkbox list at standard level         |             |
-| Feature names are humanized from camelCase pattern names       |             |
 
 --- TransformDatasetTesting ---
 

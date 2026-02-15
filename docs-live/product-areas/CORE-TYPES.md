@@ -78,6 +78,21 @@ interface BaseDocError {
 | type     | Error type discriminator for pattern matching |
 | message  | Human-readable error message                  |
 
+### Result (type)
+
+```typescript
+/**
+ * Result type representing either success (Ok) or failure (Err)
+ *
+ * @typeParam T - The success value type
+ * @typeParam E - The error type (defaults to Error)
+ */
+```
+
+```typescript
+type Result<T, E = Error> = Ok<T> | Err<E>;
+```
+
 ### DocError (type)
 
 ```typescript

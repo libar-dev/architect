@@ -4,7 +4,7 @@
 
 ---
 
-**223 rules** from 45 features. 186 rules have explicit invariants.
+**223 rules** from 45 features. 189 rules have explicit invariants.
 
 ---
 
@@ -1302,6 +1302,10 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Each relationship type has a distinct arrow style
 
+> **Invariant:** Each relationship type (uses, depends-on, implements, extends) must render with a unique, visually distinguishable arrow style.
+>
+> **Rationale:** Identical arrow styles would make relationship semantics indistinguishable in generated diagrams.
+
 **Verified by:**
 - Uses relationships render as solid arrows
 - Depends-on relationships render as dashed arrows
@@ -1312,12 +1316,16 @@ Each Rule keyword creates a separate entry in the Business Rules section.
 
 #### Pattern names are sanitized for Mermaid node IDs
 
+> **Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots, hyphens, spaces) with underscores.
+
 **Verified by:**
 - Special characters are replaced
 
 ---
 
 #### All relationship types appear in single graph
+
+> **Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements, extends) into a single top-down graph.
 
 **Verified by:**
 - Complete dependency graph with all relationship types

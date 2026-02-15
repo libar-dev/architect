@@ -87,6 +87,32 @@ interface InternalConfig {
 }
 ```
 
+**Tagged type is found despite same-name const declaration**
+
+- Given a TypeScript source file containing:
+- When discoverTaggedShapes runs on the source
+- Then 1 shape is returned
+- And the shape has name "Result" and kind "type"
+- And the shape has name "Result" and group "core-types"
+
+```typescript
+/**
+ * @libar-docs-shape core-types
+ */
+export type Result<T, E = Error> =
+  | { readonly ok: true; readonly value: T }
+  | { readonly ok: false; readonly error: E };
+
+export const Result = {
+  ok<T>(value: T): Result<T, never> {
+    return { ok: true, value };
+  },
+  err<E>(error: E): Result<never, E> {
+    return { ok: false, error };
+  },
+};
+```
+
 **All five declaration kinds are discoverable**
 
 - Given a TypeScript source file containing:
@@ -193,9 +219,10 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
     Untagged export is ignored,
     Group name is captured from tag value,
     Bare tag works without group,
-    Non-exported tagged declaration is extracted
+    Non-exported tagged declaration is extracted,
+    Tagged type is found despite same-name const declaration
 
-_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted_
+_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted, Tagged type is found despite same-name const declaration_
 
 **Discovery uses existing estree parser with JSDoc comment scanning**
 

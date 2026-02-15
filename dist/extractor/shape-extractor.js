@@ -46,6 +46,17 @@ const PROPERTY_JSDOC_MAX_GAP = 1;
  */
 const MAX_SOURCE_SIZE_BYTES = 5 * 1024 * 1024;
 // =============================================================================
+// Parse Helper
+// =============================================================================
+/**
+ * Parse TypeScript source with the correct JSX mode.
+ * JSX must only be enabled for .tsx files — enabling it for .ts files causes
+ * generic arrow functions like `<T>(v: T)` to be mis-parsed as JSX elements.
+ */
+function parseSource(sourceCode, jsx) {
+    return parse(sourceCode, { loc: true, range: true, comment: true, jsx });
+}
+// =============================================================================
 // Main Extraction Function
 // =============================================================================
 /**
@@ -70,12 +81,7 @@ export function extractShapes(sourceCode, shapeNames, options = {}) {
     // Parse the source code
     let ast;
     try {
-        ast = parse(sourceCode, {
-            loc: true,
-            range: true,
-            comment: true,
-            jsx: true,
-        });
+        ast = parseSource(sourceCode, options.jsx ?? false);
     }
     catch (error) {
         return Result.err(error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`));
@@ -86,8 +92,9 @@ export function extractShapes(sourceCode, shapeNames, options = {}) {
     // Process each requested shape name
     for (const shapeName of shapeNames) {
         // Check if it's a local declaration
-        const declaration = declarations.get(shapeName);
-        if (declaration) {
+        const declarationList = declarations.get(shapeName);
+        if (declarationList !== undefined) {
+            const declaration = pickBestDeclaration(declarationList);
             const shape = extractShape(sourceCode, declaration, ast.comments ?? [], {
                 includeJsDoc,
                 preserveFormatting,
@@ -123,23 +130,34 @@ export function extractShapes(sourceCode, shapeNames, options = {}) {
  */
 function findDeclarations(ast) {
     const declarations = new Map();
+    function pushDeclaration(decl) {
+        const existing = declarations.get(decl.name);
+        if (existing !== undefined) {
+            existing.push(decl);
+        }
+        else {
+            declarations.set(decl.name, [decl]);
+        }
+    }
     for (const node of ast.body) {
         // Handle export declarations
         if (node.type === 'ExportNamedDeclaration') {
             if (node.declaration) {
                 const found = processDeclaration(node.declaration, true);
                 for (const decl of found) {
-                    declarations.set(decl.name, decl);
+                    pushDeclaration(decl);
                 }
             }
             // Handle export { Foo } without a source (local re-export)
             if (!node.source) {
                 for (const spec of node.specifiers) {
                     const localName = spec.local.name;
-                    // This might reference a local declaration - mark it as exported
+                    // This might reference a local declaration - mark all as exported
                     const existing = declarations.get(localName);
-                    if (existing) {
-                        existing.exported = true;
+                    if (existing !== undefined) {
+                        for (const decl of existing) {
+                            decl.exported = true;
+                        }
                     }
                 }
             }
@@ -148,14 +166,38 @@ function findDeclarations(ast) {
         else {
             const found = processDeclaration(node, false);
             for (const decl of found) {
-                // Only add if not already found (export takes precedence)
-                if (!declarations.has(decl.name)) {
-                    declarations.set(decl.name, decl);
+                const existing = declarations.get(decl.name);
+                // Only add if no exported version of same kind already exists
+                if (existing !== undefined) {
+                    const hasExportedSameKind = existing.some((e) => e.exported && e.kind === decl.kind);
+                    if (!hasExportedSameKind) {
+                        existing.push(decl);
+                    }
+                }
+                else {
+                    declarations.set(decl.name, [decl]);
                 }
             }
         }
     }
     return declarations;
+}
+/** Priority ranking for declaration kinds — type-level preferred for documentation */
+const KIND_PRIORITY = {
+    interface: 0,
+    type: 1,
+    enum: 2,
+    function: 3,
+    const: 4,
+};
+/**
+ * Pick the best declaration from an array of same-name declarations.
+ * Prefers type-level constructs (interface, type, enum) over value-level (function, const).
+ */
+function pickBestDeclaration(declarations) {
+    if (declarations.length === 1)
+        return declarations[0];
+    return [...declarations].sort((a, b) => KIND_PRIORITY[a.kind] - KIND_PRIORITY[b.kind])[0];
 }
 /**
  * Process a declaration node and extract shape info.
@@ -709,19 +751,14 @@ function extractJsDocText(jsDoc) {
  * @param sourceCode - File content
  * @returns Result with all exported shapes
  */
-function extractAllExportedShapes(sourceCode) {
+function extractAllExportedShapes(sourceCode, jsx = false) {
     // Validate input size
     if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
         return Result.err(new Error(`Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`));
     }
     let ast;
     try {
-        ast = parse(sourceCode, {
-            loc: true,
-            range: true,
-            comment: true,
-            jsx: true,
-        });
+        ast = parseSource(sourceCode, jsx);
     }
     catch (error) {
         return Result.err(error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`));
@@ -729,11 +766,13 @@ function extractAllExportedShapes(sourceCode) {
     const declarations = findDeclarations(ast);
     const shapes = [];
     const warnings = [];
-    // Extract only exported declarations
-    for (const [, declaration] of declarations) {
-        if (!declaration.exported)
+    // Extract best exported declaration per name (one shape per name)
+    for (const [, declarationList] of declarations) {
+        const exportedDecls = declarationList.filter((d) => d.exported);
+        if (exportedDecls.length === 0)
             continue;
-        const shape = extractShape(sourceCode, declaration, ast.comments ?? [], {
+        const best = pickBestDeclaration(exportedDecls);
+        const shape = extractShape(sourceCode, best, ast.comments ?? [], {
             includeJsDoc: true,
             preserveFormatting: true,
         });
@@ -757,7 +796,8 @@ function extractAllExportedShapes(sourceCode) {
  * @param extractShapesTag - Comma-separated shape names from tag, or `*` for auto-discovery
  * @returns Result with extracted shapes and any warnings
  */
-export function processExtractShapesTag(sourceCode, extractShapesTag) {
+export function processExtractShapesTag(sourceCode, extractShapesTag, options) {
+    const jsx = options?.jsx ?? false;
     // DD-4: Auto-shape discovery via wildcard
     const shapeNames = extractShapesTag
         .split(',')
@@ -776,7 +816,7 @@ export function processExtractShapesTag(sourceCode, extractShapesTag) {
                 ],
             };
         }
-        const result = extractAllExportedShapes(sourceCode);
+        const result = extractAllExportedShapes(sourceCode, jsx);
         if (!result.ok) {
             return {
                 shapes: [],
@@ -785,7 +825,7 @@ export function processExtractShapesTag(sourceCode, extractShapesTag) {
         }
         return { shapes: [...result.value.shapes], warnings: [...result.value.warnings] };
     }
-    const extractionResult = extractShapes(sourceCode, shapeNames);
+    const extractionResult = extractShapes(sourceCode, shapeNames, { jsx });
     // If extraction failed (parse error), return empty shapes with error as warning
     if (!extractionResult.ok) {
         return {
@@ -867,22 +907,18 @@ function extractIncludeTag(jsDocText) {
  * and extractShape() — no parser changes needed (DD-2).
  *
  * @param sourceCode - TypeScript source code to scan
+ * @param options - Parse options (jsx should match file extension)
  * @returns Result containing discovered shapes and warnings
  */
-export function discoverTaggedShapes(sourceCode) {
+export function discoverTaggedShapes(sourceCode, options) {
     // Validate input size
     if (sourceCode.length > MAX_SOURCE_SIZE_BYTES) {
         return Result.err(new Error(`Source code size (${sourceCode.length} bytes) exceeds maximum allowed (${MAX_SOURCE_SIZE_BYTES} bytes)`));
     }
-    // Parse with same config as extractShapes (DD-2: stay on estree parser)
+    // Parse with correct JSX mode (DD-2: stay on estree parser)
     let ast;
     try {
-        ast = parse(sourceCode, {
-            loc: true,
-            range: true,
-            comment: true,
-            jsx: true,
-        });
+        ast = parseSource(sourceCode, options?.jsx ?? false);
     }
     catch (error) {
         return Result.err(error instanceof Error ? error : new Error(`Failed to parse source code: ${String(error)}`));
@@ -892,28 +928,30 @@ export function discoverTaggedShapes(sourceCode) {
     const comments = ast.comments ?? [];
     const shapes = [];
     const warnings = [];
-    for (const [, declaration] of declarations) {
-        // Get JSDoc for this declaration (respects MAX_JSDOC_LINE_DISTANCE)
-        const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
-        if (jsDoc === undefined)
-            continue;
-        // Check for @libar-docs-shape tag
-        const tagResult = extractShapeTag(jsDoc);
-        if (!tagResult.tagged)
-            continue;
-        // Extract the shape using existing infrastructure
-        const shape = extractShape(sourceCode, declaration, comments, {
-            includeJsDoc: true,
-            preserveFormatting: true,
-        });
-        // DD-5: Add group field from tag value
-        // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
-        const includeValues = extractIncludeTag(jsDoc);
-        shapes.push({
-            ...shape,
-            group: tagResult.group,
-            ...(includeValues !== undefined && { includes: includeValues }),
-        });
+    for (const [, declarationList] of declarations) {
+        for (const declaration of declarationList) {
+            // Get JSDoc for this declaration (respects MAX_JSDOC_LINE_DISTANCE)
+            const jsDoc = extractPrecedingJsDoc(sourceCode, declaration.node, comments);
+            if (jsDoc === undefined)
+                continue;
+            // Check for @libar-docs-shape tag
+            const tagResult = extractShapeTag(jsDoc);
+            if (!tagResult.tagged)
+                continue;
+            // Extract the shape using existing infrastructure
+            const shape = extractShape(sourceCode, declaration, comments, {
+                includeJsDoc: true,
+                preserveFormatting: true,
+            });
+            // DD-5: Add group field from tag value
+            // DD-3 (CrossCuttingDocumentInclusion): Add includes from @libar-docs-include
+            const includeValues = extractIncludeTag(jsDoc);
+            shapes.push({
+                ...shape,
+                group: tagResult.group,
+                ...(includeValues !== undefined && { includes: includeValues }),
+            });
+        }
     }
     return Result.ok({ shapes, warnings });
 }

@@ -274,6 +274,8 @@ List Filters (for 'list' subcommand):
   --phase <number>          Filter by roadmap phase number
   --category <name>         Filter by category
   --source <ts|gherkin>     Filter by source type
+  --arch-context <name>     Filter by architecture context (@libar-docs-arch-context)
+  --product-area <name>     Filter by product area (@libar-docs-product-area)
   --limit <n>               Maximum results
   --offset <n>              Skip first n results
 
@@ -532,6 +534,8 @@ function parseListFilters(subArgs) {
     let phase = null;
     let category = null;
     let source = null;
+    let archContext = null;
+    let productArea = null;
     let limit = null;
     let offset = null;
     for (let i = 0; i < subArgs.length; i++) {
@@ -582,11 +586,22 @@ function parseListFilters(subArgs) {
                 i++;
                 break;
             }
+            case '--arch-context':
+                archContext = next ?? null;
+                i++;
+                break;
+            case '--product-area':
+                productArea = next ?? null;
+                i++;
+                break;
             default:
+                if (arg?.startsWith('-') === true) {
+                    console.warn(`Warning: Unknown flag '${arg}' ignored`);
+                }
                 break;
         }
     }
-    return { status, phase, category, source, limit, offset };
+    return { status, phase, category, source, archContext, productArea, limit, offset };
 }
 /**
  * Generate contextual hint for empty list results.

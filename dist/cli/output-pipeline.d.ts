@@ -54,6 +54,10 @@ export interface ListFilters {
     readonly category: string | null;
     /** Filter by source type */
     readonly source: 'typescript' | 'gherkin' | null;
+    /** Filter by architecture context (@libar-docs-arch-context) */
+    readonly archContext: string | null;
+    /** Filter by product area (@libar-docs-product-area) */
+    readonly productArea: string | null;
     /** Maximum number of results */
     readonly limit: number | null;
     /** Number of results to skip */

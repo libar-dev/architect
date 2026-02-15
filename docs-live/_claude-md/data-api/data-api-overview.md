@@ -25,16 +25,6 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
---- ProcessStateAPITesting ---
-
-| Rule                                           | Description                                                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
-| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
-| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
-| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
-| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
-
 --- ValidatePatternsCli ---
 
 | Rule                                                         | Description                                                                                                              |
@@ -110,6 +100,16 @@ Detail Level: Compact summary
 | CLI generates documentation from source files | **Invariant:** Given valid input patterns and a generator name, the CLI must scan sources, extract patterns, and... |
 | CLI rejects unknown options                   | **Invariant:** Unrecognized CLI flags must cause an error with a descriptive message rather than being silently...  |
 
+--- ProcessStateAPITesting ---
+
+| Rule                                           | Description                                                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Status queries return correct patterns         | **Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM...  |
+| Phase queries return correct phase data        | **Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and...      |
+| FSM queries expose transition validation       | **Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels...   |
+| Pattern queries find and retrieve pattern data | **Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with...   |
+| Timeline queries group patterns by time        | **Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date... |
+
 --- StubTaxonomyTagTests ---
 
 | Rule                                         | Description                                                                                                             |
@@ -140,6 +140,14 @@ Detail Level: Compact summary
 | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Handoff generates compact session state summary | **Invariant:** The handoff generator must produce a compact session state summary including pattern status,... |
 | Formatter produces structured text output       | **Invariant:** The handoff formatter must produce structured text output with ADR-008 section markers for...   |
+
+--- ArchQueriesTest ---
+
+| Rule                                              | Description                                                                                                              |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
+| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
+| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |
 
 --- ContextFormatterTests ---
 
@@ -191,11 +199,3 @@ Detail Level: Compact summary
 | Fuzzy matching uses tiered scoring      | **Invariant:** Pattern matching must use a tiered scoring system: exact match (1.0) > prefix match (0.9) > substring... |
 | findBestMatch returns single suggestion | **Invariant:** findBestMatch must return the single highest-scoring match above the threshold, or undefined when no...  |
 | Levenshtein distance computation        | **Invariant:** The Levenshtein distance function must correctly compute edit distance between strings, returning 0...   |
-
---- ArchQueriesTest ---
-
-| Rule                                              | Description                                                                                                              |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Neighborhood and comparison views                 | **Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and...            |
-| Taxonomy discovery via tags and sources           | **Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type,... |
-| Coverage analysis reports annotation completeness | **Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include...   |

@@ -382,5 +382,36 @@ describeFeature(feature, ({ Background, Rule, AfterEachScenario }) => {
         expect(state.wildcardResult.shapes).toHaveLength(count);
       });
     });
+
+    RuleScenario(
+      'Same-name type and const exports produce one shape',
+      ({ Given, When, Then, And }) => {
+        Given('TypeScript source for wildcard extraction:', givenTypeScriptSourceForWildcard);
+        When('extracting shapes with wildcard "*"', whenExtractingWithWildcard);
+        Then('{int} shapes are extracted', (_ctx: unknown, count: number) => {
+          if (state.wildcardResult === null) throw new Error('No wildcard result');
+          expect(state.wildcardResult.shapes).toHaveLength(count);
+        });
+        And(
+          'the extracted shapes include all:',
+          (_ctx: unknown, table: ReadonlyArray<{ name: string }>) => {
+            if (state.wildcardResult === null) throw new Error('No wildcard result');
+            const names = state.wildcardResult.shapes.map((s) => s.name);
+            for (const row of table) {
+              expect(names).toContain(row.name);
+            }
+          }
+        );
+        And(
+          'the extracted shape {string} has kind {string}',
+          (_ctx: unknown, name: string, kind: string) => {
+            if (state.wildcardResult === null) throw new Error('No wildcard result');
+            const shape = state.wildcardResult.shapes.find((s) => s.name === name);
+            expect(shape, `Shape "${name}" not found`).toBeDefined();
+            expect(shape!.kind).toBe(kind);
+          }
+        );
+      }
+    );
   });
 });

@@ -24,21 +24,11 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        ContentDeduplicator[/"ContentDeduplicator"/]
-        CodecBasedGenerator("CodecBasedGenerator")
-        FileCache[/"FileCache"/]
         TransformDataset("TransformDataset")
         DecisionDocGenerator("DecisionDocGenerator")
     end
     subgraph renderer["Renderer"]
-        RenderableDocument[/"RenderableDocument"/]
-        UniversalRenderer("UniversalRenderer")
-        DocumentGenerator("DocumentGenerator")
-        SessionCodec[("SessionCodec")]
-        PatternsCodec[("PatternsCodec")]
-        Shared_Mermaid_Diagram_Utilities["Shared Mermaid Diagram Utilities"]
         DecisionDocCodec[("DecisionDocCodec")]
-        CompositeCodec[("CompositeCodec")]
         ArchitectureCodec[("ArchitectureCodec")]
     end
     subgraph related["Related"]
@@ -302,6 +292,343 @@ system errors.
 
 - Division of two numbers
 - Division by zero is prevented
+
+### TableExtraction
+
+[View TableExtraction source](tests/features/generators/table-extraction.feature)
+
+Tables in business rule descriptions should appear exactly once in output.
+The extractTables() function extracts tables for proper formatting, and
+stripMarkdownTables() removes them from the raw text to prevent duplicates.
+
+<details>
+<summary>Tables in rule descriptions render exactly once (2 scenarios)</summary>
+
+#### Tables in rule descriptions render exactly once
+
+**Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no residual pipe characters in surrounding text.
+
+**Rationale:** Without deduplication, tables extracted for formatting would also remain in the raw description text, producing duplicate output.
+
+**Verified by:**
+
+- Single table renders once in detailed mode
+- Table is extracted and properly formatted
+
+</details>
+
+<details>
+<summary>Multiple tables in description each render exactly once (1 scenarios)</summary>
+
+#### Multiple tables in description each render exactly once
+
+**Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
+
+**Verified by:**
+
+- Two tables in description render as two separate tables
+
+</details>
+
+<details>
+<summary>stripMarkdownTables removes table syntax from text (3 scenarios)</summary>
+
+#### stripMarkdownTables removes table syntax from text
+
+**Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
+
+**Verified by:**
+
+- Strips single table from text
+- Strips multiple tables from text
+- Preserves text without tables
+
+</details>
+
+### GeneratorRegistryTesting
+
+[View GeneratorRegistryTesting source](tests/features/generators/registry.feature)
+
+Tests the GeneratorRegistry registration, lookup, and listing capabilities.
+The registry manages document generators with name uniqueness constraints.
+
+#### Registry manages generator registration and retrieval
+
+**Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
+
+**Verified by:**
+
+- Register generator with unique name
+- Duplicate registration throws error
+- Get registered generator
+- Get unknown generator returns undefined
+- Available returns sorted list
+
+### PrdImplementationSectionTesting
+
+[View PrdImplementationSectionTesting source](tests/features/generators/prd-implementation-section.feature)
+
+Tests the Implementations section rendering in pattern documents.
+Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
+with working links to the source files.
+
+<details>
+<summary>Implementation files appear in pattern docs via @libar-docs-implements (2 scenarios)</summary>
+
+#### Implementation files appear in pattern docs via @libar-docs-implements
+
+**Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
+
+**Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
+
+**Verified by:**
+
+- Implementations section renders with file links
+- Implementation includes description when available
+
+</details>
+
+<details>
+<summary>Multiple implementations are listed alphabetically (1 scenarios)</summary>
+
+#### Multiple implementations are listed alphabetically
+
+**Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
+
+**Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
+
+**Verified by:**
+
+- Multiple implementations sorted by file path
+
+</details>
+
+<details>
+<summary>Patterns without implementations omit the section (1 scenarios)</summary>
+
+#### Patterns without implementations omit the section
+
+**Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
+
+**Verified by:**
+
+- No implementations section when none exist
+
+</details>
+
+<details>
+<summary>Implementation references use relative file links (1 scenarios)</summary>
+
+#### Implementation references use relative file links
+
+**Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
+
+**Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
+
+**Verified by:**
+
+- Links are relative from patterns directory
+
+</details>
+
+### PrChangesOptions
+
+[View PrChangesOptions source](tests/features/generators/pr-changes-options.feature)
+
+Tests the PrChangesCodec filtering capabilities for generating PR-scoped
+documentation. The codec filters patterns by changed files and/or release
+version, supporting combined OR logic when both filters are provided.
+
+#### Orchestrator supports PR changes generation options
+
+**Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
+
+**Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
+
+**Verified by:**
+
+- PR changes filters to explicit file list
+- PR changes filters by release version
+- Combined filters use OR logic
+
+### DocumentationOrchestrator
+
+[View DocumentationOrchestrator source](tests/features/generators/orchestrator.feature)
+
+Tests the orchestrator's pattern merging, conflict detection, and generator
+coordination capabilities. The orchestrator coordinates the full documentation
+generation pipeline: Scanner -> Extractor -> Generators -> File Writer.
+
+#### Orchestrator coordinates full documentation generation pipeline
+
+**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
+
+**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
+
+**Verified by:**
+
+- Non-overlapping patterns merge successfully
+- Orchestrator detects pattern name conflicts
+- Orchestrator detects pattern name conflicts with status mismatch
+- Unknown generator name fails gracefully
+- Partial success when some generators are invalid
+
+### CodecBasedGeneratorTesting
+
+[View CodecBasedGeneratorTesting source](tests/features/generators/codec-based.feature)
+
+Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
+codec system to the DocumentGenerator interface. This enables codec-based
+document generation to work seamlessly with the existing orchestrator.
+
+#### CodecBasedGenerator adapts codecs to generator interface
+
+**Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
+
+**Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
+
+**Verified by:**
+
+- Generator delegates to codec
+- Missing MasterDataset returns error
+- Codec options are passed through
+
+### BusinessRulesDocumentCodec
+
+[View BusinessRulesDocumentCodec source](tests/features/generators/business-rules-codec.feature)
+
+Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
+Verifies rule extraction, organization by domain/phase, and progressive disclosure.
+
+<details>
+<summary>Extracts Rule blocks with Invariant and Rationale (2 scenarios)</summary>
+
+#### Extracts Rule blocks with Invariant and Rationale
+
+**Verified by:**
+
+- Extracts annotated Rule with Invariant and Rationale
+- Extracts unannotated Rule without showing not specified
+
+</details>
+
+<details>
+<summary>Organizes rules by product area and phase (2 scenarios)</summary>
+
+#### Organizes rules by product area and phase
+
+**Verified by:**
+
+- Groups rules by product area and phase
+- Orders rules by phase within domain
+
+</details>
+
+<details>
+<summary>Summary mode generates compact output (2 scenarios)</summary>
+
+#### Summary mode generates compact output
+
+**Verified by:**
+
+- Summary mode includes statistics line
+- Summary mode excludes detailed sections
+
+</details>
+
+<details>
+<summary>Preserves code examples and tables in detailed mode (2 scenarios)</summary>
+
+#### Preserves code examples and tables in detailed mode
+
+**Verified by:**
+
+- Code examples included in detailed mode
+- Code examples excluded in standard mode
+
+</details>
+
+<details>
+<summary>Generates scenario traceability links (1 scenarios)</summary>
+
+#### Generates scenario traceability links
+
+**Verified by:**
+
+- Verification links include file path
+
+</details>
+
+<details>
+<summary>Progressive disclosure generates detail files per product area (3 scenarios)</summary>
+
+#### Progressive disclosure generates detail files per product area
+
+**Verified by:**
+
+- Detail files are generated per product area
+- Main document has product area index table with links
+- Detail files have back-link to main document
+
+</details>
+
+<details>
+<summary>Empty rules show placeholder instead of blank content (2 scenarios)</summary>
+
+#### Empty rules show placeholder instead of blank content
+
+**Verified by:**
+
+- Rule without invariant or description or scenarios shows placeholder
+- Rule without invariant but with scenarios shows verified-by instead
+
+</details>
+
+<details>
+<summary>Rules always render flat for full visibility (1 scenarios)</summary>
+
+#### Rules always render flat for full visibility
+
+**Verified by:**
+
+- Features with many rules render flat without collapsible blocks
+
+</details>
+
+<details>
+<summary>Source file shown as filename text (1 scenarios)</summary>
+
+#### Source file shown as filename text
+
+**Verified by:**
+
+- Source file rendered as plain text not link
+
+</details>
+
+<details>
+<summary>Verified-by renders as checkbox list at standard level (2 scenarios)</summary>
+
+#### Verified-by renders as checkbox list at standard level
+
+**Verified by:**
+
+- Rules with scenarios show verified-by checklist
+- Duplicate scenario names are deduplicated
+
+</details>
+
+<details>
+<summary>Feature names are humanized from camelCase pattern names (2 scenarios)</summary>
+
+#### Feature names are humanized from camelCase pattern names
+
+**Verified by:**
+
+- CamelCase pattern name becomes spaced heading
+- Testing suffix is stripped from feature names
+
+</details>
 
 ### WarningCollectorTesting
 
@@ -1457,343 +1784,6 @@ on source priority, and preserve original section order after deduplication.
 
   The deduplicator is called after all extractions complete but before
   the RenderableDocument is assembled.
-
-</details>
-
-### TableExtraction
-
-[View TableExtraction source](tests/features/generators/table-extraction.feature)
-
-Tables in business rule descriptions should appear exactly once in output.
-The extractTables() function extracts tables for proper formatting, and
-stripMarkdownTables() removes them from the raw text to prevent duplicates.
-
-<details>
-<summary>Tables in rule descriptions render exactly once (2 scenarios)</summary>
-
-#### Tables in rule descriptions render exactly once
-
-**Invariant:** Each markdown table in a rule description appears exactly once in the rendered output, with no residual pipe characters in surrounding text.
-
-**Rationale:** Without deduplication, tables extracted for formatting would also remain in the raw description text, producing duplicate output.
-
-**Verified by:**
-
-- Single table renders once in detailed mode
-- Table is extracted and properly formatted
-
-</details>
-
-<details>
-<summary>Multiple tables in description each render exactly once (1 scenarios)</summary>
-
-#### Multiple tables in description each render exactly once
-
-**Invariant:** When a rule description contains multiple markdown tables, each table renders as a separate formatted table block with no merging or duplication.
-
-**Verified by:**
-
-- Two tables in description render as two separate tables
-
-</details>
-
-<details>
-<summary>stripMarkdownTables removes table syntax from text (3 scenarios)</summary>
-
-#### stripMarkdownTables removes table syntax from text
-
-**Invariant:** stripMarkdownTables removes all pipe-delimited table syntax from input text while preserving all surrounding content unchanged.
-
-**Verified by:**
-
-- Strips single table from text
-- Strips multiple tables from text
-- Preserves text without tables
-
-</details>
-
-### GeneratorRegistryTesting
-
-[View GeneratorRegistryTesting source](tests/features/generators/registry.feature)
-
-Tests the GeneratorRegistry registration, lookup, and listing capabilities.
-The registry manages document generators with name uniqueness constraints.
-
-#### Registry manages generator registration and retrieval
-
-**Invariant:** Each generator name is unique within the registry; duplicate registration is rejected and lookup of unknown names returns undefined.
-
-**Verified by:**
-
-- Register generator with unique name
-- Duplicate registration throws error
-- Get registered generator
-- Get unknown generator returns undefined
-- Available returns sorted list
-
-### PrdImplementationSectionTesting
-
-[View PrdImplementationSectionTesting source](tests/features/generators/prd-implementation-section.feature)
-
-Tests the Implementations section rendering in pattern documents.
-Verifies that code stubs with @libar-docs-implements tags appear in pattern docs
-with working links to the source files.
-
-<details>
-<summary>Implementation files appear in pattern docs via @libar-docs-implements (2 scenarios)</summary>
-
-#### Implementation files appear in pattern docs via @libar-docs-implements
-
-**Invariant:** Any TypeScript file with a matching @libar-docs-implements tag must appear in the pattern document's Implementations section with a working file link.
-
-**Rationale:** Implementation discovery relies on tag-based linking — missing entries break traceability between specs and code.
-
-**Verified by:**
-
-- Implementations section renders with file links
-- Implementation includes description when available
-
-</details>
-
-<details>
-<summary>Multiple implementations are listed alphabetically (1 scenarios)</summary>
-
-#### Multiple implementations are listed alphabetically
-
-**Invariant:** When multiple files implement the same pattern, they must be listed in ascending file path order.
-
-**Rationale:** Deterministic ordering ensures stable document output across regeneration runs.
-
-**Verified by:**
-
-- Multiple implementations sorted by file path
-
-</details>
-
-<details>
-<summary>Patterns without implementations omit the section (1 scenarios)</summary>
-
-#### Patterns without implementations omit the section
-
-**Invariant:** The Implementations heading must not appear in pattern documents when no implementing files exist.
-
-**Verified by:**
-
-- No implementations section when none exist
-
-</details>
-
-<details>
-<summary>Implementation references use relative file links (1 scenarios)</summary>
-
-#### Implementation references use relative file links
-
-**Invariant:** Implementation file links must be relative paths starting from the patterns output directory.
-
-**Rationale:** Absolute paths break when documentation is viewed from different locations; relative paths ensure portability.
-
-**Verified by:**
-
-- Links are relative from patterns directory
-
-</details>
-
-### PrChangesOptions
-
-[View PrChangesOptions source](tests/features/generators/pr-changes-options.feature)
-
-Tests the PrChangesCodec filtering capabilities for generating PR-scoped
-documentation. The codec filters patterns by changed files and/or release
-version, supporting combined OR logic when both filters are provided.
-
-#### Orchestrator supports PR changes generation options
-
-**Invariant:** PR changes output includes only patterns matching the changed files list, the release version filter, or both (OR logic when combined).
-
-**Rationale:** PR-scoped documentation must reflect exactly what changed, avoiding noise from unrelated patterns.
-
-**Verified by:**
-
-- PR changes filters to explicit file list
-- PR changes filters by release version
-- Combined filters use OR logic
-
-### DocumentationOrchestrator
-
-[View DocumentationOrchestrator source](tests/features/generators/orchestrator.feature)
-
-Tests the orchestrator's pattern merging, conflict detection, and generator
-coordination capabilities. The orchestrator coordinates the full documentation
-generation pipeline: Scanner -> Extractor -> Generators -> File Writer.
-
-#### Orchestrator coordinates full documentation generation pipeline
-
-**Invariant:** Non-overlapping patterns from TypeScript and Gherkin sources must merge into a unified dataset; overlapping pattern names must fail with conflict error.
-
-**Rationale:** Silent merging of conflicting patterns would produce incorrect documentation — fail-fast ensures data integrity across the pipeline.
-
-**Verified by:**
-
-- Non-overlapping patterns merge successfully
-- Orchestrator detects pattern name conflicts
-- Orchestrator detects pattern name conflicts with status mismatch
-- Unknown generator name fails gracefully
-- Partial success when some generators are invalid
-
-### CodecBasedGeneratorTesting
-
-[View CodecBasedGeneratorTesting source](tests/features/generators/codec-based.feature)
-
-Tests the CodecBasedGenerator which adapts the RenderableDocument Model (RDM)
-codec system to the DocumentGenerator interface. This enables codec-based
-document generation to work seamlessly with the existing orchestrator.
-
-#### CodecBasedGenerator adapts codecs to generator interface
-
-**Invariant:** CodecBasedGenerator delegates document generation to the underlying codec and surfaces codec errors through the generator interface.
-
-**Rationale:** The adapter pattern enables codec-based rendering to integrate with the existing orchestrator without modifying either side.
-
-**Verified by:**
-
-- Generator delegates to codec
-- Missing MasterDataset returns error
-- Codec options are passed through
-
-### BusinessRulesDocumentCodec
-
-[View BusinessRulesDocumentCodec source](tests/features/generators/business-rules-codec.feature)
-
-Tests the BusinessRulesCodec transformation from MasterDataset to RenderableDocument.
-Verifies rule extraction, organization by domain/phase, and progressive disclosure.
-
-<details>
-<summary>Extracts Rule blocks with Invariant and Rationale (2 scenarios)</summary>
-
-#### Extracts Rule blocks with Invariant and Rationale
-
-**Verified by:**
-
-- Extracts annotated Rule with Invariant and Rationale
-- Extracts unannotated Rule without showing not specified
-
-</details>
-
-<details>
-<summary>Organizes rules by product area and phase (2 scenarios)</summary>
-
-#### Organizes rules by product area and phase
-
-**Verified by:**
-
-- Groups rules by product area and phase
-- Orders rules by phase within domain
-
-</details>
-
-<details>
-<summary>Summary mode generates compact output (2 scenarios)</summary>
-
-#### Summary mode generates compact output
-
-**Verified by:**
-
-- Summary mode includes statistics line
-- Summary mode excludes detailed sections
-
-</details>
-
-<details>
-<summary>Preserves code examples and tables in detailed mode (2 scenarios)</summary>
-
-#### Preserves code examples and tables in detailed mode
-
-**Verified by:**
-
-- Code examples included in detailed mode
-- Code examples excluded in standard mode
-
-</details>
-
-<details>
-<summary>Generates scenario traceability links (1 scenarios)</summary>
-
-#### Generates scenario traceability links
-
-**Verified by:**
-
-- Verification links include file path
-
-</details>
-
-<details>
-<summary>Progressive disclosure generates detail files per product area (3 scenarios)</summary>
-
-#### Progressive disclosure generates detail files per product area
-
-**Verified by:**
-
-- Detail files are generated per product area
-- Main document has product area index table with links
-- Detail files have back-link to main document
-
-</details>
-
-<details>
-<summary>Empty rules show placeholder instead of blank content (2 scenarios)</summary>
-
-#### Empty rules show placeholder instead of blank content
-
-**Verified by:**
-
-- Rule without invariant or description or scenarios shows placeholder
-- Rule without invariant but with scenarios shows verified-by instead
-
-</details>
-
-<details>
-<summary>Rules always render flat for full visibility (1 scenarios)</summary>
-
-#### Rules always render flat for full visibility
-
-**Verified by:**
-
-- Features with many rules render flat without collapsible blocks
-
-</details>
-
-<details>
-<summary>Source file shown as filename text (1 scenarios)</summary>
-
-#### Source file shown as filename text
-
-**Verified by:**
-
-- Source file rendered as plain text not link
-
-</details>
-
-<details>
-<summary>Verified-by renders as checkbox list at standard level (2 scenarios)</summary>
-
-#### Verified-by renders as checkbox list at standard level
-
-**Verified by:**
-
-- Rules with scenarios show verified-by checklist
-- Duplicate scenario names are deduplicated
-
-</details>
-
-<details>
-<summary>Feature names are humanized from camelCase pattern names (2 scenarios)</summary>
-
-#### Feature names are humanized from camelCase pattern names
-
-**Verified by:**
-
-- CamelCase pattern name becomes spaced heading
-- Testing suffix is stripped from feature names
 
 </details>
 

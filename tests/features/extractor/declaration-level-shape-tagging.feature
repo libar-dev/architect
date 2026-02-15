@@ -20,7 +20,9 @@ Feature: Declaration-Level Shape Tagging - Extraction
     Untagged export is ignored,
     Group name is captured from tag value,
     Bare tag works without group,
-    Non-exported tagged declaration is extracted
+    Non-exported tagged declaration is extracted,
+    Tagged type is found despite same-name const declaration,
+    Both same-name declarations tagged produces shapes for each
 
     @acceptance-criteria @happy-path
     Scenario: Tagged declaration is extracted as shape
@@ -86,6 +88,51 @@ Feature: Declaration-Level Shape Tagging - Extraction
       And the shape has name "InternalConfig" and kind "interface"
       And the shape has exported false
 
+    @acceptance-criteria @edge-case
+    Scenario: Tagged type is found despite same-name const declaration
+      Given a TypeScript source file containing:
+        """typescript
+        /**
+         * @libar-docs-shape core-types
+         */
+        export type Result<T, E = Error> =
+          | { readonly ok: true; readonly value: T }
+          | { readonly ok: false; readonly error: E };
+
+        export const Result = {
+          ok<T>(value: T): Result<T, never> {
+            return { ok: true, value };
+          },
+          err<E>(error: E): Result<never, E> {
+            return { ok: false, error };
+          },
+        };
+        """
+      When discoverTaggedShapes runs on the source
+      Then 1 shape is returned
+      And the shape has name "Result" and kind "type"
+      And the shape has name "Result" and group "core-types"
+
+    @acceptance-criteria @edge-case
+    Scenario: Both same-name declarations tagged produces shapes for each
+      Given a TypeScript source file containing:
+        """typescript
+        /** @libar-docs-shape core-types */
+        export type Result<T, E = Error> =
+          | { readonly ok: true; readonly value: T }
+          | { readonly ok: false; readonly error: E };
+
+        /** @libar-docs-shape core-types */
+        export const Result = {
+          ok<T>(value: T): Result<T, never> {
+            return { ok: true, value };
+          },
+        };
+        """
+      When discoverTaggedShapes runs on the source
+      Then 2 shapes are returned
+      And the shapes include kind "type" and kind "const"
+
   Rule: Discovery uses existing estree parser with JSDoc comment scanning
 
     **Invariant:** The discoverTaggedShapes function uses the existing
@@ -93,7 +140,8 @@ Feature: Declaration-Level Shape Tagging - Extraction
 
     **Verified by:** All 5 declaration kinds supported,
     JSDoc gap enforcement,
-    Tag with other JSDoc content
+    Tag with other JSDoc content,
+    Generic arrow function in non-JSX context parses correctly
 
     @acceptance-criteria @happy-path
     Scenario: All five declaration kinds are discoverable
@@ -184,3 +232,14 @@ Feature: Declaration-Level Shape Tagging - Extraction
       Then 1 shape is returned
       And the shape has name "RiskLevel" and group "risk-types"
       And the shape JSDoc contains "Represents risk severity levels"
+
+    @acceptance-criteria @edge-case
+    Scenario: Generic arrow function in non-JSX context parses correctly
+      Given a TypeScript source file containing:
+        """typescript
+        /** @libar-docs-shape */
+        export const identity = <T>(value: T): T => value;
+        """
+      When discoverTaggedShapes runs on the source
+      Then 1 shape is returned
+      And the shape has name "identity" and kind "const"

@@ -7,14 +7,14 @@
 
 ## Progress
 
-**Overall:** [██████████████░░░░░░] 200/289 (69% complete)
+**Overall:** [██████████████░░░░░░] 202/291 (69% complete)
 
 | Status | Count |
 | --- | --- |
-| ✅ Completed | 200 |
+| ✅ Completed | 202 |
 | 🚧 Active | 47 |
 | 📋 Planned | 42 |
-| **Total** | 289 |
+| **Total** | 291 |
 
 ---
 
@@ -24,7 +24,7 @@
 - [Behavior](#behavior) (41)
 - [Cli](#cli) (12)
 - [Config](#config) (1)
-- [Core](#core) (72)
+- [Core](#core) (74)
 - [DDD](#ddd) (84)
 - [Extract](#extract) (1)
 - [Extractor](#extractor) (3)
@@ -124,6 +124,7 @@
 | ✅ Dual Source Extractor Testing | Behavior | completed | Extracts and combines pattern metadata from both TypeScript code stubs (@libar-docs-) and Gherkin feature files... |
 | ✅ Dual Source Schemas | Validation | completed | Zod schemas for dual-source extraction types. |
 | ✅ Error Factories | Types | completed | Error factories create structured, discriminated error types with consistent message formatting. |
+| ✅ Error Factory Types | Core | completed | Structured, discriminated error types with factory functions. |
 | ✅ Error Handling Unification | Behavior | completed | All CLI commands and extractors should use the DocError discriminated union pattern for consistent, structured error... |
 | ✅ Extends Tag Testing | DDD | completed | Tests for the @libar-docs-extends tag which establishes generalization relationships between patterns (pattern... |
 | ✅ Extracted Pattern Schema | Validation | completed | Zod schema for validating complete extracted patterns with code, metadata, relationships, and source information. |
@@ -203,6 +204,7 @@
 | ✅ Requirements Adr Codec Testing | Behavior | completed | The RequirementsDocumentCodec and AdrDocumentCodec transform MasterDataset into RenderableDocuments for PRD-style and... |
 | ✅ Requirements Codec | Core | completed | Transforms MasterDataset into RenderableDocument for PRD/requirements output. |
 | ✅ Result Monad | Types | completed | The Result type provides explicit error handling via a discriminated union. |
+| ✅ Result Monad Types | Core | completed | Explicit error handling via discriminated union. |
 | ✅ Rich Content Helpers | Core | completed | Shared helper functions for rendering Gherkin rich content in document codecs. |
 | ✅ Risk Levels | Core | completed | Three-tier risk classification for roadmap planning. |
 | ✅ Robustness Integration | DDD | completed | Context: Document generation pipeline needs validation, deduplication, and warning collection to work together... |
@@ -436,7 +438,7 @@
 
 ### Core
 
-58/72 complete (81%)
+60/74 complete (81%)
 
 - [✅ Adr Document Codec](patterns/adr-document-codec.md)
 - [✅ Architecture Codec](patterns/architecture-codec.md)
@@ -460,6 +462,7 @@
 - [✅ Documentation Generator CLI](patterns/documentation-generator-cli.md)
 - [✅ Document Codecs](patterns/document-codecs.md)
 - [✅ Document Generator](patterns/document-generator.md)
+- [✅ Error Factory Types](patterns/error-factory-types.md)
 - [✅ Format Types](patterns/format-types.md)
 - [✅ Hierarchy Levels](patterns/hierarchy-levels.md)
 - [✅ Layer Types](patterns/layer-types.md)
@@ -478,6 +481,7 @@
 - [✅ Renderable Utils](patterns/renderable-utils.md)
 - [✅ Reporting Codecs](patterns/reporting-codecs.md)
 - [✅ Requirements Codec](patterns/requirements-codec.md)
+- [✅ Result Monad Types](patterns/result-monad-types.md)
 - [✅ Rich Content Helpers](patterns/rich-content-helpers.md)
 - [✅ Risk Levels](patterns/risk-levels.md)
 - [✅ Session Codec](patterns/session-codec.md)
@@ -838,13 +842,13 @@ Pattern relationships and dependencies:
 
 ```mermaid
 graph TD
-    UtilsModule --> StringUtilities
-    UtilsModule --> CollectionUtilities
     DoDValidator --> DoDValidationTypes
     DoDValidator --> GherkinTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
     AntiPatternDetector --> GherkinTypes
+    UtilsModule --> StringUtilities
+    UtilsModule --> CollectionUtilities
     OutputSchemas --> Zod
     OutputSchemas --> LintSeveritySchema
     MasterDataset --> Zod
@@ -855,6 +859,8 @@ graph TD
     DualSourceSchemas ..-> MvpWorkflowImplementation
     DocDirectiveSchema ..-> MvpWorkflowImplementation
     CodecUtils --> Zod
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
     Pattern_Scanner --> glob
     Pattern_Scanner --> AST_Parser
     GherkinScanner --> GherkinASTParser
@@ -871,6 +877,17 @@ graph TD
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    ShapeExtractor --> typescript_estree
+    ShapeExtractor ..-> ShapeExtraction
+    GherkinExtractor --> GherkinTypes
+    GherkinExtractor --> GherkinASTParser
+    GherkinExtractor ..-> GherkinRulesSupport
+    DualSourceExtractor --> DocExtractor
+    DualSourceExtractor --> GherkinExtractor
+    DualSourceExtractor --> GherkinScanner
+    Document_Extractor --> Pattern_Scanner
+    Document_Extractor --> Tag_Registry
+    Document_Extractor --> Zod
     ValidatePatternsCLI --> PatternScanner
     ValidatePatternsCLI --> GherkinScanner
     ValidatePatternsCLI --> DocExtractor
@@ -927,17 +944,6 @@ graph TD
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    ShapeExtractor --> typescript_estree
-    ShapeExtractor ..-> ShapeExtraction
-    GherkinExtractor --> GherkinTypes
-    GherkinExtractor --> GherkinASTParser
-    GherkinExtractor ..-> GherkinRulesSupport
-    DualSourceExtractor --> DocExtractor
-    DualSourceExtractor --> GherkinExtractor
-    DualSourceExtractor --> GherkinScanner
-    Document_Extractor --> Pattern_Scanner
-    Document_Extractor --> Tag_Registry
-    Document_Extractor --> Zod
     PatternSummarizerImpl --> ProcessStateAPI
     PatternSummarizerImpl ..-> DataAPIOutputShaping
     StubResolverImpl --> ProcessStateAPI
@@ -982,13 +988,6 @@ graph TD
     ContextAssembler___Session_Oriented_Context_Bundle_Builder ..-> DataAPIContextAssembly
     StubResolver___Design_Stub_Discovery_and_Resolution --> ProcessStateAPI
     StubResolver___Design_Stub_Discovery_and_Resolution ..-> DataAPIStubIntegration
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
-    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
-    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> ProcessStateAPI
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> MasterDataset
     ScopeValidator___Pre_flight_Session_Readiness_Checker --> StubResolver
@@ -997,6 +996,13 @@ graph TD
     HandoffGenerator___Session_End_State_Summary --> MasterDataset
     HandoffGenerator___Session_End_State_Summary --> ContextFormatterImpl
     HandoffGenerator___Session_End_State_Summary ..-> DataAPIDesignSessionSupport
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> Pattern_Scanner
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection --> MasterDataset
+    CoverageAnalyzer___Annotation_Coverage_and_Taxonomy_Gap_Detection ..-> DataAPIArchitectureQueries
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> ProcessStateAPI
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> MasterDataset
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context --> Pattern_Scanner
+    ArchQueries___Neighborhood__Comparison__Tags__Sources__and_CLI_Context ..-> DataAPIArchitectureQueries
     FSMValidator ..-> PhaseStateMachineValidation
     FSMTransitions ..-> PhaseStateMachineValidation
     FSMStates ..-> PhaseStateMachineValidation
@@ -1011,17 +1017,17 @@ graph TD
     DetectChanges ..-> ProcessGuardLinter
     DeriveProcessState ..-> ProcessGuardLinter
     ProcessGuardDecider ..-> ProcessGuardLinter
-    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
-    BuiltInGenerators --> GeneratorRegistry
-    BuiltInGenerators --> CodecBasedGenerator
-    DecisionDocGenerator -.-> DecisionDocCodec
-    DecisionDocGenerator -.-> SourceMapper
     TransformDataset --> MasterDataset
     TransformDataset --> ExtractedPattern
     TransformDataset --> TagRegistry
     TransformDataset --> NormalizeStatus
     TransformDataset ..-> PatternRelationshipModel
     PipelineModule --> TransformDataset
+    ReferenceGeneratorRegistration ..-> CodecDrivenReferenceGeneration
+    BuiltInGenerators --> GeneratorRegistry
+    BuiltInGenerators --> CodecBasedGenerator
+    DecisionDocGenerator -.-> DecisionDocCodec
+    DecisionDocGenerator -.-> SourceMapper
     UniversalDocGeneratorRobustness -.-> DocGenerationProofOfConcept
     StreamingGitDiff -.-> ProcessGuardLinter
     StepLintExtendedRules -.-> StepLintVitestCucumber
@@ -1052,6 +1058,10 @@ graph TD
     DoDValidatorTesting ..-> DoDValidation
     DetectChangesTesting ..-> DetectChanges
     AntiPatternDetectorTesting ..-> AntiPatternDetector
+    ShapeExtractionTesting ..-> ReferenceDocShowcase
+    ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
+    DualSourceExtractorTesting ..-> DualSourceExtractor
+    DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
     GeneratorRegistryTesting ..-> GeneratorRegistry
     GeneratorRegistryTesting ..-> GeneratorInfrastructureTesting
     PrdImplementationSectionTesting ..-> PrdImplementationSection
@@ -1060,10 +1070,6 @@ graph TD
     CodecBasedGeneratorTesting ..-> CodecBasedGenerator
     CodecBasedGeneratorTesting ..-> GeneratorInfrastructureTesting
     BusinessRulesDocumentCodec ..-> BusinessRulesGenerator
-    ShapeExtractionTesting ..-> ReferenceDocShowcase
-    ExtractionPipelineEnhancementsTesting ..-> ReferenceDocShowcase
-    DualSourceExtractorTesting ..-> DualSourceExtractor
-    DeclarationLevelShapeTaggingTesting ..-> DeclarationLevelShapeTagging
     DefineConfigTesting ..-> DefineConfig
     ConfigLoaderTesting ..-> ConfigLoader
     TransformDatasetTesting ..-> TransformDataset
@@ -1093,11 +1099,6 @@ graph TD
     ImplementsTagProcessing ..-> PatternRelationshipModel
     ExtendsTagTesting ..-> PatternRelationshipModel
     DependsOnTagTesting ..-> PatternRelationshipModel
-    LayeredDiagramGeneration ..-> ArchitectureDiagramGeneration
-    ArchGeneratorRegistration ..-> ArchitectureDiagramGeneration
-    ComponentDiagramGeneration ..-> ArchitectureDiagramGeneration
-    ArchTagExtraction ..-> ArchitectureDiagramGeneration
-    ArchIndexDataset ..-> ArchitectureDiagramGeneration
     TimelineCodecTesting ..-> CodecBehaviorTesting
     ShapeSelectorTesting ..-> ReferenceDocShowcase
     ShapeSelectorTesting ..-> DeclarationLevelShapeTagging
@@ -1112,6 +1113,11 @@ graph TD
     PlanningCodecTesting ..-> CodecBehaviorTesting
     ConventionExtractorTesting ..-> ReferenceDocShowcase
     CompositeCodecTesting ..-> ReferenceDocShowcase
+    LayeredDiagramGeneration ..-> ArchitectureDiagramGeneration
+    ArchGeneratorRegistration ..-> ArchitectureDiagramGeneration
+    ComponentDiagramGeneration ..-> ArchitectureDiagramGeneration
+    ArchTagExtraction ..-> ArchitectureDiagramGeneration
+    ArchIndexDataset ..-> ArchitectureDiagramGeneration
 ```
 
 ---

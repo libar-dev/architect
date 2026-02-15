@@ -23,6 +23,12 @@ Error factories create structured, discriminated error types with consistent
   - Structured data for logging and reporting
   - Type narrowing via discriminator field
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`errors.ts`](../../src/types/errors.ts) - ## Error Factories - Type Definitions
+
 ## Acceptance Criteria
 
 **createFileSystemError generates correct message for each reason**

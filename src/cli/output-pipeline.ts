@@ -70,6 +70,10 @@ export interface ListFilters {
   readonly category: string | null;
   /** Filter by source type */
   readonly source: 'typescript' | 'gherkin' | null;
+  /** Filter by architecture context (@libar-docs-arch-context) */
+  readonly archContext: string | null;
+  /** Filter by product area (@libar-docs-product-area) */
+  readonly productArea: string | null;
   /** Maximum number of results */
   readonly limit: number | null;
   /** Number of results to skip */
@@ -81,6 +85,8 @@ export const DEFAULT_LIST_FILTERS: ListFilters = {
   phase: null,
   category: null,
   source: null,
+  archContext: null,
+  productArea: null,
   limit: null,
   offset: null,
 };
@@ -245,6 +251,18 @@ export function applyListFilters(
     candidates = candidates.filter((p) => {
       return deriveSource(p.source.file) === source;
     });
+  }
+
+  // Filter by architecture context
+  if (filters.archContext !== null) {
+    const ctx = filters.archContext.toLowerCase();
+    candidates = candidates.filter((p) => p.archContext?.toLowerCase() === ctx);
+  }
+
+  // Filter by product area
+  if (filters.productArea !== null) {
+    const area = filters.productArea.toLowerCase();
+    candidates = candidates.filter((p) => p.productArea?.toLowerCase() === area);
   }
 
   // Apply pagination

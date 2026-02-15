@@ -4,7 +4,7 @@
 
 ---
 
-**67 rules** from 14 features. 40 rules have explicit invariants.
+**67 rules** from 14 features. 53 rules have explicit invariants.
 
 ---
 
@@ -118,6 +118,8 @@
 - Group name is captured from tag value
 - Bare tag works without group name
 - Non-exported tagged declaration is extracted
+- Tagged type is found despite same-name const declaration
+- Both same-name declarations tagged produces shapes for each
 - Tagged declaration is extracted
 - Untagged export is ignored
 - Bare tag works without group
@@ -134,6 +136,7 @@
 - Tag as last line before closing JSDoc delimiter
 - Hypothetical libar-docs-shape-extended tag is not matched
 - Tag coexists with other JSDoc content
+- Generic arrow function in non-JSX context parses correctly
 - All 5 declaration kinds supported
 - JSDoc gap enforcement
 - Tag with other JSDoc content
@@ -259,6 +262,10 @@
 
 #### Parser preserves DocString mediaType during extraction
 
+> **Invariant:** The Gherkin parser must retain the mediaType annotation from DocString delimiters through to the parsed AST; DocStrings without a mediaType have undefined mediaType.
+>
+> **Rationale:** Losing the mediaType causes downstream renderers to apply incorrect escaping or default language hints, corrupting code block output.
+
 **Verified by:**
 - Parse DocString with typescript mediaType
 - Parse DocString with json mediaType
@@ -269,6 +276,8 @@
 
 #### MediaType is used when rendering code blocks
 
+> **Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the renderer falls back to a caller-specified default language.
+
 **Verified by:**
 - TypeScript mediaType renders as typescript code block
 - JSDoc mediaType prevents asterisk escaping
@@ -277,6 +286,10 @@
 ---
 
 #### renderDocString handles both string and object formats
+
+> **Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a mediaType, it takes precedence over the caller-supplied language parameter.
+>
+> **Rationale:** Legacy callers pass raw strings while newer code passes structured objects — the renderer must handle both without breaking existing usage.
 
 **Verified by:**
 - String docString renders correctly (legacy format)
@@ -292,6 +305,10 @@
 
 #### Process metadata is extracted from feature tags
 
+> **Invariant:** A feature file must have both @pattern and @phase tags to produce valid process metadata; missing either yields null.
+>
+> **Rationale:** Pattern name and phase are the minimum identifiers for placing a pattern in the roadmap — without both, the pattern cannot be tracked.
+
 **Verified by:**
 - Complete process metadata extraction
 - Minimal required tags extraction
@@ -302,6 +319,10 @@
 
 #### Deliverables are extracted from Background tables
 
+> **Invariant:** Deliverables are sourced exclusively from Background tables; features without a Background produce an empty deliverable list.
+>
+> **Rationale:** The Background table is the single source of truth for deliverable tracking — extracting from other locations would create ambiguity.
+
 **Verified by:**
 - Standard deliverables table extraction
 - Extended deliverables with Finding and Release
@@ -311,6 +332,10 @@
 ---
 
 #### Code and feature patterns are combined into dual-source patterns
+
+> **Invariant:** A combined pattern is produced only when both a code stub and a feature file exist for the same pattern name; unmatched sources are tracked separately as code-only or feature-only.
+>
+> **Rationale:** Dual-source combination ensures documentation reflects both implementation intent (code) and specification (Gherkin) — mismatches signal inconsistency.
 
 **Verified by:**
 - Matching code and feature are combined
@@ -323,6 +348,10 @@
 
 #### Dual-source results are validated for consistency
 
+> **Invariant:** Cross-source validation reports errors for metadata mismatches and warnings for orphaned patterns that are still in roadmap status.
+>
+> **Rationale:** Inconsistencies between code stubs and feature files indicate drift — errors catch conflicts while warnings surface missing counterparts that may be intentional.
+
 **Verified by:**
 - Clean results have no errors
 - Cross-validation errors are reported
@@ -332,6 +361,8 @@
 ---
 
 #### Include tags are extracted from Gherkin feature tags
+
+> **Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no includes.
 
 **Verified by:**
 - Single include tag is extracted
@@ -449,6 +480,7 @@
 **Verified by:**
 - Wildcard extracts all exported declarations
 - Mixed wildcard and names produces warning
+- Same-name type and const exports produce one shape
 - Wildcard extracts all exports
 - Non-exported declarations excluded
 - Mixed wildcard and names rejected
@@ -790,6 +822,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 #### Uses tag is defined in taxonomy registry
 
+> **Invariant:** The uses and used-by tags must be registered in the taxonomy with CSV format and dependency-related purpose descriptions.
+
 **Verified by:**
 - Uses tag exists in registry
 - Used-by tag exists in registry
@@ -797,6 +831,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 ---
 
 #### Uses tag is extracted from TypeScript files
+
+> **Invariant:** The AST parser must extract single and comma-separated uses values from TypeScript JSDoc annotations.
 
 **Verified by:**
 - Single uses value extracted
@@ -806,6 +842,8 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 #### Used-by tag is extracted from TypeScript files
 
+> **Invariant:** The AST parser must extract single and comma-separated used-by values from TypeScript JSDoc annotations.
+
 **Verified by:**
 - Single used-by value extracted
 - Multiple used-by values extracted as CSV
@@ -814,16 +852,22 @@ The extractor uses strict adjacency (gap = 1 line) to prevent
 
 #### Uses relationships are stored in relationship index
 
-The relationship index stores uses and usedBy relationships directly
-    from pattern metadata.
+> **Invariant:** All declared uses and usedBy relationships must be stored in the relationship index as explicitly declared entries.
 
 **Verified by:**
 - Uses relationships stored in relationship index
 - UsedBy relationships stored explicitly
+- UsedBy relationships stored explicitly
+
+    The relationship index stores uses and usedBy relationships directly
+    from pattern metadata. Unlike implements
+- these are explicit declarations.
 
 ---
 
 #### Schemas validate uses field correctly
+
+> **Invariant:** DocDirective and RelationshipEntry schemas must accept uses and usedBy fields as valid CSV string values.
 
 **Verified by:**
 - DocDirective schema accepts uses

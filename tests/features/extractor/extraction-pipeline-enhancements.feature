@@ -226,7 +226,8 @@ Feature: Extraction Pipeline Enhancements
 
     **Verified by:** Wildcard extracts all exports,
     Non-exported declarations excluded,
-    Mixed wildcard and names rejected
+    Mixed wildcard and names rejected,
+    Same-name type and const exports produce one shape
 
     @acceptance-criteria @happy-path
     Scenario: Wildcard extracts all exported declarations
@@ -260,3 +261,24 @@ Feature: Extraction Pipeline Enhancements
       When extracting shapes with tag "*, Foo"
       Then extraction produces a warning about wildcard exclusivity
       And 0 shapes are extracted
+
+    @acceptance-criteria @edge-case
+    Scenario: Same-name type and const exports produce one shape
+      Given TypeScript source for wildcard extraction:
+        """
+        export type Result<T, E = Error> =
+          | { readonly ok: true; readonly value: T }
+          | { readonly ok: false; readonly error: E };
+
+        export const Result = {
+          ok<T>(value: T): Result<T, never> {
+            return { ok: true, value };
+          },
+        };
+        """
+      When extracting shapes with wildcard "*"
+      Then 1 shapes are extracted
+      And the extracted shapes include all:
+        | name   |
+        | Result |
+      And the extracted shape "Result" has kind "type"

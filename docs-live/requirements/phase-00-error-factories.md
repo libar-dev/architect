@@ -182,6 +182,12 @@ _Verified by: createProcessMetadataValidationError formats file and reason, crea
 
 _Verified by: createDeliverableValidationError formats file and reason, createDeliverableValidationError includes optional deliverableName, createDeliverableValidationError omits deliverableName when not provided, createDeliverableValidationError includes validation errors_
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`errors.ts`](../../src/types/errors.ts) - ## Error Factories - Type Definitions
+
 ---
 
 [← Back to Product Requirements](../PRODUCT-REQUIREMENTS.md)

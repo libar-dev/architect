@@ -126,9 +126,16 @@ _Verified by: Uses referencing non-existent pattern warns, Implements referencin
 
 **Bidirectional traceability links should be consistent**
 
+**Invariant:** Every forward traceability link (executable-specs, roadmap-spec) must have a corresponding back-link in the target file.
+**Rationale:** Asymmetric links mean one side of the traceability chain is invisible, defeating the purpose of bidirectional tracing.
+**Verified by:** Missing back-link detected, Orphan executable spec detected
+
 _Verified by: Missing back-link detected, Orphan executable spec detected_
 
 **Parent references must be valid**
+
+**Invariant:** A pattern's parent reference must point to an existing epic pattern in the registry.
+**Verified by:** Invalid parent reference detected, Valid parent reference passes
 
 _Verified by: Invalid parent reference detected, Valid parent reference passes_
 

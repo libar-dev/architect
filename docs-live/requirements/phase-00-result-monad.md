@@ -6,21 +6,22 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value     |
+| ------------ | --------- |
+| Status       | completed |
 | Product Area | CoreTypes |
 
 ## Description
 
 The Result type provides explicit error handling via a discriminated union.
-  This eliminates thrown exceptions in favor of type-safe error propagation.
+This eliminates thrown exceptions in favor of type-safe error propagation.
 
-  **Why Result over try/catch:**
-  - Compile-time verification that errors are handled
-  - Type narrowing via isOk/isErr guards
-  - Chainable transformations via map/mapErr
-  - No hidden control flow from thrown exceptions
+**Why Result over try/catch:**
+
+- Compile-time verification that errors are handled
+- Type narrowing via isOk/isErr guards
+- Chainable transformations via map/mapErr
+- No hidden control flow from thrown exceptions
 
 ## Acceptance Criteria
 
@@ -38,8 +39,8 @@ The Result type provides explicit error handling via a discriminated union.
 - And the result value should have count 42
 
 | name | count |
-| --- | --- |
-| test | 42 |
+| ---- | ----- |
+| test | 42    |
 
 **Result.ok wraps null value**
 
@@ -73,8 +74,8 @@ The Result type provides explicit error handling via a discriminated union.
 - And the error should have code "E001"
 - And the error should have message "Invalid input"
 
-| code | message |
-| --- | --- |
+| code | message       |
+| ---- | ------------- |
 | E001 | Invalid input |
 
 **Type guards correctly identify success results**
@@ -115,13 +116,13 @@ The Result type provides explicit error handling via a discriminated union.
 - Then unwrap should throw an Error instance
 - And the thrown error message should contain all of:
 
-| code | reason |
-| --- | --- |
+| code   | reason       |
+| ------ | ------------ |
 | ERR_42 | test failure |
 
-| substring |
-| --- |
-| ERR_42 |
+| substring    |
+| ------------ |
+| ERR_42       |
 | test failure |
 
 **unwrapOr returns value from success result**
@@ -183,6 +184,12 @@ The Result type provides explicit error handling via a discriminated union.
 - When I mapErr to parse into structured error
 - Then the mapped result should be err
 - And the error should have code "123"
+
+## Implementations
+
+Files that implement this pattern:
+
+- [`result.ts`](../../src/types/result.ts) - ## Result Monad - Type Definitions
 
 ---
 

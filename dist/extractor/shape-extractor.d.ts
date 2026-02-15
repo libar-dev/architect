@@ -56,7 +56,9 @@ export interface ProcessExtractShapesResult {
  * @param extractShapesTag - Comma-separated shape names from tag, or `*` for auto-discovery
  * @returns Result with extracted shapes and any warnings
  */
-export declare function processExtractShapesTag(sourceCode: string, extractShapesTag: string): ProcessExtractShapesResult;
+export declare function processExtractShapesTag(sourceCode: string, extractShapesTag: string, options?: {
+    readonly jsx?: boolean;
+}): ProcessExtractShapesResult;
 /**
  * Discover declarations tagged with @libar-docs-shape in source code.
  *
@@ -68,8 +70,11 @@ export declare function processExtractShapesTag(sourceCode: string, extractShape
  * and extractShape() — no parser changes needed (DD-2).
  *
  * @param sourceCode - TypeScript source code to scan
+ * @param options - Parse options (jsx should match file extension)
  * @returns Result containing discovered shapes and warnings
  */
-export declare function discoverTaggedShapes(sourceCode: string): Result<ProcessExtractShapesResult>;
+export declare function discoverTaggedShapes(sourceCode: string, options?: {
+    readonly jsx?: boolean;
+}): Result<ProcessExtractShapesResult>;
 export { renderShapesAsMarkdown } from '../renderable/codecs/helpers.js';
 //# sourceMappingURL=shape-extractor.d.ts.map

@@ -26,7 +26,6 @@ graph TB
         PatternSummarizerImpl("PatternSummarizerImpl")
         ScopeValidatorImpl("ScopeValidatorImpl")
         ProcessStateAPI("ProcessStateAPI")
-        PatternHelpers["PatternHelpers"]
         HandoffGeneratorImpl("HandoffGeneratorImpl")
         FuzzyMatcherImpl("FuzzyMatcherImpl")
         CoverageAnalyzerImpl("CoverageAnalyzerImpl")
@@ -330,116 +329,6 @@ ArchIndexSchema = z.object({
 ---
 
 ## Behavior Specifications
-
-### ProcessStateAPITesting
-
-[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
-
-Programmatic interface for querying delivery process state.
-Designed for Claude Code integration and tool automation.
-
-**Problem:**
-
-- Markdown generation is not ideal for programmatic access
-- Claude Code needs structured data to answer process questions
-- Multiple queries require redundant parsing of MasterDataset
-
-**Solution:**
-
-- ProcessStateAPI wraps MasterDataset with typed query methods
-- Returns structured data suitable for programmatic consumption
-- Integrates FSM validation for transition checks
-
-<details>
-<summary>Status queries return correct patterns (6 scenarios)</summary>
-
-#### Status queries return correct patterns
-
-**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
-
-**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
-
-**Verified by:**
-
-- Get patterns by normalized status
-- Get patterns by FSM status
-- Get current work returns active patterns
-- Get roadmap items returns roadmap and deferred
-- Get status counts
-- Get completion percentage
-
-</details>
-
-<details>
-<summary>Phase queries return correct phase data (4 scenarios)</summary>
-
-#### Phase queries return correct phase data
-
-**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
-
-**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
-
-**Verified by:**
-
-- Get patterns by phase
-- Get phase progress
-- Get nonexistent phase returns undefined
-- Get active phases
-
-</details>
-
-<details>
-<summary>FSM queries expose transition validation (4 scenarios)</summary>
-
-#### FSM queries expose transition validation
-
-**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
-
-**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
-
-**Verified by:**
-
-- Check valid transition
-- Check invalid transition
-- Get valid transitions from status
-- Get protection info
-
-</details>
-
-<details>
-<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
-
-#### Pattern queries find and retrieve pattern data
-
-**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
-
-**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
-
-**Verified by:**
-
-- Find pattern by name (case insensitive)
-- Find nonexistent pattern returns undefined
-- Get patterns by category
-- Get all categories with counts
-
-</details>
-
-<details>
-<summary>Timeline queries group patterns by time (3 scenarios)</summary>
-
-#### Timeline queries group patterns by time
-
-**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
-
-**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
-
-**Verified by:**
-
-- Get patterns by quarter
-- Get all quarters
-- Get recently completed sorted by date
-
-</details>
 
 ### ValidatePatternsCli
 
@@ -1147,6 +1036,116 @@ Command-line interface for generating documentation from annotated TypeScript.
 
 </details>
 
+### ProcessStateAPITesting
+
+[View ProcessStateAPITesting source](tests/features/api/process-state-api.feature)
+
+Programmatic interface for querying delivery process state.
+Designed for Claude Code integration and tool automation.
+
+**Problem:**
+
+- Markdown generation is not ideal for programmatic access
+- Claude Code needs structured data to answer process questions
+- Multiple queries require redundant parsing of MasterDataset
+
+**Solution:**
+
+- ProcessStateAPI wraps MasterDataset with typed query methods
+- Returns structured data suitable for programmatic consumption
+- Integrates FSM validation for transition checks
+
+<details>
+<summary>Status queries return correct patterns (6 scenarios)</summary>
+
+#### Status queries return correct patterns
+
+**Invariant:** Status queries must correctly filter by both normalized status (planned = roadmap + deferred) and FSM status (exact match).
+
+**Rationale:** The two-domain status convention requires separate query methods — mixing them produces incorrect filtered results.
+
+**Verified by:**
+
+- Get patterns by normalized status
+- Get patterns by FSM status
+- Get current work returns active patterns
+- Get roadmap items returns roadmap and deferred
+- Get status counts
+- Get completion percentage
+
+</details>
+
+<details>
+<summary>Phase queries return correct phase data (4 scenarios)</summary>
+
+#### Phase queries return correct phase data
+
+**Invariant:** Phase queries must return only patterns in the requested phase, with accurate progress counts and completion percentage.
+
+**Rationale:** Phase-level queries power the roadmap and session planning views — incorrect counts cascade into wrong progress percentages.
+
+**Verified by:**
+
+- Get patterns by phase
+- Get phase progress
+- Get nonexistent phase returns undefined
+- Get active phases
+
+</details>
+
+<details>
+<summary>FSM queries expose transition validation (4 scenarios)</summary>
+
+#### FSM queries expose transition validation
+
+**Invariant:** FSM queries must validate transitions against the PDR-005 state machine and expose protection levels per status.
+
+**Rationale:** Programmatic FSM access enables tooling to enforce delivery process rules without reimplementing the state machine.
+
+**Verified by:**
+
+- Check valid transition
+- Check invalid transition
+- Get valid transitions from status
+- Get protection info
+
+</details>
+
+<details>
+<summary>Pattern queries find and retrieve pattern data (4 scenarios)</summary>
+
+#### Pattern queries find and retrieve pattern data
+
+**Invariant:** Pattern lookup must be case-insensitive by name, and category queries must return only patterns with the requested category.
+
+**Rationale:** Case-insensitive search reduces friction in CLI and AI agent usage where exact casing is often unknown.
+
+**Verified by:**
+
+- Find pattern by name (case insensitive)
+- Find nonexistent pattern returns undefined
+- Get patterns by category
+- Get all categories with counts
+
+</details>
+
+<details>
+<summary>Timeline queries group patterns by time (3 scenarios)</summary>
+
+#### Timeline queries group patterns by time
+
+**Invariant:** Quarter queries must correctly filter by quarter string, and recently completed must be sorted by date descending with limit.
+
+**Rationale:** Timeline grouping enables quarterly reporting and session context — recent completions show delivery momentum.
+
+**Verified by:**
+
+- Get patterns by quarter
+- Get all quarters
+- Get recently completed sorted by date
+
+</details>
+
 ### StubTaxonomyTagTests
 
 [View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
@@ -1361,6 +1360,62 @@ issues, and next-session priorities.
 **Verified by:**
 
 - Handoff formatter produces markers per ADR-008
+
+### ArchQueriesTest
+
+[View ArchQueriesTest source](tests/features/api/architecture-queries/arch-queries.feature)
+
+<details>
+<summary>Neighborhood and comparison views (3 scenarios)</summary>
+
+#### Neighborhood and comparison views
+
+**Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
+
+**Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
+
+**Verified by:**
+
+- Pattern neighborhood shows direct connections
+- Cross-context comparison shows shared and unique dependencies
+- Neighborhood for nonexistent pattern returns undefined
+
+</details>
+
+<details>
+<summary>Taxonomy discovery via tags and sources (3 scenarios)</summary>
+
+#### Taxonomy discovery via tags and sources
+
+**Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
+
+**Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
+
+**Verified by:**
+
+- Tag aggregation counts values across patterns
+- Source inventory categorizes files by type
+- Tags with no patterns returns empty report
+
+</details>
+
+<details>
+<summary>Coverage analysis reports annotation completeness (4 scenarios)</summary>
+
+#### Coverage analysis reports annotation completeness
+
+**Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
+
+**Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
+
+**Verified by:**
+
+- Unused taxonomy detection
+- Cross-context comparison with integration points
+- Neighborhood includes implements relationships
+- Neighborhood includes dependsOn and enables relationships
+
+</details>
 
 ### ContextFormatterTests
 
@@ -1752,62 +1807,6 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 - Identical strings have distance 0
 - Single character difference
-
-</details>
-
-### ArchQueriesTest
-
-[View ArchQueriesTest source](tests/features/api/architecture-queries/arch-queries.feature)
-
-<details>
-<summary>Neighborhood and comparison views (3 scenarios)</summary>
-
-#### Neighborhood and comparison views
-
-**Invariant:** The architecture query API must provide pattern neighborhood views (direct connections) and cross-context comparison views (shared/unique dependencies), returning undefined for nonexistent patterns.
-
-**Rationale:** Neighborhood and comparison views are the primary navigation tools for understanding architecture — without them, developers must manually trace relationship chains across files.
-
-**Verified by:**
-
-- Pattern neighborhood shows direct connections
-- Cross-context comparison shows shared and unique dependencies
-- Neighborhood for nonexistent pattern returns undefined
-
-</details>
-
-<details>
-<summary>Taxonomy discovery via tags and sources (3 scenarios)</summary>
-
-#### Taxonomy discovery via tags and sources
-
-**Invariant:** The API must aggregate tag values with counts across all patterns and categorize source files by type, returning empty reports when no patterns match.
-
-**Rationale:** Tag aggregation reveals annotation coverage gaps and source inventory helps teams understand their codebase composition — both are essential for project health monitoring.
-
-**Verified by:**
-
-- Tag aggregation counts values across patterns
-- Source inventory categorizes files by type
-- Tags with no patterns returns empty report
-
-</details>
-
-<details>
-<summary>Coverage analysis reports annotation completeness (4 scenarios)</summary>
-
-#### Coverage analysis reports annotation completeness
-
-**Invariant:** Coverage analysis must detect unused taxonomy entries, cross-context integration points, and include all relationship types (implements, dependsOn, enables) in neighborhood views.
-
-**Rationale:** Unused taxonomy entries indicate dead configuration while missing relationship types produce incomplete architecture views — both degrade the reliability of generated documentation.
-
-**Verified by:**
-
-- Unused taxonomy detection
-- Cross-context comparison with integration points
-- Neighborhood includes implements relationships
-- Neighborhood includes dependsOn and enables relationships
 
 </details>
 

@@ -181,6 +181,77 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         expect(shape!.exported).toBe(false);
       });
     });
+
+    RuleScenario(
+      'Tagged type is found despite same-name const declaration',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript source file containing:', (_ctx: unknown, docString: string) => {
+          state!.sourceCode = docString;
+        });
+
+        When('discoverTaggedShapes runs on the source', () => {
+          const result = discoverTaggedShapes(state!.sourceCode);
+          expect(result.ok).toBe(true);
+          if (result.ok) {
+            state!.discoveredShapes = result.value.shapes;
+          }
+        });
+
+        Then('1 shape is returned', () => {
+          expect(state!.discoveredShapes).toHaveLength(1);
+        });
+
+        And(
+          'the shape has name {string} and kind {string}',
+          (_ctx: unknown, name: string, kind: string) => {
+            const shape = state!.discoveredShapes[0];
+            expect(shape).toBeDefined();
+            expect(shape!.name).toBe(name);
+            expect(shape!.kind).toBe(kind);
+          }
+        );
+
+        And(
+          'the shape has name {string} and group {string}',
+          (_ctx: unknown, name: string, group: string) => {
+            const shape = state!.discoveredShapes[0];
+            expect(shape).toBeDefined();
+            expect(shape!.name).toBe(name);
+            expect(shape!.group).toBe(group);
+          }
+        );
+      }
+    );
+
+    RuleScenario(
+      'Both same-name declarations tagged produces shapes for each',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript source file containing:', (_ctx: unknown, docString: string) => {
+          state!.sourceCode = docString;
+        });
+
+        When('discoverTaggedShapes runs on the source', () => {
+          const result = discoverTaggedShapes(state!.sourceCode);
+          expect(result.ok).toBe(true);
+          if (result.ok) {
+            state!.discoveredShapes = result.value.shapes;
+          }
+        });
+
+        Then('2 shapes are returned', () => {
+          expect(state!.discoveredShapes).toHaveLength(2);
+        });
+
+        And(
+          'the shapes include kind {string} and kind {string}',
+          (_ctx: unknown, kind1: string, kind2: string) => {
+            const kinds = state!.discoveredShapes.map((s) => s.kind);
+            expect(kinds).toContain(kind1);
+            expect(kinds).toContain(kind2);
+          }
+        );
+      }
+    );
   });
 
   // ──────────────────────────────────────────────────────────────────────
@@ -331,5 +402,36 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
         expect(shape!.jsDoc).toContain(expectedContent);
       });
     });
+
+    RuleScenario(
+      'Generic arrow function in non-JSX context parses correctly',
+      ({ Given, When, Then, And }) => {
+        Given('a TypeScript source file containing:', (_ctx: unknown, docString: string) => {
+          state!.sourceCode = docString;
+        });
+
+        When('discoverTaggedShapes runs on the source', () => {
+          const result = discoverTaggedShapes(state!.sourceCode);
+          expect(result.ok).toBe(true);
+          if (result.ok) {
+            state!.discoveredShapes = result.value.shapes;
+          }
+        });
+
+        Then('1 shape is returned', () => {
+          expect(state!.discoveredShapes).toHaveLength(1);
+        });
+
+        And(
+          'the shape has name {string} and kind {string}',
+          (_ctx: unknown, name: string, kind: string) => {
+            const shape = state!.discoveredShapes[0];
+            expect(shape).toBeDefined();
+            expect(shape!.name).toBe(name);
+            expect(shape!.kind).toBe(kind);
+          }
+        );
+      }
+    );
   });
 });

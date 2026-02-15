@@ -22,6 +22,12 @@ The Result type provides explicit error handling via a discriminated union.
   - Chainable transformations via map/mapErr
   - No hidden control flow from thrown exceptions
 
+## Implementations
+
+Files that implement this pattern:
+
+- [`result.ts`](../../src/types/result.ts) - ## Result Monad - Type Definitions
+
 ## Acceptance Criteria
 
 **Result.ok wraps a primitive value**

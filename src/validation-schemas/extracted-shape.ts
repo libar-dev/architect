@@ -224,6 +224,11 @@ export const ShapeExtractionOptionsSchema = z.object({
 
   /** Preserve original formatting vs normalize (default: true) */
   preserveFormatting: z.boolean().default(true),
+
+  /** Enable JSX parsing — only for .tsx files (default: false).
+   *  Enabling for .ts files causes generic arrows like `<T>(v: T)` to be
+   *  mis-parsed as JSX elements. */
+  jsx: z.boolean().default(false),
 });
 
 /** Output type with all defaults applied */

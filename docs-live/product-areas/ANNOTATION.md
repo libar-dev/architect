@@ -62,10 +62,6 @@ graph LR
         GherkinASTParser[/"GherkinASTParser"/]
         TypeScript_AST_Parser[/"TypeScript AST Parser"/]
     end
-    subgraph taxonomy["Taxonomy"]
-        TagRegistryBuilder("TagRegistryBuilder")
-        CategoryDefinitions[/"CategoryDefinitions"/]
-    end
     subgraph related["Related"]
         DocDirectiveSchema["DocDirectiveSchema"]:::neighbor
     end
@@ -733,7 +729,7 @@ param/returns/throws extraction, and auto-shape discovery mode.
 </details>
 
 <details>
-<summary>Auto-shape discovery extracts all exported types via wildcard (2 scenarios)</summary>
+<summary>Auto-shape discovery extracts all exported types via wildcard (3 scenarios)</summary>
 
 #### Auto-shape discovery extracts all exported types via wildcard
 
@@ -743,6 +739,7 @@ param/returns/throws extraction, and auto-shape discovery mode.
 
 - Wildcard extracts all exported declarations
 - Mixed wildcard and names produces warning
+- Same-name type and const exports produce one shape
 - Wildcard extracts all exports
 - Non-exported declarations excluded
 - Mixed wildcard and names rejected
@@ -877,6 +874,8 @@ code for declarations annotated with the libar-docs-shape JSDoc tag.
 - Group name is captured from tag value
 - Bare tag works without group name
 - Non-exported tagged declaration is extracted
+- Tagged type is found despite same-name const declaration
+- Both same-name declarations tagged produces shapes for each
 - Tagged declaration is extracted
 - Untagged export is ignored
 - Bare tag works without group
@@ -892,6 +891,7 @@ code for declarations annotated with the libar-docs-shape JSDoc tag.
 - Tag as last line before closing JSDoc delimiter
 - Hypothetical libar-docs-shape-extended tag is not matched
 - Tag coexists with other JSDoc content
+- Generic arrow function in non-JSX context parses correctly
 - All 5 declaration kinds supported
 - JSDoc gap enforcement
 - Tag with other JSDoc content

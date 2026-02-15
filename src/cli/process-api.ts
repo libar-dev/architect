@@ -362,6 +362,8 @@ List Filters (for 'list' subcommand):
   --phase <number>          Filter by roadmap phase number
   --category <name>         Filter by category
   --source <ts|gherkin>     Filter by source type
+  --arch-context <name>     Filter by architecture context (@libar-docs-arch-context)
+  --product-area <name>     Filter by product area (@libar-docs-product-area)
   --limit <n>               Maximum results
   --offset <n>              Skip first n results
 
@@ -664,6 +666,8 @@ function parseListFilters(subArgs: string[]): ListFilters {
   let phase: number | null = null;
   let category: string | null = null;
   let source: 'typescript' | 'gherkin' | null = null;
+  let archContext: string | null = null;
+  let productArea: string | null = null;
   let limit: number | null = null;
   let offset: number | null = null;
 
@@ -724,12 +728,23 @@ function parseListFilters(subArgs: string[]): ListFilters {
         i++;
         break;
       }
+      case '--arch-context':
+        archContext = next ?? null;
+        i++;
+        break;
+      case '--product-area':
+        productArea = next ?? null;
+        i++;
+        break;
       default:
+        if (arg?.startsWith('-') === true) {
+          console.warn(`Warning: Unknown flag '${arg}' ignored`);
+        }
         break;
     }
   }
 
-  return { status, phase, category, source, limit, offset };
+  return { status, phase, category, source, archContext, productArea, limit, offset };
 }
 
 /**

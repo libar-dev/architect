@@ -261,21 +261,40 @@ Extracts and combines pattern metadata from both TypeScript code stubs
 
 **Process metadata is extracted from feature tags**
 
+**Invariant:** A feature file must have both @pattern and @phase tags to produce valid process metadata; missing either yields null.
+    **Rationale:** Pattern name and phase are the minimum identifiers for placing a pattern in the roadmap — without both, the pattern cannot be tracked.
+    **Verified by:** Complete process metadata extraction, Minimal required tags extraction, Missing pattern tag returns null, Missing phase tag returns null
+
 _Verified by: Complete process metadata extraction, Minimal required tags extraction, Missing pattern tag returns null, Missing phase tag returns null_
 
 **Deliverables are extracted from Background tables**
+
+**Invariant:** Deliverables are sourced exclusively from Background tables; features without a Background produce an empty deliverable list.
+    **Rationale:** The Background table is the single source of truth for deliverable tracking — extracting from other locations would create ambiguity.
+    **Verified by:** Standard deliverables table extraction, Extended deliverables with Finding and Release, Feature without background returns empty, Tests column handles various formats
 
 _Verified by: Standard deliverables table extraction, Extended deliverables with Finding and Release, Feature without background returns empty, Tests column handles various formats_
 
 **Code and feature patterns are combined into dual-source patterns**
 
+**Invariant:** A combined pattern is produced only when both a code stub and a feature file exist for the same pattern name; unmatched sources are tracked separately as code-only or feature-only.
+    **Rationale:** Dual-source combination ensures documentation reflects both implementation intent (code) and specification (Gherkin) — mismatches signal inconsistency.
+    **Verified by:** Matching code and feature are combined, Code-only pattern has no matching feature, Feature-only pattern has no matching code, Phase mismatch creates validation error, Pattern name collision merges sources
+
 _Verified by: Matching code and feature are combined, Code-only pattern has no matching feature, Feature-only pattern has no matching code, Phase mismatch creates validation error, Pattern name collision merges sources_
 
 **Dual-source results are validated for consistency**
 
+**Invariant:** Cross-source validation reports errors for metadata mismatches and warnings for orphaned patterns that are still in roadmap status.
+    **Rationale:** Inconsistencies between code stubs and feature files indicate drift — errors catch conflicts while warnings surface missing counterparts that may be intentional.
+    **Verified by:** Clean results have no errors, Cross-validation errors are reported, Orphaned roadmap code stubs produce warnings, Feature-only roadmap patterns produce warnings
+
 _Verified by: Clean results have no errors, Cross-validation errors are reported, Orphaned roadmap code stubs produce warnings, Feature-only roadmap patterns produce warnings_
 
 **Include tags are extracted from Gherkin feature tags**
+
+**Invariant:** Include tags are parsed as comma-separated values; absence of the tag means the pattern has no includes.
+    **Verified by:** Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field
 
 _Verified by: Single include tag is extracted, CSV include tag produces multiple values, Feature without include tag has no include field_
 

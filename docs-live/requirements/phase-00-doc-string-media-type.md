@@ -6,16 +6,16 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 DocString language hints (mediaType) should be preserved through the parsing
-  pipeline from feature files to rendered output. This prevents code blocks
-  from being incorrectly escaped when the language hint is lost.
+pipeline from feature files to rendered output. This prevents code blocks
+from being incorrectly escaped when the language hint is lost.
 
 ## Acceptance Criteria
 
@@ -54,7 +54,7 @@ DocString language hints (mediaType) should be preserved through the parsing
 
 **JSDoc mediaType prevents asterisk escaping**
 
-- Given a docString with content "/** @param name */" and mediaType "jsdoc"
+- Given a docString with content "/\*_ @param name _/" and mediaType "jsdoc"
 - When the step docString is rendered
 - Then the code block language is "jsdoc"
 - And asterisks are not escaped in the output
@@ -83,13 +83,24 @@ DocString language hints (mediaType) should be preserved through the parsing
 
 **Parser preserves DocString mediaType during extraction**
 
+**Invariant:** The Gherkin parser must retain the mediaType annotation from DocString delimiters through to the parsed AST; DocStrings without a mediaType have undefined mediaType.
+**Rationale:** Losing the mediaType causes downstream renderers to apply incorrect escaping or default language hints, corrupting code block output.
+**Verified by:** Parse DocString with typescript mediaType, Parse DocString with json mediaType, Parse DocString with jsdoc mediaType, DocString without mediaType has undefined mediaType
+
 _Verified by: Parse DocString with typescript mediaType, Parse DocString with json mediaType, Parse DocString with jsdoc mediaType, DocString without mediaType has undefined mediaType_
 
 **MediaType is used when rendering code blocks**
 
+**Invariant:** The rendered code block language must match the DocString mediaType; when mediaType is absent, the renderer falls back to a caller-specified default language.
+**Verified by:** TypeScript mediaType renders as typescript code block, JSDoc mediaType prevents asterisk escaping, Missing mediaType falls back to default language
+
 _Verified by: TypeScript mediaType renders as typescript code block, JSDoc mediaType prevents asterisk escaping, Missing mediaType falls back to default language_
 
 **renderDocString handles both string and object formats**
+
+**Invariant:** renderDocString accepts both plain string and object DocString formats; when an object has a mediaType, it takes precedence over the caller-supplied language parameter.
+**Rationale:** Legacy callers pass raw strings while newer code passes structured objects — the renderer must handle both without breaking existing usage.
+**Verified by:** String docString renders correctly (legacy format), Object docString with mediaType takes precedence
 
 _Verified by: String docString renders correctly (legacy format), Object docString with mediaType takes precedence_
 

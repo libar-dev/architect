@@ -13,11 +13,11 @@
 
 | Product Area | Features | Rules | With Invariants |
 | --- | --- | --- | --- |
-| [Annotation](business-rules/annotation.md) | 14 | 67 | 40 |
+| [Annotation](business-rules/annotation.md) | 14 | 67 | 53 |
 | [Configuration](business-rules/configuration.md) | 7 | 32 | 32 |
 | [CoreTypes](business-rules/core-types.md) | 3 | 11 | 11 |
 | [DataAPI](business-rules/data-api.md) | 18 | 85 | 71 |
-| [Generation](business-rules/generation.md) | 45 | 223 | 186 |
+| [Generation](business-rules/generation.md) | 45 | 223 | 189 |
 | [Validation](business-rules/validation.md) | 8 | 41 | 41 |
 
 ---

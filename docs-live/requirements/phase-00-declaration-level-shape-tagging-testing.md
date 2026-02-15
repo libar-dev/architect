@@ -6,15 +6,15 @@
 
 ## Overview
 
-| Property | Value |
-| --- | --- |
-| Status | completed |
+| Property     | Value      |
+| ------------ | ---------- |
+| Status       | completed  |
 | Product Area | Annotation |
 
 ## Description
 
 Tests the discoverTaggedShapes function that scans TypeScript source
-  code for declarations annotated with the libar-docs-shape JSDoc tag.
+code for declarations annotated with the libar-docs-shape JSDoc tag.
 
 ## Acceptance Criteria
 
@@ -69,7 +69,11 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 
 ```typescript
 /** @libar-docs-shape */
-export enum Priority { Low, Medium, High }
+export enum Priority {
+  Low,
+  Medium,
+  High,
+}
 ```
 
 **Non-exported tagged declaration is extracted**
@@ -85,6 +89,32 @@ export enum Priority { Low, Medium, High }
 interface InternalConfig {
   readonly maxRetries: number;
 }
+```
+
+**Tagged type is found despite same-name const declaration**
+
+- Given a TypeScript source file containing:
+- When discoverTaggedShapes runs on the source
+- Then 1 shape is returned
+- And the shape has name "Result" and kind "type"
+- And the shape has name "Result" and group "core-types"
+
+```typescript
+/**
+ * @libar-docs-shape core-types
+ */
+export type Result<T, E = Error> =
+  | { readonly ok: true; readonly value: T }
+  | { readonly ok: false; readonly error: E };
+
+export const Result = {
+  ok<T>(value: T): Result<T, never> {
+    return { ok: true, value };
+  },
+  err<E>(error: E): Result<never, E> {
+    return { ok: false, error };
+  },
+};
 ```
 
 **All five declaration kinds are discoverable**
@@ -105,7 +135,11 @@ export interface Config {
 export type Status = 'active' | 'inactive';
 
 /** @libar-docs-shape core-types */
-export enum Priority { Low, Medium, High }
+export enum Priority {
+  Low,
+  Medium,
+  High,
+}
 
 /** @libar-docs-shape core-types */
 export function validate(input: string): boolean {
@@ -125,9 +159,7 @@ export const MAX_RETRIES: number = 3;
 ```typescript
 /** @libar-docs-shape */
 
-
 // unrelated comment
-
 
 export interface TooFar {
   readonly value: string;
@@ -187,20 +219,21 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 **Declarations opt in via libar-docs-shape tag**
 
 **Invariant:** Only declarations with the libar-docs-shape tag in their
-    immediately preceding JSDoc are collected as tagged shapes.
+immediately preceding JSDoc are collected as tagged shapes.
 
     **Verified by:** Tagged declaration is extracted,
     Untagged export is ignored,
     Group name is captured from tag value,
     Bare tag works without group,
-    Non-exported tagged declaration is extracted
+    Non-exported tagged declaration is extracted,
+    Tagged type is found despite same-name const declaration
 
-_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted_
+_Verified by: Tagged declaration is extracted as shape, Untagged exported declaration is not extracted, Group name is captured from tag value, Bare tag works without group name, Non-exported tagged declaration is extracted, Tagged type is found despite same-name const declaration_
 
 **Discovery uses existing estree parser with JSDoc comment scanning**
 
 **Invariant:** The discoverTaggedShapes function uses the existing
-    typescript-estree parse() and extractPrecedingJsDoc() approach.
+typescript-estree parse() and extractPrecedingJsDoc() approach.
 
     **Verified by:** All 5 declaration kinds supported,
     JSDoc gap enforcement,

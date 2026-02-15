@@ -21,9 +21,9 @@ import { z } from 'zod';
  */
 export declare const ShapeKindSchema: z.ZodEnum<{
     function: "function";
+    interface: "interface";
     type: "type";
     enum: "enum";
-    interface: "interface";
     const: "const";
 }>;
 export type ShapeKind = z.infer<typeof ShapeKindSchema>;
@@ -73,9 +73,9 @@ export declare const ExtractedShapeSchema: z.ZodObject<{
     name: z.ZodString;
     kind: z.ZodEnum<{
         function: "function";
+        interface: "interface";
         type: "type";
         enum: "enum";
-        interface: "interface";
         const: "const";
     }>;
     sourceText: z.ZodString;
@@ -131,9 +131,9 @@ export declare const ShapeExtractionResultSchema: z.ZodObject<{
         name: z.ZodString;
         kind: z.ZodEnum<{
             function: "function";
+            interface: "interface";
             type: "type";
             enum: "enum";
-            interface: "interface";
             const: "const";
         }>;
         sourceText: z.ZodString;
@@ -183,6 +183,7 @@ export declare const ShapeExtractionOptionsSchema: z.ZodObject<{
         "name-only": "name-only";
     }>>;
     preserveFormatting: z.ZodDefault<z.ZodBoolean>;
+    jsx: z.ZodDefault<z.ZodBoolean>;
 }, z.core.$strip>;
 /** Output type with all defaults applied */
 export type ShapeExtractionOptions = z.infer<typeof ShapeExtractionOptionsSchema>;

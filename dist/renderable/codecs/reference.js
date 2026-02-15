@@ -76,7 +76,7 @@ export const PRODUCT_AREA_META = {
                 title: 'Scanning & Extraction Boundary',
             },
             {
-                archContext: ['scanner', 'extractor', 'taxonomy'],
+                archContext: ['scanner', 'extractor'],
                 direction: 'LR',
                 title: 'Annotation Pipeline',
             },
@@ -94,6 +94,7 @@ export const PRODUCT_AREA_META = {
             'GherkinRulesSupport',
             'DeclarationLevelShapeTagging',
             'CrossSourceValidation',
+            'ExtractionPipelineEnhancementsTesting',
         ],
     },
     Configuration: {
@@ -803,6 +804,57 @@ function prepareDiagramContext(dataset, scope) {
     }
     const relationships = dataset.relationshipIndex ?? {};
     const allNames = new Set([...scopeNames, ...neighborNames]);
+    // Prune orphan scope patterns — nodes with zero edges in the diagram context.
+    // A pattern participates if it is the source or target of any edge within allNames.
+    const connected = new Set();
+    for (const name of allNames) {
+        const rel = relationships[name];
+        if (!rel)
+            continue;
+        const edgeArrays = [rel.uses, rel.dependsOn, rel.implementsPatterns];
+        for (const targets of edgeArrays) {
+            for (const target of targets) {
+                if (allNames.has(target)) {
+                    connected.add(name);
+                    connected.add(target);
+                }
+            }
+        }
+        if (rel.extendsPattern !== undefined && allNames.has(rel.extendsPattern)) {
+            connected.add(name);
+            connected.add(rel.extendsPattern);
+        }
+    }
+    // Only prune orphan scope patterns when the diagram has SOME connected
+    // patterns. If no edges exist at all, the diagram is a component listing
+    // and all scope patterns should be preserved.
+    if (connected.size > 0) {
+        const prunedScopePatterns = scopePatterns.filter((p) => connected.has(getPatternName(p)));
+        if (prunedScopePatterns.length === 0) {
+            return undefined;
+        }
+        const prunedScopeNames = new Set();
+        for (const p of prunedScopePatterns) {
+            prunedScopeNames.add(getPatternName(p));
+        }
+        // Rebuild nodeIds — remove pruned entries
+        const prunedNodeIds = new Map();
+        for (const name of [...prunedScopeNames, ...neighborNames]) {
+            const id = nodeIds.get(name);
+            if (id !== undefined)
+                prunedNodeIds.set(name, id);
+        }
+        const prunedAllNames = new Set([...prunedScopeNames, ...neighborNames]);
+        return {
+            scopePatterns: prunedScopePatterns,
+            neighborPatterns,
+            scopeNames: prunedScopeNames,
+            neighborNames,
+            nodeIds: prunedNodeIds,
+            relationships,
+            allNames: prunedAllNames,
+        };
+    }
     return {
         scopePatterns,
         neighborPatterns,

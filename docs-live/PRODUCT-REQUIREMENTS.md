@@ -7,12 +7,12 @@
 
 ## Summary
 
-**Overall:** [███████████████░░░░░] 113/155 (73%)
+**Overall:** [███████████████░░░░░] 115/157 (73%)
 
 | Metric         | Value |
 | -------------- | ----- |
-| Total Features | 155   |
-| Completed      | 113   |
+| Total Features | 157   |
+| Completed      | 115   |
 | Active         | 14    |
 | Planned        | 28    |
 | Product Areas  | 7     |
@@ -64,11 +64,13 @@
 
 ### CoreTypes
 
-4/5 complete (80%)
+6/7 complete (86%)
 
 - [✅ Error Factories](requirements/phase-00-error-factories.md)
+- [✅ Error Factory Types](requirements/phase-00-error-factory-types.md)
 - [✅ Error Handling Unification](requirements/phase-00-error-handling-unification.md)
 - [✅ Result Monad](requirements/phase-00-result-monad.md)
+- [✅ Result Monad Types](requirements/phase-00-result-monad-types.md)
 - [✅ String Utils](requirements/phase-00-string-utils.md)
 - [📋 Kebab Case Slugs](requirements/phase-44-kebab-case-slugs.md)
 
@@ -269,6 +271,7 @@
 | ✅ DoD Validator Testing                    | Validation    | -         | completed |
 | ✅ Dual Source Extractor Testing            | Annotation    | -         | completed |
 | ✅ Error Factories                          | CoreTypes     | -         | completed |
+| ✅ Error Factory Types                      | CoreTypes     | -         | completed |
 | ✅ Error Handling Unification               | CoreTypes     | -         | completed |
 | ✅ Extends Tag Testing                      | Annotation    | -         | completed |
 | ✅ Extraction Pipeline Enhancements Testing | Annotation    | -         | completed |
@@ -316,6 +319,7 @@
 | ✅ Reporting Codec Testing                  | Generation    | -         | completed |
 | ✅ Requirements Adr Codec Testing           | Generation    | -         | completed |
 | ✅ Result Monad                             | CoreTypes     | -         | completed |
+| ✅ Result Monad Types                       | CoreTypes     | -         | completed |
 | ✅ Robustness Integration                   | Generation    | -         | completed |
 | ✅ Rule Keyword Po C                        | Generation    | -         | completed |
 | ✅ Scanner Core                             | Annotation    | -         | completed |

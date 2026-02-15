@@ -67,13 +67,23 @@ Tests for rendering all relationship types in Mermaid dependency graphs
 
 **Each relationship type has a distinct arrow style**
 
+**Invariant:** Each relationship type (uses, depends-on, implements, extends) must render with a unique, visually distinguishable arrow style.
+    **Rationale:** Identical arrow styles would make relationship semantics indistinguishable in generated diagrams.
+    **Verified by:** Uses relationships render as solid arrows, Depends-on relationships render as dashed arrows, Implements relationships render as dotted arrows, Extends relationships render as solid open arrows
+
 _Verified by: Uses relationships render as solid arrows, Depends-on relationships render as dashed arrows, Implements relationships render as dotted arrows, Extends relationships render as solid open arrows_
 
 **Pattern names are sanitized for Mermaid node IDs**
 
+**Invariant:** Pattern names must be transformed into valid Mermaid node IDs by replacing special characters (dots, hyphens, spaces) with underscores.
+    **Verified by:** Special characters are replaced
+
 _Verified by: Special characters are replaced_
 
 **All relationship types appear in single graph**
+
+**Invariant:** The generated Mermaid graph must combine all relationship types (uses, depends-on, implements, extends) into a single top-down graph.
+    **Verified by:** Complete dependency graph with all relationship types
 
 _Verified by: Complete dependency graph with all relationship types_
 

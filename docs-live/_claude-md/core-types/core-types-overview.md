@@ -17,6 +17,7 @@ Detail Level: Compact summary
 | Type         | Kind      |
 | ------------ | --------- |
 | BaseDocError | interface |
+| Result       | type      |
 | DocError     | type      |
 
 === BEHAVIOR SPECIFICATIONS ===
