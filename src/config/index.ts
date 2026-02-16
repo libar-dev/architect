@@ -64,7 +64,6 @@ export {
 } from './config-loader.js';
 
 export {
-  loadWorkflowConfig,
   loadWorkflowFromPath,
   loadDefaultWorkflow,
   formatWorkflowLoadError,

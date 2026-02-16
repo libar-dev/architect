@@ -398,7 +398,7 @@ export async function generateDocumentation(
   const allPatterns = computeHierarchyChildren(mergeResult.value);
 
   // Step 7: Load workflow configuration
-  let workflow: LoadedWorkflow | undefined;
+  let workflow: LoadedWorkflow;
   if (options.workflowPath) {
     const workflowResult = await loadWorkflowFromPath(options.workflowPath);
     if (!workflowResult.ok) {
@@ -406,16 +406,7 @@ export async function generateDocumentation(
     }
     workflow = workflowResult.value;
   } else {
-    // Load default workflow
-    try {
-      workflow = await loadDefaultWorkflow();
-    } catch (error) {
-      // Default workflow load failure is not fatal - continue without workflow
-      warnings.push({
-        type: 'config',
-        message: `Could not load default workflow: ${error instanceof Error ? error.message : String(error)}`,
-      });
-    }
+    workflow = loadDefaultWorkflow();
   }
 
   // Step 8: Transform patterns into MasterDataset with pre-computed views
@@ -498,7 +489,7 @@ export async function generateDocumentation(
       outputDir: options.outputDir,
       registry,
       masterDataset,
-      ...(workflow && { workflow }),
+      workflow,
       ...(codecOptions && { codecOptions }),
     };
 

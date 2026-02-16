@@ -36,7 +36,7 @@ const WorkflowConfigCodec = createJsonInputCodec(WorkflowConfigSchema);
  * DD-1: Inline constant in workflow-loader.ts, not preset integration.
  * DD-2: Satisfies existing WorkflowConfig type — no new types needed.
  */
-const DEFAULT_WORKFLOW_CONFIG = {
+const DEFAULT_WORKFLOW_CONFIG = Object.freeze({
     name: '6-phase-standard',
     version: '1.0.0',
     statuses: [
@@ -54,7 +54,9 @@ const DEFAULT_WORKFLOW_CONFIG = {
         { name: 'Retrospective', order: 6 },
     ],
     defaultStatus: 'roadmap',
-};
+});
+/** Pre-computed LoadedWorkflow singleton — avoids rebuilding Maps on every call */
+const DEFAULT_LOADED_WORKFLOW = createLoadedWorkflow(DEFAULT_WORKFLOW_CONFIG);
 /**
  * Load workflow configuration from a specific file path
  *
@@ -137,7 +139,7 @@ export async function loadWorkflowFromPath(configPath, source) {
  * ```
  */
 export function loadDefaultWorkflow() {
-    return createLoadedWorkflow(DEFAULT_WORKFLOW_CONFIG);
+    return DEFAULT_LOADED_WORKFLOW;
 }
 /**
  * Format workflow load error for console display

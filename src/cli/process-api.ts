@@ -546,13 +546,7 @@ async function buildPipeline(config: ProcessAPICLIConfig): Promise<PipelineResul
     }
     workflow = workflowResult.value;
   } else {
-    try {
-      workflow = await loadDefaultWorkflow();
-    } catch (err) {
-      console.error(
-        `Warning: Could not load default workflow: ${err instanceof Error ? err.message : String(err)}`
-      );
-    }
+    workflow = loadDefaultWorkflow();
   }
 
   // Step 8: Transform to MasterDataset (with validation for graph health commands)

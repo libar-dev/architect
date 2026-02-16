@@ -148,7 +148,25 @@ Feature: ADR-001 - Taxonomy Canonical Values and Process Constants
     ISO-year-first sorting works lexicographically.
 
   # ===========================================================================
-  # RULE 8: Deliverable Status Canonical Values
+  # RULE 8: Canonical Phase Definitions
+  # ===========================================================================
+
+  Rule: Canonical phase definitions (6-phase USDP standard)
+
+    **Invariant:** The default workflow defines exactly 6 phases in fixed
+    order. These are the canonical phase names and ordinals used by all
+    generated documentation.
+
+    | Order | Phase | Purpose |
+    | 1 | Inception | Problem framing, scope definition |
+    | 2 | Elaboration | Design decisions, architecture exploration |
+    | 3 | Session | Planning and design session work |
+    | 4 | Construction | Implementation, testing, integration |
+    | 5 | Validation | Verification, acceptance criteria confirmation |
+    | 6 | Retrospective | Review, lessons learned, documentation |
+
+  # ===========================================================================
+  # RULE 9: Deliverable Status Canonical Values
   # ===========================================================================
 
   Rule: Deliverable status canonical values

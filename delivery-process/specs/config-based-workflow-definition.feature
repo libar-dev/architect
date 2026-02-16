@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ConfigBasedWorkflowDefinition
-@libar-docs-status:roadmap
+@libar-docs-status:active
 @libar-docs-phase:99
 @libar-docs-effort:2h
 @libar-docs-product-area:Configuration
@@ -49,14 +49,14 @@ Feature: Config-Based Workflow Definition
   Background: Deliverables
     Given the following deliverables:
       | Deliverable | Status | Location |
-      | Inline default workflow constant | pending | src/config/workflow-loader.ts |
-      | Make loadDefaultWorkflow synchronous | pending | src/config/workflow-loader.ts |
-      | Remove dead code paths | pending | src/config/workflow-loader.ts |
-      | Update public API exports | pending | src/config/index.ts |
-      | Remove async and try-catch in orchestrator | pending | src/generators/orchestrator.ts |
-      | Remove async and try-catch in process-api | pending | src/cli/process-api.ts |
-      | Delete orphaned JSON file | pending | delivery-process/6-phase-standard.json |
-      | Amend ADR-001 with phase definitions rule | pending | docs-live/decisions/adr-001-taxonomy-canonical-values.md |
+      | Inline default workflow constant | complete | src/config/workflow-loader.ts |
+      | Make loadDefaultWorkflow synchronous | complete | src/config/workflow-loader.ts |
+      | Remove dead code paths | complete | src/config/workflow-loader.ts |
+      | Update public API exports | complete | src/config/index.ts |
+      | Remove async and try-catch in orchestrator | complete | src/generators/orchestrator.ts |
+      | Remove async and try-catch in process-api | complete | src/cli/process-api.ts |
+      | Delete orphaned JSON file | n/a | delivery-process/6-phase-standard.json |
+      | Amend ADR-001 with phase definitions rule | complete | delivery-process/decisions/adr-001-taxonomy-canonical-values.feature |
 
   # ============================================================================
   # RULE 1: Default workflow is always available without file I/O
