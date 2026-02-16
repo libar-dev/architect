@@ -1,6 +1,6 @@
 @libar-docs
 @libar-docs-pattern:ConfigBasedWorkflowDefinition
-@libar-docs-status:active
+@libar-docs-status:completed
 @libar-docs-phase:99
 @libar-docs-effort:2h
 @libar-docs-product-area:Configuration
