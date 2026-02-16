@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [██████████████░░░░░░] 115/159 (72%)
+**Overall:** [███████████████░░░░░] 116/159 (73%)
 
 | Metric         | Value |
 | -------------- | ----- |
 | Total Features | 159   |
-| Completed      | 115   |
+| Completed      | 116   |
 | Active         | 14    |
-| Planned        | 30    |
+| Planned        | 29    |
 | Product Areas  | 7     |
 | User Roles     | 1     |
 
@@ -52,8 +52,9 @@
 
 ### Configuration
 
-7/9 complete (78%)
+8/9 complete (89%)
 
+- [✅ Config Based Workflow Definition - eliminate broken workflow loading](requirements/phase-99-config-based-workflow-definition.md)
 - [✅ Config Loader Testing](requirements/phase-00-config-loader-testing.md)
 - [✅ Config Resolution](requirements/phase-00-config-resolution.md)
 - [✅ Configuration API](requirements/phase-00-configuration-api.md)
@@ -61,7 +62,6 @@
 - [✅ Preset System](requirements/phase-00-preset-system.md)
 - [✅ Project Config Loader](requirements/phase-00-project-config-loader.md)
 - [✅ Source Merging](requirements/phase-00-source-merging.md)
-- [📋 Config Based Workflow Definition - eliminate broken workflow loading](requirements/phase-99-config-based-workflow-definition.md)
 - [📋 DEFAULT_WORKFLOW_CONFIG — Inline Default Workflow Constant](requirements/phase-00-default-workflow-config-inline-default-workflow-constant.md)
 
 ### CoreTypes
@@ -245,6 +245,7 @@
 | ✅ Codec Driven Reference Generation                          | Generation    | -         | completed |
 | ✅ Component Diagram Generation                               | Generation    | -         | completed |
 | ✅ Composite Codec Testing                                    | Generation    | -         | completed |
+| ✅ Config Based Workflow Definition                           | Configuration | -         | completed |
 | ✅ Config Loader Testing                                      | Configuration | -         | completed |
 | ✅ Config Resolution                                          | Configuration | -         | completed |
 | ✅ Config Schema Validation                                   | Validation    | -         | completed |
@@ -370,7 +371,6 @@
 | 📋 Claude Module Generation                                   | Generation    | -         | planned   |
 | 📋 Cli Behavior Testing                                       | Process       | -         | planned   |
 | 📋 Codec Behavior Testing                                     | Generation    | -         | planned   |
-| 📋 Config Based Workflow Definition                           | Configuration | -         | planned   |
 | 📋 Cross Source Validation                                    | Annotation    | -         | planned   |
 | 📋 Data API CLI Ergonomics                                    | DataAPI       | -         | planned   |
 | 📋 Data API Platform Integration                              | DataAPI       | -         | planned   |

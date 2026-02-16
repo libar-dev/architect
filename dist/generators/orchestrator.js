@@ -208,17 +208,7 @@ export async function generateDocumentation(options) {
         workflow = workflowResult.value;
     }
     else {
-        // Load default workflow
-        try {
-            workflow = await loadDefaultWorkflow();
-        }
-        catch (error) {
-            // Default workflow load failure is not fatal - continue without workflow
-            warnings.push({
-                type: 'config',
-                message: `Could not load default workflow: ${error instanceof Error ? error.message : String(error)}`,
-            });
-        }
+        workflow = loadDefaultWorkflow();
     }
     // Step 8: Transform patterns into MasterDataset with pre-computed views
     // This is a single-pass transformation that computes all derived views:
@@ -290,7 +280,7 @@ export async function generateDocumentation(options) {
             outputDir: options.outputDir,
             registry,
             masterDataset,
-            ...(workflow && { workflow }),
+            workflow,
             ...(codecOptions && { codecOptions }),
         };
         // Generate files with merged patterns (TypeScript + Gherkin)

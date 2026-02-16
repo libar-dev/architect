@@ -88,6 +88,19 @@ Detail Level: Compact summary
 
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
 
+=== CANONICAL PHASE DEFINITIONS (6-PHASE USDP STANDARD) ===
+
+**Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
+
+| Order | Phase         | Purpose                                        |
+| ----- | ------------- | ---------------------------------------------- |
+| 1     | Inception     | Problem framing, scope definition              |
+| 2     | Elaboration   | Design decisions, architecture exploration     |
+| 3     | Session       | Planning and design session work               |
+| 4     | Construction  | Implementation, testing, integration           |
+| 5     | Validation    | Verification, acceptance criteria confirmation |
+| 6     | Retrospective | Review, lessons learned, documentation         |
+
 === DELIVERABLE STATUS CANONICAL VALUES ===
 
 **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
@@ -122,16 +135,17 @@ Detail Level: Compact summary
 
 --- ADR001TaxonomyCanonicalValues ---
 
-| Rule                                    | Description                                                                                                                |
-| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Product area canonical values           | **Invariant:** The product-area tag uses one of 7 canonical values.<br> Each value represents a reader-facing...           |
-| ADR category canonical values           | **Invariant:** The adr-category tag uses one of 4 values.<br><br> \| Value \| Purpose \|<br> \| architecture \| System...  |
-| FSM status values and protection levels | **Invariant:** Pattern status uses exactly 4 values with defined<br> protection levels. These are enforced by Process...   |
-| Valid FSM transitions                   | **Invariant:** Only these transitions are valid. All others are<br> rejected by Process Guard.<br><br> \| From \| To \|... |
-| Tag format types                        | **Invariant:** Every tag has one of 6 format types that determines<br> how its value is parsed.<br><br> \| Format \|...    |
-| Source ownership                        | **Invariant:** Relationship tags have defined ownership by source type.<br> Anti-pattern detection enforces these...       |
-| Quarter format convention               | **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`).<br> ISO-year-first sorting works...                |
-| Deliverable status canonical values     | **Invariant:** Deliverable status (distinct from pattern FSM status)<br> uses exactly 6 values, enforced by Zod...         |
+| Rule                                                | Description                                                                                                                |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Product area canonical values                       | **Invariant:** The product-area tag uses one of 7 canonical values.<br> Each value represents a reader-facing...           |
+| ADR category canonical values                       | **Invariant:** The adr-category tag uses one of 4 values.<br><br> \| Value \| Purpose \|<br> \| architecture \| System...  |
+| FSM status values and protection levels             | **Invariant:** Pattern status uses exactly 4 values with defined<br> protection levels. These are enforced by Process...   |
+| Valid FSM transitions                               | **Invariant:** Only these transitions are valid. All others are<br> rejected by Process Guard.<br><br> \| From \| To \|... |
+| Tag format types                                    | **Invariant:** Every tag has one of 6 format types that determines<br> how its value is parsed.<br><br> \| Format \|...    |
+| Source ownership                                    | **Invariant:** Relationship tags have defined ownership by source type.<br> Anti-pattern detection enforces these...       |
+| Quarter format convention                           | **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`).<br> ISO-year-first sorting works...                |
+| Canonical phase definitions (6-phase USDP standard) | **Invariant:** The default workflow defines exactly 6 phases in fixed<br> order. These are the canonical phase names...    |
+| Deliverable status canonical values                 | **Invariant:** Deliverable status (distinct from pattern FSM status)<br> uses exactly 6 values, enforced by Zod...         |
 
 --- StepDefinitionCompletion ---
 

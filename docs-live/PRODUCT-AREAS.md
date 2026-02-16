@@ -21,7 +21,7 @@ The annotation system is the ingestion boundary — it transforms annotated Type
 
 Configuration is the entry boundary — it transforms a user-authored `delivery-process.config.ts` file into a fully resolved `DeliveryProcessInstance` that powers the entire pipeline. The flow is: `defineConfig()` provides type-safe authoring (Vite convention, zero validation), `ConfigLoader` discovers and loads the file, `ProjectConfigSchema` validates via Zod, `ConfigResolver` applies defaults and merges stubs into sources, and `DeliveryProcessFactory` builds the final instance with `TagRegistry` and `RegexBuilders`. Three presets define escalating taxonomy complexity — from 3 categories (`generic`, `libar-generic`) to 21 (`ddd-es-cqrs`). `SourceMerger` computes per-generator source overrides, enabling generators like changelog to pull from different feature sets than the base config.
 
-**9 patterns** — 7 completed, 0 active, 2 planned
+**9 patterns** — 8 completed, 0 active, 1 planned
 
 **Key patterns:** DeliveryProcessFactory, ConfigLoader, ConfigResolver, DefineConfig, ConfigurationPresets, SourceMerger
 
@@ -82,13 +82,13 @@ Process defines the USDP-inspired session workflow that governs how work moves t
 | Area                                            | Patterns | Completed | Active | Planned |
 | ----------------------------------------------- | -------- | --------- | ------ | ------- |
 | [Annotation](product-areas/ANNOTATION.md)       | 23       | 20        | 2      | 1       |
-| [Configuration](product-areas/CONFIGURATION.md) | 9        | 7         | 0      | 2       |
+| [Configuration](product-areas/CONFIGURATION.md) | 9        | 8         | 0      | 1       |
 | [Generation](product-areas/GENERATION.md)       | 66       | 54        | 1      | 11      |
 | [Validation](product-areas/VALIDATION.md)       | 20       | 12        | 1      | 7       |
 | [DataAPI](product-areas/DATA-API.md)            | 29       | 15        | 10     | 4       |
 | [CoreTypes](product-areas/CORE-TYPES.md)        | 7        | 6         | 0      | 1       |
 | [Process](product-areas/PROCESS.md)             | 11       | 4         | 0      | 7       |
-| **Total**                                       | **165**  | **118**   | **14** | **33**  |
+| **Total**                                       | **165**  | **119**   | **14** | **32**  |
 
 ---
 

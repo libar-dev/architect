@@ -1,4 +1,4 @@
-# 📋 Config Based Workflow Definition
+# ✅ Config Based Workflow Definition
 
 **Purpose:** Detailed requirements for the Config Based Workflow Definition feature
 
@@ -8,7 +8,7 @@
 
 | Property       | Value                             |
 | -------------- | --------------------------------- |
-| Status         | planned                           |
+| Status         | completed                         |
 | Product Area   | Configuration                     |
 | Business Value | eliminate broken workflow loading |
 | Phase          | 99                                |
@@ -152,14 +152,14 @@ but NOT required for the MVP fix.
 
 ## Deliverables
 
-- Inline default workflow constant (pending)
-- Make loadDefaultWorkflow synchronous (pending)
-- Remove dead code paths (pending)
-- Update public API exports (pending)
-- Remove async and try-catch in orchestrator (pending)
-- Remove async and try-catch in process-api (pending)
-- Delete orphaned JSON file (pending)
-- Amend ADR-001 with phase definitions rule (pending)
+- Inline default workflow constant (complete)
+- Make loadDefaultWorkflow synchronous (complete)
+- Remove dead code paths (complete)
+- Update public API exports (complete)
+- Remove async and try-catch in orchestrator (complete)
+- Remove async and try-catch in process-api (complete)
+- Delete orphaned JSON file (n/a)
+- Amend ADR-001 with phase definitions rule (complete)
 
 ## Implementations
 

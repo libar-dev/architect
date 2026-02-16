@@ -211,10 +211,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -251,10 +251,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -453,10 +453,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -493,10 +493,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -695,10 +695,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -735,10 +735,10 @@ export declare const StatusGroupsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -956,10 +956,10 @@ export declare const PhaseGroupSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -996,10 +996,10 @@ export declare const PhaseGroupSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1209,10 +1209,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1249,10 +1249,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1451,10 +1451,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1491,10 +1491,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1693,10 +1693,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1733,10 +1733,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -1935,10 +1935,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -1975,10 +1975,10 @@ export declare const SourceViewsSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2216,10 +2216,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2256,10 +2256,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2458,10 +2458,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2498,10 +2498,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2700,10 +2700,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2740,10 +2740,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -2942,10 +2942,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -2982,10 +2982,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3184,10 +3184,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3224,10 +3224,10 @@ export declare const ArchIndexSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3434,10 +3434,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3474,10 +3474,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -3715,10 +3715,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3755,10 +3755,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -3957,10 +3957,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -3997,10 +3997,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4199,10 +4199,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4239,10 +4239,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4445,10 +4445,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4485,10 +4485,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -4694,10 +4694,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4734,10 +4734,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -4936,10 +4936,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
         constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
         adr: z.ZodOptional<z.ZodString>;
         adrStatus: z.ZodOptional<z.ZodEnum<{
+            deprecated: "deprecated";
             superseded: "superseded";
             proposed: "proposed";
             accepted: "accepted";
-            deprecated: "deprecated";
         }>>;
         adrCategory: z.ZodOptional<z.ZodString>;
         adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -4976,10 +4976,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             name: z.ZodString;
             kind: z.ZodEnum<{
                 function: "function";
-                interface: "interface";
                 type: "type";
                 enum: "enum";
                 const: "const";
+                interface: "interface";
             }>;
             sourceText: z.ZodString;
             jsDoc: z.ZodOptional<z.ZodString>;
@@ -5179,10 +5179,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5219,10 +5219,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5421,10 +5421,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5461,10 +5461,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5663,10 +5663,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5703,10 +5703,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -5905,10 +5905,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -5945,10 +5945,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6173,10 +6173,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6213,10 +6213,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6415,10 +6415,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6455,10 +6455,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6657,10 +6657,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6697,10 +6697,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -6899,10 +6899,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -6939,10 +6939,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;
@@ -7141,10 +7141,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
             constraints: z.ZodOptional<z.ZodReadonly<z.ZodArray<z.ZodString>>>;
             adr: z.ZodOptional<z.ZodString>;
             adrStatus: z.ZodOptional<z.ZodEnum<{
+                deprecated: "deprecated";
                 superseded: "superseded";
                 proposed: "proposed";
                 accepted: "accepted";
-                deprecated: "deprecated";
             }>>;
             adrCategory: z.ZodOptional<z.ZodString>;
             adrSupersedes: z.ZodOptional<z.ZodString>;
@@ -7181,10 +7181,10 @@ export declare const MasterDatasetSchema: z.ZodObject<{
                 name: z.ZodString;
                 kind: z.ZodEnum<{
                     function: "function";
-                    interface: "interface";
                     type: "type";
                     enum: "enum";
                     const: "const";
+                    interface: "interface";
                 }>;
                 sourceText: z.ZodString;
                 jsDoc: z.ZodOptional<z.ZodString>;

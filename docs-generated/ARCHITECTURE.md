@@ -191,6 +191,10 @@ graph TB
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
         LintModule["LintModule"]
+        WarningCollector["WarningCollector"]
+        GeneratorTypes["GeneratorTypes"]
+        SourceMappingValidator["SourceMappingValidator"]
+        GeneratorRegistry["GeneratorRegistry"]
         ShapeExtractor["ShapeExtractor"]
         LayerInference["LayerInference"]
         CLIVersionHelper["CLIVersionHelper"]
@@ -200,10 +204,6 @@ graph TB
         TagTaxonomyCLI["TagTaxonomyCLI"]
         Documentation_Generator_CLI["Documentation Generator CLI"]
         CLIErrorHandler["CLIErrorHandler"]
-        WarningCollector["WarningCollector"]
-        GeneratorTypes["GeneratorTypes"]
-        SourceMappingValidator["SourceMappingValidator"]
-        GeneratorRegistry["GeneratorRegistry"]
         ProcessStateTypes["ProcessStateTypes"]
         StubResolverImpl["StubResolverImpl"]
         APIModule["APIModule"]
@@ -241,8 +241,8 @@ graph TB
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        ProcessGuardTesting["ProcessGuardTesting"]
         StringUtils["StringUtils"]
+        ProcessGuardTesting["ProcessGuardTesting"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
         SessionHandoffs["SessionHandoffs"]
@@ -264,24 +264,15 @@ graph TB
     LintModule --> LintEngine
     LintEngine --> LintRules
     LintEngine --> CodecUtils
+    SourceMapper -.-> DecisionDocCodec
+    SourceMapper -.-> ShapeExtractor
+    SourceMapper -.-> GherkinASTParser
+    GeneratorRegistry --> GeneratorTypes
+    Documentation_Generation_Orchestrator --> Pattern_Scanner
     GherkinExtractor --> GherkinASTParser
     DualSourceExtractor --> GherkinExtractor
     DualSourceExtractor --> GherkinScanner
     Document_Extractor --> Pattern_Scanner
-    ValidatePatternsCLI --> GherkinScanner
-    ValidatePatternsCLI --> DualSourceExtractor
-    ValidatePatternsCLI --> CodecUtils
-    ProcessAPICLIImpl --> ProcessStateAPI
-    ProcessAPICLIImpl --> MasterDataset
-    ProcessAPICLIImpl --> Pattern_Scanner
-    ProcessAPICLIImpl --> PatternSummarizerImpl
-    ProcessAPICLIImpl --> FuzzyMatcherImpl
-    ProcessAPICLIImpl --> OutputPipelineImpl
-    OutputPipelineImpl --> PatternSummarizerImpl
-    LintProcessCLI --> ProcessGuardModule
-    LintPatternsCLI --> LintEngine
-    LintPatternsCLI --> LintRules
-    TagTaxonomyCLI --> ConfigLoader
     WorkflowLoader --> WorkflowConfigSchema
     WorkflowLoader --> CodecUtils
     ConfigResolver --> ProjectConfigTypes
@@ -299,11 +290,20 @@ graph TB
     DefineConfig --> ProjectConfigTypes
     ConfigLoader --> DeliveryProcessFactory
     ConfigLoader --> ConfigurationTypes
-    SourceMapper -.-> DecisionDocCodec
-    SourceMapper -.-> ShapeExtractor
-    SourceMapper -.-> GherkinASTParser
-    GeneratorRegistry --> GeneratorTypes
-    Documentation_Generation_Orchestrator --> Pattern_Scanner
+    ValidatePatternsCLI --> GherkinScanner
+    ValidatePatternsCLI --> DualSourceExtractor
+    ValidatePatternsCLI --> CodecUtils
+    ProcessAPICLIImpl --> ProcessStateAPI
+    ProcessAPICLIImpl --> MasterDataset
+    ProcessAPICLIImpl --> Pattern_Scanner
+    ProcessAPICLIImpl --> PatternSummarizerImpl
+    ProcessAPICLIImpl --> FuzzyMatcherImpl
+    ProcessAPICLIImpl --> OutputPipelineImpl
+    OutputPipelineImpl --> PatternSummarizerImpl
+    LintProcessCLI --> ProcessGuardModule
+    LintPatternsCLI --> LintEngine
+    LintPatternsCLI --> LintRules
+    TagTaxonomyCLI --> ConfigLoader
     PatternSummarizerImpl --> ProcessStateAPI
     StubResolverImpl --> ProcessStateAPI
     ScopeValidatorImpl --> ProcessStateAPI
@@ -444,7 +444,7 @@ All components with architecture annotations:
 | ✅ Codec Base Options | - | - | - | src/renderable/codecs/types/base.ts |
 | ✅ Codec Generator Registration | - | - | - | src/generators/built-in/codec-generators.ts |
 | ✅ Codec Utils | - | - | - | src/validation-schemas/codec-utils.ts |
-| 📋 Config Based Workflow Definition | - | - | - | delivery-process/specs/config-based-workflow-definition.feature |
+| ✅ Config Based Workflow Definition | - | - | - | delivery-process/specs/config-based-workflow-definition.feature |
 | 🚧 Deliverable Status Taxonomy | - | - | - | src/taxonomy/deliverable-status.ts |
 | 🚧 Derive Process State | - | - | - | src/lint/process-guard/derive-state.ts |
 | 🚧 Detect Changes | - | - | - | src/lint/process-guard/detect-changes.ts |

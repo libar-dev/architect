@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 205/299 (69%)
+**Patterns:** [██████████████░░░░░░] 206/299 (69%)
 
 **Phases:** 4/19 complete
 
 | Metric | Value |
 | --- | --- |
 | Total Patterns | 299 |
-| Completed | 205 |
+| Completed | 206 |
 | Active | 47 |
-| Planned | 47 |
+| Planned | 46 |
 
 ---
 
@@ -37,7 +37,7 @@
 | 📋 [RichContentHelpersTesting](phases/phase-44-rich-content-helpers-testing.md) | 0/2 | 0% |
 | 🚧 [StepLintVitestCucumber](phases/phase-50-step-lint-vitest-cucumber.md) | 0/1 | 0% |
 | 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
-| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 4/9 | 44% |
+| 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 5/9 | 56% |
 | 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
@@ -200,11 +200,11 @@
 
 ### 📋 TypeScriptTaxonomyImplementation
 
-[███████░░░░░░░░] 4/9 44% complete
+[████████░░░░░░░] 5/9 56% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
-| 📋 Config Based Workflow Definition | planned | Every `pnpm process:query` and `pnpm docs:*` invocation prints: `Failed to load default workflow (6-phase-standard):... |
+| ✅ Config Based Workflow Definition | completed | Every `pnpm process:query` and `pnpm docs:*` invocation prints: `Failed to load default workflow (6-phase-standard):... |
 | ✅ Mvp Workflow Implementation | completed | PDR-005 defines a 4-state workflow FSM (`roadmap, active, completed, deferred`) but the delivery-process package... |
 | ✅ Pattern Relationship Model | completed | Problem: The delivery process lacks a comprehensive relationship model between artifacts. |
 | 📋 Prd Implementation Section | planned | Problem: Implementation files with `@libar-docs-implements:PatternName` contain rich relationship metadata... |

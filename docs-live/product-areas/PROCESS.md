@@ -106,6 +106,21 @@
 
 ---
 
+## Canonical phase definitions (6-phase USDP standard)
+
+**Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
+
+| Order | Phase         | Purpose                                        |
+| ----- | ------------- | ---------------------------------------------- |
+| 1     | Inception     | Problem framing, scope definition              |
+| 2     | Elaboration   | Design decisions, architecture exploration     |
+| 3     | Session       | Planning and design session work               |
+| 4     | Construction  | Implementation, testing, integration           |
+| 5     | Validation    | Verification, acceptance criteria confirmation |
+| 6     | Retrospective | Review, lessons learned, documentation         |
+
+---
+
 ## Deliverable status canonical values
 
 **Invariant:** Deliverable status (distinct from pattern FSM status) uses exactly 6 values, enforced by Zod schema at parse time.
@@ -479,6 +494,24 @@ These are the durable constants of the delivery process.
 #### Quarter format convention
 
 **Invariant:** The quarter tag uses `YYYY-QN` format (e.g., `2026-Q1`). ISO-year-first sorting works lexicographically.
+
+</details>
+
+<details>
+<summary>Canonical phase definitions (6-phase USDP standard)</summary>
+
+#### Canonical phase definitions (6-phase USDP standard)
+
+**Invariant:** The default workflow defines exactly 6 phases in fixed order. These are the canonical phase names and ordinals used by all generated documentation.
+
+| Order | Phase         | Purpose                                        |
+| ----- | ------------- | ---------------------------------------------- |
+| 1     | Inception     | Problem framing, scope definition              |
+| 2     | Elaboration   | Design decisions, architecture exploration     |
+| 3     | Session       | Planning and design session work               |
+| 4     | Construction  | Implementation, testing, integration           |
+| 5     | Validation    | Verification, acceptance criteria confirmation |
+| 6     | Retrospective | Review, lessons learned, documentation         |
 
 </details>
 
