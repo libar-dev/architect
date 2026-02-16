@@ -1888,58 +1888,55 @@ describeFeature(feature, ({ Background, AfterEachScenario, Rule }) => {
   // ──────────────────────────────────────────────────────────────────────
 
   Rule('Shape JSDoc prose renders at standard and detailed levels', ({ RuleScenario }) => {
-    RuleScenario(
-      'Standard level includes JSDoc in code blocks',
-      ({ Given, And, When, Then }) => {
-        Given(
-          'a reference config with shapeSources {string}',
-          (_ctx: unknown, shapeSources: string) => {
-            state!.config = {
-              title: 'Test Reference Document',
-              conventionTags: [],
-              shapeSources: shapeSources.split(',').map((s) => s.trim()),
-              behaviorCategories: [],
-              claudeMdSection: 'test',
-              docsFilename: 'TEST-REFERENCE.md',
-              claudeMdFilename: 'test.md',
-            };
-          }
-        );
+    RuleScenario('Standard level includes JSDoc in code blocks', ({ Given, And, When, Then }) => {
+      Given(
+        'a reference config with shapeSources {string}',
+        (_ctx: unknown, shapeSources: string) => {
+          state!.config = {
+            title: 'Test Reference Document',
+            conventionTags: [],
+            shapeSources: shapeSources.split(',').map((s) => s.trim()),
+            behaviorCategories: [],
+            claudeMdSection: 'test',
+            docsFilename: 'TEST-REFERENCE.md',
+            claudeMdFilename: 'test.md',
+          };
+        }
+      );
 
-        And('a MasterDataset with a shape pattern with JSDoc', () => {
-          state!.dataset = createTestMasterDataset({
-            patterns: [
-              createTestPattern({
-                name: 'ShapeWithDoc',
-                filePath: 'src/lint/rules.ts',
-                extractedShapes: [
-                  {
-                    name: 'DeciderInput',
-                    kind: 'interface',
-                    sourceText: 'export interface DeciderInput { state: ProcessState; }',
-                    jsDoc: 'Input to the process guard decider function.',
-                    lineNumber: 10,
-                    exported: true,
-                  },
-                ],
-              }),
-            ],
-          });
+      And('a MasterDataset with a shape pattern with JSDoc', () => {
+        state!.dataset = createTestMasterDataset({
+          patterns: [
+            createTestPattern({
+              name: 'ShapeWithDoc',
+              filePath: 'src/lint/rules.ts',
+              extractedShapes: [
+                {
+                  name: 'DeciderInput',
+                  kind: 'interface',
+                  sourceText: 'export interface DeciderInput { state: ProcessState; }',
+                  jsDoc: 'Input to the process guard decider function.',
+                  lineNumber: 10,
+                  exported: true,
+                },
+              ],
+            }),
+          ],
         });
+      });
 
-        When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
-          const codec = createReferenceCodec(state!.config!, {
-            detailLevel: level as DetailLevel,
-          });
-          state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      When('decoding at detail level {string}', (_ctx: unknown, level: string) => {
+        const codec = createReferenceCodec(state!.config!, {
+          detailLevel: level as DetailLevel,
         });
+        state!.document = codec.decode(state!.dataset!) as RenderableDocument;
+      });
 
-        Then('the document contains text {string}', (_ctx: unknown, text: string) => {
-          const rendered = getRenderedMarkdown();
-          expect(rendered).toContain(text);
-        });
-      }
-    );
+      Then('the document contains text {string}', (_ctx: unknown, text: string) => {
+        const rendered = getRenderedMarkdown();
+        expect(rendered).toContain(text);
+      });
+    });
 
     RuleScenario(
       'Detailed level includes JSDoc in code block and property table',
