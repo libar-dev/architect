@@ -63,8 +63,8 @@ export declare const ScenarioRefSchema: z.ZodObject<{
     }, z.core.$strict>>>>;
     layer: z.ZodOptional<z.ZodEnum<{
         unknown: "unknown";
-        timeline: "timeline";
         domain: "domain";
+        timeline: "timeline";
         integration: "integration";
         e2e: "e2e";
         component: "component";
