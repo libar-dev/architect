@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall Progress:** [██████████████░░░░░░] 206/299 (69%)
+**Overall Progress:** [██████████████░░░░░░] 207/302 (69%)
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 299 |
-| Completed | 206 |
+| Total Patterns | 302 |
+| Completed | 207 |
 | Active | 47 |
-| Planned | 46 |
+| Planned | 48 |
 | Active Phases | 5 |
 
 ---
@@ -52,7 +52,7 @@
 
 ---
 
-### 🚧 SourceMapper
+### 🚧 FileCache
 
 [████████████░░░] 4/5 80% complete (4 done, 1 active)
 
@@ -60,7 +60,7 @@
 | --- | --- |
 | 🚧 File Cache | Simple Map-based cache for file contents during a single generation run. |
 
-[View SourceMapper details →](current/phase-27-source-mapper.md)
+[View FileCache details →](current/phase-27-file-cache.md)
 
 ---
 

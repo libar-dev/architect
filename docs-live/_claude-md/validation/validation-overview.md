@@ -39,6 +39,14 @@ Detail Level: Compact summary
 
 === BEHAVIOR SPECIFICATIONS ===
 
+--- ValidatorReadModelConsolidation ---
+
+| Rule                                                       | Description                                                                                                              |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Validator queries the read model for cross-source matching | **Invariant:** Pattern identity resolution — including implements<br> relationships in both directions — uses...         |
+| No lossy local types in the validator                      | **Invariant:** The validator operates on `ExtractedPattern` from the<br> MasterDataset, not a consumer-local DTO that... |
+| Utility patterns without specs are not false positives     | **Invariant:** Internal utility patterns that have a `@libar-docs-phase`<br> but will never have a Gherkin spec...       |
+
 --- StreamingGitDiff ---
 
 | Rule                                            | Description |

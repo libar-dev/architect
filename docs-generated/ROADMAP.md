@@ -7,16 +7,16 @@
 
 ## Overall Progress
 
-**Patterns:** [██████████████░░░░░░] 206/299 (69%)
+**Patterns:** [██████████████░░░░░░] 207/302 (69%)
 
 **Phases:** 4/19 complete
 
 | Metric | Value |
 | --- | --- |
-| Total Patterns | 299 |
-| Completed | 206 |
+| Total Patterns | 302 |
+| Completed | 207 |
 | Active | 47 |
-| Planned | 46 |
+| Planned | 48 |
 
 ---
 
@@ -38,7 +38,7 @@
 | 🚧 [StepLintVitestCucumber](phases/phase-50-step-lint-vitest-cucumber.md) | 0/1 | 0% |
 | 📋 [StepLintExtendedRules](phases/phase-51-step-lint-extended-rules.md) | 0/1 | 0% |
 | 📋 [TypeScriptTaxonomyImplementation](phases/phase-99-type-script-taxonomy-implementation.md) | 5/9 | 56% |
-| 📋 [TraceabilityEnhancements](phases/phase-100-traceability-enhancements.md) | 2/13 | 15% |
+| 📋 [ValidatorReadModelConsolidation](phases/phase-100-validator-read-model-consolidation.md) | 2/15 | 13% |
 | 📋 [CliBehaviorTesting](phases/phase-101-cli-behavior-testing.md) | 0/1 | 0% |
 | 📋 [CodecBehaviorTesting](phases/phase-102-codec-behavior-testing.md) | 0/1 | 0% |
 | 📋 [StepDefinitionCompletion](phases/phase-103-step-definition-completion.md) | 0/1 | 0% |
@@ -216,9 +216,9 @@
 
 ---
 
-### 📋 TraceabilityEnhancements
+### 📋 ValidatorReadModelConsolidation
 
-[██░░░░░░░░░░░░░] 2/13 15% complete
+[██░░░░░░░░░░░░░] 2/15 13% complete
 
 | Pattern | Status | Description |
 | --- | --- | --- |
@@ -231,10 +231,12 @@
 | 📋 Living Roadmap CLI | planned | Roadmap is a static document that requires regeneration. |
 | 📋 Phase Numbering Conventions | planned | Phase numbers are assigned manually without validation, leading to potential conflicts (duplicate numbers), gaps that... |
 | ✅ Phase State Machine Validation | completed | Phase lifecycle state transitions are not enforced programmatically despite being documented in PROCESS_SETUP.md. |
+| 📋 Process API Layered Extraction | planned | `process-api.ts` is 1,700 lines containing three distinct responsibilities in one file: CLI shell (arg parsing, help,... |
 | 📋 Progressive Governance | planned | Enterprise governance patterns applied everywhere create overhead. |
 | 📋 Release Association Rules | planned | PDR-002 and PDR-003 define conventions for separating specs from release metadata, but there's no automated enforcement. |
 | 📋 Session File Cleanup | planned | Session files (docs-living/sessions/phase-*.md) are ephemeral working documents for active phases. |
 | 📋 Traceability Enhancements | planned | Current TRACEABILITY.md shows 15% coverage (timeline → behavior). |
+| 📋 Validator Read Model Consolidation | planned | `validate-patterns.ts` is the only feature consumer that bypasses the MasterDataset. |
 
 ---
 

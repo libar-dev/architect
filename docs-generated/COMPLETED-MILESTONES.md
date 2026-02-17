@@ -9,7 +9,7 @@
 
 | Metric | Value |
 | --- | --- |
-| Completed Patterns | 206 |
+| Completed Patterns | 207 |
 | Completed Phases | 4 |
 | Total Phases | 19 |
 
@@ -62,17 +62,17 @@
 
 ## Recent Completions
 
-- ✅ Arch Index Dataset
-- ✅ Arch Tag Extraction
-- ✅ Component Diagram Generation
-- ✅ Arch Generator Registration
-- ✅ Layered Diagram Generation
 - ✅ Composite Codec Testing
 - ✅ Convention Extractor Testing
 - ✅ Dedent Helper
 - ✅ Planning Codec Testing
 - ✅ Pr Changes Codec Testing
+- ✅ Reference Codec Testing
+- ✅ Reference Generator Testing
+- ✅ Reporting Codec Testing
+- ✅ Requirements Adr Codec Testing
+- ✅ Session Codec Testing
 
-Showing 10 of 206 completed patterns. See quarterly files for full history.
+Showing 10 of 207 completed patterns. See quarterly files for full history.
 
 ---

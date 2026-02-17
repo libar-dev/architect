@@ -7,14 +7,14 @@
 
 ## Summary
 
-**Overall:** [███████████████░░░░░] 116/159 (73%)
+**Overall:** [██████████████░░░░░░] 116/161 (72%)
 
 | Metric         | Value |
 | -------------- | ----- |
-| Total Features | 159   |
+| Total Features | 161   |
 | Completed      | 116   |
 | Active         | 14    |
-| Planned        | 29    |
+| Planned        | 31    |
 | Product Areas  | 7     |
 | User Roles     | 1     |
 
@@ -78,7 +78,7 @@
 
 ### DataAPI
 
-15/28 complete (54%)
+15/29 complete (52%)
 
 - [✅ Data API Architecture Queries - deep architecture exploration for design sessions](requirements/phase-25-data-api-architecture-queries.md)
 - [✅ Data API Context Assembly - replace explore agents with one command](requirements/phase-25-data-api-context-assembly.md)
@@ -108,6 +108,7 @@
 - [📋 Data API CLI Ergonomics - fast interactive cli for repeated queries](requirements/phase-25-data-apicli-ergonomics.md)
 - [📋 Data API Platform Integration - native claude code integration and monorepo support](requirements/phase-25-data-api-platform-integration.md)
 - [📋 Data API Relationship Graph - deep dependency analysis and health checks](requirements/phase-25-data-api-relationship-graph.md)
+- [📋 Process API Layered Extraction - separate cli shell from domain logic in process api](requirements/phase-100-process-api-layered-extraction.md)
 
 ### Generation
 
@@ -193,7 +194,7 @@
 
 ### Validation
 
-12/20 complete (60%)
+12/21 complete (57%)
 
 - [✅ Anti Pattern Detector Testing](requirements/phase-00-anti-pattern-detector-testing.md)
 - [✅ Config Schema Validation](requirements/phase-00-config-schema-validation.md)
@@ -215,6 +216,7 @@
 - [📋 Status Aware Eslint Suppression](requirements/phase-99-status-aware-eslint-suppression.md)
 - [📋 Step Lint Extended Rules - catch remaining vitest cucumber traps statically](requirements/phase-51-step-lint-extended-rules.md)
 - [📋 Streaming Git Diff - enable process guard on large repositories](requirements/phase-99-streaming-git-diff.md)
+- [📋 Validator Read Model Consolidation - eliminate parallel pipeline and relationship blind spots in validator](requirements/phase-100-validator-read-model-consolidation.md)
 
 ---
 
@@ -383,6 +385,7 @@
 | 📋 Living Roadmap CLI                                         | Process       | -         | planned   |
 | 📋 Phase Numbering Conventions                                | Validation    | -         | planned   |
 | 📋 Prd Implementation Section                                 | Generation    | -         | planned   |
+| 📋 Process API Layered Extraction                             | DataAPI       | -         | planned   |
 | 📋 Progressive Governance                                     | Validation    | -         | planned   |
 | 📋 Release Association Rules                                  | Validation    | -         | planned   |
 | 📋 Rich Content Helpers Testing                               | Generation    | -         | planned   |
@@ -394,5 +397,6 @@
 | 📋 Test Content Blocks                                        | Generation    | -         | planned   |
 | 📋 Traceability Enhancements                                  | Generation    | -         | planned   |
 | 📋 Traceability Generator                                     | Generation    | -         | planned   |
+| 📋 Validator Read Model Consolidation                         | Validation    | -         | planned   |
 
 ---

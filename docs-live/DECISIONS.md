@@ -9,7 +9,7 @@
 
 | Metric     | Value |
 | ---------- | ----- |
-| Total ADRs | 6     |
+| Total ADRs | 7     |
 | Accepted   | 5     |
 | Proposed   | 0     |
 | Deprecated | 0     |
@@ -22,12 +22,13 @@
 
 ### architecture
 
-2 decisions
+3 decisions
 
 | ADR                                                            | Title                                  | Status   |
 | -------------------------------------------------------------- | -------------------------------------- | -------- |
 | [ADR-004](decisions/adr-004-session-workflow-commands.md)      | PDR 001 Session Workflow Commands      | accepted |
 | [ADR-005](decisions/adr-005-codec-based-markdown-rendering.md) | ADR 005 Codec Based Markdown Rendering | accepted |
+| [ADR-006](decisions/adr-006-single-read-model-architecture.md) | ADR 006 Single Read Model Architecture | proposed |
 
 ---
 
@@ -71,6 +72,7 @@
 | [ADR-003](decisions/adr-003-source-first-pattern-architecture.md) | ADR 003 Source First Pattern Architecture | accepted   | process       |
 | [ADR-004](decisions/adr-004-session-workflow-commands.md)         | PDR 001 Session Workflow Commands         | accepted   | architecture  |
 | [ADR-005](decisions/adr-005-codec-based-markdown-rendering.md)    | ADR 005 Codec Based Markdown Rendering    | accepted   | architecture  |
+| [ADR-006](decisions/adr-006-single-read-model-architecture.md)    | ADR 006 Single Read Model Architecture    | proposed   | architecture  |
 | [ADR-021](decisions/adr-021-doc-generation-proof-of-concept.md)   | Doc Generation Proof Of Concept           | superseded | documentation |
 
 ---

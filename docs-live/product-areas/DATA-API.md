@@ -353,109 +353,6 @@ ArchIndexSchema = z.object({
 
 ## Behavior Specifications
 
-### PDR001SessionWorkflowCommands
-
-[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
-
-**Context:**
-DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
-readiness check) and `handoff` (session-end state summary) CLI subcommands.
-Seven design decisions affect how these commands behave.
-
-**Decision:**
-Seven design decisions (DD-1 through DD-7) captured as Rules below.
-
-<details>
-<summary>DD-1 - Text output with section markers</summary>
-
-#### DD-1 - Text output with section markers
-
-Both scope-validate and handoff return string from the router, using
-=== SECTION === markers. Follows the dual output path where text
-commands bypass JSON.stringify.
-
-</details>
-
-<details>
-<summary>DD-2 - Git integration is opt-in via --git flag</summary>
-
-#### DD-2 - Git integration is opt-in via --git flag
-
-The handoff command accepts an optional --git flag. The CLI handler
-calls git diff and passes file list to the pure generator function.
-No shell dependency in domain logic.
-
-</details>
-
-<details>
-<summary>DD-3 - Session type inferred from FSM status</summary>
-
-#### DD-3 - Session type inferred from FSM status
-
-Handoff infers session type from pattern's current FSM status.
-An explicit --session flag overrides inference.
-
-| Status    | Inferred Session |
-| --------- | ---------------- |
-| roadmap   | design           |
-| active    | implement        |
-| completed | review           |
-| deferred  | design           |
-
-</details>
-
-<details>
-<summary>DD-4 - Severity levels match Process Guard model</summary>
-
-#### DD-4 - Severity levels match Process Guard model
-
-Scope validation uses three severity levels:
-
-    The --strict flag promotes WARN to BLOCKED.
-
-| Severity | Meaning                   |
-| -------- | ------------------------- |
-| PASS     | Check passed              |
-| BLOCKED  | Hard prerequisite missing |
-| WARN     | Recommendation not met    |
-
-</details>
-
-<details>
-<summary>DD-5 - Current date only for handoff</summary>
-
-#### DD-5 - Current date only for handoff
-
-Handoff always uses the current date. No --date flag.
-
-</details>
-
-<details>
-<summary>DD-6 - Both positional and flag forms for scope type</summary>
-
-#### DD-6 - Both positional and flag forms for scope type
-
-scope-validate accepts scope type as both positional argument
-and --type flag.
-
-</details>
-
-<details>
-<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
-
-#### DD-7 - Co-located formatter functions
-
-Each module (scope-validator.ts, handoff-generator.ts) exports
-both the data builder and the text formatter. Simpler than the
-context-assembler/context-formatter split.
-
-**Verified by:**
-
-- scope-validate outputs structured text
-- Active pattern infers implement session
-
-</details>
-
 ### ProcessStateAPIRelationshipQueries
 
 [View ProcessStateAPIRelationshipQueries source](delivery-process/specs/process-state-api-relationship-queries.feature)
@@ -725,6 +622,88 @@ Add a CLI command `pnpm process:query` that exposes key ProcessStateAPI methods:
 
 - Help output shows all flags
 - Help shows examples
+
+</details>
+
+### ProcessAPILayeredExtraction
+
+[View ProcessAPILayeredExtraction source](delivery-process/specs/process-api-layered-extraction.feature)
+
+**Problem:**
+`process-api.ts` is 1,700 lines containing three distinct responsibilities
+in one file: CLI shell (arg parsing, help, output formatting), pipeline
+orchestration (scan, extract, transform), and subcommand domain logic
+(rules grouping, stub resolution, scope validation).
+
+The subcommand handlers are feature consumers of the MasterDataset —
+per ADR-006 they belong in the API layer, not the CLI layer. Some already
+have API counterparts (`context-assembler.ts`, `arch-queries.ts`,
+`scope-validator.ts`), but others (`handleRules`, `handleStubs`,
+`handleDecisions`, `handlePdr`) do domain logic inline in the CLI file.
+
+This means:
+
+- Domain logic is only accessible via CLI (not programmatically testable)
+- `handleRules()` alone is 183 lines building its own Map hierarchies
+- Adding a new query requires modifying the CLI file
+- Pipeline orchestration is duplicated between process-api.ts,
+  orchestrator.ts, and validate-patterns.ts (three consumers wiring
+  the same scan-extract-transform sequence)
+
+**Solution:**
+Extract process-api.ts into three clean layers that mirror the project's
+own architecture (ADR-006 boundary: orchestration vs feature consumption):
+
+| Layer | Responsibility | Location |
+| CLI Shell | Arg parsing, help text, output formatting, error envelope | src/cli/process-api.ts (slim) |
+| Pipeline Factory | Shared scan-extract-transform sequence | src/generators/pipeline/ (reusable) |
+| Query Handlers | Domain logic consuming MasterDataset | src/api/ modules |
+
+The CLI becomes a thin routing layer: parse args, call pipeline factory,
+route subcommand to API module, format output. No domain logic in the CLI.
+
+This also enables the ValidatorReadModelConsolidation spec — once the
+pipeline factory exists, validate-patterns.ts can consume it instead of
+wiring its own mini-pipeline.
+
+<details>
+<summary>CLI file contains only routing, no domain logic (1 scenarios)</summary>
+
+#### CLI file contains only routing, no domain logic
+
+**Invariant:** `process-api.ts` parses arguments, calls a pipeline factory for the MasterDataset, routes subcommands to API modules, and formats output. It does not build Maps, filter patterns, group data, or resolve relationships.
+
+**Verified by:**
+
+- CLI routing shell
+- Domain logic in API modules
+
+</details>
+
+<details>
+<summary>Pipeline factory is shared across consumers (2 scenarios)</summary>
+
+#### Pipeline factory is shared across consumers
+
+**Invariant:** The scan-extract-transform sequence is defined once in a reusable factory. All consumers that need a MasterDataset — orchestrator, process-api, validate-patterns — call the same factory rather than wiring the pipeline independently.
+
+**Verified by:**
+
+- Pipeline factory is shared
+- No parallel pipelines
+
+</details>
+
+<details>
+<summary>Domain logic lives in API modules (1 scenarios)</summary>
+
+#### Domain logic lives in API modules
+
+**Invariant:** Query logic that operates on MasterDataset lives in `src/api/` modules. This makes it programmatically testable, reusable by future consumers (e.g. MCP server, watch mode), and aligned with the feature-consumption layer defined in ADR-006.
+
+**Verified by:**
+
+- Domain logic in API modules
 
 </details>
 
@@ -1721,6 +1700,109 @@ Extend the `arch` subcommand and add new discovery commands:
 
 </details>
 
+### PDR001SessionWorkflowCommands
+
+[View PDR001SessionWorkflowCommands source](delivery-process/decisions/pdr-001-session-workflow-commands.feature)
+
+**Context:**
+DataAPIDesignSessionSupport adds `scope-validate` (pre-flight session
+readiness check) and `handoff` (session-end state summary) CLI subcommands.
+Seven design decisions affect how these commands behave.
+
+**Decision:**
+Seven design decisions (DD-1 through DD-7) captured as Rules below.
+
+<details>
+<summary>DD-1 - Text output with section markers</summary>
+
+#### DD-1 - Text output with section markers
+
+Both scope-validate and handoff return string from the router, using
+=== SECTION === markers. Follows the dual output path where text
+commands bypass JSON.stringify.
+
+</details>
+
+<details>
+<summary>DD-2 - Git integration is opt-in via --git flag</summary>
+
+#### DD-2 - Git integration is opt-in via --git flag
+
+The handoff command accepts an optional --git flag. The CLI handler
+calls git diff and passes file list to the pure generator function.
+No shell dependency in domain logic.
+
+</details>
+
+<details>
+<summary>DD-3 - Session type inferred from FSM status</summary>
+
+#### DD-3 - Session type inferred from FSM status
+
+Handoff infers session type from pattern's current FSM status.
+An explicit --session flag overrides inference.
+
+| Status    | Inferred Session |
+| --------- | ---------------- |
+| roadmap   | design           |
+| active    | implement        |
+| completed | review           |
+| deferred  | design           |
+
+</details>
+
+<details>
+<summary>DD-4 - Severity levels match Process Guard model</summary>
+
+#### DD-4 - Severity levels match Process Guard model
+
+Scope validation uses three severity levels:
+
+    The --strict flag promotes WARN to BLOCKED.
+
+| Severity | Meaning                   |
+| -------- | ------------------------- |
+| PASS     | Check passed              |
+| BLOCKED  | Hard prerequisite missing |
+| WARN     | Recommendation not met    |
+
+</details>
+
+<details>
+<summary>DD-5 - Current date only for handoff</summary>
+
+#### DD-5 - Current date only for handoff
+
+Handoff always uses the current date. No --date flag.
+
+</details>
+
+<details>
+<summary>DD-6 - Both positional and flag forms for scope type</summary>
+
+#### DD-6 - Both positional and flag forms for scope type
+
+scope-validate accepts scope type as both positional argument
+and --type flag.
+
+</details>
+
+<details>
+<summary>DD-7 - Co-located formatter functions (2 scenarios)</summary>
+
+#### DD-7 - Co-located formatter functions
+
+Each module (scope-validator.ts, handoff-generator.ts) exports
+both the data builder and the text formatter. Simpler than the
+context-assembler/context-formatter split.
+
+**Verified by:**
+
+- scope-validate outputs structured text
+- Active pattern infers implement session
+
+</details>
+
 ### ValidatePatternsCli
 
 [View ValidatePatternsCli source](tests/features/cli/validate-patterns.feature)
@@ -2560,115 +2642,6 @@ Designed for Claude Code integration and tool automation.
 
 </details>
 
-### StubTaxonomyTagTests
-
-[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
-
-**Problem:**
-Stub metadata (target path, design session) was stored as plain text
-in JSDoc descriptions, invisible to structured queries.
-
-**Solution:**
-Register libar-docs-target and libar-docs-since as taxonomy tags
-so they flow through the extraction pipeline as structured fields.
-
-#### Taxonomy tags are registered in the registry
-
-**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
-
-**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
-
-**Verified by:**
-
-- Target and since tags exist in registry
-
-#### Tags are part of the stub metadata group
-
-**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
-
-**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
-
-**Verified by:**
-
-- Built registry groups target and since as stub tags
-
-### StubResolverTests
-
-[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
-
-**Problem:**
-Design session stubs need structured discovery and resolution
-to determine which stubs have been implemented and which remain.
-
-**Solution:**
-StubResolver functions identify, resolve, and group stubs from
-the MasterDataset with filesystem existence checks.
-
-<details>
-<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
-
-#### Stubs are identified by path or target metadata
-
-**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
-
-**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
-
-**Verified by:**
-
-- Patterns in stubs directory are identified as stubs
-- Patterns with targetPath are identified as stubs
-
-</details>
-
-<details>
-<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
-
-#### Stubs are resolved against the filesystem
-
-**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
-
-**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
-
-**Verified by:**
-
-- Resolved stubs show target existence status
-- Stubs are grouped by implementing pattern
-
-</details>
-
-<details>
-<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
-
-#### Decision items are extracted from descriptions
-
-**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
-
-**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
-
-**Verified by:**
-
-- AD-N items are extracted from description text
-- Empty description returns no decision items
-- Malformed AD items are skipped
-
-</details>
-
-<details>
-<summary>PDR references are found across patterns (2 scenarios)</summary>
-
-#### PDR references are found across patterns
-
-**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
-
-**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
-
-**Verified by:**
-
-- Patterns referencing a PDR are found
-- No references returns empty result
-
-</details>
-
 ### ScopeValidatorTests
 
 [View ScopeValidatorTests source](tests/features/api/session-support/scope-validator.feature)
@@ -3011,6 +2984,115 @@ Validates tiered fuzzy matching: exact > prefix > substring > Levenshtein.
 
 - Identical strings have distance 0
 - Single character difference
+
+</details>
+
+### StubTaxonomyTagTests
+
+[View StubTaxonomyTagTests source](tests/features/api/stub-integration/taxonomy-tags.feature)
+
+**Problem:**
+Stub metadata (target path, design session) was stored as plain text
+in JSDoc descriptions, invisible to structured queries.
+
+**Solution:**
+Register libar-docs-target and libar-docs-since as taxonomy tags
+so they flow through the extraction pipeline as structured fields.
+
+#### Taxonomy tags are registered in the registry
+
+**Invariant:** The target and since stub metadata tags must be registered in the tag registry as recognized taxonomy entries.
+
+**Rationale:** Unregistered tags would be flagged as unknown by the linter — registration ensures stub metadata tags pass validation alongside standard annotation tags.
+
+**Verified by:**
+
+- Target and since tags exist in registry
+
+#### Tags are part of the stub metadata group
+
+**Invariant:** The target and since tags must be grouped under the stub metadata domain in the built registry.
+
+**Rationale:** Domain grouping enables the taxonomy codec to render stub metadata tags in their own section — ungrouped tags would be lost in the "Other" category.
+
+**Verified by:**
+
+- Built registry groups target and since as stub tags
+
+### StubResolverTests
+
+[View StubResolverTests source](tests/features/api/stub-integration/stub-resolver.feature)
+
+**Problem:**
+Design session stubs need structured discovery and resolution
+to determine which stubs have been implemented and which remain.
+
+**Solution:**
+StubResolver functions identify, resolve, and group stubs from
+the MasterDataset with filesystem existence checks.
+
+<details>
+<summary>Stubs are identified by path or target metadata (2 scenarios)</summary>
+
+#### Stubs are identified by path or target metadata
+
+**Invariant:** A pattern must be identified as a stub if it resides in the stubs directory OR has a targetPath metadata field.
+
+**Rationale:** Dual identification supports both convention-based (directory) and metadata-based (targetPath) stub detection — relying on only one would miss stubs organized differently.
+
+**Verified by:**
+
+- Patterns in stubs directory are identified as stubs
+- Patterns with targetPath are identified as stubs
+
+</details>
+
+<details>
+<summary>Stubs are resolved against the filesystem (2 scenarios)</summary>
+
+#### Stubs are resolved against the filesystem
+
+**Invariant:** Resolved stubs must show whether their target file exists on the filesystem and must be grouped by the pattern they implement.
+
+**Rationale:** Target existence status tells developers whether a stub has been implemented — grouping by pattern enables the "stubs --unresolved" command to show per-pattern implementation gaps.
+
+**Verified by:**
+
+- Resolved stubs show target existence status
+- Stubs are grouped by implementing pattern
+
+</details>
+
+<details>
+<summary>Decision items are extracted from descriptions (3 scenarios)</summary>
+
+#### Decision items are extracted from descriptions
+
+**Invariant:** AD-N formatted items must be extracted from pattern description text, with empty descriptions returning no items and malformed items being skipped.
+
+**Rationale:** Decision items (AD-1, AD-2, etc.) link stubs to architectural decisions — extracting them enables traceability from code stubs back to the design rationale.
+
+**Verified by:**
+
+- AD-N items are extracted from description text
+- Empty description returns no decision items
+- Malformed AD items are skipped
+
+</details>
+
+<details>
+<summary>PDR references are found across patterns (2 scenarios)</summary>
+
+#### PDR references are found across patterns
+
+**Invariant:** The resolver must find all patterns that reference a given PDR identifier, returning empty results when no references exist.
+
+**Rationale:** PDR cross-referencing enables impact analysis — knowing which patterns reference a decision helps assess the blast radius of changing that decision.
+
+**Verified by:**
+
+- Patterns referencing a PDR are found
+- No references returns empty result
 
 </details>
 

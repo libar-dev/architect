@@ -18,7 +18,7 @@ status models, phase definitions, and artifact mappings.
 
 ### When to Use
 
-- When loading workflow configs from catalogue/workflows/
+- When validating workflow configuration (inline defaults or custom files)
 - When validating custom workflow configurations
 - When creating new workflow definitions
 

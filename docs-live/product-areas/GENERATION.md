@@ -24,8 +24,8 @@ graph TB
     subgraph generator["Generator"]
         SourceMapper[/"SourceMapper"/]
         Documentation_Generation_Orchestrator("Documentation Generation Orchestrator")
-        TransformDataset("TransformDataset")
         DecisionDocGenerator("DecisionDocGenerator")
+        TransformDataset("TransformDataset")
     end
     subgraph renderer["Renderer"]
         PatternsCodec[("PatternsCodec")]
@@ -45,13 +45,13 @@ graph TB
     SourceMapper -.->|depends on| ShapeExtractor
     SourceMapper -.->|depends on| GherkinASTParser
     Documentation_Generation_Orchestrator -->|uses| Pattern_Scanner
-    TransformDataset -->|uses| MasterDataset
-    TransformDataset ..->|implements| PatternRelationshipModel
-    DecisionDocGenerator -.->|depends on| DecisionDocCodec
-    DecisionDocGenerator -.->|depends on| SourceMapper
     PatternsCodec ..->|implements| PatternRelationshipModel
     CompositeCodec ..->|implements| ReferenceDocShowcase
     ArchitectureCodec -->|uses| MasterDataset
+    DecisionDocGenerator -.->|depends on| DecisionDocCodec
+    DecisionDocGenerator -.->|depends on| SourceMapper
+    TransformDataset -->|uses| MasterDataset
+    TransformDataset ..->|implements| PatternRelationshipModel
     classDef neighbor stroke-dasharray: 5 5
 ```
 
@@ -230,163 +230,6 @@ function transformToMasterDataset(raw: RawDataset): RuntimeMasterDataset;
 ---
 
 ## Behavior Specifications
-
-### ADR005CodecBasedMarkdownRendering
-
-[View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
-
-**Context:**
-The documentation generator needs to transform structured pattern data
-(MasterDataset) into markdown files. The initial approach used direct
-string concatenation in generator functions, mixing data selection,
-formatting logic, and output assembly in a single pass. This made
-generators hard to test, difficult to compose, and impossible to
-render the same data in different formats (e.g., full docs vs compact
-AI context).
-
-**Decision:**
-Adopt a codec architecture inspired by serialization codecs (encode/decode).
-Each document type has a codec that decodes a MasterDataset into a
-RenderableDocument — an intermediate representation of sections, headings,
-tables, paragraphs, and code blocks. A separate renderer transforms the
-RenderableDocument into markdown. This separates data selection (what to
-include) from formatting (how it looks) from serialization (markdown syntax).
-
-**Consequences:**
-| Type | Impact |
-| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
-| Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
-| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
-| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
-| Negative | Extra abstraction layer between data and output |
-| Negative | RenderableDocument vocabulary must cover all needed output patterns |
-
-**Benefits:**
-| Benefit | Before (String Concat) | After (Codec) |
-| Testability | Assert on markdown strings | Assert on typed section blocks |
-| Composability | Copy-paste between generators | CompositeCodec assembles children |
-| Format variants | Duplicate generator logic | Same codec, different renderer |
-| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
-
-<details>
-<summary>Codecs implement a decode-only contract (2 scenarios)</summary>
-
-#### Codecs implement a decode-only contract
-
-**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
-
-**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
-
-**Codec call signature:**
-
-```typescript
-interface DocumentCodec {
-  decode(dataset: MasterDataset): RenderableDocument;
-}
-```
-
-**Verified by:**
-
-- Codec produces deterministic output
-- Codec has no side effects
-
-</details>
-
-<details>
-<summary>RenderableDocument is a typed intermediate representation (2 scenarios)</summary>
-
-#### RenderableDocument is a typed intermediate representation
-
-**Invariant:** RenderableDocument contains a title, an ordered array of SectionBlock elements, and an optional record of additional files. Each SectionBlock is a discriminated union: heading, paragraph, table, code, list, separator, or metaRow. The renderer consumes this IR without needing to know which codec produced it.
-
-**Rationale:** A typed IR decouples codecs from rendering. Codecs express intent ("this is a table with these rows") and the renderer handles syntax ("pipe-delimited markdown with separator row"). This means switching output format (e.g., HTML instead of markdown) requires only a new renderer, not changes to every codec.
-
-**Section block types:**
-
-| Block Type | Purpose                       | Markdown Output             |
-| ---------- | ----------------------------- | --------------------------- |
-| heading    | Section title with depth      | ## Title (depth-adjusted)   |
-| paragraph  | Prose text                    | Plain text with blank lines |
-| table      | Structured data               | Pipe-delimited table        |
-| code       | Code sample with language     | Fenced code block           |
-| list       | Ordered or unordered items    | - item or 1. item           |
-| separator  | Visual break between sections | ---                         |
-| metaRow    | Key-value metadata            | **Key:** Value              |
-
-**Verified by:**
-
-- All block types render to markdown
-- Unknown block type is rejected
-
-</details>
-
-<details>
-<summary>CompositeCodec assembles documents from child codecs (2 scenarios)</summary>
-
-#### CompositeCodec assembles documents from child codecs
-
-**Invariant:** CompositeCodec accepts an array of child codecs and produces a single RenderableDocument by concatenating their sections. Child codec order determines section order in the output. Separators are inserted between children by default.
-
-**Rationale:** Reference documents combine content from multiple domains (patterns, conventions, shapes, diagrams). Rather than building a monolithic codec that knows about all content types, CompositeCodec lets each domain own its codec and composes them declaratively.
-
-**Composition example:**
-
-```typescript
-const referenceDoc = CompositeCodec.create({
-  title: 'Architecture Reference',
-  codecs: [
-    behaviorCodec, // patterns with rules
-    conventionCodec, // decision records
-    shapeCodec, // type definitions
-    diagramCodec, // mermaid diagrams
-  ],
-});
-```
-
-**Verified by:**
-
-- Child sections appear in codec array order
-- Empty children are skipped without separators
-
-</details>
-
-<details>
-<summary>ADR content comes from both Feature description and Rule prefixes (3 scenarios)</summary>
-
-#### ADR content comes from both Feature description and Rule prefixes
-
-**Invariant:** ADR structured content (Context, Decision, Consequences) can appear in two locations within a feature file. Both sources must be rendered. Silently dropping either source causes content loss.
-
-**Rationale:** Early ADRs used name prefixes like "Context - ..." and "Decision - ..." on Rule blocks to structure content. Later ADRs placed Context, Decision, and Consequences as bold-annotated prose in the Feature description, reserving Rule: blocks for invariants and design rules. Both conventions are valid. The ADR codec must handle both because the codebase contains ADRs authored in each style. The Feature description lives in pattern.directive.description. If the codec only renders Rules (via partitionRulesByPrefix), then Feature description content is silently dropped -- no error, no warning. This caused confusion across two repos where ADR content appeared in the feature file but was missing from generated docs. The fix renders pattern.directive.description in buildSingleAdrDocument between the Overview metadata table and the partitioned Rules section, using renderFeatureDescription() which walks content linearly and handles prose, tables, and DocStrings with correct interleaving.
-
-| Source              | Location                            | Example                   | Rendered Via               |
-| ------------------- | ----------------------------------- | ------------------------- | -------------------------- |
-| Rule prefix         | Rule: Context - ...                 | ADR-001 (taxonomy)        | partitionRulesByPrefix()   |
-| Feature description | **Context:** prose in Feature block | ADR-005 (codec rendering) | renderFeatureDescription() |
-
-**Verified by:**
-
-- Feature description content is rendered
-- Rule prefix content is rendered
-- Both sources combine in single ADR
-
-</details>
-
-<details>
-<summary>The markdown renderer is codec-agnostic (2 scenarios)</summary>
-
-#### The markdown renderer is codec-agnostic
-
-**Invariant:** The renderer accepts any RenderableDocument regardless of which codec produced it. Rendering depends only on block types, not on document origin. This enables testing codecs and renderers independently.
-
-**Rationale:** If the renderer knew about specific codecs, adding a new codec would require renderer changes. By operating purely on the SectionBlock discriminated union, the renderer is closed for modification but open for extension via new block types.
-
-**Verified by:**
-
-- Same renderer handles different codec outputs
-- Renderer and codec are tested independently
-
-</details>
 
 ### UniversalDocGeneratorRobustness
 
@@ -2450,6 +2293,270 @@ Uses git tags to determine release boundaries.
 Uses @libar-docs-decision, @libar-docs-replaces annotations.
 
 Implements Convergence Opportunity 5: Architecture Change Control.
+
+### ADR006SingleReadModelArchitecture
+
+[View ADR006SingleReadModelArchitecture source](delivery-process/decisions/adr-006-single-read-model-architecture.feature)
+
+**Context:**
+The delivery-process package applies event sourcing to itself: git is
+the event store, annotated source files are authoritative state, generated
+documentation is a projection. The MasterDataset is the read model —
+produced by a single-pass O(n) transformer with pre-computed views
+and a relationship index.
+
+ADR-005 established that codecs consume MasterDataset as their sole input.
+The ProcessStateAPI consumes it. But the validation layer bypasses it,
+wiring its own mini-pipeline from raw scanner/extractor output. It creates
+a lossy local type that discards relationship data, then discovers it
+lacks the information needed — requiring ad-hoc re-derivation of what
+the MasterDataset already computes.
+
+This is the same class of problem the MasterDataset was created to solve.
+Before the single-pass transformer, each generator called `.filter()`
+independently. The MasterDataset eliminated that duplication for codecs.
+This ADR extends the same principle to all consumers.
+
+**Decision:**
+The MasterDataset is the single read model for all consumers. No consumer
+re-derives pattern data from raw scanner/extractor output when that data
+is available in the MasterDataset. Validators, codecs, and query APIs
+consume the same pre-computed read model.
+
+**Consequences:**
+| Type | Impact |
+| Positive | Relationship resolution happens once — no consumer re-derives implements, uses, or dependsOn |
+| Positive | Eliminates lossy local types that discard fields from canonical ExtractedPattern |
+| Positive | Validation rules automatically benefit from new MasterDataset views and indices |
+| Positive | Aligns with the monorepo's own ADR-006: projections for all reads, never query aggregate state |
+| Negative | Validators that today only need stage 1-2 data will import the transformer |
+| Negative | MasterDataset schema changes affect more consumers |
+
+<details>
+<summary>All feature consumers query the read model, not raw state</summary>
+
+#### All feature consumers query the read model, not raw state
+
+**Invariant:** Code that needs pattern relationships, status groupings, cross-source resolution, or dependency information consumes the MasterDataset. Direct scanner/extractor imports are permitted only in pipeline orchestration code that builds the MasterDataset. Exception: `lint-patterns.ts` is a pure stage-1 consumer. It validates annotation syntax on scanned files. No relationships, no cross-source resolution. Direct scanner consumption is correct for that use case.
+
+| Layer                  | May Import                       | Examples                                            |
+| ---------------------- | -------------------------------- | --------------------------------------------------- |
+| Pipeline Orchestration | scanner/, extractor/, pipeline/  | orchestrator.ts, process-api.ts pipeline setup      |
+| Feature Consumption    | MasterDataset, relationshipIndex | codecs, ProcessStateAPI, validators, query handlers |
+
+</details>
+
+<details>
+<summary>No lossy local types</summary>
+
+#### No lossy local types
+
+**Invariant:** Consumers do not define local DTOs that duplicate and discard fields from ExtractedPattern. If a consumer needs a subset, the type system provides the projection — not a hand-written extraction function that becomes a barrier between the consumer and canonical data.
+
+</details>
+
+<details>
+<summary>Relationship resolution is computed once</summary>
+
+#### Relationship resolution is computed once
+
+**Invariant:** Forward relationships (uses, dependsOn, implementsPatterns) and reverse lookups (usedBy, implementedBy, extendedBy) are computed in `transformToMasterDataset()`. No consumer re-derives these from raw pattern arrays or scanned file tags.
+
+</details>
+
+<details>
+<summary>Three named anti-patterns</summary>
+
+#### Three named anti-patterns
+
+**Invariant:** These are recognized violations, serving as review criteria for new code and refactoring targets for existing code: Naming them makes them visible in code review — including AI-assisted sessions where the default proposal is often "add a helper function."
+
+**Good vs Bad**
+
+**References**
+
+- Monorepo ADR-006: Projections for All Reads (same principle, application domain)
+- ADR-005: Codec-Based Markdown Rendering (established MasterDataset as codec input)
+- Order-management ARCHITECTURE.md: CommandOrchestrator + Read Model separation
+
+| Anti-Pattern            | Detection Signal                                                                         |
+| ----------------------- | ---------------------------------------------------------------------------------------- |
+| Parallel Pipeline       | Feature consumer imports from scanner/ or extractor/                                     |
+| Lossy Local Type        | Local interface with subset of ExtractedPattern fields + dedicated extraction function   |
+| Re-derived Relationship | Building Map or Set from pattern.implementsPatterns, uses, or dependsOn in consumer code |
+
+```typescript
+// Good: consume the read model
+  function validateCrossSource(dataset: RuntimeMasterDataset): ValidationSummary {
+    const rel = dataset.relationshipIndex[patternName];
+    const isImplemented = rel.implementedBy.length > 0;
+  }
+
+  // Bad: re-derive from raw state (Parallel Pipeline + Re-derived Relationship)
+  function buildImplementsLookup(
+    gherkinFiles: readonly ScannedGherkinFile[],
+    tsPatterns: readonly ExtractedPattern[]
+  ): ReadonlySet<string> { ... }
+```
+
+</details>
+
+### ADR005CodecBasedMarkdownRendering
+
+[View ADR005CodecBasedMarkdownRendering source](delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature)
+
+**Context:**
+The documentation generator needs to transform structured pattern data
+(MasterDataset) into markdown files. The initial approach used direct
+string concatenation in generator functions, mixing data selection,
+formatting logic, and output assembly in a single pass. This made
+generators hard to test, difficult to compose, and impossible to
+render the same data in different formats (e.g., full docs vs compact
+AI context).
+
+**Decision:**
+Adopt a codec architecture inspired by serialization codecs (encode/decode).
+Each document type has a codec that decodes a MasterDataset into a
+RenderableDocument — an intermediate representation of sections, headings,
+tables, paragraphs, and code blocks. A separate renderer transforms the
+RenderableDocument into markdown. This separates data selection (what to
+include) from formatting (how it looks) from serialization (markdown syntax).
+
+**Consequences:**
+| Type | Impact |
+| Positive | Codecs are pure functions: dataset in, document out -- trivially testable |
+| Positive | RenderableDocument is an inspectable IR -- tests assert on structure, not strings |
+| Positive | Composable via CompositeCodec -- reference docs assemble from child codecs |
+| Positive | Same dataset can produce different outputs (full doc, compact doc, AI context) |
+| Negative | Extra abstraction layer between data and output |
+| Negative | RenderableDocument vocabulary must cover all needed output patterns |
+
+**Benefits:**
+| Benefit | Before (String Concat) | After (Codec) |
+| Testability | Assert on markdown strings | Assert on typed section blocks |
+| Composability | Copy-paste between generators | CompositeCodec assembles children |
+| Format variants | Duplicate generator logic | Same codec, different renderer |
+| Progressive disclosure | Manual heading management | Heading depth auto-calculated |
+
+<details>
+<summary>Codecs implement a decode-only contract (2 scenarios)</summary>
+
+#### Codecs implement a decode-only contract
+
+**Invariant:** Every codec is a pure function that accepts a MasterDataset and returns a RenderableDocument. Codecs do not perform side effects, do not write files, and do not access the filesystem. The codec contract is decode-only because the transformation is one-directional: structured data becomes a document, never the reverse.
+
+**Rationale:** Pure functions are deterministic and trivially testable. For the same MasterDataset, a codec always produces the same RenderableDocument. This makes snapshot testing reliable and enables codec output comparison across versions.
+
+**Codec call signature:**
+
+```typescript
+interface DocumentCodec {
+  decode(dataset: MasterDataset): RenderableDocument;
+}
+```
+
+**Verified by:**
+
+- Codec produces deterministic output
+- Codec has no side effects
+
+</details>
+
+<details>
+<summary>RenderableDocument is a typed intermediate representation (2 scenarios)</summary>
+
+#### RenderableDocument is a typed intermediate representation
+
+**Invariant:** RenderableDocument contains a title, an ordered array of SectionBlock elements, and an optional record of additional files. Each SectionBlock is a discriminated union: heading, paragraph, table, code, list, separator, or metaRow. The renderer consumes this IR without needing to know which codec produced it.
+
+**Rationale:** A typed IR decouples codecs from rendering. Codecs express intent ("this is a table with these rows") and the renderer handles syntax ("pipe-delimited markdown with separator row"). This means switching output format (e.g., HTML instead of markdown) requires only a new renderer, not changes to every codec.
+
+**Section block types:**
+
+| Block Type | Purpose                       | Markdown Output             |
+| ---------- | ----------------------------- | --------------------------- |
+| heading    | Section title with depth      | ## Title (depth-adjusted)   |
+| paragraph  | Prose text                    | Plain text with blank lines |
+| table      | Structured data               | Pipe-delimited table        |
+| code       | Code sample with language     | Fenced code block           |
+| list       | Ordered or unordered items    | - item or 1. item           |
+| separator  | Visual break between sections | ---                         |
+| metaRow    | Key-value metadata            | **Key:** Value              |
+
+**Verified by:**
+
+- All block types render to markdown
+- Unknown block type is rejected
+
+</details>
+
+<details>
+<summary>CompositeCodec assembles documents from child codecs (2 scenarios)</summary>
+
+#### CompositeCodec assembles documents from child codecs
+
+**Invariant:** CompositeCodec accepts an array of child codecs and produces a single RenderableDocument by concatenating their sections. Child codec order determines section order in the output. Separators are inserted between children by default.
+
+**Rationale:** Reference documents combine content from multiple domains (patterns, conventions, shapes, diagrams). Rather than building a monolithic codec that knows about all content types, CompositeCodec lets each domain own its codec and composes them declaratively.
+
+**Composition example:**
+
+```typescript
+const referenceDoc = CompositeCodec.create({
+  title: 'Architecture Reference',
+  codecs: [
+    behaviorCodec, // patterns with rules
+    conventionCodec, // decision records
+    shapeCodec, // type definitions
+    diagramCodec, // mermaid diagrams
+  ],
+});
+```
+
+**Verified by:**
+
+- Child sections appear in codec array order
+- Empty children are skipped without separators
+
+</details>
+
+<details>
+<summary>ADR content comes from both Feature description and Rule prefixes (3 scenarios)</summary>
+
+#### ADR content comes from both Feature description and Rule prefixes
+
+**Invariant:** ADR structured content (Context, Decision, Consequences) can appear in two locations within a feature file. Both sources must be rendered. Silently dropping either source causes content loss.
+
+**Rationale:** Early ADRs used name prefixes like "Context - ..." and "Decision - ..." on Rule blocks to structure content. Later ADRs placed Context, Decision, and Consequences as bold-annotated prose in the Feature description, reserving Rule: blocks for invariants and design rules. Both conventions are valid. The ADR codec must handle both because the codebase contains ADRs authored in each style. The Feature description lives in pattern.directive.description. If the codec only renders Rules (via partitionRulesByPrefix), then Feature description content is silently dropped -- no error, no warning. This caused confusion across two repos where ADR content appeared in the feature file but was missing from generated docs. The fix renders pattern.directive.description in buildSingleAdrDocument between the Overview metadata table and the partitioned Rules section, using renderFeatureDescription() which walks content linearly and handles prose, tables, and DocStrings with correct interleaving.
+
+| Source              | Location                            | Example                   | Rendered Via               |
+| ------------------- | ----------------------------------- | ------------------------- | -------------------------- |
+| Rule prefix         | Rule: Context - ...                 | ADR-001 (taxonomy)        | partitionRulesByPrefix()   |
+| Feature description | **Context:** prose in Feature block | ADR-005 (codec rendering) | renderFeatureDescription() |
+
+**Verified by:**
+
+- Feature description content is rendered
+- Rule prefix content is rendered
+- Both sources combine in single ADR
+
+</details>
+
+<details>
+<summary>The markdown renderer is codec-agnostic (2 scenarios)</summary>
+
+#### The markdown renderer is codec-agnostic
+
+**Invariant:** The renderer accepts any RenderableDocument regardless of which codec produced it. Rendering depends only on block types, not on document origin. This enables testing codecs and renderers independently.
+
+**Rationale:** If the renderer knew about specific codecs, adding a new codec would require renderer changes. By operating purely on the SectionBlock discriminated union, the renderer is closed for modification but open for extension via new block types.
+
+**Verified by:**
+
+- Same renderer handles different codec outputs
+- Renderer and codec are tested independently
+
+</details>
 
 ### TestContentBlocks
 
@@ -5364,618 +5471,6 @@ with distinct visual styles per relationship semantics.
 
 </details>
 
-### LayeredDiagramGeneration
-
-[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
-
-As a documentation generator
-I want to generate layered architecture diagrams from metadata
-So that system architecture is visualized by layer hierarchy
-
-<details>
-<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
-
-#### Layered diagrams group patterns by arch-layer
-
-**Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
-
-**Verified by:**
-
-- Generate subgraphs for each layer
-- Generate subgraphs for each layer
-
-  Patterns with arch-layer are grouped into Mermaid subgraphs.
-  Each layer becomes a visual container.
-
-</details>
-
-<details>
-<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
-
-#### Layer order is domain to infrastructure (top to bottom)
-
-**Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
-
-**Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
-
-**Verified by:**
-
-- Layers render in correct order
-- Layers render in correct order
-
-  The layer subgraphs are rendered in Clean Architecture order:
-  domain at top
-
-- then application
-- then infrastructure at bottom.
-  This reflects the dependency rule: outer layers depend on inner layers.
-
-</details>
-
-<details>
-<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
-
-#### Context labels included in layered diagram nodes
-
-**Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
-
-**Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
-
-**Verified by:**
-
-- Nodes include context labels
-- Nodes include context labels
-
-  Unlike component diagrams which group by context
-
-- layered diagrams
-  include the context as a label in each node name.
-
-</details>
-
-<details>
-<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
-
-#### Patterns without layer go to Other subgraph
-
-**Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
-
-**Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
-
-**Verified by:**
-
-- Unlayered patterns in Other subgraph
-- Unlayered patterns in Other subgraph
-
-  Patterns that have arch-role or arch-context but no arch-layer
-  are grouped into an "Other" subgraph.
-
-</details>
-
-<details>
-<summary>Layered diagram includes summary section (1 scenarios)</summary>
-
-#### Layered diagram includes summary section
-
-**Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
-
-**Verified by:**
-
-- Summary section for layered view
-- Summary section for layered view
-
-  The generated document starts with an overview section
-  specific to layered architecture visualization.
-
-</details>
-
-### ArchGeneratorRegistration
-
-[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
-
-As a CLI user
-I want an architecture generator registered in the generator registry
-So that I can run pnpm docs:architecture to generate diagrams
-
-<details>
-<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
-
-#### Architecture generator is registered in the registry
-
-**Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
-
-**Verified by:**
-
-- Generator is available in registry
-- Generator is available in registry
-
-  The architecture generator must be registered like other built-in
-  generators so it can be invoked via CLI.
-
-</details>
-
-<details>
-<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
-
-#### Architecture generator produces component diagram by default
-
-**Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
-
-**Verified by:**
-
-- Default generation produces component diagram
-- Default generation produces component diagram
-
-  Running the architecture generator without options produces
-  a component diagram (bounded context view).
-
-</details>
-
-<details>
-<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
-
-#### Architecture generator supports diagram type options
-
-**Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
-
-**Verified by:**
-
-- Generate layered diagram with options
-- Generate layered diagram with options
-
-  The generator accepts options to specify diagram type
-  (component or layered).
-
-</details>
-
-<details>
-<summary>Architecture generator supports context filtering (1 scenarios)</summary>
-
-#### Architecture generator supports context filtering
-
-**Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
-
-**Verified by:**
-
-- Filter to specific contexts
-- Filter to specific contexts
-
-  The generator can filter to specific bounded contexts
-  for focused diagram output.
-
-</details>
-
-### ComponentDiagramGeneration
-
-[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
-
-As a documentation generator
-I want to generate component diagrams from architecture metadata
-So that system architecture is automatically visualized with bounded context subgraphs
-
-<details>
-<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
-
-#### Component diagrams group patterns by bounded context
-
-**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
-
-**Verified by:**
-
-- Generate subgraphs for bounded contexts
-- Generate subgraphs for bounded contexts
-
-  Patterns with arch-context are grouped into Mermaid subgraphs.
-  Each bounded context becomes a visual container.
-
-</details>
-
-<details>
-<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
-
-#### Context-less patterns go to Shared Infrastructure
-
-**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
-
-**Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
-
-**Verified by:**
-
-- Shared infrastructure subgraph for context-less patterns
-- Shared infrastructure subgraph for context-less patterns
-
-  Patterns without arch-context are grouped into a
-  "Shared Infrastructure" subgraph.
-
-</details>
-
-<details>
-<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
-
-#### Relationship types render with distinct arrow styles
-
-**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
-
-**Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
-
-**Verified by:**
-
-- Arrow styles for relationship types
-- Arrow styles for relationship types
-
-  Arrow styles follow UML conventions:
-  - uses: solid arrow (-->)
-  - depends-on: dashed arrow (-.->)
-  - implements: dotted arrow (..->)
-  - extends: open arrow (-->>)
-
-</details>
-
-<details>
-<summary>Arrows only connect annotated components (1 scenarios)</summary>
-
-#### Arrows only connect annotated components
-
-**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
-
-**Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
-
-**Verified by:**
-
-- Skip arrows to non-annotated targets
-- Skip arrows to non-annotated targets
-
-  Relationships pointing to non-annotated patterns
-  are not rendered (target would not exist in diagram).
-
-</details>
-
-<details>
-<summary>Component diagram includes summary section (1 scenarios)</summary>
-
-#### Component diagram includes summary section
-
-**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
-
-**Verified by:**
-
-- Summary section with counts
-- Summary section with counts
-
-  The generated document starts with an overview section
-  showing component counts and bounded context statistics.
-
-</details>
-
-<details>
-<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
-
-#### Component diagram includes legend when enabled
-
-**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
-
-**Verified by:**
-
-- Legend section with arrow explanations
-- Legend section with arrow explanations
-
-  The legend explains arrow style meanings for readers.
-
-</details>
-
-<details>
-<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
-
-#### Component diagram includes inventory table when enabled
-
-**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
-
-**Verified by:**
-
-- Inventory table with component details
-- Inventory table with component details
-
-  The inventory lists all components with their metadata.
-
-</details>
-
-<details>
-<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
-
-#### Empty architecture data shows guidance message
-
-**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
-
-**Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
-
-**Verified by:**
-
-- No architecture data message
-- No architecture data message
-
-  If no patterns have architecture annotations
-
-- the document explains how to add them.
-
-</details>
-
-### ArchTagExtraction
-
-[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
-
-As a documentation generator
-I want architecture tags extracted from source code
-So that I can generate accurate architecture diagrams
-
-<details>
-<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-role tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
-
-**Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
-
-**Verified by:**
-
-- arch-role tag exists with enum format
-- arch-role has required enum values
-- arch-role has required enum values
-
-  Architecture roles classify components for diagram rendering.
-  Valid roles: command-handler
-
-- projection
-- saga
-- process-manager
-- infrastructure
-- repository
-- decider
-- read-model
-- bounded-context.
-
-</details>
-
-<details>
-<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
-
-#### arch-context tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
-
-**Verified by:**
-
-- arch-context tag exists with value format
-- arch-context tag exists with value format
-
-  Context tags group components into bounded context subgraphs.
-  Format is "value" (free-form string like "orders"
-
-- "inventory").
-
-</details>
-
-<details>
-<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
-
-#### arch-layer tag is defined in the registry
-
-**Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
-
-**Verified by:**
-
-- arch-layer tag exists with enum format
-- arch-layer has exactly three values
-- arch-layer has exactly three values
-
-  Layer tags enable layered architecture diagrams.
-  Valid layers: domain
-
-- application
-- infrastructure.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-role from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
-
-**Verified by:**
-
-- Extract arch-role projection
-- Extract arch-role command-handler
-- Extract arch-role command-handler
-
-  The AST parser must extract arch-role alongside other pattern metadata.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-context from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
-
-**Verified by:**
-
-- Extract arch-context orders
-- Extract arch-context inventory
-- Extract arch-context inventory
-
-  Context values are free-form strings naming the bounded context.
-
-</details>
-
-<details>
-<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
-
-#### AST parser extracts arch-layer from TypeScript annotations
-
-**Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
-
-**Verified by:**
-
-- Extract arch-layer application
-- Extract arch-layer infrastructure
-- Extract arch-layer infrastructure
-
-  Layer tags classify components by architectural layer.
-
-</details>
-
-<details>
-<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
-
-#### AST parser handles multiple arch tags together
-
-**Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
-
-**Verified by:**
-
-- Extract all three arch tags
-- Extract all three arch tags
-
-  Components often have role + context + layer together.
-
-</details>
-
-<details>
-<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
-
-#### Missing arch tags yield undefined values
-
-**Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
-
-**Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
-
-**Verified by:**
-
-- Missing arch tags are undefined
-- Missing arch tags are undefined
-
-  Components without arch tags should have undefined (not null or empty).
-
-</details>
-
-### ArchIndexDataset
-
-[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
-
-As a documentation generator
-I want an archIndex built during dataset transformation
-So that I can efficiently look up patterns by role, context, and layer
-
-<details>
-<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-role
-
-**Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
-
-**Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
-
-**Verified by:**
-
-- Group patterns by role
-- Group patterns by role
-
-  The archIndex.byRole map groups patterns by their architectural role
-  (command-handler
-
-- projection
-- saga
-- etc.) for efficient lookup.
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-context
-
-**Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
-
-**Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
-
-**Verified by:**
-
-- Group patterns by context
-- Group patterns by context
-
-  The archIndex.byContext map groups patterns by bounded context
-  for subgraph rendering in component diagrams.
-
-</details>
-
-<details>
-<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
-
-#### archIndex groups patterns by arch-layer
-
-**Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
-
-**Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
-
-**Verified by:**
-
-- Group patterns by layer
-- Group patterns by layer
-
-  The archIndex.byLayer map groups patterns by architectural layer
-  (domain
-
-- application
-- infrastructure) for layered diagram rendering.
-
-</details>
-
-<details>
-<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
-
-#### archIndex.all contains all patterns with any arch tag
-
-**Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
-
-**Verified by:**
-
-- archIndex.all includes all annotated patterns
-- archIndex.all includes all annotated patterns
-
-  The archIndex.all array contains all patterns that have at least
-  one arch tag (role
-
-- context
-- or layer). Patterns without any arch
-  tags are excluded.
-
-</details>
-
-<details>
-<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
-
-#### Patterns without arch tags are excluded from archIndex
-
-**Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
-
-**Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
-
-**Verified by:**
-
-- Non-annotated patterns excluded
-- Non-annotated patterns excluded
-
-  Patterns that have no arch-role
-
-- arch-context
-- or arch-layer are
-  not included in the archIndex at all.
-
-</details>
-
 ### TimelineCodecTesting
 
 [View TimelineCodecTesting source](tests/features/behavior/codecs/timeline-codecs.feature)
@@ -7275,6 +6770,618 @@ documents composed from any combination of existing codecs.
 **Verified by:**
 
 - Empty codec skipped without separator
+
+</details>
+
+### LayeredDiagramGeneration
+
+[View LayeredDiagramGeneration source](tests/features/behavior/architecture-diagrams/layered-diagram.feature)
+
+As a documentation generator
+I want to generate layered architecture diagrams from metadata
+So that system architecture is visualized by layer hierarchy
+
+<details>
+<summary>Layered diagrams group patterns by arch-layer (1 scenarios)</summary>
+
+#### Layered diagrams group patterns by arch-layer
+
+**Invariant:** Each distinct arch-layer value must produce exactly one Mermaid subgraph containing all patterns with that layer.
+
+**Verified by:**
+
+- Generate subgraphs for each layer
+- Generate subgraphs for each layer
+
+  Patterns with arch-layer are grouped into Mermaid subgraphs.
+  Each layer becomes a visual container.
+
+</details>
+
+<details>
+<summary>Layer order is domain to infrastructure (top to bottom) (1 scenarios)</summary>
+
+#### Layer order is domain to infrastructure (top to bottom)
+
+**Invariant:** Layer subgraphs must be rendered in Clean Architecture order: domain first, then application, then infrastructure.
+
+**Rationale:** The visual order reflects the dependency rule where outer layers depend on inner layers; reversing it would misrepresent the architecture.
+
+**Verified by:**
+
+- Layers render in correct order
+- Layers render in correct order
+
+  The layer subgraphs are rendered in Clean Architecture order:
+  domain at top
+
+- then application
+- then infrastructure at bottom.
+  This reflects the dependency rule: outer layers depend on inner layers.
+
+</details>
+
+<details>
+<summary>Context labels included in layered diagram nodes (1 scenarios)</summary>
+
+#### Context labels included in layered diagram nodes
+
+**Invariant:** Each node in a layered diagram must include its bounded context name as a label, since context is not conveyed by subgraph grouping.
+
+**Rationale:** Layered diagrams group by layer, not context, so the context label is the only way to identify which bounded context a node belongs to.
+
+**Verified by:**
+
+- Nodes include context labels
+- Nodes include context labels
+
+  Unlike component diagrams which group by context
+
+- layered diagrams
+  include the context as a label in each node name.
+
+</details>
+
+<details>
+<summary>Patterns without layer go to Other subgraph (1 scenarios)</summary>
+
+#### Patterns without layer go to Other subgraph
+
+**Invariant:** Patterns that have arch-role or arch-context but no arch-layer must be placed in an "Other" subgraph, never omitted from the diagram.
+
+**Rationale:** Omitting unlayered patterns would silently hide architectural components; the "Other" group makes their missing classification visible.
+
+**Verified by:**
+
+- Unlayered patterns in Other subgraph
+- Unlayered patterns in Other subgraph
+
+  Patterns that have arch-role or arch-context but no arch-layer
+  are grouped into an "Other" subgraph.
+
+</details>
+
+<details>
+<summary>Layered diagram includes summary section (1 scenarios)</summary>
+
+#### Layered diagram includes summary section
+
+**Invariant:** The generated layered diagram document must include an Overview section with annotated source file count.
+
+**Verified by:**
+
+- Summary section for layered view
+- Summary section for layered view
+
+  The generated document starts with an overview section
+  specific to layered architecture visualization.
+
+</details>
+
+### ArchGeneratorRegistration
+
+[View ArchGeneratorRegistration source](tests/features/behavior/architecture-diagrams/generator-registration.feature)
+
+As a CLI user
+I want an architecture generator registered in the generator registry
+So that I can run pnpm docs:architecture to generate diagrams
+
+<details>
+<summary>Architecture generator is registered in the registry (1 scenarios)</summary>
+
+#### Architecture generator is registered in the registry
+
+**Invariant:** The generator registry must contain an "architecture" generator entry available for CLI invocation.
+
+**Verified by:**
+
+- Generator is available in registry
+- Generator is available in registry
+
+  The architecture generator must be registered like other built-in
+  generators so it can be invoked via CLI.
+
+</details>
+
+<details>
+<summary>Architecture generator produces component diagram by default (1 scenarios)</summary>
+
+#### Architecture generator produces component diagram by default
+
+**Invariant:** Running the architecture generator without diagram type options must produce a component diagram with bounded context subgraphs.
+
+**Verified by:**
+
+- Default generation produces component diagram
+- Default generation produces component diagram
+
+  Running the architecture generator without options produces
+  a component diagram (bounded context view).
+
+</details>
+
+<details>
+<summary>Architecture generator supports diagram type options (1 scenarios)</summary>
+
+#### Architecture generator supports diagram type options
+
+**Invariant:** The architecture generator must accept a diagram type option that selects between component and layered diagram output.
+
+**Verified by:**
+
+- Generate layered diagram with options
+- Generate layered diagram with options
+
+  The generator accepts options to specify diagram type
+  (component or layered).
+
+</details>
+
+<details>
+<summary>Architecture generator supports context filtering (1 scenarios)</summary>
+
+#### Architecture generator supports context filtering
+
+**Invariant:** When context filtering is applied, the generated diagram must include only patterns from the specified bounded contexts and exclude all others.
+
+**Verified by:**
+
+- Filter to specific contexts
+- Filter to specific contexts
+
+  The generator can filter to specific bounded contexts
+  for focused diagram output.
+
+</details>
+
+### ComponentDiagramGeneration
+
+[View ComponentDiagramGeneration source](tests/features/behavior/architecture-diagrams/component-diagram.feature)
+
+As a documentation generator
+I want to generate component diagrams from architecture metadata
+So that system architecture is automatically visualized with bounded context subgraphs
+
+<details>
+<summary>Component diagrams group patterns by bounded context (1 scenarios)</summary>
+
+#### Component diagrams group patterns by bounded context
+
+**Invariant:** Each distinct arch-context value must produce exactly one Mermaid subgraph containing all patterns with that context.
+
+**Verified by:**
+
+- Generate subgraphs for bounded contexts
+- Generate subgraphs for bounded contexts
+
+  Patterns with arch-context are grouped into Mermaid subgraphs.
+  Each bounded context becomes a visual container.
+
+</details>
+
+<details>
+<summary>Context-less patterns go to Shared Infrastructure (1 scenarios)</summary>
+
+#### Context-less patterns go to Shared Infrastructure
+
+**Invariant:** Patterns without an arch-context value must be placed in a "Shared Infrastructure" subgraph, never omitted from the diagram.
+
+**Rationale:** Cross-cutting infrastructure components (event bus, logger) belong to no bounded context but must still appear in the diagram.
+
+**Verified by:**
+
+- Shared infrastructure subgraph for context-less patterns
+- Shared infrastructure subgraph for context-less patterns
+
+  Patterns without arch-context are grouped into a
+  "Shared Infrastructure" subgraph.
+
+</details>
+
+<details>
+<summary>Relationship types render with distinct arrow styles (1 scenarios)</summary>
+
+#### Relationship types render with distinct arrow styles
+
+**Invariant:** Each relationship type must render with its designated Mermaid arrow style: uses (-->), depends-on (-.->), implements (..->), extends (-->>).
+
+**Rationale:** Distinct arrow styles convey dependency semantics visually; conflating them loses architectural information.
+
+**Verified by:**
+
+- Arrow styles for relationship types
+- Arrow styles for relationship types
+
+  Arrow styles follow UML conventions:
+  - uses: solid arrow (-->)
+  - depends-on: dashed arrow (-.->)
+  - implements: dotted arrow (..->)
+  - extends: open arrow (-->>)
+
+</details>
+
+<details>
+<summary>Arrows only connect annotated components (1 scenarios)</summary>
+
+#### Arrows only connect annotated components
+
+**Invariant:** Relationship arrows must only be rendered when both source and target patterns exist in the architecture index.
+
+**Rationale:** Rendering an arrow to a non-existent node would produce invalid Mermaid syntax or dangling references.
+
+**Verified by:**
+
+- Skip arrows to non-annotated targets
+- Skip arrows to non-annotated targets
+
+  Relationships pointing to non-annotated patterns
+  are not rendered (target would not exist in diagram).
+
+</details>
+
+<details>
+<summary>Component diagram includes summary section (1 scenarios)</summary>
+
+#### Component diagram includes summary section
+
+**Invariant:** The generated component diagram document must include an Overview section with component count and bounded context count.
+
+**Verified by:**
+
+- Summary section with counts
+- Summary section with counts
+
+  The generated document starts with an overview section
+  showing component counts and bounded context statistics.
+
+</details>
+
+<details>
+<summary>Component diagram includes legend when enabled (1 scenarios)</summary>
+
+#### Component diagram includes legend when enabled
+
+**Invariant:** When the legend is enabled, the document must include a Legend section explaining relationship arrow styles.
+
+**Verified by:**
+
+- Legend section with arrow explanations
+- Legend section with arrow explanations
+
+  The legend explains arrow style meanings for readers.
+
+</details>
+
+<details>
+<summary>Component diagram includes inventory table when enabled (1 scenarios)</summary>
+
+#### Component diagram includes inventory table when enabled
+
+**Invariant:** When the inventory is enabled, the document must include a Component Inventory table with Component, Context, Role, and Layer columns.
+
+**Verified by:**
+
+- Inventory table with component details
+- Inventory table with component details
+
+  The inventory lists all components with their metadata.
+
+</details>
+
+<details>
+<summary>Empty architecture data shows guidance message (1 scenarios)</summary>
+
+#### Empty architecture data shows guidance message
+
+**Invariant:** When no patterns have architecture annotations, the document must display a guidance message explaining how to add arch tags.
+
+**Rationale:** An empty diagram with no explanation would be confusing; guidance helps users onboard to the annotation system.
+
+**Verified by:**
+
+- No architecture data message
+- No architecture data message
+
+  If no patterns have architecture annotations
+
+- the document explains how to add them.
+
+</details>
+
+### ArchTagExtraction
+
+[View ArchTagExtraction source](tests/features/behavior/architecture-diagrams/arch-tag-extraction.feature)
+
+As a documentation generator
+I want architecture tags extracted from source code
+So that I can generate accurate architecture diagrams
+
+<details>
+<summary>arch-role tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-role tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-role tag with enum format and all valid architectural role values.
+
+**Rationale:** Without a registry-defined arch-role tag, the extractor cannot validate role values and diagrams may render invalid roles.
+
+**Verified by:**
+
+- arch-role tag exists with enum format
+- arch-role has required enum values
+- arch-role has required enum values
+
+  Architecture roles classify components for diagram rendering.
+  Valid roles: command-handler
+
+- projection
+- saga
+- process-manager
+- infrastructure
+- repository
+- decider
+- read-model
+- bounded-context.
+
+</details>
+
+<details>
+<summary>arch-context tag is defined in the registry (1 scenarios)</summary>
+
+#### arch-context tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-context tag with value format for free-form bounded context names.
+
+**Verified by:**
+
+- arch-context tag exists with value format
+- arch-context tag exists with value format
+
+  Context tags group components into bounded context subgraphs.
+  Format is "value" (free-form string like "orders"
+
+- "inventory").
+
+</details>
+
+<details>
+<summary>arch-layer tag is defined in the registry (2 scenarios)</summary>
+
+#### arch-layer tag is defined in the registry
+
+**Invariant:** The tag registry must contain an arch-layer tag with enum format and exactly three values: domain, application, infrastructure.
+
+**Verified by:**
+
+- arch-layer tag exists with enum format
+- arch-layer has exactly three values
+- arch-layer has exactly three values
+
+  Layer tags enable layered architecture diagrams.
+  Valid layers: domain
+
+- application
+- infrastructure.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-role from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-role from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-role value from JSDoc annotations and populate the directive's archRole field.
+
+**Verified by:**
+
+- Extract arch-role projection
+- Extract arch-role command-handler
+- Extract arch-role command-handler
+
+  The AST parser must extract arch-role alongside other pattern metadata.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-context from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-context from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-context value from JSDoc annotations and populate the directive's archContext field.
+
+**Verified by:**
+
+- Extract arch-context orders
+- Extract arch-context inventory
+- Extract arch-context inventory
+
+  Context values are free-form strings naming the bounded context.
+
+</details>
+
+<details>
+<summary>AST parser extracts arch-layer from TypeScript annotations (2 scenarios)</summary>
+
+#### AST parser extracts arch-layer from TypeScript annotations
+
+**Invariant:** The AST parser must extract the arch-layer value from JSDoc annotations and populate the directive's archLayer field.
+
+**Verified by:**
+
+- Extract arch-layer application
+- Extract arch-layer infrastructure
+- Extract arch-layer infrastructure
+
+  Layer tags classify components by architectural layer.
+
+</details>
+
+<details>
+<summary>AST parser handles multiple arch tags together (1 scenarios)</summary>
+
+#### AST parser handles multiple arch tags together
+
+**Invariant:** When a JSDoc block contains arch-role, arch-context, and arch-layer tags, all three must be extracted into the directive.
+
+**Verified by:**
+
+- Extract all three arch tags
+- Extract all three arch tags
+
+  Components often have role + context + layer together.
+
+</details>
+
+<details>
+<summary>Missing arch tags yield undefined values (1 scenarios)</summary>
+
+#### Missing arch tags yield undefined values
+
+**Invariant:** Arch tag fields absent from a JSDoc block must be undefined in the extracted directive, not null or empty string.
+
+**Rationale:** Downstream consumers distinguish between "not annotated" (undefined) and "annotated with empty value" to avoid rendering ghost nodes.
+
+**Verified by:**
+
+- Missing arch tags are undefined
+- Missing arch tags are undefined
+
+  Components without arch tags should have undefined (not null or empty).
+
+</details>
+
+### ArchIndexDataset
+
+[View ArchIndexDataset source](tests/features/behavior/architecture-diagrams/arch-index.feature)
+
+As a documentation generator
+I want an archIndex built during dataset transformation
+So that I can efficiently look up patterns by role, context, and layer
+
+<details>
+<summary>archIndex groups patterns by arch-role (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-role
+
+**Invariant:** Every pattern with an arch-role tag must appear in the archIndex.byRole map under its role key.
+
+**Rationale:** Diagram generators need O(1) lookup of patterns by role to render role-based groupings efficiently.
+
+**Verified by:**
+
+- Group patterns by role
+- Group patterns by role
+
+  The archIndex.byRole map groups patterns by their architectural role
+  (command-handler
+
+- projection
+- saga
+- etc.) for efficient lookup.
+
+</details>
+
+<details>
+<summary>archIndex groups patterns by arch-context (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-context
+
+**Invariant:** Every pattern with an arch-context tag must appear in the archIndex.byContext map under its context key.
+
+**Rationale:** Component diagrams render bounded context subgraphs and need patterns grouped by context.
+
+**Verified by:**
+
+- Group patterns by context
+- Group patterns by context
+
+  The archIndex.byContext map groups patterns by bounded context
+  for subgraph rendering in component diagrams.
+
+</details>
+
+<details>
+<summary>archIndex groups patterns by arch-layer (1 scenarios)</summary>
+
+#### archIndex groups patterns by arch-layer
+
+**Invariant:** Every pattern with an arch-layer tag must appear in the archIndex.byLayer map under its layer key.
+
+**Rationale:** Layered diagrams render layer subgraphs and need patterns grouped by architectural layer.
+
+**Verified by:**
+
+- Group patterns by layer
+- Group patterns by layer
+
+  The archIndex.byLayer map groups patterns by architectural layer
+  (domain
+
+- application
+- infrastructure) for layered diagram rendering.
+
+</details>
+
+<details>
+<summary>archIndex.all contains all patterns with any arch tag (1 scenarios)</summary>
+
+#### archIndex.all contains all patterns with any arch tag
+
+**Invariant:** archIndex.all must contain exactly the set of patterns that have at least one arch tag (role, context, or layer).
+
+**Verified by:**
+
+- archIndex.all includes all annotated patterns
+- archIndex.all includes all annotated patterns
+
+  The archIndex.all array contains all patterns that have at least
+  one arch tag (role
+
+- context
+- or layer). Patterns without any arch
+  tags are excluded.
+
+</details>
+
+<details>
+<summary>Patterns without arch tags are excluded from archIndex (1 scenarios)</summary>
+
+#### Patterns without arch tags are excluded from archIndex
+
+**Invariant:** Patterns lacking all three arch tags (role, context, layer) must not appear in any archIndex view.
+
+**Rationale:** Including non-architectural patterns would pollute diagrams with irrelevant components.
+
+**Verified by:**
+
+- Non-annotated patterns excluded
+- Non-annotated patterns excluded
+
+  Patterns that have no arch-role
+
+- arch-context
+- or arch-layer are
+  not included in the archIndex at all.
 
 </details>
 

@@ -7,11 +7,11 @@
 
 ## Overview
 
-This diagram was auto-generated from 140 annotated source files across 11 bounded contexts.
+This diagram was auto-generated from 143 annotated source files across 11 bounded contexts.
 
 | Metric | Count |
 | --- | --- |
-| Total Components | 140 |
+| Total Components | 143 |
 | Bounded Contexts | 11 |
 | Component Roles | 5 |
 
@@ -177,11 +177,6 @@ graph TB
         CodecUtils["CodecUtils"]
         DoDValidationTypes["DoDValidationTypes"]
         ValidationModule["ValidationModule"]
-        ResultMonadTypes["ResultMonadTypes"]
-        ErrorFactoryTypes["ErrorFactoryTypes"]
-        RenderableUtils["RenderableUtils"]
-        SectionBlock["SectionBlock"]
-        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         StatusValues["StatusValues"]
         RiskLevels["RiskLevels"]
         NormalizedStatus["NormalizedStatus"]
@@ -190,6 +185,11 @@ graph TB
         FormatTypes["FormatTypes"]
         DeliverableStatusTaxonomy["DeliverableStatusTaxonomy"]
         CategoryDefinition["CategoryDefinition"]
+        ResultMonadTypes["ResultMonadTypes"]
+        ErrorFactoryTypes["ErrorFactoryTypes"]
+        RenderableUtils["RenderableUtils"]
+        SectionBlock["SectionBlock"]
+        RenderableDocumentModel_RDM_["RenderableDocumentModel(RDM)"]
         LintModule["LintModule"]
         WarningCollector["WarningCollector"]
         GeneratorTypes["GeneratorTypes"]
@@ -230,21 +230,24 @@ graph TB
         BuiltInGenerators["BuiltInGenerators"]
         CodecGeneratorRegistration["CodecGeneratorRegistration"]
         CodecBaseOptions["CodecBaseOptions"]
+        ADR006SingleReadModelArchitecture["ADR006SingleReadModelArchitecture"]
         ADR005CodecBasedMarkdownRendering["ADR005CodecBasedMarkdownRendering"]
         ADR003SourceFirstPatternArchitecture["ADR003SourceFirstPatternArchitecture"]
         ADR002GherkinOnlyTesting["ADR002GherkinOnlyTesting"]
         ADR001TaxonomyCanonicalValues["ADR001TaxonomyCanonicalValues"]
+        ValidatorReadModelConsolidation["ValidatorReadModelConsolidation"]
         StepDefinitionCompletion["StepDefinitionCompletion"]
         SessionFileCleanup["SessionFileCleanup"]
+        ProcessAPILayeredExtraction["ProcessAPILayeredExtraction"]
         MvpWorkflowImplementation["MvpWorkflowImplementation"]
         LivingRoadmapCLI["LivingRoadmapCLI"]
         EffortVarianceTracking["EffortVarianceTracking"]
         ConfigBasedWorkflowDefinition["ConfigBasedWorkflowDefinition"]
         CliBehaviorTesting["CliBehaviorTesting"]
-        StringUtils["StringUtils"]
         ProcessGuardTesting["ProcessGuardTesting"]
         ResultMonad["ResultMonad"]
         ErrorFactories["ErrorFactories"]
+        StringUtils["StringUtils"]
         SessionHandoffs["SessionHandoffs"]
         SessionFileLifecycle["SessionFileLifecycle"]
         KebabCaseSlugs["KebabCaseSlugs"]
@@ -256,10 +259,10 @@ graph TB
     DoDValidator --> DoDValidationTypes
     DoDValidator --> DualSourceExtractor
     AntiPatternDetector --> DoDValidationTypes
-    ResultMonadTypes ..-> ResultMonad
-    ErrorFactoryTypes ..-> ErrorFactories
     GherkinScanner --> GherkinASTParser
     TypeScript_AST_Parser --> DocDirectiveSchema
+    ResultMonadTypes ..-> ResultMonad
+    ErrorFactoryTypes ..-> ErrorFactories
     LintModule --> LintRules
     LintModule --> LintEngine
     LintEngine --> LintRules
@@ -339,9 +342,12 @@ graph TB
     BuiltInGenerators --> CodecBasedGenerator
     DecisionDocGenerator -.-> DecisionDocCodec
     DecisionDocGenerator -.-> SourceMapper
+    ADR006SingleReadModelArchitecture -.-> ADR005CodecBasedMarkdownRendering
     ADR003SourceFirstPatternArchitecture -.-> ADR001TaxonomyCanonicalValues
+    ValidatorReadModelConsolidation -.-> ADR006SingleReadModelArchitecture
     StepDefinitionCompletion -.-> ADR002GherkinOnlyTesting
     SessionFileCleanup -.-> SessionFileLifecycle
+    ProcessAPILayeredExtraction -.-> ValidatorReadModelConsolidation
     LivingRoadmapCLI -.-> MvpWorkflowImplementation
     EffortVarianceTracking -.-> MvpWorkflowImplementation
     ConfigBasedWorkflowDefinition -.-> MvpWorkflowImplementation
@@ -433,6 +439,7 @@ All components with architecture annotations:
 | ✅ ADR 002 Gherkin Only Testing | - | - | - | delivery-process/decisions/adr-002-gherkin-only-testing.feature |
 | 📋 ADR 003 Source First Pattern Architecture | - | - | - | delivery-process/decisions/adr-003-source-first-pattern-architecture.feature |
 | ✅ ADR 005 Codec Based Markdown Rendering | - | - | - | delivery-process/decisions/adr-005-codec-based-markdown-rendering.feature |
+| ✅ ADR 006 Single Read Model Architecture | - | - | - | delivery-process/decisions/adr-006-single-read-model-architecture.feature |
 | ✅ Adr Document Codec | - | - | - | src/renderable/codecs/adr.ts |
 | 🚧 API Module | - | - | - | src/api/index.ts |
 | ✅ Built In Generators | - | - | - | src/generators/built-in/index.ts |
@@ -477,6 +484,7 @@ All components with architecture annotations:
 | ✅ Pipeline Module | - | - | - | src/generators/pipeline/index.ts |
 | ✅ Planning Codecs | - | - | - | src/renderable/codecs/planning.ts |
 | ✅ Pr Changes Codec | - | - | - | src/renderable/codecs/pr-changes.ts |
+| 📋 Process API Layered Extraction | - | - | - | delivery-process/specs/process-api-layered-extraction.feature |
 | 🚧 Process Guard Module | - | - | - | src/lint/process-guard/index.ts |
 | ✅ Process Guard Testing | - | - | - | tests/features/validation/process-guard.feature |
 | 🚧 Process Guard Types | - | - | - | src/lint/process-guard/types.ts |
@@ -509,5 +517,6 @@ All components with architecture annotations:
 | ✅ Validate Patterns CLI | - | - | - | src/cli/validate-patterns.ts |
 | ✅ Validation Module | - | - | - | src/validation/index.ts |
 | ✅ Validation Rules Codec | - | - | - | src/renderable/codecs/validation-rules.ts |
+| 📋 Validator Read Model Consolidation | - | - | - | delivery-process/specs/validator-read-model-consolidation.feature |
 | ✅ Warning Collector | - | - | - | src/generators/warning-collector.ts |
 | ✅ Workflow Config Schema | - | - | - | src/validation-schemas/workflow-config.ts |
